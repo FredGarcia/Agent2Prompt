@@ -1,8 +1,8 @@
 # Régulation de second niveau inter-agents
 
-Dimensions D8, D9 et D10 du registre de `SKILL.md` (section 17, version 2.1.0). Statut en 2.1.0 : `reserved`. Elles s'activent en version 3.0. Les points d'extension qui les préparent (E1 à E5, section 17.4 du SKILL) sont posés dès la version 2.1.0.
+Dimensions D8, D9 et D10 du registre de `SKILL.md` (section 5, version 2.2.0). Statut en 2.2.0 : `reserved`, déclarées dans `manifest.json`. Elles s'activent en version 3.0. Les points d'extension qui les préparent sont décrits dans `SKILL.md`, section 6.2 : E1 à E5 depuis la 2.1.0, E6 depuis la 2.2.0.
 
-Cette section remplace, pour la communication entre agents, les sections 8 (canal unique), 13 (répartition) et 16 (hors périmètre) de la version 2.0.0, archivée dans `SKILL-v2.md`.
+Cette section remplace, pour la communication entre agents, le canal unique, la répartition des agents et le périmètre hors version qui figuraient dans la version 2.0.0 (`archives/SKILL-v2.0.0.md`).
 
 ## 0. Décisions retenues
 
@@ -21,11 +21,11 @@ Distinction centrale :
 
 ## 2. Enveloppe d'autonomie
 
-Les règles sont classées en trois catégories. Les bornes sont déclarées dans `src/core/bounds.js` (point d'extension E4 du SKILL, section 17.4), un module que le méta-niveau ne peut pas modifier. Seul un commit relu par le développeur peut les changer.
+Les règles sont classées en trois catégories. Les bornes sont déclarées dans `src/core/bounds.js` (point d'extension E4 de `SKILL.md`, section 6.2, et module `etats`), un module que le méta-niveau ne peut pas modifier. Seul un commit relu par le développeur peut les changer.
 
 | Catégorie | Exemples | Pouvoir du méta-niveau |
 |---|---|---|
-| Intangibles | HMAC, écoute sur `127.0.0.1`, interdits Git de la section 9 du SKILL, journal en ajout seul, listes `sensitive` et `generated` | Aucun, à l'exécution |
+| Intangibles | HMAC, écoute sur `127.0.0.1`, interdits Git du module `effecteur-gitlab`, journal en ajout seul, listes `sensitive` et `generated` | Aucun, à l'exécution |
 | Bornées | `seuil` (150 à 500), `tStabMin` (5 à 30), `tGelMin` (15 à 120), `tVolatileH` (6 à 72), `fetchIntervalSec` (30 à 300) | Modifier, dans les bornes, au plus une fois par paramètre et par 24 h |
 | De coordination | ordre de réponse entre agents, temporisation entre messages, plafond de messages par fil et par heure (bornes : 5 à 60) | Créer et modifier, dans les bornes |
 
@@ -89,7 +89,7 @@ Le rapport est déterministe : à partir du même journal, il produit le même c
 
 ## 7. Communication directe entre agents
 
-- Même enveloppe HMAC que la section 8 du SKILL, complétée par deux champs : `to` (agent destinataire) et `thread` (identifiant de la conversation). Ces deux champs sont réservés en 2.x (point E2) : un message qui les porte est rejeté. Ils sont activés en 3.0.
+- Même enveloppe HMAC que le module `messagerie`, complétée par deux champs : `to` (agent destinataire) et `thread` (identifiant de la conversation). Ces deux champs sont réservés en 2.x (point E2) : un message qui les porte est rejeté. Ils sont activés en 3.0.
 - Un agent peut demander une information, signaler un état, proposer une option.
 - Un agent ne peut ni engager une action sur un fichier qui relève d'un autre agent, ni répondre à un arbitrage à la place du développeur.
 - Toute demande d'arbitrage de contenu déclenche `ARBITRATION_NEEDED` vers le développeur. L'échange sur ce fil est alors suspendu.

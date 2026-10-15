@@ -1,0 +1,26 @@
+{
+  "name": "tension-dashboard-gitlab-agent",
+  "version": "2.2.0",
+  "specSchema": 1,
+  "language": "fr",
+  "description": "Agent de surveillance des fichiers sous tension, tableau de bord et assistant GitLab à garde-fous.",
+  "entry": "SKILL.md",
+  "runtime": {
+    "node": ">=20",
+    "git": ">=2.38"
+  },
+  "modules": [
+    { "id": "tension", "path": "modules/tension/SKILL.md", "dimensions": ["D1"], "status": "active" },
+    { "id": "etats", "path": "modules/etats/SKILL.md", "dimensions": ["D2"], "status": "active" },
+    { "id": "verdict-journal", "path": "modules/verdict-journal/SKILL.md", "dimensions": ["D5", "D6"], "status": "active" },
+    { "id": "messagerie", "path": "modules/messagerie/SKILL.md", "dimensions": ["D3", "D7"], "status": "active" },
+    { "id": "dashboard", "path": "modules/dashboard/SKILL.md", "dimensions": ["D3"], "status": "active" },
+    { "id": "effecteur-gitlab", "path": "modules/effecteur-gitlab/SKILL.md", "dimensions": ["D4"], "status": "active" },
+    { "id": "regulation-inter-agents", "path": "regulation-inter-agents.md", "dimensions": ["D8", "D9", "D10"], "status": "reserved", "activation": "3.0.0" }
+  ],
+  "extensionPoints": ["E1", "E2", "E3", "E4", "E5", "E6"],
+  "previousVersions": [
+    { "version": "2.1.0", "file": "archives/SKILL-v2.1.0.md" },
+    { "version": "2.0.0", "file": "archives/SKILL-v2.0.0.md" }
+  ]
+}
