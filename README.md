@@ -27,7 +27,7 @@ Agent2Prompt/
 ├── transmissions/
 │   └── <nom>-X.Y.Z.md           texte unique remis à l'IA, une par version
 └── tools/
-    └── bundle.py                assemblage d'une transmission
+    └── bundle.mjs               assemblage d'une transmission (Node)
 ```
 
 ## Transmettre une spécification
@@ -41,10 +41,10 @@ Coller le contenu du fichier de `transmissions/` dans l'IA du développeur. Aucu
 ## Générer une transmission
 
 ```bash
-python3 tools/bundle.py specs/tension-dashboard-gitlab-agent
+node tools/bundle.mjs specs/tension-dashboard-gitlab-agent
 ```
 
-Le script lit `manifest.json`, écrit `transmissions/<nom>-<version>.md` et échoue si le texte ne redonne pas exactement chaque fichier. Il n'utilise que la bibliothèque standard de Python 3.
+Le script lit `manifest.json`, écrit `transmissions/<nom>-<version>.md` et échoue si le texte ne redonne pas exactement chaque fichier. Il demande Node 20 ou plus récent et n'utilise que les modules natifs (`node:fs`, `node:crypto`, `node:path`), sans `npm install`.
 
 ## Faire évoluer une spécification
 

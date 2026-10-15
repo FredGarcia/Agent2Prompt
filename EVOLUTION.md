@@ -63,7 +63,7 @@ La spécification n'évolue pas seule. Elle est corrigée par ce que révèle so
 
 ```mermaid
 flowchart LR
-  V["Spécification vN<br/>specs/&lt;nom&gt;/"] --> B["tools/bundle.py"]
+  V["Spécification vN<br/>specs/&lt;nom&gt;/"] --> B["tools/bundle.mjs"]
   B --> T["Transmission texte<br/>transmissions/&lt;nom&gt;-vN.md"]
   T --> IA["IA du développeur<br/>matérialise spec/, implémente"]
   IA --> CR["Comptes rendus par étape<br/>invariants, tests, écarts"]
@@ -102,7 +102,7 @@ Procédure, dans cet ordre :
 3. Mettre à jour `version` dans le frontmatter du `SKILL.md` racine et dans `manifest.json`, ainsi que `previousVersions`.
 4. Ajouter l'entrée au journal de révision du `SKILL.md` et à `CHANGELOG.md`.
 5. Vérifier : chaque invariant défini apparaît dans au moins un scénario ; chaque chemin du manifeste existe ; les blocs de code sont fermés.
-6. Régénérer la transmission : `python3 tools/bundle.py specs/<nom>`. Le script échoue si l'aller-retour n'est pas identique.
+6. Régénérer la transmission : `node tools/bundle.mjs specs/<nom>`. Le script échoue si l'aller-retour n'est pas identique.
 7. Commiter la version seule, avec un message `spec(<nom>): version X.Y.Z, <résumé>`, puis la transmission.
 8. Ouvrir une pull request ; le développeur ratifie avant fusion.
 

@@ -4,9 +4,13 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## tension-dashboard-gitlab-agent
 
+### 2026-10-16 : outil de transmission en Node
+
+- `tools/bundle.py` est remplacé par `tools/bundle.mjs` (Node 20 ou plus récent, modules natifs uniquement), cohérent avec la chaîne Node et Angular du projet. La sortie est identique octet pour octet à celle de la version Python.
+
 ### 2026-10-16 : transmission texte
 
-- Ajout de `tools/bundle.py` : assemble une spécification modulaire en un texte unique, avec table d'intégrité sha256 et vérification de l'aller-retour.
+- Ajout de `tools/bundle.py` (remplacé depuis par `tools/bundle.mjs`) : assemble une spécification modulaire en un texte unique, avec table d'intégrité sha256 et vérification de l'aller-retour.
 - Ajout de `ENTETE-TRANSMISSION.md` : consigne pour l'IA du développeur (matérialiser `spec/`, lire, planifier, implémenter par étapes en commençant par le noyau).
 - Première transmission : `transmissions/tension-dashboard-gitlab-agent-2.2.0.md`.
 - Décision : seul du texte est transmis ; l'IA construit elle-même le package et le code. Le prompt d'amorçage intermédiaire, qui supposait un dossier joint, est remplacé par cet en-tête et n'a pas été versionné.
