@@ -119,7 +119,9 @@ function verifierSpec(dossier) {
     if (frontmatter(texte).version !== partage.version) {
       erreur(`${partage.from} n'est pas en version ${partage.version}`);
     }
-    for (const id of definitions(texte)) definis.add(id);
+    // Seuls les identifiants hors de l'espace local `Dn` sont importés (ceux du socle, `SCn`) :
+    // un référentiel d'expert inclus définit aussi des `Dn`, qui masqueraient une faute de frappe locale.
+    for (const id of definitions(texte)) if (!id.startsWith('D')) definis.add(id);
   }
   for (const reference of manifeste.references ?? []) {
     const chemin = join(dossierSpecs, reference.name, 'manifest.json');
