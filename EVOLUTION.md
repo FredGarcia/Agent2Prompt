@@ -126,6 +126,7 @@ flowchart LR
 - Un socle se marque `"transmissible": false` : il n'a de sens qu'inclus.
 - Une référence (`references`) cite un skill dont on reprend les règles, à une version donnée. Si le skill référencé change de version, le skill qui le cite doit être revu et sa référence mise à jour.
 - Les identifiants d'un autre skill sont toujours préfixés par son nom (`expert-java:D4.INV-2`), pour ne jamais se confondre avec les invariants locaux.
+- Un skill peut inclure le point d'entrée d'un autre skill comme **référentiel** (par exemple `references/expert-java.md` dans l'expert SonarQube) : il en lit les invariants sans en adopter le mode de travail, ce que son en-tête de transmission précise. Le vérificateur n'importe depuis les fichiers partagés que les identifiants du socle (`SCn`) : les `Dn` d'un référentiel ne peuvent pas masquer une faute de frappe sur un invariant local.
 
 ## 9. Ajouter une nouvelle spécification
 

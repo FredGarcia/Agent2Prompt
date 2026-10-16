@@ -12,8 +12,9 @@ Chaque spécification est un package modulaire versionné : un point d'entrée, 
 | [`expert-java`](specs/expert-java/SKILL.md) | 1.0.0 | [`transmissions/expert-java-1.0.0.md`](transmissions/expert-java-1.0.0.md) | Produire et relire un back Java 21, Spring Boot 3.5, PostgreSQL |
 | [`expert-angular`](specs/expert-angular/SKILL.md) | 1.0.0 | [`transmissions/expert-angular-1.0.0.md`](transmissions/expert-angular-1.0.0.md) | Produire et relire un front Angular 20, accessibilité RGAA et WCAG comprise |
 | [`expert-analyse-projet`](specs/expert-analyse-projet/SKILL.md) | 1.0.0 | [`transmissions/expert-analyse-projet-1.0.0.md`](transmissions/expert-analyse-projet-1.0.0.md) | Analyser un projet back et front en lecture seule : cartographie, rapport et feuille de route, ou plans d'action |
+| [`expert-sonarqube`](specs/expert-sonarqube/SKILL.md) | 1.0.0 | [`transmissions/expert-sonarqube-1.0.0.md`](transmissions/expert-sonarqube-1.0.0.md) | SonarQube Server 2026.x : configurer l'analyse et la CI GitLab, trier, corriger ou planifier, gouverner la qualité |
 
-Socle partagé, non transmis seul : [`socle-back-front`](specs/socle-back-front/SKILL.md) 1.0.0 (contrat OpenAPI, erreurs RFC 9457, formats, sécurité, traçabilité, accessibilité). Il est inclus, à une version épinglée, dans chaque transmission des trois experts, qui restent ainsi autonomes et cohérents entre eux.
+Socle partagé, non transmis seul : [`socle-back-front`](specs/socle-back-front/SKILL.md) 1.0.0 (contrat OpenAPI, erreurs RFC 9457, formats, sécurité, traçabilité, accessibilité). Il est inclus, à une version épinglée, dans chaque transmission des experts, qui restent ainsi autonomes et cohérents entre eux. L'expert SonarQube inclut en plus les points d'entrée des experts Java et Angular comme référentiels d'invariants : une correction faite à partir de SonarQube respecte les mêmes règles qu'une correction faite par l'expert du langage.
 
 ```mermaid
 flowchart LR
@@ -22,6 +23,11 @@ flowchart LR
   SOCLE -->|"inclus, épinglé"| AN["expert-analyse-projet 1.0.0"]
   AN -.->|"référence, plans d'action"| J
   AN -.->|"référence, plans d'action"| A
+  SOCLE -->|"inclus, épinglé"| SQ["expert-sonarqube 1.0.0"]
+  J -->|"inclus comme référentiel"| SQ
+  A -->|"inclus comme référentiel"| SQ
+  SQ -.->|"plans d'action"| J
+  SQ -.->|"plans d'action"| A
 ```
 
 ## Structure du dépôt
