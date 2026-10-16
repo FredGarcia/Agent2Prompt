@@ -9,25 +9,31 @@ Chaque spécification est un package modulaire versionné : un point d'entrée, 
 | Spécification | Version | Transmission | Objet |
 |---|---|---|---|
 | [`tension-dashboard-gitlab-agent`](specs/tension-dashboard-gitlab-agent/SKILL.md) | 2.2.0 | [`transmissions/tension-dashboard-gitlab-agent-2.2.0.md`](transmissions/tension-dashboard-gitlab-agent-2.2.0.md) | Fichiers sous tension entre local et distant, tableau de bord temps réel, assistant GitLab à garde-fous |
-| [`expert-java`](specs/expert-java/SKILL.md) | 1.0.0 | [`transmissions/expert-java-1.0.0.md`](transmissions/expert-java-1.0.0.md) | Produire et relire un back Java 21, Spring Boot 3.5, PostgreSQL |
+| [`expert-java`](specs/expert-java/SKILL.md) | 1.1.0 | [`transmissions/expert-java-1.1.0.md`](transmissions/expert-java-1.1.0.md) | Produire et relire un back Java 21, Spring Boot 3.5, PostgreSQL, migrations Flyway ou Liquibase |
 | [`expert-angular`](specs/expert-angular/SKILL.md) | 1.0.0 | [`transmissions/expert-angular-1.0.0.md`](transmissions/expert-angular-1.0.0.md) | Produire et relire un front Angular 20, accessibilité RGAA et WCAG comprise |
-| [`expert-analyse-projet`](specs/expert-analyse-projet/SKILL.md) | 1.0.0 | [`transmissions/expert-analyse-projet-1.0.0.md`](transmissions/expert-analyse-projet-1.0.0.md) | Analyser un projet back et front en lecture seule : cartographie, rapport et feuille de route, ou plans d'action |
-| [`expert-sonarqube`](specs/expert-sonarqube/SKILL.md) | 1.0.0 | [`transmissions/expert-sonarqube-1.0.0.md`](transmissions/expert-sonarqube-1.0.0.md) | SonarQube Server 2026.x : configurer l'analyse et la CI GitLab, trier, corriger ou planifier, gouverner la qualité |
+| [`expert-analyse-projet`](specs/expert-analyse-projet/SKILL.md) | 1.0.1 | [`transmissions/expert-analyse-projet-1.0.1.md`](transmissions/expert-analyse-projet-1.0.1.md) | Analyser un projet back et front en lecture seule : cartographie, rapport et feuille de route, ou plans d'action |
+| [`expert-sonarqube`](specs/expert-sonarqube/SKILL.md) | 1.0.1 | [`transmissions/expert-sonarqube-1.0.1.md`](transmissions/expert-sonarqube-1.0.1.md) | SonarQube Server 2026.x : configurer l'analyse et la CI GitLab, trier, corriger ou planifier, gouverner la qualité |
+| [`agent-tdd-jira`](specs/agent-tdd-jira/SKILL.md) | 1.0.0 | [`transmissions/agent-tdd-jira-1.0.0.md`](transmissions/agent-tdd-jira-1.0.0.md) | Développement TDD à partir d'une demande Jira en MHTML : analyse avec commentaires, scénarios Gherkin, variantes back et front, cycle rouge, vert, remanié, traçabilité |
+
+Les transmissions des versions précédentes restent dans `transmissions/` : elles sont la trace exacte de ce qui a été remis à une IA.
 
 Socle partagé, non transmis seul : [`socle-back-front`](specs/socle-back-front/SKILL.md) 1.0.0 (contrat OpenAPI, erreurs RFC 9457, formats, sécurité, traçabilité, accessibilité). Il est inclus, à une version épinglée, dans chaque transmission des experts, qui restent ainsi autonomes et cohérents entre eux. L'expert SonarQube inclut en plus les points d'entrée des experts Java et Angular comme référentiels d'invariants : une correction faite à partir de SonarQube respecte les mêmes règles qu'une correction faite par l'expert du langage.
 
 ```mermaid
 flowchart LR
-  SOCLE["socle-back-front 1.0.0"] -->|"inclus, épinglé"| J["expert-java 1.0.0"]
+  SOCLE["socle-back-front 1.0.0"] -->|"inclus, épinglé"| J["expert-java 1.1.0"]
   SOCLE -->|"inclus, épinglé"| A["expert-angular 1.0.0"]
-  SOCLE -->|"inclus, épinglé"| AN["expert-analyse-projet 1.0.0"]
+  SOCLE -->|"inclus, épinglé"| AN["expert-analyse-projet 1.0.1"]
   AN -.->|"référence, plans d'action"| J
   AN -.->|"référence, plans d'action"| A
-  SOCLE -->|"inclus, épinglé"| SQ["expert-sonarqube 1.0.0"]
+  SOCLE -->|"inclus, épinglé"| SQ["expert-sonarqube 1.0.1"]
   J -->|"inclus comme référentiel"| SQ
   A -->|"inclus comme référentiel"| SQ
   SQ -.->|"plans d'action"| J
   SQ -.->|"plans d'action"| A
+  SOCLE -->|"inclus, épinglé"| TDD["agent-tdd-jira 1.0.0"]
+  J -->|"inclus comme référentiel"| TDD
+  A -->|"inclus comme référentiel"| TDD
 ```
 
 ## Structure du dépôt
