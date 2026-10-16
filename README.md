@@ -61,7 +61,7 @@ node tools/bundle.mjs specs/tension-dashboard-gitlab-agent
 node tools/bundle.mjs specs/expert-java
 ```
 
-`verifier.mjs` contrôle les manifestes, les versions, les modules, les fichiers partagés épinglés, les blocs de code et les invariants (chaque invariant défini est repris dans un module, chaque invariant cité est défini). `bundle.mjs` lit `manifest.json`, insère les fichiers partagés, écrit `transmissions/<nom>-<version>.md` et échoue si une version épinglée ne correspond pas ou si le texte ne redonne pas exactement chaque fichier. Les deux scripts demandent Node 20 ou plus récent et n'utilise que les modules natifs (`node:fs`, `node:crypto`, `node:path`), sans `npm install`.
+`verifier.mjs` contrôle les manifestes, les versions, les modules, les fichiers partagés épinglés, les blocs de code et les invariants (chaque invariant défini est repris dans un module, chaque invariant cité est défini). `bundle.mjs` lit `manifest.json`, insère les fichiers partagés, écrit `transmissions/<nom>-<version>.md` et échoue si une version épinglée ne correspond pas ou si le texte ne redonne pas exactement chaque fichier. Les deux scripts demandent Node 20 ou plus récent et n'utilisent que les modules natifs (`node:fs`, `node:crypto`, `node:path`), sans `npm install`.
 
 ## Faire évoluer une spécification
 
