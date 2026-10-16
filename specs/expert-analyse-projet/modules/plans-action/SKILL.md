@@ -31,7 +31,7 @@ Le plan ne remplace pas l'étape « proposer le plan, attendre la validation » 
 
 ```markdown
 ### PLAN-03 : Désactiver open-in-view et charger explicitement les relations
-- **Destinataire** : expert-java 1.0.0, mode produire
+- **Destinataire** : expert-java 1.1.0, mode produire
 - **Recommandation** : R03 ; **constats** : F07, F12
 - **Invariants visés** : `expert-java:D4.INV-2`, `expert-java:D4.INV-3`
 - **Dépend de** : PLAN-01 (tests de persistance sur PostgreSQL)
@@ -84,7 +84,7 @@ Chaque plan lié porte `Dépend de` et `Débloque`, et le rapport présente le g
 "plans": [
   {
     "id": "PLAN-03",
-    "destinataire": { "skill": "expert-java", "version": "1.0.0", "mode": "produire" },
+    "destinataire": { "skill": "expert-java", "version": "1.1.0", "mode": "produire" },
     "recommandation": "R03",
     "constats": ["F07", "F12"],
     "invariants": ["expert-java:D4.INV-2", "expert-java:D4.INV-3"],

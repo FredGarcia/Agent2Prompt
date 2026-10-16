@@ -105,8 +105,8 @@ Identifiant d'affichage (`F01`, `F02`…) : attribué après tri des constats pa
 {
   "schemaVersion": 1,
   "generatedAt": "2026-10-16T14:00:00Z",
-  "skill": { "name": "expert-analyse-projet", "version": "1.0.0" },
-  "references": { "socle-back-front": "1.0.0", "expert-java": "1.0.0", "expert-angular": "1.0.0" },
+  "skill": { "name": "expert-analyse-projet", "version": "1.0.1" },
+  "references": { "socle-back-front": "1.0.0", "expert-java": "1.1.0", "expert-angular": "1.0.0" },
   "cadrage": {
     "mode": "rapport",
     "perimetre": "projet",

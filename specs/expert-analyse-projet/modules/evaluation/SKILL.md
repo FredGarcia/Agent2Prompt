@@ -27,7 +27,7 @@ flowchart TD
 #### F07 : open-in-view actif
 - **Identifiant stable** : AX7.expert-java:D4.INV-2@back:src/main/resources/application.yml
 - **Axe** : AX7 performance
-- **Règle** : `expert-java:D4.INV-2` (expert-java 1.0.0)
+- **Règle** : `expert-java:D4.INV-2` (expert-java 1.1.0)
 - **Gravité** : majeur
 - **Preuve** : `application.yml` ne définit pas `spring.jpa.open-in-view` ; la valeur par défaut est `true`,
   et le journal de démarrage fourni (S4, ligne 37) contient l'avertissement correspondant.
@@ -86,7 +86,7 @@ Aucune note chiffrée globale : une moyenne masquerait un constat bloquant derri
 
 Extrait des skills référencés dans `manifest.json`. Les identifiants sont préfixés par le nom du skill (`expert-java:D4.INV-2`), comme dans les identifiants stables et l'annexe JSON, pour ne pas les confondre avec les invariants de l'analyste. En cas de doute sur la formulation exacte, la version du skill de l'expert fait foi.
 
-**expert-java 1.0.0**
+**expert-java 1.1.0**
 
 | ID | Règle |
 |---|---|
@@ -102,7 +102,7 @@ Extrait des skills référencés dans `manifest.json`. Les identifiants sont pr�
 | expert-java:D3.INV-2 | entrées validées par Bean Validation |
 | expert-java:D3.INV-3 | un seul gestionnaire de Problem Details, avec `code` et `traceId` |
 | expert-java:D3.INV-4 | collections paginées avec taille maximale |
-| expert-java:D4.INV-1 | schéma par migrations Flyway, `ddl-auto=validate`, migrations jamais modifiées |
+| expert-java:D4.INV-1 | schéma par migrations versionnées (Flyway ou Liquibase), `ddl-auto=validate`, migrations jamais modifiées |
 | expert-java:D4.INV-2 | `open-in-view` désactivé |
 | expert-java:D4.INV-3 | transactions dans la couche `application`, lectures en `readOnly` |
 | expert-java:D4.INV-4 | aucune requête construite par concaténation |

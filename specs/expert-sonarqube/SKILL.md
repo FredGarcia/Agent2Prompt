@@ -1,10 +1,10 @@
 ---
 name: expert-sonarqube
 description: Expert SonarQube Server 2026.x (édition Developer ou supérieure) pour des projets Java Spring Boot et Angular sur GitLab. Il configure l'analyse et la CI, trie et interprète les constats, corrige le code ou prépare des plans pour les experts Java et Angular, et gouverne la qualité (quality gate, profils, nouveau code). À utiliser pour toute question ou action liée à SonarQube sur un projet back et front.
-version: 1.0.0
+version: 1.0.1
 ---
 
-# Expert SonarQube, version 1.0.0
+# Expert SonarQube, version 1.0.1
 
 Ce document est le point d'entrée du skill. Il fixe les quatre missions de l'expert, l'instance ciblée, les règles d'accès à SonarQube, le registre des dimensions et les invariants. Les règles détaillées sont dans `modules/`.
 
@@ -79,7 +79,7 @@ Avant toute interprétation, l'expert relève la version, l'édition et le mode 
 flowchart TD
   subgraph INCLUS["Inclus, épinglés"]
     SO["socle 1.0.0"]
-    RJ["référentiel expert-java 1.0.0"]
+    RJ["référentiel expert-java 1.1.0"]
     RA["référentiel expert-angular 1.0.0"]
   end
   CA["cadrage-acces<br/>D1"] --> CO["configuration-analyse<br/>D2"]
@@ -200,4 +200,6 @@ Toute intervention se termine par un rapport conforme au module `rapport`.
 
 ## 11. Journal de révision
 
-**1.0.0** (2026-10-16) : première version. Dimensions D1 à D6 actives, D7 et D8 réservées. Points d'extension E1 à E3. Socle back-front 1.0.0, expert-java 1.0.0 et expert-angular 1.0.0 inclus et épinglés.
+**1.0.0** (2026-10-16) : première version. Dimensions D1 à D6 actives, D7 et D8 réservées. Points d'extension E1 à E3. Socle back-front 1.0.0, expert-java 1.0.0 et expert-angular 1.0.0 inclus et épinglés. Archive : `archives/SKILL-v1.0.0.md`.
+
+**1.0.1** (2026-10-16) : correctif. Référentiel expert-java monté en 1.1.0 (migrations Flyway ou Liquibase). Aucune dimension ni aucun invariant modifié.

@@ -90,7 +90,7 @@ Format identique à celui de l'expert en analyse de projet, pour que l'expert Ja
 ```markdown
 ### PLAN-S07 : Remplacer la recherche dynamique de commandes par des critères typés
 - **Émetteur** : expert-sonarqube 1.0.0
-- **Destinataire** : expert-java 1.0.0, mode produire
+- **Destinataire** : expert-java 1.1.0, mode produire
 - **Constats SonarQube** : java:S3649 sur `order/infrastructure/OrderSearch.java` (clé AZ3k…), MR !412
 - **Invariants visés** : `expert-java:D4.INV-4`, `SC4.INV-1`
 - **Contexte constaté** : la clause `where` est assemblée par concaténation à partir des filtres reçus.

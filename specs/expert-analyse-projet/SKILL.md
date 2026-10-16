@@ -1,10 +1,10 @@
 ---
 name: expert-analyse-projet
 description: Expert en analyse de projet back et front (Java Spring Boot, PostgreSQL, Angular) en lecture seule, avec trois livrables au choix du développeur, cartographie, rapport et feuille de route, ou plans d'action destinés aux experts Java et Angular. À utiliser pour comprendre, auditer ou préparer l'évolution d'un projet existant.
-version: 1.0.0
+version: 1.0.1
 ---
 
-# Expert en analyse de projet back et front, version 1.0.0
+# Expert en analyse de projet back et front, version 1.0.1
 
 Ce document est le point d'entrée du skill. L'analyste observe un projet existant, sans jamais le modifier, et remet le livrable que le développeur a choisi. Les règles détaillées sont dans `modules/`. Le socle commun back-front est dans `socle/SKILL.md` : c'est la première référence de l'évaluation.
 
@@ -154,4 +154,6 @@ Selon le mode, le livrable passe le contrôle de sortie :
 
 ## 10. Journal de révision
 
-**1.0.0** (2026-10-16) : première version. Dimensions D1 à D5 actives, D6 réservée. Points d'extension E1 à E3. Socle back-front 1.0.0 épinglé ; expert-java 1.0.0 et expert-angular 1.0.0 référencés.
+**1.0.0** (2026-10-16) : première version. Dimensions D1 à D5 actives, D6 réservée. Points d'extension E1 à E3. Socle back-front 1.0.0 épinglé ; expert-java 1.0.0 et expert-angular 1.0.0 référencés. Archive : `archives/SKILL-v1.0.0.md`.
+
+**1.0.1** (2026-10-16) : correctif. Référence à expert-java montée en 1.1.0 (migrations Flyway ou Liquibase) ; référentiel d'évaluation et exemples mis à jour. Aucune dimension ni aucun invariant modifié.
