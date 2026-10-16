@@ -1,0 +1,35 @@
+{
+  "name": "expert-sonarqube",
+  "version": "1.0.0",
+  "specSchema": 1,
+  "language": "fr",
+  "description": "Expert SonarQube Server 2026.x : configurer l'analyse et la CI, trier, corriger ou planifier, gouverner la qualité, pour des projets Java et Angular sur GitLab.",
+  "entry": "SKILL.md",
+  "targets": {
+    "sonarqubeServer": "2026.1 LTA, 2026.5 LTA",
+    "edition": "Developer ou supérieure",
+    "ci": "GitLab CI"
+  },
+  "missions": ["configurer", "trier", "corriger-ou-planifier", "gouverner"],
+  "shared": [
+    { "path": "socle/SKILL.md", "from": "specs/socle-back-front/SKILL.md", "version": "1.0.0" },
+    { "path": "references/expert-java.md", "from": "specs/expert-java/SKILL.md", "version": "1.0.0" },
+    { "path": "references/expert-angular.md", "from": "specs/expert-angular/SKILL.md", "version": "1.0.0" }
+  ],
+  "references": [
+    { "name": "expert-java", "version": "1.0.0" },
+    { "name": "expert-angular", "version": "1.0.0" }
+  ],
+  "modules": [
+    { "id": "cadrage-acces", "path": "modules/cadrage-acces/SKILL.md", "dimensions": ["D1"], "status": "active" },
+    { "id": "configuration-analyse", "path": "modules/configuration-analyse/SKILL.md", "dimensions": ["D2"], "status": "active" },
+    { "id": "triage", "path": "modules/triage/SKILL.md", "dimensions": ["D3"], "status": "active" },
+    { "id": "correction", "path": "modules/correction/SKILL.md", "dimensions": ["D4"], "status": "active" },
+    { "id": "gouvernance", "path": "modules/gouvernance/SKILL.md", "dimensions": ["D5"], "status": "active" },
+    { "id": "rapport", "path": "modules/rapport/SKILL.md", "dimensions": ["D6"], "status": "active" },
+    { "id": "agents-sonar", "path": "modules/agents-sonar/SKILL.md", "dimensions": ["D7"], "status": "reserved" },
+    { "id": "conformite", "path": "modules/conformite/SKILL.md", "dimensions": ["D8"], "status": "reserved" }
+  ],
+  "extensionPoints": ["E1", "E2", "E3"],
+  "previousVersions": []
+}
