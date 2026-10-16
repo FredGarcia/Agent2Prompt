@@ -1,10 +1,10 @@
 ---
 name: expert-java
 description: Expert Java 21, Spring Boot 3.5 et PostgreSQL qui produit du code conforme à des invariants vérifiables et relit du code existant avec une grille de revue. À utiliser pour écrire, compléter, corriger ou relire un back Spring Boot (architecture, API REST, persistance JPA et Flyway, sécurité, tests), dans le respect du socle commun back-front.
-version: 1.0.0
+version: 1.1.0
 ---
 
-# Expert Java, Spring Boot et PostgreSQL, version 1.0.0
+# Expert Java, Spring Boot et PostgreSQL, version 1.1.0
 
 Ce document est le point d'entrée du skill. Il fixe le rôle de l'expert, ses versions cibles, ses deux modes de travail, le registre des dimensions et la liste des invariants. Les règles détaillées sont dans `modules/`. Le socle commun back-front est dans `socle/SKILL.md` et fait foi pour tout ce qui traverse la frontière avec le front.
 
@@ -52,7 +52,7 @@ flowchart TD
 | Spring Framework | 6.2.x | géré par Spring Boot |
 | Spring Security | 6.5.x | géré par Spring Boot |
 | Hibernate ORM | 6.6.x | géré par Spring Boot |
-| Flyway | version gérée par Spring Boot 3.5 | module `flyway-database-postgresql` requis |
+| Migrations | Flyway ou Liquibase, versions gérées par Spring Boot 3.5 | l'outil du projet est conservé ; avec Flyway, module `flyway-database-postgresql` requis |
 | PostgreSQL | version du projet, 14 ou plus récente | à confirmer avec le développeur |
 | Tests | JUnit 5, AssertJ, Mockito, Testcontainers, ArchUnit | versions gérées par Spring Boot, sauf ArchUnit |
 | Build | Maven ou Gradle, avec le wrapper du projet | exemples donnés en Maven |
@@ -89,7 +89,7 @@ flowchart LR
 | Engendrent | les dépendances autorisées entre couches, les relations entre entités | `architecture` |
 | État | transactions, verrous optimistes, état de sécurité de chaque requête | `persistance`, `securite` |
 | Expression | le contrat d'API, les Problem Details, les journaux | `api-rest`, socle |
-| Évolutif | migrations Flyway, versions d'API, journal de révision du skill | `persistance`, `api-rest`, section 11 |
+| Évolutif | migrations Flyway ou Liquibase, versions d'API, journal de révision du skill | `persistance`, `api-rest`, section 11 |
 | Environnement | le front, PostgreSQL, le fournisseur d'identité, la CI | socle, `tests` |
 
 Clause de second ordre : en mode relire, l'expert fait partie du système qu'il observe. Sa revue oriente les choix du développeur. Il distingue donc toujours un constat (vérifiable, avec preuve) d'une préférence (étiquetée comme telle), et ne présente jamais une préférence comme une règle.
@@ -101,7 +101,7 @@ Clause de second ordre : en mode relire, l'expert fait partie du système qu'il 
 | D1 | Architecture en couches par fonctionnalité | 1.0 | active | | `architecture` |
 | D2 | Langage Java 21 | 1.0 | active | | `langage` |
 | D3 | API REST conforme au socle | 1.0 | active | D1, SC1 à SC3 | `api-rest` |
-| D4 | Persistance JPA, Flyway, PostgreSQL | 1.0 | active | D1 | `persistance` |
+| D4 | Persistance JPA, migrations Flyway ou Liquibase, PostgreSQL | 1.0 | active | D1 | `persistance` |
 | D5 | Sécurité Spring Security | 1.0 | active | D3, SC4 | `securite` |
 | D6 | Tests et contrôles automatisés | 1.0 | active | D1 à D5 | `tests` |
 | D7 | Revue de code | 1.0 | active | D1 à D6 | `revue` |
@@ -117,6 +117,7 @@ Points d'extension posés en 1.0.0. Ce sont des règles actives dès maintenant 
 - **E2** : toute personnalisation de Jackson est isolée dans une seule classe de configuration, au moyen d'un `Jackson2ObjectMapperBuilderCustomizer`. Aucun `new ObjectMapper()` dans le code applicatif.
 - **E3** : les tests utilisent `@MockitoBean` et `@MockitoSpyBean`, jamais `@MockBean` ni `@SpyBean`, dépréciés depuis Spring Boot 3.4.
 - **E4** : les versions des dépendances non gérées par Spring Boot sont centralisées dans les propriétés du build, à un seul endroit.
+- **E5** : les règles de migration portent sur des garanties (versionnement, immuabilité, ordre déterministe, schéma validé), pas sur un outil. Flyway et Liquibase sont pris en charge ; un autre outil s'ajouterait par une section du module `persistance`, sans changer D4.INV-1.
 
 ## 8. Règles globales
 
@@ -169,7 +170,7 @@ Chaque invariant a un contrôle : test, règle ArchUnit, propriété vérifiée 
 
 **D4 : persistance**
 
-- **D4.INV-1** : le schéma n'évolue que par migrations Flyway versionnées ; `spring.jpa.hibernate.ddl-auto=validate` ; une migration appliquée n'est jamais modifiée.
+- **D4.INV-1** : le schéma n'évolue que par migrations versionnées (Flyway ou Liquibase) ; `spring.jpa.hibernate.ddl-auto=validate` ; une migration appliquée n'est jamais modifiée.
 - **D4.INV-2** : `spring.jpa.open-in-view=false`.
 - **D4.INV-3** : les frontières transactionnelles sont déclarées dans la couche `application`, et les lectures sont en `readOnly = true`.
 - **D4.INV-4** : aucune requête SQL ou JPQL n'est construite par concaténation avec une donnée d'entrée.
@@ -198,4 +199,6 @@ Chaque invariant a un contrôle : test, règle ArchUnit, propriété vérifiée 
 
 ## 11. Journal de révision
 
-**1.0.0** (2026-10-16) : première version. Dimensions D1 à D7 actives, D8 réservée. Points d'extension E1 à E4. Socle back-front 1.0.0 épinglé.
+**1.0.0** (2026-10-16) : première version. Dimensions D1 à D7 actives, D8 réservée. Points d'extension E1 à E4. Socle back-front 1.0.0 épinglé. Archive : `archives/SKILL-v1.0.0.md`.
+
+**1.1.0** (2026-10-16) : point d'extension E5, migrations Flyway ou Liquibase. D4.INV-1 est reformulé sur les garanties communes aux deux outils, sans être affaibli (versionnement, immuabilité vérifiée par somme de contrôle, `ddl-auto=validate`). Module `persistance` : garanties communes et section Liquibase. Motif : projets existants sous Liquibase.

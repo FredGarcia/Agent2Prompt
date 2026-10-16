@@ -95,7 +95,7 @@ C'est la table que l'expert complète dans son compte rendu (D6.INV-1). Un invar
 | D3.INV-1 | `ContractConformanceTest` | intégration |
 | D3.INV-2, D3.INV-3 | tests de tranche web sur un cas invalide et un cas métier | tranche web |
 | D3.INV-4 | test vérifiant qu'une demande `size=1000` est ramenée au maximum | tranche web |
-| D4.INV-1 | `@DataJpaTest` (migrations appliquées, `validate` passe) et somme de contrôle Flyway | tranche données |
+| D4.INV-1 | `@DataJpaTest` (migrations appliquées, `validate` passe) et sommes de contrôle vérifiées par Flyway ou Liquibase | tranche données |
 | D4.INV-2 | test de propriété : `spring.jpa.open-in-view` vaut `false` dans le contexte | intégration |
 | D4.INV-3 | règle ArchUnit : `@Transactional` uniquement sur des classes de `..application..` | ArchUnit |
 | D4.INV-4 | revue (point P4) | revue |

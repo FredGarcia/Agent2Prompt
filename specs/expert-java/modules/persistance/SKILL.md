@@ -1,13 +1,13 @@
 ---
 name: persistance
-description: Persistance Spring Data JPA, Hibernate 6.6 et PostgreSQL (migrations Flyway versionnées, ddl-auto validate, open-in-view désactivé, transactions dans la couche application, N+1, verrou optimiste, types PostgreSQL, Testcontainers). À lire avant de toucher une entité, un dépôt, une requête ou une migration.
+description: Persistance Spring Data JPA, Hibernate 6.6 et PostgreSQL (migrations Flyway ou Liquibase versionnées et immuables, ddl-auto validate, open-in-view désactivé, transactions dans la couche application, N+1, verrou optimiste, types PostgreSQL, Testcontainers). À lire avant de toucher une entité, un dépôt, une requête ou une migration.
 dimensions: [D4]
 status: active
 ---
 
 # Module `persistance` (D4)
 
-Ce module fixe comment le back parle à PostgreSQL. Le schéma de la base appartient aux migrations Flyway, jamais à Hibernate.
+Ce module fixe comment le back parle à PostgreSQL. Le schéma de la base appartient aux migrations, jamais à Hibernate. L'outil de migration est celui du projet, Flyway ou Liquibase : les règles portent sur des garanties communes aux deux (point d'extension E5).
 
 ## 1. Vue d'ensemble
 
@@ -17,7 +17,7 @@ flowchart LR
   REPO --> HIB["Hibernate 6.6<br/>ddl-auto = validate"]
   HIB --> POOL["HikariCP"]
   POOL --> PG[("PostgreSQL")]
-  FLY["Flyway<br/>db/migration/V*.sql"] -->|"au démarrage, avant JPA"| PG
+  FLY["Flyway ou Liquibase<br/>migrations versionnées"] -->|"au démarrage, avant JPA"| PG
   HIB -.->|"vérifie que les entités<br/>correspondent au schéma"| PG
 ```
 
@@ -37,14 +37,39 @@ spring:
       hibernate:
         jdbc:
           time_zone: UTC
+  # Selon l'outil du projet, l'un ou l'autre bloc :
   flyway:
     enabled: true
     locations: classpath:db/migration
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.yaml
 ```
 
-Dépendances : `spring-boot-starter-data-jpa`, `org.postgresql:postgresql`, `org.flywaydb:flyway-core` **et** `org.flywaydb:flyway-database-postgresql` (le support de PostgreSQL est un module séparé depuis Flyway 10).
+Dépendances : `spring-boot-starter-data-jpa`, `org.postgresql:postgresql`, puis selon l'outil :
 
-## 3. Migrations Flyway
+- Flyway : `org.flywaydb:flyway-core` **et** `org.flywaydb:flyway-database-postgresql` (le support de PostgreSQL est un module séparé depuis Flyway 10) ;
+- Liquibase : `org.liquibase:liquibase-core`.
+
+Un projet n'utilise qu'un seul outil. L'expert n'en change jamais sans décision explicite du développeur.
+
+## 3. Migrations
+
+### 3.1 Garanties communes (D4.INV-1, point E5)
+
+Quel que soit l'outil :
+
+| Garantie | Flyway | Liquibase |
+|---|---|---|
+| le schéma n'évolue que par migrations versionnées dans le dépôt | scripts `V<n>__<description>.sql` | changesets inclus dans le changelog maître |
+| une migration appliquée n'est jamais modifiée | somme de contrôle vérifiée au démarrage | somme de contrôle de chaque changeset vérifiée au démarrage |
+| l'ordre d'application est déterministe | numéro de version | ordre d'inclusion dans le changelog maître |
+| Hibernate ne modifie jamais le schéma | `ddl-auto=validate` | `ddl-auto=validate` |
+| les données de test ne sont pas des migrations de production | emplacement réservé aux tests | contexte ou étiquette réservé aux tests |
+
+Un nouvel outil de migration s'ajouterait au skill par une colonne de ce tableau et une section dédiée, sans changer l'invariant.
+
+### 3.2 Flyway
 
 ```text
 src/main/resources/db/migration/
@@ -74,6 +99,51 @@ CREATE TABLE purchase_order (
 );
 CREATE INDEX idx_purchase_order_customer ON purchase_order (customer_id);
 ```
+
+### 3.3 Liquibase
+
+```text
+src/main/resources/db/changelog/
+├── db.changelog-master.yaml
+└── changes/
+    ├── 0001-create-customer.sql
+    ├── 0002-create-purchase-order.sql
+    └── 0003-add-order-status-index.sql
+```
+
+```yaml
+# db.changelog-master.yaml : inclusions explicites, dans l'ordre
+databaseChangeLog:
+  - include: { file: changes/0001-create-customer.sql, relativeToChangelogFile: true }
+  - include: { file: changes/0002-create-purchase-order.sql, relativeToChangelogFile: true }
+  - include: { file: changes/0003-add-order-status-index.sql, relativeToChangelogFile: true }
+```
+
+```sql
+--liquibase formatted sql
+
+--changeset acme:0002-create-purchase-order
+CREATE TABLE purchase_order (
+    id           UUID PRIMARY KEY,
+    customer_id  UUID        NOT NULL REFERENCES customer (id),
+    status       VARCHAR(32) NOT NULL,
+    total_amount NUMERIC(19, 2) NOT NULL,          -- SC3.INV-2
+    created_at   TIMESTAMPTZ NOT NULL,             -- SC3.INV-1
+    version      BIGINT      NOT NULL DEFAULT 0    -- D4.INV-6
+);
+CREATE INDEX idx_purchase_order_customer ON purchase_order (customer_id);
+--rollback DROP TABLE purchase_order;
+```
+
+Règles :
+
+- un changeset est identifié par son identifiant, son auteur et son fichier ; une fois appliqué, il n'est **jamais** modifié (D4.INV-1). Une correction est un nouveau changeset ;
+- `validCheckSum` et `runOnChange` contournent la vérification des sommes de contrôle : interdits, sauf pour un objet recréé à chaque fois (vue, fonction) avec un commentaire qui le justifie ;
+- inclusions explicites plutôt que `includeAll`, pour que l'ordre soit lisible dans le changelog maître ;
+- format SQL (`--liquibase formatted sql`) recommandé pour PostgreSQL : il permet les fonctions propres à PostgreSQL sans traduction. Dans un projet existant, le format en place (YAML, XML) est conservé ;
+- chaque changeset porte un bloc `--rollback` quand le retour arrière est possible ;
+- `CREATE INDEX CONCURRENTLY` dans un changeset dédié, avec `runInTransaction:false` ;
+- les données de test sont dans des changesets portant un contexte réservé aux tests (`context:test`), exclu en production par `spring.liquibase.contexts`.
 
 ## 4. Correspondance des types
 
@@ -202,7 +272,7 @@ class PurchaseOrderRepositoryTest {
 ```
 
 - `@ServiceConnection` (Spring Boot 3.1 et plus) configure la source de données à partir du conteneur.
-- `@DataJpaTest` exécute les migrations Flyway : le test vérifie donc aussi que les migrations s'appliquent et que `ddl-auto=validate` passe.
+- `@DataJpaTest` exécute les migrations Flyway ou Liquibase : le test vérifie donc aussi que les migrations s'appliquent et que `ddl-auto=validate` passe.
 - L'image PostgreSQL du test a la même version majeure que la production (D4.INV-5).
 
 ## 9. Pièges connus

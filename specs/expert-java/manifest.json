@@ -1,6 +1,6 @@
 {
   "name": "expert-java",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "specSchema": 1,
   "language": "fr",
   "description": "Expert Java 21, Spring Boot 3.5 et PostgreSQL : produire et relire du code conforme à des invariants vérifiables.",
@@ -8,7 +8,8 @@
   "targets": {
     "java": "21",
     "springBoot": "3.5.x",
-    "postgresql": ">=14"
+    "postgresql": ">=14",
+    "migrations": "Flyway ou Liquibase"
   },
   "shared": [
     { "path": "socle/SKILL.md", "from": "specs/socle-back-front/SKILL.md", "version": "1.0.0" }
@@ -23,6 +24,8 @@
     { "id": "revue", "path": "modules/revue/SKILL.md", "dimensions": ["D7"], "status": "active" },
     { "id": "migration-boot4", "path": "modules/migration-boot4/SKILL.md", "dimensions": ["D8"], "status": "reserved" }
   ],
-  "extensionPoints": ["E1", "E2", "E3", "E4"],
-  "previousVersions": []
+  "extensionPoints": ["E1", "E2", "E3", "E4", "E5"],
+  "previousVersions": [
+    { "version": "1.0.0", "file": "archives/SKILL-v1.0.0.md" }
+  ]
 }
