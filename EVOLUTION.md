@@ -22,6 +22,8 @@ Trois conséquences :
 | Module | fichier qui porte une ou plusieurs dimensions | `modules/<id>/SKILL.md` | `modules/etats/SKILL.md` |
 | Manifeste | déclaration des modules, de leur statut et de la version | `manifest.json` | `"status": "reserved"` |
 | Archive | version antérieure figée | `archives/SKILL-vX.Y.Z.md` | `SKILL-v2.1.0.md` |
+| Fichier partagé | fichier versionné à part, inclus à l'identique dans plusieurs skills, à une version épinglée | `shared` dans `manifest.json` | `socle/SKILL.md` ← `specs/socle-back-front/SKILL.md` 1.0.0 |
+| Référence | skill dont un autre reprend les règles sans l'inclure, à une version citée | `references` dans `manifest.json` | l'analyste référence `expert-java` 1.0.0 |
 | Transmission | texte unique destiné à l'IA qui implémente | `transmissions/<nom>-X.Y.Z.md` | `tension-dashboard-gitlab-agent-2.2.0.md` |
 | Scénario | cas de test nommé, rattaché à un invariant | lettre + numéro | `T3`, `M7`, `G1` |
 
@@ -101,14 +103,31 @@ Procédure, dans cet ordre :
 2. Modifier la spécification : registre, invariants, scénarios, modules.
 3. Mettre à jour `version` dans le frontmatter du `SKILL.md` racine et dans `manifest.json`, ainsi que `previousVersions`.
 4. Ajouter l'entrée au journal de révision du `SKILL.md` et à `CHANGELOG.md`.
-5. Vérifier : chaque invariant défini apparaît dans au moins un scénario ; chaque chemin du manifeste existe ; les blocs de code sont fermés.
+5. Vérifier : `node tools/verifier.mjs` (manifestes, versions, modules, épinglages, références, blocs de code, invariants définis et cités). La relecture humaine reste nécessaire pour le fond : le vérificateur contrôle la structure.
 6. Régénérer la transmission : `node tools/bundle.mjs specs/<nom>`. Le script échoue si l'aller-retour n'est pas identique.
 7. Commiter la version seule, avec un message `spec(<nom>): version X.Y.Z, <résumé>`, puis la transmission.
 8. Ouvrir une pull request ; le développeur ratifie avant fusion.
 
 Les transmissions des versions précédentes restent dans `transmissions/` : elles sont la trace exacte de ce qui a été remis à une IA.
 
-## 8. Ajouter une nouvelle spécification
+## 8. Fichiers partagés et références
+
+Plusieurs skills peuvent partager un même socle sans perdre leur autonomie de transmission :
+
+```mermaid
+flowchart LR
+  S["specs/socle/SKILL.md<br/>version 1.0.0<br/>source unique"] -->|"shared : épinglé 1.0.0"| K1["skill A<br/>transmission autonome"]
+  S -->|"shared : épinglé 1.0.0"| K2["skill B<br/>transmission autonome"]
+  K3["skill C"] -.->|"references : B 1.0.0"| K2
+```
+
+- Le fichier partagé n'existe qu'une fois dans le dépôt. `bundle.mjs` l'insère dans chaque transmission, sous le chemin déclaré (`socle/SKILL.md`).
+- La version épinglée est vérifiée à chaque assemblage. Faire évoluer le socle oblige donc chaque skill dépendant à décider explicitement de monter son épinglage : c'est voulu, une règle commune ne change pas en silence sous un skill.
+- Un socle se marque `"transmissible": false` : il n'a de sens qu'inclus.
+- Une référence (`references`) cite un skill dont on reprend les règles, à une version donnée. Si le skill référencé change de version, le skill qui le cite doit être revu et sa référence mise à jour.
+- Les identifiants d'un autre skill sont toujours préfixés par son nom (`expert-java:D4.INV-2`), pour ne jamais se confondre avec les invariants locaux.
+
+## 9. Ajouter une nouvelle spécification
 
 1. Créer `specs/<nom>/` avec `SKILL.md`, `manifest.json`, `ENTETE-TRANSMISSION.md` et `modules/`.
 2. Reprendre dans son `SKILL.md` un registre des dimensions, un contrat de version conforme à la section 4, la liste des invariants et les points d'extension.
