@@ -13,11 +13,12 @@ Chaque spécification est un package modulaire versionné : un point d'entrée, 
 | [`expert-angular`](specs/expert-angular/SKILL.md) | 1.0.0 | [`transmissions/expert-angular-1.0.0.md`](transmissions/expert-angular-1.0.0.md) | Produire et relire un front Angular 20, accessibilité RGAA et WCAG comprise |
 | [`expert-analyse-projet`](specs/expert-analyse-projet/SKILL.md) | 1.0.1 | [`transmissions/expert-analyse-projet-1.0.1.md`](transmissions/expert-analyse-projet-1.0.1.md) | Analyser un projet back et front en lecture seule : cartographie, rapport et feuille de route, ou plans d'action |
 | [`expert-sonarqube`](specs/expert-sonarqube/SKILL.md) | 1.0.1 | [`transmissions/expert-sonarqube-1.0.1.md`](transmissions/expert-sonarqube-1.0.1.md) | SonarQube Server 2026.x : configurer l'analyse et la CI GitLab, trier, corriger ou planifier, gouverner la qualité |
-| [`agent-tdd-jira`](specs/agent-tdd-jira/SKILL.md) | 1.0.0 | [`transmissions/agent-tdd-jira-1.0.0.md`](transmissions/agent-tdd-jira-1.0.0.md) | Développement TDD à partir d'une demande Jira en MHTML : analyse avec commentaires, scénarios Gherkin, variantes back et front, cycle rouge, vert, remanié, traçabilité |
+| [`agent-tdd-jira`](specs/agent-tdd-jira/SKILL.md) | 1.1.0 | [`transmissions/agent-tdd-jira-1.1.0.md`](transmissions/agent-tdd-jira-1.1.0.md) | Développement TDD à partir d'une demande Jira en MHTML : analyse avec commentaires, scénarios Gherkin, variantes back et front, cycle rouge, vert, remanié, traçabilité ; mode parallèle dans un worktree géré |
+| [`agents-paralleles-gitlab`](specs/agents-paralleles-gitlab/SKILL.md) | 1.0.0 | [`transmissions/agents-paralleles-gitlab-1.0.0.md`](transmissions/agents-paralleles-gitlab-1.0.0.md) | Plusieurs agents en parallèle sur un dépôt GitLab, une demande Jira par worktree : isolation, hooks communs, script `agt`, garde-fous GitLab, recette de 44 contrôles |
 
 Les transmissions des versions précédentes restent dans `transmissions/` : elles sont la trace exacte de ce qui a été remis à une IA.
 
-Socle partagé, non transmis seul : [`socle-back-front`](specs/socle-back-front/SKILL.md) 1.0.0 (contrat OpenAPI, erreurs RFC 9457, formats, sécurité, traçabilité, accessibilité). Il est inclus, à une version épinglée, dans chaque transmission des experts, qui restent ainsi autonomes et cohérents entre eux. L'expert SonarQube inclut en plus les points d'entrée des experts Java et Angular comme référentiels d'invariants : une correction faite à partir de SonarQube respecte les mêmes règles qu'une correction faite par l'expert du langage.
+Socle partagé, non transmis seul : [`socle-back-front`](specs/socle-back-front/SKILL.md) 1.0.0 (contrat OpenAPI, erreurs RFC 9457, formats, sécurité, traçabilité, accessibilité). Il est inclus, à une version épinglée, dans chaque transmission des experts, qui restent ainsi autonomes et cohérents entre eux. L'expert SonarQube inclut en plus les points d'entrée des experts Java et Angular comme référentiels d'invariants : une correction faite à partir de SonarQube respecte les mêmes règles qu'une correction faite par l'expert du langage. L'agent TDD inclut de même le point d'entrée du kit `agents-paralleles-gitlab` : en mode parallèle, il y lit les règles du worktree que le kit lui impose.
 
 ```mermaid
 flowchart LR
@@ -31,9 +32,10 @@ flowchart LR
   A -->|"inclus comme référentiel"| SQ
   SQ -.->|"plans d'action"| J
   SQ -.->|"plans d'action"| A
-  SOCLE -->|"inclus, épinglé"| TDD["agent-tdd-jira 1.0.0"]
+  SOCLE -->|"inclus, épinglé"| TDD["agent-tdd-jira 1.1.0"]
   J -->|"inclus comme référentiel"| TDD
   A -->|"inclus comme référentiel"| TDD
+  APG["agents-paralleles-gitlab 1.0.0"] -->|"inclus comme référentiel"| TDD
 ```
 
 ## Structure du dépôt
