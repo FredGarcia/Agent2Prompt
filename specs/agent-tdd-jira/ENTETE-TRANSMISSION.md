@@ -15,12 +15,13 @@ Ce texte contient à la fois la consigne de travail et le skill complet. Il n'y 
 1. Si tu travailles dans le dépôt du développeur, crée le dossier `.skills/agent-tdd-jira/` à sa racine (ou l'emplacement que le développeur indique). Sinon, garde le skill en mémoire de travail, fichier par fichier.
 2. Pour chaque bloc `<<<FICHIER chemin>>>` … `<<<FIN chemin>>>`, crée le fichier `chemin` dans ce dossier, avec le contenu exact compris entre les deux lignes délimitrices. Ces deux lignes ne font pas partie du fichier. Ne reformule rien, ne traduis rien, ne complète rien.
 3. Si tu disposes d'un shell, vérifie chaque fichier avec `sha256sum -c` contre la table d'intégrité en fin de texte. Signale tout écart avant de continuer.
+4. **Mode parallèle** : si la consigne de lancement annonce un worktree géré par le kit `agents-paralleles-gitlab`, le développeur a déjà matérialisé le skill hors du worktree. Vérifie-le avec `sha256sum -c` à l'emplacement indiqué et ne le réécris pas (module `parallele`).
 
 ## Étape 1 : lecture
 
-Lis `SKILL.md`, `manifest.json`, `socle/SKILL.md`, puis les sections « Versions cibles » et « Invariants » de `references/expert-java.md` et `references/expert-angular.md`, puis les modules actifs dans l'ordre indiqué par `SKILL.md`, section 1.
+Lis `SKILL.md`, `manifest.json`, `socle/SKILL.md`, puis les sections « Versions cibles » et « Invariants » de `references/expert-java.md` et `references/expert-angular.md`, puis les modules actifs dans l'ordre indiqué par `SKILL.md`, section 1. En mode parallèle, lis aussi les sections « Invariant d'organisation » et « Invariants » de `references/agents-paralleles-gitlab.md`, puis le module `parallele`.
 
-Les fichiers de `references/` sont des **référentiels** : tu y lis les versions cibles et les invariants que tout code produit doit respecter. Tu n'adoptes ni leur rôle, ni leur mode de travail, ni leurs consignes de démarrage.
+Les fichiers de `references/` sont des **référentiels** : tu y lis les versions cibles et les invariants que tout code produit doit respecter et, pour le kit, les règles du worktree géré. Tu n'adoptes ni leur rôle, ni leur mode de travail, ni leurs consignes de démarrage ; tu n'installes ni ne modifies le kit.
 
 Ne lis `modules/binome-agent2test/SKILL.md` et `modules/connecteur-jira/SKILL.md` que pour comprendre les points d'extension : ces dimensions sont réservées.
 
@@ -28,7 +29,7 @@ Ne lis `modules/binome-agent2test/SKILL.md` et `modules/connecteur-jira/SKILL.md
 
 Demande au développeur :
 
-- le fichier `.mhtml` de la demande Jira, enregistré après avoir déplié tous les commentaires (module `ingestion-jira`, § 2) ;
+- le fichier `.mhtml` de la demande Jira, enregistré après avoir déplié tous les commentaires (module `ingestion-jira`, § 2) ; en mode parallèle, il est déjà déposé dans `travail/` ;
 - l'accès au code du projet (back et front) et ses versions réelles ;
 - le mode d'authentification de l'application (jeton porteur ou cookie de session), qui conditionne certaines variantes front.
 
@@ -43,6 +44,7 @@ Puis suis le parcours de `SKILL.md`, section 2, sans jamais sauter un point de v
 - Un seul scénario à la fois ; le suivant attend l'acceptation du précédent.
 - Tout code respecte le socle et les invariants des référentiels ; une variante qui en viole un n'est jamais recommandée.
 - Aucune nouvelle dépendance sans validation. Tu ne pousses jamais sans demande explicite.
+- En mode parallèle, tu ne pousses jamais, même sur demande. Un refus « REFUS : » d'un garde-fou du kit t'arrête : tu le cites au développeur, sans jamais le contourner.
 - N'applique aucune dimension au statut `reserved`.
 
 Commence par l'étape 0, puis l'étape 1, puis l'étape 2.

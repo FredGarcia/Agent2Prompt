@@ -1,10 +1,10 @@
 ---
 name: agent-tdd-jira
-description: Agent de développement TDD qui part d'une demande Jira enregistrée en MHTML, l'analyse avec ses commentaires, la décompose en scénarios Gherkin, propose au développeur des variantes de réalisation back Java et front Angular pour chaque scénario, puis réalise les scénarios choisis un par un en cycle rouge, vert, remanié, avec traçabilité de la demande jusqu'aux commits.
-version: 1.0.0
+description: Agent de développement TDD qui part d'une demande Jira enregistrée en MHTML, l'analyse avec ses commentaires, la décompose en scénarios Gherkin, propose au développeur des variantes de réalisation back Java et front Angular pour chaque scénario, puis réalise les scénarios choisis un par un en cycle rouge, vert, remanié, avec traçabilité de la demande jusqu'aux commits ; en mode parallèle, il travaille dans un worktree géré par le kit agents-paralleles-gitlab.
+version: 1.1.0
 ---
 
-# Agent de développement TDD à partir d'une demande Jira, version 1.0.0
+# Agent de développement TDD à partir d'une demande Jira, version 1.1.0
 
 Ce document est le point d'entrée du skill. Il fixe le parcours de l'agent, ses points de validation, le registre des dimensions et les invariants. Les règles détaillées sont dans `modules/`.
 
@@ -12,14 +12,16 @@ Fichiers inclus à des versions épinglées (voir `manifest.json`) :
 
 - `socle/SKILL.md` : socle commun back-front (contrat d'API, erreurs, formats, sécurité, accessibilité) ;
 - `references/expert-java.md` et `references/expert-angular.md` : points d'entrée des experts Java et Angular. Ce sont des **référentiels** : l'agent y lit les versions cibles et les invariants que tout code produit doit respecter, sans adopter leur mode de travail.
+- `references/agents-paralleles-gitlab.md` : point d'entrée du kit de travail en parallèle, une demande par worktree. C'est aussi un référentiel : en mode parallèle (D9), l'agent y lit les règles du worktree géré, sans installer ni modifier le kit.
 
 ## 1. Ordre de lecture
 
 1. Ce document, en entier.
 2. `manifest.json`.
-3. `socle/SKILL.md`, puis les sections « Versions cibles » et « Invariants » des deux référentiels.
+3. `socle/SKILL.md`, puis les sections « Versions cibles » et « Invariants » des référentiels Java et Angular.
 4. Les modules actifs, dans l'ordre du parcours : `ingestion-jira`, `analyse-demande`, `impact`, `variantes`, `cycle-tdd`, `tracabilite`.
-5. `modules/binome-agent2test/SKILL.md` et `modules/connecteur-jira/SKILL.md` : seulement pour comprendre les points d'extension. Ne pas les appliquer en 1.x.
+5. En mode parallèle seulement : les sections « Invariant d'organisation » et « Invariants » de `references/agents-paralleles-gitlab.md`, puis `modules/parallele/SKILL.md`, qui s'ajoute aux autres modules.
+6. `modules/binome-agent2test/SKILL.md` et `modules/connecteur-jira/SKILL.md` : seulement pour comprendre les points d'extension. Ne pas les appliquer en 1.x.
 
 ## 2. Parcours et points de validation
 
@@ -76,13 +78,13 @@ Les tests de bout en bout relèvent de la dimension réservée D7 (binôme avec 
 | État | état de chaque scénario : proposé, validé, rouge, vert, remanié, accepté | `cycle-tdd` |
 | Expression | fichier Gherkin, tests, code, matrice, projet de commentaire Jira | `analyse-demande`, `cycle-tdd`, `tracabilite` |
 | Évolutif | commits successifs, réponses aux questions, versions du skill | `cycle-tdd`, `tracabilite` |
-| Environnement | développeur, auteur de la demande, experts de référence, Agent2Test | `tracabilite`, D7 |
+| Environnement | développeur, auteur de la demande, experts de référence, Agent2Test, agents des autres demandes et garde-fous du kit en mode parallèle | `tracabilite`, `parallele`, D7 |
 
 Clause de second ordre : l'agent interprète une demande écrite par d'autres. Ses scénarios deviennent la définition de « terminé ». Il distingue donc ce que dit la demande (avec sa provenance), ce qu'il en déduit (scénario proposé, à valider), et ce qu'il ignore (question). Il ne tranche jamais seul une contradiction entre la description et un commentaire.
 
 ## 5. Registre des dimensions
 
-| ID | Dimension | Introduite | Statut 1.0.0 | Dépend de | Module |
+| ID | Dimension | Introduite | Statut 1.1.0 | Dépend de | Module |
 |---|---|---|---|---|---|
 | D1 | Ingestion d'une demande Jira en MHTML | 1.0 | active | | `ingestion-jira` |
 | D2 | Analyse et scénarios Gherkin | 1.0 | active | D1 | `analyse-demande` |
@@ -92,6 +94,7 @@ Clause de second ordre : l'agent interprète une demande écrite par d'autres. S
 | D6 | Traçabilité et rapport | 1.0 | active | D1 à D5 | `tracabilite` |
 | D7 | Binôme avec Agent2Test (tests de bout en bout) | 1.0 | reserved | D2, D5 | `binome-agent2test` |
 | D8 | Connecteur Jira (API ou MCP) à la place du MHTML | 1.0 | reserved | D1 | `connecteur-jira` |
+| D9 | Travail dans un worktree géré, en parallèle d'autres demandes | 1.1 | active | D1, D3, D5, D6, référentiel du kit | `parallele` |
 
 ## 6. Contrat de version et points d'extension
 
@@ -111,6 +114,7 @@ Points d'extension, actifs dès 1.0.0 :
 - **Dépendances** : aucune nouvelle dépendance (back ou front), ni outil d'exécution Gherkin, sans validation.
 - **Secrets et données** : la demande peut contenir des noms de personnes et des données métier ; l'agent ne les recopie que dans les artefacts du projet qui en ont besoin (scénarios, rapport), jamais dans le code ni dans les tests, où il utilise des données fictives.
 - **Langue** : scénarios Gherkin en français (`# language: fr`), identifiants de code en anglais, rapports en français.
+- **Mode parallèle** : quand la consigne de lancement annonce un worktree géré par le kit `agents-paralleles-gitlab`, le module `parallele` s'ajoute aux autres. Ses règles sont plus strictes, jamais plus souples : l'agent ne pousse plus du tout, même sur demande (D9.INV-2).
 
 ## 8. Critères d'acceptation
 
@@ -119,6 +123,7 @@ Points d'extension, actifs dès 1.0.0 :
 - Variantes choisies et consignées (V3).
 - Pour chaque scénario réalisé : test rouge observé pour la bonne raison, test vert, remaniement, suites back et front vertes, scénario accepté (V4).
 - Matrice de traçabilité complète et rapport final (V5), avec projet de commentaire Jira.
+- En mode parallèle : `travail/<CLÉ>/impact.txt` et `travail/<CLÉ>/rapport.md` produits, chaque commit au format de la demande, aucun refus de garde-fou contourné (D9).
 
 ## 9. Invariants
 
@@ -164,6 +169,18 @@ Points d'extension, actifs dès 1.0.0 :
 - **D6.INV-3** : l'agent n'écrit jamais dans Jira ; il fournit un projet de commentaire que le développeur publie lui-même.
 - **D6.INV-4** : le rapport final liste les écarts à la demande, les questions restées ouvertes et le résultat des suites de tests back et front.
 
+**D9 : travail en parallèle**
+
+- **D9.INV-1** : en mode parallèle, l'agent n'écrit que dans le worktree de sa demande ; ses fichiers de travail (demande enregistrée, `demande.json`, images, script d'extraction, `impact.txt`, `rapport.md`) vont dans `travail/`.
+- **D9.INV-2** : en mode parallèle, l'agent ne pousse pas, ne fusionne pas, ne rebase pas et ne change pas de branche ; il n'emploie ni `--no-verify`, ni `--force`, ni `--force-with-lease`, ni `git config`, ni `git -c`, ni `reset --hard`, ni `stash drop`, ni `stash clear`, ni `branch -D`, ni `git worktree`.
+- **D9.INV-3** : en mode parallèle, chaque commit commence par `<CLÉ> Snn : ` pour un scénario, ou `<CLÉ> : ` hors scénario.
+- **D9.INV-4** : un refus d'un garde-fou du kit arrête l'action en cours ; l'agent le cite au développeur et ne le contourne jamais.
+- **D9.INV-5** : à l'étape d'impact, l'agent écrit les chemins impactés dans `travail/<CLÉ>/impact.txt`, un chemin relatif par ligne, et signale dans la fiche ceux qui relèvent d'un point chaud.
+- **D9.INV-6** : le skill partagé est vérifié avec la table d'intégrité de la transmission et n'est jamais réécrit.
+- **D9.INV-7** : après une synchronisation annoncée par le développeur, l'agent relance les suites back et front avant le scénario suivant et signale toute régression.
+
 ## 10. Journal de révision
 
-**1.0.0** (2026-10-16) : première version. Dimensions D1 à D6 actives, D7 et D8 réservées. Points d'extension E1 à E3. Socle back-front 1.0.0, expert-java 1.1.0 et expert-angular 1.0.0 inclus et épinglés.
+**1.0.0** (2026-10-16) : première version. Dimensions D1 à D6 actives, D7 et D8 réservées. Points d'extension E1 à E3. Socle back-front 1.0.0, expert-java 1.1.0 et expert-angular 1.0.0 inclus et épinglés. Archive : `archives/SKILL-v1.0.0.md`.
+
+**1.1.0** (2026-10-20) : dimension D9 active, travail dans un worktree géré par le kit `agents-paralleles-gitlab` 1.0.0, en parallèle d'autres demandes ; module `parallele`. Le point d'entrée du kit est inclus et épinglé comme référentiel (`references/agents-paralleles-gitlab.md`). Aucun invariant existant n'est modifié. En mode parallèle, la règle « jamais de push sans demande explicite » (`cycle-tdd`, section 7) devient « jamais de push » (D9.INV-2), plus forte ; un commit hors scénario porte la clé seule (D9.INV-3). Motif : mener plusieurs demandes de front sans qu'un agent puisse abîmer le travail d'un autre.
