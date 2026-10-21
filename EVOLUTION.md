@@ -106,7 +106,7 @@ Procédure, dans cet ordre :
 5. Régénérer le glossaire : `node tools/glossaire.mjs`. Il détaille chaque invariant de chaque spécification et n'est jamais modifié à la main.
 6. Régénérer la transmission : `node tools/bundle.mjs specs/<nom>`. Le script échoue si l'aller-retour n'est pas identique.
 7. Vérifier : `node tools/verifier.mjs` (manifestes, versions, modules et registre, épinglages, références, archives, points d'extension, blocs de code, invariants définis et cités, transmissions fidèles aux fichiers, README et glossaire à jour). La relecture humaine reste nécessaire pour le fond : le vérificateur contrôle la structure.
-8. Commiter la version seule, avec un message `spec(<nom>): version X.Y.Z, <résumé>`, puis la transmission.
+8. Commiter la version en un seul commit, avec sa transmission, le glossaire, le README et l'entrée du CHANGELOG, sous le message `spec(<nom>): version X.Y.Z, <résumé>` : le vérificateur passe ainsi sur chaque commit.
 9. Ouvrir une pull request ; le vérificateur y tourne automatiquement, et le développeur ratifie avant fusion.
 
 Les transmissions des versions précédentes restent dans `transmissions/` : elles sont la trace exacte de ce qui a été remis à une IA. La transmission d'une version publiée n'est donc jamais régénérée : si le vérificateur la trouve infidèle aux fichiers, c'est qu'une modification attend une nouvelle version.
