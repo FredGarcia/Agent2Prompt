@@ -103,10 +103,11 @@ Procédure, dans cet ordre :
 2. Modifier la spécification : registre, invariants, scénarios, modules.
 3. Mettre à jour `version` dans le frontmatter du `SKILL.md` racine et dans `manifest.json`, ainsi que `previousVersions`.
 4. Ajouter l'entrée au journal de révision du `SKILL.md` et à `CHANGELOG.md`.
-5. Vérifier : `node tools/verifier.mjs` (manifestes, versions, modules, épinglages, références, blocs de code, invariants définis et cités). La relecture humaine reste nécessaire pour le fond : le vérificateur contrôle la structure.
-6. Régénérer la transmission : `node tools/bundle.mjs specs/<nom>`. Le script échoue si l'aller-retour n'est pas identique.
-7. Commiter la version seule, avec un message `spec(<nom>): version X.Y.Z, <résumé>`, puis la transmission.
-8. Ouvrir une pull request ; le développeur ratifie avant fusion.
+5. Régénérer le glossaire : `node tools/glossaire.mjs`. Il détaille chaque invariant de chaque spécification et n'est jamais modifié à la main.
+6. Vérifier : `node tools/verifier.mjs` (manifestes, versions, modules, épinglages, références, blocs de code, invariants définis et cités, glossaire à jour). La relecture humaine reste nécessaire pour le fond : le vérificateur contrôle la structure.
+7. Régénérer la transmission : `node tools/bundle.mjs specs/<nom>`. Le script échoue si l'aller-retour n'est pas identique.
+8. Commiter la version seule, avec un message `spec(<nom>): version X.Y.Z, <résumé>`, puis la transmission.
+9. Ouvrir une pull request ; le développeur ratifie avant fusion.
 
 Les transmissions des versions précédentes restent dans `transmissions/` : elles sont la trace exacte de ce qui a été remis à une IA.
 
@@ -133,4 +134,4 @@ flowchart LR
 1. Créer `specs/<nom>/` avec `SKILL.md`, `manifest.json`, `ENTETE-TRANSMISSION.md` et `modules/`.
 2. Reprendre dans son `SKILL.md` un registre des dimensions, un contrat de version conforme à la section 4, la liste des invariants et les points d'extension.
 3. Écrire l'en-tête de transmission avec `{{VERSION}}` dans son titre ; il contient la consigne propre à cette spécification.
-4. Générer la première transmission, puis l'ajouter au tableau du `README.md` et à `CHANGELOG.md`.
+4. Générer la première transmission et régénérer le glossaire, puis ajouter la spécification au tableau du `README.md` et à `CHANGELOG.md`.

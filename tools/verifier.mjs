@@ -18,7 +18,8 @@
  * - chaque invariant défini dans le point d'entrée (`**Dn.INV-k**`, `**SCn.INV-k**`) est
  *   repris dans au moins un module, et chaque invariant cité est défini (un identifiant
  *   préfixé par un nom de skill, comme `expert-java:D4.INV-2`, désigne un autre skill et
- *   n'est pas vérifié ici).
+ *   n'est pas vérifié ici) ;
+ * - `glossaire.md` est exactement celui que génère `tools/glossaire.mjs`.
  *
  * Les archives (`archives/`) ne sont pas vérifiées : elles sont figées.
  * Code de sortie 1 si une erreur est trouvée. Node 20 ou plus récent, modules natifs.
@@ -26,6 +27,7 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { CHEMIN_GLOSSAIRE, genererGlossaire } from './glossaire.mjs';
 
 const racine = dirname(dirname(fileURLToPath(import.meta.url)));
 const dossierSpecs = join(racine, 'specs');
@@ -171,7 +173,14 @@ for (const nom of readdirSync(dossierSpecs).sort()) {
     if (bilan) bilans.push(bilan);
   }
 }
+// Glossaire : il doit être exactement celui que génère tools/glossaire.mjs.
+let glossaireAJour = false;
+if (!existsSync(CHEMIN_GLOSSAIRE)) erreurs.push('glossaire.md : absent, lancer node tools/glossaire.mjs');
+else if (lire(CHEMIN_GLOSSAIRE) !== genererGlossaire()) erreurs.push("glossaire.md : n'est plus à jour, lancer node tools/glossaire.mjs");
+else glossaireAJour = true;
+
 for (const bilan of bilans) console.log(`ok  ${bilan}`);
+if (glossaireAJour) console.log('ok  glossaire.md à jour');
 const uniques = [...new Set(erreurs)];
 for (const message of uniques) console.error(`ERREUR  ${message}`);
 if (uniques.length > 0) process.exit(1);
