@@ -4,6 +4,19 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-10-21 : agent2test 1.0.0, agent-tdd-jira 1.3.0
+
+- **agent2test 1.0.0** : Agent2Test, système multi-agents qui choisit, prépare, joue et journalise les tests essentiels d'une demande, dans un projet séparé de l'application. Playwright y est piloté comme une bibliothèque depuis Node ; le plan vient d'agent-tdd-jira (`us.md` et fichier Gherkin) ; chaque critère d'acceptation reçoit un verdict prouvé ; l'humain ratifie aux points de contrôle CP-0 à CP-5 ; le système observe et fait évoluer ses propres règles sous gouvernance. Dimensions D1 à D18 actives, D19 (accessibilité) et D20 (profil recette et conteneur) réservées ; 20 modules, 90 invariants, points d'extension E1 à E5 ; implémentation en huit lots. Node 22 au moins, deux dépendances (`playwright` 1.63 ou plus récent, `pg`), PostgreSQL pgvector sur le port 5433, Gemini Code Assist par MCP ou modèle local compatible OpenAI, tableau de bord sur `127.0.0.1`. Tirée du dossier de conception du dépôt Agent2Test (cadrage, architecture, cahier des charges du 25 septembre 2026), dont la section 11 donne la filiation.
+- **agent-tdd-jira 1.3.0** : dimension D7 active, binôme avec Agent2Test ; module `binome-agent2test`. Après le dernier scénario accepté, l'agent remet le plan validé et commité ; le développeur redémarre l'application sur le Tomcat local et conduit la campagne ; le script `lire-acceptation.mjs` tire du journal de tests le verdict de chaque critère, s'il vaut pour le plan et le code courants, sinon « non joué » avec sa raison ; chaque défaut applicatif confirmé en CP-3 rouvre son scénario en cycle TDD. Étiquettes de prérequis dans le fichier Gherkin : `@role-<nom>`, `@batch-<nom>`, `@redemarrage`, `@ecriture-base`, et au choix du développeur `@criticite-*` et `@socle`. Colonne « Acceptation » dans la matrice, ligne d'acceptation dans le rapport et le projet de commentaire Jira. Invariants D7.INV-1 à D7.INV-5, aucun invariant existant modifié. Archive 1.2.2.
+- Les deux spécifications se référencent l'une l'autre et se publient dans un même commit (`EVOLUTION.md`, section 7). Le script `lire-acceptation.mjs` est testé sur 33 cas, dont deux en worktree et un qui vérifie qu'il ne modifie aucun fichier, index git compris ; le journal d'exemple d'agent2test, lu par ce script sur l'exemple ECR-77 d'agent-tdd-jira, redonne exactement les deux sorties du module `binome-agent2test` ; l'exemple, qui porte désormais `@role-LECTEUR`, passe `controler-criteres.mjs` sans écart.
+- Décisions du développeur (21 octobre 2026) : Agent2Dev reste la tête de développement et applique agent-tdd-jira ; Playwright en bibliothèque, Agent2Test en projet séparé de l'application ; Agent2Test devient une spécification transmissible de ce dépôt ; tout reste en local, enchaîné à la main ; application sur Tomcat en local, lancée par le développeur ; batchs Java lancés par le développeur à un point de contrôle (CP-5) ; tous les modules actifs, accessibilité réservée.
+- Soumis à ratification :
+  - lecture de « connexion SSO réglée automatiquement » : authentification intégrée du poste par défaut (stratégie `integree`), connexion humaine en CP-0 en repli, sans identifiant détenu ;
+  - écarts au dossier de conception d'Agent2Test (H1, H2, H3, CA-1.5, H9, CA-9.4, T1, H12 et US-29), dont l'AI Act mis hors périmètre et l'envoi des sources à Gemini soumis à l'autorisation de la DSI et du RSSI ;
+  - rôles de l'application : étiquette `@role-<nom>`, rôles de la session déclarés par un humain (`session.roles`), scénario non jouable si le rôle manque ;
+  - contrat de lecture du journal JSON : sources du plan et leurs empreintes, état git relevé à l'ouverture, cible de chaque décision ; verdict « non joué » dès que le plan ou le code a changé depuis la campagne ;
+  - cycle de correction ouvert par un défaut applicatif confirmé en CP-3 sans désaccord, et par lui seul ; régression d'une autre demande corrigée dans la demande en cours, avec l'accord du développeur.
+
 ### 2026-10-21 : agent-tdd-jira 1.2.2
 
 - **agent-tdd-jira 1.2.2** : script de contrôle `controler-criteres.mjs` (module `us-criteres`, section 7), en Node sans dépendance. Il confronte `us.md` et le fichier Gherkin et signale chaque écart avec son invariant (D10.INV-1 à D10.INV-7, D2.INV-3) : identifiants, provenance, énoncés invérifiables, exigences rattachées, couverture des critères par les scénarios, critères en attente, colonne « Scénarios ». Avec `--depuis`, il vérifie qu'aucun identifiant n'a été renuméroté depuis une révision git. L'agent le lance avant V2 et avant V5 ; sa sortie donne les critères prêts pour la réalisation.
@@ -57,6 +70,13 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 - Point d'attention consigné dans les skills : la branche Spring Boot 3.5 n'a plus de support open source depuis le 30 juin 2026, et Angular 20 arrive en fin de support long terme vers la fin novembre 2026. Les migrations correspondantes sont les dimensions réservées D8 (Java) et D9 (Angular).
 
 ## Outils
+
+### 2026-10-21 : citations entre skills vérifiées
+
+- `tools/verifier.mjs` vérifie aussi les identifiants d'un autre skill, cités sous la forme `java:D4.INV-2` : chacun doit être défini dans le point d'entrée du skill qu'il nomme, et ce skill doit exister dans le dépôt. Jusqu'ici, ces identifiants n'étaient pas vérifiés. Les 107 citations de ce type que contient le dépôt sont toutes définies.
+- Testé par deux contre-épreuves de plus, soit 16 sur des copies du dépôt : un invariant d'un autre skill absent, un préfixe qui ne nomme aucun skill du dépôt.
+- `EVOLUTION.md`, section 7 : deux versions qui se référencent l'une l'autre ne passent le vérificateur qu'ensemble, et se publient donc dans un même commit, avec leurs deux transmissions ; section 8 : le vérificateur contrôle les identifiants préfixés.
+- Motif : le binôme entre agent-tdd-jira et Agent2Test repose sur des invariants cités d'une spécification à l'autre.
 
 ### 2026-10-21 : vérificateur étendu et vérification des pull requests
 

@@ -1,0 +1,46 @@
+{
+  "name": "agent2test",
+  "version": "1.0.0",
+  "specSchema": 1,
+  "language": "fr",
+  "description": "Agent2Test : système multi-agents qui choisit, prépare, exécute et journalise les tests essentiels d'une application Angular pour une demande, en pilotant Playwright comme une bibliothèque depuis Node, dans un projet séparé de l'application ; plan importé d'agent-tdd-jira, verdict par critère d'acceptation, points de contrôle humains, cybernétique de premier et de second ordre, exécution locale.",
+  "entry": "SKILL.md",
+  "runtime": {
+    "node": ">=22",
+    "playwright": ">=1.63",
+    "postgresql": ">=17, image pgvector"
+  },
+  "targets": {
+    "application": "front Angular 20, API Spring Boot 3.5 sur Tomcat en local, PostgreSQL de l'application en Docker, Liquibase au démarrage",
+    "plan": "us.md et fichier Gherkin d'agent-tdd-jira, ou convention de l'annexe A",
+    "moteur": "Gemini Code Assist par MCP, modèle local compatible OpenAI, ou simulation",
+    "profil": "local"
+  },
+  "references": [
+    { "name": "agent-tdd-jira", "version": "1.3.0" }
+  ],
+  "modules": [
+    { "id": "noyau", "path": "modules/noyau/SKILL.md", "dimensions": ["D1"], "status": "active" },
+    { "id": "donnees", "path": "modules/donnees/SKILL.md", "dimensions": ["D2"], "status": "active" },
+    { "id": "plan", "path": "modules/plan/SKILL.md", "dimensions": ["D3"], "status": "active" },
+    { "id": "navigateur", "path": "modules/navigateur/SKILL.md", "dimensions": ["D4"], "status": "active" },
+    { "id": "scanner", "path": "modules/scanner/SKILL.md", "dimensions": ["D5"], "status": "active" },
+    { "id": "stratege", "path": "modules/stratege/SKILL.md", "dimensions": ["D6"], "status": "active" },
+    { "id": "preparateur", "path": "modules/preparateur/SKILL.md", "dimensions": ["D7"], "status": "active" },
+    { "id": "verdict", "path": "modules/verdict/SKILL.md", "dimensions": ["D8"], "status": "active" },
+    { "id": "orchestrateur", "path": "modules/orchestrateur/SKILL.md", "dimensions": ["D9"], "status": "active" },
+    { "id": "journal", "path": "modules/journal/SKILL.md", "dimensions": ["D10"], "status": "active" },
+    { "id": "observateur", "path": "modules/observateur/SKILL.md", "dimensions": ["D11"], "status": "active" },
+    { "id": "memoire", "path": "modules/memoire/SKILL.md", "dimensions": ["D12"], "status": "active" },
+    { "id": "apprenant", "path": "modules/apprenant/SKILL.md", "dimensions": ["D13"], "status": "active" },
+    { "id": "reflexif", "path": "modules/reflexif/SKILL.md", "dimensions": ["D14"], "status": "active" },
+    { "id": "referentiel", "path": "modules/referentiel/SKILL.md", "dimensions": ["D15"], "status": "active" },
+    { "id": "mcp", "path": "modules/mcp/SKILL.md", "dimensions": ["D16"], "status": "active" },
+    { "id": "tableau-de-bord", "path": "modules/tableau-de-bord/SKILL.md", "dimensions": ["D17"], "status": "active" },
+    { "id": "exploitation", "path": "modules/exploitation/SKILL.md", "dimensions": ["D18"], "status": "active" },
+    { "id": "accessibilite", "path": "modules/accessibilite/SKILL.md", "dimensions": ["D19"], "status": "reserved" },
+    { "id": "profil-recette", "path": "modules/profil-recette/SKILL.md", "dimensions": ["D20"], "status": "reserved" }
+  ],
+  "extensionPoints": ["E1", "E2", "E3", "E4", "E5"],
+  "previousVersions": []
+}

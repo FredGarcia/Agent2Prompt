@@ -1,6 +1,6 @@
 ---
 name: tracabilite
-description: Traçabilité d'une demande Jira jusqu'au code (matrice US, critères d'acceptation, exigences, scénarios, tests, commits, statuts, construction par recherche des étiquettes, rapport final par critère, écarts, questions ouvertes, projet de commentaire Jira à publier par le développeur, V5). À lire à la fin de chaque scénario et en fin de demande.
+description: Traçabilité d'une demande Jira jusqu'au code (matrice US, critères d'acceptation, exigences, scénarios, tests, commits, statuts, construction par recherche des étiquettes, verdict d'acceptation d'Agent2Test par critère en binôme, rapport final par critère, écarts, questions ouvertes, projet de commentaire Jira à publier par le développeur, V5). À lire à la fin de chaque scénario et en fin de demande.
 dimensions: [D6]
 status: active
 ---
@@ -23,6 +23,7 @@ flowchart LR
   S --> TF["Tests front<br/>describe ECR-77-Snn"]
   TB --> C["Commits<br/>ECR-77 Snn : …"]
   TF --> C
+  S -.->|"en binôme"| AT["Verdict d'acceptation<br/>par critère, Agent2Test"]
 ```
 
 ## 2. Construire la matrice par recherche (point E3)
@@ -38,18 +39,22 @@ grep -rn "describe('ECR-77-S" src/app --include=*.spec.ts
 git log --oneline --grep='^ECR-77 '
 # US, critères et scénarios cohérents, aucun identifiant renuméroté depuis l'ajout de us.md (module us-criteres, section 7)
 node outils/controler-criteres.mjs docs/demandes/ECR-77 --depuis "$(git log --diff-filter=A --format=%h -- docs/demandes/ECR-77/us.md | tail -n 1)"
+# en binôme : verdict d'acceptation de chaque critère, d'après le journal de la dernière campagne (module binome-agent2test, section 6)
+node outils/lire-acceptation.mjs docs/demandes/ECR-77 ../agent2test/rapports/C-20261021-002/journal-de-tests.json
 ```
 
-## 3. Matrice (D6.INV-1, D6.INV-2, D10.INV-7)
+## 3. Matrice (D6.INV-1, D6.INV-2, D10.INV-7, D7.INV-3)
 
-| US | CA | Exigences | Scénario | Variante | Tests back | Tests front | Commit | Statut |
-|---|---|---|---|---|---|---|---|---|
-| ECR-77-US01 | ECR-77-CA01 | EX-01 | @ECR-77-S01 | B1 + F1 | `FeedbackExportControllerTest#exporteLaListeFiltree` | `feedback.store.spec.ts` › ECR-77-S01 | `a1b2c3d` | réalisé |
-| ECR-77-US01 | ECR-77-CA02 | EX-02, EX-03 | @ECR-77-S02 | B1 | `FeedbackCsvTest#exportCommenceParLeBomEtUtiliseLePointVirgule` | non concerné | `d4e5f6a` | réalisé |
-| ECR-77-US01 | ECR-77-CA03 | EX-04 | @ECR-77-S03 | — | — | — | — | non réalisé : en attente de Q1 |
-| ECR-77-US01 | ECR-77-CA04 (proposé, validé) | — | @ECR-77-S04 | B1 + F1 | `…` | `feedback-list.spec.ts` › ECR-77-S04 | `b7c8d9e` | réalisé |
+| US | CA | Exigences | Scénario | Variante | Tests back | Tests front | Commit | Statut | Acceptation |
+|---|---|---|---|---|---|---|---|---|---|
+| ECR-77-US01 | ECR-77-CA01 | EX-01 | @ECR-77-S01 | B1 + F1 | `FeedbackExportControllerTest#exporteLaListeFiltree` | `feedback.store.spec.ts` › ECR-77-S01 | `a1b2c3d` | réalisé | conforme |
+| ECR-77-US01 | ECR-77-CA02 | EX-02, EX-03 | @ECR-77-S02 | B1 | `FeedbackCsvTest#exportCommenceParLeBomEtUtiliseLePointVirgule` | non concerné | `d4e5f6a` | réalisé | non vérifié (non jouable : limité au back) |
+| ECR-77-US01 | ECR-77-CA03 | EX-04 | @ECR-77-S03 | — | — | — | — | non réalisé : en attente de Q1 | non vérifié (non jouable : en attente de Q1) |
+| ECR-77-US01 | ECR-77-CA04 (proposé, validé) | — | @ECR-77-S04 | B1 + F1 | `…` | `feedback-list.spec.ts` › ECR-77-S04 | `b7c8d9e`, `f0a1b2c` | réalisé, corrigé après la campagne C-20261021-001 | conforme |
 
 Une exigence sans CA ni scénario, un CA sans scénario, ou un scénario validé sans test ni statut, rend la matrice incomplète : l'agent ne remet pas le rapport dans cet état. Un CA est réalisé quand tous ses scénarios le sont.
+
+La colonne « Acceptation » reprend, telle quelle, la ligne du critère dans la sortie de `lire-acceptation.mjs` : le verdict d'Agent2Test quand il vaut pour le plan et le code courants, sinon « non joué » avec sa raison (D7.INV-3). Sans binôme, elle porte « non joué (pas de campagne Agent2Test) ». Un critère « non vérifié » côté Agent2Test peut être réalisé et couvert par les tests de l'agent, comme CA02 : les deux colonnes se lisent ensemble.
 
 ## 4. Rapport final (D6.INV-4)
 
@@ -60,6 +65,7 @@ Une exigence sans CA ni scénario, un CA sans scénario, ou un scénario validé
 - **Critères d'acceptation** : 4 pour 1 US, dont 1 proposé et validé ; 3 réalisés (CA01, CA02, CA04), 1 en attente (CA03, Q1)
 - **Scénarios** : 4 dont 1 proposé et validé ; 3 réalisés, 1 en attente
 - **Suites** : back `./mvnw verify` vert (415 tests) ; front `ng test` vert (238 tests), `ng lint` sans erreur
+- **Acceptation** : campagne C-20261021-002 d'Agent2Test, sur le commit f0a1b2c ; 2 conformes (CA01, CA04), 2 non vérifiés (CA02 limité au back, CA03 en attente de Q1) ; 1 défaut applicatif confirmé par la campagne C-20261021-001 (CA04) et corrigé
 - **Écarts à la demande** : aucun
 - **Écarts aux référentiels** : aucun
 - **Questions ouvertes** : Q1 (au-delà de 10 000 lignes) — S03 non réalisé
@@ -83,7 +89,10 @@ En attente :
   A. exporter les 10 000 premières lignes et prévenir l'utilisateur
   B. refuser l'export et demander d'affiner le filtre
 
-Tests : back et front verts. Commits : a1b2c3d, d4e5f6a, b7c8d9e.
+Acceptation par Agent2Test : CA01 et CA04 conformes ; CA02 vérifié par les tests du back ;
+CA03 en attente de la réponse.
+
+Tests : back et front verts. Commits : a1b2c3d, d4e5f6a, b7c8d9e, f0a1b2c.
 ```
 
 ## 6. Pièges connus
@@ -99,3 +108,4 @@ Tests : back et front verts. Commits : a1b2c3d, d4e5f6a, b7c8d9e.
 - Chaque test de la matrice porte l'étiquette de son scénario (D6.INV-2).
 - Aucune écriture dans Jira ; projet de commentaire fourni (D6.INV-3).
 - Rapport final avec écarts, questions ouvertes et résultats des suites (D6.INV-4).
+- Chaque CA porte son verdict d'acceptation, valable pour le plan et le code courants, ou « non joué » avec sa raison, repris de `lire-acceptation.mjs` (D7.INV-3).

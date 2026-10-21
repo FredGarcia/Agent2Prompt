@@ -1,10 +1,10 @@
 ---
 name: agent-tdd-jira
-description: Agent de développement TDD qui part d'une demande Jira enregistrée en MHTML, l'analyse avec ses commentaires, établit les US et leurs critères d'acceptation numérotés, décline chaque critère en scénarios Gherkin, propose au développeur des variantes de réalisation back Java et front Angular pour chaque scénario, puis réalise les scénarios choisis un par un en cycle rouge, vert, remanié, avec traçabilité de la demande jusqu'aux commits ; en mode parallèle, il travaille dans un worktree géré par le kit agents-paralleles-gitlab.
-version: 1.2.2
+description: Agent de développement TDD qui part d'une demande Jira enregistrée en MHTML, l'analyse avec ses commentaires, établit les US et leurs critères d'acceptation numérotés, décline chaque critère en scénarios Gherkin, propose au développeur des variantes de réalisation back Java et front Angular pour chaque scénario, puis réalise les scénarios choisis un par un en cycle rouge, vert, remanié, avec traçabilité de la demande jusqu'aux commits ; en binôme avec Agent2Test, il reçoit un verdict d'acceptation par critère et corrige en TDD les défauts applicatifs confirmés ; en mode parallèle, il travaille dans un worktree géré par le kit agents-paralleles-gitlab.
+version: 1.3.0
 ---
 
-# Agent de développement TDD à partir d'une demande Jira, version 1.2.2
+# Agent de développement TDD à partir d'une demande Jira, version 1.3.0
 
 Ce document est le point d'entrée du skill. Il fixe le parcours de l'agent, ses points de validation, le registre des dimensions et les invariants. Les règles détaillées sont dans `modules/`.
 
@@ -21,7 +21,8 @@ Fichiers inclus à des versions épinglées (voir `manifest.json`) :
 3. `socle/SKILL.md`, puis les sections « Versions cibles » et « Invariants » des référentiels Java et Angular.
 4. Les modules actifs, dans l'ordre du parcours : `ingestion-jira`, `us-criteres`, `analyse-demande`, `impact`, `variantes`, `cycle-tdd`, `tracabilite`.
 5. En mode parallèle seulement : les sections « Invariant d'organisation » et « Invariants » de `references/agents-paralleles-gitlab.md`, puis `modules/parallele/SKILL.md`, qui s'ajoute aux autres modules.
-6. `modules/binome-agent2test/SKILL.md` et `modules/connecteur-jira/SKILL.md` : seulement pour comprendre les points d'extension. Ne pas les appliquer en 1.x.
+6. En binôme avec Agent2Test : `modules/binome-agent2test/SKILL.md`, qui s'ajoute aux autres modules.
+7. `modules/connecteur-jira/SKILL.md` : seulement pour comprendre le point d'extension E1. Ne pas l'appliquer en 1.x.
 
 ## 2. Parcours et points de validation
 
@@ -42,7 +43,9 @@ flowchart TD
   T --> V4{"V4 : scénario<br/>accepté ?"}
   V4 -->|"non, ajustement"| T
   V4 -->|"oui, scénario suivant"| T
-  V4 -->|"oui, dernier scénario"| TR["6. Traçabilité<br/>matrice, rapport,<br/>projet de commentaire Jira"]
+  V4 -->|"oui, dernier scénario"| AC["6. Acceptation, en binôme<br/>Agent2Test : verdict par critère"]
+  AC -->|"défaut applicatif confirmé"| T
+  AC -->|"aucun, ou sans binôme"| TR["7. Traçabilité<br/>matrice, rapport,<br/>projet de commentaire Jira"]
   TR --> V5{"V5 : rapport<br/>accepté ?"}
 ```
 
@@ -52,7 +55,7 @@ flowchart TD
 | V2 | les US et leurs critères d'acceptation, les scénarios de chaque critère, les réponses aux questions, ce que l'agent propose | `us-criteres`, `analyse-demande` |
 | V3 | une variante back et une variante front par scénario | `variantes` |
 | V4 | chaque scénario réalisé (rouge, vert, remanié) avant le suivant | `cycle-tdd` |
-| V5 | la matrice de traçabilité et le rapport final | `tracabilite` |
+| V5 | la matrice de traçabilité et le rapport final, avec le verdict d'acceptation de chaque critère en binôme | `tracabilite`, `binome-agent2test` |
 
 ## 3. Cibles techniques
 
@@ -66,7 +69,7 @@ Les versions cibles sont celles des référentiels : Java 21, Spring Boot 3.5, P
 | Front, stores et services | tests avec `HttpTestingController` | outil de tests unitaires du projet (Jasmine et Karma, ou Jest) |
 | Front, composants | tests de composants | `TestBed`, harnais du CDK si présents |
 
-Les tests de bout en bout relèvent de la dimension réservée D7 (binôme avec Agent2Test).
+Les tests de bout en bout et d'acceptation sont ceux d'Agent2Test, projet séparé de l'application, en binôme (D7) : l'agent n'en écrit pas.
 
 ## 4. Cycle 7E
 
@@ -75,16 +78,16 @@ Les tests de bout en bout relèvent de la dimension réservée D7 (binôme avec 
 | Éléments | phrases de la demande, commentaires, pièces, US, critères d'acceptation, scénarios | `ingestion-jira`, `us-criteres`, `analyse-demande` |
 | Espace | code back et front concerné, contrat d'API | `impact` |
 | Engendrent | variantes de réalisation et leurs combinaisons | `variantes` |
-| État | état de chaque critère (à valider, validé, en attente, retiré) et de chaque scénario (proposé, validé, rouge, vert, remanié, accepté) | `us-criteres`, `cycle-tdd` |
+| État | état de chaque critère (à valider, validé, en attente, retiré) et de chaque scénario (proposé, validé, rouge, vert, remanié, accepté) ; en binôme, verdict d'acceptation de chaque critère | `us-criteres`, `cycle-tdd`, `binome-agent2test` |
 | Expression | fichier des US et critères (`us.md`), fichier Gherkin, tests, code, matrice, projet de commentaire Jira | `us-criteres`, `analyse-demande`, `cycle-tdd`, `tracabilite` |
 | Évolutif | commits successifs, réponses aux questions, versions du skill | `cycle-tdd`, `tracabilite` |
-| Environnement | développeur, auteur de la demande, experts de référence, Agent2Test, agents des autres demandes et garde-fous du kit en mode parallèle | `tracabilite`, `parallele`, D7 |
+| Environnement | développeur, auteur de la demande, experts de référence, Agent2Test, agents des autres demandes et garde-fous du kit en mode parallèle | `tracabilite`, `parallele`, `binome-agent2test` |
 
 Clause de second ordre : l'agent interprète une demande écrite par d'autres. Ses critères d'acceptation, et les scénarios qui les illustrent, deviennent la définition de « terminé ». Il distingue donc ce que dit la demande (avec sa provenance), ce qu'il en déduit (critère d'acceptation ou scénario proposé, à valider), et ce qu'il ignore (question). Il ne tranche jamais seul une contradiction entre la description et un commentaire.
 
 ## 5. Registre des dimensions
 
-| ID | Dimension | Introduite | Statut 1.2.0 | Dépend de | Module |
+| ID | Dimension | Introduite | Statut 1.3.0 | Dépend de | Module |
 |---|---|---|---|---|---|
 | D1 | Ingestion d'une demande Jira en MHTML | 1.0 | active | | `ingestion-jira` |
 | D2 | Analyse et scénarios Gherkin | 1.0 | active | D1, D10 | `analyse-demande` |
@@ -92,7 +95,7 @@ Clause de second ordre : l'agent interprète une demande écrite par d'autres. S
 | D4 | Variantes de réalisation back et front | 1.0 | active | D3, référentiels, socle | `variantes` |
 | D5 | Cycle TDD scénario par scénario | 1.0 | active | D4, référentiels | `cycle-tdd` |
 | D6 | Traçabilité et rapport | 1.0 | active | D1 à D5, D10 | `tracabilite` |
-| D7 | Binôme avec Agent2Test (tests de bout en bout) | 1.0 | reserved | D2, D5 | `binome-agent2test` |
+| D7 | Binôme avec Agent2Test (tests de bout en bout et d'acceptation) | 1.0 | active | D2, D5, D6, D10 | `binome-agent2test` |
 | D8 | Connecteur Jira (API ou MCP) à la place du MHTML | 1.0 | reserved | D1 | `connecteur-jira` |
 | D9 | Travail dans un worktree géré, en parallèle d'autres demandes | 1.1 | active | D1, D3, D5, D6, référentiel du kit | `parallele` |
 | D10 | US et critères d'acceptation numérotés | 1.2 | active | D1 | `us-criteres` |
@@ -104,12 +107,12 @@ Le skill suit le contrat de version de `EVOLUTION.md` du dépôt Agent2Prompt. L
 Points d'extension, actifs dès 1.0.0 :
 
 - **E1** : l'analyse ne lit que `demande.json` (schéma version 1), jamais le MHTML directement. Un connecteur Jira (D8) remplacera l'ingestion sans toucher aux modules suivants.
-- **E2** : chaque scénario porte une étiquette stable `@<CLÉ>-Snn` (par exemple `@ECR-77-S03`), jamais renumérotée. Agent2Test (D7) s'en servira pour rattacher ses tests de bout en bout.
+- **E2** : chaque scénario porte une étiquette stable `@<CLÉ>-Snn` (par exemple `@ECR-77-S03`), jamais renumérotée. Agent2Test s'en sert pour rattacher ses parcours et ses verdicts (D7).
 - **E3** : chaque test écrit par l'agent porte l'étiquette de son scénario (`@Tag` et `@DisplayName` en JUnit, libellé du `describe` côté front), ce qui permet de sélectionner les tests d'un scénario et de construire la matrice par recherche.
 
 Point d'extension ajouté en 1.2.0 :
 
-- **E4** : chaque critère d'acceptation porte une étiquette stable `@<CLÉ>-CAnn`, reprise par les scénarios qui l'illustrent. Les tests d'acceptation du binôme avec Agent2Test (D7) s'y rattacheront, et le rapport d'acceptation donnera un verdict par critère.
+- **E4** : chaque critère d'acceptation porte une étiquette stable `@<CLÉ>-CAnn`, reprise par les scénarios qui l'illustrent. Les tests d'acceptation d'Agent2Test s'y rattachent, et son journal de tests donne un verdict par critère (D7).
 
 ## 7. Règles globales
 
@@ -119,6 +122,7 @@ Point d'extension ajouté en 1.2.0 :
 - **Dépendances** : aucune nouvelle dépendance (back ou front), ni outil d'exécution Gherkin, sans validation.
 - **Secrets et données** : la demande peut contenir des noms de personnes et des données métier ; l'agent ne les recopie que dans les artefacts du projet qui en ont besoin (scénarios, rapport), jamais dans le code ni dans les tests, où il utilise des données fictives.
 - **Langue** : scénarios Gherkin en français (`# language: fr`), identifiants de code en anglais, rapports en français.
+- **Binôme** : avec Agent2Test, l'agent remet le plan validé, lit le journal de tests et corrige en TDD les défauts applicatifs confirmés. Il ne démarre, n'arrête ni ne déploie l'application et ne lance aucun batch : le développeur s'en charge, et enchaîne les deux têtes à la main (D7.INV-4).
 - **Mode parallèle** : quand la consigne de lancement annonce un worktree géré par le kit `agents-paralleles-gitlab`, le module `parallele` s'ajoute aux autres. Ses règles sont plus strictes, jamais plus souples : l'agent ne pousse plus du tout, même sur demande (D9.INV-2).
 
 ## 8. Critères d'acceptation
@@ -129,6 +133,7 @@ Point d'extension ajouté en 1.2.0 :
 - Variantes choisies et consignées (V3).
 - Pour chaque scénario réalisé : test rouge observé pour la bonne raison, test vert, remaniement, suites back et front vertes, scénario accepté (V4).
 - Matrice de traçabilité complète et rapport final (V5), avec projet de commentaire Jira.
+- En binôme : chaque critère d'acceptation porte le verdict d'Agent2Test valable pour le plan et le code courants, établi par le script `lire-acceptation.mjs`, ou « non joué » avec sa raison ; chaque défaut applicatif confirmé est corrigé en cycle TDD (D7).
 - En mode parallèle : `travail/<CLÉ>/impact.txt` et `travail/<CLÉ>/rapport.md` produits, chaque commit au format de la demande, aucun refus de garde-fou contourné (D9).
 
 ## 9. Invariants
@@ -175,6 +180,14 @@ Point d'extension ajouté en 1.2.0 :
 - **D6.INV-3** : l'agent n'écrit jamais dans Jira ; il fournit un projet de commentaire que le développeur publie lui-même.
 - **D6.INV-4** : le rapport final liste les écarts à la demande, les questions restées ouvertes et le résultat des suites de tests back et front.
 
+**D7 : binôme avec Agent2Test**
+
+- **D7.INV-1** : le plan remis à Agent2Test est `us.md` et le fichier Gherkin validés à V2 et commités, tels quels ; l'agent n'écrit ni parcours ni fichier d'Agent2Test.
+- **D7.INV-2** : chaque défaut applicatif confirmé en CP-3 par Agent2Test rouvre le scénario qu'il vise en cycle TDD : un test rouge, étiqueté avec ce scénario, reproduit le défaut avant tout code de production.
+- **D7.INV-3** : la matrice et le rapport final donnent, pour chaque critère d'acceptation, le verdict d'Agent2Test valable pour le plan et le code courants (conforme, non conforme, non vérifié avec son motif), ou « non joué » avec sa raison.
+- **D7.INV-4** : l'agent ne démarre, n'arrête ni ne déploie l'application et ne lance aucun batch ; il ne réécrit ni ne conteste lui-même un verdict d'Agent2Test : un désaccord est remonté au développeur.
+- **D7.INV-5** : un scénario qui exige un rôle de l'application porte `@role-<nom>`, directement ou par sa fonctionnalité ; un batch Java, `@batch-<nom>` ; un redémarrage de l'application ou une écriture directe en base, `@redemarrage` ou `@ecriture-base`.
+
 **D9 : travail en parallèle**
 
 - **D9.INV-1** : en mode parallèle, l'agent n'écrit que dans le worktree de sa demande ; ses fichiers de travail (demande enregistrée, `demande.json`, images, script d'extraction, `impact.txt`, `rapport.md`) vont dans `travail/`.
@@ -205,4 +218,6 @@ Point d'extension ajouté en 1.2.0 :
 
 **1.2.1** (2026-10-21) : correctif. Référentiels renommés, le préfixe `expert-` étant retiré de tous les skills du dépôt : `references/java.md` (java 1.1.1) et `references/angular.md` (angular 1.0.1), cités sous la forme `java:Dn.INV-k` et `angular:Dn.INV-k`. Épinglages montés : socle back-front 1.0.1, agents-paralleles-gitlab 1.0.1. Aucune dimension ni aucun invariant modifié. Motif : une nouvelle notion d'expertise sera définie ensuite. Archive : `archives/SKILL-v1.2.1.md`.
 
-**1.2.2** (2026-10-21) : correctif. Script de contrôle `controler-criteres.mjs` (module `us-criteres`, section 7), en Node sans dépendance : il confronte `us.md` et le fichier Gherkin et signale chaque écart avec son invariant (D10.INV-1 à D10.INV-7, D2.INV-3) ; avec `--depuis`, il vérifie qu'aucun identifiant n'a été renuméroté depuis une révision git. L'agent le lance avant V2 et avant V5. `us.md` gagne une section « Exigences », qui consigne le rattachement de chaque exigence, et le statut d'un CA retiré s'écrit « retiré : <raison> ». Aucune dimension ni aucun invariant modifié : le script rend vérifiables des invariants existants.
+**1.2.2** (2026-10-21) : correctif. Script de contrôle `controler-criteres.mjs` (module `us-criteres`, section 7), en Node sans dépendance : il confronte `us.md` et le fichier Gherkin et signale chaque écart avec son invariant (D10.INV-1 à D10.INV-7, D2.INV-3) ; avec `--depuis`, il vérifie qu'aucun identifiant n'a été renuméroté depuis une révision git. L'agent le lance avant V2 et avant V5. `us.md` gagne une section « Exigences », qui consigne le rattachement de chaque exigence, et le statut d'un CA retiré s'écrit « retiré : <raison> ». Aucune dimension ni aucun invariant modifié : le script rend vérifiables des invariants existants. Archive : `archives/SKILL-v1.2.2.md`.
+
+**1.3.0** (2026-10-21) : dimension D7 active, binôme avec Agent2Test (spécification `agent2test` 1.0.0), en local et enchaîné à la main par le développeur ; module `binome-agent2test`. Après le dernier scénario accepté, le plan validé (`us.md` et fichier Gherkin) part à Agent2Test ; son journal de tests revient avec un verdict par critère ; le script `lire-acceptation.mjs` (module `binome-agent2test`, section 6) en tire le verdict de chaque critère, s'il vaut pour le plan et le code courants ; chaque défaut applicatif confirmé en CP-3 rouvre son scénario en cycle TDD ; la matrice et le rapport final portent le verdict d'acceptation de chaque critère, et le projet de commentaire Jira le résumé. Étiquettes du binôme dans le fichier Gherkin : `@role-<nom>`, `@batch-<nom>`, `@redemarrage`, `@ecriture-base`, et au choix du développeur `@criticite-*` et `@socle` ; une étiquette de la fonctionnalité vaut pour chacun de ses scénarios. L'exemple ECR-77 porte `@role-LECTEUR`. D7 dépend aussi de D6 et D10. Invariants D7.INV-1 à D7.INV-5 ; aucun invariant existant modifié. Motif : fermer la boucle du ticket aux tests d'acceptation, Agent2Dev appliquant ce skill comme méthode.

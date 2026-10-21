@@ -25,9 +25,9 @@
  *   point d'entrée (`- **En**`) ;
  * - chaque bloc de code Markdown est fermé ;
  * - chaque invariant défini dans le point d'entrée (`**Dn.INV-k**`, `**SCn.INV-k**`) est
- *   repris dans au moins un module, et chaque invariant cité est défini (un identifiant
- *   préfixé par un nom de skill, comme `java:D4.INV-2`, désigne un autre skill et
- *   n'est pas vérifié ici).
+ *   repris dans au moins un module, et chaque invariant cité est défini ; un identifiant
+ *   préfixé par un nom de skill, comme `java:D4.INV-2`, désigne un autre skill du dépôt
+ *   et doit être défini dans son point d'entrée.
  *
  * Pour le dépôt :
  *
@@ -80,9 +80,21 @@ function fichiersMarkdown(dossier) {
 const DEFINITION = /\*\*((?:D|SC)\d+\.INV-\d+)\*\*/g;
 // Identifiant non précédé d'un préfixe de skill (`nom-du-skill:`) ni d'un autre caractère d'identifiant.
 const CITATION = /(?<![\w:-])((?:D|SC)\d+\.INV-\d+)/g;
+// Identifiant d'un autre skill, préfixé par son nom : `java:D4.INV-2`.
+const CITATION_EXTERNE = /(?<![\w-])([a-z][a-z0-9-]*):((?:D|SC)\d+\.INV-\d+)/g;
 
 function definitions(texte) {
   return new Set([...texte.matchAll(DEFINITION)].map((m) => m[1]));
+}
+
+/** Invariants définis par le point d'entrée d'un autre skill du dépôt, ou null s'il n'existe pas. */
+const definitionsParSkill = new Map();
+function definitionsDe(nom) {
+  if (!definitionsParSkill.has(nom)) {
+    const chemin = join(dossierSpecs, nom, 'SKILL.md');
+    definitionsParSkill.set(nom, existsSync(chemin) ? definitions(lire(chemin)) : null);
+  }
+  return definitionsParSkill.get(nom);
 }
 
 /** Statut de chaque dimension d'après le registre du point d'entrée (colonne « Statut … »). */
@@ -264,6 +276,11 @@ function verifierSpec(dossier) {
   for (const texte of [texteEntree, ...textesModules]) {
     for (const [, id] of texte.matchAll(CITATION)) {
       if (!definis.has(id)) erreur(`${id} est cité mais n'est défini ni dans le point d'entrée ni dans un fichier partagé`);
+    }
+    for (const [, nom, id] of texte.matchAll(CITATION_EXTERNE)) {
+      const autres = definitionsDe(nom);
+      if (autres === null) erreur(`${nom}:${id} est cité, mais ${nom} n'est pas une spécification du dépôt`);
+      else if (!autres.has(id)) erreur(`${nom}:${id} est cité mais n'est pas défini dans specs/${nom}/SKILL.md`);
     }
   }
 

@@ -105,8 +105,8 @@ Procédure, dans cet ordre :
 4. Ajouter l'entrée au journal de révision du `SKILL.md` et à `CHANGELOG.md`, et mettre à jour `README.md` (tableau des spécifications et schéma).
 5. Régénérer le glossaire : `node tools/glossaire.mjs`. Il détaille chaque invariant de chaque spécification et n'est jamais modifié à la main.
 6. Régénérer la transmission : `node tools/bundle.mjs specs/<nom>`. Le script échoue si l'aller-retour n'est pas identique.
-7. Vérifier : `node tools/verifier.mjs` (manifestes, versions, modules et registre, épinglages, références, archives, points d'extension, blocs de code, invariants définis et cités, transmissions fidèles aux fichiers, README et glossaire à jour). La relecture humaine reste nécessaire pour le fond : le vérificateur contrôle la structure.
-8. Commiter la version en un seul commit, avec sa transmission, le glossaire, le README et l'entrée du CHANGELOG, sous le message `spec(<nom>): version X.Y.Z, <résumé>` : le vérificateur passe ainsi sur chaque commit.
+7. Vérifier : `node tools/verifier.mjs` (manifestes, versions, modules et registre, épinglages, références, archives, points d'extension, blocs de code, invariants définis et cités, y compris ceux d'un autre skill, transmissions fidèles aux fichiers, README et glossaire à jour). La relecture humaine reste nécessaire pour le fond : le vérificateur contrôle la structure.
+8. Commiter la version en un seul commit, avec sa transmission, le glossaire, le README et l'entrée du CHANGELOG, sous le message `spec(<nom>): version X.Y.Z, <résumé>` : le vérificateur passe ainsi sur chaque commit. Deux versions qui se référencent l'une l'autre ne passent le vérificateur qu'ensemble : elles se publient dans un même commit, avec leurs deux transmissions, sous le message `spec(<nom>, <nom>): versions X.Y.Z et X.Y.Z, <résumé>`.
 9. Ouvrir une pull request ; le vérificateur y tourne automatiquement, et le développeur ratifie avant fusion.
 
 Les transmissions des versions précédentes restent dans `transmissions/` : elles sont la trace exacte de ce qui a été remis à une IA. La transmission d'une version publiée n'est donc jamais régénérée : si le vérificateur la trouve infidèle aux fichiers, c'est qu'une modification attend une nouvelle version.
@@ -126,7 +126,7 @@ flowchart LR
 - La version épinglée est vérifiée à chaque assemblage. Faire évoluer le socle oblige donc chaque skill dépendant à décider explicitement de monter son épinglage : c'est voulu, une règle commune ne change pas en silence sous un skill.
 - Un socle se marque `"transmissible": false` : il n'a de sens qu'inclus.
 - Une référence (`references`) cite un skill dont on reprend les règles, à une version donnée. Si le skill référencé change de version, le skill qui le cite doit être revu et sa référence mise à jour.
-- Les identifiants d'un autre skill sont toujours préfixés par son nom (`java:D4.INV-2`), pour ne jamais se confondre avec les invariants locaux.
+- Les identifiants d'un autre skill sont toujours préfixés par son nom (`java:D4.INV-2`), pour ne jamais se confondre avec les invariants locaux. Le vérificateur s'assure que chacun est défini dans le point d'entrée du skill qu'il nomme.
 - Un skill peut inclure le point d'entrée d'un autre skill comme **référentiel** (par exemple `references/java.md` dans l'expert SonarQube) : il en lit les invariants sans en adopter le mode de travail, ce que son en-tête de transmission précise. Le vérificateur n'importe depuis les fichiers partagés que les identifiants du socle (`SCn`) : les `Dn` d'un référentiel ne peuvent pas masquer une faute de frappe sur un invariant local.
 
 ## 9. Ajouter une nouvelle spécification
