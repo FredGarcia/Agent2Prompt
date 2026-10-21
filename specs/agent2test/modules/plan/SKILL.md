@@ -15,7 +15,7 @@ status: active
 
 ### 1.1 `agent-tdd-jira`
 
-Source : le dossier `docs/demandes/<CLÉ>/` du projet de l'application, produit par agent-tdd-jira 1.3.0 (`agent-tdd-jira:D10.INV-5`, `agent-tdd-jira:D7.INV-1`).
+Source : le dossier `docs/demandes/<CLÉ>/` du projet de l'application, produit par agent-tdd-jira 1.3.1 (`agent-tdd-jira:D10.INV-5`, `agent-tdd-jira:D7.INV-1`).
 
 `us.md` :
 
@@ -111,13 +111,14 @@ await bus.demander('plan', 'ouvrir', {
 - `changements` : une liste de fichiers modifiés, ou une plage git lue par le `scanner` ; elle alimente l'impact (module `scanner`).
 - Rôles : un scénario `@role-<nom>` dont le rôle manque à `session.roles` de la configuration humaine est non jouable pour la campagne, motif « rôle <nom> absent de la session ». Le système ne déduit jamais les rôles de la session : un humain les déclare.
 - La campagne retient, à son ouverture, la version du plan, les empreintes de ses sources et l'état git de la racine relevé par le `scanner` : commit `HEAD` et fichiers suivis modifiés. Une modification ultérieure des sources ne change ni sa sélection ni ses verdicts (D3.INV-4).
+- Depuis une remise (module `relais`), `ouvrir` reçoit aussi `attendu : { commit, sources }`, tirés de la remise. Si le commit relevé diffère, si un fichier suivi est modifié, ou si l'empreinte d'une source diffère, l'ouverture est refusée `REMISE_PERIMEE`, avec l'écart, avant toute sélection (D22.INV-3).
 
 ## 6. Actions et événements
 
 | Action | Rôle |
 |---|---|
 | `importer(sources)` | importe et versionne ; rend le plan canonique et ses marques |
-| `ouvrir(demande)` | vérifie le périmètre, fige la version et l'état git, rend critères cités, trous, absents et scénarios non jouables faute de rôle |
+| `ouvrir(demande)` | vérifie le périmètre, et la fraîcheur d'une remise, fige la version et l'état git, rend critères cités, trous, absents et scénarios non jouables faute de rôle |
 | `plan(campagne)` | plan figé de la campagne |
 | `criteres(filtre)` | critères et leurs scénarios |
 

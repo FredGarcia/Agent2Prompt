@@ -40,12 +40,12 @@ Attends la validation du développeur avant d'écrire la moindre ligne de code.
 Après validation, implémente dans cet ordre. Chaque lot passe ses tests, en simulation et sans réseau, avant le suivant, et se termine par un point de validation du développeur. Un lot qui a besoin d'un module d'un lot suivant s'appuie sur sa simulation, déclarée par le même contrat de bus.
 
 1. Noyau : `noyau` (D1).
-2. Données, journal et référentiel : `donnees`, `journal`, `referentiel` (D2, D10, D15).
+2. Données, journal et référentiel : `donnees`, `journal`, `referentiel` (D21, D10, D15).
 3. Plan, mémoire et cartographie : `plan`, `memoire`, `scanner` (D3, D12, D5).
 4. Exécution : `navigateur`, `preparateur`, `verdict`, `orchestrateur` (D4, D7, D8, D9).
 5. Sélection : `stratege` (D6).
 6. Premier et second ordre : `observateur`, `apprenant`, `reflexif` (D11, D13, D14).
-7. Interfaces : `mcp`, `tableau-de-bord` (D16, D17).
+7. Interfaces : `mcp`, `tableau-de-bord`, `relais` (D16, D17, D22).
 8. Exploitation : `exploitation` (D18) et le guide de démarrage.
 
 ## Étape 4 : recette
@@ -61,7 +61,9 @@ Vérifie les critères d'acceptation globaux de `SKILL.md`, section 9, puis rend
 - Aucun point de contrôle n'est sauté, supprimé ou validé par le système.
 - Aucun verdict sans preuve ; aucun verdict réécrit.
 - Le journal et le grand livre sont en ajout seul.
+- Les données d'Agent2Test sont des fichiers SQLite, un par agent, par `node:sqlite` : aucun serveur de base de données. La dimension D2 est remplacée par D21 : n'implémente pas ses invariants.
 - Tout s'exécute en local ; les interfaces n'écoutent que sur `127.0.0.1`.
+- n8n est facultatif : rien ne doit en dépendre. Il ne fait que déposer une remise et relever un journal de tests, par le serveur MCP ; il ne décide rien et n'ouvre aucune campagne.
 - N'implémente aucun module au statut `reserved`.
 
 Commence par l'étape 0, puis l'étape 1, puis l'étape 2.

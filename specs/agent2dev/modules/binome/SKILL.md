@@ -7,7 +7,7 @@ status: active
 
 # Module `binome` (D10)
 
-Le `binome` applique le module `binome-agent2test` du skill. Agent2Test (spécification `agent2test` 1.0.0) est la tête de test ; Agent2Dev est la tête de développement ; le développeur fait le lien. Les deux têtes ne s'appellent jamais : elles échangent des fichiers, que le développeur porte.
+Le `binome` applique le module `binome-agent2test` du skill. Agent2Test (spécification `agent2test` 1.1.0) est la tête de test ; Agent2Dev est la tête de développement ; le développeur fait le lien. Les deux têtes ne s'appellent jamais : elles échangent des fichiers, que le développeur porte, ou le relais n8n quand il est activé (module `relais`).
 
 ## 1. Remise (D10.INV-1)
 
@@ -18,7 +18,7 @@ Quand tous les scénarios prêts pour la réalisation sont acceptés à V4 :
 3. l'`executant` lance `controler-criteres` dans l'arbre de la demande : aucun écart ;
 4. le `binome` rend la remise au format du skill (`binome-agent2test`, section 4), sans moteur : commit de l'arbre de la demande, fichiers du plan, critères et leurs statuts, scénarios jouables prévus et non jouables avec leur motif, préalables de batch, plage de changements depuis la branche de base.
 
-C'est l'arbre de la demande que le développeur construit et lance pour la campagne : la remise ne cite jamais la copie de travail.
+C'est l'arbre de la demande que le développeur construit et lance pour la campagne : la remise ne cite jamais la copie de travail. Avec le relais n8n, la même remise se lit aussi au format `agent2test.remise/1`, par l'outil `a2d_remise` (module `relais`).
 
 La liste des jouables se déduit des étiquettes, selon les règles du skill (`binome-agent2test`, section 3) : `@back` sans `@front`, `@en-attente`, `@propose`, `@redemarrage` et `@ecriture-base` rendent un scénario non jouable ; `@role-<nom>` et `@batch-<nom>` sont rappelés. C'est une prévision : Agent2Test décide (`agent2test:D3.INV-5`).
 
@@ -27,6 +27,7 @@ La liste des jouables se déduit des étiquettes, selon les règles du skill (`b
 La demande passe à l'état « attente du journal de tests ». Le développeur redémarre l'application sur le Tomcat local, ouvre la campagne d'Agent2Test, la conduit à ses points de contrôle, puis donne à Agent2Dev le chemin du journal (`rapports/<campagne>/journal-de-tests.json`), depuis le tableau de bord ou par l'outil MCP `a2d_journal_de_tests`. Il peut aussi déclarer la demande « sans binôme ».
 
 - En mode parallèle, le journal est déposé dans `travail/<CLÉ>/acceptation/`, et Agent2Dev refuse un chemin hors de ce dossier (skill, `binome-agent2test`, section 9).
+- Avec le relais n8n, le journal arrive par son contenu : le `depot` le range dans `acceptation/<campagne>.json` du dossier de travail, et la lecture qui suit est la même (module `relais`, section 4).
 - Agent2Dev n'ouvre aucune campagne, n'appelle pas Agent2Test et n'écrit rien dans son projet (D10.INV-4).
 
 ## 3. Lecture du journal (D10.INV-2)

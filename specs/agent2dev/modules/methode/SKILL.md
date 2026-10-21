@@ -1,6 +1,6 @@
 ---
 name: methode
-description: La méthode d'Agent2Dev, le skill agent-tdd-jira 1.3.0 (lecture de sa transmission, vérification par sa table d'intégrité, version épinglée, table de correspondance entre ses modules et les étapes d'Agent2Dev vérifiée au démarrage, fiches composées à partir de ses sections citées telles quelles, plafond de contexte sans troncature, extraction de ses trois scripts). À implémenter au lot 2.
+description: La méthode d'Agent2Dev, le skill agent-tdd-jira 1.3.1 (lecture de sa transmission, vérification par sa table d'intégrité, version épinglée, table de correspondance entre ses modules et les étapes d'Agent2Dev vérifiée au démarrage, fiches composées à partir de ses sections citées telles quelles, plafond de contexte sans troncature, extraction de ses trois scripts). À implémenter au lot 2.
 dimensions: [D3]
 status: active
 ---
@@ -14,13 +14,13 @@ status: active
 La configuration humaine désigne la méthode :
 
 ```json
-{ "methode": { "skill": "agent-tdd-jira", "version": "1.3.0", "transmission": "/home/fred/agent2prompt/transmissions/agent-tdd-jira-1.3.0.md" } }
+{ "methode": { "skill": "agent-tdd-jira", "version": "1.3.1", "transmission": "/home/fred/agent2prompt/transmissions/agent-tdd-jira-1.3.1.md" } }
 ```
 
 Au démarrage, `methode.charger()` :
 
-1. refuse un autre skill ou une autre version que agent-tdd-jira 1.3.0, avec le motif « méthode non prise en charge » (point E2) ;
-2. lit la transmission en octets bruts et vérifie que son titre annonce la version épinglée (`… : skill 1.3.0, transmission texte`) ;
+1. refuse un autre skill ou une autre version que agent-tdd-jira 1.3.1, avec le motif « méthode non prise en charge » (point E2) ;
+2. lit la transmission en octets bruts et vérifie que son titre annonce la version épinglée (`… : skill 1.3.1, transmission texte`) ;
 3. découpe les blocs de fichiers, ouverts par une ligne `^<{3}FICHIER (.+)>{3}$` et fermés par la ligne `^<{3}FIN \1>{3}$` du même chemin, comme l'en-tête de la transmission les décrit : le contenu d'un fichier est exactement le texte compris entre les deux lignes délimitrices ;
 4. relit la table d'intégrité de fin de texte, une ligne `empreinte  chemin` par fichier, et vérifie que chaque fichier a sa ligne, que chaque ligne a son fichier, et que le SHA-256 de chaque contenu égale son empreinte ;
 5. vérifie que le `manifest.json` reconstitué porte le nom et la version épinglés.
@@ -43,7 +43,7 @@ Un seul écart empêche le démarrage, avec le message « méthode non vérifié
 | `parallele` | `depot`, `orchestrateur` | en mode parallèle |
 | `socle/SKILL.md`, `references/java.md` et `references/angular.md`, sections « Versions cibles » et « Invariants » | fiches `variantes`, `contrat`, `rouge`, `vert`, `remanie` | V3, V4 |
 
-Au démarrage, `methode` confronte cette table au `manifest.json` du skill : chaque module `active` du skill doit y figurer, et aucun module `reserved` (en 1.3.0, `connecteur-jira`) ne doit y figurer. Un écart empêche le démarrage avec le motif « table de correspondance incomplète : <module> ».
+Au démarrage, `methode` confronte cette table au `manifest.json` du skill : chaque module `active` du skill doit y figurer, et aucun module `reserved` (en 1.3.1, `connecteur-jira`) ne doit y figurer. Un écart empêche le démarrage avec le motif « table de correspondance incomplète : <module> ».
 
 ## 3. Fiches (D3.INV-2)
 
@@ -77,7 +77,7 @@ Une fiche est un fichier JSON de `fiches/`, versionné par le `referentiel`. Hui
 ```text
 <role de la fiche>
 
-## Méthode : agent-tdd-jira 1.3.0, sections citées telles quelles
+## Méthode : agent-tdd-jira 1.3.1, sections citées telles quelles
 <fichier> § <n>
 <texte de la section>
 …
@@ -91,7 +91,7 @@ Une fiche est un fichier JSON de `fiches/`, versionné par le `referentiel`. Hui
 
 Le message porte les entrées du pas, en JSON : extraits de `demande.json`, contenu courant des fichiers visés, décisions et commentaires du développeur, écarts d'un essai précédent. Il passe par le masque du noyau ; le texte du skill n'est pas masqué, il ne contient aucun secret.
 
-- Version composée : `<fiche>@<version>+agent-tdd-jira@1.3.0+L<n>`, où `n` compte les leçons actives injectées.
+- Version composée : `<fiche>@<version>+agent-tdd-jira@1.3.1+L<n>`, où `n` compte les leçons actives injectées.
 - L'empreinte SHA-256 du prompt rendu est journalisée avec la version composée (D17.INV-5, module `referentiel`).
 - Si le prompt et le message dépassent le plafond de contexte (`contexte.plafond`, 60 000 caractères par défaut), la fiche n'est pas envoyée, ni tronquée : le pas s'arrête et se présente au développeur, avec la taille de chaque partie. Le développeur peut réduire les fichiers visés ou relever le plafond par CP-4, dans ses bornes.
 
@@ -116,11 +116,11 @@ Le message porte les entrées du pas, en JSON : extraits de `demande.json`, cont
 
 ## 7. Tests (scénarios)
 
-Jeu d'essai : `test/fixtures/methode/agent-tdd-jira-1.3.0.md`, la transmission publiée, et des copies altérées.
+Jeu d'essai : `test/fixtures/methode/agent-tdd-jira-1.3.1.md`, la transmission publiée, et des copies altérées.
 
 | Scénario | Vérifie | Cas |
 |---|---|---|
-| ME1 | D3.INV-1 | la transmission publiée se charge : 16 fichiers, chaque empreinte conforme, version 1.3.0 |
+| ME1 | D3.INV-1 | la transmission publiée se charge : 16 fichiers, chaque empreinte conforme, version 1.3.1 |
 | ME2 | D3.INV-1 | un caractère changé dans un module empêche le démarrage « méthode non vérifiée » et nomme le fichier |
 | ME3 | D3.INV-1 | une ligne de table d'intégrité sans fichier, ou un fichier sans ligne, empêche le démarrage |
 | ME4 | point E2 | `agent-tdd-jira` 1.2.2 ou un autre skill est refusé « méthode non prise en charge » |

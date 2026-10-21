@@ -11,7 +11,7 @@ Le `navigateur` est le seul module qui ouvre un navigateur (D4.INV-1). Il import
 
 ## 1. Session (D4.INV-3, D4.INV-7)
 
-| Stratégie | Principe | Statut 1.0.0 |
+| Stratégie | Principe | Statut 1.1.0 |
 |---|---|---|
 | `integree` (défaut) | contexte persistant dans un profil dédié ; Chromium lancé avec `--auth-server-allowlist` et `--auth-negotiate-delegate-allowlist` sur les domaines SSO de la configuration humaine : l'authentification intégrée du poste, ou la session déjà ouverte chez le fournisseur, connecte sans action humaine | active |
 | `profil` | contexte persistant ; l'opérateur se connecte une fois en CP-0, puis le cookie du fournisseur rend les reconnexions silencieuses | active |
@@ -44,7 +44,7 @@ Le `navigateur` est le seul module qui ouvre un navigateur (D4.INV-1). Il import
 | `televerser` | téléverser un fichier de `test/donnees/` | `cible`, `fichier` |
 | `attendre` | attendre un état : `visible`, `masque`, `actif`, `inactif`, `url`, `texte` | `cible` ou `url`, `etat` |
 | `verifier` | constater un attendu : `contient`, `visible`, `valeur`, `nombre`, `url`, `actif` | `critere`, `cible`, `attendu` |
-| `auditer` | réservée à l'accessibilité (D19, point E2) | rejetée en 1.0.0 |
+| `auditer` | réservée à l'accessibilité (D19, point E2) | rejetée en 1.x |
 
 Résolution d'une cible, dans l'ordre des stratégies du profil : `getByRole(role, { name })`, `getByLabel`, `getByTestId` (attribut d'identifiant de test du profil), `getByText`, `getByPlaceholder`, puis `locator(css)` en dernier recours. Les localisateurs de Playwright sont stricts : une cible ambiguë échoue au lieu de cliquer au hasard.
 
@@ -65,7 +65,7 @@ Résolution d'une cible, dans l'ordre des stratégies du profil : `getByRole(rol
 - Un instantané ARIA à chaque échec (`page.ariaSnapshotJSON()`).
 - Les erreurs de console (`page.on('console')`, type `error`) et les réponses de statut 400 ou plus (`page.on('response')`) sont relevées et versées au résultat d'étape.
 - Avant d'écrire une trace dans le dossier des preuves, le navigateur réécrit son archive : la valeur des en-têtes `Authorization`, `Cookie` et `Set-Cookie` est remplacée par `[expurgé]`. L'enregistrement HAR est désactivé par défaut ; activé, il subit la même expurgation.
-- Chemins : `preuves/<campagne>/<scénario>/<n>.png`, `trace.zip`, `aria-<n>.json` ; chaque fichier a son empreinte SHA-256, enregistrée dans le schéma `execution`.
+- Chemins : `preuves/<campagne>/<scénario>/<n>.png`, `trace.zip`, `aria-<n>.json` ; chaque fichier a son empreinte SHA-256, enregistrée dans `execution.sqlite`.
 
 ## 6. Autres actions
 

@@ -15,7 +15,7 @@ Le `preparateur` rend jouables les scénarios retenus. Il fait rédiger les parc
 
 | Champ | Exemple | Provenance |
 |---|---|---|
-| `profil` | `local` | constant en 1.0.0 (D18.INV-4) |
+| `profil` | `local` | constant en 1.x (D18.INV-4) |
 | `urlBase` | `http://localhost:4200` | `angular.json`, `proxy.conf.json` |
 | `urlApi` | `http://localhost:8080` | `proxy.conf.json` |
 | `urlSante` | `http://localhost:8080/actuator/health` | `application.yml`, ou « à renseigner » |

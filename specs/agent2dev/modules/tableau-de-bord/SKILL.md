@@ -22,6 +22,7 @@ L'IHM du développeur et du référent. Elle montre l'état des demandes et recu
 |---|---|---|
 | développeur | V0 à V5, attentes, soumission d'une demande, journal de tests, synchronisation annoncée, reprise | demandes, points et attentes, patchs, journal en arbre 7E, livrable |
 | référent | CP-4, depuis le tableau de bord seulement : ratifier, amender dans les bornes, refuser | gouvernance : leçons candidates, propositions, suspensions, grand livre, effets mesurés, échappements, dérives, alertes |
+| relais | aucune | aucune vue : trois outils MCP, pour n8n (module `relais`) |
 
 - La configuration humaine associe chaque utilisateur à un ou plusieurs rôles ; en local, une même personne peut tenir les deux.
 - Une décision envoyée par un rôle qui n'y a pas droit est refusée `DROIT_INSUFFISANT`.
@@ -43,7 +44,7 @@ Chaque point présente ce qui est à décider, à gauche, et ses preuves, à dro
 
 - Sous l'objet : les boutons de décision et le champ de commentaire, obligatoire quand la décision l'exige (module `orchestrateur`, section 4).
 - **Patchs** : chaque patch remis, avec son scénario, son état (appliqué, en attente), son téléchargement, et la commande `git am -3` à copier (module `depot`, section 2).
-- **Demande** : état, pas courant, arbre 7E dépliable jusqu'au pas, budgets consommés.
+- **Demande** : état, pas courant, arbre 7E dépliable jusqu'au pas, budgets consommés ; avec le relais n8n, l'heure du dépôt de la remise chez Agent2Test et celle de la réception du journal.
 - **Gouvernance** : chaque proposition avec règle, échelle, phase, valeurs, preuves et effet attendu ; chaque leçon avec sa source ; ratifier, amender dans les bornes, refuser.
 - **Notice** : mode d'emploi et limites du système. Agent2Dev ne démarre ni ne déploie l'application, ne lance aucun batch, n'écrit ni dans Jira ni en base, ne pousse rien, n'écrit pas dans l'arbre du développeur sans autorisation, et ne ratifie pas ses propres leçons.
 

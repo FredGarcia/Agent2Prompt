@@ -11,14 +11,15 @@
   },
   "targets": {
     "application": "back Java 21 et Spring Boot 3.5 construit par Maven, front Angular 20, PostgreSQL en Docker, Liquibase au démarrage ; application lancée par le développeur sur Tomcat en local",
-    "methode": "skill agent-tdd-jira 1.3.0, lu depuis sa transmission vérifiée",
+    "methode": "skill agent-tdd-jira 1.3.1, lu depuis sa transmission vérifiée",
     "moteur": "Gemini Code Assist par MCP, modèle local compatible OpenAI, ou simulation",
-    "stockage": "JSON par agent, SQLite au-delà de 250 Ko",
-    "profil": "local"
+    "stockage": "un fichier SQLite par agent, par node:sqlite, dès le départ",
+    "profil": "local",
+    "relais": "n8n facultatif, en relais de transport, sur 127.0.0.1, base SQLite"
   },
   "references": [
-    { "name": "agent-tdd-jira", "version": "1.3.0" },
-    { "name": "agent2test", "version": "1.0.0" }
+    { "name": "agent-tdd-jira", "version": "1.3.1" },
+    { "name": "agent2test", "version": "1.1.0" }
   ],
   "modules": [
     { "id": "noyau", "path": "modules/noyau/SKILL.md", "dimensions": ["D1"], "status": "active" },
@@ -41,6 +42,7 @@
     { "id": "mcp", "path": "modules/mcp/SKILL.md", "dimensions": ["D18"], "status": "active" },
     { "id": "tableau-de-bord", "path": "modules/tableau-de-bord/SKILL.md", "dimensions": ["D19"], "status": "active" },
     { "id": "exploitation", "path": "modules/exploitation/SKILL.md", "dimensions": ["D20"], "status": "active" },
+    { "id": "relais", "path": "modules/relais/SKILL.md", "dimensions": ["D23"], "status": "active" },
     { "id": "memoire", "path": "modules/memoire/SKILL.md", "dimensions": ["D21"], "status": "reserved" },
     { "id": "autonomie", "path": "modules/autonomie/SKILL.md", "dimensions": ["D22"], "status": "reserved" }
   ],

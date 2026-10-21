@@ -1,6 +1,6 @@
 ---
 name: journal
-description: Journal d'Agent2Test (lignes en ajout seul chaînées par empreintes SHA-256, échelle et phase 7E sur chaque ligne, vérification de la chaîne) et journal de tests d'une campagne (rubriques, matrice critères × verdicts, Markdown, JSON lu par agent-tdd-jira, JUnit XML pour GitLab CI, HTML accessible, marquage des productions du moteur, empreinte de fin de chaîne). À implémenter au lot 2.
+description: Journal d'Agent2Test (lignes en ajout seul, protégées par des déclencheurs et chaînées par empreintes SHA-256, échelle et phase 7E sur chaque ligne, chaîne vérifiée à chaque démarrage, journal rompu mis de côté par commande humaine) et journal de tests d'une campagne (rubriques, matrice critères × verdicts, Markdown, JSON lu par agent-tdd-jira, JUnit XML pour GitLab CI, HTML accessible, marquage des productions du moteur, empreinte de fin de chaîne). À implémenter au lot 2.
 dimensions: [D10]
 status: active
 ---
@@ -15,7 +15,7 @@ status: active
 {
   "n": 1234,
   "horodatage": "2026-10-21T10:15:02.123Z",
-  "specVersion": "1.0.0",
+  "specVersion": "1.1.0",
   "campagne": "C-20261021-001",
   "correlation": "8f2c…",
   "parent": "77a1…",
@@ -32,9 +32,12 @@ status: active
 - `empreinte` est le SHA-256 de `empreintePrecedente` suivi du JSON canonique de la ligne sans son champ `empreinte`. La première ligne prend 64 zéros pour empreinte précédente.
 - Chaque ligne porte `echelle` et `phase` (D1.INV-1).
 - La charge passe par le masque du noyau avant écriture : ni session, ni jeton, ni en-tête sensible (D4.INV-3).
-- Les droits SQL n'accordent que `INSERT` et `SELECT` (module `donnees`).
+- La table `lignes` de `journal.sqlite` porte deux déclencheurs qui refusent toute modification et toute suppression (module `donnees`, section 5).
+- `ecrire` lit la dernière ligne et écrit la nouvelle dans la même transaction `BEGIN IMMEDIATE` : le numéro `n` et l'empreinte précédente viennent du fichier, jamais d'une valeur gardée en mémoire, et deux écrivains, le kit et la purge, ne rompent pas la chaîne.
 
 `verifierChaine({ depuis, jusqua })` recalcule les empreintes et rend `{ intacte: true }` ou `{ intacte: false, premiereLigneRompue: n }`. Il détecte aussi une ligne supprimée, par la rupture du numéro `n`.
+
+Au démarrage, `verifierChaine` parcourt la chaîne entière. Une chaîne rompue empêche le démarrage, avec la première ligne rompue, comme un déclencheur absent (module `donnees`, section 2). Pour repartir, un humain restaure `journal.sqlite` depuis une sauvegarde (module `donnees`, section 7), ou le met de côté par `npm run journal:mettre-de-cote` : la commande le renomme en `journal-<date>.sqlite.rompu`, sans rien en effacer, et la première ligne du journal neuf, `journal.reprise`, cite ce fichier, sa première ligne rompue et l'empreinte de sa dernière ligne.
 
 ## 2. Actions
 
@@ -66,7 +69,7 @@ Format JSON, `agent2test.journal-de-tests/1`, celui que lit agent-tdd-jira (`age
   "campagne": "C-20261021-001",
   "demande": { "cle": "ECR-77", "texte": "Export des retours d'expérience en CSV" },
   "versions": {
-    "specification": "1.0.0", "plan": "P-14", "referentiel": "R-9", "constitution": "<sha256>",
+    "specification": "1.1.0", "plan": "P-14", "referentiel": "R-9", "constitution": "<sha256>",
     "sources": [{ "chemin": "docs/demandes/ECR-77/us.md", "empreinte": "<sha256>" }, { "chemin": "docs/demandes/ECR-77/ECR-77.feature", "empreinte": "<sha256>" }],
     "application": { "commit": "<sha1 de HEAD>", "fichiersModifies": [] }
   },
@@ -107,31 +110,35 @@ Règles :
 - Tout contenu produit par le moteur (motif de sélection, parcours, réparation, leçon) est marqué « produit par <moteur>, fiche <fiche> » et figure dans `origineIA` (D10.INV-3).
 - `empreinteFin` est l'empreinte de la ligne `campagne.close` ; un journal de tests produit avant la clôture porte la mention « provisoire » et aucune empreinte de fin (D10.INV-4).
 - Les fichiers produits vont dans `rapports/<campagne>/journal-de-tests.{md,json,xml,html}`.
-- **Contrat de lecture** : agent-tdd-jira 1.3.0 lit ce JSON pour reporter un verdict par critère et corriger les défauts confirmés (`agent-tdd-jira:D7.INV-3`). Il s'appuie sur `format`, `campagne`, `demande.cle`, `versions.plan`, `versions.sources`, `versions.application`, `matrice` (critère, verdict de la liste fermée, motif, scénarios), `scenarios` (identifiant, cause, étapes), `decisions` et `desaccords` avec leur cible, et `empreinteFin`. Changer le sens ou la forme de l'un de ces champs change le format, donc son nom (`agent2test.journal-de-tests/2`).
+- **Contrat de lecture** : agent-tdd-jira 1.3.1 lit ce JSON pour reporter un verdict par critère et corriger les défauts confirmés (`agent-tdd-jira:D7.INV-3`). Il s'appuie sur `format`, `campagne`, `demande.cle`, `versions.plan`, `versions.sources`, `versions.application`, `matrice` (critère, verdict de la liste fermée, motif, scénarios), `scenarios` (identifiant, cause, étapes), `decisions` et `desaccords` avec leur cible, et `empreinteFin`. Changer le sens ou la forme de l'un de ces champs change le format, donc son nom (`agent2test.journal-de-tests/2`).
 
 ## 4. Pièges connus
 
 - **Horloge relue au rejeu** : l'horodatage est écrit une fois ; la vérification ne relit jamais l'horloge.
 - **Empreinte sur un JSON non canonique** : l'ordre des clés change l'empreinte ; le JSON canonique trie les clés.
 - **Matrice limitée aux scénarios joués** : elle porte tous les critères de la demande.
+- **Dernière empreinte gardée en mémoire** : un second écrivain, la purge par exemple, ferait diverger la chaîne ; la dernière ligne se relit dans la transaction d'écriture.
 
 ## 5. Tests (scénarios)
 
 | Scénario | Vérifie | Cas |
 |---|---|---|
 | JO1 | D10.INV-1 | trois lignes écrites forment une chaîne intacte ; chaque ligne porte échelle et phase |
-| JO2 | D10.INV-1 | une ligne modifiée en base par le compte d'administration est détectée, et `premiereLigneRompue` la nomme |
-| JO3 | D10.INV-1 | une ligne supprimée par le compte d'administration est détectée par la rupture de `n` |
+| JO2 | D10.INV-1 | une ligne modifiée par un outil SQLite, déclencheurs retirés puis remis, empêche le démarrage suivant, et `premiereLigneRompue` la nomme |
+| JO3 | D10.INV-1 | une ligne supprimée par un outil SQLite, déclencheurs retirés puis remis, est détectée par la rupture de `n` |
 | JO4 | D10.INV-2 | les quatre formats sortent de la même projection : mêmes critères, mêmes verdicts, mêmes causes |
 | JO5 | D10.INV-2 | un critère sans scénario figure dans la matrice, « non vérifié », motif « trou de couverture » |
 | JO6 | D10.INV-2 | le JUnit XML d'une campagne à un échec et un scénario non joué contient un `<failure>` avec sa cause et un `<skipped>` avec son motif |
 | JO7 | D10.INV-3 | un parcours produit par le moteur apparaît dans `origineIA` et porte la mention dans le Markdown |
 | JO8 | D10.INV-4 | `empreinteFin` égale l'empreinte de la ligne `campagne.close` ; avant la clôture, le rapport est « provisoire » |
 | JO9 | D10.INV-2 | le JSON de l'exemple ECR-77 porte les sources du plan et leurs empreintes, l'état git relevé à l'ouverture, et la cible de chaque décision et de chaque désaccord ; il se valide contre `schemas/journal-de-tests.json` |
+| JO10 | D10.INV-1 | un `UPDATE` ou un `DELETE`, sans condition compris, sur `lignes` lève « ajout seul », par la connexion du journal comme par un outil SQLite ; un déclencheur retiré empêche le démarrage |
+| JO11 | D10.INV-1 | après une chaîne rompue, `npm run journal:mettre-de-cote` permet le démarrage ; le fichier rompu est gardé, et la première ligne du journal neuf cite son nom, sa première ligne rompue et l'empreinte de sa dernière ligne |
 
 ## 6. Fichiers à produire
 
 - `src/agents/journal/agent.js`, `src/agents/journal/chaine.js`
 - `src/agents/journal/projection.js`, `src/agents/journal/formats/{markdown,json,junit,html}.js`
 - `schemas/journal-de-tests.json`
+- `scripts/mettre-de-cote-journal.js`
 - `test/journal/*.test.js`

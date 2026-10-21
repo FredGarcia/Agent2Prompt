@@ -16,7 +16,7 @@ La spécification reprend la conception d'Agent2Dev de l'étape 1 (cadrage et ar
 2. `manifest.json` : modules actifs et réservés.
 3. Les modules actifs, dans cet ordre :
    1. `noyau` : cycle 7E, bus, contrats, validateur, constitution, port moteur.
-   2. `donnees` : stockage par agent, JSON puis SQLite.
+   2. `donnees` : un fichier SQLite par agent.
    3. `journal` : journal chaîné, livrable de demande.
    4. `referentiel` : fiches, règles, épinglage, grand livre.
    5. `methode` : le skill, ses fiches et ses scripts.
@@ -32,8 +32,9 @@ La spécification reprend la conception d'Agent2Dev de l'étape 1 (cadrage et ar
    15. `observateur` : mesures et alertes.
    16. `apprenant`, `reflexif` : leçons candidates, mesures de second ordre.
    17. `mcp` : moteurs et serveur MCP.
-   18. `tableau-de-bord` : IHM par rôle.
-   19. `exploitation` : installation et lancement sur le poste.
+   18. `relais` : relais du binôme par n8n, facultatif.
+   19. `tableau-de-bord` : IHM par rôle.
+   20. `exploitation` : installation et lancement sur le poste.
 4. `modules/memoire/SKILL.md` et `modules/autonomie/SKILL.md` : seulement pour comprendre les points d'extension E3 et E4. Ne pas les implémenter en 1.x.
 
 ## 2. Mode de travail pour l'IA qui produit le code
@@ -45,7 +46,7 @@ La spécification reprend la conception d'Agent2Dev de l'étape 1 (cadrage et ar
 5. Les identifiants de code sont sans accents. Les commentaires, les textes de l'IHM, les messages et les journaux sont en français.
 6. Chaque test cite l'invariant ou le scénario qu'il vérifie, par exemple `// D9.INV-2, RE3`. Un invariant sans test n'est pas implémenté.
 7. N'implémentez aucun module au statut `reserved` dans `manifest.json`, sauf les tests d'inertie de ses points d'extension.
-8. La méthode n'est pas recopiée dans le code : Agent2Dev la lit dans la transmission du skill agent-tdd-jira 1.3.0 (module `methode`). Ce que dit le skill, le code ne le redit pas.
+8. La méthode n'est pas recopiée dans le code : Agent2Dev la lit dans la transmission du skill agent-tdd-jira 1.3.1 (module `methode`). Ce que dit le skill, le code ne le redit pas.
 
 ## 3. Objectif et principe
 
@@ -53,12 +54,13 @@ Pour une demande Jira, Agent2Dev applique la méthode du skill agent-tdd-jira : 
 
 **Le skill fixe la méthode, le moteur rédige, les agents déterministes agissent, le développeur valide.**
 
-- Le skill agent-tdd-jira 1.3.0 est lu depuis sa transmission, vérifiée par sa table d'intégrité. Agent2Dev ne le réécrit jamais : les consignes de ses fiches en citent les sections telles quelles.
+- Le skill agent-tdd-jira 1.3.1 est lu depuis sa transmission, vérifiée par sa table d'intégrité. Agent2Dev ne le réécrit jamais : les consignes de ses fiches en citent les sections telles quelles.
 - Le moteur (Gemini Code Assist par défaut, tout LLM par le port moteur) ne produit que des données : le contenu de `us.md` et du fichier Gherkin, la fiche d'impact, les variantes, les modifications de tests et de code, le rapport et le projet de commentaire Jira. Chaque sortie est validée contre un schéma fermé et des contrôles nommés. Le moteur n'écrit aucun fichier et n'exécute rien.
 - Trois agents déterministes agissent, chacun seul dans son domaine : `depot` écrit et tient git dans l'arbre de travail de la demande, `executant` y exécute les commandes du profil ratifié et les scripts du skill, `methode` fournit le skill.
 - L'écriture du code se règle dans la configuration humaine. Sans autorisation, ce qui est le défaut, l'arbre de travail est une copie de travail du dépôt, dans les données d'Agent2Dev : il y écrit, y teste, et remet au développeur un patch par scénario accepté, que celui-ci applique lui-même. Avec l'autorisation, l'arbre de travail est l'arbre de la demande : la branche du développeur, ou le worktree du kit en mode parallèle.
 - Le développeur valide aux points V0 à V5 (section 5). Rien ne passe un point sans sa réponse explicite.
 - Agent2Test juge l'acceptation, dans son propre projet, sur une campagne que le développeur ouvre à la main. Agent2Dev ne se note pas lui-même : il lit le journal de tests avec le script du skill.
+- n8n est facultatif : activé, il porte la remise vers Agent2Test et le journal de tests vers Agent2Dev, par leurs serveurs MCP, et rien d'autre. Sans lui, le développeur porte ces fichiers à la main.
 
 Chaîne de traçabilité, celle du skill :
 
@@ -68,8 +70,9 @@ Chaîne de traçabilité, celle du skill :
 flowchart TB
   DEV(["Développeur · Référent"])
   GEM{{"Moteur : Gemini Code Assist,<br/>modèle local ou simulation"}}
-  SK[["skill agent-tdd-jira 1.3.0<br/>transmission vérifiée"]]
+  SK[["skill agent-tdd-jira 1.3.1<br/>transmission vérifiée"]]
   A2T[["Agent2Test<br/>journal de tests"]]
+  REL{{"n8n, facultatif<br/>relais de transport"}}
   subgraph C6["C6 Interfaces · E7"]
     TDB["tableau-de-bord<br/>HTTP + SSE"]
     MCP["mcp<br/>moteurs · HTTP · stdio"]
@@ -92,7 +95,7 @@ flowchart TB
   end
   subgraph C0["C0 Noyau"]
     K["Cycle7E · Cellule7E · bus<br/>validateur · constitution · port moteur"]
-    DON["donnees<br/>JSON, puis SQLite"]
+    DON["donnees<br/>SQLite par agent"]
   end
   subgraph C4["C4 Observabilité O1 · E4, E5"]
     JRN["journal"] --> OBS["observateur"]
@@ -110,6 +113,8 @@ flowchart TB
   C2 --> C1
   SK --> MET
   A2T -.->|"chemin donné par le développeur"| BIN
+  REL -.->|"remise, journal de tests"| MCP
+  REL -.-> A2T
   DEP <--> PROJ
   EXE --> PROJ
   ORC -.->|"traces du bus"| C4
@@ -131,6 +136,7 @@ Une responsabilité, un seul lieu :
 | dérouler un cycle | `Cycle7E` du noyau |
 | décider de la suite d'une demande | `orchestrateur` |
 | lire un journal de tests d'Agent2Test | `binome`, par le script du skill |
+| porter la remise et le journal de tests entre les têtes | le développeur, ou n8n en relais (`relais`) |
 | écrire le journal | `journal` |
 | versionner une fiche ou une règle | `referentiel` |
 
@@ -168,14 +174,14 @@ Les points V1 à V5 sont ceux du skill, appliqués tels quels. Agent2Dev ajoute 
 | V5 Rapport | après la traçabilité | développeur | accepter · corriger, commentaire obligatoire · recalculer, après un patch appliqué | la clôture de la demande |
 | CP-4 Gouvernance | proposition de leçon ou de règle | référent, depuis le tableau de bord seulement | ratifier · amender · refuser | rien : asynchrone, effet à la demande suivante |
 
-Entre V4 et V5, l'acceptation en binôme n'est pas un point de validation : le développeur ouvre la campagne d'Agent2Test, puis donne à Agent2Dev le chemin du journal, ou déclare la demande sans binôme (module `binome`). Chaque point attend une décision explicite ; aucun n'est décidé par le système (D12.INV-1).
+Entre V4 et V5, l'acceptation en binôme n'est pas un point de validation : le développeur ouvre la campagne d'Agent2Test, puis donne à Agent2Dev le chemin du journal, ou déclare la demande sans binôme (module `binome`). Avec le relais n8n, la remise et le journal circulent sans lui ; il ouvre toujours la campagne lui-même (module `relais`). Chaque point attend une décision explicite ; aucun n'est décidé par le système (D12.INV-1).
 
 ## 6. Registre des dimensions
 
 | ID | Dimension | Introduite | Statut 1.0.0 | Dépend de | Module |
 |---|---|---|---|---|---|
 | D1 | Noyau 7E, bus et constitution | 1.0 | active | | `noyau` |
-| D2 | Données par agent, JSON puis SQLite | 1.0 | active | D1 | `donnees` |
+| D2 | Données par agent, en SQLite | 1.0 | active | D1 | `donnees` |
 | D3 | Méthode : skill agent-tdd-jira, fiches et scripts | 1.0 | active | D1, D2 | `methode` |
 | D4 | Profil du projet | 1.0 | active | D1, D3 | `profil` |
 | D5 | Écriture dans le projet | 1.0 | active | D1, D4 | `depot` |
@@ -196,6 +202,7 @@ Entre V4 et V5, l'acceptation en binôme n'est pas un point de validation : le d
 | D20 | Exploitation locale | 1.0 | active | D2, D3, D4 | `exploitation` |
 | D21 | Mémoire et recherche sur le code et les demandes passées | 1.0 | reserved | D2, D3, D8 | `memoire` |
 | D22 | Autonomie par point de validation | 1.0 | reserved | D12 | `autonomie` |
+| D23 | Relais du binôme par n8n, facultatif | 1.0 | active | D10, D18 | `relais` |
 
 Statuts : `active` (implémentée et testée), `reserved` (points d'extension posés, fonctionnalité absente), `superseded` (remplacée ; la version de remplacement est indiquée).
 
@@ -217,20 +224,21 @@ Statuts : `active` (implémentée et testée), `reserved` (points d'extension po
 Un point d'extension n'est pas une fonctionnalité. En 1.x, il n'a qu'un test qui prouve qu'il est inerte.
 
 - **E1** : le port moteur accepte de nouveaux adaptateurs par version ; en 1.0.0 : `simulation`, `externe` (Gemini Code Assist par MCP) et `compatible-openai`. Un adaptateur inconnu est refusé au démarrage.
-- **E2** : la méthode est désignée par le nom, la version et la transmission d'un skill dans la configuration humaine. En 1.0.0, seul agent-tdd-jira 1.3.0 est pris en charge ; un autre skill ou une autre version est refusé au démarrage avec le motif « méthode non prise en charge ».
+- **E2** : la méthode est désignée par le nom, la version et la transmission d'un skill dans la configuration humaine. En 1.0.0, seul agent-tdd-jira 1.3.1 est pris en charge ; un autre skill ou une autre version est refusé au démarrage avec le motif « méthode non prise en charge ».
 - **E3** : l'action `memoire.rechercher` existe et rend une liste vide ; chaque fiche a un emplacement « fragments », vide en 1.0.0. La mémoire sur le code et les demandes passées est réservée à D21.
 - **E4** : chaque point de validation V0 à V5 porte, dans la configuration humaine, un champ `regime`, qui vaut `presenter` ; toute autre valeur est refusée au démarrage. L'autonomie par point est réservée à D22, et suppose une version du skill qui la permette ; CP-4 n'a pas de régime, et reste toujours une décision humaine.
 
 ## 8. Règles globales
 
 - **Périmètre** : Agent2Dev traite une demande Jira déjà rédigée, exportée en MHTML, pour un projet dont le profil est ratifié. Il ne rédige pas la demande, ne démarre, n'arrête ni ne déploie l'application, ne lance aucun batch, n'écrit ni en base ni dans Jira.
-- **Méthode** : le skill agent-tdd-jira 1.3.0 fait foi pour la méthode. Agent2Dev le lit depuis sa transmission, vérifiée, et n'en change rien.
+- **Méthode** : le skill agent-tdd-jira 1.3.1 fait foi pour la méthode. Agent2Dev le lit depuis sa transmission, vérifiée, et n'en change rien.
 - **Projet séparé** : Agent2Dev est un projet à part. L'arbre de la demande est la branche de travail du développeur, ou le worktree que le kit `agents-paralleles-gitlab` a créé en mode parallèle.
 - **Écriture du code** : sans l'autorisation de la configuration humaine, Agent2Dev n'écrit rien dans l'arbre de la demande, hors des fichiers de travail que le kit exclut du dépôt ; il écrit et teste dans une copie de travail, et remet un patch par scénario accepté. Avec l'autorisation, le seul `depot` écrit dans l'arbre de la demande.
 - **Git** : dans l'arbre de la demande, Agent2Dev commite après V4 si l'écriture est autorisée et que le développeur l'accepte, au format du skill ; il ne fusionne pas, ne rebase pas, ne change pas de branche. Dans la copie de travail, chaque scénario accepté est commité pour former son patch. Agent2Dev ne pousse jamais.
 - **Local** : en 1.0.0, tout s'exécute sur le poste du développeur. Les interfaces n'écoutent que sur `127.0.0.1`.
+- **Relais n8n** : facultatif et désactivé par défaut. n8n ne porte que la remise et le journal de tests, par les serveurs MCP des deux têtes ; il ne décide rien, n'ouvre aucune campagne et n'écrit aucun fichier. Agent2Dev n'en dépend jamais.
 - **Secrets** : les jetons des interfaces et la configuration des moteurs viennent de fichiers hors dépôt, en mode 0600, ou de l'environnement. Les fichiers de secrets du projet sont exclus de toute lecture. Aucun secret n'apparaît dans le journal, les messages, les commits ni le contexte transmis au moteur.
-- **Configuration humaine** : un fichier `humaine.json`, lu au démarrage et jamais écrit par le système, fixe la transmission du skill et sa version, l'autorisation d'écrire le code, le moteur et son autorisation, le régime des points, les utilisateurs et leurs rôles, les instances et leurs ports, les seuils d'alerte et le seuil de bascule du stockage (module `exploitation`, section 4).
+- **Configuration humaine** : un fichier `humaine.json`, lu au démarrage et jamais écrit par le système, fixe la transmission du skill et sa version, l'autorisation d'écrire le code, le moteur et son autorisation, le régime des points, les utilisateurs et leurs rôles, les instances et leurs ports, les seuils d'alerte et l'activation du relais n8n (module `exploitation`, section 4).
 - **Langue** : identifiants de code sans accents ; textes de l'IHM, messages, journal et livrables en français.
 - **Node** : Node 24 recommandé, Node 22.13 au minimum, pour `node:sqlite` ; aucune dépendance d'exécution.
 
@@ -241,6 +249,7 @@ Un point d'extension n'est pas une fonctionnalité. En 1.x, il n'a qu'un test qu
 - Sur l'exemple ECR-77 du skill, une demande simulée va du fichier MHTML au point V5, et s'arrête à chaque point de validation. Elle produit ce que le skill attend : `demande.json`, `us.md` et le fichier Gherkin sans écart au script de contrôle, `suivi.md`, des tests étiquetés, un commit par scénario accepté, et son patch en copie de travail, la matrice, le rapport et le projet de commentaire Jira.
 - Un journal de tests simulé qui porte un défaut applicatif confirmé rouvre son scénario ; un second journal, sur le code corrigé, donne « conforme ».
 - Sans autorisation d'écrire le code, une demande simulée ne modifie aucun fichier de l'arbre du développeur et remet, pour chaque scénario accepté, un patch qui s'y applique par `git am` ; avec l'autorisation, elle écrit dans l'arbre de la demande.
+- Avec le relais activé, un client MCP simulé au rôle `relais` porte la remise et le journal de tests : la demande suit le même parcours qu'à la main, chaque décision reste au développeur, et Agent2Dev n'ouvre aucune connexion sortante. Relais désactivé, rien ne change.
 - Une écriture dans l'arbre de travail faite hors du `depot` est détectée, et la demande s'arrête.
 - Une commande absente du profil, une commande de démarrage de l'application et un batch sont refusés.
 - Une altération du journal est détectée, et la première ligne rompue est nommée.
@@ -263,7 +272,7 @@ Chaque invariant est vérifié par au moins un test. Les invariants du skill, ci
 **D2 : données**
 
 - **D2.INV-1** : chaque fichier de données a un seul agent propriétaire ; un agent lit les données d'un autre par une action du bus, jamais par le fichier.
-- **D2.INV-2** : les données d'un agent sont en JSON jusqu'au seuil fixé par l'humain, 250 Ko par défaut, puis basculent dans un fichier SQLite de l'agent sans perte : même nombre d'enregistrements, mêmes empreintes, chaîne du journal intacte.
+- **D2.INV-2** : les données d'un agent sont dans son seul fichier SQLite, ouvert par `node:sqlite` dès le premier enregistrement ; chaque écriture est une transaction, et un arrêt du processus, même brutal, ne laisse aucun enregistrement partiel.
 - **D2.INV-3** : le journal et le grand livre sont en ajout seul : aucune action ne modifie ni ne supprime un enregistrement, et toute purge est une commande humaine, journalisée.
 
 **D3 : méthode**
@@ -395,6 +404,13 @@ Chaque invariant est vérifié par au moins un test. Les invariants du skill, ci
 - **D20.INV-2** : la configuration humaine et les secrets vivent hors du dépôt d'Agent2Dev et du projet, et ne sont jamais écrits par le système.
 - **D20.INV-3** : tout s'exécute en local, sur le poste du développeur.
 
+**D23 : relais n8n**
+
+- **D23.INV-1** : Agent2Dev ne dépend jamais du relais n8n : désactivé par défaut, le binôme se fait à la main, à l'identique ; activé, c'est le relais qui appelle le serveur MCP, et Agent2Dev n'ouvre aucune connexion vers n8n ni vers Agent2Test.
+- **D23.INV-2** : un jeton au rôle `relais` n'atteint que `a2d_remise`, `a2d_remise_relayee` et `a2d_journal_de_tests` ; toute décision, rédaction, soumission de demande, suspension ou reprise lui est refusée.
+- **D23.INV-3** : un journal de tests reçu du relais l'est par son contenu, jamais par un chemin ; le `depot` le range dans le dossier de travail de la demande, et `lire-acceptation.mjs` le lit comme un journal déposé à la main.
+- **D23.INV-4** : la configuration fournie pour n8n le fait écouter sur `127.0.0.1` seulement, avec sa base SQLite, sans télémétrie ni appel sortant ; son workflow n'appelle que les outils du rôle `relais` des deux têtes, et ses fichiers ne contiennent aucun jeton.
+
 ## 11. Filiation
 
 ### 11.1 Avec la conception de l'étape 1
@@ -427,13 +443,13 @@ Ce qui change par rapport à l'étape 1 :
 | demande en texte libre | l'export MHTML reste la règle | extraction par le script du skill, V1 (module `cadrage`) |
 | remplacements « avant / après » par tâche, tests unitaires secondaires | méthode TDD du skill | un test rouge étiqueté précède tout code (D9.INV-2) ; le « avant / après » reste le format d'écriture du `depot` |
 | option B : agent `exploitant`, instance dédiée sous Docker, sonde, instantanés de base | l'équipe déploie à la main ; application sur Tomcat en local | `exploitant` remplacé par `executant`, limité à la compilation, aux tests et aux scripts du skill (D6.INV-2) |
-| module `liaison`, protocole `binome-7e/1`, couplage par n8n | enchaînement à la main | remise et lecture du journal par fichiers et par le script du skill (module `binome`) |
+| module `liaison`, protocole `binome-7e/1`, couplage par n8n | enchaînement à la main ; n8n facultatif, en relais de transport | remise et lecture du journal par fichiers et par le script du skill (module `binome`) ; avec le relais, n8n porte la remise et le journal par les serveurs MCP, sans enveloppe ni décision (D23) |
 | plan de tests projeté au format de l'annexe A | Agent2Test lit les fichiers d'agent-tdd-jira | aucune projection : `us.md` et le fichier Gherkin tels quels (D10.INV-1) |
 | contestation argumentée par Agent2Dev, tranchée en CP-5 | désaccord remonté au développeur | D10.INV-4 |
 | arbre de travail et branche `a2d/<demande>` créés par Agent2Dev, poussée vers un Gitea local | GitLab de la mission ; seule la partie locale est concernée ; écriture du code en option, à autoriser | par défaut, copie de travail et branche `a2d/<CLÉ>` dans les données d'Agent2Dev, un patch par scénario accepté (D5.INV-7) ; sur autorisation, écriture dans l'arbre de la demande, commit après V4 ; aucune poussée (D5.INV-4) |
-| CP-0 à CP-6, autonomie par défaut (`differe`) | points de validation toujours présentés | V0 à V5 et CP-4 (section 5) ; autonomie réservée à D22 |
+| CP-0 à CP-6, autonomie par défaut (`differe`) | points de validation toujours présentés | V0 à V5 et CP-4 (section 5), décidés dans le tableau de bord ou par MCP, jamais par n8n ; autonomie réservée à D22 |
 | adaptateurs `gemini-cli` (défaut), `externe`, `compatible-openai`, `anthropic`, `simulation` | même moteur que pour Agent2Test | `externe` (défaut), `compatible-openai`, `simulation` (point E1) |
-| stockage JSON, puis SQLite au-delà de 250 Ko | conservé | D2.INV-2 |
+| stockage JSON, puis SQLite au-delà de 250 Ko | SQLite dès le départ, pour les deux têtes | un fichier SQLite par agent dès le premier enregistrement, sans phase JSON (D2.INV-2) |
 | mémoire et recherche hybride sur le code | — | réservée à D21 (point E3) |
 | plusieurs demandes actives, verrou d'instance | une demande à la fois ; parallélisme par le kit | une instance par demande, une instance par worktree en mode parallèle (D12.INV-2) |
 | AI Act | mis de côté | hors périmètre ; restent l'origine des productions (D13.INV-4) et la gouvernance (D17) |
@@ -457,4 +473,4 @@ Ce qui change par rapport à l'étape 1 :
 
 ## 12. Journal de révision
 
-**1.0.0** (2026-10-21) : première version, tirée de la conception de l'étape 1 (version 0.3.0 du 4 octobre 2026) et des décisions du 21 octobre 2026. Méthode : skill agent-tdd-jira 1.3.0, lu depuis sa transmission vérifiée. Binôme : journal de tests d'agent2test 1.0.0, lu par le script du skill. Dimensions D1 à D20 actives, D21 (mémoire) et D22 (autonomie) réservées. Points d'extension E1 à E4. Moteur : Gemini Code Assist par MCP, modèle local compatible OpenAI ou simulation. Stockage : JSON par agent, puis SQLite au-delà de 250 Ko. Écriture du code en option : sans autorisation, copie de travail et un patch par scénario accepté ; avec, écriture dans l'arbre de la demande.
+**1.0.0** (2026-10-22) : première version, tirée de la conception de l'étape 1 (version 0.3.0 du 4 octobre 2026) et des décisions du 21 octobre 2026. Méthode : skill agent-tdd-jira 1.3.1, lu depuis sa transmission vérifiée. Binôme : journal de tests d'agent2test 1.1.0, lu par le script du skill. Dimensions D1 à D20 et D23 actives, D21 (mémoire) et D22 (autonomie) réservées. Points d'extension E1 à E4. Moteur : Gemini Code Assist par MCP, modèle local compatible OpenAI ou simulation. Stockage : un fichier SQLite par agent, dès le départ. Écriture du code en option : sans autorisation, copie de travail et un patch par scénario accepté ; avec, écriture dans l'arbre de la demande. Relais n8n facultatif (D23), qui ne porte que la remise et le journal de tests. Amendements du développeur à la ratification du 21 octobre 2026 : SQLite dès le départ, pour Agent2Dev comme pour Agent2Test (agent2test 1.1.0) ; n8n facultatif, en relais de transport seulement, sur sa base SQLite.

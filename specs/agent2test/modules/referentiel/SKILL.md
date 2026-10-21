@@ -58,7 +58,7 @@ Valeurs fixées par la configuration humaine, que le système lit sans les modif
 
 ## 5. Grand livre (D15.INV-2)
 
-- Table `referentiel.grand_livre`, en ajout seul, chaînée comme le journal (module `journal`, section 1).
+- Table `grand_livre` de `referentiel.sqlite`, en ajout seul, protégée par les déclencheurs du module `donnees` (section 5) et chaînée comme le journal (module `journal`, section 1). Sa chaîne est vérifiée en entier à chaque démarrage ; une chaîne rompue empêche le démarrage, et un grand livre rompu ne se répare que par la restauration d'une sauvegarde (module `donnees`, section 7).
 - Types d'entrée : `constitution.publiee`, `fiche.publiee`, `lecon.ratifiee`, `lecon.refusee`, `regle.ratifiee`, `regle.refusee`, `regle.suspendue`, `retour.arriere`, `epinglage`.
 - Chaque entrée porte sa cause, ses preuves (références au journal), l'auteur de la ratification et, plus tard, l'effet mesuré, ajouté par une nouvelle entrée, jamais par modification.
 
@@ -76,7 +76,7 @@ Valeurs fixées par la configuration humaine, que le système lit sans les modif
 |---|---|---|
 | RF1 | D15.INV-1 | une règle ratifiée pendant une campagne ne change pas ses valeurs ; la campagne suivante l'applique |
 | RF2 | D15.INV-2 | ratification, refus, suspension et retour arrière s'inscrivent au grand livre ; la chaîne reste intacte |
-| RF3 | D15.INV-2 | une entrée modifiée en base par le compte d'administration rompt la chaîne du grand livre |
+| RF3 | D15.INV-2 | une entrée modifiée par un outil SQLite, déclencheurs retirés puis remis, rompt la chaîne du grand livre, et le démarrage suivant est refusé avec l'entrée rompue |
 | RF4 | D15.INV-3 | pour un appel au moteur journalisé, `reconstituer` redonne un prompt de même empreinte |
 | RF5 | D15.INV-3 | une leçon ratifiée crée une version composée nouvelle, `+L<n+1>`, pour son seul moteur |
 | RF6 | D15.INV-4 | une décision CP-4 venue du canal MCP, ou d'un rôle testeur, est refusée `DECISION_IRRECEVABLE` |

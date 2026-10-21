@@ -16,7 +16,7 @@ La conception de l'étape 1 prévoyait une mémoire et une recherche hybride sur
 ## 2. Principe prévu
 
 - Fragments tirés du projet (code, contrat, migrations), des demandes closes (livrables, fiches d'impact, variantes retenues, défauts confirmés) et de leurs décisions.
-- Recherche lexicale écrite dans Agent2Dev, sans dépendance ; vecteurs en option, par un modèle de plongement local (adaptateur `compatible-openai`), jamais par un moteur externe sans autorisation.
+- Recherche plein texte par FTS5, dans le fichier SQLite de la mémoire (`unicode61 remove_diacritics 2`, classement `bm25`) ; vecteurs en option, par un modèle de plongement local (adaptateur `compatible-openai`), rangés avec leurs fragments et comparés en JavaScript, jamais calculés par un moteur externe sans autorisation.
 - Seuls les fragments des versions de l'instantané épinglé de la demande sont rendus ; ils sont masqués comme le contexte transmis au moteur (D18.INV-4), et leurs identifiants sont journalisés avec l'appel.
 - Un fragment n'est jamais une preuve : un élément d'impact cite toujours un résultat de recherche du `depot` (D8.INV-1).
 
