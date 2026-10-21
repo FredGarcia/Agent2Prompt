@@ -51,6 +51,19 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Outils
 
+### 2026-10-21 : vérificateur étendu et vérification des pull requests
+
+- `tools/verifier.mjs` contrôle aussi :
+  - la transmission de la version courante de chaque spécification, qui doit redonner exactement l'en-tête, les fichiers et la table d'intégrité ;
+  - le README : version de chaque spécification dans le tableau et dans le schéma, liens vers `specs/` et `transmissions/` ;
+  - les archives : une par version précédente déclarée, à la bonne version, aucune archive non déclarée ;
+  - les points d'extension du manifeste, face à ceux du point d'entrée ;
+  - le registre des dimensions, face aux statuts des modules dans le manifeste.
+- Testé par 14 contre-épreuves sur des copies du dépôt, chacune refusée avec le message attendu ; le dépôt intact passe.
+- `tools/bundle.mjs` exporte `assembler` et `relire`, dont se sert le vérificateur ; les transmissions produites ne changent pas, sauf la consigne de la table d'intégrité, à vérifier « depuis le dossier où les fichiers ont été matérialisés » au lieu de `spec/`. La correction vaut pour les transmissions des prochaines versions : celles déjà publiées restent telles quelles.
+- `.github/workflows/verifier.yml` : le vérificateur tourne à chaque pull request et à chaque push sur `main`, sous Node 20 et Node 24.
+- `EVOLUTION.md`, section 7 : README mis à jour avec le journal, transmission régénérée avant la vérification ; la transmission d'une version publiée n'est jamais régénérée.
+
 ### 2026-10-21 : glossaire des invariants
 
 - Ajout de `tools/glossaire.mjs` : génère `glossaire.md`, qui détaille les 180 invariants des huit spécifications (dimension, énoncé, modules qui les reprennent, spécifications qui les citent) et la notation des identifiants. Node 20 ou plus récent, modules natifs.
