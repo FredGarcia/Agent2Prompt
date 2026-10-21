@@ -4,6 +4,12 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-10-21 : agent-tdd-jira 1.2.0
+
+- **agent-tdd-jira 1.2.0** : dimension D10 active, US et critères d'acceptation numérotés ; module `us-criteres`. L'analyse établit d'abord les US et leurs critères d'acceptation, repris du ticket avec leur provenance ou proposés, y rattache les exigences, puis décline chaque critère en au moins un scénario Gherkin. Identifiants stables `<CLÉ>-USnn` et `<CLÉ>-CAnn`, fichier `docs/demandes/<CLÉ>/us.md`, étiquette `@<CLÉ>-CAnn` sur chaque scénario (point d'extension E4), validation au point V2, matrice, rapport final et projet de commentaire Jira par critère. Invariants D10.INV-1 à D10.INV-7, aucun invariant existant modifié ; D2 et D6 dépendent de D10. Archive 1.1.0.
+- Décision du développeur : « CA puis Gherkin, toujours ». Chaque critère d'acceptation est décliné en scénarios Gherkin, y compris quand le ticket ne contient que des critères ; aucun scénario sans critère.
+- Soumis à ratification : numérotation des US et des critères sur toute la demande, jamais renumérotée ; fichier `us.md` versionné avec les autres fichiers de la demande ; validation des US et des critères intégrée au point V2, sans point de validation supplémentaire ; point d'extension E4 pour le futur rapport d'acceptation d'Agent2Test, un verdict par critère.
+
 ### 2026-10-20 : agents-paralleles-gitlab 1.0.0, agent-tdd-jira 1.1.0
 
 - **agents-paralleles-gitlab 1.0.0** : kit de travail en parallèle sur un dépôt GitLab, une demande Jira par worktree. Dépôt nu partagé, branche sans amont, hooks communs (`pre-commit`, `commit-msg`, `pre-push`), script `agt` (`new`, `ls`, `diff`, `collisions`, `sync`, `reset`, `done`), push rules dans `regles-gitlab.txt`, fiche des garde-fous GitLab par édition, recette `recette.sh` de 44 contrôles sans réseau. Modules `isolation`, `hooks`, `orchestration`, `gitlab`, `distribution`, `recette` ; `controle-gitlab` (D6, contrôle par l'API en lecture seule) et `tension-depot` (D7, tension au niveau du dépôt) réservés. 20 invariants, points d'extension E1 et E2. Code de référence testé sur une copie du dépôt Agent2Prompt (git 2.43, bash 5.2), contre-épreuve comprise ; issu du tutoriel « Agents de code en parallèle » v2.
