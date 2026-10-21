@@ -13,7 +13,7 @@ Chaque spécification est un package modulaire versionné : un point d'entrée, 
 | [`angular`](specs/angular/SKILL.md) | 1.0.1 | [`transmissions/angular-1.0.1.md`](transmissions/angular-1.0.1.md) | Produire et relire un front Angular 20, accessibilité RGAA et WCAG comprise |
 | [`analyse-projet`](specs/analyse-projet/SKILL.md) | 1.0.2 | [`transmissions/analyse-projet-1.0.2.md`](transmissions/analyse-projet-1.0.2.md) | Analyser un projet back et front en lecture seule : cartographie, rapport et feuille de route, ou plans d'action |
 | [`sonarqube`](specs/sonarqube/SKILL.md) | 1.0.2 | [`transmissions/sonarqube-1.0.2.md`](transmissions/sonarqube-1.0.2.md) | SonarQube Server 2026.x : configurer l'analyse et la CI GitLab, trier, corriger ou planifier, gouverner la qualité |
-| [`agent-tdd-jira`](specs/agent-tdd-jira/SKILL.md) | 1.2.1 | [`transmissions/agent-tdd-jira-1.2.1.md`](transmissions/agent-tdd-jira-1.2.1.md) | Développement TDD à partir d'une demande Jira en MHTML : analyse avec commentaires, US et critères d'acceptation numérotés, scénarios Gherkin par critère, variantes back et front, cycle rouge, vert, remanié, traçabilité jusqu'aux critères ; mode parallèle dans un worktree géré |
+| [`agent-tdd-jira`](specs/agent-tdd-jira/SKILL.md) | 1.2.2 | [`transmissions/agent-tdd-jira-1.2.2.md`](transmissions/agent-tdd-jira-1.2.2.md) | Développement TDD à partir d'une demande Jira en MHTML : analyse avec commentaires, US et critères d'acceptation numérotés, scénarios Gherkin par critère, variantes back et front, cycle rouge, vert, remanié, traçabilité jusqu'aux critères ; mode parallèle dans un worktree géré |
 | [`agents-paralleles-gitlab`](specs/agents-paralleles-gitlab/SKILL.md) | 1.0.1 | [`transmissions/agents-paralleles-gitlab-1.0.1.md`](transmissions/agents-paralleles-gitlab-1.0.1.md) | Plusieurs agents en parallèle sur un dépôt GitLab, une demande Jira par worktree : isolation, hooks communs, script `agt`, garde-fous GitLab, recette de 44 contrôles |
 
 Les transmissions des versions précédentes restent dans `transmissions/` : elles sont la trace exacte de ce qui a été remis à une IA. Les skills `java`, `angular`, `analyse-projet` et `sonarqube` s'appelaient `expert-java`, `expert-angular`, `expert-analyse-projet` et `expert-sonarqube` jusqu'au 21 octobre 2026 : leurs transmissions et archives antérieures gardent ces noms.
@@ -34,7 +34,7 @@ flowchart LR
   A -->|"inclus comme référentiel"| SQ
   SQ -.->|"plans d'action"| J
   SQ -.->|"plans d'action"| A
-  SOCLE -->|"inclus, épinglé"| TDD["agent-tdd-jira 1.2.1"]
+  SOCLE -->|"inclus, épinglé"| TDD["agent-tdd-jira 1.2.2"]
   J -->|"inclus comme référentiel"| TDD
   A -->|"inclus comme référentiel"| TDD
   APG["agents-paralleles-gitlab 1.0.1"] -->|"inclus comme référentiel"| TDD

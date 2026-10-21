@@ -36,6 +36,8 @@ grep -rn '@Tag("ECR-77-S' src/test/java
 grep -rn "describe('ECR-77-S" src/app --include=*.spec.ts
 # commits de la demande
 git log --oneline --grep='^ECR-77 '
+# US, critères et scénarios cohérents, aucun identifiant renuméroté depuis l'ajout de us.md (module us-criteres, section 7)
+node outils/controler-criteres.mjs docs/demandes/ECR-77 --depuis "$(git log --diff-filter=A --format=%h -- docs/demandes/ECR-77/us.md | tail -n 1)"
 ```
 
 ## 3. Matrice (D6.INV-1, D6.INV-2, D10.INV-7)
