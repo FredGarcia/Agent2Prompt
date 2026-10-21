@@ -1,10 +1,10 @@
 ---
 name: agents-paralleles-gitlab
 description: Faire travailler plusieurs agents de développement en parallèle sur un même dépôt GitLab, une demande Jira par worktree, sans qu'aucun ne puisse abîmer le code d'un autre ni la branche d'intégration (dépôt nu partagé, branche sans amont, hooks communs, script agt, garde-fous GitLab, recette de 44 contrôles). À utiliser pour installer, vérifier ou faire évoluer ce kit.
-version: 1.0.0
+version: 1.0.1
 ---
 
-# Agents en parallèle sur GitLab, spécification 1.0.0
+# Agents en parallèle sur GitLab, spécification 1.0.1
 
 Ce document est le point d'entrée de la spécification. Il fixe l'invariant d'organisation, le registre des dimensions, les règles communes et les invariants. Le code de référence, à reproduire à l'identique, et la recette sont dans `modules/`.
 
@@ -153,4 +153,6 @@ Points d'extension, actifs dès 1.0.0 :
 
 ## 11. Journal de révision
 
-**1.0.0** (2026-10-20) : première version. Dimensions D1 à D5 actives, D6 et D7 réservées. Points d'extension E1 et E2. Issue du tutoriel « Agents de code en parallèle » v2, testé sur une copie du dépôt Agent2Prompt. Ajouts par rapport au tutoriel : commit à clé seule hors scénario, prévision des collisions par les fiches d'impact, points chauds, alerte sur un identifiant dans une URL de distant, fichier `regles-gitlab.txt`, recette de 44 contrôles rattachés aux invariants.
+**1.0.0** (2026-10-20) : première version. Dimensions D1 à D5 actives, D6 et D7 réservées. Points d'extension E1 et E2. Issue du tutoriel « Agents de code en parallèle » v2, testé sur une copie du dépôt Agent2Prompt. Ajouts par rapport au tutoriel : commit à clé seule hors scénario, prévision des collisions par les fiches d'impact, points chauds, alerte sur un identifiant dans une URL de distant, fichier `regles-gitlab.txt`, recette de 44 contrôles rattachés aux invariants. Archive : `archives/SKILL-v1.0.0.md`.
+
+**1.0.1** (2026-10-21) : correctif. Module `distribution` : le skill Java est cité sous son nouveau nom, `java` (auparavant `expert-java`), le préfixe `expert-` étant retiré de tous les skills du dépôt. Aucune dimension, aucun invariant ni aucun contrôle de la recette modifié.

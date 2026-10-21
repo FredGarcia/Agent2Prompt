@@ -1,0 +1,32 @@
+{
+  "name": "java",
+  "version": "1.1.1",
+  "specSchema": 1,
+  "language": "fr",
+  "description": "Expert Java 21, Spring Boot 3.5 et PostgreSQL : produire et relire du code conforme à des invariants vérifiables.",
+  "entry": "SKILL.md",
+  "targets": {
+    "java": "21",
+    "springBoot": "3.5.x",
+    "postgresql": ">=14",
+    "migrations": "Flyway ou Liquibase"
+  },
+  "shared": [
+    { "path": "socle/SKILL.md", "from": "specs/socle-back-front/SKILL.md", "version": "1.0.1" }
+  ],
+  "modules": [
+    { "id": "architecture", "path": "modules/architecture/SKILL.md", "dimensions": ["D1"], "status": "active" },
+    { "id": "langage", "path": "modules/langage/SKILL.md", "dimensions": ["D2"], "status": "active" },
+    { "id": "api-rest", "path": "modules/api-rest/SKILL.md", "dimensions": ["D3"], "status": "active" },
+    { "id": "persistance", "path": "modules/persistance/SKILL.md", "dimensions": ["D4"], "status": "active" },
+    { "id": "securite", "path": "modules/securite/SKILL.md", "dimensions": ["D5"], "status": "active" },
+    { "id": "tests", "path": "modules/tests/SKILL.md", "dimensions": ["D6"], "status": "active" },
+    { "id": "revue", "path": "modules/revue/SKILL.md", "dimensions": ["D7"], "status": "active" },
+    { "id": "migration-boot4", "path": "modules/migration-boot4/SKILL.md", "dimensions": ["D8"], "status": "reserved" }
+  ],
+  "extensionPoints": ["E1", "E2", "E3", "E4", "E5"],
+  "previousVersions": [
+    { "version": "1.0.0", "file": "archives/SKILL-v1.0.0.md" },
+    { "version": "1.1.0", "file": "archives/SKILL-v1.1.0.md" }
+  ]
+}

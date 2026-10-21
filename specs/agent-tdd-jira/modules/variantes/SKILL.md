@@ -35,7 +35,7 @@ Chaque variante est décrite avec les mêmes rubriques, pour que la comparaison 
 | Principe | en deux ou trois phrases |
 | Éléments touchés | fichiers et classes, d'après la fiche d'impact |
 | Contrat | aucun changement, ajout compatible, ou changement cassant |
-| Invariants engagés | identifiants des référentiels et du socle (`expert-java:D3.INV-4`, `SC4.INV-1`) ; violation éventuelle en clair |
+| Invariants engagés | identifiants des référentiels et du socle (`java:D3.INV-4`, `SC4.INV-1`) ; violation éventuelle en clair |
 | Tests prévus | niveaux de test (unitaire, tranche web, tranche données, store, composant) |
 | Effort | `S`, `M`, `L` |
 | Risques | techniques et fonctionnels |
@@ -48,14 +48,14 @@ Chaque variante est décrite avec les mêmes rubriques, pour que la comparaison 
 **B1 : endpoint d'export qui produit le CSV en flux**
 - Principe : nouvelle opération `exportFeedbacks` (réponse `text/csv`), mêmes filtres que la liste ; le contrôleur écrit le CSV en flux.
 - Contrat : ajout compatible.
-- Invariants : `expert-java:D3.INV-1` (opération ajoutée au contrat), `expert-java:D3.INV-2` (filtres validés), `expert-java:D4.INV-3` (lecture `readOnly` dans la couche application), `SC4.INV-2` (endpoint protégé).
+- Invariants : `java:D3.INV-1` (opération ajoutée au contrat), `java:D3.INV-2` (filtres validés), `java:D4.INV-3` (lecture `readOnly` dans la couche application), `SC4.INV-2` (endpoint protégé).
 - Tests : unitaire sur l'écriture CSV ; tranche web sur l'opération (type de contenu, en-tête de téléchargement, 401 anonyme).
 - Effort : M. Risques : volume (voir S03). Réversibilité : facile.
 
 **B2 : renvoyer toute la liste en JSON, le front fabrique le CSV**
 - Principe : nouvelle opération qui renvoie toutes les lignes filtrées, sans pagination.
 - Contrat : ajout compatible.
-- Invariants : **viole** `expert-java:D3.INV-4` et `SC3.INV-3` (collection non paginée, sans taille maximale).
+- Invariants : **viole** `java:D3.INV-4` et `SC3.INV-3` (collection non paginée, sans taille maximale).
 - **Non recommandée** : signalée pour information (D4.INV-2).
 
 **B3 : génération asynchrone et lien de téléchargement**
@@ -68,13 +68,13 @@ Chaque variante est décrite avec les mêmes rubriques, pour que la comparaison 
 
 **F1 : bouton qui appelle le client généré et déclenche le téléchargement**
 - Principe : le contrat déclare la réponse `text/csv` en `format: binary` ; le client généré renvoie un `Blob` ; le store le transmet à un service de téléchargement.
-- Invariants : `expert-angular:D3.INV-1` (client généré), `expert-angular:D3.INV-2` (erreurs converties en un point), `expert-angular:D6.INV-4` (fin de l'export annoncée), `expert-angular:D2.INV-1` (OnPush).
+- Invariants : `angular:D3.INV-1` (client généré), `angular:D3.INV-2` (erreurs converties en un point), `angular:D6.INV-4` (fin de l'export annoncée), `angular:D2.INV-1` (OnPush).
 - Tests : store avec `HttpTestingController` ; composant (bouton, état désactivé, annonce).
 - Effort : S. Réversibilité : facile.
 
 **F2 : simple lien `<a href download>` vers l'endpoint**
 - Principe : le navigateur suit le lien.
-- Invariants : avec une authentification par jeton porteur, le navigateur n'envoie pas l'en-tête `Authorization` sur un lien : l'appel serait refusé (401). Contournement par jeton dans l'URL : **viole** `SC4.INV-1` et `expert-angular:D5.INV-3`.
+- Invariants : avec une authentification par jeton porteur, le navigateur n'envoie pas l'en-tête `Authorization` sur un lien : l'appel serait refusé (401). Contournement par jeton dans l'URL : **viole** `SC4.INV-1` et `angular:D5.INV-3`.
 - **Non recommandée** avec un jeton porteur ; envisageable seulement si le projet authentifie par cookie de session.
 
 ### Combinaisons
@@ -82,7 +82,7 @@ Chaque variante est décrite avec les mêmes rubriques, pour que la comparaison 
 | | F1 | F2 |
 |---|---|---|
 | **B1** | **recommandée** : contrat compatible, invariants respectés, effort M + S | incompatible avec un jeton porteur |
-| **B2** | non recommandée (B2 viole `expert-java:D3.INV-4`) | non recommandée |
+| **B2** | non recommandée (B2 viole `java:D3.INV-4`) | non recommandée |
 | **B3** | possible : F1 à adapter au suivi de tâche ; effort L + M | incompatible |
 
 **Recommandation** : B1 + F1. Raison : seule combinaison qui respecte tous les invariants avec l'effort le plus faible ; B3 reste à considérer si la réponse à Q1 relève fortement la limite de volume.

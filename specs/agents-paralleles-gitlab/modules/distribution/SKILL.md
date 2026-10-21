@@ -41,7 +41,7 @@ src/app/features/feedback/data-access/feedback.store.ts
 | Chemin commun à deux demandes | Risque | Règle |
 |---|---|---|
 | `api/openapi.yaml` | contrat modifié des deux côtés, clients régénérés en conflit | séquencer. Le contrat passe avant le back et le front (`agent-tdd-jira:D5.INV-5`). Un fichier généré se régénère, il ne se fusionne jamais à la main |
-| migrations Flyway (`db/migration/`) | même numéro `V5__` pris deux fois : la numérotation est séquentielle (`expert-java`, module `persistance`) | réserver les numéros à la distribution, fusionner dans leur ordre : Flyway refuse par défaut une migration plus ancienne que la dernière appliquée |
+| migrations Flyway (`db/migration/`) | même numéro `V5__` pris deux fois : la numérotation est séquentielle (`java`, module `persistance`) | réserver les numéros à la distribution, fusionner dans leur ordre : Flyway refuse par défaut une migration plus ancienne que la dernière appliquée |
 | changelog Liquibase (`db/changelog/`) | lignes `include` ajoutées au même endroit | séquencer, ou fusion manuelle relue |
 | configuration de sécurité | classe `sensitive` de `tension-dashboard-gitlab-agent` : toute tension y est critique (`tension-dashboard-gitlab-agent:D1.INV-3`) | séquencer |
 | `pom.xml`, `package.json`, `build.gradle` | ajout de dépendance, soumis à validation (`agent-tdd-jira:D5.INV-6`) | séquencer les ajouts ; un lock file se régénère |

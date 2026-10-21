@@ -1,12 +1,12 @@
 ---
 name: socle-back-front
 description: Socle commun aux experts Java, Angular et analyse de projet. Il fixe le contrat entre back et front (OpenAPI, erreurs RFC 9457, formats de données, pagination, sécurité, traçabilité, accessibilité). À lire avant de produire, relire ou analyser du code qui traverse la frontière back-front.
-version: 1.0.0
+version: 1.0.1
 ---
 
-# Socle commun back-front, version 1.0.0
+# Socle commun back-front, version 1.0.1
 
-Ce socle définit ce que le back et le front doivent respecter **ensemble**. Il est inclus à l'identique dans chaque skill qui en dépend (`expert-java`, `expert-angular`, `expert-analyse-projet`), à une version épinglée. Un skill ne redéfinit jamais une règle du socle : il peut seulement la préciser pour sa technologie.
+Ce socle définit ce que le back et le front doivent respecter **ensemble**. Il est inclus à l'identique dans chaque skill qui en dépend (`java`, `angular`, `analyse-projet`, `sonarqube`, `agent-tdd-jira`), à une version épinglée. Un skill ne redéfinit jamais une règle du socle : il peut seulement la préciser pour sa technologie.
 
 Les identifiants du socle commencent par `SC` (`SC2.INV-1`), pour ne jamais se confondre avec ceux d'un skill, qui commencent par `D` suivi du numéro de dimension.
 
@@ -206,4 +206,6 @@ Réservé à une version ultérieure du socle : contrat AsyncAPI, format d'envel
 
 ## 11. Journal de révision
 
-**1.0.0** (2026-10-16) : première version. Dimensions SC1 à SC6 actives, SC7 réservée.
+**1.0.0** (2026-10-16) : première version. Dimensions SC1 à SC6 actives, SC7 réservée. Archive : `archives/SKILL-v1.0.0.md`.
+
+**1.0.1** (2026-10-21) : correctif. Les skills qui incluent le socle sont désignés sans le préfixe `expert-`, retiré de tous les skills du dépôt : `java`, `angular`, `analyse-projet`, auxquels s'ajoutent `sonarqube` et `agent-tdd-jira`, qui l'incluent aussi et manquaient à la liste. Aucune dimension ni aucun invariant modifié. Motif : une nouvelle notion d'expertise sera définie ensuite.

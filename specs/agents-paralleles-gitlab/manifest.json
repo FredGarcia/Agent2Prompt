@@ -1,6 +1,6 @@
 {
   "name": "agents-paralleles-gitlab",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "specSchema": 1,
   "language": "fr",
   "description": "Plusieurs agents en parallèle sur un dépôt GitLab, une demande Jira par worktree : isolation, hooks communs, script agt, garde-fous GitLab, recette de 44 contrôles.",
@@ -22,5 +22,7 @@
     { "id": "tension-depot", "path": "modules/tension-depot/SKILL.md", "dimensions": ["D7"], "status": "reserved" }
   ],
   "extensionPoints": ["E1", "E2"],
-  "previousVersions": []
+  "previousVersions": [
+    { "version": "1.0.0", "file": "archives/SKILL-v1.0.0.md" }
+  ]
 }

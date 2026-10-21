@@ -1,12 +1,14 @@
 {
   "name": "socle-back-front",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "specSchema": 1,
   "language": "fr",
   "description": "Socle commun back-front : contrat OpenAPI, erreurs RFC 9457, formats de données, sécurité, traçabilité, accessibilité.",
   "entry": "SKILL.md",
   "transmissible": false,
-  "usedBy": ["expert-java", "expert-angular", "expert-analyse-projet"],
+  "usedBy": ["java", "angular", "analyse-projet", "sonarqube", "agent-tdd-jira"],
   "modules": [],
-  "previousVersions": []
+  "previousVersions": [
+    { "version": "1.0.0", "file": "archives/SKILL-v1.0.0.md" }
+  ]
 }

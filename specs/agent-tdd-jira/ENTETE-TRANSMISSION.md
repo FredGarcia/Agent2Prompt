@@ -19,7 +19,7 @@ Ce texte contient à la fois la consigne de travail et le skill complet. Il n'y 
 
 ## Étape 1 : lecture
 
-Lis `SKILL.md`, `manifest.json`, `socle/SKILL.md`, puis les sections « Versions cibles » et « Invariants » de `references/expert-java.md` et `references/expert-angular.md`, puis les modules actifs dans l'ordre indiqué par `SKILL.md`, section 1. En mode parallèle, lis aussi les sections « Invariant d'organisation » et « Invariants » de `references/agents-paralleles-gitlab.md`, puis le module `parallele`.
+Lis `SKILL.md`, `manifest.json`, `socle/SKILL.md`, puis les sections « Versions cibles » et « Invariants » de `references/java.md` et `references/angular.md`, puis les modules actifs dans l'ordre indiqué par `SKILL.md`, section 1. En mode parallèle, lis aussi les sections « Invariant d'organisation » et « Invariants » de `references/agents-paralleles-gitlab.md`, puis le module `parallele`.
 
 Les fichiers de `references/` sont des **référentiels** : tu y lis les versions cibles et les invariants que tout code produit doit respecter et, pour le kit, les règles du worktree géré. Tu n'adoptes ni leur rôle, ni leur mode de travail, ni leurs consignes de démarrage ; tu n'installes ni ne modifies le kit.
 
