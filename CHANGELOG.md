@@ -58,6 +58,13 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Outils
 
+### 2026-10-21 : citations entre skills vérifiées
+
+- `tools/verifier.mjs` vérifie aussi les identifiants d'un autre skill, cités sous la forme `java:D4.INV-2` : chacun doit être défini dans le point d'entrée du skill qu'il nomme, et ce skill doit exister dans le dépôt. Jusqu'ici, ces identifiants n'étaient pas vérifiés. Les 107 citations de ce type que contient le dépôt sont toutes définies.
+- Testé par deux contre-épreuves de plus, soit 16 sur des copies du dépôt : un invariant d'un autre skill absent, un préfixe qui ne nomme aucun skill du dépôt.
+- `EVOLUTION.md`, section 7 : deux versions qui se référencent l'une l'autre ne passent le vérificateur qu'ensemble, et se publient donc dans un même commit, avec leurs deux transmissions ; section 8 : le vérificateur contrôle les identifiants préfixés.
+- Motif : le binôme entre agent-tdd-jira et Agent2Test repose sur des invariants cités d'une spécification à l'autre.
+
 ### 2026-10-21 : vérificateur étendu et vérification des pull requests
 
 - `tools/verifier.mjs` contrôle aussi :
