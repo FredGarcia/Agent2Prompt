@@ -10,7 +10,7 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 - **agent-tdd-jira 1.3.0** : dimension D7 active, binôme avec Agent2Test ; module `binome-agent2test`. Après le dernier scénario accepté, l'agent remet le plan validé et commité ; le développeur redémarre l'application sur le Tomcat local et conduit la campagne ; le script `lire-acceptation.mjs` tire du journal de tests le verdict de chaque critère, s'il vaut pour le plan et le code courants, sinon « non joué » avec sa raison ; chaque défaut applicatif confirmé en CP-3 rouvre son scénario en cycle TDD. Étiquettes de prérequis dans le fichier Gherkin : `@role-<nom>`, `@batch-<nom>`, `@redemarrage`, `@ecriture-base`, et au choix du développeur `@criticite-*` et `@socle`. Colonne « Acceptation » dans la matrice, ligne d'acceptation dans le rapport et le projet de commentaire Jira. Invariants D7.INV-1 à D7.INV-5, aucun invariant existant modifié. Archive 1.2.2.
 - Les deux spécifications se référencent l'une l'autre et se publient dans un même commit (`EVOLUTION.md`, section 7). Le script `lire-acceptation.mjs` est testé sur 33 cas, dont deux en worktree et un qui vérifie qu'il ne modifie aucun fichier, index git compris ; le journal d'exemple d'agent2test, lu par ce script sur l'exemple ECR-77 d'agent-tdd-jira, redonne exactement les deux sorties du module `binome-agent2test` ; l'exemple, qui porte désormais `@role-LECTEUR`, passe `controler-criteres.mjs` sans écart.
 - Décisions du développeur (21 octobre 2026) : Agent2Dev reste la tête de développement et applique agent-tdd-jira ; Playwright en bibliothèque, Agent2Test en projet séparé de l'application ; Agent2Test devient une spécification transmissible de ce dépôt ; tout reste en local, enchaîné à la main ; application sur Tomcat en local, lancée par le développeur ; batchs Java lancés par le développeur à un point de contrôle (CP-5) ; tous les modules actifs, accessibilité réservée.
-- Soumis à ratification :
+- Décisions ratifiées (pull request n° 5) :
   - lecture de « connexion SSO réglée automatiquement » : authentification intégrée du poste par défaut (stratégie `integree`), connexion humaine en CP-0 en repli, sans identifiant détenu ;
   - écarts au dossier de conception d'Agent2Test (H1, H2, H3, CA-1.5, H9, CA-9.4, T1, H12 et US-29), dont l'AI Act mis hors périmètre et l'envoi des sources à Gemini soumis à l'autorisation de la DSI et du RSSI ;
   - rôles de l'application : étiquette `@role-<nom>`, rôles de la session déclarés par un humain (`session.roles`), scénario non jouable si le rôle manque ;
@@ -22,7 +22,7 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 - **agent-tdd-jira 1.2.2** : script de contrôle `controler-criteres.mjs` (module `us-criteres`, section 7), en Node sans dépendance. Il confronte `us.md` et le fichier Gherkin et signale chaque écart avec son invariant (D10.INV-1 à D10.INV-7, D2.INV-3) : identifiants, provenance, énoncés invérifiables, exigences rattachées, couverture des critères par les scénarios, critères en attente, colonne « Scénarios ». Avec `--depuis`, il vérifie qu'aucun identifiant n'a été renuméroté depuis une révision git. L'agent le lance avant V2 et avant V5 ; sa sortie donne les critères prêts pour la réalisation.
 - `us.md` gagne une section « Exigences » ; le statut d'un critère retiré s'écrit « retiré : <raison> ». Aucune dimension ni aucun invariant modifié. Archive 1.2.1.
 - Script testé sur l'exemple ECR-77 du module et sur 27 variantes défectueuses ou limites, dont 5 avec un historique git ; chaque défaut est signalé avec l'invariant attendu.
-- Soumis à ratification : le contrôle par script avant V2 et avant V5 ; la section « Exigences » dans `us.md` ; le format « retiré : <raison> » ; la liste des formulations jugées invérifiables (« correctement », « rapidement », « facilement », « intuitif », « convivial », « ergonomique », « optimal », « rapide » sans seuil).
+- Décisions ratifiées (pull request n° 4) : le contrôle par script avant V2 et avant V5 ; la section « Exigences » dans `us.md` ; le format « retiré : <raison> » ; la liste des formulations jugées invérifiables (« correctement », « rapidement », « facilement », « intuitif », « convivial », « ergonomique », « optimal », « rapide » sans seuil).
 
 ### 2026-10-21 : retrait du préfixe `expert-`
 
@@ -31,7 +31,7 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 - **sonarqube 1.0.2** précise la notation : `java:Dn.INV-k` désigne un invariant du référentiel `java`, `java:Snnnn` une règle SonarQube.
 - `README.md`, `EVOLUTION.md` et les commentaires des outils emploient les nouveaux noms ; le glossaire est régénéré.
 - Inchangés, parce qu'ils sont des traces : les archives, les transmissions antérieures et les entrées plus anciennes de ce journal et des journaux de révision, qui gardent les anciens noms.
-- Soumis à ratification : noms sans préfixe ; montée en correctif (`EVOLUTION.md`, section 4, point 2), le renommage n'ajoutant aucune dimension ; anciens noms conservés dans l'historique.
+- Décisions ratifiées (pull request n° 3) : noms sans préfixe ; montée en correctif (`EVOLUTION.md`, section 4, point 2), le renommage n'ajoutant aucune dimension ; anciens noms conservés dans l'historique.
 
 ### 2026-10-21 : agent-tdd-jira 1.2.0
 
