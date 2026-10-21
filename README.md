@@ -13,7 +13,7 @@ Chaque spécification est un package modulaire versionné : un point d'entrée, 
 | [`angular`](specs/angular/SKILL.md) | 1.0.1 | [`transmissions/angular-1.0.1.md`](transmissions/angular-1.0.1.md) | Produire et relire un front Angular 20, accessibilité RGAA et WCAG comprise |
 | [`analyse-projet`](specs/analyse-projet/SKILL.md) | 1.0.2 | [`transmissions/analyse-projet-1.0.2.md`](transmissions/analyse-projet-1.0.2.md) | Analyser un projet back et front en lecture seule : cartographie, rapport et feuille de route, ou plans d'action |
 | [`sonarqube`](specs/sonarqube/SKILL.md) | 1.0.2 | [`transmissions/sonarqube-1.0.2.md`](transmissions/sonarqube-1.0.2.md) | SonarQube Server 2026.x : configurer l'analyse et la CI GitLab, trier, corriger ou planifier, gouverner la qualité |
-| [`agent-tdd-jira`](specs/agent-tdd-jira/SKILL.md) | 1.2.1 | [`transmissions/agent-tdd-jira-1.2.1.md`](transmissions/agent-tdd-jira-1.2.1.md) | Développement TDD à partir d'une demande Jira en MHTML : analyse avec commentaires, US et critères d'acceptation numérotés, scénarios Gherkin par critère, variantes back et front, cycle rouge, vert, remanié, traçabilité jusqu'aux critères ; mode parallèle dans un worktree géré |
+| [`agent-tdd-jira`](specs/agent-tdd-jira/SKILL.md) | 1.2.2 | [`transmissions/agent-tdd-jira-1.2.2.md`](transmissions/agent-tdd-jira-1.2.2.md) | Développement TDD à partir d'une demande Jira en MHTML : analyse avec commentaires, US et critères d'acceptation numérotés, scénarios Gherkin par critère, variantes back et front, cycle rouge, vert, remanié, traçabilité jusqu'aux critères ; mode parallèle dans un worktree géré |
 | [`agents-paralleles-gitlab`](specs/agents-paralleles-gitlab/SKILL.md) | 1.0.1 | [`transmissions/agents-paralleles-gitlab-1.0.1.md`](transmissions/agents-paralleles-gitlab-1.0.1.md) | Plusieurs agents en parallèle sur un dépôt GitLab, une demande Jira par worktree : isolation, hooks communs, script `agt`, garde-fous GitLab, recette de 44 contrôles |
 
 Les transmissions des versions précédentes restent dans `transmissions/` : elles sont la trace exacte de ce qui a été remis à une IA. Les skills `java`, `angular`, `analyse-projet` et `sonarqube` s'appelaient `expert-java`, `expert-angular`, `expert-analyse-projet` et `expert-sonarqube` jusqu'au 21 octobre 2026 : leurs transmissions et archives antérieures gardent ces noms.
@@ -34,7 +34,7 @@ flowchart LR
   A -->|"inclus comme référentiel"| SQ
   SQ -.->|"plans d'action"| J
   SQ -.->|"plans d'action"| A
-  SOCLE -->|"inclus, épinglé"| TDD["agent-tdd-jira 1.2.1"]
+  SOCLE -->|"inclus, épinglé"| TDD["agent-tdd-jira 1.2.2"]
   J -->|"inclus comme référentiel"| TDD
   A -->|"inclus comme référentiel"| TDD
   APG["agents-paralleles-gitlab 1.0.1"] -->|"inclus comme référentiel"| TDD
@@ -67,9 +67,9 @@ Agent2Prompt/
 
 Coller le contenu du fichier de `transmissions/` dans l'IA du développeur. Aucune pièce jointe n'est nécessaire. Le texte contient :
 
-1. la consigne : matérialiser la spécification dans `spec/`, la lire, proposer un plan, attendre la validation, implémenter par étapes ;
+1. la consigne propre à la spécification : où matérialiser ses fichiers (`spec/` pour `tension-dashboard-gitlab-agent`, `.skills/<nom>/` pour les skills), quoi lire, puis comment travailler ;
 2. chaque fichier de la spécification entre `<<<FICHIER chemin>>>` et `<<<FIN chemin>>>` ;
-3. une table sha256 pour vérifier la reconstruction (`sha256sum -c`).
+3. une table sha256 pour vérifier la reconstruction (`sha256sum -c`, depuis le dossier où les fichiers ont été matérialisés).
 
 ## Générer une transmission
 
@@ -80,7 +80,7 @@ node tools/bundle.mjs specs/tension-dashboard-gitlab-agent
 node tools/bundle.mjs specs/java
 ```
 
-`verifier.mjs` contrôle les manifestes, les versions, les modules, les fichiers partagés épinglés, les blocs de code et les invariants (chaque invariant défini est repris dans un module, chaque invariant cité est défini) ; il échoue si `glossaire.md` ne correspond plus exactement aux spécifications. `bundle.mjs` lit `manifest.json`, insère les fichiers partagés, écrit `transmissions/<nom>-<version>.md` et échoue si une version épinglée ne correspond pas ou si le texte ne redonne pas exactement chaque fichier. Les trois scripts demandent Node 20 ou plus récent et n'utilisent que les modules natifs (`node:fs`, `node:crypto`, `node:path`), sans `npm install`.
+`verifier.mjs` contrôle les manifestes, les versions, les modules et le registre des dimensions, les fichiers partagés épinglés, les archives, les points d'extension, les blocs de code et les invariants (chaque invariant défini est repris dans un module, chaque invariant cité est défini). Il échoue aussi si la transmission de la version courante d'une spécification ne redonne plus exactement ses fichiers, si ce README n'affiche plus les versions courantes, ou si `glossaire.md` ne correspond plus exactement aux spécifications. Il tourne à chaque pull request et à chaque push sur `main` (`.github/workflows/verifier.yml`). `bundle.mjs` lit `manifest.json`, insère les fichiers partagés, écrit `transmissions/<nom>-<version>.md` et échoue si une version épinglée ne correspond pas ou si le texte ne redonne pas exactement chaque fichier. Les trois scripts demandent Node 20 ou plus récent et n'utilisent que les modules natifs (`node:fs`, `node:crypto`, `node:path`), sans `npm install`.
 
 ## Faire évoluer une spécification
 

@@ -4,6 +4,13 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-10-21 : agent-tdd-jira 1.2.2
+
+- **agent-tdd-jira 1.2.2** : script de contrôle `controler-criteres.mjs` (module `us-criteres`, section 7), en Node sans dépendance. Il confronte `us.md` et le fichier Gherkin et signale chaque écart avec son invariant (D10.INV-1 à D10.INV-7, D2.INV-3) : identifiants, provenance, énoncés invérifiables, exigences rattachées, couverture des critères par les scénarios, critères en attente, colonne « Scénarios ». Avec `--depuis`, il vérifie qu'aucun identifiant n'a été renuméroté depuis une révision git. L'agent le lance avant V2 et avant V5 ; sa sortie donne les critères prêts pour la réalisation.
+- `us.md` gagne une section « Exigences » ; le statut d'un critère retiré s'écrit « retiré : <raison> ». Aucune dimension ni aucun invariant modifié. Archive 1.2.1.
+- Script testé sur l'exemple ECR-77 du module et sur 27 variantes défectueuses ou limites, dont 5 avec un historique git ; chaque défaut est signalé avec l'invariant attendu.
+- Soumis à ratification : le contrôle par script avant V2 et avant V5 ; la section « Exigences » dans `us.md` ; le format « retiré : <raison> » ; la liste des formulations jugées invérifiables (« correctement », « rapidement », « facilement », « intuitif », « convivial », « ergonomique », « optimal », « rapide » sans seuil).
+
 ### 2026-10-21 : retrait du préfixe `expert-`
 
 - Les skills `expert-java`, `expert-angular`, `expert-analyse-projet` et `expert-sonarqube` s'appellent désormais `java`, `angular`, `analyse-projet` et `sonarqube`. Le changement couvre les dossiers, les manifestes, les points d'entrée, les citations (`java:Dn.INV-k`), les référentiels inclus (`references/java.md`, `references/angular.md`) et les dossiers de matérialisation (`.skills/java/`, …). Motif : une nouvelle notion d'expertise sera définie ensuite.
@@ -50,6 +57,19 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 - Point d'attention consigné dans les skills : la branche Spring Boot 3.5 n'a plus de support open source depuis le 30 juin 2026, et Angular 20 arrive en fin de support long terme vers la fin novembre 2026. Les migrations correspondantes sont les dimensions réservées D8 (Java) et D9 (Angular).
 
 ## Outils
+
+### 2026-10-21 : vérificateur étendu et vérification des pull requests
+
+- `tools/verifier.mjs` contrôle aussi :
+  - la transmission de la version courante de chaque spécification, qui doit redonner exactement l'en-tête, les fichiers et la table d'intégrité ;
+  - le README : version de chaque spécification dans le tableau et dans le schéma, liens vers `specs/` et `transmissions/` ;
+  - les archives : une par version précédente déclarée, à la bonne version, aucune archive non déclarée ;
+  - les points d'extension du manifeste, face à ceux du point d'entrée ;
+  - le registre des dimensions, face aux statuts des modules dans le manifeste.
+- Testé par 14 contre-épreuves sur des copies du dépôt, chacune refusée avec le message attendu ; le dépôt intact passe.
+- `tools/bundle.mjs` exporte `assembler` et `relire`, dont se sert le vérificateur ; les transmissions produites ne changent pas, sauf la consigne de la table d'intégrité, à vérifier « depuis le dossier où les fichiers ont été matérialisés » au lieu de `spec/`. La correction vaut pour les transmissions des prochaines versions : celles déjà publiées restent telles quelles.
+- `.github/workflows/verifier.yml` : le vérificateur tourne à chaque pull request et à chaque push sur `main`, sous Node 20 et Node 24.
+- `EVOLUTION.md`, section 7 : README mis à jour avec le journal, transmission régénérée avant la vérification, une version par commit, transmission comprise ; la transmission d'une version publiée n'est jamais régénérée.
 
 ### 2026-10-21 : glossaire des invariants
 

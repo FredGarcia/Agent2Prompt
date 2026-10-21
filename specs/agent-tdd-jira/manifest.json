@@ -1,6 +1,6 @@
 {
   "name": "agent-tdd-jira",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "specSchema": 1,
   "language": "fr",
   "description": "Agent de développement TDD : demande Jira en MHTML, analyse avec commentaires, US et critères d'acceptation numérotés, scénarios Gherkin par critère, variantes back Java et front Angular, cycle rouge, vert, remanié scénario par scénario, traçabilité ; mode parallèle dans un worktree géré par agents-paralleles-gitlab.",
@@ -39,6 +39,7 @@
   "previousVersions": [
     { "version": "1.0.0", "file": "archives/SKILL-v1.0.0.md" },
     { "version": "1.1.0", "file": "archives/SKILL-v1.1.0.md" },
-    { "version": "1.2.0", "file": "archives/SKILL-v1.2.0.md" }
+    { "version": "1.2.0", "file": "archives/SKILL-v1.2.0.md" },
+    { "version": "1.2.1", "file": "archives/SKILL-v1.2.1.md" }
   ]
 }

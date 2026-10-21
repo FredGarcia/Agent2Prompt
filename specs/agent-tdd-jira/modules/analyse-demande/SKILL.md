@@ -38,6 +38,8 @@ Chaque phrase porteuse d'une règle devient une exigence numérotée, avec sa pr
 
 Une capture d'écran qui porte une exigence (maquette, message attendu) est une provenance au même titre qu'une phrase : `pièce images/piece-002.png`.
 
+Le tableau est consigné dans la section « Exigences » de `us.md` (module `us-criteres`, section 3).
+
 ## 3. Lire les commentaires
 
 Les commentaires se lisent dans l'ordre chronologique. Chacun est classé :
@@ -134,7 +136,7 @@ L'agent propose les cas que la demande n'énonce pas mais que le code devra trai
 
 ## 7. Validation V2 (D2.INV-5)
 
-L'agent présente : les US et les critères d'acceptation (`us.md`, module `us-criteres`, section 6), le tableau des exigences, les questions, le fichier Gherkin, et la couverture (chaque exigence a au moins un CA, chaque CA au moins un scénario). Il attend :
+L'agent présente : les US et les critères d'acceptation (`us.md`, module `us-criteres`, section 6), le tableau des exigences, les questions, le fichier Gherkin, et la couverture (chaque exigence a au moins un CA, chaque CA au moins un scénario), établie par le script de contrôle (module `us-criteres`, section 7). Il attend :
 
 - une réponse à chaque question, ou l'accord pour laisser les scénarios concernés en attente ;
 - l'acceptation, la modification ou le rejet de chaque critère d'acceptation et de chaque scénario proposés ;
