@@ -9,35 +9,35 @@ Chaque spécification est un package modulaire versionné : un point d'entrée, 
 | Spécification | Version | Transmission | Objet |
 |---|---|---|---|
 | [`tension-dashboard-gitlab-agent`](specs/tension-dashboard-gitlab-agent/SKILL.md) | 2.2.0 | [`transmissions/tension-dashboard-gitlab-agent-2.2.0.md`](transmissions/tension-dashboard-gitlab-agent-2.2.0.md) | Fichiers sous tension entre local et distant, tableau de bord temps réel, assistant GitLab à garde-fous |
-| [`expert-java`](specs/expert-java/SKILL.md) | 1.1.0 | [`transmissions/expert-java-1.1.0.md`](transmissions/expert-java-1.1.0.md) | Produire et relire un back Java 21, Spring Boot 3.5, PostgreSQL, migrations Flyway ou Liquibase |
-| [`expert-angular`](specs/expert-angular/SKILL.md) | 1.0.0 | [`transmissions/expert-angular-1.0.0.md`](transmissions/expert-angular-1.0.0.md) | Produire et relire un front Angular 20, accessibilité RGAA et WCAG comprise |
-| [`expert-analyse-projet`](specs/expert-analyse-projet/SKILL.md) | 1.0.1 | [`transmissions/expert-analyse-projet-1.0.1.md`](transmissions/expert-analyse-projet-1.0.1.md) | Analyser un projet back et front en lecture seule : cartographie, rapport et feuille de route, ou plans d'action |
-| [`expert-sonarqube`](specs/expert-sonarqube/SKILL.md) | 1.0.1 | [`transmissions/expert-sonarqube-1.0.1.md`](transmissions/expert-sonarqube-1.0.1.md) | SonarQube Server 2026.x : configurer l'analyse et la CI GitLab, trier, corriger ou planifier, gouverner la qualité |
-| [`agent-tdd-jira`](specs/agent-tdd-jira/SKILL.md) | 1.2.0 | [`transmissions/agent-tdd-jira-1.2.0.md`](transmissions/agent-tdd-jira-1.2.0.md) | Développement TDD à partir d'une demande Jira en MHTML : analyse avec commentaires, US et critères d'acceptation numérotés, scénarios Gherkin par critère, variantes back et front, cycle rouge, vert, remanié, traçabilité jusqu'aux critères ; mode parallèle dans un worktree géré |
-| [`agents-paralleles-gitlab`](specs/agents-paralleles-gitlab/SKILL.md) | 1.0.0 | [`transmissions/agents-paralleles-gitlab-1.0.0.md`](transmissions/agents-paralleles-gitlab-1.0.0.md) | Plusieurs agents en parallèle sur un dépôt GitLab, une demande Jira par worktree : isolation, hooks communs, script `agt`, garde-fous GitLab, recette de 44 contrôles |
+| [`java`](specs/java/SKILL.md) | 1.1.1 | [`transmissions/java-1.1.1.md`](transmissions/java-1.1.1.md) | Produire et relire un back Java 21, Spring Boot 3.5, PostgreSQL, migrations Flyway ou Liquibase |
+| [`angular`](specs/angular/SKILL.md) | 1.0.1 | [`transmissions/angular-1.0.1.md`](transmissions/angular-1.0.1.md) | Produire et relire un front Angular 20, accessibilité RGAA et WCAG comprise |
+| [`analyse-projet`](specs/analyse-projet/SKILL.md) | 1.0.2 | [`transmissions/analyse-projet-1.0.2.md`](transmissions/analyse-projet-1.0.2.md) | Analyser un projet back et front en lecture seule : cartographie, rapport et feuille de route, ou plans d'action |
+| [`sonarqube`](specs/sonarqube/SKILL.md) | 1.0.2 | [`transmissions/sonarqube-1.0.2.md`](transmissions/sonarqube-1.0.2.md) | SonarQube Server 2026.x : configurer l'analyse et la CI GitLab, trier, corriger ou planifier, gouverner la qualité |
+| [`agent-tdd-jira`](specs/agent-tdd-jira/SKILL.md) | 1.2.1 | [`transmissions/agent-tdd-jira-1.2.1.md`](transmissions/agent-tdd-jira-1.2.1.md) | Développement TDD à partir d'une demande Jira en MHTML : analyse avec commentaires, US et critères d'acceptation numérotés, scénarios Gherkin par critère, variantes back et front, cycle rouge, vert, remanié, traçabilité jusqu'aux critères ; mode parallèle dans un worktree géré |
+| [`agents-paralleles-gitlab`](specs/agents-paralleles-gitlab/SKILL.md) | 1.0.1 | [`transmissions/agents-paralleles-gitlab-1.0.1.md`](transmissions/agents-paralleles-gitlab-1.0.1.md) | Plusieurs agents en parallèle sur un dépôt GitLab, une demande Jira par worktree : isolation, hooks communs, script `agt`, garde-fous GitLab, recette de 44 contrôles |
 
-Les transmissions des versions précédentes restent dans `transmissions/` : elles sont la trace exacte de ce qui a été remis à une IA.
+Les transmissions des versions précédentes restent dans `transmissions/` : elles sont la trace exacte de ce qui a été remis à une IA. Les skills `java`, `angular`, `analyse-projet` et `sonarqube` s'appelaient `expert-java`, `expert-angular`, `expert-analyse-projet` et `expert-sonarqube` jusqu'au 21 octobre 2026 : leurs transmissions et archives antérieures gardent ces noms.
 
 Le [glossaire](glossaire.md) détaille chaque invariant `Dn.INV-k` de chaque spécification : dimension, énoncé, modules qui le reprennent et spécifications qui le citent. Il est généré, jamais écrit à la main.
 
-Socle partagé, non transmis seul : [`socle-back-front`](specs/socle-back-front/SKILL.md) 1.0.0 (contrat OpenAPI, erreurs RFC 9457, formats, sécurité, traçabilité, accessibilité). Il est inclus, à une version épinglée, dans chaque transmission des experts, qui restent ainsi autonomes et cohérents entre eux. L'expert SonarQube inclut en plus les points d'entrée des experts Java et Angular comme référentiels d'invariants : une correction faite à partir de SonarQube respecte les mêmes règles qu'une correction faite par l'expert du langage. L'agent TDD inclut de même le point d'entrée du kit `agents-paralleles-gitlab` : en mode parallèle, il y lit les règles du worktree que le kit lui impose.
+Socle partagé, non transmis seul : [`socle-back-front`](specs/socle-back-front/SKILL.md) 1.0.1 (contrat OpenAPI, erreurs RFC 9457, formats, sécurité, traçabilité, accessibilité). Il est inclus, à une version épinglée, dans chaque transmission des experts, qui restent ainsi autonomes et cohérents entre eux. L'expert SonarQube inclut en plus les points d'entrée des experts Java et Angular comme référentiels d'invariants : une correction faite à partir de SonarQube respecte les mêmes règles qu'une correction faite par l'expert du langage. L'agent TDD inclut de même le point d'entrée du kit `agents-paralleles-gitlab` : en mode parallèle, il y lit les règles du worktree que le kit lui impose.
 
 ```mermaid
 flowchart LR
-  SOCLE["socle-back-front 1.0.0"] -->|"inclus, épinglé"| J["expert-java 1.1.0"]
-  SOCLE -->|"inclus, épinglé"| A["expert-angular 1.0.0"]
-  SOCLE -->|"inclus, épinglé"| AN["expert-analyse-projet 1.0.1"]
+  SOCLE["socle-back-front 1.0.1"] -->|"inclus, épinglé"| J["java 1.1.1"]
+  SOCLE -->|"inclus, épinglé"| A["angular 1.0.1"]
+  SOCLE -->|"inclus, épinglé"| AN["analyse-projet 1.0.2"]
   AN -.->|"référence, plans d'action"| J
   AN -.->|"référence, plans d'action"| A
-  SOCLE -->|"inclus, épinglé"| SQ["expert-sonarqube 1.0.1"]
+  SOCLE -->|"inclus, épinglé"| SQ["sonarqube 1.0.2"]
   J -->|"inclus comme référentiel"| SQ
   A -->|"inclus comme référentiel"| SQ
   SQ -.->|"plans d'action"| J
   SQ -.->|"plans d'action"| A
-  SOCLE -->|"inclus, épinglé"| TDD["agent-tdd-jira 1.2.0"]
+  SOCLE -->|"inclus, épinglé"| TDD["agent-tdd-jira 1.2.1"]
   J -->|"inclus comme référentiel"| TDD
   A -->|"inclus comme référentiel"| TDD
-  APG["agents-paralleles-gitlab 1.0.0"] -->|"inclus comme référentiel"| TDD
+  APG["agents-paralleles-gitlab 1.0.1"] -->|"inclus comme référentiel"| TDD
 ```
 
 ## Structure du dépôt
@@ -77,7 +77,7 @@ Coller le contenu du fichier de `transmissions/` dans l'IA du développeur. Aucu
 node tools/glossaire.mjs                                 # après toute modification d'une spécification
 node tools/verifier.mjs                                  # toutes les spécifications, et le glossaire
 node tools/bundle.mjs specs/tension-dashboard-gitlab-agent
-node tools/bundle.mjs specs/expert-java
+node tools/bundle.mjs specs/java
 ```
 
 `verifier.mjs` contrôle les manifestes, les versions, les modules, les fichiers partagés épinglés, les blocs de code et les invariants (chaque invariant défini est repris dans un module, chaque invariant cité est défini) ; il échoue si `glossaire.md` ne correspond plus exactement aux spécifications. `bundle.mjs` lit `manifest.json`, insère les fichiers partagés, écrit `transmissions/<nom>-<version>.md` et échoue si une version épinglée ne correspond pas ou si le texte ne redonne pas exactement chaque fichier. Les trois scripts demandent Node 20 ou plus récent et n'utilisent que les modules natifs (`node:fs`, `node:crypto`, `node:path`), sans `npm install`.

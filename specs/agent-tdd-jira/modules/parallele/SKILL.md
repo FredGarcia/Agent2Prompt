@@ -7,7 +7,7 @@ status: active
 
 # Module `parallele` (D9)
 
-Le développeur peut mener plusieurs demandes de front, une par worktree, avec le kit `agents-paralleles-gitlab` 1.0.0, inclus comme référentiel (`references/agents-paralleles-gitlab.md`). Ce module dit ce qui change pour l'agent. Le parcours V1 à V5 et les autres modules s'appliquent sans changement.
+Le développeur peut mener plusieurs demandes de front, une par worktree, avec le kit `agents-paralleles-gitlab` 1.0.1, inclus comme référentiel (`references/agents-paralleles-gitlab.md`). Ce module dit ce qui change pour l'agent. Le parcours V1 à V5 et les autres modules s'appliquent sans changement.
 
 ```mermaid
 sequenceDiagram

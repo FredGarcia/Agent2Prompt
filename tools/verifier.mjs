@@ -17,7 +17,7 @@
  * - chaque bloc de code Markdown est fermé ;
  * - chaque invariant défini dans le point d'entrée (`**Dn.INV-k**`, `**SCn.INV-k**`) est
  *   repris dans au moins un module, et chaque invariant cité est défini (un identifiant
- *   préfixé par un nom de skill, comme `expert-java:D4.INV-2`, désigne un autre skill et
+ *   préfixé par un nom de skill, comme `java:D4.INV-2`, désigne un autre skill et
  *   n'est pas vérifié ici) ;
  * - `glossaire.md` est exactement celui que génère `tools/glossaire.mjs`.
  *

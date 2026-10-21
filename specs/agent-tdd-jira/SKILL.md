@@ -1,17 +1,17 @@
 ---
 name: agent-tdd-jira
 description: Agent de développement TDD qui part d'une demande Jira enregistrée en MHTML, l'analyse avec ses commentaires, établit les US et leurs critères d'acceptation numérotés, décline chaque critère en scénarios Gherkin, propose au développeur des variantes de réalisation back Java et front Angular pour chaque scénario, puis réalise les scénarios choisis un par un en cycle rouge, vert, remanié, avec traçabilité de la demande jusqu'aux commits ; en mode parallèle, il travaille dans un worktree géré par le kit agents-paralleles-gitlab.
-version: 1.2.0
+version: 1.2.1
 ---
 
-# Agent de développement TDD à partir d'une demande Jira, version 1.2.0
+# Agent de développement TDD à partir d'une demande Jira, version 1.2.1
 
 Ce document est le point d'entrée du skill. Il fixe le parcours de l'agent, ses points de validation, le registre des dimensions et les invariants. Les règles détaillées sont dans `modules/`.
 
 Fichiers inclus à des versions épinglées (voir `manifest.json`) :
 
 - `socle/SKILL.md` : socle commun back-front (contrat d'API, erreurs, formats, sécurité, accessibilité) ;
-- `references/expert-java.md` et `references/expert-angular.md` : points d'entrée des experts Java et Angular. Ce sont des **référentiels** : l'agent y lit les versions cibles et les invariants que tout code produit doit respecter, sans adopter leur mode de travail.
+- `references/java.md` et `references/angular.md` : points d'entrée des experts Java et Angular. Ce sont des **référentiels** : l'agent y lit les versions cibles et les invariants que tout code produit doit respecter, sans adopter leur mode de travail.
 - `references/agents-paralleles-gitlab.md` : point d'entrée du kit de travail en parallèle, une demande par worktree. C'est aussi un référentiel : en mode parallèle (D9), l'agent y lit les règles du worktree géré, sans installer ni modifier le kit.
 
 ## 1. Ordre de lecture
@@ -56,7 +56,7 @@ flowchart TD
 
 ## 3. Cibles techniques
 
-Les versions cibles sont celles des référentiels : Java 21, Spring Boot 3.5, PostgreSQL avec migrations Flyway ou Liquibase (référentiel expert-java 1.1.0), Angular 20 (référentiel expert-angular 1.0.0). Avant d'écrire du code, l'agent relève les versions réelles du projet ; si elles diffèrent, il le signale et demande comment procéder.
+Les versions cibles sont celles des référentiels : Java 21, Spring Boot 3.5, PostgreSQL avec migrations Flyway ou Liquibase (référentiel java 1.1.1), Angular 20 (référentiel angular 1.0.1). Avant d'écrire du code, l'agent relève les versions réelles du projet ; si elles diffèrent, il le signale et demande comment procéder.
 
 | Couche | Tests écrits par l'agent | Outils |
 |---|---|---|
@@ -201,4 +201,6 @@ Point d'extension ajouté en 1.2.0 :
 
 **1.1.0** (2026-10-20) : dimension D9 active, travail dans un worktree géré par le kit `agents-paralleles-gitlab` 1.0.0, en parallèle d'autres demandes ; module `parallele`. Le point d'entrée du kit est inclus et épinglé comme référentiel (`references/agents-paralleles-gitlab.md`). Aucun invariant existant n'est modifié. En mode parallèle, la règle « jamais de push sans demande explicite » (`cycle-tdd`, section 7) devient « jamais de push » (D9.INV-2), plus forte ; un commit hors scénario porte la clé seule (D9.INV-3). Motif : mener plusieurs demandes de front sans qu'un agent puisse abîmer le travail d'un autre. Archive : `archives/SKILL-v1.1.0.md`.
 
-**1.2.0** (2026-10-21) : dimension D10 active, US et critères d'acceptation numérotés ; module `us-criteres`. Règle « CA puis Gherkin, toujours » : l'analyse établit d'abord les US et leurs critères d'acceptation (repris du ticket avec leur provenance, ou proposés), y rattache les exigences, puis décline chaque critère en scénarios Gherkin. Chaque critère porte un identifiant stable `<CLÉ>-CAnn`, repris en étiquette par ses scénarios (point d'extension E4) ; le fichier `docs/demandes/<CLÉ>/us.md` les consigne ; la validation V2 porte sur les US, les critères et les scénarios ; la matrice et le rapport final donnent l'état de chaque critère. D2 et D6 dépendent désormais de D10. Aucun invariant existant n'est modifié ; D10.INV-1 à D10.INV-7 s'ajoutent. Motif : rendre explicite la définition de « terminé » de l'auteur de la demande, et préparer les tests d'acceptation du binôme avec Agent2Test (D7), un verdict par critère.
+**1.2.0** (2026-10-21) : dimension D10 active, US et critères d'acceptation numérotés ; module `us-criteres`. Règle « CA puis Gherkin, toujours » : l'analyse établit d'abord les US et leurs critères d'acceptation (repris du ticket avec leur provenance, ou proposés), y rattache les exigences, puis décline chaque critère en scénarios Gherkin. Chaque critère porte un identifiant stable `<CLÉ>-CAnn`, repris en étiquette par ses scénarios (point d'extension E4) ; le fichier `docs/demandes/<CLÉ>/us.md` les consigne ; la validation V2 porte sur les US, les critères et les scénarios ; la matrice et le rapport final donnent l'état de chaque critère. D2 et D6 dépendent désormais de D10. Aucun invariant existant n'est modifié ; D10.INV-1 à D10.INV-7 s'ajoutent. Motif : rendre explicite la définition de « terminé » de l'auteur de la demande, et préparer les tests d'acceptation du binôme avec Agent2Test (D7), un verdict par critère. Archive : `archives/SKILL-v1.2.0.md`.
+
+**1.2.1** (2026-10-21) : correctif. Référentiels renommés, le préfixe `expert-` étant retiré de tous les skills du dépôt : `references/java.md` (java 1.1.1) et `references/angular.md` (angular 1.0.1), cités sous la forme `java:Dn.INV-k` et `angular:Dn.INV-k`. Épinglages montés : socle back-front 1.0.1, agents-paralleles-gitlab 1.0.1. Aucune dimension ni aucun invariant modifié. Motif : une nouvelle notion d'expertise sera définie ensuite.

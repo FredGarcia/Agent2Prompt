@@ -1,6 +1,6 @@
 {
   "name": "agent-tdd-jira",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "specSchema": 1,
   "language": "fr",
   "description": "Agent de développement TDD : demande Jira en MHTML, analyse avec commentaires, US et critères d'acceptation numérotés, scénarios Gherkin par critère, variantes back Java et front Angular, cycle rouge, vert, remanié scénario par scénario, traçabilité ; mode parallèle dans un worktree géré par agents-paralleles-gitlab.",
@@ -13,15 +13,15 @@
     "front": "Angular 20"
   },
   "shared": [
-    { "path": "socle/SKILL.md", "from": "specs/socle-back-front/SKILL.md", "version": "1.0.0" },
-    { "path": "references/expert-java.md", "from": "specs/expert-java/SKILL.md", "version": "1.1.0" },
-    { "path": "references/expert-angular.md", "from": "specs/expert-angular/SKILL.md", "version": "1.0.0" },
-    { "path": "references/agents-paralleles-gitlab.md", "from": "specs/agents-paralleles-gitlab/SKILL.md", "version": "1.0.0" }
+    { "path": "socle/SKILL.md", "from": "specs/socle-back-front/SKILL.md", "version": "1.0.1" },
+    { "path": "references/java.md", "from": "specs/java/SKILL.md", "version": "1.1.1" },
+    { "path": "references/angular.md", "from": "specs/angular/SKILL.md", "version": "1.0.1" },
+    { "path": "references/agents-paralleles-gitlab.md", "from": "specs/agents-paralleles-gitlab/SKILL.md", "version": "1.0.1" }
   ],
   "references": [
-    { "name": "expert-java", "version": "1.1.0" },
-    { "name": "expert-angular", "version": "1.0.0" },
-    { "name": "agents-paralleles-gitlab", "version": "1.0.0" }
+    { "name": "java", "version": "1.1.1" },
+    { "name": "angular", "version": "1.0.1" },
+    { "name": "agents-paralleles-gitlab", "version": "1.0.1" }
   ],
   "modules": [
     { "id": "ingestion-jira", "path": "modules/ingestion-jira/SKILL.md", "dimensions": ["D1"], "status": "active" },
@@ -38,6 +38,7 @@
   "extensionPoints": ["E1", "E2", "E3", "E4"],
   "previousVersions": [
     { "version": "1.0.0", "file": "archives/SKILL-v1.0.0.md" },
-    { "version": "1.1.0", "file": "archives/SKILL-v1.1.0.md" }
+    { "version": "1.1.0", "file": "archives/SKILL-v1.1.0.md" },
+    { "version": "1.2.0", "file": "archives/SKILL-v1.2.0.md" }
   ]
 }

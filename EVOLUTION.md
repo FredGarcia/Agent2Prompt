@@ -23,7 +23,7 @@ Trois conséquences :
 | Manifeste | déclaration des modules, de leur statut et de la version | `manifest.json` | `"status": "reserved"` |
 | Archive | version antérieure figée | `archives/SKILL-vX.Y.Z.md` | `SKILL-v2.1.0.md` |
 | Fichier partagé | fichier versionné à part, inclus à l'identique dans plusieurs skills, à une version épinglée | `shared` dans `manifest.json` | `socle/SKILL.md` ← `specs/socle-back-front/SKILL.md` 1.0.0 |
-| Référence | skill dont un autre reprend les règles sans l'inclure, à une version citée | `references` dans `manifest.json` | l'analyste référence `expert-java` 1.0.0 |
+| Référence | skill dont un autre reprend les règles sans l'inclure, à une version citée | `references` dans `manifest.json` | `analyse-projet` référence `java` 1.1.1 |
 | Transmission | texte unique destiné à l'IA qui implémente | `transmissions/<nom>-X.Y.Z.md` | `tension-dashboard-gitlab-agent-2.2.0.md` |
 | Scénario | cas de test nommé, rattaché à un invariant | lettre + numéro | `T3`, `M7`, `G1` |
 
@@ -126,8 +126,8 @@ flowchart LR
 - La version épinglée est vérifiée à chaque assemblage. Faire évoluer le socle oblige donc chaque skill dépendant à décider explicitement de monter son épinglage : c'est voulu, une règle commune ne change pas en silence sous un skill.
 - Un socle se marque `"transmissible": false` : il n'a de sens qu'inclus.
 - Une référence (`references`) cite un skill dont on reprend les règles, à une version donnée. Si le skill référencé change de version, le skill qui le cite doit être revu et sa référence mise à jour.
-- Les identifiants d'un autre skill sont toujours préfixés par son nom (`expert-java:D4.INV-2`), pour ne jamais se confondre avec les invariants locaux.
-- Un skill peut inclure le point d'entrée d'un autre skill comme **référentiel** (par exemple `references/expert-java.md` dans l'expert SonarQube) : il en lit les invariants sans en adopter le mode de travail, ce que son en-tête de transmission précise. Le vérificateur n'importe depuis les fichiers partagés que les identifiants du socle (`SCn`) : les `Dn` d'un référentiel ne peuvent pas masquer une faute de frappe sur un invariant local.
+- Les identifiants d'un autre skill sont toujours préfixés par son nom (`java:D4.INV-2`), pour ne jamais se confondre avec les invariants locaux.
+- Un skill peut inclure le point d'entrée d'un autre skill comme **référentiel** (par exemple `references/java.md` dans l'expert SonarQube) : il en lit les invariants sans en adopter le mode de travail, ce que son en-tête de transmission précise. Le vérificateur n'importe depuis les fichiers partagés que les identifiants du socle (`SCn`) : les `Dn` d'un référentiel ne peuvent pas masquer une faute de frappe sur un invariant local.
 
 ## 9. Ajouter une nouvelle spécification
 

@@ -90,8 +90,8 @@ C'est à cette phase que le code rejoint les référentiels :
 
 | Côté | Exemples de remaniement attendus |
 |---|---|
-| Back | DTO en `record` (`expert-java:D2.INV-1`), injection par constructeur (`expert-java:D1.INV-3`), transaction `readOnly` dans la couche application (`expert-java:D4.INV-3`), erreurs par le gestionnaire unique (`expert-java:D3.INV-3`) |
-| Front | `OnPush` (`expert-angular:D2.INV-1`), état en signaux, client généré (`expert-angular:D3.INV-1`), annonce accessible (`expert-angular:D6.INV-4`) |
+| Back | DTO en `record` (`java:D2.INV-1`), injection par constructeur (`java:D1.INV-3`), transaction `readOnly` dans la couche application (`java:D4.INV-3`), erreurs par le gestionnaire unique (`java:D3.INV-3`) |
+| Front | `OnPush` (`angular:D2.INV-1`), état en signaux, client généré (`angular:D3.INV-1`), annonce accessible (`angular:D6.INV-4`) |
 
 Règles : comportement inchangé ; suites vertes après chaque modification ; pas de remaniement d'un code qui n'est pas touché par le scénario, sauf demande.
 

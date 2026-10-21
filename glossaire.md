@@ -9,7 +9,7 @@ Ce fichier détaille chaque invariant de chaque spécification du dépôt : son 
 | `Dn` | dimension n d'une spécification : un axe, avec ses invariants et ses tests | `D4` de `tension-dashboard-gitlab-agent` : effecteur GitLab à garde-fous |
 | `Dn.INV-k` | invariant k de la dimension n : une propriété qui doit toujours tenir, vérifiée par au moins un test ou un contrôle | `D4.INV-3` : la procédure n'emploie ni `--force` ni `--force-with-lease` |
 | `SCn`, `SCn.INV-k` | dimension et invariant du socle back-front, inclus à l'identique dans plusieurs skills | `SC1.INV-2` : aucun changement cassant dans une version d'API publiée |
-| `<spécification>:Dn.INV-k` | invariant d'une autre spécification, cité avec le nom de celle-ci | `expert-java:D4.INV-2` |
+| `<spécification>:Dn.INV-k` | invariant d'une autre spécification, cité avec le nom de celle-ci | `java:D4.INV-2` |
 | `En` | point d'extension : emplacement réservé, inerte, pour une dimension future | `E2` |
 
 Un identifiant n'a de sens qu'avec sa spécification : `D6.INV-3` existe dans plusieurs d'entre elles. Statut d'une dimension : `active` (invariants en vigueur et vérifiés), `reserved` (place posée, aucun invariant en vigueur), `superseded` (remplacée). Un invariant ne s'affaiblit jamais ; il peut être remplacé par un invariant plus fort, signalé dans le journal de révision de sa spécification (`EVOLUTION.md`, section 4).
@@ -20,16 +20,16 @@ La colonne « Repris dans » cite les modules de la spécification qui reprennen
 
 | Spécification | Version | Dimensions actives | Dimensions réservées | Invariants |
 |---|---|---|---|---|
-| [`agent-tdd-jira`](#agent-tdd-jira-120) | 1.2.0 | 8 | 2 | 38 |
-| [`agents-paralleles-gitlab`](#agents-paralleles-gitlab-100) | 1.0.0 | 5 | 2 | 20 |
-| [`expert-analyse-projet`](#expert-analyse-projet-101) | 1.0.1 | 5 | 1 | 16 |
-| [`expert-angular`](#expert-angular-100) | 1.0.0 | 8 | 2 | 30 |
-| [`expert-java`](#expert-java-110) | 1.1.0 | 7 | 1 | 29 |
-| [`expert-sonarqube`](#expert-sonarqube-101) | 1.0.1 | 6 | 2 | 22 |
-| [`socle-back-front`](#socle-back-front-100) | 1.0.0 | 6 | 1 | 15 |
+| [`agent-tdd-jira`](#agent-tdd-jira-121) | 1.2.1 | 8 | 2 | 38 |
+| [`agents-paralleles-gitlab`](#agents-paralleles-gitlab-101) | 1.0.1 | 5 | 2 | 20 |
+| [`analyse-projet`](#analyse-projet-102) | 1.0.2 | 5 | 1 | 16 |
+| [`angular`](#angular-101) | 1.0.1 | 8 | 2 | 30 |
+| [`java`](#java-111) | 1.1.1 | 7 | 1 | 29 |
+| [`socle-back-front`](#socle-back-front-101) | 1.0.1 | 6 | 1 | 15 |
+| [`sonarqube`](#sonarqube-102) | 1.0.2 | 6 | 2 | 22 |
 | [`tension-dashboard-gitlab-agent`](#tension-dashboard-gitlab-agent-220) | 2.2.0 | 7 | 3 | 17 |
 
-## agent-tdd-jira 1.2.0
+## agent-tdd-jira 1.2.1
 
 Agent de développement TDD : demande Jira en MHTML, analyse avec commentaires, US et critères d'acceptation numérotés, scénarios Gherkin par critère, variantes back Java et front Angular, cycle rouge, vert, remanié scénario par scénario, traçabilité ; mode parallèle dans un worktree géré par agents-paralleles-gitlab. Point d'entrée : [`specs/agent-tdd-jira/SKILL.md`](specs/agent-tdd-jira/SKILL.md).
 
@@ -119,7 +119,7 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 | **D10.INV-6** | un critère d'acceptation n'entre en réalisation (choix des variantes V3, cycle TDD V4) que s'il est validé, décliné en scénarios validés, et qu'aucune question ouverte ne le concerne. | `us-criteres`, `variantes` |
 | **D10.INV-7** | la matrice de traçabilité relie chaque US à ses critères d'acceptation, et chaque critère à ses scénarios, tests et commits, ou à un statut « non réalisé » avec sa raison ; le rapport final donne l'état de chaque critère. | `us-criteres`, `tracabilite` |
 
-## agents-paralleles-gitlab 1.0.0
+## agents-paralleles-gitlab 1.0.1
 
 Plusieurs agents en parallèle sur un dépôt GitLab, une demande Jira par worktree : isolation, hooks communs, script agt, garde-fous GitLab, recette de 44 contrôles. Point d'entrée : [`specs/agents-paralleles-gitlab/SKILL.md`](specs/agents-paralleles-gitlab/SKILL.md).
 
@@ -176,9 +176,9 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 
 Dimension réservée : aucun invariant en vigueur dans cette version.
 
-## expert-analyse-projet 1.0.1
+## analyse-projet 1.0.2
 
-Expert en analyse de projet back et front, en lecture seule : cartographie, rapport et feuille de route, ou plans d'action pour les experts Java et Angular. Point d'entrée : [`specs/expert-analyse-projet/SKILL.md`](specs/expert-analyse-projet/SKILL.md).
+Expert en analyse de projet back et front, en lecture seule : cartographie, rapport et feuille de route, ou plans d'action pour les experts Java et Angular. Point d'entrée : [`specs/analyse-projet/SKILL.md`](specs/analyse-projet/SKILL.md).
 
 ### D1 : Cadrage et lecture seule (active)
 
@@ -225,71 +225,71 @@ Expert en analyse de projet back et front, en lecture seule : cartographie, rapp
 
 Dimension réservée : aucun invariant en vigueur dans cette version.
 
-## expert-angular 1.0.0
+## angular 1.0.1
 
-Expert Angular 20 : produire et relire du code conforme à des invariants vérifiables, accessibilité RGAA et WCAG comprise. Point d'entrée : [`specs/expert-angular/SKILL.md`](specs/expert-angular/SKILL.md).
+Expert Angular 20 : produire et relire du code conforme à des invariants vérifiables, accessibilité RGAA et WCAG comprise. Point d'entrée : [`specs/angular/SKILL.md`](specs/angular/SKILL.md).
 
 ### D1 : Architecture standalone par fonctionnalité (active)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D1.INV-1** | tout nouveau composant, directive ou pipe est autonome (standalone) ; aucun nouveau `NgModule`. | `architecture`, `tests`, `revue`, `expert-analyse-projet/evaluation` |
-| **D1.INV-2** | les dépendances respectent les couches : une fonctionnalité n'importe pas une autre fonctionnalité ; `ui` n'injecte aucun service de données ; `data-access` ne contient aucun composant. | `architecture`, `tests`, `expert-analyse-projet/evaluation` |
-| **D1.INV-3** | TypeScript en mode `strict` et templates en `strictTemplates`. | `architecture`, `tests`, `revue`, `expert-analyse-projet/evaluation` |
+| **D1.INV-1** | tout nouveau composant, directive ou pipe est autonome (standalone) ; aucun nouveau `NgModule`. | `architecture`, `tests`, `revue`, `analyse-projet/evaluation` |
+| **D1.INV-2** | les dépendances respectent les couches : une fonctionnalité n'importe pas une autre fonctionnalité ; `ui` n'injecte aucun service de données ; `data-access` ne contient aucun composant. | `architecture`, `tests`, `analyse-projet/evaluation` |
+| **D1.INV-3** | TypeScript en mode `strict` et templates en `strictTemplates`. | `architecture`, `tests`, `revue`, `analyse-projet/evaluation` |
 
 ### D2 : Composants à signaux (active)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D2.INV-1** | chaque composant est en `ChangeDetectionStrategy.OnPush`. | `composants`, `tests`, `revue`, `agent-tdd-jira/variantes`, `agent-tdd-jira/cycle-tdd`, `expert-analyse-projet/evaluation` |
-| **D2.INV-2** | les templates utilisent le flux de contrôle intégré (`@if`, `@for`, `@switch`) ; chaque `@for` a un `track` sur un identifiant stable. | `composants`, `tests`, `migration-angular22`, `expert-analyse-projet/evaluation` |
-| **D2.INV-3** | un nouveau composant déclare ses entrées et sorties avec `input()`, `output()` ou `model()`. | `composants`, `tests`, `expert-analyse-projet/evaluation` |
-| **D2.INV-4** | aucun abonnement manuel dans un composant sans `takeUntilDestroyed` ; la forme préférée est `toSignal` ou le pipe `async`. | `composants`, `tests`, `expert-analyse-projet/evaluation` |
-| **D2.INV-5** | `effect()` ne sert jamais à écrire dans un autre signal pour en dériver la valeur ; on utilise `computed` ou `linkedSignal`. | `composants`, `tests`, `revue`, `expert-analyse-projet/evaluation` |
+| **D2.INV-1** | chaque composant est en `ChangeDetectionStrategy.OnPush`. | `composants`, `tests`, `revue`, `agent-tdd-jira/variantes`, `agent-tdd-jira/cycle-tdd`, `analyse-projet/evaluation` |
+| **D2.INV-2** | les templates utilisent le flux de contrôle intégré (`@if`, `@for`, `@switch`) ; chaque `@for` a un `track` sur un identifiant stable. | `composants`, `tests`, `migration-angular22`, `analyse-projet/evaluation` |
+| **D2.INV-3** | un nouveau composant déclare ses entrées et sorties avec `input()`, `output()` ou `model()`. | `composants`, `tests`, `analyse-projet/evaluation` |
+| **D2.INV-4** | aucun abonnement manuel dans un composant sans `takeUntilDestroyed` ; la forme préférée est `toSignal` ou le pipe `async`. | `composants`, `tests`, `analyse-projet/evaluation` |
+| **D2.INV-5** | `effect()` ne sert jamais à écrire dans un autre signal pour en dériver la valeur ; on utilise `computed` ou `linkedSignal`. | `composants`, `tests`, `revue`, `analyse-projet/evaluation` |
 
 ### D3 : Données HTTP conformes au socle (active)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D3.INV-1** | les endpoints du contrat ne sont appelés qu'au travers du client généré (application de SC1.INV-3). | `donnees-http`, `tests`, `revue`, `bff-node`, `agent-tdd-jira/variantes`, `agent-tdd-jira/cycle-tdd`, `expert-analyse-projet/evaluation` |
-| **D3.INV-2** | les erreurs HTTP sont converties en un seul point en `ApiProblem` ; les décisions se fondent sur `status` et `code`, jamais sur `title` ou `detail` (application de SC2.INV-2). | `donnees-http`, `tests`, `agent-tdd-jira/variantes`, `expert-analyse-projet/evaluation` |
-| **D3.INV-3** | aucun composant de la couche `ui` ne déclenche de requête HTTP. | `donnees-http`, `tests`, `expert-analyse-projet/evaluation` |
-| **D3.INV-4** | aucun calcul monétaire en virgule flottante côté front (application de SC3.INV-2). | `donnees-http`, `tests`, `revue`, `expert-analyse-projet/evaluation` |
+| **D3.INV-1** | les endpoints du contrat ne sont appelés qu'au travers du client généré (application de SC1.INV-3). | `donnees-http`, `tests`, `revue`, `bff-node`, `agent-tdd-jira/variantes`, `agent-tdd-jira/cycle-tdd`, `analyse-projet/evaluation` |
+| **D3.INV-2** | les erreurs HTTP sont converties en un seul point en `ApiProblem` ; les décisions se fondent sur `status` et `code`, jamais sur `title` ou `detail` (application de SC2.INV-2). | `donnees-http`, `tests`, `agent-tdd-jira/variantes`, `analyse-projet/evaluation` |
+| **D3.INV-3** | aucun composant de la couche `ui` ne déclenche de requête HTTP. | `donnees-http`, `tests`, `analyse-projet/evaluation` |
+| **D3.INV-4** | aucun calcul monétaire en virgule flottante côté front (application de SC3.INV-2). | `donnees-http`, `tests`, `revue`, `analyse-projet/evaluation` |
 
 ### D4 : Formulaires réactifs typés (active)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D4.INV-1** | tout nouveau formulaire est réactif et typé ; aucun `UntypedFormGroup` ni `any` dans son modèle. | `formulaires`, `tests`, `revue`, `expert-analyse-projet/evaluation` |
-| **D4.INV-2** | chaque erreur de validation renvoyée par le back est rattachée au contrôle correspondant (application de SC6.INV-1) ; une erreur sans contrôle correspondant est affichée dans le résumé d'erreurs. | `formulaires`, `tests`, `revue`, `expert-analyse-projet/evaluation` |
-| **D4.INV-3** | chaque champ a un libellé associé, et son message d'erreur lui est lié par `aria-describedby`. | `formulaires`, `tests`, `revue`, `expert-analyse-projet/evaluation`, `expert-analyse-projet/rapport` |
+| **D4.INV-1** | tout nouveau formulaire est réactif et typé ; aucun `UntypedFormGroup` ni `any` dans son modèle. | `formulaires`, `tests`, `revue`, `analyse-projet/evaluation` |
+| **D4.INV-2** | chaque erreur de validation renvoyée par le back est rattachée au contrôle correspondant (application de SC6.INV-1) ; une erreur sans contrôle correspondant est affichée dans le résumé d'erreurs. | `formulaires`, `tests`, `revue`, `analyse-projet/evaluation` |
+| **D4.INV-3** | chaque champ a un libellé associé, et son message d'erreur lui est lié par `aria-describedby`. | `formulaires`, `tests`, `revue`, `analyse-projet/evaluation`, `analyse-projet/rapport` |
 
 ### D5 : Routage et sécurité (active)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D5.INV-1** | chaque fonctionnalité est chargée à la demande (`loadComponent` ou `loadChildren`). | `routage-securite`, `tests`, `revue`, `expert-analyse-projet/evaluation` |
-| **D5.INV-2** | aucun `bypassSecurityTrust*` ni `innerHTML` alimenté par une donnée non maîtrisée, sauf justification écrite et revue. | `routage-securite`, `tests`, `expert-analyse-projet/evaluation` |
-| **D5.INV-3** | le jeton d'accès n'est jamais dans une URL, dans `localStorage` ni dans un journal, et l'intercepteur ne l'envoie qu'à l'origine de l'API. | `donnees-http`, `routage-securite`, `tests`, `bff-node`, `agent-tdd-jira/variantes`, `expert-analyse-projet/evaluation` |
-| **D5.INV-4** | les gardes de route améliorent l'expérience mais ne sont jamais la seule protection d'une donnée ; le back décide (application de SC4). | `routage-securite`, `revue`, `expert-analyse-projet/evaluation` |
+| **D5.INV-1** | chaque fonctionnalité est chargée à la demande (`loadComponent` ou `loadChildren`). | `routage-securite`, `tests`, `revue`, `analyse-projet/evaluation` |
+| **D5.INV-2** | aucun `bypassSecurityTrust*` ni `innerHTML` alimenté par une donnée non maîtrisée, sauf justification écrite et revue. | `routage-securite`, `tests`, `analyse-projet/evaluation` |
+| **D5.INV-3** | le jeton d'accès n'est jamais dans une URL, dans `localStorage` ni dans un journal, et l'intercepteur ne l'envoie qu'à l'origine de l'API. | `donnees-http`, `routage-securite`, `tests`, `bff-node`, `agent-tdd-jira/variantes`, `analyse-projet/evaluation` |
+| **D5.INV-4** | les gardes de route améliorent l'expérience mais ne sont jamais la seule protection d'une donnée ; le back décide (application de SC4). | `routage-securite`, `revue`, `analyse-projet/evaluation` |
 
 ### D6 : Accessibilité RGAA 4.1, WCAG 2.2 AA (active)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D6.INV-1** | aucune erreur des règles d'accessibilité des templates d'`angular-eslint`. | `accessibilite`, `tests`, `revue`, `expert-analyse-projet/evaluation`, `expert-sonarqube/triage` |
-| **D6.INV-2** | aucune violation axe des niveaux WCAG A et AA sur les parcours couverts par les tests de bout en bout. | `accessibilite`, `tests`, `expert-analyse-projet/evaluation` |
-| **D6.INV-3** | à chaque navigation, le titre du document change et le focus est placé sur le titre principal de la page. | `architecture`, `routage-securite`, `accessibilite`, `tests`, `expert-analyse-projet/evaluation` |
-| **D6.INV-4** | tout message qui apparaît sans action de l'utilisateur sur l'élément concerné (chargement terminé, erreur, confirmation) est annoncé aux technologies d'assistance. | `donnees-http`, `accessibilite`, `tests`, `revue`, `agent-tdd-jira/variantes`, `agent-tdd-jira/cycle-tdd`, `expert-analyse-projet/evaluation` |
+| **D6.INV-1** | aucune erreur des règles d'accessibilité des templates d'`angular-eslint`. | `accessibilite`, `tests`, `revue`, `analyse-projet/evaluation`, `sonarqube/triage` |
+| **D6.INV-2** | aucune violation axe des niveaux WCAG A et AA sur les parcours couverts par les tests de bout en bout. | `accessibilite`, `tests`, `analyse-projet/evaluation` |
+| **D6.INV-3** | à chaque navigation, le titre du document change et le focus est placé sur le titre principal de la page. | `architecture`, `routage-securite`, `accessibilite`, `tests`, `analyse-projet/evaluation` |
+| **D6.INV-4** | tout message qui apparaît sans action de l'utilisateur sur l'élément concerné (chargement terminé, erreur, confirmation) est annoncé aux technologies d'assistance. | `donnees-http`, `accessibilite`, `tests`, `revue`, `agent-tdd-jira/variantes`, `agent-tdd-jira/cycle-tdd`, `analyse-projet/evaluation` |
 
 ### D7 : Tests et contrôles automatisés (active)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D7.INV-1** | chaque invariant actif a au moins un contrôle automatisé, ou une entrée de grille de revue justifiée. | `tests`, `revue`, `expert-analyse-projet/evaluation` |
-| **D7.INV-2** | les tests unitaires n'émettent aucune requête réseau réelle ; les appels HTTP sont vérifiés avec `HttpTestingController`. | `tests`, `expert-analyse-projet/evaluation` |
-| **D7.INV-3** | les tests ciblent les éléments par rôle, libellé ou harnais, jamais par une classe CSS de présentation. | `tests`, `expert-analyse-projet/evaluation` |
-| **D7.INV-4** | aucun test ne dépend de l'heure réelle ni d'un délai réel. | `tests`, `revue`, `expert-analyse-projet/evaluation` |
+| **D7.INV-1** | chaque invariant actif a au moins un contrôle automatisé, ou une entrée de grille de revue justifiée. | `tests`, `revue`, `analyse-projet/evaluation` |
+| **D7.INV-2** | les tests unitaires n'émettent aucune requête réseau réelle ; les appels HTTP sont vérifiés avec `HttpTestingController`. | `tests`, `analyse-projet/evaluation` |
+| **D7.INV-3** | les tests ciblent les éléments par rôle, libellé ou harnais, jamais par une classe CSS de présentation. | `tests`, `analyse-projet/evaluation` |
+| **D7.INV-4** | aucun test ne dépend de l'heure réelle ni d'un délai réel. | `tests`, `revue`, `analyse-projet/evaluation` |
 
 ### D8 : Revue de code (active)
 
@@ -307,65 +307,65 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 
 Dimension réservée : aucun invariant en vigueur dans cette version.
 
-## expert-java 1.1.0
+## java 1.1.1
 
-Expert Java 21, Spring Boot 3.5 et PostgreSQL : produire et relire du code conforme à des invariants vérifiables. Point d'entrée : [`specs/expert-java/SKILL.md`](specs/expert-java/SKILL.md).
+Expert Java 21, Spring Boot 3.5 et PostgreSQL : produire et relire du code conforme à des invariants vérifiables. Point d'entrée : [`specs/java/SKILL.md`](specs/java/SKILL.md).
 
 ### D1 : Architecture en couches par fonctionnalité (active)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D1.INV-1** | aucune classe des couches `domain` et `application` ne dépend de la couche `api` ni de `org.springframework.web`. | `architecture`, `api-rest`, `tests`, `revue`, `expert-analyse-projet/evaluation` |
-| **D1.INV-2** | aucune entité JPA n'est exposée par un contrôleur, ni en paramètre ni en retour. | `architecture`, `expert-analyse-projet/evaluation` |
-| **D1.INV-3** | l'injection se fait par constructeur ; aucun champ n'est annoté `@Autowired`. | `architecture`, `api-rest`, `agent-tdd-jira/cycle-tdd`, `expert-analyse-projet/evaluation`, `expert-sonarqube/triage`, `expert-sonarqube/correction`, `expert-sonarqube/rapport` |
-| **D1.INV-4** | les fonctionnalités n'ont pas de dépendances cycliques entre elles. | `architecture`, `tests`, `revue`, `expert-analyse-projet/evaluation` |
+| **D1.INV-1** | aucune classe des couches `domain` et `application` ne dépend de la couche `api` ni de `org.springframework.web`. | `architecture`, `api-rest`, `tests`, `revue`, `analyse-projet/evaluation` |
+| **D1.INV-2** | aucune entité JPA n'est exposée par un contrôleur, ni en paramètre ni en retour. | `architecture`, `analyse-projet/evaluation` |
+| **D1.INV-3** | l'injection se fait par constructeur ; aucun champ n'est annoté `@Autowired`. | `architecture`, `api-rest`, `agent-tdd-jira/cycle-tdd`, `analyse-projet/evaluation`, `sonarqube/triage`, `sonarqube/correction`, `sonarqube/rapport` |
+| **D1.INV-4** | les fonctionnalités n'ont pas de dépendances cycliques entre elles. | `architecture`, `tests`, `revue`, `analyse-projet/evaluation` |
 
 ### D2 : Langage Java 21 (active)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D2.INV-1** | les DTO d'API sont des `record` immuables. | `langage`, `api-rest`, `tests`, `revue`, `agent-tdd-jira/cycle-tdd`, `expert-analyse-projet/evaluation` |
-| **D2.INV-2** | `Optional` n'est jamais un type de champ ni de paramètre ; il sert uniquement de type de retour. | `langage`, `tests`, `expert-analyse-projet/evaluation`, `expert-sonarqube/triage` |
-| **D2.INV-3** | quand les threads virtuels sont activés, aucun bloc `synchronized` n'englobe une entrée-sortie bloquante. | `langage`, `tests`, `migration-boot4`, `expert-analyse-projet/evaluation` |
-| **D2.INV-4** | aucune exception n'est avalée : un `catch` traite, relance ou traduit, jamais ne se contente d'ignorer. | `langage`, `tests`, `revue`, `expert-analyse-projet/evaluation`, `expert-sonarqube/triage` |
+| **D2.INV-1** | les DTO d'API sont des `record` immuables. | `langage`, `api-rest`, `tests`, `revue`, `agent-tdd-jira/cycle-tdd`, `analyse-projet/evaluation` |
+| **D2.INV-2** | `Optional` n'est jamais un type de champ ni de paramètre ; il sert uniquement de type de retour. | `langage`, `tests`, `analyse-projet/evaluation`, `sonarqube/triage` |
+| **D2.INV-3** | quand les threads virtuels sont activés, aucun bloc `synchronized` n'englobe une entrée-sortie bloquante. | `langage`, `tests`, `migration-boot4`, `analyse-projet/evaluation` |
+| **D2.INV-4** | aucune exception n'est avalée : un `catch` traite, relance ou traduit, jamais ne se contente d'ignorer. | `langage`, `tests`, `revue`, `analyse-projet/evaluation`, `sonarqube/triage` |
 
 ### D3 : API REST conforme au socle (active)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D3.INV-1** | l'API implémentée correspond exactement au contrat OpenAPI (application de SC1.INV-1). | `api-rest`, `tests`, `revue`, `agent-tdd-jira/variantes`, `expert-analyse-projet/evaluation` |
-| **D3.INV-2** | toute entrée est validée par Bean Validation avant d'atteindre la couche `application`. | `api-rest`, `tests`, `agent-tdd-jira/variantes`, `expert-analyse-projet/evaluation` |
-| **D3.INV-3** | un seul `@RestControllerAdvice` produit les Problem Details, avec `code` et `traceId` (application de SC2.INV-1). | `api-rest`, `tests`, `agent-tdd-jira/cycle-tdd`, `expert-analyse-projet/evaluation` |
-| **D3.INV-4** | toute collection est paginée, avec une taille maximale imposée (application de SC3.INV-3). | `api-rest`, `tests`, `revue`, `agent-tdd-jira/variantes`, `expert-analyse-projet/evaluation` |
+| **D3.INV-1** | l'API implémentée correspond exactement au contrat OpenAPI (application de SC1.INV-1). | `api-rest`, `tests`, `revue`, `agent-tdd-jira/variantes`, `analyse-projet/evaluation` |
+| **D3.INV-2** | toute entrée est validée par Bean Validation avant d'atteindre la couche `application`. | `api-rest`, `tests`, `agent-tdd-jira/variantes`, `analyse-projet/evaluation` |
+| **D3.INV-3** | un seul `@RestControllerAdvice` produit les Problem Details, avec `code` et `traceId` (application de SC2.INV-1). | `api-rest`, `tests`, `agent-tdd-jira/cycle-tdd`, `analyse-projet/evaluation` |
+| **D3.INV-4** | toute collection est paginée, avec une taille maximale imposée (application de SC3.INV-3). | `api-rest`, `tests`, `revue`, `agent-tdd-jira/variantes`, `analyse-projet/evaluation` |
 
 ### D4 : Persistance JPA, migrations Flyway ou Liquibase, PostgreSQL (active)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D4.INV-1** | le schéma n'évolue que par migrations versionnées (Flyway ou Liquibase) ; `spring.jpa.hibernate.ddl-auto=validate` ; une migration appliquée n'est jamais modifiée. | `persistance`, `tests`, `revue`, `expert-analyse-projet/evaluation` |
-| **D4.INV-2** | `spring.jpa.open-in-view=false`. | `architecture`, `persistance`, `tests`, `expert-analyse-projet/evaluation`, `expert-analyse-projet/rapport`, `expert-analyse-projet/plans-action` |
-| **D4.INV-3** | les frontières transactionnelles sont déclarées dans la couche `application`, et les lectures sont en `readOnly = true`. | `persistance`, `tests`, `agent-tdd-jira/variantes`, `agent-tdd-jira/cycle-tdd`, `expert-analyse-projet/evaluation`, `expert-analyse-projet/plans-action` |
-| **D4.INV-4** | aucune requête SQL ou JPQL n'est construite par concaténation avec une donnée d'entrée. | `persistance`, `tests`, `revue`, `expert-analyse-projet/evaluation`, `expert-sonarqube/triage`, `expert-sonarqube/correction`, `expert-sonarqube/rapport` |
-| **D4.INV-5** | les tests de persistance s'exécutent sur PostgreSQL (Testcontainers), jamais sur une base en mémoire. | `persistance`, `tests`, `expert-analyse-projet/evaluation` |
-| **D4.INV-6** | toute entité modifiable de façon concurrente porte un attribut `@Version`. | `persistance`, `tests`, `revue`, `expert-analyse-projet/evaluation` |
+| **D4.INV-1** | le schéma n'évolue que par migrations versionnées (Flyway ou Liquibase) ; `spring.jpa.hibernate.ddl-auto=validate` ; une migration appliquée n'est jamais modifiée. | `persistance`, `tests`, `revue`, `analyse-projet/evaluation` |
+| **D4.INV-2** | `spring.jpa.open-in-view=false`. | `architecture`, `persistance`, `tests`, `analyse-projet/evaluation`, `analyse-projet/rapport`, `analyse-projet/plans-action` |
+| **D4.INV-3** | les frontières transactionnelles sont déclarées dans la couche `application`, et les lectures sont en `readOnly = true`. | `persistance`, `tests`, `agent-tdd-jira/variantes`, `agent-tdd-jira/cycle-tdd`, `analyse-projet/evaluation`, `analyse-projet/plans-action` |
+| **D4.INV-4** | aucune requête SQL ou JPQL n'est construite par concaténation avec une donnée d'entrée. | `persistance`, `tests`, `revue`, `analyse-projet/evaluation`, `sonarqube`, `sonarqube/triage`, `sonarqube/correction`, `sonarqube/rapport` |
+| **D4.INV-5** | les tests de persistance s'exécutent sur PostgreSQL (Testcontainers), jamais sur une base en mémoire. | `persistance`, `tests`, `analyse-projet/evaluation` |
+| **D4.INV-6** | toute entité modifiable de façon concurrente porte un attribut `@Version`. | `persistance`, `tests`, `revue`, `analyse-projet/evaluation` |
 
 ### D5 : Sécurité Spring Security (active)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D5.INV-1** | la chaîne de sécurité refuse par défaut (`anyRequest().authenticated()` ou plus strict) ; chaque exception publique est explicite. | `securite`, `tests`, `revue`, `expert-analyse-projet/evaluation` |
-| **D5.INV-2** | les réponses 401 et 403 émises par la chaîne de sécurité sont des Problem Details conformes au socle. | `api-rest`, `securite`, `expert-analyse-projet/evaluation` |
-| **D5.INV-3** | seuls `health` et `info` d'Actuator sont exposés sans authentification. | `securite`, `tests`, `expert-analyse-projet/evaluation` |
-| **D5.INV-4** | aucun jeton, mot de passe ni donnée personnelle non nécessaire n'est journalisé (application de SC4.INV-1 et SC5). | `securite`, `tests`, `revue`, `expert-analyse-projet/evaluation` |
+| **D5.INV-1** | la chaîne de sécurité refuse par défaut (`anyRequest().authenticated()` ou plus strict) ; chaque exception publique est explicite. | `securite`, `tests`, `revue`, `analyse-projet/evaluation` |
+| **D5.INV-2** | les réponses 401 et 403 émises par la chaîne de sécurité sont des Problem Details conformes au socle. | `api-rest`, `securite`, `analyse-projet/evaluation` |
+| **D5.INV-3** | seuls `health` et `info` d'Actuator sont exposés sans authentification. | `securite`, `tests`, `analyse-projet/evaluation` |
+| **D5.INV-4** | aucun jeton, mot de passe ni donnée personnelle non nécessaire n'est journalisé (application de SC4.INV-1 et SC5). | `securite`, `tests`, `revue`, `analyse-projet/evaluation` |
 
 ### D6 : Tests et contrôles automatisés (active)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D6.INV-1** | chaque invariant actif du skill a au moins un contrôle automatisé, ou une entrée de grille de revue justifiée. | `tests`, `revue`, `expert-analyse-projet/evaluation` |
-| **D6.INV-2** | les tests unitaires du domaine et de la couche application ne démarrent pas de contexte Spring. | `tests`, `expert-analyse-projet/evaluation` |
-| **D6.INV-3** | aucun test n'utilise `@MockBean` ni `@SpyBean` (point E3). | `tests`, `migration-boot4`, `expert-analyse-projet/evaluation` |
-| **D6.INV-4** | aucun test ne dépend de l'ordre d'exécution, de l'heure réelle ni du réseau public. | `architecture`, `langage`, `tests`, `revue`, `expert-analyse-projet/evaluation` |
+| **D6.INV-1** | chaque invariant actif du skill a au moins un contrôle automatisé, ou une entrée de grille de revue justifiée. | `tests`, `revue`, `analyse-projet/evaluation` |
+| **D6.INV-2** | les tests unitaires du domaine et de la couche application ne démarrent pas de contexte Spring. | `tests`, `analyse-projet/evaluation` |
+| **D6.INV-3** | aucun test n'utilise `@MockBean` ni `@SpyBean` (point E3). | `tests`, `migration-boot4`, `analyse-projet/evaluation` |
+| **D6.INV-4** | aucun test ne dépend de l'ordre d'exécution, de l'heure réelle ni du réseau public. | `architecture`, `langage`, `tests`, `revue`, `analyse-projet/evaluation` |
 
 ### D7 : Revue de code (active)
 
@@ -379,9 +379,62 @@ Expert Java 21, Spring Boot 3.5 et PostgreSQL : produire et relire du code confo
 
 Dimension réservée : aucun invariant en vigueur dans cette version.
 
-## expert-sonarqube 1.0.1
+## socle-back-front 1.0.1
 
-Expert SonarQube Server 2026.x : configurer l'analyse et la CI, trier, corriger ou planifier, gouverner la qualité, pour des projets Java et Angular sur GitLab. Point d'entrée : [`specs/expert-sonarqube/SKILL.md`](specs/expert-sonarqube/SKILL.md).
+Socle commun back-front : contrat OpenAPI, erreurs RFC 9457, formats de données, sécurité, traçabilité, accessibilité. Point d'entrée : [`specs/socle-back-front/SKILL.md`](specs/socle-back-front/SKILL.md).
+
+### SC1 : Contrat d'API OpenAPI (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **SC1.INV-1** | tout endpoint exposé par le back figure dans le contrat, et tout endpoint du contrat est implémenté. Contrôle : test de conformité du contrat côté back. | `java`, `java/api-rest` |
+| **SC1.INV-2** | aucun changement cassant n'est introduit dans une version d'API publiée. Contrôle : comparaison du contrat avec sa version précédente (outil de diff OpenAPI en CI, ou revue). | `agent-tdd-jira`, `analyse-projet`, `analyse-projet/plans-action`, `java/api-rest` |
+| **SC1.INV-3** | le front n'appelle les endpoints du contrat qu'au travers du client généré. Contrôle : recherche d'URL `/api/` codées en dur dans le front, hors client généré. | `angular`, `angular/architecture`, `angular/donnees-http`, `angular/revue` |
+
+### SC2 : Erreurs RFC 9457 (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **SC2.INV-1** | toute réponse 4xx ou 5xx du back est en `application/problem+json`, avec `code` et `traceId`. Contrôle : tests d'API sur un cas de chaque statut. | `java`, `java/api-rest` |
+| **SC2.INV-2** | le front ne fonde aucune décision sur `title` ou `detail`. Il décide sur `status` et `code`. Contrôle : revue et tests du gestionnaire d'erreurs. | `angular`, `angular/donnees-http`, `java/tests` |
+| **SC2.INV-3** | une erreur 500 ne révèle ni trace de pile, ni requête SQL, ni nom de classe. Contrôle : test d'API provoquant une exception non gérée. | `java/api-rest` |
+
+### SC3 : Formats de données et pagination (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **SC3.INV-1** | aucune date-heure ne circule sans fuseau. Contrôle : schéma du contrat (`format: date-time`) et tests de sérialisation. | `java/api-rest`, `java/persistance` |
+| **SC3.INV-2** | aucun montant n'est représenté en virgule flottante, ni en JSON, ni en Java, ni en base. Contrôle : revue du contrat et recherche de `double`, `float` sur les champs monétaires. | `angular`, `angular/donnees-http`, `java/langage`, `java/persistance`, `java/revue` |
+| **SC3.INV-3** | toute liste potentiellement non bornée est paginée, avec une taille maximale imposée par le back. Contrôle : revue des endpoints de collection. | `agent-tdd-jira/variantes`, `java`, `java/api-rest` |
+
+### SC4 : Sécurité de la frontière (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **SC4.INV-1** | aucun secret ni jeton dans le code du front, dans une URL ou dans un journal. Contrôle : recherche de motifs de secrets et revue de la configuration de journalisation. | `agent-tdd-jira/variantes`, `angular`, `angular/donnees-http`, `angular/routage-securite`, `java`, `java/securite`, `sonarqube/triage`, `sonarqube/correction` |
+| **SC4.INV-2** | chaque endpoint non public est protégé par une règle d'autorisation côté back. Contrôle : test d'accès anonyme refusé sur chaque endpoint protégé. | `agent-tdd-jira/variantes`, `angular/routage-securite`, `java/securite` |
+| **SC4.INV-3** | CORS n'autorise jamais `*` avec identifiants. Contrôle : revue de la configuration CORS par environnement. | `analyse-projet/rapport`, `java/securite`, `sonarqube/triage` |
+
+### SC5 : Traçabilité (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **SC5.INV-1** | toute erreur 5xx est journalisée côté back avec son `traceId`, et le même `traceId` est renvoyé au front. Contrôle : test d'API et vérification du journal capturé. | — |
+
+### SC6 : Accessibilité et messages (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **SC6.INV-1** | chaque erreur de validation renvoyée par le back est rattachée au champ correspondant dans le formulaire du front. Contrôle : test de composant avec une réponse 400 simulée. | `angular`, `angular/formulaires`, `angular/tests`, `angular/revue`, `java/tests` |
+| **SC6.INV-2** | aucune information n'est transmise par la couleur seule. Contrôle : revue RGAA (critère 3.1) et tests automatisés d'accessibilité. | `angular/accessibilite`, `angular/revue` |
+
+### SC7 : Événements asynchrones (WebSocket, SSE, messages) (reserved)
+
+Dimension réservée : aucun invariant en vigueur dans cette version.
+
+## sonarqube 1.0.2
+
+Expert SonarQube Server 2026.x : configurer l'analyse et la CI, trier, corriger ou planifier, gouverner la qualité, pour des projets Java et Angular sur GitLab. Point d'entrée : [`specs/sonarqube/SKILL.md`](specs/sonarqube/SKILL.md).
 
 ### D1 : Cadrage, accès et sécurité du jeton (active)
 
@@ -440,59 +493,6 @@ Expert SonarQube Server 2026.x : configurer l'analyse et la CI, trier, corriger 
 Dimension réservée : aucun invariant en vigueur dans cette version.
 
 ### D8 : Rapports de conformité (WCAG, OWASP, CRA) (reserved)
-
-Dimension réservée : aucun invariant en vigueur dans cette version.
-
-## socle-back-front 1.0.0
-
-Socle commun back-front : contrat OpenAPI, erreurs RFC 9457, formats de données, sécurité, traçabilité, accessibilité. Point d'entrée : [`specs/socle-back-front/SKILL.md`](specs/socle-back-front/SKILL.md).
-
-### SC1 : Contrat d'API OpenAPI (active)
-
-| Invariant | Énoncé | Repris dans |
-|---|---|---|
-| **SC1.INV-1** | tout endpoint exposé par le back figure dans le contrat, et tout endpoint du contrat est implémenté. Contrôle : test de conformité du contrat côté back. | `expert-java`, `expert-java/api-rest` |
-| **SC1.INV-2** | aucun changement cassant n'est introduit dans une version d'API publiée. Contrôle : comparaison du contrat avec sa version précédente (outil de diff OpenAPI en CI, ou revue). | `agent-tdd-jira`, `expert-analyse-projet`, `expert-analyse-projet/plans-action`, `expert-java/api-rest` |
-| **SC1.INV-3** | le front n'appelle les endpoints du contrat qu'au travers du client généré. Contrôle : recherche d'URL `/api/` codées en dur dans le front, hors client généré. | `expert-angular`, `expert-angular/architecture`, `expert-angular/donnees-http`, `expert-angular/revue` |
-
-### SC2 : Erreurs RFC 9457 (active)
-
-| Invariant | Énoncé | Repris dans |
-|---|---|---|
-| **SC2.INV-1** | toute réponse 4xx ou 5xx du back est en `application/problem+json`, avec `code` et `traceId`. Contrôle : tests d'API sur un cas de chaque statut. | `expert-java`, `expert-java/api-rest` |
-| **SC2.INV-2** | le front ne fonde aucune décision sur `title` ou `detail`. Il décide sur `status` et `code`. Contrôle : revue et tests du gestionnaire d'erreurs. | `expert-angular`, `expert-angular/donnees-http`, `expert-java/tests` |
-| **SC2.INV-3** | une erreur 500 ne révèle ni trace de pile, ni requête SQL, ni nom de classe. Contrôle : test d'API provoquant une exception non gérée. | `expert-java/api-rest` |
-
-### SC3 : Formats de données et pagination (active)
-
-| Invariant | Énoncé | Repris dans |
-|---|---|---|
-| **SC3.INV-1** | aucune date-heure ne circule sans fuseau. Contrôle : schéma du contrat (`format: date-time`) et tests de sérialisation. | `expert-java/api-rest`, `expert-java/persistance` |
-| **SC3.INV-2** | aucun montant n'est représenté en virgule flottante, ni en JSON, ni en Java, ni en base. Contrôle : revue du contrat et recherche de `double`, `float` sur les champs monétaires. | `expert-angular`, `expert-angular/donnees-http`, `expert-java/langage`, `expert-java/persistance`, `expert-java/revue` |
-| **SC3.INV-3** | toute liste potentiellement non bornée est paginée, avec une taille maximale imposée par le back. Contrôle : revue des endpoints de collection. | `agent-tdd-jira/variantes`, `expert-java`, `expert-java/api-rest` |
-
-### SC4 : Sécurité de la frontière (active)
-
-| Invariant | Énoncé | Repris dans |
-|---|---|---|
-| **SC4.INV-1** | aucun secret ni jeton dans le code du front, dans une URL ou dans un journal. Contrôle : recherche de motifs de secrets et revue de la configuration de journalisation. | `agent-tdd-jira/variantes`, `expert-angular`, `expert-angular/donnees-http`, `expert-angular/routage-securite`, `expert-java`, `expert-java/securite`, `expert-sonarqube/triage`, `expert-sonarqube/correction` |
-| **SC4.INV-2** | chaque endpoint non public est protégé par une règle d'autorisation côté back. Contrôle : test d'accès anonyme refusé sur chaque endpoint protégé. | `agent-tdd-jira/variantes`, `expert-angular/routage-securite`, `expert-java/securite` |
-| **SC4.INV-3** | CORS n'autorise jamais `*` avec identifiants. Contrôle : revue de la configuration CORS par environnement. | `expert-analyse-projet/rapport`, `expert-java/securite`, `expert-sonarqube/triage` |
-
-### SC5 : Traçabilité (active)
-
-| Invariant | Énoncé | Repris dans |
-|---|---|---|
-| **SC5.INV-1** | toute erreur 5xx est journalisée côté back avec son `traceId`, et le même `traceId` est renvoyé au front. Contrôle : test d'API et vérification du journal capturé. | — |
-
-### SC6 : Accessibilité et messages (active)
-
-| Invariant | Énoncé | Repris dans |
-|---|---|---|
-| **SC6.INV-1** | chaque erreur de validation renvoyée par le back est rattachée au champ correspondant dans le formulaire du front. Contrôle : test de composant avec une réponse 400 simulée. | `expert-angular`, `expert-angular/formulaires`, `expert-angular/tests`, `expert-angular/revue`, `expert-java/tests` |
-| **SC6.INV-2** | aucune information n'est transmise par la couleur seule. Contrôle : revue RGAA (critère 3.1) et tests automatisés d'accessibilité. | `expert-angular/accessibilite`, `expert-angular/revue` |
-
-### SC7 : Événements asynchrones (WebSocket, SSE, messages) (reserved)
 
 Dimension réservée : aucun invariant en vigueur dans cette version.
 
