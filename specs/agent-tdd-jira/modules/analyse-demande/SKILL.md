@@ -1,6 +1,6 @@
 ---
 name: analyse-demande
-description: Analyse d'une demande Jira à partir de demande.json (exigences numérotées avec provenance et rattachées aux critères d'acceptation, lecture chronologique des commentaires, contradictions et ambiguïtés transformées en questions, scénarios Gherkin en français par critère, étiquetés @CLÉ-Snn et @CLÉ-CAnn, scénarios proposés @propose, validation V2). À lire après le module us-criteres, avant l'impact.
+description: Analyse d'une demande Jira à partir de demande.json (exigences numérotées avec provenance et rattachées aux critères d'acceptation, lecture chronologique des commentaires, contradictions et ambiguïtés transformées en questions, scénarios Gherkin en français par critère, étiquetés @CLÉ-Snn et @CLÉ-CAnn, étiquettes de prérequis du binôme avec Agent2Test, scénarios proposés @propose, validation V2). À lire après le module us-criteres, avant l'impact.
 dimensions: [D2]
 status: active
 ---
@@ -74,7 +74,7 @@ Fichier par demande, en français, versionné dans le dépôt du projet (par exe
 
 ```gherkin
 # language: fr
-@ECR-77
+@ECR-77 @role-LECTEUR
 Fonctionnalité: Export des retours d'expérience en CSV
   En tant qu'utilisateur de la liste des retours d'expérience
   Je veux exporter la liste filtrée en CSV
@@ -118,6 +118,7 @@ Règles d'écriture :
 - une étiquette `@<CLÉ>-Snn` par scénario, attribuée une fois pour toutes : un scénario supprimé laisse son numéro inutilisé (point E2) ;
 - une ou plusieurs étiquettes `@<CLÉ>-CAnn` : les critères d'acceptation que le scénario illustre, rappelés dans le commentaire de provenance (D10.INV-5, point E4) ;
 - étiquettes de couche `@back`, `@front` ; étiquettes d'état `@en-attente` (question ouverte) et `@propose` (scénario déduit par l'agent, D2.INV-4) ;
+- étiquettes de prérequis, lues par Agent2Test : `@role-<nom>` pour un rôle de l'application, `@batch-<nom>` pour un batch Java à lancer avant le scénario, `@redemarrage` ou `@ecriture-base` ; au choix du développeur, `@criticite-haute`, `@criticite-moyenne`, `@criticite-basse` et `@socle` (module `binome-agent2test`, section 3, D7.INV-5). Une étiquette de la ligne `Fonctionnalité:` vaut pour chacun de ses scénarios : dans l'exemple, `@role-LECTEUR` traduit le Contexte ;
 - la provenance en commentaire juste au-dessus des étiquettes (D2.INV-1) ;
 - chaque `Alors` est vérifiable par un test : pas de « fonctionne correctement », pas de « est rapide » sans seuil ;
 - les étapes décrivent le comportement observable, pas l'implémentation (« je demande l'export », pas « j'appelle GET /api/v1/… ») ;
@@ -156,4 +157,5 @@ L'agent présente : les US et les critères d'acceptation (`us.md`, module `us-c
 - Chaque scénario est en Gherkin français, étiqueté, avec un `Alors` vérifiable (D2.INV-3).
 - Les scénarios déduits portent `@propose` (D2.INV-4).
 - Chaque exigence est rattachée à un CA ou à une question (D10.INV-4) ; chaque scénario porte l'étiquette d'au moins un CA (D10.INV-5).
+- Chaque scénario qui exige un rôle, un batch, un redémarrage ou une écriture en base porte son étiquette de prérequis, directement ou par sa fonctionnalité (D7.INV-5).
 - V2 obtenue avant l'étude des variantes (D2.INV-5).

@@ -20,7 +20,8 @@ La colonne « Repris dans » cite les modules de la spécification qui reprennen
 
 | Spécification | Version | Dimensions actives | Dimensions réservées | Invariants |
 |---|---|---|---|---|
-| [`agent-tdd-jira`](#agent-tdd-jira-122) | 1.2.2 | 8 | 2 | 38 |
+| [`agent-tdd-jira`](#agent-tdd-jira-130) | 1.3.0 | 9 | 1 | 43 |
+| [`agent2test`](#agent2test-100) | 1.0.0 | 18 | 2 | 90 |
 | [`agents-paralleles-gitlab`](#agents-paralleles-gitlab-101) | 1.0.1 | 5 | 2 | 20 |
 | [`analyse-projet`](#analyse-projet-102) | 1.0.2 | 5 | 1 | 16 |
 | [`angular`](#angular-101) | 1.0.1 | 8 | 2 | 30 |
@@ -29,9 +30,9 @@ La colonne « Repris dans » cite les modules de la spécification qui reprennen
 | [`sonarqube`](#sonarqube-102) | 1.0.2 | 6 | 2 | 22 |
 | [`tension-dashboard-gitlab-agent`](#tension-dashboard-gitlab-agent-220) | 2.2.0 | 7 | 3 | 17 |
 
-## agent-tdd-jira 1.2.2
+## agent-tdd-jira 1.3.0
 
-Agent de développement TDD : demande Jira en MHTML, analyse avec commentaires, US et critères d'acceptation numérotés, scénarios Gherkin par critère, variantes back Java et front Angular, cycle rouge, vert, remanié scénario par scénario, traçabilité ; mode parallèle dans un worktree géré par agents-paralleles-gitlab. Point d'entrée : [`specs/agent-tdd-jira/SKILL.md`](specs/agent-tdd-jira/SKILL.md).
+Agent de développement TDD : demande Jira en MHTML, analyse avec commentaires, US et critères d'acceptation numérotés, scénarios Gherkin par critère, variantes back Java et front Angular, cycle rouge, vert, remanié scénario par scénario, traçabilité ; binôme avec Agent2Test, verdict d'acceptation par critère ; mode parallèle dans un worktree géré par agents-paralleles-gitlab. Point d'entrée : [`specs/agent-tdd-jira/SKILL.md`](specs/agent-tdd-jira/SKILL.md).
 
 ### D1 : Ingestion d'une demande Jira en MHTML (active)
 
@@ -87,9 +88,15 @@ Agent de développement TDD : demande Jira en MHTML, analyse avec commentaires, 
 | **D6.INV-3** | l'agent n'écrit jamais dans Jira ; il fournit un projet de commentaire que le développeur publie lui-même. | `tracabilite`, `parallele` |
 | **D6.INV-4** | le rapport final liste les écarts à la demande, les questions restées ouvertes et le résultat des suites de tests back et front. | `tracabilite` |
 
-### D7 : Binôme avec Agent2Test (tests de bout en bout) (reserved)
+### D7 : Binôme avec Agent2Test (tests de bout en bout et d'acceptation) (active)
 
-Dimension réservée : aucun invariant en vigueur dans cette version.
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D7.INV-1** | le plan remis à Agent2Test est `us.md` et le fichier Gherkin validés à V2 et commités, tels quels ; l'agent n'écrit ni parcours ni fichier d'Agent2Test. | `binome-agent2test`, `agent2test/plan` |
+| **D7.INV-2** | chaque défaut applicatif confirmé en CP-3 par Agent2Test rouvre le scénario qu'il vise en cycle TDD : un test rouge, étiqueté avec ce scénario, reproduit le défaut avant tout code de production. | `binome-agent2test` |
+| **D7.INV-3** | la matrice et le rapport final donnent, pour chaque critère d'acceptation, le verdict d'Agent2Test valable pour le plan et le code courants (conforme, non conforme, non vérifié avec son motif), ou « non joué » avec sa raison. | `tracabilite`, `binome-agent2test`, `agent2test/journal` |
+| **D7.INV-4** | l'agent ne démarre, n'arrête ni ne déploie l'application et ne lance aucun batch ; il ne réécrit ni ne conteste lui-même un verdict d'Agent2Test : un désaccord est remonté au développeur. | `binome-agent2test` |
+| **D7.INV-5** | un scénario qui exige un rôle de l'application porte `@role-<nom>`, directement ou par sa fonctionnalité ; un batch Java, `@batch-<nom>` ; un redémarrage de l'application ou une écriture directe en base, `@redemarrage` ou `@ecriture-base`. | `analyse-demande`, `binome-agent2test` |
 
 ### D8 : Connecteur Jira (API ou MCP) à la place du MHTML (reserved)
 
@@ -100,8 +107,8 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
 | **D9.INV-1** | en mode parallèle, l'agent n'écrit que dans le worktree de sa demande ; ses fichiers de travail (demande enregistrée, `demande.json`, images, script d'extraction, `impact.txt`, `rapport.md`) vont dans `travail/`. | `parallele` |
-| **D9.INV-2** | en mode parallèle, l'agent ne pousse pas, ne fusionne pas, ne rebase pas et ne change pas de branche ; il n'emploie ni `--no-verify`, ni `--force`, ni `--force-with-lease`, ni `git config`, ni `git -c`, ni `reset --hard`, ni `stash drop`, ni `stash clear`, ni `branch -D`, ni `git worktree`. | `parallele`, `agents-paralleles-gitlab/hooks` |
-| **D9.INV-3** | en mode parallèle, chaque commit commence par `<CLÉ> Snn : ` pour un scénario, ou `<CLÉ> : ` hors scénario. | `parallele` |
+| **D9.INV-2** | en mode parallèle, l'agent ne pousse pas, ne fusionne pas, ne rebase pas et ne change pas de branche ; il n'emploie ni `--no-verify`, ni `--force`, ni `--force-with-lease`, ni `git config`, ni `git -c`, ni `reset --hard`, ni `stash drop`, ni `stash clear`, ni `branch -D`, ni `git worktree`. | `parallele`, `binome-agent2test`, `agents-paralleles-gitlab/hooks` |
+| **D9.INV-3** | en mode parallèle, chaque commit commence par `<CLÉ> Snn : ` pour un scénario, ou `<CLÉ> : ` hors scénario. | `parallele`, `binome-agent2test` |
 | **D9.INV-4** | un refus d'un garde-fou du kit arrête l'action en cours ; l'agent le cite au développeur et ne le contourne jamais. | `parallele`, `agents-paralleles-gitlab` |
 | **D9.INV-5** | à l'étape d'impact, l'agent écrit les chemins impactés dans `travail/<CLÉ>/impact.txt`, un chemin relatif par ligne, et signale dans la fiche ceux qui relèvent d'un point chaud. | `parallele`, `agents-paralleles-gitlab/orchestration`, `agents-paralleles-gitlab/distribution` |
 | **D9.INV-6** | le skill partagé est vérifié avec la table d'intégrité de la transmission et n'est jamais réécrit. | `parallele` |
@@ -115,9 +122,201 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 | **D10.INV-2** | chaque US et chaque critère d'acceptation cite sa provenance (champ du ticket, passage de la description, commentaire avec auteur et date) ; ce que le ticket n'énonce pas est marqué « proposé » et n'est utilisé qu'après validation à V2. | `us-criteres`, `analyse-demande` |
 | **D10.INV-3** | chaque critère d'acceptation énonce un résultat observable et vérifiable ; un critère ambigu, invérifiable ou contredit par un commentaire devient une question, jamais une interprétation de l'agent. | `us-criteres` |
 | **D10.INV-4** | chaque exigence de la demande est rattachée à au moins un critère d'acceptation, ou à une question. | `us-criteres`, `analyse-demande` |
-| **D10.INV-5** | chaque critère d'acceptation validé est décliné en au moins un scénario Gherkin, et chaque scénario porte l'étiquette `@<CLÉ>-CAnn` d'au moins un critère qu'il illustre. | `us-criteres`, `analyse-demande` |
+| **D10.INV-5** | chaque critère d'acceptation validé est décliné en au moins un scénario Gherkin, et chaque scénario porte l'étiquette `@<CLÉ>-CAnn` d'au moins un critère qu'il illustre. | `us-criteres`, `analyse-demande`, `agent2test/plan` |
 | **D10.INV-6** | un critère d'acceptation n'entre en réalisation (choix des variantes V3, cycle TDD V4) que s'il est validé, décliné en scénarios validés, et qu'aucune question ouverte ne le concerne. | `us-criteres`, `variantes` |
 | **D10.INV-7** | la matrice de traçabilité relie chaque US à ses critères d'acceptation, et chaque critère à ses scénarios, tests et commits, ou à un statut « non réalisé » avec sa raison ; le rapport final donne l'état de chaque critère. | `us-criteres`, `tracabilite` |
+
+## agent2test 1.0.0
+
+Agent2Test : système multi-agents qui choisit, prépare, exécute et journalise les tests essentiels d'une application Angular pour une demande, en pilotant Playwright comme une bibliothèque depuis Node, dans un projet séparé de l'application ; plan importé d'agent-tdd-jira, verdict par critère d'acceptation, points de contrôle humains, cybernétique de premier et de second ordre, exécution locale. Point d'entrée : [`specs/agent2test/SKILL.md`](specs/agent2test/SKILL.md).
+
+### D1 : Noyau 7E, bus et constitution (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D1.INV-1** | chaque cycle déroule les sept phases E1 à E7, dans l'ordre, à chacune des quatre échelles (Système, Campagne, Scénario, Étape) ; l'E3 d'une échelle est la suite des cycles complets de l'échelle inférieure, et chaque ligne de journal porte son échelle et sa phase. | `noyau`, `orchestrateur`, `journal`, `observateur` |
+| **D1.INV-2** | les agents ne communiquent que par le bus ; le bus refuse tout appel ou événement absent du contrat déclaré de l'agent, et aucun agent n'importe un autre agent. | `noyau` |
+| **D1.INV-3** | toute sortie du moteur est validée contre un schéma fermé et des contrôles nommés avant d'être consommée ; une sortie non conforme n'est jamais utilisée. | `noyau`, `preparateur` |
+| **D1.INV-4** | au démarrage, une constitution dont l'empreinte SHA-256 diffère de celle inscrite au grand livre empêche le démarrage, avec un message explicite. | `noyau` |
+| **D1.INV-5** | toute demande étrangère aux tests (modifier le code, déployer, administrer) est refusée avec le motif « hors périmètre ». | `noyau`, `plan` |
+| **D1.INV-6** | aucune action d'agent n'écrit la constitution, le code, les schémas du journal ou du grand livre, ni la configuration humaine. | `noyau`, `referentiel`, `exploitation` |
+
+### D2 : Données isolées par agent (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D2.INV-1** | chaque agent propriétaire a son schéma et son rôle PostgreSQL ; une écriture d'un agent dans le schéma d'un autre est refusée par la base elle-même. | `donnees` |
+| **D2.INV-2** | seuls des contrats nommés s'exécutent ; une requête SQL libre est refusée. | `donnees` |
+| **D2.INV-3** | la base de l'application n'est jamais accédée, sauf par l'oracle en lecture seule, activé explicitement dans la configuration humaine et limité à des contrats de lecture nommés. | `donnees`, `exploitation` |
+| **D2.INV-4** | les preuves sont purgées au-delà de leur durée de conservation ; le journal garde leurs empreintes. | `donnees` |
+
+### D3 : Plan canonique et demande (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D3.INV-1** | le système ne rédige ni ne corrige aucune US, aucun critère, aucun scénario ; un critère qu'aucun scénario ne couvre est marqué « trou de couverture », et aucun scénario n'est créé pour lui. | `plan`, `agent-tdd-jira/binome-agent2test` |
+| **D3.INV-2** | chaque US, critère et scénario a un identifiant canonique unique ; deux éléments de même identifiant bloquent l'import, et le message cite leurs deux emplacements. | `plan` |
+| **D3.INV-3** | un scénario dont un prérequis sort du périmètre (redémarrage, écriture directe en base) est marqué « non automatisable » avec son motif ; un prérequis de batch Java devient un préalable confié au développeur (CP-5). | `plan` |
+| **D3.INV-4** | le plan est versionné : réimporter des sources inchangées ne crée aucune version, une source modifiée en crée une nouvelle, et la précédente reste consultable. | `plan` |
+| **D3.INV-5** | seul un scénario validé, qui illustre au moins un critère validé, est jouable ; un scénario proposé non validé, en attente d'une question, limité au back, ou qui exige un rôle que la session n'a pas, est « non jouable », avec son motif. | `plan`, `navigateur`, `agent-tdd-jira/binome-agent2test` |
+| **D3.INV-6** | un critère cité par la demande et absent du plan est signalé avant la sélection. | `plan` |
+
+### D4 : Navigateur, session et preuves (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D4.INV-1** | seul `navigateur` pilote Playwright ; aucun autre module n'ouvre de navigateur. | `navigateur` |
+| **D4.INV-2** | le navigateur ne charge que les origines déclarées au profil ; une navigation vers une autre origine est bloquée avant chargement, et le journal indique l'origine visée. | `navigateur` |
+| **D4.INV-3** | le système ne détient aucun identifiant SSO et ne saisit rien dans les pages du fournisseur SSO ; la session est un secret local (fichier hors dépôt, mode 0600), jamais journalisée ni transmise au moteur, et les traces conservées sont expurgées des en-têtes `Authorization`, `Cookie` et `Set-Cookie`. | `navigateur`, `journal`, `profil-recette` |
+| **D4.INV-4** | seules les actions du jeu fermé s'exécutent ; aucun code produit par le moteur n'atteint la page, ni par script, ni par évaluation. | `navigateur` |
+| **D4.INV-5** | une étape n'attend que des états, dans un délai borné ; aucune étape n'attend une durée fixe. | `navigateur` |
+| **D4.INV-6** | une étape de mutation exécutée n'est jamais rejouée ; une étape `verifier`, ou une étape dont l'action n'a pas eu lieu, est retentée deux fois au plus, et un succès au réessai classe l'étape `INSTABILITE`, jamais « réussie ». | `navigateur`, `verdict` |
+| **D4.INV-7** | la session s'établit d'abord sans action humaine, par la stratégie configurée ; si cela échoue, CP-0 s'ouvre, et seul le système le ferme, après avoir atteint seul une page protégée. | `navigateur` |
+
+### D5 : Cartographie de l'application (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D5.INV-1** | le scan ne crée, ne modifie ni ne supprime aucun fichier du projet de l'application, et refuse toute lecture hors de sa racine. | `scanner` |
+| **D5.INV-2** | le relevé des écrans en marche ne joue que des navigations : aucun clic, aucune saisie, aucune soumission. | `scanner` |
+| **D5.INV-3** | chaque élément interactif sans nom accessible figure dans la liste des fragilités de ciblage. | `scanner` |
+| **D5.INV-4** | pour un fichier modifié, l'impact renvoie chaque écran atteint avec le chemin qui le justifie : fichier, point d'API, service, composant, route. | `scanner` |
+| **D5.INV-5** | un second scan sans fichier modifié ne réanalyse aucun fichier. | `scanner` |
+
+### D6 : Sélection des tests essentiels (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D6.INV-1** | le palier P1 contient tous les scénarios jouables qui couvrent un critère cité par la demande ; la règle est revérifiée après la revue du moteur. | `stratege`, `reflexif` |
+| **D6.INV-2** | le palier P3 contient tous les scénarios jouables déclarés « socle ». | `stratege`, `reflexif`, `accessibilite` |
+| **D6.INV-3** | chaque scénario retenu ou écarté porte un motif d'une phrase, et chaque score du palier P2 se lit décomposé facteur par facteur. | `stratege` |
+| **D6.INV-4** | aucune préparation ne démarre avant la décision en CP-1 ; une correction en CP-1 exige un commentaire. | `stratege`, `orchestrateur` |
+| **D6.INV-5** | sans moteur disponible, la sélection déterministe est présentée seule, avec la marque « sans revue du moteur ». | `stratege`, `mcp` |
+
+### D7 : Préparation des parcours (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D7.INV-1** | un parcours est une donnée conforme au schéma des parcours ; une action hors du jeu fermé, ou une donnée non conforme, est rejetée avant toute exécution. | `preparateur` |
+| **D7.INV-2** | chaque critère couvert par un parcours est porté par au moins une étape `verifier`. | `preparateur` |
+| **D7.INV-3** | toute valeur saisie par une étape de mutation porte le préfixe `A2T-<campagne>-` ; une étape de suppression dont la cible ne porte pas ce préfixe n'est pas jouée et bloque le scénario jusqu'à la décision en CP-3. | `navigateur`, `preparateur` |
+| **D7.INV-4** | chaque parcours porte son origine : moteur, fiche et version composée, empreinte du prompt, ratificateur. | `preparateur` |
+| **D7.INV-5** | un profil d'environnement ou un parcours n'est exécuté en campagne qu'une fois ratifié en CP-2 ; toute modification, réparation comprise, crée une version nouvelle soumise à CP-2. | `preparateur` |
+| **D7.INV-6** | les budgets sont bornés : 3 renvois au moteur pour une sortie non conforme, 2 réparations par parcours et par campagne ; au-delà, l'échec est présenté au point de contrôle. | `preparateur` |
+| **D7.INV-7** | les cibles suivent l'ordre fixé (rôle et nom accessible, libellé, identifiant de test, texte, texte indicatif, CSS) ; une cible CSS porte un motif et figure parmi les fragilités de ciblage. | `preparateur` |
+
+### D8 : Verdicts et causes présumées (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D8.INV-1** | pas de verdict sans preuve : un critère dont une preuve manque est « non vérifié », jamais « conforme » ; « conforme » et « non conforme » dérivent des critères d'acceptation, jamais du code. | `verdict`, `reflexif` |
+| **D8.INV-2** | un verdict n'est jamais réécrit ; un désaccord humain est consigné à côté. | `verdict` |
+| **D8.INV-3** | chaque échec reçoit une cause de la liste fermée (`DEFAUT_APPLICATIF`, `DEFAUT_PARCOURS`, `SESSION_EXPIREE`, `ENVIRONNEMENT`, `INSTABILITE`, `INDETERMINE`) et cite les signaux qui la fondent. | `verdict` |
+| **D8.INV-4** | chaque verdict porte l'empreinte SHA-256 de ses preuves. | `verdict` |
+| **D8.INV-5** | une session expirée n'impute aucun échec : après CP-0, le scénario est rejoué depuis son début. | `verdict` |
+
+### D9 : Orchestration et points de contrôle (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D9.INV-1** | aucun point de contrôle n'est supprimé, sauté ou validé par le système ; aucune phase ne consomme une sortie non ratifiée, et le niveau d'autonomie de chaque point se lit dans la configuration humaine. | `orchestrateur` |
+| **D9.INV-2** | chaque décision enregistre son auteur, son canal, sa date et son commentaire. | `orchestrateur` |
+| **D9.INV-3** | avant le premier scénario, une sonde vérifie que l'application répond ; sinon, la campagne est refusée avec ce motif. | `orchestrateur` |
+| **D9.INV-4** | une seule campagne s'exécute à la fois sur une application cible ; les autres attendent en file. | `orchestrateur` |
+| **D9.INV-5** | l'arrêt d'urgence suspend la campagne au plus tard à la fin de l'étape en cours. | `orchestrateur` |
+| **D9.INV-6** | après un redémarrage du processus, la campagne reprend au début du scénario interrompu, sans perte de journal. | `orchestrateur` |
+| **D9.INV-7** | Agent2Test ne démarre, n'arrête ni ne déploie l'application, et ne lance aucun batch ; un scénario à préalable de batch attend en CP-5 que le développeur l'ait lancé et l'ait déclaré terminé. | `plan`, `orchestrateur`, `exploitation`, `agent-tdd-jira/binome-agent2test` |
+
+### D10 : Journal et journal de tests (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D10.INV-1** | le journal est en ajout seul, imposé par les droits de la base, et chaîné par empreintes ; `verifierChaine` détecte une altération faite en base par un compte privilégié et nomme la première ligne rompue. | `journal` |
+| **D10.INV-2** | le journal de tests d'une campagne est produit en Markdown, JSON, JUnit XML et HTML à partir de la même source, et sa matrice critères × verdicts couvre tous les critères de la demande, trous de couverture compris. | `journal` |
+| **D10.INV-3** | tout contenu produit par le moteur est marqué comme tel dans le journal de tests, avec moteur, fiche et version. | `stratege`, `journal` |
+| **D10.INV-4** | l'empreinte de fin de chaîne du journal de tests est celle du journal à la clôture de la campagne. | `journal` |
+
+### D11 : Observabilité de premier ordre (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D11.INV-1** | chaque appel entre agents produit une trace portant corrélation, parent, échelle, phase et vecteur des sept durées. | `observateur` |
+| **D11.INV-2** | pour chaque campagne, toute échelle dont les sept phases ne figurent pas dans l'ordre au journal est signalée comme violation de D1.INV-1. | `observateur` |
+| **D11.INV-3** | aucun module du premier ordre n'appelle un module du second ordre ; le graphe des appels du bus le vérifie. | `noyau`, `observateur` |
+| **D11.INV-4** | une dérive d'indicateur au-delà de son seuil lève une alerte visible au tableau de bord. | `observateur` |
+
+### D12 : Mémoire et recherche hybride (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D12.INV-1** | la recherche fonctionne par le plein texte seul ; avec un modèle de plongement local, plein texte et vecteurs sont fusionnés par rang réciproque. | `memoire` |
+| **D12.INV-2** | tout fragment injecté dans une consigne appartient aux versions épinglées de la campagne, et ses identifiants sont journalisés avec l'appel au moteur. | `memoire` |
+| **D12.INV-3** | avant injection, les secrets, adresses électroniques et noms de personnes déclarés sont masqués, et un fragment trop long est tronqué avec la marque « tronqué ». | `memoire`, `mcp` |
+
+### D13 : Apprentissage (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D13.INV-1** | chaque correction ou rejet commenté en CP-1, CP-2 ou CP-3 produit une leçon candidate, liée à sa fiche, à son moteur et à sa décision source. | `apprenant` |
+| **D13.INV-2** | aucune leçon n'entre dans une fiche avant sa ratification en CP-4. | `apprenant` |
+| **D13.INV-3** | une leçon ratifiée ne s'applique qu'au moteur sur lequel elle a été apprise ; l'étendre à un autre moteur est une ratification distincte. | `apprenant`, `referentiel` |
+
+### D14 : Réflexivité de second ordre (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D14.INV-1** | pour chaque contrôle automatique, l'accord avec les décisions humaines est mesuré par fiche, version et moteur dès l'exposition minimale, et la précision des alertes O1 est mesurée à partir de leur qualification par l'opérateur. | `observateur`, `reflexif` |
+| **D14.INV-2** | le système revient seul au dernier état ratifié quand une leçon ou un recalibrage dégrade sa mesure au-delà de la marge ; il n'adopte jamais seul une règle nouvelle, n'élargit aucune borne et n'assouplit aucun point de contrôle. | `reflexif`, `referentiel` |
+| **D14.INV-3** | un écart entre la répartition des causes présumées et les reclassements humains en CP-3 lève une alerte au référent qualité. | `verdict`, `reflexif` |
+| **D14.INV-4** | chaque proposition nomme la règle, l'échelle et la phase touchées, la valeur actuelle, la valeur proposée, les preuves et l'effet attendu, et reste dans les bornes de la constitution. | `reflexif` |
+| **D14.INV-5** | le second ordre lit le premier ordre et ne l'écrit jamais. | `reflexif` |
+
+### D15 : Référentiel, versions et grand livre (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D15.INV-1** | chaque campagne s'exécute avec le référentiel épinglé à son E2 ; une règle ratifiée ne s'applique qu'à partir de la campagne suivante. | `orchestrateur`, `referentiel` |
+| **D15.INV-2** | le grand livre est en ajout seul et chaîné par empreintes ; il inscrit chaque version publiée de la constitution, chaque ratification, refus, suspension et retour arrière. | `referentiel` |
+| **D15.INV-3** | chaque fiche porte une version composée ; pour toute sortie du moteur, le prompt se reconstitue à partir de la fiche, de sa version et des fragments journalisés, et son empreinte égale celle du journal. | `memoire`, `apprenant`, `referentiel` |
+| **D15.INV-4** | les pouvoirs sont séparés : proposer (`apprenant`, `reflexif`), ratifier (un humain, en CP-4, hors du canal MCP), appliquer (`referentiel`), mesurer (`reflexif`). | `referentiel` |
+| **D15.INV-5** | les règles modifiables se limitent à la liste fermée de la constitution, chacune dans ses bornes ; une valeur hors bornes est refusée. | `reflexif`, `referentiel` |
+
+### D16 : Moteurs et serveur MCP (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D16.INV-1** | le serveur MCP n'écoute que sur `127.0.0.1` ; une requête HTTP sans jeton valide, ou venant d'une origine non autorisée, est refusée. | `mcp` |
+| **D16.INV-2** | une décision CP-4 reçue par le canal MCP est refusée ; l'arrêt d'urgence y reste permis. | `orchestrateur`, `referentiel`, `mcp` |
+| **D16.INV-3** | le contexte transmis au moteur, par MCP ou par un autre adaptateur, est minimisé, borné et masqué ; aucun secret ni identifiant n'y figure. | `mcp` |
+| **D16.INV-4** | changer de moteur ne demande aucune modification de code ; chaque appel au moteur est journalisé avec fiche et version composée, moteur, empreinte du prompt, fragments injectés et usage. | `mcp` |
+| **D16.INV-5** | aucun contenu du projet de l'application n'est transmis à un moteur externe tant que la configuration humaine ne porte pas l'autorisation de l'envoyer. | `mcp` |
+| **D16.INV-6** | avec le profil souverain, une campagne complète aboutit sans autre connexion sortante que vers l'application cible et son fournisseur SSO. | `mcp` |
+
+### D17 : Tableau de bord par rôle (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D17.INV-1** | le tableau de bord n'écoute que sur `127.0.0.1` et exige un jeton porteur. | `tableau-de-bord` |
+| **D17.INV-2** | les droits de décision suivent les rôles : testeur (CP-0 à CP-3), développeur (CP-2, CP-5), référent qualité (CP-4, seulement depuis le tableau de bord). | `mcp`, `tableau-de-bord` |
+| **D17.INV-3** | l'IHM ne présente aucune non-conformité RGAA 4.1 de niveau A ou AA. | `tableau-de-bord` |
+| **D17.INV-4** | les textes de l'IHM, les messages et le journal de tests sont en français. | `tableau-de-bord` |
+
+### D18 : Exploitation locale (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D18.INV-1** | sous une version de Node antérieure à 22, le kit refuse de démarrer avec un message explicite. | `exploitation` |
+| **D18.INV-2** | le kit n'a que deux dépendances d'exécution, `playwright` et `pg`, épinglées par un fichier de verrouillage et installées par `npm ci` ; toutes ses dépendances et images sont sous licence open source. | `exploitation`, `accessibilite` |
+| **D18.INV-3** | le PostgreSQL d'Agent2Test écoute sur le port 5433 et n'est jamais celui de l'application. | `exploitation` |
+| **D18.INV-4** | seul le profil d'environnement `local` est accepté ; un profil `recette` ou `conteneur` est refusé tant que la dimension D20 est réservée. | `preparateur`, `exploitation` |
+
+### D19 : Accessibilité des parcours (axe) (reserved)
+
+Dimension réservée : aucun invariant en vigueur dans cette version.
+
+### D20 : Profil recette et conteneur (reserved)
+
+Dimension réservée : aucun invariant en vigueur dans cette version.
 
 ## agents-paralleles-gitlab 1.0.1
 
@@ -278,7 +477,7 @@ Expert Angular 20 : produire et relire du code conforme à des invariants vérif
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
 | **D6.INV-1** | aucune erreur des règles d'accessibilité des templates d'`angular-eslint`. | `accessibilite`, `tests`, `revue`, `analyse-projet/evaluation`, `sonarqube/triage` |
-| **D6.INV-2** | aucune violation axe des niveaux WCAG A et AA sur les parcours couverts par les tests de bout en bout. | `accessibilite`, `tests`, `analyse-projet/evaluation` |
+| **D6.INV-2** | aucune violation axe des niveaux WCAG A et AA sur les parcours couverts par les tests de bout en bout. | `accessibilite`, `tests`, `agent2test/accessibilite`, `analyse-projet/evaluation` |
 | **D6.INV-3** | à chaque navigation, le titre du document change et le focus est placé sur le titre principal de la page. | `architecture`, `routage-securite`, `accessibilite`, `tests`, `analyse-projet/evaluation` |
 | **D6.INV-4** | tout message qui apparaît sans action de l'utilisateur sur l'élément concerné (chargement terminé, erreur, confirmation) est annoncé aux technologies d'assistance. | `donnees-http`, `accessibilite`, `tests`, `revue`, `agent-tdd-jira/variantes`, `agent-tdd-jira/cycle-tdd`, `analyse-projet/evaluation` |
 

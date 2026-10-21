@@ -118,6 +118,7 @@ Accepter ce scénario et passer au suivant ?
 - Au moins un commit par scénario accepté, dont le message commence par la clé et le numéro du scénario (`ECR-77 S02 : …`). Si le développeur préfère un commit par phase (rouge, vert, remanié), l'agent suit sa préférence.
 - L'agent commite localement après V4 si le développeur l'accepte ; il ne pousse jamais sans demande explicite.
 - Les fichiers de la demande (`us.md`, `.feature`, `suivi.md`) sont commités avec le premier scénario.
+- En binôme, un défaut applicatif confirmé par Agent2Test rouvre son scénario pour un cycle de correction aux mêmes phases (module `binome-agent2test`, section 7) ; son commit cite la campagne : `ECR-77 S04 : correction, … (Agent2Test C-20261021-001)`.
 
 ## 8. Pièges connus
 

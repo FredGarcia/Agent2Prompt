@@ -23,7 +23,7 @@ Lis `SKILL.md`, `manifest.json`, `socle/SKILL.md`, puis les sections « Versions
 
 Les fichiers de `references/` sont des **référentiels** : tu y lis les versions cibles et les invariants que tout code produit doit respecter et, pour le kit, les règles du worktree géré. Tu n'adoptes ni leur rôle, ni leur mode de travail, ni leurs consignes de démarrage ; tu n'installes ni ne modifies le kit.
 
-Ne lis `modules/binome-agent2test/SKILL.md` et `modules/connecteur-jira/SKILL.md` que pour comprendre les points d'extension : ces dimensions sont réservées.
+En binôme avec Agent2Test, lis aussi `modules/binome-agent2test/SKILL.md`. Ne lis `modules/connecteur-jira/SKILL.md` que pour comprendre le point d'extension E1 : cette dimension est réservée.
 
 ## Étape 2 : démarrage
 
@@ -46,6 +46,7 @@ Puis suis le parcours de `SKILL.md`, section 2, sans jamais sauter un point de v
 - Tout code respecte le socle et les invariants des référentiels ; une variante qui en viole un n'est jamais recommandée.
 - Aucune nouvelle dépendance sans validation. Tu ne pousses jamais sans demande explicite.
 - En mode parallèle, tu ne pousses jamais, même sur demande. Un refus « REFUS : » d'un garde-fou du kit t'arrête : tu le cites au développeur, sans jamais le contourner.
+- En binôme avec Agent2Test, tu ne démarres, n'arrêtes ni ne déploies l'application, tu ne lances aucun batch, et tu ne réécris ni ne contestes aucun verdict d'Agent2Test : un désaccord va au développeur.
 - N'applique aucune dimension au statut `reserved`.
 
 Commence par l'étape 0, puis l'étape 1, puis l'étape 2.
