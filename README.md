@@ -18,6 +18,8 @@ Chaque spécification est un package modulaire versionné : un point d'entrée, 
 
 Les transmissions des versions précédentes restent dans `transmissions/` : elles sont la trace exacte de ce qui a été remis à une IA.
 
+Le [glossaire](glossaire.md) détaille chaque invariant `Dn.INV-k` de chaque spécification : dimension, énoncé, modules qui le reprennent et spécifications qui le citent. Il est généré, jamais écrit à la main.
+
 Socle partagé, non transmis seul : [`socle-back-front`](specs/socle-back-front/SKILL.md) 1.0.0 (contrat OpenAPI, erreurs RFC 9457, formats, sécurité, traçabilité, accessibilité). Il est inclus, à une version épinglée, dans chaque transmission des experts, qui restent ainsi autonomes et cohérents entre eux. L'expert SonarQube inclut en plus les points d'entrée des experts Java et Angular comme référentiels d'invariants : une correction faite à partir de SonarQube respecte les mêmes règles qu'une correction faite par l'expert du langage. L'agent TDD inclut de même le point d'entrée du kit `agents-paralleles-gitlab` : en mode parallèle, il y lit les règles du worktree que le kit lui impose.
 
 ```mermaid
@@ -45,6 +47,7 @@ Agent2Prompt/
 ├── README.md
 ├── EVOLUTION.md                 principe d'évolution des structures
 ├── CHANGELOG.md                 historique de toutes les versions
+├── glossaire.md                 détail de tous les invariants, généré
 ├── specs/
 │   └── <nom>/
 │       ├── SKILL.md             point d'entrée : registre, contrat, invariants
@@ -56,6 +59,7 @@ Agent2Prompt/
 │   └── <nom>-X.Y.Z.md           texte unique remis à l'IA, une par version
 └── tools/
     ├── bundle.mjs               assemblage d'une transmission (Node)
+    ├── glossaire.mjs            génération de glossaire.md
     └── verifier.mjs             vérification structurelle de toutes les spécifications
 ```
 
@@ -70,12 +74,13 @@ Coller le contenu du fichier de `transmissions/` dans l'IA du développeur. Aucu
 ## Générer une transmission
 
 ```bash
-node tools/verifier.mjs                                  # toutes les spécifications
+node tools/glossaire.mjs                                 # après toute modification d'une spécification
+node tools/verifier.mjs                                  # toutes les spécifications, et le glossaire
 node tools/bundle.mjs specs/tension-dashboard-gitlab-agent
 node tools/bundle.mjs specs/expert-java
 ```
 
-`verifier.mjs` contrôle les manifestes, les versions, les modules, les fichiers partagés épinglés, les blocs de code et les invariants (chaque invariant défini est repris dans un module, chaque invariant cité est défini). `bundle.mjs` lit `manifest.json`, insère les fichiers partagés, écrit `transmissions/<nom>-<version>.md` et échoue si une version épinglée ne correspond pas ou si le texte ne redonne pas exactement chaque fichier. Les deux scripts demandent Node 20 ou plus récent et n'utilisent que les modules natifs (`node:fs`, `node:crypto`, `node:path`), sans `npm install`.
+`verifier.mjs` contrôle les manifestes, les versions, les modules, les fichiers partagés épinglés, les blocs de code et les invariants (chaque invariant défini est repris dans un module, chaque invariant cité est défini) ; il échoue si `glossaire.md` ne correspond plus exactement aux spécifications. `bundle.mjs` lit `manifest.json`, insère les fichiers partagés, écrit `transmissions/<nom>-<version>.md` et échoue si une version épinglée ne correspond pas ou si le texte ne redonne pas exactement chaque fichier. Les trois scripts demandent Node 20 ou plus récent et n'utilisent que les modules natifs (`node:fs`, `node:crypto`, `node:path`), sans `npm install`.
 
 ## Faire évoluer une spécification
 

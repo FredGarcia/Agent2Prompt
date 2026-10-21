@@ -36,6 +36,12 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Outils
 
+### 2026-10-21 : glossaire des invariants
+
+- Ajout de `tools/glossaire.mjs` : génère `glossaire.md`, qui détaille les 180 invariants des huit spécifications (dimension, énoncé, modules qui les reprennent, spécifications qui les citent) et la notation des identifiants. Node 20 ou plus récent, modules natifs.
+- `tools/verifier.mjs` échoue si `glossaire.md` est absent ou ne correspond plus exactement aux spécifications. Testé sur trois défauts introduits volontairement : invariant modifié sans régénération, glossaire retouché à la main, glossaire absent.
+- `EVOLUTION.md` : régénération du glossaire dans la procédure de publication et dans l'ajout d'une spécification.
+
 ### 2026-10-16 : fichiers partagés et vérificateur
 
 - `tools/bundle.mjs` gère les fichiers partagés (`shared`, version épinglée vérifiée), les références entre skills (`references`, version vérifiée) et refuse une spécification `"transmissible": false`. Transmission de `tension-dashboard-gitlab-agent` 2.2.0 inchangée, octet pour octet.
