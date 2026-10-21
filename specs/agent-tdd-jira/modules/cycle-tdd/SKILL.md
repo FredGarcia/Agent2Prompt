@@ -100,6 +100,7 @@ Règles : comportement inchangé ; suites vertes après chaque modification ; pa
 ```markdown
 ## @ECR-77-S02 : encodage et séparateur du fichier
 
+- **Critère d'acceptation** : ECR-77-CA02
 - **Variante** : B1 (front non concerné)
 - **Rouge** : `FeedbackCsvTest.exportCommenceParLeBomEtUtiliseLePointVirgule` en échec :
   « Expecting actual: [] to start with: [-17, -69, -65] »
@@ -116,7 +117,7 @@ Accepter ce scénario et passer au suivant ?
 
 - Au moins un commit par scénario accepté, dont le message commence par la clé et le numéro du scénario (`ECR-77 S02 : …`). Si le développeur préfère un commit par phase (rouge, vert, remanié), l'agent suit sa préférence.
 - L'agent commite localement après V4 si le développeur l'accepte ; il ne pousse jamais sans demande explicite.
-- Les fichiers de la demande (`.feature`, `suivi.md`) sont commités avec le premier scénario.
+- Les fichiers de la demande (`us.md`, `.feature`, `suivi.md`) sont commités avec le premier scénario.
 
 ## 8. Pièges connus
 

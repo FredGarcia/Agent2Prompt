@@ -20,7 +20,7 @@ La colonne « Repris dans » cite les modules de la spécification qui reprennen
 
 | Spécification | Version | Dimensions actives | Dimensions réservées | Invariants |
 |---|---|---|---|---|
-| [`agent-tdd-jira`](#agent-tdd-jira-110) | 1.1.0 | 7 | 2 | 31 |
+| [`agent-tdd-jira`](#agent-tdd-jira-120) | 1.2.0 | 8 | 2 | 38 |
 | [`agents-paralleles-gitlab`](#agents-paralleles-gitlab-100) | 1.0.0 | 5 | 2 | 20 |
 | [`expert-analyse-projet`](#expert-analyse-projet-101) | 1.0.1 | 5 | 1 | 16 |
 | [`expert-angular`](#expert-angular-100) | 1.0.0 | 8 | 2 | 30 |
@@ -29,9 +29,9 @@ La colonne « Repris dans » cite les modules de la spécification qui reprennen
 | [`socle-back-front`](#socle-back-front-100) | 1.0.0 | 6 | 1 | 15 |
 | [`tension-dashboard-gitlab-agent`](#tension-dashboard-gitlab-agent-220) | 2.2.0 | 7 | 3 | 17 |
 
-## agent-tdd-jira 1.1.0
+## agent-tdd-jira 1.2.0
 
-Agent de développement TDD : demande Jira en MHTML, analyse avec commentaires, scénarios Gherkin, variantes back Java et front Angular, cycle rouge, vert, remanié scénario par scénario, traçabilité ; mode parallèle dans un worktree géré par agents-paralleles-gitlab. Point d'entrée : [`specs/agent-tdd-jira/SKILL.md`](specs/agent-tdd-jira/SKILL.md).
+Agent de développement TDD : demande Jira en MHTML, analyse avec commentaires, US et critères d'acceptation numérotés, scénarios Gherkin par critère, variantes back Java et front Angular, cycle rouge, vert, remanié scénario par scénario, traçabilité ; mode parallèle dans un worktree géré par agents-paralleles-gitlab. Point d'entrée : [`specs/agent-tdd-jira/SKILL.md`](specs/agent-tdd-jira/SKILL.md).
 
 ### D1 : Ingestion d'une demande Jira en MHTML (active)
 
@@ -46,7 +46,7 @@ Agent de développement TDD : demande Jira en MHTML, analyse avec commentaires, 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
 | **D2.INV-1** | chaque scénario cite sa provenance : passage de la description, commentaire (auteur, date) ou réponse du développeur. | `analyse-demande` |
-| **D2.INV-2** | une contradiction ou une ambiguïté entre la description et les commentaires devient une question ; elle n'est jamais tranchée par l'agent. | `analyse-demande` |
+| **D2.INV-2** | une contradiction ou une ambiguïté entre la description et les commentaires devient une question ; elle n'est jamais tranchée par l'agent. | `us-criteres`, `analyse-demande` |
 | **D2.INV-3** | chaque scénario est écrit en Gherkin français, porte une étiquette unique `@<CLÉ>-Snn` et au moins une étape `Alors` vérifiable. | `analyse-demande` |
 | **D2.INV-4** | un scénario que la demande n'énonce pas explicitement (cas d'erreur, limite) porte l'étiquette `@propose` et n'est utilisé qu'après validation. | `analyse-demande` |
 | **D2.INV-5** | les scénarios sont validés par le développeur avant l'étude des variantes. | `analyse-demande` |
@@ -106,6 +106,18 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 | **D9.INV-5** | à l'étape d'impact, l'agent écrit les chemins impactés dans `travail/<CLÉ>/impact.txt`, un chemin relatif par ligne, et signale dans la fiche ceux qui relèvent d'un point chaud. | `parallele`, `agents-paralleles-gitlab/orchestration`, `agents-paralleles-gitlab/distribution` |
 | **D9.INV-6** | le skill partagé est vérifié avec la table d'intégrité de la transmission et n'est jamais réécrit. | `parallele` |
 | **D9.INV-7** | après une synchronisation annoncée par le développeur, l'agent relance les suites back et front avant le scénario suivant et signale toute régression. | `parallele`, `agents-paralleles-gitlab/distribution` |
+
+### D10 : US et critères d'acceptation numérotés (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D10.INV-1** | chaque US porte un identifiant stable `<CLÉ>-USnn` et chaque critère d'acceptation un identifiant stable `<CLÉ>-CAnn`, attribués une fois pour toutes et jamais renumérotés ; un critère appartient à une seule US. | `us-criteres` |
+| **D10.INV-2** | chaque US et chaque critère d'acceptation cite sa provenance (champ du ticket, passage de la description, commentaire avec auteur et date) ; ce que le ticket n'énonce pas est marqué « proposé » et n'est utilisé qu'après validation à V2. | `us-criteres`, `analyse-demande` |
+| **D10.INV-3** | chaque critère d'acceptation énonce un résultat observable et vérifiable ; un critère ambigu, invérifiable ou contredit par un commentaire devient une question, jamais une interprétation de l'agent. | `us-criteres` |
+| **D10.INV-4** | chaque exigence de la demande est rattachée à au moins un critère d'acceptation, ou à une question. | `us-criteres`, `analyse-demande` |
+| **D10.INV-5** | chaque critère d'acceptation validé est décliné en au moins un scénario Gherkin, et chaque scénario porte l'étiquette `@<CLÉ>-CAnn` d'au moins un critère qu'il illustre. | `us-criteres`, `analyse-demande` |
+| **D10.INV-6** | un critère d'acceptation n'entre en réalisation (choix des variantes V3, cycle TDD V4) que s'il est validé, décliné en scénarios validés, et qu'aucune question ouverte ne le concerne. | `us-criteres`, `variantes` |
+| **D10.INV-7** | la matrice de traçabilité relie chaque US à ses critères d'acceptation, et chaque critère à ses scénarios, tests et commits, ou à un statut « non réalisé » avec sa raison ; le rapport final donne l'état de chaque critère. | `us-criteres`, `tracabilite` |
 
 ## agents-paralleles-gitlab 1.0.0
 

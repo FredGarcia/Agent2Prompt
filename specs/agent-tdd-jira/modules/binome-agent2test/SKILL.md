@@ -1,6 +1,6 @@
 ---
 name: binome-agent2test
-description: Dimension réservée D7, binôme avec Agent2Test pour les tests de bout en bout Playwright des scénarios réalisés (plan de tests transmis, journal de tests reçu, anomalies corrigées en cycle TDD). Ne pas appliquer en version 1.x du skill ; lire uniquement pour comprendre les points d'extension E2 et E3.
+description: Dimension réservée D7, binôme avec Agent2Test pour les tests de bout en bout Playwright des scénarios réalisés (plan de tests transmis, journal de tests reçu, anomalies corrigées en cycle TDD). Ne pas appliquer en version 1.x du skill ; lire uniquement pour comprendre les points d'extension E2, E3 et E4.
 dimensions: [D7]
 status: reserved
 ---
@@ -34,13 +34,15 @@ sequenceDiagram
 |---|---|---|
 | E2 | étiquettes de scénario stables `@<CLÉ>-Snn` | Agent2Test rattache chaque test de bout en bout et chaque anomalie à un scénario |
 | E3 | tests unitaires et de tranche étiquetés | une anomalie de bout en bout se rapproche des tests de couche du même scénario |
+| E4 | critères d'acceptation étiquetés `@<CLÉ>-CAnn`, repris par leurs scénarios | chaque test d'acceptation se rattache à un critère ; le rapport d'acceptation donne un verdict par critère |
 
 ## 4. Contenu prévu à l'activation
 
 - format du plan de tests transmis à Agent2Test, compatible avec sa documentation ;
 - lecture du journal de tests et conversion d'une anomalie en scénario de correction ;
-- règle de notification à Agent2Test quand une correction est effective.
+- règle de notification à Agent2Test quand une correction est effective ;
+- rapport d'acceptation : un verdict par critère d'acceptation (point E4).
 
 ## 5. Test d'inertie en 1.x
 
-Chaque scénario réalisé porte une étiquette stable, et chaque test écrit par l'agent porte cette étiquette (E2, E3).
+Chaque scénario réalisé porte une étiquette stable, et chaque test écrit par l'agent porte cette étiquette (E2, E3). Chaque scénario porte aussi l'étiquette du ou des critères d'acceptation qu'il illustre (E4).

@@ -46,7 +46,7 @@ Si l'un de ces points ne correspond pas, il le signale avant de commencer.
 | extraction | `travail/<CLÉ>/demande.json`, `travail/<CLÉ>/images/` |
 | chemins impactés | `travail/<CLÉ>/impact.txt` (section 5) |
 | rapport final | `travail/<CLÉ>/rapport.md` (section 8) |
-| artefacts versionnés | `docs/demandes/<CLÉ>/` : `<CLÉ>.feature`, `suivi.md`, comme hors mode parallèle |
+| artefacts versionnés | `docs/demandes/<CLÉ>/` : `us.md`, `<CLÉ>.feature`, `suivi.md`, comme hors mode parallèle |
 
 ```bash
 node travail/outils/extraire-jira.mjs travail/ECR-77.mhtml --sortie travail/ECR-77/demande.json --images travail/ECR-77/images

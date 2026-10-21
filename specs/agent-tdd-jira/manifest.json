@@ -1,13 +1,14 @@
 {
   "name": "agent-tdd-jira",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "specSchema": 1,
   "language": "fr",
-  "description": "Agent de développement TDD : demande Jira en MHTML, analyse avec commentaires, scénarios Gherkin, variantes back Java et front Angular, cycle rouge, vert, remanié scénario par scénario, traçabilité ; mode parallèle dans un worktree géré par agents-paralleles-gitlab.",
+  "description": "Agent de développement TDD : demande Jira en MHTML, analyse avec commentaires, US et critères d'acceptation numérotés, scénarios Gherkin par critère, variantes back Java et front Angular, cycle rouge, vert, remanié scénario par scénario, traçabilité ; mode parallèle dans un worktree géré par agents-paralleles-gitlab.",
   "entry": "SKILL.md",
   "targets": {
     "entree": "page Jira Cloud ou Data Center enregistrée en MHTML",
-    "scenarios": "Gherkin en français",
+    "criteres": "US et critères d'acceptation numérotés <CLÉ>-USnn, <CLÉ>-CAnn",
+    "scenarios": "Gherkin en français, au moins un par critère d'acceptation",
     "back": "Java 21, Spring Boot 3.5, PostgreSQL",
     "front": "Angular 20"
   },
@@ -24,6 +25,7 @@
   ],
   "modules": [
     { "id": "ingestion-jira", "path": "modules/ingestion-jira/SKILL.md", "dimensions": ["D1"], "status": "active" },
+    { "id": "us-criteres", "path": "modules/us-criteres/SKILL.md", "dimensions": ["D10"], "status": "active" },
     { "id": "analyse-demande", "path": "modules/analyse-demande/SKILL.md", "dimensions": ["D2"], "status": "active" },
     { "id": "impact", "path": "modules/impact/SKILL.md", "dimensions": ["D3"], "status": "active" },
     { "id": "variantes", "path": "modules/variantes/SKILL.md", "dimensions": ["D4"], "status": "active" },
@@ -33,8 +35,9 @@
     { "id": "binome-agent2test", "path": "modules/binome-agent2test/SKILL.md", "dimensions": ["D7"], "status": "reserved" },
     { "id": "connecteur-jira", "path": "modules/connecteur-jira/SKILL.md", "dimensions": ["D8"], "status": "reserved" }
   ],
-  "extensionPoints": ["E1", "E2", "E3"],
+  "extensionPoints": ["E1", "E2", "E3", "E4"],
   "previousVersions": [
-    { "version": "1.0.0", "file": "archives/SKILL-v1.0.0.md" }
+    { "version": "1.0.0", "file": "archives/SKILL-v1.0.0.md" },
+    { "version": "1.1.0", "file": "archives/SKILL-v1.1.0.md" }
   ]
 }

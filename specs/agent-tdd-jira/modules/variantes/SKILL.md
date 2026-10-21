@@ -94,6 +94,7 @@ Chaque variante est décrite avec les mêmes rubriques, pour que la comparaison 
 - Une variante qui viole un invariant reste visible, marquée **non recommandée** (D4.INV-2) : le développeur peut la choisir en connaissance de cause, et ce choix est consigné comme écart au référentiel.
 - La combinaison retenue doit respecter le contrat publié : pas de changement cassant dans une version d'API en service (D4.INV-4).
 - Plusieurs scénarios qui partagent une variante (même endpoint pour S01 et S03) sont regroupés : le choix vaut pour le groupe.
+- Seuls les scénarios d'un critère d'acceptation prêt pour la réalisation reçoivent un choix de variantes ; les autres restent « en attente de Qn » dans le fichier de suivi (D10.INV-6, module `us-criteres`, section 6). L'agent peut toutefois esquisser les variantes de chaque option d'une question, pour éclairer la réponse.
 
 ## 5. Consigner le choix (D4.INV-3)
 

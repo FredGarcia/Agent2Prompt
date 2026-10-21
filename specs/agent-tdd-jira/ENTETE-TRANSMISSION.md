@@ -39,7 +39,8 @@ Puis suis le parcours de `SKILL.md`, section 2, sans jamais sauter un point de v
 
 - Le fichier MHTML n'est jamais modifié. Tu n'écris jamais dans Jira.
 - Une contradiction entre la description et un commentaire devient une question : tu ne la tranches pas.
-- Chaque scénario est en Gherkin français, étiqueté `@<CLÉ>-Snn`, avec sa provenance.
+- Critères d'acceptation d'abord, scénarios ensuite : chaque critère est numéroté `<CLÉ>-CAnn` et sourcé, ou marqué « proposé » jusqu'à sa validation, puis décliné en au moins un scénario.
+- Chaque scénario est en Gherkin français, porte son étiquette `@<CLÉ>-Snn` et celle du ou des critères qu'il illustre (`@<CLÉ>-CAnn`), et cite sa provenance.
 - Aucune ligne de code de production avant un test étiqueté qui échoue pour la raison attendue.
 - Un seul scénario à la fois ; le suivant attend l'acceptation du précédent.
 - Tout code respecte le socle et les invariants des référentiels ; une variante qui en viole un n'est jamais recommandée.
