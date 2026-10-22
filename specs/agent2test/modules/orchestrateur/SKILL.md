@@ -1,6 +1,6 @@
 ---
 name: orchestrateur
-description: Pilotage d'Agent2Test (cycles 7E des échelles Système, Campagne et Scénario, campagne nominale de la demande au journal de tests, points de contrôle CP-0 à CP-5 et leur niveau d'autonomie fixé par l'humain, décisions tracées, sonde avant exécution, file et verrou par application, arrêt d'urgence, reprise après redémarrage, préalable de batch confié au développeur). À implémenter au lot 4.
+description: Pilotage d'Agent2Test (cycles 7E des échelles Système, Campagne et Scénario, campagne nominale de la demande au journal de tests, ouverte à la main, ou depuis une remise reçue du relais, toujours par un humain, points de contrôle CP-0 à CP-5 et leur niveau d'autonomie fixé par l'humain, décisions tracées, sonde avant exécution, file et verrou par application, arrêt d'urgence, reprise après redémarrage, préalable de batch confié au développeur). À implémenter au lot 4.
 dimensions: [D9]
 status: active
 ---
@@ -65,6 +65,8 @@ sequenceDiagram
 
 À l'E2, l'orchestrateur demande aussi `referentiel.epingler(campagne)` : toute la campagne lit fiches et règles à travers cet instantané (D15.INV-1).
 
+Une campagne s'ouvre aussi depuis une remise que le relais n8n a déposée : l'orchestrateur la garde, avec son état, sans rien lancer, jusqu'à ce qu'un testeur ou le développeur l'ouvre ; `lancer` reçoit alors la remise, et `plan.ouvrir` vérifie qu'elle n'est pas périmée avant tout le reste (module `relais`, section 4).
+
 ## 2. Points de contrôle (D9.INV-1, D9.INV-2)
 
 - Un point ouvert met la campagne en attente ; l'événement `point.ouvert` alerte le tableau de bord et le MCP.
@@ -81,7 +83,7 @@ sequenceDiagram
 ## 4. Arrêt d'urgence et reprise (D9.INV-5, D9.INV-6)
 
 - `suspendre(campagne)`, depuis le tableau de bord ou le MCP, lève un drapeau lu entre deux étapes : l'étape en cours se termine, puis la campagne passe à l'état `suspendue`. `reprendre(campagne)` est une décision humaine.
-- L'état de chaque cycle est écrit à chaque fin de phase dans le schéma `orchestration`. Après un redémarrage du processus, une campagne `en cours` reprend au début du scénario interrompu ; le passage interrompu reste au journal.
+- L'état de chaque cycle est écrit à chaque fin de phase dans `orchestration.sqlite`, en une transaction. Après un redémarrage du processus, une campagne `en cours` reprend au début du scénario interrompu ; le passage interrompu reste au journal.
 
 ## 5. Préalable de batch (D9.INV-7)
 
@@ -91,12 +93,13 @@ Avant de jouer un scénario qui porte un préalable `{ type: "batch", nom }` (mo
 
 | Action | Rôle |
 |---|---|
-| `lancer(demande)` | ouvre une campagne ou la met en file |
+| `lancer(demande)` | ouvre une campagne ou la met en file ; avec `{ remise }`, la demande, le dossier du plan, la racine et la plage sont ceux de la remise, et seul un utilisateur humain peut l'appeler (D22.INV-3) |
+| `recevoirRemise(remise)` | garde une remise déposée par le relais, à l'état « reçue » ; n'ouvre rien (module `relais`) |
 | `decider(point, decision)` | décision humaine sur un point ouvert |
 | `suspendre(campagne)`, `reprendre(campagne)` | arrêt d'urgence, reprise |
 | `etat(campagne)` | état, phase courante, point ouvert |
 
-Événements : `point.ouvert`, `point.decide`, `campagne.suspendue`, `campagne.close`.
+Événements : `point.ouvert`, `point.decide`, `campagne.suspendue`, `campagne.close`, `remise.recue`, `remise.ouverte`, `remise.perimee`.
 
 ## 7. Pièges connus
 
@@ -123,6 +126,6 @@ Avant de jouer un scénario qui porte un préalable `{ type: "batch", nom }` (mo
 ## 9. Fichiers à produire
 
 - `src/agents/orchestrateur/agent.js`, `src/agents/orchestrateur/campagne.js`, `src/agents/orchestrateur/scenario.js`, `src/agents/orchestrateur/systeme.js`
-- `src/agents/orchestrateur/points.js`, `src/agents/orchestrateur/file.js`, `src/agents/orchestrateur/reprise.js`
+- `src/agents/orchestrateur/points.js`, `src/agents/orchestrateur/file.js`, `src/agents/orchestrateur/reprise.js`, `src/agents/orchestrateur/remises.js`
 - `configuration/humaine.exemple.json`
 - `test/orchestrateur/*.test.js`

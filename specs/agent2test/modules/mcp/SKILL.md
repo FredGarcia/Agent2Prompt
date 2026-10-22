@@ -1,6 +1,6 @@
 ---
 name: mcp
-description: Moteurs et serveur MCP d'Agent2Test (adaptateurs du port moteur simulation, externe par MCP pour Gemini Code Assist et compatible OpenAI pour un modèle local, autorisation humaine avant tout envoi de contenu du projet à un moteur externe, outils a2t_*, transport HTTP local à jeton porteur et contrôle d'origine, stdio en repli, refus des décisions CP-4, contexte borné et masqué, journalisation de chaque appel, profil souverain sans connexion sortante, settings.json et GEMINI.md fournis). À implémenter au lot 7.
+description: Moteurs et serveur MCP d'Agent2Test (adaptateurs du port moteur simulation, externe par MCP pour Gemini Code Assist et compatible OpenAI pour un modèle local, autorisation humaine avant tout envoi de contenu du projet à un moteur externe, outils a2t_*, transport HTTP local sans session, à jeton porteur et contrôle d'origine, stdio en repli, outils du rôle relais pour n8n, refus des décisions CP-4, contexte borné et masqué, journalisation de chaque appel, profil souverain sans connexion sortante, settings.json et GEMINI.md fournis). À implémenter au lot 7.
 dimensions: [D16]
 status: active
 ---
@@ -34,21 +34,23 @@ Sans cette autorisation, `a2t_tache_suivante` ne rend aucune tâche de rédactio
 
 | Outil | Rôle |
 |---|---|
-| `a2t_demarrer_campagne` | ouvre une campagne à partir d'une demande et du dossier du plan |
+| `a2t_demarrer_campagne` | ouvre une campagne à partir d'une demande et du dossier du plan, ou d'une remise reçue ; refusé au rôle `relais` |
+| `a2t_deposer_remise` | réservé au rôle `relais` : dépose une remise au format `agent2test.remise/1`, sans ouvrir de campagne (module `relais`) |
 | `a2t_tache_suivante` | rend la prochaine rédaction attendue (rôle, consignes, leçons, schéma de sortie, contexte borné), ou le point de contrôle à présenter à l'opérateur |
 | `a2t_soumettre` | soumet une sortie ; rend les écarts de validation, ou l'acceptation |
 | `a2t_decider` | relaie la décision explicite de l'opérateur pour CP-0, CP-1, CP-2, CP-3 et CP-5 |
 | `a2t_suspendre` | arrêt d'urgence d'une campagne |
-| `a2t_etat`, `a2t_journal`, `a2t_rapport`, `a2t_carte` | lecture seule |
+| `a2t_etat`, `a2t_journal`, `a2t_rapport`, `a2t_carte` | lecture seule ; au rôle `relais`, `a2t_etat` et `a2t_rapport` seulement, pour les remises et les campagnes qui en sont issues (D22.INV-2) |
 
-- Une décision CP-4 reçue par `a2t_decider` est refusée `CP4_HORS_TABLEAU_DE_BORD` (D16.INV-2). L'arrêt d'urgence reste permis : il va dans le sens sûr.
+- Une décision CP-4 reçue par `a2t_decider` est refusée `CP4_HORS_TABLEAU_DE_BORD` (D16.INV-2). L'arrêt d'urgence reste permis aux rôles humains : il va dans le sens sûr.
 - `a2t_soumettre` passe la sortie au validateur du noyau ; en cas d'écart, la réponse liste les écarts, et la boucle reprend dans le budget de 3 renvois.
 
 ## 4. Transports (D16.INV-1)
 
 - **HTTP en flux**, par défaut : `http://127.0.0.1:4701/mcp`, protocole JSON-RPC 2.0 de MCP (`initialize`, `tools/list`, `tools/call`), avec la révision du protocole négociée à l'initialisation, au moins celle qui définit le transport HTTP en flux. Écoute sur `127.0.0.1` seulement.
 - Chaque requête exige l'en-tête `Authorization: Bearer <jeton>` ; le jeton est lu dans un fichier hors dépôt, en mode 0600. Une requête dont l'en-tête `Origin` est présent et absent de la liste autorisée est refusée, contre le rebond DNS.
-- Le jeton est attaché à un utilisateur de la configuration humaine : les décisions relayées par `a2t_decider` portent cet auteur et obéissent aux droits de ses rôles (D17.INV-2).
+- Le jeton est attaché à un utilisateur de la configuration humaine : les décisions relayées par `a2t_decider` portent cet auteur et obéissent aux droits de ses rôles (D17.INV-2). Un jeton au rôle `relais` n'atteint que les outils de ce rôle ; tout autre lui est refusé `DROIT_INSUFFISANT` (module `relais`, section 3).
+- Le serveur ne tient pas de session : il ne pose pas d'en-tête `Mcp-Session-Id` et traite chaque requête seule, avec son jeton. Un client qui commence par `initialize` est servi de même ; le relais n8n poste directement ses `tools/call`.
 - **stdio**, en repli, pour la parité avec Agent2Dev.
 - Le protocole est écrit dans le module, sans dépendance ajoutée.
 
@@ -86,6 +88,7 @@ Avec `moteur.adaptateur = compatible-openai` sur `127.0.0.1`, une campagne compl
 | MC8 | point E5 | un adaptateur `inconnu` est refusé au démarrage |
 | MC9 | D16.INV-1 | le transport stdio expose les mêmes outils que le transport HTTP |
 | MC10 | D16.INV-4 | une sortie non conforme soumise par `a2t_soumettre` reçoit la liste de ses écarts ; au quatrième envoi, l'échec part en CP-2 |
+| MC11 | D16.INV-1 | un `tools/call` posté sans `initialize` préalable, avec un jeton valide, est servi, et la réponse ne porte aucun en-tête `Mcp-Session-Id` ; sans jeton, il est refusé |
 
 ## 10. Fichiers à produire
 

@@ -20,8 +20,9 @@ La colonne « Repris dans » cite les modules de la spécification qui reprennen
 
 | Spécification | Version | Dimensions actives | Dimensions réservées | Invariants |
 |---|---|---|---|---|
-| [`agent-tdd-jira`](#agent-tdd-jira-130) | 1.3.0 | 9 | 1 | 43 |
-| [`agent2test`](#agent2test-100) | 1.0.0 | 18 | 2 | 90 |
+| [`agent-tdd-jira`](#agent-tdd-jira-131) | 1.3.1 | 9 | 1 | 43 |
+| [`agent2dev`](#agent2dev-100) | 1.0.0 | 21 | 2 | 88 |
+| [`agent2test`](#agent2test-110) | 1.1.0 | 19 | 2 | 99 |
 | [`agents-paralleles-gitlab`](#agents-paralleles-gitlab-101) | 1.0.1 | 5 | 2 | 20 |
 | [`analyse-projet`](#analyse-projet-102) | 1.0.2 | 5 | 1 | 16 |
 | [`angular`](#angular-101) | 1.0.1 | 8 | 2 | 30 |
@@ -30,7 +31,7 @@ La colonne « Repris dans » cite les modules de la spécification qui reprennen
 | [`sonarqube`](#sonarqube-102) | 1.0.2 | 6 | 2 | 22 |
 | [`tension-dashboard-gitlab-agent`](#tension-dashboard-gitlab-agent-220) | 2.2.0 | 7 | 3 | 17 |
 
-## agent-tdd-jira 1.3.0
+## agent-tdd-jira 1.3.1
 
 Agent de développement TDD : demande Jira en MHTML, analyse avec commentaires, US et critères d'acceptation numérotés, scénarios Gherkin par critère, variantes back Java et front Angular, cycle rouge, vert, remanié scénario par scénario, traçabilité ; binôme avec Agent2Test, verdict d'acceptation par critère ; mode parallèle dans un worktree géré par agents-paralleles-gitlab. Point d'entrée : [`specs/agent-tdd-jira/SKILL.md`](specs/agent-tdd-jira/SKILL.md).
 
@@ -38,8 +39,8 @@ Agent de développement TDD : demande Jira en MHTML, analyse avec commentaires, 
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D1.INV-1** | le fichier MHTML n'est jamais modifié ; l'extraction travaille en lecture seule et enregistre l'empreinte sha256 de la source. | `ingestion-jira`, `parallele` |
-| **D1.INV-2** | le résumé de l'extraction (clé, titre, description, nombre de commentaires, pièces, limites) est confirmé par le développeur avant toute analyse. | `ingestion-jira` |
+| **D1.INV-1** | le fichier MHTML n'est jamais modifié ; l'extraction travaille en lecture seule et enregistre l'empreinte sha256 de la source. | `ingestion-jira`, `parallele`, `agent2dev`, `agent2dev/cadrage` |
+| **D1.INV-2** | le résumé de l'extraction (clé, titre, description, nombre de commentaires, pièces, limites) est confirmé par le développeur avant toute analyse. | `ingestion-jira`, `agent2dev`, `agent2dev/cadrage` |
 | **D1.INV-3** | toute partie non extraite ou incertaine (commentaires repliés, pièces absentes, page non reconnue) est déclarée comme limite. | `ingestion-jira` |
 
 ### D2 : Analyse et scénarios Gherkin (active)
@@ -47,55 +48,55 @@ Agent de développement TDD : demande Jira en MHTML, analyse avec commentaires, 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
 | **D2.INV-1** | chaque scénario cite sa provenance : passage de la description, commentaire (auteur, date) ou réponse du développeur. | `analyse-demande` |
-| **D2.INV-2** | une contradiction ou une ambiguïté entre la description et les commentaires devient une question ; elle n'est jamais tranchée par l'agent. | `us-criteres`, `analyse-demande` |
+| **D2.INV-2** | une contradiction ou une ambiguïté entre la description et les commentaires devient une question ; elle n'est jamais tranchée par l'agent. | `us-criteres`, `analyse-demande`, `agent2dev`, `agent2dev/cadrage` |
 | **D2.INV-3** | chaque scénario est écrit en Gherkin français, porte une étiquette unique `@<CLÉ>-Snn` et au moins une étape `Alors` vérifiable. | `us-criteres`, `analyse-demande` |
 | **D2.INV-4** | un scénario que la demande n'énonce pas explicitement (cas d'erreur, limite) porte l'étiquette `@propose` et n'est utilisé qu'après validation. | `analyse-demande` |
-| **D2.INV-5** | les scénarios sont validés par le développeur avant l'étude des variantes. | `analyse-demande` |
+| **D2.INV-5** | les scénarios sont validés par le développeur avant l'étude des variantes. | `analyse-demande`, `agent2dev/autonomie` |
 
 ### D3 : Analyse d'impact back et front (active)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D3.INV-1** | l'analyse d'impact ne modifie rien et cite le fichier de chaque élément impacté. | `impact`, `parallele` |
-| **D3.INV-2** | l'impact sur le contrat d'API est qualifié pour chaque scénario : aucun, compatible ou cassant. | `impact` |
+| **D3.INV-1** | l'analyse d'impact ne modifie rien et cite le fichier de chaque élément impacté. | `impact`, `parallele`, `agent2dev`, `agent2dev/conception` |
+| **D3.INV-2** | l'impact sur le contrat d'API est qualifié pour chaque scénario : aucun, compatible ou cassant. | `impact`, `agent2dev/conception` |
 
 ### D4 : Variantes de réalisation back et front (active)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D4.INV-1** | pour chaque scénario, l'agent propose des variantes back et front (au moins deux par couche concernée, ou une seule avec la justification de son unicité), ou justifie qu'une couche n'est pas concernée. | `variantes` |
-| **D4.INV-2** | chaque variante indique les invariants des référentiels et du socle qu'elle engage ; une variante qui en viole un est signalée et n'est jamais recommandée. | `variantes` |
-| **D4.INV-3** | le choix du développeur est consigné avant toute écriture de code. | `variantes` |
+| **D4.INV-1** | pour chaque scénario, l'agent propose des variantes back et front (au moins deux par couche concernée, ou une seule avec la justification de son unicité), ou justifie qu'une couche n'est pas concernée. | `variantes`, `agent2dev/conception` |
+| **D4.INV-2** | chaque variante indique les invariants des référentiels et du socle qu'elle engage ; une variante qui en viole un est signalée et n'est jamais recommandée. | `variantes`, `agent2dev`, `agent2dev/conception` |
+| **D4.INV-3** | le choix du développeur est consigné avant toute écriture de code. | `variantes`, `agent2dev`, `agent2dev/conception` |
 | **D4.INV-4** | la combinaison back et front retenue est compatible avec le contrat publié (SC1.INV-2). | `variantes` |
 
 ### D5 : Cycle TDD scénario par scénario (active)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D5.INV-1** | aucun code de production n'est écrit pour un scénario avant qu'un test étiqueté de ce scénario ait échoué pour la raison attendue. | `cycle-tdd` |
+| **D5.INV-1** | aucun code de production n'est écrit pour un scénario avant qu'un test étiqueté de ce scénario ait échoué pour la raison attendue. | `cycle-tdd`, `agent2dev`, `agent2dev/apprenant` |
 | **D5.INV-2** | la phase verte se limite au code nécessaire pour faire passer le test, et la suite de tests du module concerné reste verte. | `cycle-tdd` |
 | **D5.INV-3** | le remaniement ne change pas le comportement, garde toutes les suites vertes et applique les invariants des référentiels. | `cycle-tdd` |
-| **D5.INV-4** | un seul scénario est réalisé à la fois, et le suivant ne commence qu'après acceptation du précédent. | `cycle-tdd`, `parallele` |
-| **D5.INV-5** | quand un scénario touche le contrat d'API, l'ordre est : contrat, puis back, puis front. | `impact`, `cycle-tdd`, `agents-paralleles-gitlab/distribution` |
-| **D5.INV-6** | aucune dépendance nouvelle n'est ajoutée sans validation. | `cycle-tdd`, `agents-paralleles-gitlab/distribution` |
+| **D5.INV-4** | un seul scénario est réalisé à la fois, et le suivant ne commence qu'après acceptation du précédent. | `cycle-tdd`, `parallele`, `agent2dev`, `agent2dev/realisation`, `agent2dev/autonomie` |
+| **D5.INV-5** | quand un scénario touche le contrat d'API, l'ordre est : contrat, puis back, puis front. | `impact`, `cycle-tdd`, `agent2dev`, `agent2dev/realisation`, `agents-paralleles-gitlab/distribution` |
+| **D5.INV-6** | aucune dépendance nouvelle n'est ajoutée sans validation. | `cycle-tdd`, `agent2dev`, `agents-paralleles-gitlab/distribution` |
 
 ### D6 : Traçabilité et rapport (active)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D6.INV-1** | la matrice relie chaque exigence de la demande à au moins un scénario, chaque scénario validé à au moins un test et à un commit, ou à un statut explicite « non réalisé » avec sa raison. | `tracabilite` |
-| **D6.INV-2** | chaque test écrit par l'agent porte l'étiquette de son scénario. | `cycle-tdd`, `tracabilite` |
-| **D6.INV-3** | l'agent n'écrit jamais dans Jira ; il fournit un projet de commentaire que le développeur publie lui-même. | `tracabilite`, `parallele` |
+| **D6.INV-1** | la matrice relie chaque exigence de la demande à au moins un scénario, chaque scénario validé à au moins un test et à un commit, ou à un statut explicite « non réalisé » avec sa raison. | `tracabilite`, `agent2dev`, `agent2dev/tracabilite` |
+| **D6.INV-2** | chaque test écrit par l'agent porte l'étiquette de son scénario. | `cycle-tdd`, `tracabilite`, `agent2dev/realisation` |
+| **D6.INV-3** | l'agent n'écrit jamais dans Jira ; il fournit un projet de commentaire que le développeur publie lui-même. | `tracabilite`, `parallele`, `agent2dev`, `agent2dev/tracabilite` |
 | **D6.INV-4** | le rapport final liste les écarts à la demande, les questions restées ouvertes et le résultat des suites de tests back et front. | `tracabilite` |
 
 ### D7 : Binôme avec Agent2Test (tests de bout en bout et d'acceptation) (active)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D7.INV-1** | le plan remis à Agent2Test est `us.md` et le fichier Gherkin validés à V2 et commités, tels quels ; l'agent n'écrit ni parcours ni fichier d'Agent2Test. | `binome-agent2test`, `agent2test/plan` |
-| **D7.INV-2** | chaque défaut applicatif confirmé en CP-3 par Agent2Test rouvre le scénario qu'il vise en cycle TDD : un test rouge, étiqueté avec ce scénario, reproduit le défaut avant tout code de production. | `binome-agent2test` |
-| **D7.INV-3** | la matrice et le rapport final donnent, pour chaque critère d'acceptation, le verdict d'Agent2Test valable pour le plan et le code courants (conforme, non conforme, non vérifié avec son motif), ou « non joué » avec sa raison. | `tracabilite`, `binome-agent2test`, `agent2test/journal` |
-| **D7.INV-4** | l'agent ne démarre, n'arrête ni ne déploie l'application et ne lance aucun batch ; il ne réécrit ni ne conteste lui-même un verdict d'Agent2Test : un désaccord est remonté au développeur. | `binome-agent2test` |
+| **D7.INV-1** | le plan remis à Agent2Test est `us.md` et le fichier Gherkin validés à V2 et commités, tels quels ; l'agent n'écrit ni parcours ni fichier d'Agent2Test. | `binome-agent2test`, `agent2dev`, `agent2test/plan` |
+| **D7.INV-2** | chaque défaut applicatif confirmé en CP-3 par Agent2Test rouvre le scénario qu'il vise en cycle TDD : un test rouge, étiqueté avec ce scénario, reproduit le défaut avant tout code de production. | `binome-agent2test`, `agent2dev` |
+| **D7.INV-3** | la matrice et le rapport final donnent, pour chaque critère d'acceptation, le verdict d'Agent2Test valable pour le plan et le code courants (conforme, non conforme, non vérifié avec son motif), ou « non joué » avec sa raison. | `tracabilite`, `binome-agent2test`, `agent2dev`, `agent2dev/tracabilite`, `agent2test/journal` |
+| **D7.INV-4** | l'agent ne démarre, n'arrête ni ne déploie l'application et ne lance aucun batch ; il ne réécrit ni ne conteste lui-même un verdict d'Agent2Test : un désaccord est remonté au développeur. | `binome-agent2test`, `agent2dev`, `agent2dev/profil`, `agent2dev/executant`, `agent2dev/binome` |
 | **D7.INV-5** | un scénario qui exige un rôle de l'application porte `@role-<nom>`, directement ou par sa fonctionnalité ; un batch Java, `@batch-<nom>` ; un redémarrage de l'application ou une écriture directe en base, `@redemarrage` ou `@ecriture-base`. | `analyse-demande`, `binome-agent2test` |
 
 ### D8 : Connecteur Jira (API ou MCP) à la place du MHTML (reserved)
@@ -106,13 +107,13 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D9.INV-1** | en mode parallèle, l'agent n'écrit que dans le worktree de sa demande ; ses fichiers de travail (demande enregistrée, `demande.json`, images, script d'extraction, `impact.txt`, `rapport.md`) vont dans `travail/`. | `parallele` |
-| **D9.INV-2** | en mode parallèle, l'agent ne pousse pas, ne fusionne pas, ne rebase pas et ne change pas de branche ; il n'emploie ni `--no-verify`, ni `--force`, ni `--force-with-lease`, ni `git config`, ni `git -c`, ni `reset --hard`, ni `stash drop`, ni `stash clear`, ni `branch -D`, ni `git worktree`. | `parallele`, `binome-agent2test`, `agents-paralleles-gitlab/hooks` |
-| **D9.INV-3** | en mode parallèle, chaque commit commence par `<CLÉ> Snn : ` pour un scénario, ou `<CLÉ> : ` hors scénario. | `parallele`, `binome-agent2test` |
-| **D9.INV-4** | un refus d'un garde-fou du kit arrête l'action en cours ; l'agent le cite au développeur et ne le contourne jamais. | `parallele`, `agents-paralleles-gitlab` |
-| **D9.INV-5** | à l'étape d'impact, l'agent écrit les chemins impactés dans `travail/<CLÉ>/impact.txt`, un chemin relatif par ligne, et signale dans la fiche ceux qui relèvent d'un point chaud. | `parallele`, `agents-paralleles-gitlab/orchestration`, `agents-paralleles-gitlab/distribution` |
-| **D9.INV-6** | le skill partagé est vérifié avec la table d'intégrité de la transmission et n'est jamais réécrit. | `parallele` |
-| **D9.INV-7** | après une synchronisation annoncée par le développeur, l'agent relance les suites back et front avant le scénario suivant et signale toute régression. | `parallele`, `agents-paralleles-gitlab/distribution` |
+| **D9.INV-1** | en mode parallèle, l'agent n'écrit que dans le worktree de sa demande ; ses fichiers de travail (demande enregistrée, `demande.json`, images, script d'extraction, `impact.txt`, `rapport.md`) vont dans `travail/`. | `parallele`, `agent2dev/methode`, `agent2dev/depot` |
+| **D9.INV-2** | en mode parallèle, l'agent ne pousse pas, ne fusionne pas, ne rebase pas et ne change pas de branche ; il n'emploie ni `--no-verify`, ni `--force`, ni `--force-with-lease`, ni `git config`, ni `git -c`, ni `reset --hard`, ni `stash drop`, ni `stash clear`, ni `branch -D`, ni `git worktree`. | `parallele`, `binome-agent2test`, `agent2dev`, `agent2dev/depot`, `agents-paralleles-gitlab/hooks` |
+| **D9.INV-3** | en mode parallèle, chaque commit commence par `<CLÉ> Snn : ` pour un scénario, ou `<CLÉ> : ` hors scénario. | `parallele`, `binome-agent2test`, `agent2dev/depot` |
+| **D9.INV-4** | un refus d'un garde-fou du kit arrête l'action en cours ; l'agent le cite au développeur et ne le contourne jamais. | `parallele`, `agent2dev/depot`, `agents-paralleles-gitlab` |
+| **D9.INV-5** | à l'étape d'impact, l'agent écrit les chemins impactés dans `travail/<CLÉ>/impact.txt`, un chemin relatif par ligne, et signale dans la fiche ceux qui relèvent d'un point chaud. | `parallele`, `agent2dev/conception`, `agents-paralleles-gitlab/orchestration`, `agents-paralleles-gitlab/distribution` |
+| **D9.INV-6** | le skill partagé est vérifié avec la table d'intégrité de la transmission et n'est jamais réécrit. | `parallele`, `agent2dev`, `agent2dev/methode` |
+| **D9.INV-7** | après une synchronisation annoncée par le développeur, l'agent relance les suites back et front avant le scénario suivant et signale toute régression. | `parallele`, `agent2dev/depot`, `agent2dev/executant`, `agent2dev/orchestrateur`, `agents-paralleles-gitlab/distribution` |
 
 ### D10 : US et critères d'acceptation numérotés (active)
 
@@ -123,31 +124,236 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 | **D10.INV-3** | chaque critère d'acceptation énonce un résultat observable et vérifiable ; un critère ambigu, invérifiable ou contredit par un commentaire devient une question, jamais une interprétation de l'agent. | `us-criteres` |
 | **D10.INV-4** | chaque exigence de la demande est rattachée à au moins un critère d'acceptation, ou à une question. | `us-criteres`, `analyse-demande` |
 | **D10.INV-5** | chaque critère d'acceptation validé est décliné en au moins un scénario Gherkin, et chaque scénario porte l'étiquette `@<CLÉ>-CAnn` d'au moins un critère qu'il illustre. | `us-criteres`, `analyse-demande`, `agent2test/plan` |
-| **D10.INV-6** | un critère d'acceptation n'entre en réalisation (choix des variantes V3, cycle TDD V4) que s'il est validé, décliné en scénarios validés, et qu'aucune question ouverte ne le concerne. | `us-criteres`, `variantes` |
-| **D10.INV-7** | la matrice de traçabilité relie chaque US à ses critères d'acceptation, et chaque critère à ses scénarios, tests et commits, ou à un statut « non réalisé » avec sa raison ; le rapport final donne l'état de chaque critère. | `us-criteres`, `tracabilite` |
+| **D10.INV-6** | un critère d'acceptation n'entre en réalisation (choix des variantes V3, cycle TDD V4) que s'il est validé, décliné en scénarios validés, et qu'aucune question ouverte ne le concerne. | `us-criteres`, `variantes`, `agent2dev/cadrage` |
+| **D10.INV-7** | la matrice de traçabilité relie chaque US à ses critères d'acceptation, et chaque critère à ses scénarios, tests et commits, ou à un statut « non réalisé » avec sa raison ; le rapport final donne l'état de chaque critère. | `us-criteres`, `tracabilite`, `agent2dev`, `agent2dev/tracabilite` |
 
-## agent2test 1.0.0
+## agent2dev 1.0.0
 
-Agent2Test : système multi-agents qui choisit, prépare, exécute et journalise les tests essentiels d'une application Angular pour une demande, en pilotant Playwright comme une bibliothèque depuis Node, dans un projet séparé de l'application ; plan importé d'agent-tdd-jira, verdict par critère d'acceptation, points de contrôle humains, cybernétique de premier et de second ordre, exécution locale. Point d'entrée : [`specs/agent2test/SKILL.md`](specs/agent2test/SKILL.md).
+Agent2Dev : système multi-agents de développement qui applique le skill agent-tdd-jira comme méthode, de la demande Jira en MHTML jusqu'au rapport, en cycle TDD scénario par scénario et en binôme avec Agent2Test ; le moteur rédige, des agents déterministes écrivent et exécutent, le développeur valide à chaque point ; journal chaîné, apprentissage sous gouvernance, exécution locale. Point d'entrée : [`specs/agent2dev/SKILL.md`](specs/agent2dev/SKILL.md).
 
 ### D1 : Noyau 7E, bus et constitution (active)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D1.INV-1** | chaque cycle déroule les sept phases E1 à E7, dans l'ordre, à chacune des quatre échelles (Système, Campagne, Scénario, Étape) ; l'E3 d'une échelle est la suite des cycles complets de l'échelle inférieure, et chaque ligne de journal porte son échelle et sa phase. | `noyau`, `orchestrateur`, `journal`, `observateur` |
+| **D1.INV-1** | le cycle 7E se déroule en sept phases, dans l'ordre, aux quatre échelles Système, Demande, Scénario et Pas ; l'E3 d'une échelle est la suite des cycles de l'échelle inférieure, et l'E7 d'un cycle enfant est versé à l'E4 de son parent. | `noyau`, `orchestrateur`, `observateur` |
+| **D1.INV-2** | tout appel ou événement que son contrat ne déclare pas est refusé par le bus ; aucun agent n'importe le code d'un autre agent. | `noyau` |
+| **D1.INV-3** | le moteur ne produit que des données ; une sortie qui s'écarte de son schéma fermé ou échoue à un contrôle nommé n'est jamais consommée. | `noyau`, `journal` |
+| **D1.INV-4** | la constitution est vérifiée par son empreinte au démarrage ; modifiée ou non publiée, Agent2Dev ne démarre pas ; sa publication est une commande humaine. | `noyau`, `referentiel` |
+| **D1.INV-5** | Agent2Dev ne traite qu'une demande Jira exportée en MHTML, pour le projet d'un profil ratifié ; toute intention de démarrer, d'arrêter ou de déployer l'application, de lancer un batch, d'administrer un environnement, d'écrire en base ou dans Jira est refusée avec le motif « hors périmètre ». | `noyau`, `orchestrateur` |
+| **D1.INV-6** | aucun agent n'écrit la constitution, le code ou les schémas d'Agent2Dev, la configuration humaine ni la transmission du skill, et aucun ne réécrit un profil ratifié : le `profil` en crée seulement une version nouvelle, à la décision V0. | `noyau`, `profil`, `referentiel`, `exploitation` |
+
+### D2 : Données par agent, en SQLite (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D2.INV-1** | chaque fichier de données a un seul agent propriétaire ; un agent lit les données d'un autre par une action du bus, jamais par le fichier. | `donnees` |
+| **D2.INV-2** | les données d'un agent sont dans son seul fichier SQLite, ouvert par `node:sqlite` dès le premier enregistrement ; chaque écriture est une transaction, et un arrêt du processus, même brutal, ne laisse aucun enregistrement partiel. | `donnees` |
+| **D2.INV-3** | le journal et le grand livre sont en ajout seul : aucune action ne modifie ni ne supprime un enregistrement, et toute purge est une commande humaine, journalisée. | `donnees` |
+
+### D3 : Méthode : skill agent-tdd-jira, fiches et scripts (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D3.INV-1** | le skill n'est lu que depuis sa transmission, à la version épinglée par la configuration humaine, chaque fichier conforme à sa table d'intégrité ; à défaut, Agent2Dev ne démarre pas (`agent-tdd-jira:D9.INV-6`). | `methode` |
+| **D3.INV-2** | les consignes d'une fiche reprennent les sections du skill telles quelles : rien n'y est réécrit, résumé, traduit ni complété, hors des leçons ratifiées, ajoutées à part. | `methode` |
+| **D3.INV-3** | les trois scripts du skill sont extraits tels quels de leur module et exécutés par l'`executant` ; ni Agent2Dev ni le moteur n'en écrivent d'autre version. | `methode` |
+| **D3.INV-4** | chaque module actif du skill est appliqué par au moins une étape d'Agent2Dev, selon la table de correspondance, vérifiée au démarrage contre le manifeste du skill. | `methode` |
+| **D3.INV-5** | un prompt composé qui dépasse le plafond de contexte n'est jamais tronqué : le pas s'arrête et se présente au développeur. | `methode`, `apprenant`, `mcp` |
+
+### D4 : Profil du projet (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D4.INV-1** | aucune commande ne s'exécute dans un projet sans profil ratifié en V0 ; un fichier de construction modifié depuis la ratification rouvre V0. | `profil` |
+| **D4.INV-2** | chaque valeur du profil cite le fichier du projet dont elle vient, ou porte la marque « à renseigner », qui empêche la ratification. | `profil` |
+| **D4.INV-3** | les versions réelles du projet sont comparées aux cibles du skill (Java 21, Spring Boot 3.5, Angular 20) ; chaque écart est présenté en V0, avec la question de la suite à donner. | `profil` |
+| **D4.INV-4** | un profil qui contient une commande de démarrage, d'arrêt ou de déploiement de l'application, ou de lancement d'un batch, est refusé, à la proposition comme à la ratification. | `profil` |
+
+### D5 : Écriture dans le projet (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D5.INV-1** | seul le `depot` écrit dans un arbre du projet, et seulement dans l'arbre de travail de la demande et, en mode parallèle, dans le dossier `travail/` de son worktree, sous leur racine, hors des fichiers protégés (`.git`, secrets, CI, fichiers du kit) ; un chemin qui sort de la racine, y compris par lien symbolique, est refusé. | `profil`, `depot`, `tracabilite` |
+| **D5.INV-2** | une modification ne s'applique que si chaque bloc « avant » apparaît exactement une fois dans le fichier courant ; sinon rien n'est appliqué, et l'écart revient au moteur dans son budget. | `depot` |
+| **D5.INV-3** | toute écriture dans l'arbre de travail qui ne vient pas du `depot`, par l'IDE ou par un autre outil, est détectée avant le pas suivant et arrête la demande jusqu'à la décision du développeur. | `noyau`, `depot`, `mcp` |
+| **D5.INV-4** | dans l'arbre de la demande, un commit n'est fait qu'après l'acceptation du scénario à V4, si le développeur l'accepte, avec le message `<CLÉ> Snn : …`, ou `<CLÉ> : …` hors scénario, et le `depot` ne fusionne pas, ne rebase pas, ne change pas de branche et ne réécrit aucun historique (`agent-tdd-jira:D9.INV-2`) ; dans la copie de travail, chaque scénario accepté est commité avec ce message pour former son patch ; le `depot` ne pousse jamais. | `depot`, `apprenant` |
+| **D5.INV-5** | une dépendance nouvelle, une modification de la chaîne de construction, la modification d'un test existant ou la suppression d'un fichier attend une validation explicite du développeur avant d'être appliquée (`agent-tdd-jira:D5.INV-6`). | `depot` |
+| **D5.INV-6** | un changeset de migration existant n'est jamais modifié ni supprimé ; un schéma évolue par un changeset nouveau. | `depot` |
+| **D5.INV-7** | sans l'autorisation d'écrire le code, donnée dans la configuration humaine, l'arbre de travail est une copie de travail : Agent2Dev n'écrit rien dans l'arbre de la demande, hors des fichiers de travail que le kit exclut du dépôt, et remet pour chaque scénario accepté un patch que le développeur applique lui-même. | `depot`, `realisation`, `tableau-de-bord` |
+
+### D6 : Exécution des commandes (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D6.INV-1** | seules s'exécutent les commandes nommées du profil ratifié, les trois scripts du skill et les commandes git de la liste fermée du `depot`, en vecteur d'arguments, sans shell, avec leur répertoire et leur délai, dans l'arbre de travail ; dans l'arbre de la demande, sans autorisation d'écrire le code, seuls s'exécutent les scripts du skill qui lisent, `controler-criteres` et `lire-acceptation` ; les seuls paramètres substitués sont un identifiant de scénario validé par motif et des chemins sous la racine de l'arbre ou sous les données d'Agent2Dev. | `profil`, `depot`, `executant`, `orchestrateur` |
+| **D6.INV-2** | aucune commande ne démarre, n'arrête ni ne déploie l'application, ni ne lance un batch (`agent-tdd-jira:D7.INV-4`). | `executant`, `apprenant`, `exploitation` |
+| **D6.INV-3** | la sortie d'une commande est masquée et bornée avant d'être journalisée ou transmise au moteur ; les échecs de compilation et de test reviennent structurés : fichier, ligne, test, message. | `executant` |
+| **D6.INV-4** | les échecs présents avant le premier scénario forment la ligne de base de la demande ; ils ne sont imputés à aucun scénario et figurent au rapport. | `executant`, `orchestrateur` |
+
+### D7 : Cadrage : extraction et analyse (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D7.INV-1** | la demande est extraite par le script du skill, jamais par le moteur ; le fichier MHTML n'est jamais modifié, et l'extraction est confirmée à V1 avant toute analyse (`agent-tdd-jira:D1.INV-1`, `agent-tdd-jira:D1.INV-2`). | `cadrage` |
+| **D7.INV-2** | `us.md` et le fichier Gherkin ne sont présentés à V2 qu'après `controler-criteres.mjs` ; chaque écart du script est corrigé dans le budget du moteur, ou présenté comme écart. | `cadrage`, `binome` |
+| **D7.INV-3** | une question soulevée par l'analyse n'est jamais tranchée par le système : elle attend la réponse du développeur à V2 (`agent-tdd-jira:D2.INV-2`). | `cadrage` |
+| **D7.INV-4** | après V2, `us.md` et le fichier Gherkin ne changent que par une nouvelle validation V2. | `depot`, `cadrage` |
+
+### D8 : Conception : impact et variantes (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D8.INV-1** | chaque élément de la fiche d'impact cite un fichier et une ligne trouvés par une recherche du `depot` ; un élément sans résultat de recherche est un écart (`agent-tdd-jira:D3.INV-1`). | `conception`, `memoire` |
+| **D8.INV-2** | aucune réalisation ne commence avant que le développeur ait choisi à V3 une variante back et une variante front par scénario, et que le `depot` ait consigné ce choix dans `suivi.md` (`agent-tdd-jira:D4.INV-3`). | `conception` |
+| **D8.INV-3** | une variante qui viole un invariant d'un référentiel ou du socle n'est jamais présentée comme recommandée ; un contrôle nommé le vérifie sur la sortie de la fiche (`agent-tdd-jira:D4.INV-2`). | `conception` |
+
+### D9 : Réalisation en cycle TDD (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D9.INV-1** | un seul scénario est réalisé à la fois, et le suivant attend l'acceptation du précédent à V4 (`agent-tdd-jira:D5.INV-4`). | `realisation` |
+| **D9.INV-2** | aucun code de production n'est appliqué pour un scénario avant que l'`executant` ait constaté l'échec d'un test étiqueté de ce scénario pour la raison attendue : une assertion, pas une erreur de compilation ni de configuration ; seule une signature minimale, sans logique, peut précéder ce constat quand le test ne compile pas (`agent-tdd-jira:D5.INV-1`). | `realisation`, `reflexif` |
+| **D9.INV-3** | un scénario n'est présenté à V4 qu'après les suites complètes back et front vertes, ligne de base exclue, constatées par l'`executant`. | `realisation` |
+| **D9.INV-4** | aucun pas n'affaiblit les tests : retirer un test ou une assertion, ajouter `@Disabled`, `fit`, `fdescribe` ou `xit` est refusé par contrôle nommé. | `realisation`, `apprenant`, `reflexif` |
+| **D9.INV-5** | quand un scénario touche le contrat d'API, le pas `contrat` précède les tests du back, puis ceux du front (`agent-tdd-jira:D5.INV-5`). | `realisation` |
+| **D9.INV-6** | la présentation V4 est rendue depuis le journal, au format du skill : rouge avec son message d'échec, vert, remanié, suites, fichiers, commit proposé. | `realisation` |
+
+### D10 : Binôme avec Agent2Test (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D10.INV-1** | la remise n'a lieu qu'arbre de la demande propre, `controler-criteres.mjs` sans écart et, sans autorisation d'écrire le code, chaque patch remis présent dans l'arbre de la demande ; elle cite le commit et le plan tels quels (`agent-tdd-jira:D7.INV-1`). | `depot`, `binome` |
+| **D10.INV-2** | le verdict de chaque critère est celui que rend `lire-acceptation.mjs` sur le journal de tests, jamais une lecture du moteur (`agent-tdd-jira:D7.INV-3`). | `binome` |
+| **D10.INV-3** | seul un défaut que le script déclare confirmé, avec un cycle de correction, rouvre un scénario, dans le budget de corrections par scénario ; tout autre défaut est présenté au développeur (`agent-tdd-jira:D7.INV-2`). | `binome` |
+| **D10.INV-4** | Agent2Dev n'écrit rien dans le projet Agent2Test, ne conteste ni ne réécrit un verdict, et n'ouvre aucune campagne : le développeur ouvre chaque campagne à la main (`agent-tdd-jira:D7.INV-4`). | `binome` |
+
+### D11 : Traçabilité et rapport (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D11.INV-1** | la matrice est construite par les recherches du `depot` et par les scripts du skill, jamais de mémoire (`agent-tdd-jira:D6.INV-1`, `agent-tdd-jira:D10.INV-7`). | `tracabilite` |
+| **D11.INV-2** | Agent2Dev n'écrit jamais dans Jira : le projet de commentaire est remis au développeur (`agent-tdd-jira:D6.INV-3`). | `tracabilite` |
+| **D11.INV-3** | V5 n'est présentée qu'avec chaque critère dans la matrice, son état de réalisation et son verdict d'acceptation, ou « non joué » avec sa raison (`agent-tdd-jira:D7.INV-3`). | `tracabilite` |
+
+### D12 : Orchestration et points de validation (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D12.INV-1** | aucun point de validation n'est sauté, supprimé ni décidé par le système ; aucune étape ne consomme une sortie qui attend une décision. | `orchestrateur`, `apprenant` |
+| **D12.INV-2** | une instance d'Agent2Dev porte une demande à la fois ; les suivantes attendent en file. | `orchestrateur`, `exploitation` |
+| **D12.INV-3** | un pas qui épuise son budget s'arrête et se présente au développeur ; aucune boucle ne se relance sans budget. | `orchestrateur` |
+| **D12.INV-4** | l'arrêt d'urgence est lu entre deux pas ; la reprise est une décision humaine ; après un redémarrage du processus, la demande reprend au début du pas interrompu. | `depot`, `orchestrateur` |
+| **D12.INV-5** | chaque décision enregistre sa cible, son auteur, son canal, sa date et son commentaire ; une correction ou un ajustement exige un commentaire. | `depot`, `orchestrateur` |
+
+### D13 : Journal et livrable de demande (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D13.INV-1** | le journal est en ajout seul et chaîné par empreintes SHA-256 ; `verifierChaine` nomme la première ligne rompue ou manquante. | `journal` |
+| **D13.INV-2** | chaque ligne porte son échelle et sa phase : une demande se relit comme un arbre 7E, de la demande au pas. | `journal` |
+| **D13.INV-3** | le livrable de demande est une projection du journal, en Markdown et en JSON, depuis la même source. | `tracabilite`, `journal` |
+| **D13.INV-4** | toute production du moteur porte l'adaptateur et le nom du moteur, la fiche et sa version composée, l'empreinte du prompt et la décision qui l'a validée. | `journal` |
+
+### D14 : Observabilité de premier ordre (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D14.INV-1** | l'observateur ne produit que des mesures et des alertes ; il n'agit sur aucun cycle. | `observateur` |
+| **D14.INV-2** | chaque mesure se recalcule depuis le journal, à l'identique. | `observateur` |
+| **D14.INV-3** | une mesure qui franchit un seuil de la configuration humaine lève une alerte, journalisée et affichée. | `observateur` |
+
+### D15 : Apprentissage (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D15.INV-1** | chaque correction ou ajustement commenté à V2, V3, V4 ou V5, et chaque défaut confirmé par Agent2Test après une acceptation V4, produit une leçon candidate, liée à sa fiche, à son moteur et à sa source. | `apprenant` |
+| **D15.INV-2** | une leçon n'a d'effet qu'après ratification en CP-4, depuis le tableau de bord, et seulement pour le moteur sur lequel elle a été apprise. | `apprenant`, `referentiel` |
+| **D15.INV-3** | une leçon qui contredit une règle du skill ou de la constitution est refusée par contrôle nommé avant d'être proposée. | `apprenant` |
+
+### D16 : Réflexivité de second ordre (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D16.INV-1** | une leçon ou une règle dont l'effet mesuré dégrade le taux d'acceptation au-delà de la marge, sur la fenêtre et après l'exposition minimale, est suspendue par le système seul ; il n'adopte jamais seul une règle nouvelle et n'élargit aucune borne. | `reflexif`, `referentiel` |
+| **D16.INV-2** | le taux de défauts confirmés par Agent2Test après une acceptation V4 est mesuré par fiche et par moteur ; sa hausse lève une alerte au référent. | `reflexif` |
+| **D16.INV-3** | les dérives qui contourneraient la méthode (rouge pour une mauvaise raison, tests modifiés au vert, lignes par pas en hausse) sont mesurées, et lèvent une alerte au référent. | `reflexif` |
+
+### D17 : Référentiel, versions et grand livre (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D17.INV-1** | chaque demande s'exécute avec le référentiel épinglé à son E2 ; une règle ratifiée ne s'applique qu'aux demandes suivantes. | `orchestrateur`, `apprenant`, `reflexif`, `referentiel` |
+| **D17.INV-2** | le grand livre est en ajout seul et chaîné ; il inscrit chaque constitution publiée, ratification, refus, suspension et retour arrière. | `referentiel` |
+| **D17.INV-3** | les règles modifiables se limitent à la liste fermée de la constitution, chacune dans ses bornes ; une valeur hors bornes est refusée. | `reflexif`, `referentiel` |
+| **D17.INV-4** | les pouvoirs sont séparés : proposer (`apprenant`, `reflexif`), ratifier (un humain, en CP-4, hors du canal MCP), appliquer (`referentiel`), mesurer (`reflexif`). | `reflexif`, `referentiel`, `autonomie` |
+| **D17.INV-5** | chaque fiche porte une version composée, fiche, skill et leçons ; le prompt de toute sortie du moteur se reconstitue à partir du journal, et son empreinte égale celle du journal. | `methode`, `apprenant`, `referentiel` |
+
+### D18 : Moteurs et serveur MCP (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D18.INV-1** | les interfaces n'écoutent que sur `127.0.0.1` ; le serveur MCP exige un jeton porteur et refuse un en-tête `Origin` non autorisé. | `mcp`, `tableau-de-bord` |
+| **D18.INV-2** | une décision CP-4 reçue par le canal MCP est refusée ; une décision V relayée porte l'auteur humain du jeton et obéit aux droits de ses rôles. | `orchestrateur`, `referentiel`, `mcp` |
+| **D18.INV-3** | aucun contenu du projet ne part vers un moteur externe tant que la configuration humaine ne porte pas l'autorisation de l'envoyer. | `mcp` |
+| **D18.INV-4** | le contexte transmis au moteur se limite au pas, est borné et masqué : aucune valeur de secret, aucun jeton, aucun fichier exclu par le profil. | `mcp`, `memoire` |
+| **D18.INV-5** | changer d'adaptateur ne change que la configuration ; un adaptateur inconnu est refusé au démarrage ; chaque appel est journalisé. | `mcp` |
+| **D18.INV-6** | avec le profil souverain, aucune connexion sortante n'est ouverte, hors celle du moteur local. | `mcp` |
+
+### D19 : Tableau de bord par rôle (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D19.INV-1** | les décisions suivent les rôles : développeur pour V0 à V5, référent pour CP-4. | `tableau-de-bord` |
+| **D19.INV-2** | chaque point présente l'objet à décider avec ses preuves, côte à côte : extraction, fichiers et écarts du script, fiche d'impact et variantes, diff et sorties de commande, matrice et rapport. | `tracabilite`, `tableau-de-bord` |
+| **D19.INV-3** | l'interface s'utilise au clavier et au lecteur d'écran ; aucun rafraîchissement automatique ne démarre sans demande. | `tableau-de-bord` |
+
+### D20 : Exploitation locale (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D20.INV-1** | Agent2Dev n'a aucune dépendance d'exécution : modules natifs de Node seulement, `node:sqlite` compris. | `tableau-de-bord`, `exploitation` |
+| **D20.INV-2** | la configuration humaine et les secrets vivent hors du dépôt d'Agent2Dev et du projet, et ne sont jamais écrits par le système. | `exploitation` |
+| **D20.INV-3** | tout s'exécute en local, sur le poste du développeur. | `exploitation` |
+
+### D21 : Mémoire et recherche sur le code et les demandes passées (reserved)
+
+Dimension réservée : aucun invariant en vigueur dans cette version.
+
+### D22 : Autonomie par point de validation (reserved)
+
+Dimension réservée : aucun invariant en vigueur dans cette version.
+
+### D23 : Relais du binôme par n8n, facultatif (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D23.INV-1** | Agent2Dev ne dépend jamais du relais n8n : désactivé par défaut, le binôme se fait à la main, à l'identique ; activé, c'est le relais qui appelle le serveur MCP, et Agent2Dev n'ouvre aucune connexion vers n8n ni vers Agent2Test. | `mcp`, `exploitation`, `relais` |
+| **D23.INV-2** | un jeton au rôle `relais` n'atteint que `a2d_remise`, `a2d_remise_relayee` et `a2d_journal_de_tests` ; toute décision, rédaction, soumission de demande, suspension ou reprise lui est refusée. | `relais` |
+| **D23.INV-3** | un journal de tests reçu du relais l'est par son contenu, jamais par un chemin ; le `depot` le range dans le dossier de travail de la demande, et `lire-acceptation.mjs` le lit comme un journal déposé à la main. | `relais` |
+| **D23.INV-4** | la configuration fournie pour n8n le fait écouter sur `127.0.0.1` seulement, avec sa base SQLite, sans télémétrie ni appel sortant ; son workflow n'appelle que les outils du rôle `relais` des deux têtes, et ses fichiers ne contiennent aucun jeton. | `relais` |
+
+## agent2test 1.1.0
+
+Agent2Test : système multi-agents qui choisit, prépare, exécute et journalise les tests essentiels d'une application Angular pour une demande, en pilotant Playwright comme une bibliothèque depuis Node, dans un projet séparé de l'application ; plan importé d'agent-tdd-jira, verdict par critère d'acceptation, points de contrôle humains, cybernétique de premier et de second ordre, un fichier SQLite par agent, relais n8n facultatif pour la remise d'Agent2Dev, exécution locale. Point d'entrée : [`specs/agent2test/SKILL.md`](specs/agent2test/SKILL.md).
+
+### D1 : Noyau 7E, bus et constitution (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D1.INV-1** | chaque cycle déroule les sept phases E1 à E7, dans l'ordre, à chacune des quatre échelles (Système, Campagne, Scénario, Étape) ; l'E3 d'une échelle est la suite des cycles complets de l'échelle inférieure, et chaque ligne de journal porte son échelle et sa phase. | `noyau`, `orchestrateur`, `journal`, `observateur`, `agent2dev/noyau` |
 | **D1.INV-2** | les agents ne communiquent que par le bus ; le bus refuse tout appel ou événement absent du contrat déclaré de l'agent, et aucun agent n'importe un autre agent. | `noyau` |
 | **D1.INV-3** | toute sortie du moteur est validée contre un schéma fermé et des contrôles nommés avant d'être consommée ; une sortie non conforme n'est jamais utilisée. | `noyau`, `preparateur` |
 | **D1.INV-4** | au démarrage, une constitution dont l'empreinte SHA-256 diffère de celle inscrite au grand livre empêche le démarrage, avec un message explicite. | `noyau` |
 | **D1.INV-5** | toute demande étrangère aux tests (modifier le code, déployer, administrer) est refusée avec le motif « hors périmètre ». | `noyau`, `plan` |
 | **D1.INV-6** | aucune action d'agent n'écrit la constitution, le code, les schémas du journal ou du grand livre, ni la configuration humaine. | `noyau`, `referentiel`, `exploitation` |
 
-### D2 : Données isolées par agent (active)
+### D2 : Données isolées par agent, sur PostgreSQL (superseded)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
 | **D2.INV-1** | chaque agent propriétaire a son schéma et son rôle PostgreSQL ; une écriture d'un agent dans le schéma d'un autre est refusée par la base elle-même. | `donnees` |
 | **D2.INV-2** | seuls des contrats nommés s'exécutent ; une requête SQL libre est refusée. | `donnees` |
-| **D2.INV-3** | la base de l'application n'est jamais accédée, sauf par l'oracle en lecture seule, activé explicitement dans la configuration humaine et limité à des contrats de lecture nommés. | `donnees`, `exploitation` |
+| **D2.INV-3** | la base de l'application n'est jamais accédée, sauf par l'oracle en lecture seule, activé explicitement dans la configuration humaine et limité à des contrats de lecture nommés. | `donnees` |
 | **D2.INV-4** | les preuves sont purgées au-delà de leur durée de conservation ; le journal garde leurs empreintes. | `donnees` |
 
 ### D3 : Plan canonique et demande (active)
@@ -158,7 +364,7 @@ Agent2Test : système multi-agents qui choisit, prépare, exécute et journalise
 | **D3.INV-2** | chaque US, critère et scénario a un identifiant canonique unique ; deux éléments de même identifiant bloquent l'import, et le message cite leurs deux emplacements. | `plan` |
 | **D3.INV-3** | un scénario dont un prérequis sort du périmètre (redémarrage, écriture directe en base) est marqué « non automatisable » avec son motif ; un prérequis de batch Java devient un préalable confié au développeur (CP-5). | `plan` |
 | **D3.INV-4** | le plan est versionné : réimporter des sources inchangées ne crée aucune version, une source modifiée en crée une nouvelle, et la précédente reste consultable. | `plan` |
-| **D3.INV-5** | seul un scénario validé, qui illustre au moins un critère validé, est jouable ; un scénario proposé non validé, en attente d'une question, limité au back, ou qui exige un rôle que la session n'a pas, est « non jouable », avec son motif. | `plan`, `navigateur`, `agent-tdd-jira/binome-agent2test` |
+| **D3.INV-5** | seul un scénario validé, qui illustre au moins un critère validé, est jouable ; un scénario proposé non validé, en attente d'une question, limité au back, ou qui exige un rôle que la session n'a pas, est « non jouable », avec son motif. | `plan`, `navigateur`, `relais`, `agent-tdd-jira/binome-agent2test`, `agent2dev/binome` |
 | **D3.INV-6** | un critère cité par la demande et absent du plan est signalé avant la sélection. | `plan` |
 
 ### D4 : Navigateur, session et preuves (active)
@@ -221,20 +427,20 @@ Agent2Test : système multi-agents qui choisit, prépare, exécute et journalise
 |---|---|---|
 | **D9.INV-1** | aucun point de contrôle n'est supprimé, sauté ou validé par le système ; aucune phase ne consomme une sortie non ratifiée, et le niveau d'autonomie de chaque point se lit dans la configuration humaine. | `orchestrateur` |
 | **D9.INV-2** | chaque décision enregistre son auteur, son canal, sa date et son commentaire. | `orchestrateur` |
-| **D9.INV-3** | avant le premier scénario, une sonde vérifie que l'application répond ; sinon, la campagne est refusée avec ce motif. | `orchestrateur` |
+| **D9.INV-3** | avant le premier scénario, une sonde vérifie que l'application répond ; sinon, la campagne est refusée avec ce motif. | `orchestrateur`, `relais` |
 | **D9.INV-4** | une seule campagne s'exécute à la fois sur une application cible ; les autres attendent en file. | `orchestrateur` |
 | **D9.INV-5** | l'arrêt d'urgence suspend la campagne au plus tard à la fin de l'étape en cours. | `orchestrateur` |
 | **D9.INV-6** | après un redémarrage du processus, la campagne reprend au début du scénario interrompu, sans perte de journal. | `orchestrateur` |
-| **D9.INV-7** | Agent2Test ne démarre, n'arrête ni ne déploie l'application, et ne lance aucun batch ; un scénario à préalable de batch attend en CP-5 que le développeur l'ait lancé et l'ait déclaré terminé. | `plan`, `orchestrateur`, `exploitation`, `agent-tdd-jira/binome-agent2test` |
+| **D9.INV-7** | Agent2Test ne démarre, n'arrête ni ne déploie l'application, et ne lance aucun batch ; un scénario à préalable de batch attend en CP-5 que le développeur l'ait lancé et l'ait déclaré terminé. | `plan`, `orchestrateur`, `exploitation`, `relais`, `agent-tdd-jira/binome-agent2test` |
 
 ### D10 : Journal et journal de tests (active)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D10.INV-1** | le journal est en ajout seul, imposé par les droits de la base, et chaîné par empreintes ; `verifierChaine` détecte une altération faite en base par un compte privilégié et nomme la première ligne rompue. | `journal` |
+| **D10.INV-1** | le journal est en ajout seul, imposé par des déclencheurs de la base qui refusent toute modification et toute suppression, et chaîné par empreintes ; au démarrage, un déclencheur absent ou une chaîne rompue empêche le démarrage, et `verifierChaine` nomme la première ligne rompue, même quand l'altération vient d'un outil SQLite, hors du système. | `donnees`, `journal` |
 | **D10.INV-2** | le journal de tests d'une campagne est produit en Markdown, JSON, JUnit XML et HTML à partir de la même source, et sa matrice critères × verdicts couvre tous les critères de la demande, trous de couverture compris. | `journal` |
 | **D10.INV-3** | tout contenu produit par le moteur est marqué comme tel dans le journal de tests, avec moteur, fiche et version. | `stratege`, `journal` |
-| **D10.INV-4** | l'empreinte de fin de chaîne du journal de tests est celle du journal à la clôture de la campagne. | `journal` |
+| **D10.INV-4** | l'empreinte de fin de chaîne du journal de tests est celle du journal à la clôture de la campagne. | `journal`, `relais` |
 
 ### D11 : Observabilité de premier ordre (active)
 
@@ -276,7 +482,7 @@ Agent2Test : système multi-agents qui choisit, prépare, exécute et journalise
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
 | **D15.INV-1** | chaque campagne s'exécute avec le référentiel épinglé à son E2 ; une règle ratifiée ne s'applique qu'à partir de la campagne suivante. | `orchestrateur`, `referentiel` |
-| **D15.INV-2** | le grand livre est en ajout seul et chaîné par empreintes ; il inscrit chaque version publiée de la constitution, chaque ratification, refus, suspension et retour arrière. | `referentiel` |
+| **D15.INV-2** | le grand livre est en ajout seul et chaîné par empreintes ; il inscrit chaque version publiée de la constitution, chaque ratification, refus, suspension et retour arrière. | `donnees`, `referentiel` |
 | **D15.INV-3** | chaque fiche porte une version composée ; pour toute sortie du moteur, le prompt se reconstitue à partir de la fiche, de sa version et des fragments journalisés, et son empreinte égale celle du journal. | `memoire`, `apprenant`, `referentiel` |
 | **D15.INV-4** | les pouvoirs sont séparés : proposer (`apprenant`, `reflexif`), ratifier (un humain, en CP-4, hors du canal MCP), appliquer (`referentiel`), mesurer (`reflexif`). | `referentiel` |
 | **D15.INV-5** | les règles modifiables se limitent à la liste fermée de la constitution, chacune dans ses bornes ; une valeur hors bornes est refusée. | `reflexif`, `referentiel` |
@@ -305,9 +511,9 @@ Agent2Test : système multi-agents qui choisit, prépare, exécute et journalise
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D18.INV-1** | sous une version de Node antérieure à 22, le kit refuse de démarrer avec un message explicite. | `exploitation` |
-| **D18.INV-2** | le kit n'a que deux dépendances d'exécution, `playwright` et `pg`, épinglées par un fichier de verrouillage et installées par `npm ci` ; toutes ses dépendances et images sont sous licence open source. | `exploitation`, `accessibilite` |
-| **D18.INV-3** | le PostgreSQL d'Agent2Test écoute sur le port 5433 et n'est jamais celui de l'application. | `exploitation` |
+| **D18.INV-1** | sous une version de Node antérieure à 22.13, le kit refuse de démarrer avec un message explicite. | `donnees`, `exploitation` |
+| **D18.INV-2** | le kit n'a que deux dépendances d'exécution, `playwright` et `pg`, épinglées par un fichier de verrouillage et installées par `npm ci` ; toutes ses dépendances et images sont sous licence open source. | `exploitation`, `relais`, `accessibilite` |
+| **D18.INV-3** | les données d'Agent2Test sont des fichiers SQLite, hors de son dépôt et du projet de l'application, sans serveur ni port ; la seule base de l'application qu'il joint est celle de l'oracle, en lecture seule (D21.INV-3). | `donnees`, `exploitation` |
 | **D18.INV-4** | seul le profil d'environnement `local` est accepté ; un profil `recette` ou `conteneur` est refusé tant que la dimension D20 est réservée. | `preparateur`, `exploitation` |
 
 ### D19 : Accessibilité des parcours (axe) (reserved)
@@ -317,6 +523,25 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 ### D20 : Profil recette et conteneur (reserved)
 
 Dimension réservée : aucun invariant en vigueur dans cette version.
+
+### D21 : Données par agent, en SQLite (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D21.INV-1** | chaque agent propriétaire a son propre fichier SQLite, sur une connexion qui n'est qu'à lui ; un contrat ne s'exécute que sur la connexion de son propriétaire, et aucun contrat n'attache un autre fichier ni ne charge d'extension : un agent n'a aucun moyen d'écrire dans les données d'un autre. | `donnees`, `memoire` |
+| **D21.INV-2** | seuls des contrats nommés s'exécutent ; une requête SQL libre est refusée. | `donnees` |
+| **D21.INV-3** | la base de l'application n'est jamais accédée, sauf par l'oracle en lecture seule, activé explicitement dans la configuration humaine et limité à des contrats de lecture nommés. | `donnees`, `exploitation` |
+| **D21.INV-4** | les preuves sont purgées au-delà de leur durée de conservation ; le journal garde leurs empreintes. | `donnees` |
+| **D21.INV-5** | chaque écriture est une transaction : un arrêt du processus, même brutal, ne laisse aucun enregistrement partiel ; un fichier qui échoue au contrôle d'intégrité de SQLite empêche le démarrage, avec son nom. | `donnees` |
+
+### D22 : Relais du binôme par n8n, facultatif (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D22.INV-1** | Agent2Test ne dépend jamais du relais n8n : désactivé par défaut, une campagne s'ouvre et se mène à la main, à l'identique ; activé, c'est le relais qui appelle le serveur MCP, et Agent2Test n'ouvre aucune connexion vers n8n ni vers Agent2Dev. | `relais` |
+| **D22.INV-2** | un jeton au rôle `relais` n'atteint que `a2t_deposer_remise`, `a2t_etat` et `a2t_rapport`, qui ne lui montrent que les remises et les campagnes qui en sont issues ; toute décision, toute ouverture de campagne, l'arrêt d'urgence et la reprise lui sont refusés. | `mcp`, `relais` |
+| **D22.INV-3** | une remise déposée n'ouvre aucune campagne : un testeur ou le développeur l'ouvre, depuis le tableau de bord ou par MCP ; à l'ouverture, un commit, un fichier suivi modifié ou une empreinte de source qui diffère de la remise la rend périmée, et aucune campagne ne s'ouvre. | `plan`, `orchestrateur`, `relais` |
+| **D22.INV-4** | une remise n'est reçue que conforme au schéma fermé `agent2test.remise/1`, sans contenu de fichier ni secret, et pour une racine admise : celle du profil d'environnement, ou une racine de `remises.racines` dans la configuration humaine. | `relais` |
 
 ## agents-paralleles-gitlab 1.0.1
 
@@ -336,8 +561,8 @@ Plusieurs agents en parallèle sur un dépôt GitLab, une demande Jira par workt
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
 | **D2.INV-1** | aucun commit sur `main`, `master`, `develop`, `release/*`, en HEAD détachée, ni sur une branche dont la clé n'est pas celle du worktree. | `hooks`, `recette` |
-| **D2.INV-2** | tout commit, hors commit de fusion, commence par `<CLÉ> Snn : ` ou `<CLÉ> : `, de sorte que `git log --grep='^<CLÉ> '` retrouve tous les commits de la demande. | `hooks`, `recette` |
-| **D2.INV-3** | aucun fichier interdit n'est commité, même forcé dans l'index : `.env`, clés et certificats, `*.mht`, `*.mhtml`, `.skills/`, `travail/`. | `hooks`, `recette` |
+| **D2.INV-2** | tout commit, hors commit de fusion, commence par `<CLÉ> Snn : ` ou `<CLÉ> : `, de sorte que `git log --grep='^<CLÉ> '` retrouve tous les commits de la demande. | `hooks`, `recette`, `agent2dev/depot` |
+| **D2.INV-3** | aucun fichier interdit n'est commité, même forcé dans l'index : `.env`, clés et certificats, `*.mht`, `*.mhtml`, `.skills/`, `travail/`. | `hooks`, `recette`, `agent2dev/depot` |
 | **D2.INV-4** | un worktree ne pousse que vers la branche de sa demande ou une branche `fix/tension-*`, et ne supprime aucune branche distante. | `hooks`, `recette` |
 | **D2.INV-5** | aucun push ne réécrit une branche distante, avec ou sans `--force` ou `--force-with-lease`. | `hooks`, `recette`, `agent-tdd-jira/parallele` |
 
@@ -450,7 +675,7 @@ Expert Angular 20 : produire et relire du code conforme à des invariants vérif
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D3.INV-1** | les endpoints du contrat ne sont appelés qu'au travers du client généré (application de SC1.INV-3). | `donnees-http`, `tests`, `revue`, `bff-node`, `agent-tdd-jira/variantes`, `agent-tdd-jira/cycle-tdd`, `analyse-projet/evaluation` |
+| **D3.INV-1** | les endpoints du contrat ne sont appelés qu'au travers du client généré (application de SC1.INV-3). | `donnees-http`, `tests`, `revue`, `bff-node`, `agent-tdd-jira/variantes`, `agent-tdd-jira/cycle-tdd`, `agent2dev/conception`, `analyse-projet/evaluation` |
 | **D3.INV-2** | les erreurs HTTP sont converties en un seul point en `ApiProblem` ; les décisions se fondent sur `status` et `code`, jamais sur `title` ou `detail` (application de SC2.INV-2). | `donnees-http`, `tests`, `agent-tdd-jira/variantes`, `analyse-projet/evaluation` |
 | **D3.INV-3** | aucun composant de la couche `ui` ne déclenche de requête HTTP. | `donnees-http`, `tests`, `analyse-projet/evaluation` |
 | **D3.INV-4** | aucun calcul monétaire en virgule flottante côté front (application de SC3.INV-2). | `donnees-http`, `tests`, `revue`, `analyse-projet/evaluation` |
@@ -532,7 +757,7 @@ Expert Java 21, Spring Boot 3.5 et PostgreSQL : produire et relire du code confo
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D3.INV-1** | l'API implémentée correspond exactement au contrat OpenAPI (application de SC1.INV-1). | `api-rest`, `tests`, `revue`, `agent-tdd-jira/variantes`, `analyse-projet/evaluation` |
+| **D3.INV-1** | l'API implémentée correspond exactement au contrat OpenAPI (application de SC1.INV-1). | `api-rest`, `tests`, `revue`, `agent-tdd-jira/variantes`, `agent2dev/conception`, `analyse-projet/evaluation` |
 | **D3.INV-2** | toute entrée est validée par Bean Validation avant d'atteindre la couche `application`. | `api-rest`, `tests`, `agent-tdd-jira/variantes`, `analyse-projet/evaluation` |
 | **D3.INV-3** | un seul `@RestControllerAdvice` produit les Problem Details, avec `code` et `traceId` (application de SC2.INV-1). | `api-rest`, `tests`, `agent-tdd-jira/cycle-tdd`, `analyse-projet/evaluation` |
 | **D3.INV-4** | toute collection est paginée, avec une taille maximale imposée (application de SC3.INV-3). | `api-rest`, `tests`, `revue`, `agent-tdd-jira/variantes`, `analyse-projet/evaluation` |
@@ -587,7 +812,7 @@ Socle commun back-front : contrat OpenAPI, erreurs RFC 9457, formats de données
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
 | **SC1.INV-1** | tout endpoint exposé par le back figure dans le contrat, et tout endpoint du contrat est implémenté. Contrôle : test de conformité du contrat côté back. | `java`, `java/api-rest` |
-| **SC1.INV-2** | aucun changement cassant n'est introduit dans une version d'API publiée. Contrôle : comparaison du contrat avec sa version précédente (outil de diff OpenAPI en CI, ou revue). | `agent-tdd-jira`, `analyse-projet`, `analyse-projet/plans-action`, `java/api-rest` |
+| **SC1.INV-2** | aucun changement cassant n'est introduit dans une version d'API publiée. Contrôle : comparaison du contrat avec sa version précédente (outil de diff OpenAPI en CI, ou revue). | `agent-tdd-jira`, `agent2dev/conception`, `analyse-projet`, `analyse-projet/plans-action`, `java/api-rest` |
 | **SC1.INV-3** | le front n'appelle les endpoints du contrat qu'au travers du client généré. Contrôle : recherche d'URL `/api/` codées en dur dans le front, hors client généré. | `angular`, `angular/architecture`, `angular/donnees-http`, `angular/revue` |
 
 ### SC2 : Erreurs RFC 9457 (active)

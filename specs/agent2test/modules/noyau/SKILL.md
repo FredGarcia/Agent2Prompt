@@ -60,7 +60,7 @@ bus.tracer(fn)                                             // reçoit chaque app
 bus.abonner(fn)                                            // reçoit chaque événement
 ```
 
-Contexte propagé : `{ correlation, campagne, echelle, phase, parent, appelant }`. `parent` construit l'arbre des traces ; `appelant` permet à `donnees` de choisir le rôle PostgreSQL.
+Contexte propagé : `{ correlation, campagne, echelle, phase, parent, appelant }`. `parent` construit l'arbre des traces ; `appelant` permet à `donnees` de choisir la connexion, et donc le fichier, de l'agent propriétaire.
 
 Chaque agent déclare son contrat au démarrage :
 

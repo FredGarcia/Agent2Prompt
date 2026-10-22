@@ -7,7 +7,7 @@ status: reserved
 
 # Module `profil-recette` (D20, réservé)
 
-Statut : `reserved`. En 1.0.0, tout s'exécute en local, contre l'application lancée sur le poste du développeur ; seul l'environnement de développement est déployable par l'équipe, et il l'est à la main.
+Statut : `reserved`. En 1.x, tout s'exécute en local, contre l'application lancée sur le poste du développeur ; seul l'environnement de développement est déployable par l'équipe, et il l'est à la main.
 
 ## 1. Pourquoi cette dimension existe
 

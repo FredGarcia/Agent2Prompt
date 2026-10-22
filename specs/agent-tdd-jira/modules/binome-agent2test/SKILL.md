@@ -1,13 +1,13 @@
 ---
 name: binome-agent2test
-description: Binôme avec Agent2Test, en local, enchaîné à la main par le développeur (rôles des deux têtes, étiquettes du binôme dans le fichier Gherkin, remise du plan validé tel quel et commité, campagne conduite par le développeur, lecture du journal de tests par le script lire-acceptation.mjs, verdict d'acceptation par critère sur le plan et le code courants, défaut applicatif confirmé corrigé en cycle TDD, causes qui ne sont pas des défauts, régression d'une autre demande, désaccord remonté au développeur, mode parallèle). À lire avant V2 pour les étiquettes, puis après le dernier scénario accepté (V4).
+description: Binôme avec Agent2Test, en local, enchaîné à la main par le développeur ou par un relais qui ne décide rien (rôles des deux têtes, étiquettes du binôme dans le fichier Gherkin, remise du plan validé tel quel et commité, campagne conduite par le développeur, lecture du journal de tests par le script lire-acceptation.mjs, verdict d'acceptation par critère sur le plan et le code courants, défaut applicatif confirmé corrigé en cycle TDD, causes qui ne sont pas des défauts, régression d'une autre demande, désaccord remonté au développeur, mode parallèle). À lire avant V2 pour les étiquettes, puis après le dernier scénario accepté (V4).
 dimensions: [D7]
 status: active
 ---
 
 # Module `binome-agent2test` (D7)
 
-Agent2Test (spécification `agent2test` 1.0.0) est la tête de test du binôme. Dans un projet séparé de l'application, il choisit les scénarios essentiels de la demande, les joue avec Playwright sur l'application lancée, et rend un verdict prouvé par critère d'acceptation. La tête de développement est cet agent, ou Agent2Dev quand il applique ce skill. Le développeur fait le lien : il lance l'application, conduit Agent2Test et transmet son journal. Tout se fait en local et à la main : aucune des deux têtes n'appelle l'autre.
+Agent2Test (spécification `agent2test` 1.1.0) est la tête de test du binôme. Dans un projet séparé de l'application, il choisit les scénarios essentiels de la demande, les joue avec Playwright sur l'application lancée, et rend un verdict prouvé par critère d'acceptation. La tête de développement est cet agent, ou Agent2Dev quand il applique ce skill. Le développeur fait le lien : il lance l'application, conduit Agent2Test et transmet son journal. Tout se fait en local et à la main : aucune des deux têtes n'appelle l'autre.
 
 ## 1. Rôles
 
@@ -41,6 +41,8 @@ sequenceDiagram
 3. Le développeur conduit la campagne (section 5).
 4. L'agent lit le journal (section 6), corrige chaque défaut confirmé (section 7), puis remet de nouveau le plan, jusqu'à ce qu'aucun défaut confirmé ne reste.
 5. La matrice et le rapport final portent le verdict d'acceptation de chaque critère (module `tracabilite`), puis V5.
+
+Un relais peut porter la remise à Agent2Test et le journal de tests à l'agent, à la place du développeur, quand la tête de développement le prévoit : Agent2Dev le fait avec n8n, facultatif (spécification `agent2dev`, module `relais`). Le relais ne décide rien : le développeur redémarre toujours l'application et ouvre la campagne lui-même.
 
 Sans binôme, il n'y a pas d'étape d'acceptation : chaque critère porte « non joué (pas de campagne Agent2Test) » dans la matrice et le rapport (D7.INV-3).
 
@@ -327,7 +329,7 @@ Code de sortie : 0 quand les verdicts valent pour le plan et le code courants ; 
 ## 9. Mode parallèle
 
 - Une campagne porte sur une seule demande : le développeur redémarre l'application depuis le worktree de cette demande, et donne ce worktree à Agent2Test comme racine du projet.
-- Le développeur dépose le journal dans `travail/<CLÉ>/acceptation/` ; l'agent ne lit rien hors de son worktree. Le script va dans `travail/outils/lire-acceptation.mjs`.
+- Le développeur dépose le journal dans `travail/<CLÉ>/acceptation/`, où la tête de développement range aussi un journal que lui transmet un relais ; l'agent ne lit rien hors de son worktree. Le script va dans `travail/outils/lire-acceptation.mjs`.
 - Le binôme ne change rien aux règles du mode parallèle : l'agent ne pousse pas (D9.INV-2), et chaque commit porte la clé de la demande (D9.INV-3).
 
 ## 10. Pièges connus

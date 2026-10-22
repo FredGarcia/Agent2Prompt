@@ -45,7 +45,7 @@ Si l'un de ces points ne correspond pas, il le signale avant de commencer.
 | script d'extraction | `travail/outils/extraire-jira.mjs` |
 | script de contrôle des critères | `travail/outils/controler-criteres.mjs` (module `us-criteres`, section 7) |
 | script de lecture du journal de tests, en binôme | `travail/outils/lire-acceptation.mjs` (module `binome-agent2test`, section 6) |
-| journal de tests d'Agent2Test, déposé par le développeur | `travail/<CLÉ>/acceptation/<campagne>.json`, en lecture seule |
+| journal de tests d'Agent2Test, déposé par le développeur, ou rangé là depuis un relais | `travail/<CLÉ>/acceptation/<campagne>.json`, en lecture seule |
 | extraction | `travail/<CLÉ>/demande.json`, `travail/<CLÉ>/images/` |
 | chemins impactés | `travail/<CLÉ>/impact.txt` (section 5) |
 | rapport final | `travail/<CLÉ>/rapport.md` (section 8) |

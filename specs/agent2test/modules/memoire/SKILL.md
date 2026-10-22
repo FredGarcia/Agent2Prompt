@@ -1,6 +1,6 @@
 ---
 name: memoire
-description: Mémoire sémantique d'Agent2Test (documents et fragments tirés du plan, de la carte et des campagnes passées, plein texte PostgreSQL en configuration french, vecteurs pgvector en option avec un modèle de plongement local, fusion par rang réciproque, filtrage par épinglage, masquage et troncature avant injection, identifiants journalisés). À implémenter au lot 3.
+description: Mémoire sémantique d'Agent2Test (documents et fragments tirés du plan, de la carte et des campagnes passées, plein texte SQLite FTS5 sans diacritiques, termes en préfixe classés par bm25, vecteurs en option avec un modèle de plongement local, rangés avec les fragments et comparés en JavaScript, fusion par rang réciproque, filtrage par épinglage, masquage et troncature avant injection, identifiants journalisés). À implémenter au lot 3.
 dimensions: [D12]
 status: active
 ---
@@ -22,13 +22,13 @@ status: active
 
 | Action | Rôle |
 |---|---|
-| `indexer(documents)` | découpe en fragments d'au plus 800 caractères, calcule le `tsvector` (`french`) et, si un modèle est configuré, le vecteur ; chaque fragment porte la version de son document |
+| `indexer(documents)` | découpe en fragments d'au plus 800 caractères, les verse dans l'index plein texte et, si un modèle est configuré, calcule leur vecteur ; chaque fragment porte la version de son document |
 | `rechercher(requete, filtres, k)` | rend au plus `k` fragments, filtrés, masqués, avec leur identifiant |
 
 ## 3. Recherche hybride (D12.INV-1)
 
-- Plein texte : `websearch_to_tsquery('french', requete)` classé par `ts_rank_cd`.
-- Vecteurs, en option : quand la configuration désigne un modèle de plongement local (adaptateur `compatible-openai`, point d'accès `embeddings`), similarité cosinus pgvector.
+- Plein texte : table virtuelle FTS5 de `memoire.sqlite`, `tokenize = 'unicode61 remove_diacritics 2'`, classée par `bm25`. La requête se construit sans rien interpréter : chaque mot, sans diacritiques et hors des mots vides du français (`src/agents/memoire/mots-vides.js`), devient un terme entre guillemets ; au-delà de 5 lettres, il perd ses deux dernières lettres ; à partir de 4 lettres, il est cherché en préfixe (`exporter` donne `"export"*`, qui trouve « export », « exporté », « exports ») ; les termes sont joints par `OR`. Aucun caractère de la requête n'est lu comme un opérateur FTS5.
+- Vecteurs, en option : quand la configuration désigne un modèle de plongement local (adaptateur `compatible-openai`, point d'accès `embeddings`), chaque fragment garde son vecteur, en `BLOB` de nombres flottants sur 32 bits, avec le nom du modèle et la dimension ; la similarité cosinus se calcule en JavaScript, sur les fragments que l'épinglage retient. Aucune extension de SQLite n'est chargée (D21.INV-1).
 - Fusion par rang réciproque : score = Σ 1 / (60 + rang) sur les deux classements.
 - Sans modèle, le plein texte seul fait fonctionner le système ; aucun appel externe n'est fait pour les vecteurs.
 - `k` et le seuil de similarité sont des règles modifiables (module `referentiel`, section 4).
@@ -44,7 +44,9 @@ status: active
 
 - **Fragment d'une version postérieure** : interdit dans une campagne en cours ; le filtre d'épinglage n'est jamais facultatif pour une consigne.
 - **Nom propre laissé dans une provenance** : « commentaire 50001, Jeanne Dupont » devient « commentaire 50001, [masqué] ».
-- **Base vectorielle à part** : non ; tout tient dans PostgreSQL.
+- **Base vectorielle à part** : non ; tout tient dans `memoire.sqlite`, sans extension.
+- **Racine exacte attendue** : FTS5 n'a pas de racinisation française ; la réduction des mots et la recherche en préfixe en tiennent lieu, et la fusion avec les vecteurs, quand un modèle est configuré, rattrape le reste.
+- **Requête prise pour une expression FTS5** : un `NEAR`, un `:` ou un `*` venus du texte changeraient le sens de la recherche, ou la feraient échouer ; chaque terme est mis entre guillemets.
 
 ## 6. Tests (scénarios)
 
@@ -56,9 +58,12 @@ status: active
 | ME4 | D12.INV-2 | les identifiants des fragments injectés figurent dans la ligne de journal de l'appel au moteur |
 | ME5 | D12.INV-3 | une adresse électronique, un jeton et un nom déclaré sont masqués ; un fragment de 2 000 caractères porte `[tronqué]` |
 | ME6 | D12.INV-2 | une recherche destinée à une consigne sans filtre d'épinglage est refusée |
+| ME7 | D12.INV-1 | « exporter les retours » trouve le fragment « Le fichier exporté contient les retours d'expérience », malgré l'accent et la flexion |
+| ME8 | D12.INV-1 | une requête qui contient `NEAR(`, des guillemets, `texte:` et `*` rend des fragments classés, sans erreur, chaque mot étant cherché comme du texte |
 
 ## 7. Fichiers à produire
 
 - `src/agents/memoire/agent.js`, `src/agents/memoire/fragments.js`, `src/agents/memoire/recherche.js`, `src/agents/memoire/masque.js`
-- `migrations/` : schéma `memoire` (documents, fragments, `tsvector`, colonne `vector` facultative)
+- `src/agents/memoire/mots-vides.js`
+- `migrations/memoire/001-initial.sql` : documents, fragments, table FTS5, colonne `vecteur` facultative
 - `test/memoire/*.test.js`
