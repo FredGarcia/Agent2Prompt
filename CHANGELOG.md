@@ -12,7 +12,7 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 - Décisions du développeur (23 octobre 2026) :
   - une spécification transmissible dans un dossier `skill4appli` de ce dépôt, au format des autres, l'agent qui accompagne le skill en étant une dimension ;
   - un watcher sur la branche courante, chargée dans un dossier dédié par git worktree ; lecture ratifiée : worktree en HEAD détachée, puisque git refuse d'extraire deux fois la même branche, suivi par scrutation, réindexation limitée aux fichiers changés entre deux commits, modifications non commitées hors du miroir, signalées par `status` et réservées à une version suivante.
-- Soumis à ratification :
+- Décisions ratifiées (pull request n° 8) :
   - base et miroir dans le dossier commun git, `<commun>/skill4appli/<id>/`, un couple par worktree source : rien dans l'arbre suivi, rien à exclure ;
   - commandes, options, tables et colonnes en anglais, comme la version d'origine, messages en français ; `last_commit` gardé au format « sha court - sujet », colonnes structurées ajoutées ;
   - fichiers de verrouillage, minifiés et cartes de source inventoriés sans contenu ; limite de contenu à 1 Mo, réglable ;
@@ -37,7 +37,7 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
   - à la ratification de la conception, n8n facultatif, en relais de transport seulement, sur sa base SQLite : sans lui, le développeur porte les fichiers à la main ;
   - l'option B de l'étape 1 retirée : l'`executant` ne fait que compiler, tester et lancer les scripts du skill ; l'application, sa base et ses batchs restent au développeur ;
   - l'écriture du code en option : par défaut, Agent2Dev écrit et teste dans une copie de travail, dans ses propres données, et remet un patch par scénario accepté, que le développeur applique par `git am` ; avec l'autorisation de la configuration humaine, sa référence et son auteur, il écrit dans l'arbre de la demande ; avant la remise à Agent2Test, il vérifie que l'arbre du développeur contient chaque patch remis.
-- Soumis à ratification :
+- Décisions ratifiées (pull request n° 7) :
   - D2 d'agent2test remplacée par D21 plutôt que réécrite, et D10.INV-1, D18.INV-1 et D18.INV-3 remplacés par des invariants plus forts ;
   - au démarrage d'Agent2Test, un déclencheur absent ou une chaîne rompue empêche le démarrage ; un journal rompu se met de côté par commande humaine, un grand livre rompu se restaure depuis une sauvegarde ;
   - recherche plein texte sans racinisation française : mots réduits de deux lettres au-delà de cinq, cherchés en préfixe, classés par bm25 ;
