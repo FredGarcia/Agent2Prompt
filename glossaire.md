@@ -27,6 +27,7 @@ La colonne « Repris dans » cite les modules de la spécification qui reprennen
 | [`analyse-projet`](#analyse-projet-102) | 1.0.2 | 5 | 1 | 16 |
 | [`angular`](#angular-101) | 1.0.1 | 8 | 2 | 30 |
 | [`java`](#java-111) | 1.1.1 | 7 | 1 | 29 |
+| [`skill4appli`](#skill4appli-100) | 1.0.0 | 7 | 2 | 26 |
 | [`socle-back-front`](#socle-back-front-101) | 1.0.1 | 6 | 1 | 15 |
 | [`sonarqube`](#sonarqube-102) | 1.0.2 | 6 | 2 | 22 |
 | [`tension-dashboard-gitlab-agent`](#tension-dashboard-gitlab-agent-220) | 2.2.0 | 7 | 3 | 17 |
@@ -551,7 +552,7 @@ Plusieurs agents en parallèle sur un dépôt GitLab, une demande Jira par workt
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D1.INV-1** | une demande a un worktree nommé par sa clé Jira, sur une branche `<type>/<CLÉ>-<slug>` conforme aux conventions ; une même branche n'est jamais extraite dans deux worktrees. | `isolation`, `orchestration`, `recette` |
+| **D1.INV-1** | une demande a un worktree nommé par sa clé Jira, sur une branche `<type>/<CLÉ>-<slug>` conforme aux conventions ; une même branche n'est jamais extraite dans deux worktrees. | `isolation`, `orchestration`, `recette`, `skill4appli/watcher` |
 | **D1.INV-2** | la branche d'une demande est créée sans branche amont ; son premier push crée la branche distante du même nom. | `isolation`, `recette` |
 | **D1.INV-3** | le point de retour `agent/<CLÉ>/start` est posé et le worktree verrouillé avant que l'agent commence. | `isolation`, `orchestration`, `recette` |
 | **D1.INV-4** | `travail/`, `.skills/`, `*.mht` et `*.mhtml` sont exclus de tous les worktrees par l'exclusion commune (`.bare/info/exclude`), sans modifier le `.gitignore` du projet. | `isolation`, `distribution`, `recette` |
@@ -800,6 +801,79 @@ Expert Java 21, Spring Boot 3.5 et PostgreSQL : produire et relire du code confo
 | **D7.INV-3** | les constats sont classés par gravité décroissante, et un constat sans preuve est présenté comme une question, pas comme un défaut. | `revue` |
 
 ### D8 : Migration vers Spring Boot 4.x et Java 25 (reserved)
+
+Dimension réservée : aucun invariant en vigueur dans cette version.
+
+## skill4appli 1.0.0
+
+Mémoire SQLite d'une application locale et de ses branches git pour un agent : inventaire fidèle à git, recherche chemin:ligne, requêtes en lecture seule, fraîcheur mesurée, watcher de la branche courante chargée dans un worktree dédié, agent mémoire. Point d'entrée : [`specs/skill4appli/SKILL.md`](specs/skill4appli/SKILL.md).
+
+### D1 : Exécution : commandes, emplacement de la base, sorties et codes, migrations (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D1.INV-1** | aucune commande externe ne passe par un shell : git est lancé avec une liste d'arguments, et aucune donnée lue (nom de branche, chemin, message de commit) n'est jamais interprétée comme une commande. | `execution`, `branches`, `recette` |
+| **D1.INV-2** | l'emplacement de la base se déduit du worktree source, jamais du dossier courant ; dans un dépôt git, elle vit dans le dossier commun git (`<commun>/skill4appli/<id>/memoire.db`), hors de tout arbre suivi ; aucune commande de lecture ne crée de base. | `execution`, `interrogation`, `recette` |
+| **D1.INV-3** | une réussite sort avec le code 0 et un JSON sur la sortie standard ; un échec sort avec un code non nul documenté (1 à 5, 7) et un JSON `{"ok": false, ...}` sur la sortie d'erreur ; `status` sort avec le code 6, réponse sur la sortie standard, quand la base n'est pas à jour. | `execution`, `recette` |
+| **D1.INV-4** | le schéma n'évolue que par migrations numérotées (`PRAGMA user_version`) ; une base créée par une version plus récente est refusée ; une base de la version d'origine, sans numéro de schéma, est reconstruite. | `execution`, `recette` |
+| **D1.INV-5** | le script et sa recette n'utilisent que les modules natifs de Node 22.13 ou plus récent ; aucune installation de paquet n'est nécessaire. | `execution`, `recette` |
+
+### D2 : Inventaire et ingestion (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D2.INV-1** | dans un dépôt git, l'inventaire est celui de git (fichiers suivis, et non suivis non ignorés) : un fichier ignoré par `.gitignore` ou par l'exclusion du dépôt n'est jamais indexé. | `ingestion`, `recette` |
+| **D2.INV-2** | après une ingestion, la base contient exactement les fichiers de l'inventaire : un fichier disparu du disque disparaît de la base, index plein texte compris. | `ingestion`, `recette` |
+| **D2.INV-3** | un fichier binaire, de verrouillage, minifié, une carte de source ou un fichier plus gros que la limite est inventorié sans contenu, avec son type ; aucun contenu n'est altéré : un texte qui n'est pas en UTF-8 est lu en latin1 et marqué comme tel. | `ingestion`, `recette` |
+| **D2.INV-4** | une ingestion ne relit que les fichiers dont la taille ou la date a changé, et ne réécrit que ceux dont le contenu a changé. | `ingestion`, `recette` |
+
+### D3 : Branches git et fichiers par branche (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D3.INV-1** | `git_branches` donne toutes les branches locales et distantes, hors références symboliques, chacune sous son nom exact, avec la branche courante du worktree source, l'amont, l'avance et le retard, et le worktree où elle est extraite. | `branches`, `recette` |
+| **D3.INV-2** | `branch_files` donne, pour chaque branche locale, les fichiers modifiés depuis l'ancêtre commun avec la base, avec leur statut et leurs lignes ajoutées et retirées. | `branches`, `recette` |
+
+### D4 : Interrogation en lecture seule (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D4.INV-1** | `query`, `search`, `schema` et `status` ouvrent la base en lecture seule : aucune requête, même d'écriture, ne la modifie. | `interrogation`, `recette` |
+| **D4.INV-2** | une réponse est bornée (nombre de lignes ou de fichiers, longueur des valeurs) et chaque troncature est signalée dans la réponse. | `interrogation`, `recette` |
+| **D4.INV-3** | chaque réponse de `query` et de `search` porte l'instantané indexé : mode, commit, branche et date d'indexation. | `interrogation`, `fraicheur`, `recette` |
+| **D4.INV-4** | `search` rend des emplacements `chemin:ligne` avec leur extrait, sans que la casse ni les accents fassent manquer une occurrence, les fichiers classés par pertinence. | `interrogation`, `recette` |
+
+### D5 : Fraîcheur de la base (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D5.INV-1** | chaque indexation enregistre son mode, sa racine, le commit et la branche indexés et sa date. | `fraicheur`, `recette` |
+| **D5.INV-2** | `status` compare la base au worktree source sans rien écrire ; il ne rend `a_jour`, avec le code 0, que si la base reflète exactement ce worktree ; sinon il nomme l'écart (commits en retard, fichiers modifiés, nouveaux ou disparus, modifications locales) et sort avec le code 6. | `fraicheur`, `recette` |
+
+### D6 : Watcher de la branche courante dans un worktree dédié (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D6.INV-1** | le watcher charge la branche courante du worktree source dans un worktree dédié, créé détaché et verrouillé dans le dossier commun git ; il ne modifie jamais le worktree source, son index ni ses branches. | `watcher`, `recette` |
+| **D6.INV-2** | à chaque nouveau commit ou changement de branche courante, le miroir est amené sur le commit de la source, seuls les fichiers changés entre l'ancien et le nouveau commit sont relus, et la base désigne alors ce commit et cette branche. | `watcher`, `recette` |
+| **D6.INV-3** | un seul écrivain par base : tant qu'un watcher est actif, `ingest`, `git-scan`, `mirror-remove` et un second `watch` sont refusés avec le code 4 ; le verrou d'un watcher arrêté brutalement est repris. | `branches`, `watcher`, `recette` |
+| **D6.INV-4** | le watcher ne force jamais : un miroir modifié à la main n'est ni écrasé ni nettoyé ; le watcher s'arrête avec le code 7 et nomme les fichiers en cause. | `watcher`, `recette` |
+| **D6.INV-5** | le seul worktree que le skill retire est son propre miroir, sur commande explicite (`mirror-remove`), watcher arrêté ; un miroir modifié à la main n'est retiré qu'avec `--force`. | `watcher`, `recette` |
+
+### D7 : Agent mémoire (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D7.INV-1** | avant de s'appuyer sur la base, l'agent lance `status` et déclare dans sa réponse l'instantané utilisé et tout écart connu. | `agent` |
+| **D7.INV-2** | la base localise, le disque fait foi : avant d'affirmer le contenu d'un fichier ou de citer une ligne, l'agent relit ce fichier dans le worktree source. | `ingestion`, `agent` |
+| **D7.INV-3** | l'agent ne modifie ni le code du projet ni le miroir ; il n'écrit dans la base que par `ingest` et `watch`, et ne lance `watch` ni `mirror-remove` sans l'accord du développeur. | `agent` |
+| **D7.INV-4** | l'agent ne charge jamais de contenu non borné : aucune lecture de `content` sans filtre sur le chemin et sans limite de longueur. | `agent` |
+
+### D8 : Modifications locales non commitées, superposées au miroir (reserved)
+
+Dimension réservée : aucun invariant en vigueur dans cette version.
+
+### D9 : Symboles par langue : classes, méthodes, routes (reserved)
 
 Dimension réservée : aucun invariant en vigueur dans cette version.
 
