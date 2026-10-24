@@ -27,7 +27,7 @@ Un nom de branche n'est jamais réécrit ni interprété : `x;touch${IFS}PWNED`,
 | `last_commit` | `"<sha court> - <sujet>"`, format de la version d'origine |
 | `commit_sha`, `commit_subject`, `committed_at` | `objectname`, `subject`, `committerdate:iso-strict` |
 | `upstream`, `track`, `ahead`, `behind` | `upstream:short` et `upstream:track,nobracket` (`ahead 1, behind 2`, `gone`) ; avance et retard nuls sans amont ou amont disparu |
-| `worktree_path` | `%(worktreepath)` : où la branche est extraite, dans n'importe quel worktree du dépôt |
+| `worktree_path` | `%(worktreepath)` : où la branche est extraite, dans n'importe quel worktree du dépôt ; chemin réel, au format de la plateforme qui exécute le skill (`C:\dev\projet\ECR-77` sous Windows, et non le `C:/dev/projet/ECR-77` de git), D12.INV-2 |
 | `updated_at` | date de la lecture |
 
 Les références symboliques (`origin/HEAD`) sont écartées. Le miroir du watcher, détaché, n'extrait aucune branche : il n'apparaît dans aucun `worktree_path`.

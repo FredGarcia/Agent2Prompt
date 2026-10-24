@@ -4,6 +4,34 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-10-24 : skill4appli 1.1.0
+
+- **skill4appli 1.1.0** : inscription du skill dans le cycle 7E et les douze facteurs. Dans la section 5 du point d'entrée, chaque facteur est rattaché à une phase et prouvé par un invariant et ses tests, ou déclaré non couvert. Nouvelles dimensions :
+  - D10, active : configuration par l'environnement. Variables `SKILL4APPLI_REPO`, `SKILL4APPLI_DB`, `SKILL4APPLI_FORMAT`, `SKILL4APPLI_MAX_SIZE`, `SKILL4APPLI_INTERVAL`, `SKILL4APPLI_BASE` et `SKILL4APPLI_GIT`. L'option l'emporte, une variable vide vaut absente, une valeur invalide est nommée. Commande `config`.
+  - D12, active : parité Linux, WSL2 et Windows. Identité canonique du worktree (chemin réel, casse ignorée sous Windows) ; chemins absolus natifs, chemins du dépôt en `/` ; arrêt propre commun par `watch-stop`, puisque Windows ne transmet aucun signal à un processus qu'on termine ; fins de ligne CRLF sans effet ; avertissement `depot_windows_depuis_wsl`, tiré de la table des montages.
+  - D11, réservée : service MCP en stdio, en lecture seule, qui franchit la frontière Windows et WSL2 par l'interop, sans port.
+- Point d'extension E4 : un objet par commande de lecture, et `executer()` exporté. Au total : 13 modules, 34 invariants, 34 tests, scénarios d'agent A1 à A6.
+- Commande d'extraction d'une ligne, sans `$`, accent grave, `!`, `%` ni guillemet intérieur : elle vaut sous bash, CMD et PowerShell.
+- Agent `memoire-appli` : il relaie les avertissements, appelle `node.exe` depuis WSL pour un dépôt sous Windows, et ne lance `watch-stop` qu'avec l'accord du développeur.
+- Aucune migration, aucun invariant de 1.0.0 modifié ; identifiant de base inchangé sous Linux et WSL2. Archive 1.0.0.
+- Poste visé, décrit par le développeur : Java et Angular sous Windows, PostgreSQL dans WSL2. Le skill tourne du côté du git qui possède le worktree, donc sous Windows ; un agent de WSL2 l'appelle par `node.exe`, avec des chemins Windows (module `parite`).
+- Essayé avec Node 22.22, SQLite 3.50.4 et git 2.43 : 34 tests sur 34.
+  - Treize défauts réintroduits un à un font chacun échouer le test attendu, dont huit nouveaux : variables ignorées, variable vide prise pour une valeur, demande d'arrêt ignorée, demande d'un autre processus honorée, demande antérieure gardée, extrait gardant son retour chariot, repli `/mnt/<lecteur>` retiré, objet de la ligne de commande différent de celui d'`executer()`.
+  - La transmission, relue comme le ferait l'IA, redonne les trois fichiers aux empreintes publiées par la commande d'extraction, et leur recette y passe.
+- Outillage : workflow `.github/workflows/recette-skill4appli.yml`. Il rejoue ce chemin sur `ubuntu-latest` et `windows-latest`, avec Node 22 et 24 : extraction sous bash et sous CMD, puis recette, bilan et échecs en annotations. README mis à jour.
+- Décisions du développeur (24 octobre 2026) :
+  - 1.1.0 ratifiée telle que proposée : configuration par l'environnement active, service MCP réservé, section de lecture 12 facteurs ;
+  - poste : Java et Angular sous Windows, PostgreSQL dans WSL2.
+- Soumis à ratification :
+  - le skill tourne sous Windows, du côté du git du développeur ; depuis WSL, un agent l'appelle par `node.exe` plutôt que de lancer le Node de WSL sur `/mnt/c` ;
+  - un avertissement, et non un refus, pour un worktree Windows lu depuis WSL ;
+  - la correspondance proposée entre facteurs et phases 7E (section 5) ;
+  - des variables pour les réglages de déploiement, aucune pour les options de requête ;
+  - `watch-stop` par un fichier de demande qui vise un PID ; T20 sauté sous Windows ;
+  - D11 en stdio seulement, HTTP écarté en 1.x ;
+  - le workflow de recette multiplateforme ;
+  - des exemples neutres (`acme`), le dépôt étant public.
+
 ### 2026-10-23 : skill4appli 1.0.0
 
 - **skill4appli 1.0.0** : mémoire SQLite d'une application locale et de ses branches git, pour qu'un agent localise du code sans parcourir le dépôt à chaque question. Inventaire fidèle à git (`.gitignore` respecté), fichiers binaires, de verrouillage, minifiés ou trop gros inventoriés sans contenu, textes non UTF-8 lus en latin1 sans perte ; relecture limitée aux fichiers changés, aucun fichier fantôme ; branches locales et distantes par un seul `for-each-ref`, avec amont, avance, retard et worktree d'extraction, et fichiers de chaque branche depuis l'ancêtre commun ; `query` en lecture seule et bornée, `search` en FTS5 trigramme qui rend `chemin:ligne` sans casse ni accent discriminants, `schema` commenté ; `status`, qui mesure l'écart entre la base et le worktree source ; watcher qui charge la branche courante dans un worktree dédié, détaché et verrouillé dans le dossier commun git, la suit par scrutation et ne relit que les fichiers changés d'un commit à l'autre ; agent `memoire-appli`. Dimensions D1 à D7 actives, D8 (modifications non commitées superposées au miroir) et D9 (symboles par langue) réservées ; 10 modules, 26 invariants, 25 tests et 5 scénarios d'agent, points d'extension E1 à E3. Le script `scripts/app_db.mjs`, la recette `tests/app_db.test.mjs` et l'agent `agent/memoire-appli.md` sont écrits en entier dans les modules `execution`, `recette` et `agent`, avec une commande d'extraction et leurs empreintes. Node 22.13 au moins, git 2.38 au moins, aucune dépendance.
