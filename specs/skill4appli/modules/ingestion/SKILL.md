@@ -69,6 +69,7 @@ Sur 3 000 fichiers Java de 1,2 Ko (Node 22.22, SQLite 3.50.4) :
 - **UTF-16** : un fichier en UTF-16 contient des octets nuls et passe pour binaire.
 - **Fichier modifié à la même seconde, même taille** : la date en millisecondes le distingue ; sur un système de fichiers à la seconde, un changement de même taille dans la même seconde peut échapper à `ingest`. `status` le signale aussi peu : relire le disque avant d'affirmer (agent, D7.INV-2).
 - **Fichiers générés suivis** : un fichier généré mais suivi par git est indexé ; l'exclure du dépôt, ou le filtrer dans les requêtes.
+- **Fins de ligne** : avec `core.autocrlf=true`, réglage par défaut de Git for Windows, les fichiers extraits sont en CRLF et le contenu indexé est celui du disque. `lines` et les numéros de ligne ne changent pas, les extraits de `search` sont rendus sans retour chariot (D12.INV-4), mais `sha` diffère alors de l'identifiant du blob dans git.
 
 ## 7. Contrôle de sortie
 

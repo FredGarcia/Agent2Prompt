@@ -27,7 +27,7 @@ La colonne « Repris dans » cite les modules de la spécification qui reprennen
 | [`analyse-projet`](#analyse-projet-102) | 1.0.2 | 5 | 1 | 16 |
 | [`angular`](#angular-101) | 1.0.1 | 8 | 2 | 30 |
 | [`java`](#java-111) | 1.1.1 | 7 | 1 | 29 |
-| [`skill4appli`](#skill4appli-100) | 1.0.0 | 7 | 2 | 26 |
+| [`skill4appli`](#skill4appli-110) | 1.1.0 | 9 | 3 | 34 |
 | [`socle-back-front`](#socle-back-front-101) | 1.0.1 | 6 | 1 | 15 |
 | [`sonarqube`](#sonarqube-102) | 1.0.2 | 6 | 2 | 22 |
 | [`tension-dashboard-gitlab-agent`](#tension-dashboard-gitlab-agent-220) | 2.2.0 | 7 | 3 | 17 |
@@ -841,15 +841,15 @@ Expert Java 21, Spring Boot 3.5 et PostgreSQL : produire et relire du code confo
 
 Dimension réservée : aucun invariant en vigueur dans cette version.
 
-## skill4appli 1.0.0
+## skill4appli 1.1.0
 
-Mémoire SQLite d'une application locale et de ses branches git pour un agent : inventaire fidèle à git, recherche chemin:ligne, requêtes en lecture seule, fraîcheur mesurée, watcher de la branche courante chargée dans un worktree dédié, agent mémoire. Point d'entrée : [`specs/skill4appli/SKILL.md`](specs/skill4appli/SKILL.md).
+Mémoire SQLite d'une application locale et de ses branches git pour un agent : inventaire fidèle à git, recherche chemin:ligne, requêtes en lecture seule, fraîcheur mesurée, watcher de la branche courante chargée dans un worktree dédié, configuration par l'environnement, parité Linux, WSL2 et Windows, agent mémoire. Point d'entrée : [`specs/skill4appli/SKILL.md`](specs/skill4appli/SKILL.md).
 
 ### D1 : Exécution : commandes, emplacement de la base, sorties et codes, migrations (active)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D1.INV-1** | aucune commande externe ne passe par un shell : git est lancé avec une liste d'arguments, et aucune donnée lue (nom de branche, chemin, message de commit) n'est jamais interprétée comme une commande. | `execution`, `branches`, `recette` |
+| **D1.INV-1** | aucune commande externe ne passe par un shell : git est lancé avec une liste d'arguments, et aucune donnée lue (nom de branche, chemin, message de commit) n'est jamais interprétée comme une commande. | `execution`, `parite`, `branches`, `recette` |
 | **D1.INV-2** | l'emplacement de la base se déduit du worktree source, jamais du dossier courant ; dans un dépôt git, elle vit dans le dossier commun git (`<commun>/skill4appli/<id>/memoire.db`), hors de tout arbre suivi ; aucune commande de lecture ne crée de base. | `execution`, `interrogation`, `recette` |
 | **D1.INV-3** | une réussite sort avec le code 0 et un JSON sur la sortie standard ; un échec sort avec un code non nul documenté (1 à 5, 7) et un JSON `{"ok": false, ...}` sur la sortie d'erreur ; `status` sort avec le code 6, réponse sur la sortie standard, quand la base n'est pas à jour. | `execution`, `recette` |
 | **D1.INV-4** | le schéma n'évolue que par migrations numérotées (`PRAGMA user_version`) ; une base créée par une version plus récente est refusée ; une base de la version d'origine, sans numéro de schéma, est reconstruite. | `execution`, `recette` |
@@ -903,7 +903,7 @@ Mémoire SQLite d'une application locale et de ses branches git pour un agent : 
 |---|---|---|
 | **D7.INV-1** | avant de s'appuyer sur la base, l'agent lance `status` et déclare dans sa réponse l'instantané utilisé et tout écart connu. | `agent` |
 | **D7.INV-2** | la base localise, le disque fait foi : avant d'affirmer le contenu d'un fichier ou de citer une ligne, l'agent relit ce fichier dans le worktree source. | `ingestion`, `agent` |
-| **D7.INV-3** | l'agent ne modifie ni le code du projet ni le miroir ; il n'écrit dans la base que par `ingest` et `watch`, et ne lance `watch` ni `mirror-remove` sans l'accord du développeur. | `agent` |
+| **D7.INV-3** | l'agent ne modifie ni le code du projet ni le miroir ; il n'écrit dans la base que par `ingest` et `watch`, et ne lance `watch` ni `mirror-remove` sans l'accord du développeur. | `agent`, `service-mcp` |
 | **D7.INV-4** | l'agent ne charge jamais de contenu non borné : aucune lecture de `content` sans filtre sur le chemin et sans limite de longueur. | `agent` |
 
 ### D8 : Modifications locales non commitées, superposées au miroir (reserved)
@@ -913,6 +913,28 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 ### D9 : Symboles par langue : classes, méthodes, routes (reserved)
 
 Dimension réservée : aucun invariant en vigueur dans cette version.
+
+### D10 : Configuration par l'environnement (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D10.INV-1** | chaque réglage de déploiement se lit d'abord dans l'option de la ligne de commande, puis dans sa variable d'environnement `SKILL4APPLI_*`, puis prend son défaut ; aucun réglage n'est lu dans un fichier. | `execution`, `configuration`, `recette` |
+| **D10.INV-2** | une valeur invalide, d'option ou de variable, arrête la commande avec le code 1 et un message qui nomme sa source ; une variable vide vaut absente. | `configuration`, `recette` |
+| **D10.INV-3** | `config` rend la valeur effective de chaque réglage, sa source (option, environnement, défaut) et les emplacements qui en découlent, sans rien écrire ni créer. | `configuration`, `recette` |
+
+### D11 : Service MCP en stdio, en lecture seule (reserved)
+
+Dimension réservée : aucun invariant en vigueur dans cette version.
+
+### D12 : Parité Linux, WSL2 et Windows (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D12.INV-1** | le worktree source est désigné par son chemin réel, comparé sans casse sous Windows : un même worktree a une seule base et un seul miroir, quel que soit le chemin qui y mène (lien, casse, nom court). | `execution`, `parite`, `recette` |
+| **D12.INV-2** | les chemins absolus enregistrés et rendus sont au format de la plateforme qui exécute le skill ; les chemins de fichiers du dépôt sont toujours relatifs et en `/`. | `execution`, `parite`, `branches`, `recette` |
+| **D12.INV-3** | le watcher s'arrête proprement de la même façon sur toutes les plateformes, par `watch-stop`, qui attend sa confirmation ; une demande d'arrêt antérieure au watcher, ou qui vise un autre processus, ne l'arrête pas. | `execution`, `parite`, `watcher`, `recette` |
+| **D12.INV-4** | les fins de ligne de la plateforme (CRLF de `core.autocrlf`) ne faussent ni le compte et les numéros de ligne, ni les extraits de `search`, ni le verdict de `status`. | `parite`, `ingestion`, `recette` |
+| **D12.INV-5** | lancé dans WSL sur un worktree du système de fichiers Windows, le skill le signale par l'avertissement `depot_windows_depuis_wsl` dans `status` et `config`, sans refuser la commande. | `execution`, `parite`, `fraicheur`, `agent`, `recette` |
 
 ## socle-back-front 1.0.1
 

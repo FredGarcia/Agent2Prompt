@@ -1,28 +1,33 @@
 {
   "name": "skill4appli",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "specSchema": 1,
   "language": "fr",
-  "description": "Mémoire SQLite d'une application locale et de ses branches git pour un agent : inventaire fidèle à git, recherche chemin:ligne, requêtes en lecture seule, fraîcheur mesurée, watcher de la branche courante chargée dans un worktree dédié, agent mémoire.",
+  "description": "Mémoire SQLite d'une application locale et de ses branches git pour un agent : inventaire fidèle à git, recherche chemin:ligne, requêtes en lecture seule, fraîcheur mesurée, watcher de la branche courante chargée dans un worktree dédié, configuration par l'environnement, parité Linux, WSL2 et Windows, agent mémoire.",
   "entry": "SKILL.md",
   "modes": ["travail", "miroir"],
   "targets": {
     "node": ">=22.13",
     "git": ">=2.38",
-    "os": "Linux ou WSL2 ; Windows natif non vérifié"
+    "os": "Linux, WSL2 et Windows natif ; recette en CI sur ubuntu-latest et windows-latest"
   },
   "modules": [
     { "id": "execution", "path": "modules/execution/SKILL.md", "dimensions": ["D1"], "status": "active" },
+    { "id": "configuration", "path": "modules/configuration/SKILL.md", "dimensions": ["D10"], "status": "active" },
+    { "id": "parite", "path": "modules/parite/SKILL.md", "dimensions": ["D12"], "status": "active" },
     { "id": "ingestion", "path": "modules/ingestion/SKILL.md", "dimensions": ["D2"], "status": "active" },
     { "id": "branches", "path": "modules/branches/SKILL.md", "dimensions": ["D3"], "status": "active" },
     { "id": "interrogation", "path": "modules/interrogation/SKILL.md", "dimensions": ["D4"], "status": "active" },
     { "id": "fraicheur", "path": "modules/fraicheur/SKILL.md", "dimensions": ["D5"], "status": "active" },
     { "id": "watcher", "path": "modules/watcher/SKILL.md", "dimensions": ["D6"], "status": "active" },
     { "id": "agent", "path": "modules/agent/SKILL.md", "dimensions": ["D7"], "status": "active" },
-    { "id": "recette", "path": "modules/recette/SKILL.md", "dimensions": ["D1", "D2", "D3", "D4", "D5", "D6"], "status": "active" },
+    { "id": "recette", "path": "modules/recette/SKILL.md", "dimensions": ["D1", "D2", "D3", "D4", "D5", "D6", "D10", "D12"], "status": "active" },
     { "id": "local", "path": "modules/local/SKILL.md", "dimensions": ["D8"], "status": "reserved" },
-    { "id": "symboles", "path": "modules/symboles/SKILL.md", "dimensions": ["D9"], "status": "reserved" }
+    { "id": "symboles", "path": "modules/symboles/SKILL.md", "dimensions": ["D9"], "status": "reserved" },
+    { "id": "service-mcp", "path": "modules/service-mcp/SKILL.md", "dimensions": ["D11"], "status": "reserved" }
   ],
-  "extensionPoints": ["E1", "E2", "E3"],
-  "previousVersions": []
+  "extensionPoints": ["E1", "E2", "E3", "E4"],
+  "previousVersions": [
+    { "version": "1.0.0", "file": "archives/SKILL-v1.0.0.md" }
+  ]
 }

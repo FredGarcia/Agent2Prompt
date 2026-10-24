@@ -1,19 +1,19 @@
 ---
 name: skill4appli
-description: Mémoire SQLite d'une application locale et de ses branches git, interrogée par un agent sans relire tout le dépôt (inventaire fidèle à git, recherche plein texte chemin:ligne, requêtes SQL en lecture seule, fraîcheur mesurée, watcher de la branche courante chargée dans un worktree dédié, agent mémoire). À utiliser pour indexer un projet, y localiser du code ou l'état des branches, et garder cet index à jour pendant le travail.
-version: 1.0.0
+description: Mémoire SQLite d'une application locale et de ses branches git, interrogée par un agent sans relire tout le dépôt (inventaire fidèle à git, recherche plein texte chemin:ligne, requêtes SQL en lecture seule, fraîcheur mesurée, watcher de la branche courante chargée dans un worktree dédié, configuration par l'environnement, parité Linux, WSL2 et Windows, agent mémoire). À utiliser pour indexer un projet, y localiser du code ou l'état des branches, et garder cet index à jour pendant le travail.
+version: 1.1.0
 ---
 
-# Skill4Appli, mémoire d'application et watcher de branche, version 1.0.0
+# Skill4Appli, mémoire d'application et watcher de branche, version 1.1.0
 
 Ce document est le point d'entrée du skill. Le skill tient, dans un fichier SQLite, la structure et le contenu d'une application locale et l'état de ses branches git, pour qu'un agent localise du code par requête au lieu de parcourir le disque à chaque question. Un script Node sans dépendance, `scripts/app_db.mjs`, est le seul à écrire dans la base ; l'agent `memoire-appli` en est le premier lecteur. Les règles détaillées sont dans `modules/`.
 
 ## 1. Ordre de lecture
 
 1. Ce document, en entier.
-2. `manifest.json` : modules, versions de Node et de git visées.
-3. Les modules actifs, dans cet ordre : `execution`, `ingestion`, `branches`, `interrogation`, `fraicheur`, `watcher`, `agent`, `recette`.
-4. `modules/local/SKILL.md` et `modules/symboles/SKILL.md` : seulement pour comprendre les points d'extension. Ne pas les appliquer en 1.x.
+2. `manifest.json` : modules, versions de Node et de git visées, plateformes.
+3. Les modules actifs, dans cet ordre : `execution`, `configuration`, `parite`, `ingestion`, `branches`, `interrogation`, `fraicheur`, `watcher`, `agent`, `recette`.
+4. `modules/local/SKILL.md`, `modules/symboles/SKILL.md` et `modules/service-mcp/SKILL.md` : seulement pour comprendre les points d'extension. Ne pas les appliquer en 1.x.
 
 ## 2. Ce que fait le skill
 
@@ -26,11 +26,14 @@ Ce document est le point d'entrée du skill. Le skill tient, dans un fichier SQL
 | `search` | emplacements `chemin:ligne` d'un terme | non | `interrogation` |
 | `schema` | tables et colonnes commentées | non | `interrogation` |
 | `status` | écart entre la base et le worktree source | non | `fraicheur` |
+| `config` | réglages effectifs et leur source, emplacements, plateforme | non | `configuration` |
 | `watch` | charge la branche courante dans un worktree dédié et le suit (mode `miroir`) | oui | `watcher` |
+| `watch-stop` | arrête proprement le watcher, sur toutes les plateformes | non | `watcher` |
 | `mirror-remove` | retire ce worktree dédié | métadonnées | `watcher` |
 
 ```mermaid
 flowchart LR
+  ENV["Environnement<br/>SKILL4APPLI_*"] -.->|"réglages"| W
   subgraph DEP["Dépôt git"]
     SRC["Worktree source<br/>branche courante, travail en cours"]
     subgraph COM["Dossier commun git : .git ou .bare"]
@@ -41,9 +44,10 @@ flowchart LR
     end
   end
   SRC -->|"ingest : mode travail"| DB
-  SRC -->|"watch : scrute HEAD"| MIR
+  W["watch"] -->|"scrute HEAD"| SRC
+  W --> MIR
   MIR -->|"fichiers changés"| DB
-  DB -->|"query, search, schema, status<br/>lecture seule"| AG["Agent memoire-appli<br/>et autres agents"]
+  DB -->|"query, search, schema, status, config<br/>lecture seule"| AG["Agent memoire-appli<br/>et autres agents"]
   AG -.->|"relit le disque avant d'affirmer"| SRC
 ```
 
@@ -83,15 +87,36 @@ sequenceDiagram
 | Espace | le worktree source, le dossier commun git où vivent la base et le miroir | `execution`, `watcher` |
 | Engendrent | les relations : fichiers changés entre deux commits, fichiers modifiés par branche depuis l'ancêtre commun | `branches`, `watcher` |
 | État | l'instantané indexé (mode, commit, branche, date) et son écart avec la source | `fraicheur` |
-| Expression | les réponses JSON bornées et les événements du watcher | `interrogation`, `watcher` |
-| Évolutif | migrations numérotées, synchronisation incrémentale, dimensions réservées D8 et D9 | `execution`, `watcher`, `local`, `symboles` |
-| Environnement | l'agent mémoire, les autres agents qui le consultent, le développeur | `agent` |
+| Expression | les réponses JSON bornées, un objet par commande, et les événements du watcher | `interrogation`, `watcher` |
+| Évolutif | migrations numérotées, synchronisation incrémentale, dimensions réservées D8, D9 et D11 | `execution`, `watcher`, `local`, `symboles`, `service-mcp` |
+| Environnement | les plateformes qui exécutent le skill, les réglages qu'elles lui donnent, l'agent mémoire, les autres agents, le développeur | `configuration`, `parite`, `agent` |
 
-Clause de second ordre : une mémoire de code n'est pas neutre. Ce que contient la base oriente ce que l'agent croit du projet, donc ce qu'il y fait, et une base périmée répond faux avec assurance. Le skill rend donc l'écart mesurable (`status`), chaque réponse déclare son instantané, et l'agent relit le disque avant d'affirmer : la base localise, le disque fait foi (D7.INV-2).
+Clause de second ordre : une mémoire de code n'est pas neutre. Ce que contient la base oriente ce que l'agent croit du projet, donc ce qu'il y fait, et une base périmée répond faux avec assurance. Le skill rend donc l'écart mesurable (`status`), chaque réponse déclare son instantané, et l'agent relit le disque avant d'affirmer : la base localise, le disque fait foi (D7.INV-2). L'observateur fait partie du système qu'il observe : le git qui lit le dépôt détermine ce que la mémoire en voit, d'où la règle de parité qui fait tourner le skill du côté du git qui possède le worktree (D12.INV-5).
 
-## 5. Registre des dimensions
+## 5. Lecture 12 facteurs × 7E
 
-| ID | Dimension | Introduite | Statut 1.0.0 | Dépend de | Module |
+Chaque facteur de la méthode Twelve-Factor App est rattaché à une phase du cycle 7E et prouvé par un invariant et ses tests, ou déclaré non couvert. La lecture mesure la viabilité du skill, pas une conformité déclarée.
+
+| Facteur | Phase 7E | Ce que fait le skill | Preuve |
+|---|---|---|---|
+| I. Base de code | Espace | une spécification versionnée dans Agent2Prompt, matérialisée à l'identique dans chaque projet, hors de l'arbre suivi | table d'intégrité de la transmission ; empreintes du module `execution`, § 9 |
+| II. Dépendances | Éléments | Node 22.13 et git 2.38 déclarés dans le manifeste ; aucun paquet | D1.INV-5 : T7 |
+| III. Configuration | Environnement | réglages de déploiement par variables `SKILL4APPLI_*`, options en surcharge, aucun fichier de configuration | D10.INV-1 à D10.INV-3 : T25 à T27 |
+| IV. Services externes | Espace | la base SQLite est une ressource attachée par `SKILL4APPLI_DB`, jetable, reconstruite depuis le dépôt ; PostgreSQL, service externe de l'application, reste hors du skill : son schéma y entre par les changelogs Liquibase du dépôt | D1.INV-4 : T5 ; module `parite`, § 2 |
+| V. Build, release, run | Évolutif | la spécification se fige en transmission à empreintes ; ses fichiers s'extraient et s'exécutent sans modification | vérificateur du dépôt ; commande d'extraction du module `execution`, § 9 |
+| VI. Processus | État | chaque commande est un processus sans état ; l'état vit dans la base et dans le dépôt | D4.INV-1, D5.INV-1 : T14, T17 |
+| VII. Liaison de port | Expression | aucun port en 1.1.0 : l'interface est la ligne de commande ; un service MCP en stdio, sans port, est réservé | non couvert : D11 réservée ; E4 : T33 |
+| VIII. Concurrence | Engendrent | un watcher par worktree, autant de lecteurs que d'agents, un seul écrivain par base | D6.INV-3 : T21 |
+| IX. Jetabilité | État | démarrage sans préparation, arrêt propre sur toutes les plateformes, verrou orphelin repris, miroir et base recréables | D6.INV-3, D12.INV-3 : T21, T23, T30 |
+| X. Parité | Environnement | même comportement et même recette sous Linux, WSL2 et Windows | D12.INV-1 à D12.INV-5 : T28 à T32 ; CI `ubuntu-latest` et `windows-latest` |
+| XI. Journaux | Expression | les événements du watcher forment un flux JSON sur la sortie standard ; le skill ne gère aucun fichier de journal | E3 : T20, T30 |
+| XII. Processus d'administration | Évolutif | `init`, migrations, `mirror-remove`, `watch-stop` : des commandes ponctuelles du même script, sur la même base | D1.INV-4, D6.INV-5 : T5, T6, T23 |
+
+Poste type visé : back Java sur Tomcat et front Angular sous Windows, avec Git for Windows ; PostgreSQL, en image Docker, dans WSL2 ; agents dans WSL2 ou sous Windows. Le skill tourne sous Windows, à côté du code et de son git ; un agent de WSL2 l'appelle par `node.exe`, avec des chemins Windows (module `parite`, § 2 et § 3). PostgreSQL est un service externe de l'application (facteur IV) : le skill n'y accède pas. Le back Java en fait évoluer le schéma par Liquibase, que Spring Boot applique au démarrage de l'application : les changelogs Liquibase du dépôt sont la source du schéma, et le skill les indexe comme tout fichier (module `interrogation`, § 6).
+
+## 6. Registre des dimensions
+
+| ID | Dimension | Introduite | Statut 1.1.0 | Dépend de | Module |
 |---|---|---|---|---|---|
 | D1 | Exécution : commandes, emplacement de la base, sorties et codes, migrations | 1.0 | active | | `execution`, `recette` |
 | D2 | Inventaire et ingestion | 1.0 | active | D1 | `ingestion`, `recette` |
@@ -102,34 +127,41 @@ Clause de second ordre : une mémoire de code n'est pas neutre. Ce que contient 
 | D7 | Agent mémoire | 1.0 | active | D4, D5, D6 | `agent` |
 | D8 | Modifications locales non commitées, superposées au miroir | 1.0 | reserved | D5, D6 | `local` |
 | D9 | Symboles par langue : classes, méthodes, routes | 1.0 | reserved | D2 | `symboles` |
+| D10 | Configuration par l'environnement | 1.1 | active | D1 | `configuration`, `recette` |
+| D11 | Service MCP en stdio, en lecture seule | 1.1 | reserved | D4, D5, D10 | `service-mcp` |
+| D12 | Parité Linux, WSL2 et Windows | 1.1 | active | D1, D6, D10 | `parite`, `recette` |
 
-## 6. Contrat de version et points d'extension
+## 7. Contrat de version et points d'extension
 
-Le skill suit le contrat de version de `EVOLUTION.md` du dépôt Agent2Prompt. Le schéma de la base évolue uniquement par migrations numérotées (`PRAGMA user_version`) : la migration 1 est celle de la version 1.0.0 et ne sera jamais modifiée.
+Le skill suit le contrat de version de `EVOLUTION.md` du dépôt Agent2Prompt. Le schéma de la base évolue uniquement par migrations numérotées (`PRAGMA user_version`) : la migration 1 est celle de la version 1.0.0 et ne sera jamais modifiée. La version 1.1.0 n'ajoute aucune migration.
 
-Points d'extension, actifs dès 1.0.0 :
+Points d'extension, actifs depuis la version indiquée :
 
-- **E1** : en mode `miroir`, `status` liste déjà les modifications non commitées du worktree source (`modifications_locales`). D8 les indexera dans une couche superposée au miroir, sans toucher ni au miroir ni au worktree source.
-- **E2** : chaque fichier porte sa langue (`app_structure.lang`), déduite de son extension. D9 en tirera les symboles, langue par langue.
-- **E3** : les événements du watcher sont des lignes JSON aux champs stables (`t`, `evenement`, `branche`, `de`, `a`, bilans). Un consommateur, par exemple le tableau de bord de `tension-dashboard-gitlab-agent` ou un relais, pourra s'y abonner sans modifier le watcher.
+- **E1** (1.0.0) : en mode `miroir`, `status` liste déjà les modifications non commitées du worktree source (`modifications_locales`). D8 les indexera dans une couche superposée au miroir, sans toucher ni au miroir ni au worktree source.
+- **E2** (1.0.0) : chaque fichier porte sa langue (`app_structure.lang`), déduite de son extension. D9 en tirera les symboles, langue par langue.
+- **E3** (1.0.0) : les événements du watcher sont des lignes JSON aux champs stables (`t`, `evenement`, `branche`, `de`, `a`, bilans, `raison`). Un consommateur, par exemple le tableau de bord de `tension-dashboard-gitlab-agent` ou un relais, pourra s'y abonner sans modifier le watcher.
+- **E4** (1.1.0) : chaque commande de lecture construit un seul objet, écrit en une ligne par la ligne de commande ; importé, le script exporte `executer(commande, options, positionnels)`, qui rend ce même objet sans rien écrire. D11 exposera ces objets comme résultats d'outils MCP.
 
-## 7. Règles globales
+## 8. Règles globales
 
 - **Aucun shell** : git est lancé avec une liste d'arguments ; un nom de branche, un chemin ou un message lu n'est jamais interprété comme une commande (D1.INV-1).
 - **Un seul écrivain** : `ingest`, `git-scan`, `watch` et `mirror-remove` écrivent ; un watcher actif exclut tous les autres (D6.INV-3). Les commandes de lecture ouvrent la base en lecture seule (D4.INV-1).
 - **La base est un cache** : elle se reconstruit à partir du dépôt et ne fait jamais foi contre le disque (D7.INV-2).
 - **Rien n'est forcé** : le watcher n'écrase ni ne nettoie un miroir modifié à la main (D6.INV-4), et ne touche ni au worktree source, ni à son index, ni à ses branches (D6.INV-1).
+- **Configuration par l'environnement** : chaque réglage de déploiement a sa variable `SKILL4APPLI_*`, l'option l'emporte, aucun fichier de configuration (D10.INV-1).
+- **Côté du git qui possède le worktree** : le skill tourne sur la plateforme dont le git tient le worktree source ; lancé de l'autre côté, il le signale (D12.INV-5).
 - **Sortie pour un agent** : un JSON sur une ligne par défaut, les erreurs en JSON sur la sortie d'erreur, des codes de sortie documentés (D1.INV-3), des réponses bornées (D4.INV-2).
 - **Sans dépendance** : Node 22.13 ou plus récent, modules natifs, aucun `npm install` (D1.INV-5).
 - **Langue** : messages et documentation en français ; commandes, options, tables et colonnes en anglais, comme dans la version d'origine, pour que les requêtes écrites contre elle restent valides.
 
-## 8. Critères d'acceptation
+## 9. Critères d'acceptation
 
-- La recette du module `recette` passe en entier : `node --test tests/app_db.test.mjs`, 25 tests, sous Node 22.13 ou plus récent et git 2.38 ou plus récent.
+- La recette du module `recette` passe en entier : `node --test tests/app_db.test.mjs`, 34 tests sous Linux et WSL2, 33 tests et 1 sauté sous Windows, avec Node 22.13 ou plus récent et git 2.38 ou plus récent.
+- La recette passe en intégration continue sur `ubuntu-latest` et `windows-latest`, avec Node 22 et Node 24, après extraction par la commande du module `execution`, § 9, sous bash et sous CMD.
 - Les trois fichiers tirés des modules (`scripts/app_db.mjs`, `tests/app_db.test.mjs`, `agent/memoire-appli.md`) ont exactement les empreintes de la table du module `execution`, § 9.
-- Les scénarios A1 à A5 du module `agent` sont rejoués avec le développeur avant que l'agent serve d'autres agents.
+- Les scénarios A1 à A6 du module `agent` sont rejoués avec le développeur avant que l'agent serve d'autres agents.
 
-## 9. Invariants
+## 10. Invariants
 
 **D1 : exécution**
 
@@ -178,7 +210,21 @@ Points d'extension, actifs dès 1.0.0 :
 - **D7.INV-3** : l'agent ne modifie ni le code du projet ni le miroir ; il n'écrit dans la base que par `ingest` et `watch`, et ne lance `watch` ni `mirror-remove` sans l'accord du développeur.
 - **D7.INV-4** : l'agent ne charge jamais de contenu non borné : aucune lecture de `content` sans filtre sur le chemin et sans limite de longueur.
 
-## 10. Filiation
+**D10 : configuration**
+
+- **D10.INV-1** : chaque réglage de déploiement se lit d'abord dans l'option de la ligne de commande, puis dans sa variable d'environnement `SKILL4APPLI_*`, puis prend son défaut ; aucun réglage n'est lu dans un fichier.
+- **D10.INV-2** : une valeur invalide, d'option ou de variable, arrête la commande avec le code 1 et un message qui nomme sa source ; une variable vide vaut absente.
+- **D10.INV-3** : `config` rend la valeur effective de chaque réglage, sa source (option, environnement, défaut) et les emplacements qui en découlent, sans rien écrire ni créer.
+
+**D12 : parité des plateformes**
+
+- **D12.INV-1** : le worktree source est désigné par son chemin réel, comparé sans casse sous Windows : un même worktree a une seule base et un seul miroir, quel que soit le chemin qui y mène (lien, casse, nom court).
+- **D12.INV-2** : les chemins absolus enregistrés et rendus sont au format de la plateforme qui exécute le skill ; les chemins de fichiers du dépôt sont toujours relatifs et en `/`.
+- **D12.INV-3** : le watcher s'arrête proprement de la même façon sur toutes les plateformes, par `watch-stop`, qui attend sa confirmation ; une demande d'arrêt antérieure au watcher, ou qui vise un autre processus, ne l'arrête pas.
+- **D12.INV-4** : les fins de ligne de la plateforme (CRLF de `core.autocrlf`) ne faussent ni le compte et les numéros de ligne, ni les extraits de `search`, ni le verdict de `status`.
+- **D12.INV-5** : lancé dans WSL sur un worktree du système de fichiers Windows, le skill le signale par l'avertissement `depot_windows_depuis_wsl` dans `status` et `config`, sans refuser la commande.
+
+## 11. Filiation
 
 Le skill reprend `skill4appli-fr`, remis par le développeur le 23 octobre 2026 : un `SKILL.md` et le script `scripts/app_db.mjs`, quatre commandes (`init`, `ingest`, `git-scan`, `query`) et trois tables. Restent identiques : les noms de ces commandes, des tables `app_structure`, `git_branches`, `app_metadata` et de leurs colonnes d'origine (`path`, `type`, `content`, `metadata`, `branch_name`, `is_current`, `last_commit`, `updated_at`) ; les deux requêtes d'exemple de la version d'origine restent donc valides.
 
@@ -198,8 +244,10 @@ Défauts constatés en rejouant la version d'origine sur un dépôt d'essai (Nod
 | Le contenu complet des fichiers sort par `console.table`, sans limite. | D4.INV-2 |
 | Rien ne signale à l'agent que la base a divergé du disque. | D5.INV-2, D7.INV-1 |
 
-Ajouts demandés par le développeur : le watcher de la branche courante, chargée dans un dossier dédié par git worktree (D6), et l'agent qui accompagne le skill (D7).
+Ajouts demandés par le développeur : en 1.0.0, le watcher de la branche courante, chargée dans un dossier dédié par git worktree (D6), et l'agent qui accompagne le skill (D7) ; en 1.1.0, l'inscription du skill dans le cycle 7E et les douze facteurs (section 5), pour un poste où Java et Angular tournent sous Windows et PostgreSQL dans WSL2 : configuration par l'environnement (D10), service MCP réservé (D11), parité des plateformes (D12).
 
-## 11. Journal de révision
+## 12. Journal de révision
 
-**1.0.0** (2026-10-23) : première version. Dimensions D1 à D7 actives, D8 et D9 réservées. Points d'extension E1 à E3. Script `scripts/app_db.mjs` (Node 22.13, sans dépendance), recette de 25 tests et agent `memoire-appli`, écrits en entier dans les modules `execution`, `recette` et `agent`. Tirée de `skill4appli-fr` (section 10).
+**1.0.0** (2026-10-23) : première version. Dimensions D1 à D7 actives, D8 et D9 réservées. Points d'extension E1 à E3. Script `scripts/app_db.mjs` (Node 22.13, sans dépendance), recette de 25 tests et agent `memoire-appli`, écrits en entier dans les modules `execution`, `recette` et `agent`. Tirée de `skill4appli-fr` (section 10). Archive : `archives/SKILL-v1.0.0.md`.
+
+**1.1.0** (2026-10-24) : lecture 12 facteurs × 7E (section 5). Dimensions D10 (configuration par l'environnement : variables `SKILL4APPLI_*`, commande `config`) et D12 (parité Linux, WSL2 et Windows : identité canonique du worktree, chemins natifs, arrêt commun par `watch-stop`, fins de ligne CRLF, avertissement d'un worktree Windows lu depuis WSL) actives ; D11 (service MCP en stdio) réservée. Point d'extension E4 : un objet par commande de lecture, `executer()` exporté. Schéma PostgreSQL suivi par les changelogs Liquibase du dépôt, avec leurs requêtes types. Recette de 34 tests, rejouée en CI sous Linux et Windows ; commande d'extraction valable sous bash, CMD et PowerShell ; agent `memoire-appli` qui relaie les avertissements et appelle `node.exe` depuis WSL. Aucune migration, aucun invariant de 1.0.0 modifié ; une base 1.0.0 est lue telle quelle.

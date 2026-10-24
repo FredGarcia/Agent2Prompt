@@ -4,6 +4,35 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-10-24 : skill4appli 1.1.0
+
+- **skill4appli 1.1.0** : inscription du skill dans le cycle 7E et les douze facteurs. Dans la section 5 du point d'entrée, chaque facteur est rattaché à une phase et prouvé par un invariant et ses tests, ou déclaré non couvert. Nouvelles dimensions :
+  - D10, active : configuration par l'environnement. Variables `SKILL4APPLI_REPO`, `SKILL4APPLI_DB`, `SKILL4APPLI_FORMAT`, `SKILL4APPLI_MAX_SIZE`, `SKILL4APPLI_INTERVAL`, `SKILL4APPLI_BASE` et `SKILL4APPLI_GIT`. L'option l'emporte, une variable vide vaut absente, une valeur invalide est nommée. Commande `config`.
+  - D12, active : parité Linux, WSL2 et Windows. Identité canonique du worktree (chemin réel, casse ignorée sous Windows) ; chemins absolus natifs, chemins du dépôt en `/` ; arrêt propre commun par `watch-stop`, puisque Windows ne transmet aucun signal à un processus qu'on termine ; fins de ligne CRLF sans effet ; avertissement `depot_windows_depuis_wsl`, tiré de la table des montages.
+  - D11, réservée : service MCP en stdio, en lecture seule, qui franchit la frontière Windows et WSL2 par l'interop, sans port.
+- Point d'extension E4 : un objet par commande de lecture, et `executer()` exporté. Au total : 13 modules, 34 invariants, 34 tests, scénarios d'agent A1 à A6.
+- Commande d'extraction d'une ligne, sans `$`, accent grave, `!`, `%` ni guillemet intérieur : elle vaut sous bash, CMD et PowerShell.
+- Agent `memoire-appli` : il relaie les avertissements, appelle `node.exe` depuis WSL pour un dépôt sous Windows, et ne lance `watch-stop` qu'avec l'accord du développeur.
+- Aucune migration, aucun invariant de 1.0.0 modifié ; identifiant de base inchangé sous Linux et WSL2. Archive 1.0.0.
+- Poste visé, décrit par le développeur : Java et Angular sous Windows, PostgreSQL dans WSL2, le back Java faisant évoluer le schéma par Liquibase. Le skill tourne du côté du git qui possède le worktree, donc sous Windows ; un agent de WSL2 l'appelle par `node.exe`, avec des chemins Windows (module `parite`). Le schéma PostgreSQL entre dans la mémoire par les changelogs Liquibase du dépôt, avec des requêtes types (module `interrogation`, § 6).
+- Essayé avec Node 22.22, SQLite 3.50.4 et git 2.43 : 34 tests sur 34.
+  - Treize défauts réintroduits un à un font chacun échouer le test attendu, dont huit nouveaux : variables ignorées, variable vide prise pour une valeur, demande d'arrêt ignorée, demande d'un autre processus honorée, demande antérieure gardée, extrait gardant son retour chariot, repli `/mnt/<lecteur>` retiré, objet de la ligne de commande différent de celui d'`executer()`.
+  - La transmission, relue comme le ferait l'IA, redonne les trois fichiers aux empreintes publiées par la commande d'extraction, et leur recette y passe.
+- Outillage : workflow `.github/workflows/recette-skill4appli.yml`. Il rejoue ce chemin sur `ubuntu-latest` et `windows-latest`, avec Node 22 et 24 : extraction sous bash et sous CMD, puis recette, bilan et échecs en annotations. README mis à jour.
+- Décisions du développeur (24 octobre 2026) :
+  - 1.1.0 ratifiée telle que proposée : configuration par l'environnement active, service MCP réservé, section de lecture 12 facteurs ;
+  - poste : Java et Angular sous Windows, PostgreSQL dans WSL2 ;
+  - le back Java passe par Liquibase pour PostgreSQL (commentaire sur la pull request n° 11).
+- Soumis à ratification :
+  - le skill tourne sous Windows, du côté du git du développeur ; depuis WSL, un agent l'appelle par `node.exe` plutôt que de lancer le Node de WSL sur `/mnt/c` ;
+  - un avertissement, et non un refus, pour un worktree Windows lu depuis WSL ;
+  - la correspondance proposée entre facteurs et phases 7E (section 5) ;
+  - des variables pour les réglages de déploiement, aucune pour les options de requête ;
+  - `watch-stop` par un fichier de demande qui vise un PID ; T20 sauté sous Windows ;
+  - D11 en stdio seulement, HTTP écarté en 1.x ;
+  - le workflow de recette multiplateforme ;
+  - des exemples neutres (`acme`), le dépôt étant public.
+
 ### 2026-10-24 : agent2dev 1.1.0, agent2test 1.2.0, agent-tdd-jira 1.3.2
 
 - **agent2dev 1.1.0** : dimensions D24 (données en un fichier unique, par l'agent médiateur) et D25 (échange du binôme par dossiers, facultatif) actives ; D2 (données par agent) et D23 (relais n8n) passent à `superseded`, chacune avec sa section de migration. Données : un fichier SQLite unique, `agent2dev.sqlite`, dont l'agent médiateur `donnees` tient la seule connexion ; les autres agents n'y accèdent que par ses actions du bus, `lire`, `ecrire`, `ajouter`, `lister` et `compter`, sur les collections qu'ils déclarent, `modifiable`, `ajout-seul` ou `chainee` ; le médiateur tire la table de l'appelant que le bus atteste et de la collection, `<agent>__<collection>`, sans SQL ni nom de table venu d'un agent, et numérote et chaîne le journal et le grand livre dans la transaction d'ajout ; une migration qui crée ou modifie un objet hors des tables de son agent est annulée en entier, et, au démarrage, chaque requête du médiateur est vérifiée sur le plan d'exécution de SQLite (`EXPLAIN`), déclencheurs, vues et clés étrangères compris ; une instance 1.0.0 reprend ses données par `npm run donnees:reprendre`, chaînes recopiées sans recalcul puis vérifiées. Échange : en mode `manuel`, le défaut, la remise se télécharge depuis le tableau de bord, au format `agent2test.remise/1`, et le développeur donne le chemin du journal de tests ; en mode `dossiers`, le `depot` publie la remise dans la boîte de sortie de l'instance, sous un nom provisoire puis renommée, et l'échange relève, toutes les 30 secondes et en lecture seule, le journal de tests nommé d'après la remise courante dans la boîte de sortie d'Agent2Test ; le `depot` le copie dans le dossier de travail, et `lire-acceptation.mjs` le lit comme un journal déposé à la main. Aucune connexion, aucune décision. Le module `relais`, le rôle `relais` et les outils `a2d_remise` et `a2d_remise_relayee` sont retirés. D24.INV-1 et D24.INV-2 remplacent D2.INV-1 ; D24.INV-3 reprend D2.INV-2 et y ajoute le contrôle d'intégrité au démarrage ; D24.INV-4 reprend mot pour mot D2.INV-3 ; D25.INV-1 et D25.INV-3 reprennent D23.INV-1 et D23.INV-3 ; D25.INV-2 et D25.INV-4 s'ajoutent. 23 modules, 96 invariants définis, dont 89 en vigueur, 223 scénarios de test. Méthode : agent-tdd-jira 1.3.2 ; binôme : agent2test 1.2.0. Archive 1.0.0.
