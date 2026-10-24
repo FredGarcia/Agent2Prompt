@@ -1,6 +1,6 @@
 ---
 name: watcher
-description: Watcher de la branche courante chargée dans un worktree dédié (miroir créé détaché et verrouillé dans le dossier commun git, scrutation de HEAD sans événement du système de fichiers, synchronisation incrémentale par diff entre commits, changement de branche, références, événements JSON, verrou d'écrivain unique et reprise d'un verrou orphelin, miroir modifié à la main jamais forcé, retrait du seul miroir, lancement en arrière-plan, disposition du kit). À lire avant de lancer watch ou mirror-remove.
+description: Watcher de la branche courante chargée dans un worktree dédié (miroir créé détaché et verrouillé dans le dossier commun git, scrutation de HEAD sans événement du système de fichiers, synchronisation incrémentale par diff entre commits, changement de branche, références, événements JSON, verrou d'écrivain unique et reprise d'un verrou orphelin, arrêt propre par watch-stop sur toutes les plateformes, miroir modifié à la main jamais forcé, retrait du seul miroir, lancement en arrière-plan sous Linux et sous Windows, disposition du kit). À lire avant de lancer watch, watch-stop ou mirror-remove.
 dimensions: [D6]
 status: active
 ---
@@ -57,7 +57,7 @@ Une ligne JSON par événement sur la sortie standard, avec `t` (date ISO) et `e
 | `branche` | `de`, `a`, `commit` |
 | `refs` | `branches`, `locales`, `distantes`, `courante`, `base`, `fichiers_de_branches` |
 | `erreur` | `message` ; le cycle suivant réessaie |
-| `arret` | |
+| `arret` | `raison` : `watch-stop`, ou le signal reçu (`SIGINT`, `SIGTERM`, `SIGHUP`, `SIGBREAK`) |
 | `a_jour` | `branche`, `commit` ; seulement avec `--once` |
 
 ```text
@@ -68,10 +68,15 @@ Mesure, sur 3 000 fichiers : indexation complète du miroir en 0,96 s, synchroni
 
 ## 5. Un seul écrivain (D6.INV-3)
 
-- Au démarrage, le watcher crée `memoire.db.watch.lock` en mode exclusif, avec son PID, sa date de démarrage et la source.
+- Au démarrage, le watcher crée `memoire.db.watch.lock` en mode exclusif, avec son PID, sa date de démarrage, la source et son intervalle.
 - Tant que ce processus vit, `ingest`, `git-scan`, `mirror-remove` et un second `watch` sortent avec le code 4. Les lecteurs ne sont pas gênés : la base est en mode WAL.
 - Un verrou dont le processus n'existe plus (arrêt brutal, redémarrage de la machine) est repris par le `watch` suivant.
-- `SIGINT` ou `SIGTERM` : le watcher finit son cycle, écrit `arret`, ferme la base, libère le verrou et sort avec le code 0.
+
+**Arrêt propre** (D12.INV-3) : le watcher finit son cycle, écrit `arret` avec sa raison, ferme la base, libère le verrou et sort avec le code 0.
+
+- **`watch-stop`**, sur toutes les plateformes : la commande écrit `memoire.db.watch.stop` avec le PID du watcher actif, puis attend que le verrou soit libéré, au plus trois intervalles et 5 s ; au-delà, code 4. Le watcher regarde cette demande toutes les 250 ms. Une demande qui vise un autre PID est ignorée, et une demande antérieure au démarrage du watcher est effacée. Sans watcher actif, `watch-stop` rend `"arrete": false`.
+- **Signaux** : `SIGINT` (Ctrl+C), `SIGTERM` et `SIGHUP` sous Linux et WSL2 ; Ctrl+C, Ctrl+Pause (`SIGBREAK`) et la fermeture de la console sous Windows. Un second signal du même type arrête aussitôt le processus ; le verrou laissé est repris ensuite.
+- Sous Windows, terminer un processus (`taskkill /F`, gestionnaire des tâches, `kill` de Node) ne lui transmet aucun signal : c'est un arrêt brutal. `watch-stop` est l'arrêt propre commun.
 
 ## 6. Miroir modifié à la main (D6.INV-4)
 
@@ -85,14 +90,29 @@ Résolution, par le développeur : examiner le miroir, récupérer ce qui doit l
 
 ## 8. Lancer le watcher
 
+Linux et WSL2, depuis le worktree source :
+
 ```bash
 # au premier plan, dans un terminal dédié
 node .skills/skill4appli/scripts/app_db.mjs watch
 # en arrière-plan, événements dans un journal, à côté de la base
 nohup node .skills/skill4appli/scripts/app_db.mjs watch >> "$(git rev-parse --git-common-dir)/skill4appli/watch.log" 2>&1 &
 # arrêt propre
-kill -TERM <pid>          # PID donné par l'événement demarrage et par status
+node .skills/skill4appli/scripts/app_db.mjs watch-stop
 ```
+
+Windows, dans CMD ou un fichier `.bat`, depuis le worktree source. Le bloc est en ASCII pur, commentaires compris, pour se coller tel quel dans un `.bat` :
+
+```bat
+REM au premier plan, dans une console dediee
+node .skills\skill4appli\scripts\app_db.mjs watch
+REM en arriere-plan, console reduite, evenements dans un journal a cote de la base
+start "skill4appli watch" /min cmd /c "node .skills\skill4appli\scripts\app_db.mjs watch >> .git\skill4appli\watch.log 2>&1"
+REM arret propre
+node .skills\skill4appli\scripts\app_db.mjs watch-stop
+```
+
+Dans la disposition du kit, le dossier commun est `..\.bare` et le skill `..\.skills\skill4appli`. Les événements sont en UTF-8 : `chcp 65001` les affiche correctement dans la console.
 
 Un agent qui sait suivre une commande longue peut consommer les événements ligne par ligne. Dans la disposition du kit `agents-paralleles-gitlab`, chaque worktree de demande a son watcher et son miroir ; avant `agt done`, lancer `mirror-remove` depuis le worktree de la demande, faute de quoi le miroir, verrouillé, reste dans `.bare/skill4appli/`.
 
@@ -108,5 +128,6 @@ Un agent qui sait suivre une commande longue peut consommer les événements lig
 - Miroir dédié, détaché, verrouillé ; source, index et branches intacts (D6.INV-1) : T18.
 - Seuls les fichiers changés relus ; branche suivie ; en continu, arrêt propre (D6.INV-2) : T19, T20.
 - Un seul écrivain, verrou orphelin repris (D6.INV-3) : T21.
+- Arrêt propre par `watch-stop` sur toutes les plateformes, demandes périmées ou étrangères ignorées (D12.INV-3) : T30.
 - Miroir modifié jamais écrasé, au démarrage comme en continu (D6.INV-4) : T22, T22b.
 - Seul le miroir retiré, sur commande (D6.INV-5) : T22, T23.
