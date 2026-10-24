@@ -1,9 +1,9 @@
 {
   "name": "agent2dev",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "specSchema": 1,
   "language": "fr",
-  "description": "Agent2Dev : système multi-agents de développement qui applique le skill agent-tdd-jira comme méthode, de la demande Jira en MHTML jusqu'au rapport, en cycle TDD scénario par scénario et en binôme avec Agent2Test ; le moteur rédige, des agents déterministes écrivent et exécutent, le développeur valide à chaque point ; journal chaîné, apprentissage sous gouvernance, exécution locale.",
+  "description": "Agent2Dev : système multi-agents de développement qui applique le skill agent-tdd-jira comme méthode, de la demande Jira en MHTML jusqu'au rapport, en cycle TDD scénario par scénario et en binôme avec Agent2Test ; le moteur rédige, des agents déterministes écrivent et exécutent, le développeur valide à chaque point ; journal chaîné, apprentissage sous gouvernance, un fichier SQLite unique ouvert par un agent médiateur, binôme à la main ou par un échange par dossiers facultatif, exécution locale.",
   "entry": "SKILL.md",
   "runtime": {
     "node": ">=22.13, 24 recommandé",
@@ -11,19 +11,19 @@
   },
   "targets": {
     "application": "back Java 21 et Spring Boot 3.5 construit par Maven, front Angular 20, PostgreSQL en Docker, Liquibase au démarrage ; application lancée par le développeur sur Tomcat en local",
-    "methode": "skill agent-tdd-jira 1.3.1, lu depuis sa transmission vérifiée",
+    "methode": "skill agent-tdd-jira 1.3.2, lu depuis sa transmission vérifiée",
     "moteur": "Gemini Code Assist par MCP, modèle local compatible OpenAI, ou simulation",
-    "stockage": "un fichier SQLite par agent, par node:sqlite, dès le départ",
+    "stockage": "un fichier SQLite unique, agent2dev.sqlite, ouvert par le seul agent médiateur donnees, par node:sqlite ; aucun serveur de base de données",
     "profil": "local",
-    "relais": "n8n facultatif, en relais de transport, sur 127.0.0.1, base SQLite"
+    "echange": "manuel par défaut ; par dossiers, facultatif, sans aucune connexion"
   },
   "references": [
-    { "name": "agent-tdd-jira", "version": "1.3.1" },
-    { "name": "agent2test", "version": "1.1.0" }
+    { "name": "agent-tdd-jira", "version": "1.3.2" },
+    { "name": "agent2test", "version": "1.2.0" }
   ],
   "modules": [
     { "id": "noyau", "path": "modules/noyau/SKILL.md", "dimensions": ["D1"], "status": "active" },
-    { "id": "donnees", "path": "modules/donnees/SKILL.md", "dimensions": ["D2"], "status": "active" },
+    { "id": "donnees", "path": "modules/donnees/SKILL.md", "dimensions": ["D24"], "status": "active" },
     { "id": "methode", "path": "modules/methode/SKILL.md", "dimensions": ["D3"], "status": "active" },
     { "id": "profil", "path": "modules/profil/SKILL.md", "dimensions": ["D4"], "status": "active" },
     { "id": "depot", "path": "modules/depot/SKILL.md", "dimensions": ["D5"], "status": "active" },
@@ -32,6 +32,7 @@
     { "id": "conception", "path": "modules/conception/SKILL.md", "dimensions": ["D8"], "status": "active" },
     { "id": "realisation", "path": "modules/realisation/SKILL.md", "dimensions": ["D9"], "status": "active" },
     { "id": "binome", "path": "modules/binome/SKILL.md", "dimensions": ["D10"], "status": "active" },
+    { "id": "echange", "path": "modules/echange/SKILL.md", "dimensions": ["D25"], "status": "active" },
     { "id": "tracabilite", "path": "modules/tracabilite/SKILL.md", "dimensions": ["D11"], "status": "active" },
     { "id": "orchestrateur", "path": "modules/orchestrateur/SKILL.md", "dimensions": ["D12"], "status": "active" },
     { "id": "journal", "path": "modules/journal/SKILL.md", "dimensions": ["D13"], "status": "active" },
@@ -42,10 +43,11 @@
     { "id": "mcp", "path": "modules/mcp/SKILL.md", "dimensions": ["D18"], "status": "active" },
     { "id": "tableau-de-bord", "path": "modules/tableau-de-bord/SKILL.md", "dimensions": ["D19"], "status": "active" },
     { "id": "exploitation", "path": "modules/exploitation/SKILL.md", "dimensions": ["D20"], "status": "active" },
-    { "id": "relais", "path": "modules/relais/SKILL.md", "dimensions": ["D23"], "status": "active" },
     { "id": "memoire", "path": "modules/memoire/SKILL.md", "dimensions": ["D21"], "status": "reserved" },
     { "id": "autonomie", "path": "modules/autonomie/SKILL.md", "dimensions": ["D22"], "status": "reserved" }
   ],
   "extensionPoints": ["E1", "E2", "E3", "E4"],
-  "previousVersions": []
+  "previousVersions": [
+    { "version": "1.0.0", "file": "archives/SKILL-v1.0.0.md" }
+  ]
 }

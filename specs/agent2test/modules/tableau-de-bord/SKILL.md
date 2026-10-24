@@ -1,6 +1,6 @@
 ---
 name: tableau-de-bord
-description: Tableau de bord d'Agent2Test (IHM HTTP et SSE sur 127.0.0.1, HTML et JavaScript natifs sans cadre, amorçage par code à usage unique et cookie de session, vues testeur, développeur et gouvernance, remises reçues du relais et leur ouverture par un humain, droits de décision par rôle, CP-4 seulement ici, points de contrôle avec preuves côte à côte, arbre 7E, arrêt d'urgence, conformité RGAA 4.1 A et AA, textes en français, notice et limites). À implémenter au lot 7.
+description: Tableau de bord d'Agent2Test (IHM HTTP et SSE sur 127.0.0.1, HTML et JavaScript natifs sans cadre, amorçage par code à usage unique et cookie de session, vues testeur, développeur et gouvernance, remises reçues, déposées ici ou lues dans une boîte d'échange, et leur ouverture par un humain, droits de décision par rôle, CP-4 seulement ici, points de contrôle avec preuves côte à côte, arbre 7E, arrêt d'urgence, conformité RGAA 4.1 A et AA, textes en français, notice et limites). À implémenter au lot 7.
 dimensions: [D17]
 status: active
 ---
@@ -22,18 +22,17 @@ L'IHM de l'opérateur. Elle montre l'état des campagnes et recueille les décis
 | testeur | CP-0, CP-1, CP-2, CP-3 | campagnes ; points de contrôle ; journal en arbre 7E ; remises reçues |
 | développeur | CP-2, CP-5 | défauts applicatifs présumés : étapes de reproduction, captures, trace, erreurs de console et réponses en échec ; remises reçues |
 | référent qualité | CP-4, depuis le tableau de bord seulement | gouvernance : propositions, leçons candidates, grand livre, effets mesurés, accord entre contrôles et humains, indicateurs du premier ordre |
-| relais | aucune | aucune vue : trois outils MCP, pour n8n (module `relais`) |
 
 - La configuration humaine associe chaque utilisateur à un ou plusieurs rôles ; en local, une même personne peut les tenir tous.
 - Une décision envoyée par un rôle qui n'y a pas droit est refusée `DROIT_INSUFFISANT`.
-- L'arrêt d'urgence est accessible à tous les rôles humains, sur chaque page. Le rôle `relais` n'a accès à aucune route du tableau de bord.
+- L'arrêt d'urgence est accessible à tous les rôles, sur chaque page.
 
 ## 3. Écrans
 
 - **Point de contrôle** : ce qui est à décider, à gauche ; les preuves, à droite (parcours et résultat probatoire en CP-2, captures et trace en CP-3) ; boutons de décision et champ de commentaire, obligatoire pour une correction en CP-1.
 - **Campagne** : roue 7E de la campagne, dépliable jusqu'à l'étape ; matrice critères × verdicts ; liens vers les quatre formats du journal de tests.
 - **CP-5** : nom du batch à lancer, scénario concerné, boutons « batch lancé et terminé » et « scénario non joué » avec motif.
-- **Remises reçues** : chaque remise déposée par le relais, avec sa demande, sa racine, son commit, ses sources et leurs empreintes, les jouables et les préalables qu'elle prévoit, et son état (reçue, ouverte, périmée). Le bouton « ouvrir la campagne », pour le testeur et le développeur, suit le rappel : « Redémarrez l'application sur le Tomcat local depuis le commit remis ; Agent2Test ne la démarre pas. » Une remise périmée nomme le commit, le fichier suivi ou la source qui diffère (module `relais`, section 4).
+- **Remises reçues** : le bouton « déposer une remise », pour le testeur et le développeur, accepte un fichier au format `agent2test.remise/1` ; en mode `dossiers`, les remises lues dans les boîtes d'Agent2Dev s'y ajoutent, annoncées dans la région `aria-live`. Chaque remise s'affiche avec sa demande, sa racine, son commit, ses sources et leurs empreintes, les jouables et les préalables qu'elle prévoit, et son état (reçue, ouverte, périmée). Le bouton « ouvrir la campagne », pour le testeur et le développeur, suit le rappel : « Redémarrez l'application sur le Tomcat local depuis le commit remis ; Agent2Test ne la démarre pas. » Une remise périmée nomme le commit, le fichier suivi ou la source qui diffère (module `echange`, section 4).
 - **Gouvernance** : chaque proposition avec règle, échelle, phase, valeurs, preuves et effet attendu ; ratifier, amender dans les bornes, refuser.
 - **Notice** : mode d'emploi, limites du système (ce qu'il ne fait pas : modifier l'application, la démarrer, lancer un batch, ratifier ses propres leçons).
 
@@ -66,7 +65,7 @@ Les textes de l'IHM, les messages et le journal de tests sont en français ; les
 | TB5 | D17.INV-3 | un parcours complet de CP-1 se fait au clavier seul, focus visible à chaque étape |
 | TB6 | D17.INV-3 | une alerte reçue par le flux SSE est annoncée dans la région `aria-live` |
 | TB7 | D17.INV-4 | les textes des vues, des messages et du journal de tests sont en français (liste des chaînes de l'IHM) |
-| TB8 | D17.INV-2 | l'arrêt d'urgence est présent et opérant sur chaque vue, pour chaque rôle humain ; un jeton au seul rôle `relais` est refusé sur chaque route |
+| TB8 | D17.INV-2 | l'arrêt d'urgence est présent et opérant sur chaque vue, pour chaque rôle |
 
 ## 8. Fichiers à produire
 

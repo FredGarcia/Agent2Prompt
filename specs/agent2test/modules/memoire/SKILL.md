@@ -27,8 +27,8 @@ status: active
 
 ## 3. Recherche hybride (D12.INV-1)
 
-- Plein texte : table virtuelle FTS5 de `memoire.sqlite`, `tokenize = 'unicode61 remove_diacritics 2'`, classée par `bm25`. La requête se construit sans rien interpréter : chaque mot, sans diacritiques et hors des mots vides du français (`src/agents/memoire/mots-vides.js`), devient un terme entre guillemets ; au-delà de 5 lettres, il perd ses deux dernières lettres ; à partir de 4 lettres, il est cherché en préfixe (`exporter` donne `"export"*`, qui trouve « export », « exporté », « exports ») ; les termes sont joints par `OR`. Aucun caractère de la requête n'est lu comme un opérateur FTS5.
-- Vecteurs, en option : quand la configuration désigne un modèle de plongement local (adaptateur `compatible-openai`, point d'accès `embeddings`), chaque fragment garde son vecteur, en `BLOB` de nombres flottants sur 32 bits, avec le nom du modèle et la dimension ; la similarité cosinus se calcule en JavaScript, sur les fragments que l'épinglage retient. Aucune extension de SQLite n'est chargée (D21.INV-1).
+- Plein texte : table virtuelle FTS5 `memoire__texte`, dans l'espace de la `memoire`, `tokenize = 'unicode61 remove_diacritics 2'`, classée par `bm25`. La requête se construit sans rien interpréter : chaque mot, sans diacritiques et hors des mots vides du français (`src/agents/memoire/mots-vides.js`), devient un terme entre guillemets ; au-delà de 5 lettres, il perd ses deux dernières lettres ; à partir de 4 lettres, il est cherché en préfixe (`exporter` donne `"export"*`, qui trouve « export », « exporté », « exports ») ; les termes sont joints par `OR`. Aucun caractère de la requête n'est lu comme un opérateur FTS5.
+- Vecteurs, en option : quand la configuration désigne un modèle de plongement local (adaptateur `compatible-openai`, point d'accès `embeddings`), chaque fragment garde son vecteur, en `BLOB` de nombres flottants sur 32 bits, avec le nom du modèle et la dimension ; la similarité cosinus se calcule en JavaScript, sur les fragments que l'épinglage retient. Aucune extension de SQLite n'est chargée (D23.INV-1).
 - Fusion par rang réciproque : score = Σ 1 / (60 + rang) sur les deux classements.
 - Sans modèle, le plein texte seul fait fonctionner le système ; aucun appel externe n'est fait pour les vecteurs.
 - `k` et le seuil de similarité sont des règles modifiables (module `referentiel`, section 4).
@@ -44,7 +44,7 @@ status: active
 
 - **Fragment d'une version postérieure** : interdit dans une campagne en cours ; le filtre d'épinglage n'est jamais facultatif pour une consigne.
 - **Nom propre laissé dans une provenance** : « commentaire 50001, Jeanne Dupont » devient « commentaire 50001, [masqué] ».
-- **Base vectorielle à part** : non ; tout tient dans `memoire.sqlite`, sans extension.
+- **Base vectorielle à part** : non ; tout tient dans les tables de la `memoire`, au fichier de données unique, sans extension.
 - **Racine exacte attendue** : FTS5 n'a pas de racinisation française ; la réduction des mots et la recherche en préfixe en tiennent lieu, et la fusion avec les vecteurs, quand un modèle est configuré, rattrape le reste.
 - **Requête prise pour une expression FTS5** : un `NEAR`, un `:` ou un `*` venus du texte changeraient le sens de la recherche, ou la feraient échouer ; chaque terme est mis entre guillemets.
 

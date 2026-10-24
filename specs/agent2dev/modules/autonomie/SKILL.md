@@ -7,7 +7,7 @@ status: reserved
 
 # Module `autonomie` (D22, réservé)
 
-Statut : `reserved`. En 1.0.0, chaque point V0 à V5 est présenté au développeur et attend sa décision explicite, comme le skill l'exige (`agent-tdd-jira:D2.INV-5`, `agent-tdd-jira:D5.INV-4`).
+Statut : `reserved`. En 1.x, chaque point V0 à V5 est présenté au développeur et attend sa décision explicite, comme le skill l'exige (`agent-tdd-jira:D2.INV-5`, `agent-tdd-jira:D5.INV-4`).
 
 ## 1. Pourquoi cette dimension existe
 

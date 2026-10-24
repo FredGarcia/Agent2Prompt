@@ -20,9 +20,9 @@ La colonne « Repris dans » cite les modules de la spécification qui reprennen
 
 | Spécification | Version | Dimensions actives | Dimensions réservées | Invariants |
 |---|---|---|---|---|
-| [`agent-tdd-jira`](#agent-tdd-jira-131) | 1.3.1 | 9 | 1 | 43 |
-| [`agent2dev`](#agent2dev-100) | 1.0.0 | 21 | 2 | 88 |
-| [`agent2test`](#agent2test-110) | 1.1.0 | 19 | 2 | 99 |
+| [`agent-tdd-jira`](#agent-tdd-jira-132) | 1.3.2 | 9 | 1 | 43 |
+| [`agent2dev`](#agent2dev-110) | 1.1.0 | 21 | 2 | 96 |
+| [`agent2test`](#agent2test-120) | 1.2.0 | 19 | 2 | 108 |
 | [`agents-paralleles-gitlab`](#agents-paralleles-gitlab-101) | 1.0.1 | 5 | 2 | 20 |
 | [`analyse-projet`](#analyse-projet-102) | 1.0.2 | 5 | 1 | 16 |
 | [`angular`](#angular-101) | 1.0.1 | 8 | 2 | 30 |
@@ -32,7 +32,7 @@ La colonne « Repris dans » cite les modules de la spécification qui reprennen
 | [`sonarqube`](#sonarqube-102) | 1.0.2 | 6 | 2 | 22 |
 | [`tension-dashboard-gitlab-agent`](#tension-dashboard-gitlab-agent-220) | 2.2.0 | 7 | 3 | 17 |
 
-## agent-tdd-jira 1.3.1
+## agent-tdd-jira 1.3.2
 
 Agent de développement TDD : demande Jira en MHTML, analyse avec commentaires, US et critères d'acceptation numérotés, scénarios Gherkin par critère, variantes back Java et front Angular, cycle rouge, vert, remanié scénario par scénario, traçabilité ; binôme avec Agent2Test, verdict d'acceptation par critère ; mode parallèle dans un worktree géré par agents-paralleles-gitlab. Point d'entrée : [`specs/agent-tdd-jira/SKILL.md`](specs/agent-tdd-jira/SKILL.md).
 
@@ -128,9 +128,9 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 | **D10.INV-6** | un critère d'acceptation n'entre en réalisation (choix des variantes V3, cycle TDD V4) que s'il est validé, décliné en scénarios validés, et qu'aucune question ouverte ne le concerne. | `us-criteres`, `variantes`, `agent2dev/cadrage` |
 | **D10.INV-7** | la matrice de traçabilité relie chaque US à ses critères d'acceptation, et chaque critère à ses scénarios, tests et commits, ou à un statut « non réalisé » avec sa raison ; le rapport final donne l'état de chaque critère. | `us-criteres`, `tracabilite`, `agent2dev`, `agent2dev/tracabilite` |
 
-## agent2dev 1.0.0
+## agent2dev 1.1.0
 
-Agent2Dev : système multi-agents de développement qui applique le skill agent-tdd-jira comme méthode, de la demande Jira en MHTML jusqu'au rapport, en cycle TDD scénario par scénario et en binôme avec Agent2Test ; le moteur rédige, des agents déterministes écrivent et exécutent, le développeur valide à chaque point ; journal chaîné, apprentissage sous gouvernance, exécution locale. Point d'entrée : [`specs/agent2dev/SKILL.md`](specs/agent2dev/SKILL.md).
+Agent2Dev : système multi-agents de développement qui applique le skill agent-tdd-jira comme méthode, de la demande Jira en MHTML jusqu'au rapport, en cycle TDD scénario par scénario et en binôme avec Agent2Test ; le moteur rédige, des agents déterministes écrivent et exécutent, le développeur valide à chaque point ; journal chaîné, apprentissage sous gouvernance, un fichier SQLite unique ouvert par un agent médiateur, binôme à la main ou par un échange par dossiers facultatif, exécution locale. Point d'entrée : [`specs/agent2dev/SKILL.md`](specs/agent2dev/SKILL.md).
 
 ### D1 : Noyau 7E, bus et constitution (active)
 
@@ -143,7 +143,7 @@ Agent2Dev : système multi-agents de développement qui applique le skill agent-
 | **D1.INV-5** | Agent2Dev ne traite qu'une demande Jira exportée en MHTML, pour le projet d'un profil ratifié ; toute intention de démarrer, d'arrêter ou de déployer l'application, de lancer un batch, d'administrer un environnement, d'écrire en base ou dans Jira est refusée avec le motif « hors périmètre ». | `noyau`, `orchestrateur` |
 | **D1.INV-6** | aucun agent n'écrit la constitution, le code ou les schémas d'Agent2Dev, la configuration humaine ni la transmission du skill, et aucun ne réécrit un profil ratifié : le `profil` en crée seulement une version nouvelle, à la décision V0. | `noyau`, `profil`, `referentiel`, `exploitation` |
 
-### D2 : Données par agent, en SQLite (active)
+### D2 : Données par agent, en SQLite (superseded)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
@@ -324,18 +324,36 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 
 Dimension réservée : aucun invariant en vigueur dans cette version.
 
-### D23 : Relais du binôme par n8n, facultatif (active)
+### D23 : Relais du binôme par n8n, facultatif (superseded)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D23.INV-1** | Agent2Dev ne dépend jamais du relais n8n : désactivé par défaut, le binôme se fait à la main, à l'identique ; activé, c'est le relais qui appelle le serveur MCP, et Agent2Dev n'ouvre aucune connexion vers n8n ni vers Agent2Test. | `mcp`, `exploitation`, `relais` |
-| **D23.INV-2** | un jeton au rôle `relais` n'atteint que `a2d_remise`, `a2d_remise_relayee` et `a2d_journal_de_tests` ; toute décision, rédaction, soumission de demande, suspension ou reprise lui est refusée. | `relais` |
-| **D23.INV-3** | un journal de tests reçu du relais l'est par son contenu, jamais par un chemin ; le `depot` le range dans le dossier de travail de la demande, et `lire-acceptation.mjs` le lit comme un journal déposé à la main. | `relais` |
-| **D23.INV-4** | la configuration fournie pour n8n le fait écouter sur `127.0.0.1` seulement, avec sa base SQLite, sans télémétrie ni appel sortant ; son workflow n'appelle que les outils du rôle `relais` des deux têtes, et ses fichiers ne contiennent aucun jeton. | `relais` |
+| **D23.INV-1** | Agent2Dev ne dépend jamais du relais n8n : désactivé par défaut, le binôme se fait à la main, à l'identique ; activé, c'est le relais qui appelle le serveur MCP, et Agent2Dev n'ouvre aucune connexion vers n8n ni vers Agent2Test. | `echange` |
+| **D23.INV-2** | un jeton au rôle `relais` n'atteint que `a2d_remise`, `a2d_remise_relayee` et `a2d_journal_de_tests` ; toute décision, rédaction, soumission de demande, suspension ou reprise lui est refusée. | `echange` |
+| **D23.INV-3** | un journal de tests reçu du relais l'est par son contenu, jamais par un chemin ; le `depot` le range dans le dossier de travail de la demande, et `lire-acceptation.mjs` le lit comme un journal déposé à la main. | `echange` |
+| **D23.INV-4** | la configuration fournie pour n8n le fait écouter sur `127.0.0.1` seulement, avec sa base SQLite, sans télémétrie ni appel sortant ; son workflow n'appelle que les outils du rôle `relais` des deux têtes, et ses fichiers ne contiennent aucun jeton. | `echange` |
 
-## agent2test 1.1.0
+### D24 : Données en un fichier unique, par l'agent médiateur (active)
 
-Agent2Test : système multi-agents qui choisit, prépare, exécute et journalise les tests essentiels d'une application Angular pour une demande, en pilotant Playwright comme une bibliothèque depuis Node, dans un projet séparé de l'application ; plan importé d'agent-tdd-jira, verdict par critère d'acceptation, points de contrôle humains, cybernétique de premier et de second ordre, un fichier SQLite par agent, relais n8n facultatif pour la remise d'Agent2Dev, exécution locale. Point d'entrée : [`specs/agent2test/SKILL.md`](specs/agent2test/SKILL.md).
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D24.INV-1** | seul l'agent médiateur `donnees` ouvre le fichier de données, et les commandes humaines par son code ; un autre agent n'y accède que par les actions du médiateur, sur le bus, qui atteste l'appelant ; un agent lit les données d'un autre par une action déclarée de cet agent, jamais par le médiateur. | `donnees` |
+| **D24.INV-2** | chaque table a un seul agent propriétaire, dont elle porte le nom en préfixe ; le médiateur tire la table de l'appelant et de la collection, et aucun agent ne lui transmet de SQL ni de nom de table ; une migration qui crée ou modifie un objet hors des tables de son agent est annulée en entier, et, au démarrage, chaque requête du médiateur est vérifiée sur le plan d'exécution de SQLite : sur la collection d'un agent, elle ne touche que des tables de cet agent, déclencheurs, vues et clés étrangères compris. | `donnees` |
+| **D24.INV-3** | les données d'Agent2Dev sont dans un seul fichier SQLite, ouvert par `node:sqlite` dès le premier enregistrement ; chaque écriture est une transaction, et un arrêt du processus, même brutal, ne laisse aucun enregistrement partiel ; un fichier de données que SQLite refuse, ou qui échoue à son contrôle d'intégrité, empêche le démarrage. | `donnees` |
+| **D24.INV-4** | le journal et le grand livre sont en ajout seul : aucune action ne modifie ni ne supprime un enregistrement, et toute purge est une commande humaine, journalisée. | `donnees` |
+
+### D25 : Échange du binôme par dossiers, facultatif (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D25.INV-1** | Agent2Dev ne dépend jamais de l'échange : en mode `manuel`, le défaut, le binôme se fait à la main, à l'identique ; en mode `dossiers`, Agent2Dev n'ouvre aucune connexion vers Agent2Test, et l'échange n'écrit, par le `depot`, que dans la boîte de sortie de l'instance et dans le dossier de travail de la demande. | `echange`, `exploitation` |
+| **D25.INV-2** | de l'échange, Agent2Dev ne lit que la boîte de sortie d'Agent2Test déclarée dans la configuration humaine, en lecture seule, et n'y retient que le journal de tests nommé d'après la remise courante de la demande. | `echange` |
+| **D25.INV-3** | un journal relevé par l'échange est copié par le `depot` dans le dossier de travail de la demande, et `lire-acceptation.mjs` le lit comme un journal déposé à la main. | `echange` |
+| **D25.INV-4** | une remise publiée porte le format `agent2test.remise/1`, sans contenu de fichier ni secret ; elle s'écrit par un fichier provisoire renommé ensuite, et n'est jamais réécrite ; l'échange ne décide rien et n'ouvre aucune campagne. | `echange` |
+
+## agent2test 1.2.0
+
+Agent2Test : système multi-agents qui choisit, prépare, exécute et journalise les tests essentiels d'une application Angular pour une demande, en pilotant Playwright comme une bibliothèque depuis Node, dans un projet séparé de l'application ; plan importé d'agent-tdd-jira, verdict par critère d'acceptation, points de contrôle humains, cybernétique de premier et de second ordre, un fichier SQLite unique ouvert par un agent médiateur, remise d'Agent2Dev en fichier ou par un échange par dossiers facultatif, exécution locale. Point d'entrée : [`specs/agent2test/SKILL.md`](specs/agent2test/SKILL.md).
 
 ### D1 : Noyau 7E, bus et constitution (active)
 
@@ -365,7 +383,7 @@ Agent2Test : système multi-agents qui choisit, prépare, exécute et journalise
 | **D3.INV-2** | chaque US, critère et scénario a un identifiant canonique unique ; deux éléments de même identifiant bloquent l'import, et le message cite leurs deux emplacements. | `plan` |
 | **D3.INV-3** | un scénario dont un prérequis sort du périmètre (redémarrage, écriture directe en base) est marqué « non automatisable » avec son motif ; un prérequis de batch Java devient un préalable confié au développeur (CP-5). | `plan` |
 | **D3.INV-4** | le plan est versionné : réimporter des sources inchangées ne crée aucune version, une source modifiée en crée une nouvelle, et la précédente reste consultable. | `plan` |
-| **D3.INV-5** | seul un scénario validé, qui illustre au moins un critère validé, est jouable ; un scénario proposé non validé, en attente d'une question, limité au back, ou qui exige un rôle que la session n'a pas, est « non jouable », avec son motif. | `plan`, `navigateur`, `relais`, `agent-tdd-jira/binome-agent2test`, `agent2dev/binome` |
+| **D3.INV-5** | seul un scénario validé, qui illustre au moins un critère validé, est jouable ; un scénario proposé non validé, en attente d'une question, limité au back, ou qui exige un rôle que la session n'a pas, est « non jouable », avec son motif. | `plan`, `navigateur`, `echange`, `agent-tdd-jira/binome-agent2test`, `agent2dev/binome` |
 | **D3.INV-6** | un critère cité par la demande et absent du plan est signalé avant la sélection. | `plan` |
 
 ### D4 : Navigateur, session et preuves (active)
@@ -428,11 +446,11 @@ Agent2Test : système multi-agents qui choisit, prépare, exécute et journalise
 |---|---|---|
 | **D9.INV-1** | aucun point de contrôle n'est supprimé, sauté ou validé par le système ; aucune phase ne consomme une sortie non ratifiée, et le niveau d'autonomie de chaque point se lit dans la configuration humaine. | `orchestrateur` |
 | **D9.INV-2** | chaque décision enregistre son auteur, son canal, sa date et son commentaire. | `orchestrateur` |
-| **D9.INV-3** | avant le premier scénario, une sonde vérifie que l'application répond ; sinon, la campagne est refusée avec ce motif. | `orchestrateur`, `relais` |
+| **D9.INV-3** | avant le premier scénario, une sonde vérifie que l'application répond ; sinon, la campagne est refusée avec ce motif. | `orchestrateur`, `echange` |
 | **D9.INV-4** | une seule campagne s'exécute à la fois sur une application cible ; les autres attendent en file. | `orchestrateur` |
 | **D9.INV-5** | l'arrêt d'urgence suspend la campagne au plus tard à la fin de l'étape en cours. | `orchestrateur` |
 | **D9.INV-6** | après un redémarrage du processus, la campagne reprend au début du scénario interrompu, sans perte de journal. | `orchestrateur` |
-| **D9.INV-7** | Agent2Test ne démarre, n'arrête ni ne déploie l'application, et ne lance aucun batch ; un scénario à préalable de batch attend en CP-5 que le développeur l'ait lancé et l'ait déclaré terminé. | `plan`, `orchestrateur`, `exploitation`, `relais`, `agent-tdd-jira/binome-agent2test` |
+| **D9.INV-7** | Agent2Test ne démarre, n'arrête ni ne déploie l'application, et ne lance aucun batch ; un scénario à préalable de batch attend en CP-5 que le développeur l'ait lancé et l'ait déclaré terminé. | `plan`, `orchestrateur`, `exploitation`, `echange`, `agent-tdd-jira/binome-agent2test` |
 
 ### D10 : Journal et journal de tests (active)
 
@@ -441,7 +459,7 @@ Agent2Test : système multi-agents qui choisit, prépare, exécute et journalise
 | **D10.INV-1** | le journal est en ajout seul, imposé par des déclencheurs de la base qui refusent toute modification et toute suppression, et chaîné par empreintes ; au démarrage, un déclencheur absent ou une chaîne rompue empêche le démarrage, et `verifierChaine` nomme la première ligne rompue, même quand l'altération vient d'un outil SQLite, hors du système. | `donnees`, `journal` |
 | **D10.INV-2** | le journal de tests d'une campagne est produit en Markdown, JSON, JUnit XML et HTML à partir de la même source, et sa matrice critères × verdicts couvre tous les critères de la demande, trous de couverture compris. | `journal` |
 | **D10.INV-3** | tout contenu produit par le moteur est marqué comme tel dans le journal de tests, avec moteur, fiche et version. | `stratege`, `journal` |
-| **D10.INV-4** | l'empreinte de fin de chaîne du journal de tests est celle du journal à la clôture de la campagne. | `journal`, `relais` |
+| **D10.INV-4** | l'empreinte de fin de chaîne du journal de tests est celle du journal à la clôture de la campagne. | `journal`, `echange` |
 
 ### D11 : Observabilité de premier ordre (active)
 
@@ -513,8 +531,8 @@ Agent2Test : système multi-agents qui choisit, prépare, exécute et journalise
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
 | **D18.INV-1** | sous une version de Node antérieure à 22.13, le kit refuse de démarrer avec un message explicite. | `donnees`, `exploitation` |
-| **D18.INV-2** | le kit n'a que deux dépendances d'exécution, `playwright` et `pg`, épinglées par un fichier de verrouillage et installées par `npm ci` ; toutes ses dépendances et images sont sous licence open source. | `exploitation`, `relais`, `accessibilite` |
-| **D18.INV-3** | les données d'Agent2Test sont des fichiers SQLite, hors de son dépôt et du projet de l'application, sans serveur ni port ; la seule base de l'application qu'il joint est celle de l'oracle, en lecture seule (D21.INV-3). | `donnees`, `exploitation` |
+| **D18.INV-2** | le kit n'a que deux dépendances d'exécution, `playwright` et `pg`, épinglées par un fichier de verrouillage et installées par `npm ci` ; toutes ses dépendances et images sont sous licence open source. | `exploitation`, `accessibilite` |
+| **D18.INV-3** | les données d'Agent2Test sont des fichiers SQLite, hors de son dépôt et du projet de l'application, sans serveur ni port ; la seule base de l'application qu'il joint est celle de l'oracle, en lecture seule (D23.INV-3). | `donnees`, `exploitation` |
 | **D18.INV-4** | seul le profil d'environnement `local` est accepté ; un profil `recette` ou `conteneur` est refusé tant que la dimension D20 est réservée. | `preparateur`, `exploitation` |
 
 ### D19 : Accessibilité des parcours (axe) (reserved)
@@ -525,24 +543,43 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 
 Dimension réservée : aucun invariant en vigueur dans cette version.
 
-### D21 : Données par agent, en SQLite (active)
+### D21 : Données par agent, en SQLite (superseded)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D21.INV-1** | chaque agent propriétaire a son propre fichier SQLite, sur une connexion qui n'est qu'à lui ; un contrat ne s'exécute que sur la connexion de son propriétaire, et aucun contrat n'attache un autre fichier ni ne charge d'extension : un agent n'a aucun moyen d'écrire dans les données d'un autre. | `donnees`, `memoire` |
+| **D21.INV-1** | chaque agent propriétaire a son propre fichier SQLite, sur une connexion qui n'est qu'à lui ; un contrat ne s'exécute que sur la connexion de son propriétaire, et aucun contrat n'attache un autre fichier ni ne charge d'extension : un agent n'a aucun moyen d'écrire dans les données d'un autre. | `donnees` |
 | **D21.INV-2** | seuls des contrats nommés s'exécutent ; une requête SQL libre est refusée. | `donnees` |
-| **D21.INV-3** | la base de l'application n'est jamais accédée, sauf par l'oracle en lecture seule, activé explicitement dans la configuration humaine et limité à des contrats de lecture nommés. | `donnees`, `exploitation` |
+| **D21.INV-3** | la base de l'application n'est jamais accédée, sauf par l'oracle en lecture seule, activé explicitement dans la configuration humaine et limité à des contrats de lecture nommés. | `donnees` |
 | **D21.INV-4** | les preuves sont purgées au-delà de leur durée de conservation ; le journal garde leurs empreintes. | `donnees` |
 | **D21.INV-5** | chaque écriture est une transaction : un arrêt du processus, même brutal, ne laisse aucun enregistrement partiel ; un fichier qui échoue au contrôle d'intégrité de SQLite empêche le démarrage, avec son nom. | `donnees` |
 
-### D22 : Relais du binôme par n8n, facultatif (active)
+### D22 : Relais du binôme par n8n, facultatif (superseded)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D22.INV-1** | Agent2Test ne dépend jamais du relais n8n : désactivé par défaut, une campagne s'ouvre et se mène à la main, à l'identique ; activé, c'est le relais qui appelle le serveur MCP, et Agent2Test n'ouvre aucune connexion vers n8n ni vers Agent2Dev. | `relais` |
-| **D22.INV-2** | un jeton au rôle `relais` n'atteint que `a2t_deposer_remise`, `a2t_etat` et `a2t_rapport`, qui ne lui montrent que les remises et les campagnes qui en sont issues ; toute décision, toute ouverture de campagne, l'arrêt d'urgence et la reprise lui sont refusés. | `mcp`, `relais` |
-| **D22.INV-3** | une remise déposée n'ouvre aucune campagne : un testeur ou le développeur l'ouvre, depuis le tableau de bord ou par MCP ; à l'ouverture, un commit, un fichier suivi modifié ou une empreinte de source qui diffère de la remise la rend périmée, et aucune campagne ne s'ouvre. | `plan`, `orchestrateur`, `relais` |
-| **D22.INV-4** | une remise n'est reçue que conforme au schéma fermé `agent2test.remise/1`, sans contenu de fichier ni secret, et pour une racine admise : celle du profil d'environnement, ou une racine de `remises.racines` dans la configuration humaine. | `relais` |
+| **D22.INV-1** | Agent2Test ne dépend jamais du relais n8n : désactivé par défaut, une campagne s'ouvre et se mène à la main, à l'identique ; activé, c'est le relais qui appelle le serveur MCP, et Agent2Test n'ouvre aucune connexion vers n8n ni vers Agent2Dev. | `echange` |
+| **D22.INV-2** | un jeton au rôle `relais` n'atteint que `a2t_deposer_remise`, `a2t_etat` et `a2t_rapport`, qui ne lui montrent que les remises et les campagnes qui en sont issues ; toute décision, toute ouverture de campagne, l'arrêt d'urgence et la reprise lui sont refusés. | `echange` |
+| **D22.INV-3** | une remise déposée n'ouvre aucune campagne : un testeur ou le développeur l'ouvre, depuis le tableau de bord ou par MCP ; à l'ouverture, un commit, un fichier suivi modifié ou une empreinte de source qui diffère de la remise la rend périmée, et aucune campagne ne s'ouvre. | `echange` |
+| **D22.INV-4** | une remise n'est reçue que conforme au schéma fermé `agent2test.remise/1`, sans contenu de fichier ni secret, et pour une racine admise : celle du profil d'environnement, ou une racine de `remises.racines` dans la configuration humaine. | `echange` |
+
+### D23 : Données en un fichier unique, par l'agent médiateur (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D23.INV-1** | seul l'agent médiateur `donnees` ouvre le fichier de données, et les commandes humaines par son code ; chaque table a un seul agent propriétaire, dont elle porte le préfixe ; un contrat ne s'exécute que pour son propriétaire, et, au démarrage, le médiateur vérifie sur le plan d'exécution de SQLite que chaque contrat ne touche que des tables de son propriétaire, déclencheurs compris, sans attacher de fichier ni charger d'extension : un agent n'a aucun moyen d'écrire dans les données d'un autre. | `donnees`, `memoire` |
+| **D23.INV-2** | seuls des contrats nommés s'exécutent ; une requête SQL libre est refusée. | `donnees` |
+| **D23.INV-3** | la base de l'application n'est jamais accédée, sauf par l'oracle en lecture seule, activé explicitement dans la configuration humaine et limité à des contrats de lecture nommés. | `donnees`, `exploitation` |
+| **D23.INV-4** | les preuves sont purgées au-delà de leur durée de conservation ; le journal garde leurs empreintes. | `donnees` |
+| **D23.INV-5** | chaque écriture est une transaction : un arrêt du processus, même brutal, ne laisse aucun enregistrement partiel ; un fichier de données que SQLite refuse, ou qui échoue à son contrôle d'intégrité, empêche le démarrage. | `donnees` |
+
+### D24 : Remises d'Agent2Dev, en fichier ou par dossier d'échange (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D24.INV-1** | Agent2Test ne dépend jamais de l'échange : en mode `manuel`, le défaut, une campagne s'ouvre et se mène à la main, à l'identique ; en mode `dossiers`, Agent2Test n'ouvre aucune connexion vers Agent2Dev, ne lit que les boîtes de sortie d'Agent2Dev déclarées dans la configuration humaine, en lecture seule, et n'écrit que dans sa propre boîte de sortie. | `echange` |
+| **D24.INV-2** | une remise reçue, déposée par l'opérateur ou lue dans une boîte, n'ouvre aucune campagne : un testeur ou le développeur l'ouvre, depuis le tableau de bord ou par MCP ; à l'ouverture, un fichier suivi modifié ou une empreinte de source qui diffère de la remise la rend périmée, et aucune campagne ne s'ouvre. | `plan`, `orchestrateur`, `echange` |
+| **D24.INV-3** | une remise n'est reçue que conforme au schéma fermé `agent2test.remise/1`, sans contenu de fichier ni secret ; elle s'ouvre sur la racine admise, celle du profil ou de `remises.racines`, dont `HEAD` est le commit remis, et jamais sur le chemin qu'elle cite ; sans racine admise à ce commit, elle est périmée. | `plan`, `echange` |
+| **D24.INV-4** | en mode `dossiers`, Agent2Test ne dépose dans sa boîte de sortie que le journal de tests JSON clos d'une campagne issue d'une remise, octet pour octet, sous le nom de la remise et de la campagne, par un fichier provisoire renommé ensuite. | `echange` |
 
 ## agents-paralleles-gitlab 1.0.1
 

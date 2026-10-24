@@ -30,9 +30,9 @@ Dans l'un et l'autre :
 
 - chaque chemin est résolu par `realpath` ; un chemin qui sort de la racine de l'arbre, y compris par lien symbolique, est refusé `DEPOT_HORS_RACINE` ;
 - les fichiers exclus du profil (secrets) ne sont ni lus ni écrits ; les fichiers protégés (`.git/`, CI, hooks et règles du kit) ne sont jamais écrits : `DEPOT_FICHIER_PROTEGE` ;
-- les fichiers de travail de la demande (`demande.json`, images, scripts du skill, `impact.txt`, patchs, rapport) vont dans son dossier de travail : `<sortie>/<CLÉ>/` hors mode parallèle ; en mode parallèle, `travail/` du worktree, selon la disposition du skill (`agent-tdd-jira:D9.INV-1`).
+- les fichiers de travail de la demande (`demande.json`, images, scripts du skill, `impact.txt`, patchs, journaux de tests relevés par l'échange, rapport) vont dans son dossier de travail : `<sortie>/<CLÉ>/` hors mode parallèle ; en mode parallèle, `travail/` du worktree, selon la disposition du skill (`agent-tdd-jira:D9.INV-1`).
 
-`<sortie>` et `<copies>` sont les dossiers de l'instance, `~/.agent2dev/sortie/` et `~/.agent2dev/copies/` par défaut (module `exploitation`, section 2).
+`<sortie>` et `<copies>` sont les dossiers de l'instance, `~/.agent2dev/sortie/` et `~/.agent2dev/copies/` par défaut (module `exploitation`, section 2). En mode `dossiers`, le `depot` écrit aussi les remises publiées dans la boîte de sortie de l'échange, `~/.agent2dev/echanges/sortie/` par défaut, par un fichier provisoire renommé ensuite, et n'y réécrit jamais une remise publiée (module `echange`, section 3).
 
 ## 2. Copie de travail (D5.INV-7)
 

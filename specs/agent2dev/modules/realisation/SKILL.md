@@ -105,7 +105,7 @@ Agent2Dev y joint le diff du scénario, les avertissements de la garde statique,
 | accepter | le `depot` commite le scénario dans la copie et remet son patch (module `depot`, sections 2 et 7) ; le tableau de bord donne son chemin et la commande `git am -3` ; scénario suivant | case « commiter » cochée : le `depot` commite dans l'arbre de la demande ; sinon, le commit reste au développeur ; scénario suivant |
 | ajuster, commentaire obligatoire | le développeur désigne le pas de reprise : `contrat` s'il y en a un, `rouge` (par défaut), `vert` ou `remanie` ; le cycle reprend à ce pas, sur l'état courant du scénario, avec le commentaire en entrée de sa fiche | même suite |
 
-Un commit par scénario : le commit par phase, que le skill accepte quand le développeur le préfère (`cycle-tdd`, section 7), n'est pas proposé en 1.0.0.
+Un commit par scénario : le commit par phase, que le skill accepte quand le développeur le préfère (`cycle-tdd`, section 7), n'est pas proposé en 1.x.
 
 ## 7. Cycle de correction
 

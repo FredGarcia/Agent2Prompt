@@ -1,6 +1,6 @@
 ---
 name: mcp
-description: Moteurs et serveur MCP d'Agent2Dev (adaptateurs du port moteur simulation, externe par MCP pour Gemini Code Assist et compatible OpenAI pour un modèle local, autorisation humaine avant tout envoi de contenu du projet hors du poste, outils a2d_*, transport HTTP local sans session, à jeton porteur et contrôle d'origine, pont stdio, outils du relais n8n, refus des décisions CP-4, décisions relayées au nom de l'humain du jeton, contexte limité au pas, borné et masqué, journalisation de chaque appel, profil souverain sans connexion sortante, settings.json et GEMINI.md fournis). À implémenter au lot 8.
+description: Moteurs et serveur MCP d'Agent2Dev (adaptateurs du port moteur simulation, externe par MCP pour Gemini Code Assist et compatible OpenAI pour un modèle local, autorisation humaine avant tout envoi de contenu du projet hors du poste, outils a2d_*, transport HTTP local sans session, à jeton porteur et contrôle d'origine, pont stdio, refus des décisions CP-4, décisions relayées au nom de l'humain du jeton, contexte limité au pas, borné et masqué, journalisation de chaque appel, profil souverain sans connexion sortante, settings.json et GEMINI.md fournis). À implémenter au lot 8.
 dimensions: [D18]
 status: active
 ---
@@ -43,8 +43,7 @@ Le contenu du projet (extraits de code, demande, US, critères, scénarios, sort
 | `a2d_tache_suivante` | rend la prochaine rédaction attendue (rôle, sections citées du skill, leçons ratifiées, schéma de sortie, entrées du pas), ou le point à présenter au développeur |
 | `a2d_soumettre` | soumet une sortie ; rend les écarts de validation, ou l'acceptation |
 | `a2d_decider` | relaie la décision explicite du développeur sur un point V0 à V5 ou une attente |
-| `a2d_journal_de_tests` | donne le chemin du journal de tests d'Agent2Test, ou déclare la demande sans binôme (module `binome`, section 2) ; au rôle `relais`, transmet le journal par son contenu (module `relais`) |
-| `a2d_remise`, `a2d_remise_relayee` | réservés au rôle `relais` : lecture de la remise courante, accusé de son dépôt chez Agent2Test (module `relais`) |
+| `a2d_journal_de_tests` | donne le chemin du journal de tests d'Agent2Test, ou déclare la demande sans binôme (module `binome`, section 2) |
 | `a2d_suspendre`, `a2d_reprendre` | arrêt d'urgence ; reprise, décision humaine relayée |
 | `a2d_etat`, `a2d_journal`, `a2d_livrable`, `a2d_patchs` | lecture seule ; `a2d_patchs` liste les patchs remis, leur état et la commande `git am -3` |
 
@@ -57,7 +56,7 @@ Le contenu du projet (extraits de code, demande, US, critères, scénarios, sort
 - Chaque requête exige l'en-tête `Authorization: Bearer <jeton>` ; le jeton est lu dans un fichier hors dépôt, en mode 0600. Une requête dont l'en-tête `Origin` est présent et absent de la liste autorisée est refusée, contre le rebond DNS ; la liste porte l'origine du tableau de bord de l'instance, et celles que la configuration humaine ajoute (`origines`).
 - Le jeton est attaché à un utilisateur de la configuration humaine : les décisions relayées par `a2d_decider` portent cet auteur et le canal `mcp`, et obéissent aux droits de ses rôles (module `tableau-de-bord`, section 2).
 - **stdio**, en repli : `node bin/mcp-stdio.js` est un pont qui passe chaque message au serveur HTTP de l'instance, avec le jeton lu dans l'environnement. Le pont n'ouvre aucune demande et ne garde aucun état.
-- Le serveur ne tient pas de session : il ne pose pas d'en-tête `Mcp-Session-Id`, et traite chaque requête seule, avec son jeton. Un client qui commence par `initialize` est servi de même ; le relais n8n poste directement ses `tools/call`.
+- Le serveur ne tient pas de session : il ne pose pas d'en-tête `Mcp-Session-Id`, et traite chaque requête seule, avec son jeton. Un client qui commence par `initialize` est servi de même.
 - Le protocole est écrit dans le module, sans dépendance ajoutée.
 
 ## 5. Contexte transmis (D18.INV-4)
@@ -100,7 +99,7 @@ Avec `moteur.adaptateur = compatible-openai` sur `127.0.0.1`, une demande compl�
 | MC10 | D18.INV-5 | une sortie non conforme soumise par `a2d_soumettre` reçoit la liste de ses écarts ; au-delà du budget, l'attente « budget épuisé » s'ouvre |
 | MC11 | D18.INV-6 | profil souverain : une demande simulée complète n'ouvre, depuis Agent2Dev, aucune connexion vers un autre hôte que le moteur local |
 | MC12 | D18.INV-1 | le pont stdio expose les mêmes outils que le transport HTTP, et n'ouvre aucune demande lui-même |
-| MC13 | D23.INV-1 | un `tools/call` posté sans `initialize` préalable, avec un jeton valide, est servi, et la réponse ne porte aucun en-tête `Mcp-Session-Id` |
+| MC13 | D18.INV-1 | un `tools/call` posté sans `initialize` préalable, avec un jeton valide, est servi, et la réponse ne porte aucun en-tête `Mcp-Session-Id` ; sans jeton, il est refusé |
 
 ## 10. Fichiers à produire
 

@@ -13,7 +13,7 @@ Le `referentiel` est la mémoire procédurale et réflexive d'Agent2Dev : ce qui
 
 - Huit fiches, une par usage du moteur : `fiches/analyse.json`, `impact.json`, `variantes.json`, `contrat.json`, `rouge.json`, `vert.json`, `remanie.json`, `rapport.json` (module `methode`, section 3). Elles vivent dans git et ne changent que par une version publiée, écrite par un humain ; leur publication s'inscrit au grand livre (`fiche.publiee`).
 - Les leçons ratifiées sont des surcouches, rangées dans les données du `referentiel`, rattachées à une fiche et à un moteur (D15.INV-2).
-- Version composée : `<fiche>@<version>+agent-tdd-jira@1.3.1+L<n>`, où `n` compte les leçons actives pour ce moteur, par exemple `rouge@1.0.0+agent-tdd-jira@1.3.1+L1`.
+- Version composée : `<fiche>@<version>+agent-tdd-jira@1.3.2+L<n>`, où `n` compte les leçons actives pour ce moteur, par exemple `rouge@1.0.0+agent-tdd-jira@1.3.2+L1`.
 - `fiche(code, moteur)` rend la fiche composée : la fiche de base, puis les leçons actives du moteur, dans l'ordre de ratification.
 - `reconstituer(production)` refait le prompt d'une production du moteur à partir du journal : version composée, sections du skill lues dans la transmission vérifiée, identifiants des leçons, entrées du pas. Son empreinte doit égaler celle que le journal a gardée (module `journal`, section 3).
 
@@ -51,7 +51,7 @@ Liste fermée, recopiée dans la constitution. Une valeur hors de ses bornes est
 
 Hors de cette liste, rien n'est modifiable par le système : code, constitution, skill et transmission, schémas, points de validation et leur régime, contrôles nommés, listes fermées des commandes, profils, configuration humaine, méta-critères du second ordre (D1.INV-6).
 
-Valeurs fixées par la configuration humaine, que le système lit sans les modifier : seuils d'alerte, ports, autorisations, activation du relais n8n. Méta-critères, fixés par la constitution : fenêtre de 10 décisions, exposition minimale de 3, marge de 15 points.
+Valeurs fixées par la configuration humaine, que le système lit sans les modifier : seuils d'alerte, ports, autorisations, mode d'échange du binôme. Méta-critères, fixés par la constitution : fenêtre de 10 décisions, exposition minimale de 3, marge de 15 points.
 
 ## 5. Grand livre (D17.INV-2)
 

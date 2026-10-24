@@ -1,6 +1,6 @@
 {
   "name": "agent-tdd-jira",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "specSchema": 1,
   "language": "fr",
   "description": "Agent de développement TDD : demande Jira en MHTML, analyse avec commentaires, US et critères d'acceptation numérotés, scénarios Gherkin par critère, variantes back Java et front Angular, cycle rouge, vert, remanié scénario par scénario, traçabilité ; binôme avec Agent2Test, verdict d'acceptation par critère ; mode parallèle dans un worktree géré par agents-paralleles-gitlab.",
@@ -22,7 +22,7 @@
     { "name": "java", "version": "1.1.1" },
     { "name": "angular", "version": "1.0.1" },
     { "name": "agents-paralleles-gitlab", "version": "1.0.1" },
-    { "name": "agent2test", "version": "1.1.0" }
+    { "name": "agent2test", "version": "1.2.0" }
   ],
   "modules": [
     { "id": "ingestion-jira", "path": "modules/ingestion-jira/SKILL.md", "dimensions": ["D1"], "status": "active" },
@@ -43,6 +43,7 @@
     { "version": "1.2.0", "file": "archives/SKILL-v1.2.0.md" },
     { "version": "1.2.1", "file": "archives/SKILL-v1.2.1.md" },
     { "version": "1.2.2", "file": "archives/SKILL-v1.2.2.md" },
-    { "version": "1.3.0", "file": "archives/SKILL-v1.3.0.md" }
+    { "version": "1.3.0", "file": "archives/SKILL-v1.3.0.md" },
+    { "version": "1.3.1", "file": "archives/SKILL-v1.3.1.md" }
   ]
 }
