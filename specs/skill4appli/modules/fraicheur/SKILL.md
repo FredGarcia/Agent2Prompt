@@ -51,6 +51,8 @@ flowchart TD
 
 Chaque liste est rendue sous la forme `{"total", "premiers"}`, 50 chemins au plus. `watcher` indique si un watcher est actif, avec son PID.
 
+`status` porte aussi `plateforme` (`os`, `wsl`, `depot_windows_depuis_wsl`) et `avertissements`, une liste d'objets `{"code", "message"}`. L'avertissement `depot_windows_depuis_wsl` signale un worktree du système de fichiers Windows lu depuis WSL : les fins de ligne et l'état des fichiers vus par le git de WSL peuvent différer de ceux du git du développeur, et `modifications_locales` lister des fichiers qu'il n'a pas touchés (module `parite`, D12.INV-5). Le verdict reste celui que calcule le git qui exécute ; l'avertissement dit de quel côté le relancer.
+
 ## 3. Que faire d'un verdict
 
 | Verdict | Action |
@@ -71,3 +73,4 @@ Chaque liste est rendue sous la forme `{"total", "premiers"}`, 50 chemins au plu
 
 - Instantané enregistré et rendu ; écart nommé ; code 0 seulement à jour ; aucune écriture (D5.INV-1, D5.INV-2) : T17.
 - Verdict `modifs_locales` en mode `miroir` : T18 ; `a_jour` après synchronisation : T19.
+- Diagnostic de plateforme et avertissements dans `status` : T32.
