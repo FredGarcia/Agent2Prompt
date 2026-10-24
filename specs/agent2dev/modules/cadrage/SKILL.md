@@ -16,7 +16,7 @@ Le cadrage applique les modules `ingestion-jira`, `us-criteres` et `analyse-dema
 3. Le `cadrage` rend le résumé V1 depuis `demande.json`, sans moteur, au format du skill (`ingestion-jira`, section 6) : titre, description, commentaires avec auteurs et dates, pièces incluses et pièces mentionnées absentes, limites, empreinte de la source. En mode parallèle, une clé extraite qui n'est pas celle du worktree est présentée comme écart : les hooks du kit tirent la clé du nom du worktree.
 4. V1 : le développeur confirme, ou corrige. Une correction apporte des compléments (un commentaire replié, un champ personnalisé, une pièce jointe) : le `depot` les ajoute à `demande.json` sous `complements`, chacun avec sa provenance (« réponse du développeur, V1 »), comme le skill le prévoit pour une correction manuelle (`ingestion-jira`, section 4), et le résumé est présenté de nouveau (`agent-tdd-jira:D1.INV-2`).
 
-En 1.0.0, le moteur ne reçoit pas les images : V1 les liste, et la limite « images non lues par le moteur » est déclarée.
+En 1.x, le moteur ne reçoit pas les images : V1 les liste, et la limite « images non lues par le moteur » est déclarée.
 
 ## 2. Analyse et V2 (D7.INV-2, D7.INV-3)
 

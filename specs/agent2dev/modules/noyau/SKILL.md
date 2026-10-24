@@ -61,7 +61,7 @@ bus.tracer(fn)                                             // reçoit chaque app
 bus.abonner(fn)                                            // reçoit chaque événement
 ```
 
-Contexte propagé : `{ correlation, demande, scenario, echelle, phase, parent, appelant }`. `parent` construit l'arbre des traces.
+Contexte propagé : `{ correlation, demande, scenario, echelle, phase, parent, appelant }`. `parent` construit l'arbre des traces. `appelant` est posé par le bus : c'est l'agent qui appelle, jamais une valeur qu'il fournit ; l'agent médiateur des données s'y fie (module `donnees`).
 
 Chaque agent déclare son contrat au démarrage :
 
@@ -98,7 +98,7 @@ Le résultat est une liste d'écarts `{ chemin, regle, message }`. Une liste non
 ```json
 {
   "version": "1.0.0",
-  "methode": { "skill": "agent-tdd-jira", "version": "1.3.1" },
+  "methode": { "skill": "agent-tdd-jira", "version": "1.3.2" },
   "invariants": ["D1.INV-1", "D1.INV-2"],
   "points": ["V0", "V1", "V2", "V3", "V4", "V5", "CP-4"],
   "reglesModifiables": [
@@ -123,9 +123,9 @@ La liste complète des règles modifiables et de leurs bornes est au module `ref
 
 Garde d'écriture des fichiers d'Agent2Dev : le noyau expose `ecriture.autoriser(chemin, agent)`. Seuls sont permis :
 
-- le dossier de données de l'agent (module `donnees`) ;
+- pour le seul `donnees`, l'agent médiateur, le fichier de données de l'instance (module `donnees`) ;
 - pour le seul `journal`, le livrable, dans le dossier de sortie de la demande ;
-- pour le seul `depot`, le dossier de travail de la demande (scripts extraits, `demande.json` et ses compléments, `impact.txt`, journaux de tests reçus du relais, patchs, rapport, projet de commentaire) et le dossier des copies de travail ;
+- pour le seul `depot`, le dossier de travail de la demande (scripts extraits, `demande.json` et ses compléments, `impact.txt`, journaux de tests relevés par l'échange, patchs, rapport, projet de commentaire), le dossier des copies de travail et la boîte de sortie de l'échange (module `echange`) ;
 - pour le seul `profil`, la création d'une version nouvelle de profil ratifié, à la décision V0 ; un profil ratifié n'est jamais réécrit.
 
 Les autres agents rédigent ou calculent ces contenus, et les remettent au `depot` par le bus.

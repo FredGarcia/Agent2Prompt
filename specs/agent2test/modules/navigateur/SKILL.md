@@ -11,7 +11,7 @@ Le `navigateur` est le seul module qui ouvre un navigateur (D4.INV-1). Il import
 
 ## 1. Session (D4.INV-3, D4.INV-7)
 
-| Stratégie | Principe | Statut 1.1.0 |
+| Stratégie | Principe | Statut 1.2.0 |
 |---|---|---|
 | `integree` (défaut) | contexte persistant dans un profil dédié ; Chromium lancé avec `--auth-server-allowlist` et `--auth-negotiate-delegate-allowlist` sur les domaines SSO de la configuration humaine : l'authentification intégrée du poste, ou la session déjà ouverte chez le fournisseur, connecte sans action humaine | active |
 | `profil` | contexte persistant ; l'opérateur se connecte une fois en CP-0, puis le cookie du fournisseur rend les reconnexions silencieuses | active |
@@ -65,7 +65,7 @@ Résolution d'une cible, dans l'ordre des stratégies du profil : `getByRole(rol
 - Un instantané ARIA à chaque échec (`page.ariaSnapshotJSON()`).
 - Les erreurs de console (`page.on('console')`, type `error`) et les réponses de statut 400 ou plus (`page.on('response')`) sont relevées et versées au résultat d'étape.
 - Avant d'écrire une trace dans le dossier des preuves, le navigateur réécrit son archive : la valeur des en-têtes `Authorization`, `Cookie` et `Set-Cookie` est remplacée par `[expurgé]`. L'enregistrement HAR est désactivé par défaut ; activé, il subit la même expurgation.
-- Chemins : `preuves/<campagne>/<scénario>/<n>.png`, `trace.zip`, `aria-<n>.json` ; chaque fichier a son empreinte SHA-256, enregistrée dans `execution.sqlite`.
+- Chemins : `preuves/<campagne>/<scénario>/<n>.png`, `trace.zip`, `aria-<n>.json` ; chaque fichier a son empreinte SHA-256, enregistrée dans les tables de l'espace `execution`.
 
 ## 6. Autres actions
 

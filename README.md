@@ -13,9 +13,9 @@ Chaque spécification est un package modulaire versionné : un point d'entrée, 
 | [`angular`](specs/angular/SKILL.md) | 1.0.1 | [`transmissions/angular-1.0.1.md`](transmissions/angular-1.0.1.md) | Produire et relire un front Angular 20, accessibilité RGAA et WCAG comprise |
 | [`analyse-projet`](specs/analyse-projet/SKILL.md) | 1.0.2 | [`transmissions/analyse-projet-1.0.2.md`](transmissions/analyse-projet-1.0.2.md) | Analyser un projet back et front en lecture seule : cartographie, rapport et feuille de route, ou plans d'action |
 | [`sonarqube`](specs/sonarqube/SKILL.md) | 1.0.2 | [`transmissions/sonarqube-1.0.2.md`](transmissions/sonarqube-1.0.2.md) | SonarQube Server 2026.x : configurer l'analyse et la CI GitLab, trier, corriger ou planifier, gouverner la qualité |
-| [`agent-tdd-jira`](specs/agent-tdd-jira/SKILL.md) | 1.3.1 | [`transmissions/agent-tdd-jira-1.3.1.md`](transmissions/agent-tdd-jira-1.3.1.md) | Développement TDD à partir d'une demande Jira en MHTML : analyse avec commentaires, US et critères d'acceptation numérotés, scénarios Gherkin par critère, variantes back et front, cycle rouge, vert, remanié, traçabilité jusqu'aux critères ; binôme avec Agent2Test, verdict d'acceptation par critère ; mode parallèle dans un worktree géré |
-| [`agent2test`](specs/agent2test/SKILL.md) | 1.1.0 | [`transmissions/agent2test-1.1.0.md`](transmissions/agent2test-1.1.0.md) | Agent2Test, système de tests en binôme avec agent-tdd-jira : choisir, préparer et jouer avec Playwright les tests essentiels d'une demande sur l'application lancée, un verdict prouvé par critère d'acceptation, points de contrôle humains, apprentissage sous gouvernance, un fichier SQLite par agent, remise reçue par un relais n8n facultatif, exécution locale |
-| [`agent2dev`](specs/agent2dev/SKILL.md) | 1.0.0 | [`transmissions/agent2dev-1.0.0.md`](transmissions/agent2dev-1.0.0.md) | Agent2Dev, système de développement qui applique agent-tdd-jira comme méthode : de la demande Jira au rapport, cycle TDD scénario par scénario, binôme avec Agent2Test ; le moteur rédige, des agents déterministes écrivent et exécutent, le développeur valide à chaque point ; copie de travail et patchs par défaut, un fichier SQLite par agent, relais n8n facultatif, journal chaîné, apprentissage sous gouvernance, exécution locale |
+| [`agent-tdd-jira`](specs/agent-tdd-jira/SKILL.md) | 1.3.2 | [`transmissions/agent-tdd-jira-1.3.2.md`](transmissions/agent-tdd-jira-1.3.2.md) | Développement TDD à partir d'une demande Jira en MHTML : analyse avec commentaires, US et critères d'acceptation numérotés, scénarios Gherkin par critère, variantes back et front, cycle rouge, vert, remanié, traçabilité jusqu'aux critères ; binôme avec Agent2Test, verdict d'acceptation par critère ; mode parallèle dans un worktree géré |
+| [`agent2test`](specs/agent2test/SKILL.md) | 1.2.0 | [`transmissions/agent2test-1.2.0.md`](transmissions/agent2test-1.2.0.md) | Agent2Test, système de tests en binôme avec agent-tdd-jira : choisir, préparer et jouer avec Playwright les tests essentiels d'une demande sur l'application lancée, un verdict prouvé par critère d'acceptation, points de contrôle humains, apprentissage sous gouvernance, un fichier SQLite unique ouvert par un agent médiateur, remise reçue en fichier ou par un échange par dossiers facultatif, exécution locale |
+| [`agent2dev`](specs/agent2dev/SKILL.md) | 1.1.0 | [`transmissions/agent2dev-1.1.0.md`](transmissions/agent2dev-1.1.0.md) | Agent2Dev, système de développement qui applique agent-tdd-jira comme méthode : de la demande Jira au rapport, cycle TDD scénario par scénario, binôme avec Agent2Test ; le moteur rédige, des agents déterministes écrivent et exécutent, le développeur valide à chaque point ; copie de travail et patchs par défaut, un fichier SQLite unique ouvert par un agent médiateur, échange par dossiers facultatif, journal chaîné, apprentissage sous gouvernance, exécution locale |
 | [`agents-paralleles-gitlab`](specs/agents-paralleles-gitlab/SKILL.md) | 1.0.1 | [`transmissions/agents-paralleles-gitlab-1.0.1.md`](transmissions/agents-paralleles-gitlab-1.0.1.md) | Plusieurs agents en parallèle sur un dépôt GitLab, une demande Jira par worktree : isolation, hooks communs, script `agt`, garde-fous GitLab, recette de 44 contrôles |
 | [`skill4appli`](specs/skill4appli/SKILL.md) | 1.0.0 | [`transmissions/skill4appli-1.0.0.md`](transmissions/skill4appli-1.0.0.md) | Mémoire SQLite d'une application locale et de ses branches git, pour un agent : inventaire fidèle à git, recherche `chemin:ligne`, requêtes en lecture seule, fraîcheur mesurée, watcher de la branche courante chargée dans un worktree dédié, agent `memoire-appli` ; script Node sans dépendance et recette de 25 tests fournis dans la spécification |
 
@@ -37,15 +37,15 @@ flowchart LR
   A -->|"inclus comme référentiel"| SQ
   SQ -.->|"plans d'action"| J
   SQ -.->|"plans d'action"| A
-  SOCLE -->|"inclus, épinglé"| TDD["agent-tdd-jira 1.3.1"]
+  SOCLE -->|"inclus, épinglé"| TDD["agent-tdd-jira 1.3.2"]
   J -->|"inclus comme référentiel"| TDD
   A -->|"inclus comme référentiel"| TDD
   APG["agents-paralleles-gitlab 1.0.1"] -->|"inclus comme référentiel"| TDD
-  TDD -.->|"binôme : plan validé"| A2T["agent2test 1.1.0"]
+  TDD -.->|"binôme : plan validé"| A2T["agent2test 1.2.0"]
   A2T -.->|"binôme : journal de tests"| TDD
-  TDD -->|"méthode, transmission vérifiée"| A2D["agent2dev 1.0.0"]
+  TDD -->|"méthode, transmission vérifiée"| A2D["agent2dev 1.1.0"]
   A2T -.->|"journal de tests, lu par le script du skill"| A2D
-  A2D -.->|"remise, par un relais n8n facultatif"| A2T
+  A2D -.->|"remise, en fichier ou par dossier d'échange"| A2T
 ```
 
 ## Structure du dépôt

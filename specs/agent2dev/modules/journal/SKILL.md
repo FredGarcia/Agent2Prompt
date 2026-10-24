@@ -15,7 +15,7 @@ status: active
 {
   "n": 2041,
   "horodatage": "2026-10-21T14:02:11.482Z",
-  "specVersion": "1.0.0",
+  "specVersion": "1.1.0",
   "instance": "principale",
   "demande": "ECR-77",
   "correlation": "5d1e…",
@@ -33,7 +33,7 @@ status: active
 - `empreinte` est le SHA-256 de `empreintePrecedente` suivi du JSON canonique de la ligne sans son champ `empreinte`. La première ligne prend 64 zéros pour empreinte précédente.
 - Chaque ligne porte la version de spécification qui l'a produite, son échelle (`Systeme`, `Demande`, `Scenario`, `Pas`) et sa phase (`E1` à `E7`) : une demande se relit comme un arbre 7E, de la demande au pas.
 - La charge passe par le masque du noyau avant écriture : aucun secret, aucun jeton, aucun contenu de fichier exclu.
-- La ligne s'écrit dans une transaction du fichier SQLite du `journal` ; deux déclencheurs y refusent `UPDATE` et `DELETE` (module `donnees`, section 3).
+- Le `journal` remet la ligne au médiateur, dans sa collection chaînée `lignes` : dans la transaction même de l'ajout, le médiateur lui donne son numéro `n` et ses empreintes, à partir de la dernière ligne enregistrée ; deux déclencheurs refusent `UPDATE` et `DELETE` sur la table `journal__lignes` (module `donnees`, sections 1 et 3).
 
 `verifierChaine({ depuis, jusqua })` recalcule les empreintes et rend `{ intacte: true }` ou `{ intacte: false, premiereLigneRompue: n }`. Il détecte aussi une ligne supprimée, par la rupture du numéro `n`. La chaîne est vérifiée au démarrage et avant chaque livrable : une rupture lève l'alerte critique `journal.chaine_rompue`, et le livrable porte la mention « chaîne rompue à la ligne n ».
 
@@ -71,14 +71,14 @@ Une seule source, la projection JSON, de format `agent2dev.livrable/1` ; le Mark
 {
   "format": "agent2dev.livrable/1",
   "demande": { "cle": "ECR-77", "titre": "Export des retours d'expérience en CSV", "source": "<sha256 du MHTML>" },
-  "versions": { "specification": "1.0.0", "skill": "agent-tdd-jira 1.3.1", "transmission": "<sha256>", "referentiel": "R-4", "constitution": "<sha256>" },
+  "versions": { "specification": "1.1.0", "skill": "agent-tdd-jira 1.3.2", "transmission": "<sha256>", "referentiel": "R-4", "constitution": "<sha256>" },
   "autorisations": { "ecritureCode": false, "moteurExterne": true },
   "arbre": { "mode": "normal", "branche": "feature/ECR-77-export-csv", "commitDepart": "<sha1>" },
   "scenarios": [
     { "id": "ECR-77-S02", "statut": "accepté", "rouge": "Expecting actual: [] to start with: [-17, -69, -65]", "essais": { "rouge": 1, "vert": 2 },
       "suites": { "back": "vert", "front": "non concerné" }, "patch": "002-S02.patch", "commit": "<sha1 dans l'arbre de la demande>" }
   ],
-  "productions": [{ "id": "P-12", "fiche": "vert@1.0.0+agent-tdd-jira@1.3.1+L1", "moteur": "gemini", "adaptateur": "externe", "empreintePrompt": "<sha256>", "decision": "DEC-118" }],
+  "productions": [{ "id": "P-12", "fiche": "vert@1.0.0+agent-tdd-jira@1.3.2+L1", "moteur": "gemini", "adaptateur": "externe", "empreintePrompt": "<sha256>", "decision": "DEC-118" }],
   "empreinteFin": "<sha256>"
 }
 ```

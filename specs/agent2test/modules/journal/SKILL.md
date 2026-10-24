@@ -15,7 +15,7 @@ status: active
 {
   "n": 1234,
   "horodatage": "2026-10-21T10:15:02.123Z",
-  "specVersion": "1.1.0",
+  "specVersion": "1.2.0",
   "campagne": "C-20261021-001",
   "correlation": "8f2c…",
   "parent": "77a1…",
@@ -32,12 +32,12 @@ status: active
 - `empreinte` est le SHA-256 de `empreintePrecedente` suivi du JSON canonique de la ligne sans son champ `empreinte`. La première ligne prend 64 zéros pour empreinte précédente.
 - Chaque ligne porte `echelle` et `phase` (D1.INV-1).
 - La charge passe par le masque du noyau avant écriture : ni session, ni jeton, ni en-tête sensible (D4.INV-3).
-- La table `lignes` de `journal.sqlite` porte deux déclencheurs qui refusent toute modification et toute suppression (module `donnees`, section 5).
-- `ecrire` lit la dernière ligne et écrit la nouvelle dans la même transaction `BEGIN IMMEDIATE` : le numéro `n` et l'empreinte précédente viennent du fichier, jamais d'une valeur gardée en mémoire, et deux écrivains, le kit et la purge, ne rompent pas la chaîne.
+- La table `journal__lignes` porte deux déclencheurs qui refusent toute modification et toute suppression (module `donnees`, section 5).
+- `ecrire` passe par le contrat chaîné `journal.ajouter` du médiateur : dans une même transaction `BEGIN IMMEDIATE`, il lit la dernière ligne et écrit la nouvelle. Le numéro `n` et l'empreinte précédente viennent du fichier, jamais d'une valeur gardée en mémoire, et deux écrivains, le kit et la purge, ne rompent pas la chaîne (module `donnees`, section 2).
 
 `verifierChaine({ depuis, jusqua })` recalcule les empreintes et rend `{ intacte: true }` ou `{ intacte: false, premiereLigneRompue: n }`. Il détecte aussi une ligne supprimée, par la rupture du numéro `n`.
 
-Au démarrage, `verifierChaine` parcourt la chaîne entière. Une chaîne rompue empêche le démarrage, avec la première ligne rompue, comme un déclencheur absent (module `donnees`, section 2). Pour repartir, un humain restaure `journal.sqlite` depuis une sauvegarde (module `donnees`, section 7), ou le met de côté par `npm run journal:mettre-de-cote` : la commande le renomme en `journal-<date>.sqlite.rompu`, sans rien en effacer, et la première ligne du journal neuf, `journal.reprise`, cite ce fichier, sa première ligne rompue et l'empreinte de sa dernière ligne.
+Au démarrage, `verifierChaine` parcourt la chaîne entière. Une chaîne rompue empêche le démarrage, avec la première ligne rompue, comme un déclencheur absent (module `donnees`, section 3). Pour repartir, un humain restaure le fichier de données depuis une sauvegarde (module `donnees`, section 7), ou met le journal de côté par `npm run journal:mettre-de-cote`. La commande écrit d'abord une copie cohérente du fichier, `journal-rompu-<date>.sqlite`, par `VACUUM INTO`, sans rien en effacer ; puis, en une transaction, elle recrée la table `journal__lignes` et ses déclencheurs, par l'instruction même de leur migration, et y écrit la première ligne du journal neuf, `journal.reprise`, qui cite cette copie, sa première ligne rompue et l'empreinte de sa dernière ligne.
 
 ## 2. Actions
 
@@ -69,7 +69,7 @@ Format JSON, `agent2test.journal-de-tests/1`, celui que lit agent-tdd-jira (`age
   "campagne": "C-20261021-001",
   "demande": { "cle": "ECR-77", "texte": "Export des retours d'expérience en CSV" },
   "versions": {
-    "specification": "1.1.0", "plan": "P-14", "referentiel": "R-9", "constitution": "<sha256>",
+    "specification": "1.2.0", "plan": "P-14", "referentiel": "R-9", "constitution": "<sha256>",
     "sources": [{ "chemin": "docs/demandes/ECR-77/us.md", "empreinte": "<sha256>" }, { "chemin": "docs/demandes/ECR-77/ECR-77.feature", "empreinte": "<sha256>" }],
     "application": { "commit": "<sha1 de HEAD>", "fichiersModifies": [] }
   },
@@ -110,7 +110,7 @@ Règles :
 - Tout contenu produit par le moteur (motif de sélection, parcours, réparation, leçon) est marqué « produit par <moteur>, fiche <fiche> » et figure dans `origineIA` (D10.INV-3).
 - `empreinteFin` est l'empreinte de la ligne `campagne.close` ; un journal de tests produit avant la clôture porte la mention « provisoire » et aucune empreinte de fin (D10.INV-4).
 - Les fichiers produits vont dans `rapports/<campagne>/journal-de-tests.{md,json,xml,html}`.
-- **Contrat de lecture** : agent-tdd-jira 1.3.1 lit ce JSON pour reporter un verdict par critère et corriger les défauts confirmés (`agent-tdd-jira:D7.INV-3`). Il s'appuie sur `format`, `campagne`, `demande.cle`, `versions.plan`, `versions.sources`, `versions.application`, `matrice` (critère, verdict de la liste fermée, motif, scénarios), `scenarios` (identifiant, cause, étapes), `decisions` et `desaccords` avec leur cible, et `empreinteFin`. Changer le sens ou la forme de l'un de ces champs change le format, donc son nom (`agent2test.journal-de-tests/2`).
+- **Contrat de lecture** : agent-tdd-jira 1.3.2 lit ce JSON pour reporter un verdict par critère et corriger les défauts confirmés (`agent-tdd-jira:D7.INV-3`). Il s'appuie sur `format`, `campagne`, `demande.cle`, `versions.plan`, `versions.sources`, `versions.application`, `matrice` (critère, verdict de la liste fermée, motif, scénarios), `scenarios` (identifiant, cause, étapes), `decisions` et `desaccords` avec leur cible, et `empreinteFin`. Changer le sens ou la forme de l'un de ces champs change le format, donc son nom (`agent2test.journal-de-tests/2`).
 
 ## 4. Pièges connus
 
@@ -133,7 +133,7 @@ Règles :
 | JO8 | D10.INV-4 | `empreinteFin` égale l'empreinte de la ligne `campagne.close` ; avant la clôture, le rapport est « provisoire » |
 | JO9 | D10.INV-2 | le JSON de l'exemple ECR-77 porte les sources du plan et leurs empreintes, l'état git relevé à l'ouverture, et la cible de chaque décision et de chaque désaccord ; il se valide contre `schemas/journal-de-tests.json` |
 | JO10 | D10.INV-1 | un `UPDATE` ou un `DELETE`, sans condition compris, sur `lignes` lève « ajout seul », par la connexion du journal comme par un outil SQLite ; un déclencheur retiré empêche le démarrage |
-| JO11 | D10.INV-1 | après une chaîne rompue, `npm run journal:mettre-de-cote` permet le démarrage ; le fichier rompu est gardé, et la première ligne du journal neuf cite son nom, sa première ligne rompue et l'empreinte de sa dernière ligne |
+| JO11 | D10.INV-1 | après une chaîne rompue, `npm run journal:mettre-de-cote` permet le démarrage ; la copie garde le journal rompu entier, la table neuve a ses deux déclencheurs, et la première ligne du journal neuf cite la copie, sa première ligne rompue et l'empreinte de sa dernière ligne |
 
 ## 6. Fichiers à produire
 

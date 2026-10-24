@@ -71,7 +71,7 @@ sequenceDiagram
 | `conception` | à la décision V3 de chaque scénario |
 | `realisation` | à l'acceptation V4 du dernier scénario prêt |
 | `remise` | quand la remise est rendue |
-| `attente-journal` | quand le développeur donne le chemin du journal de tests, que le relais n8n en transmet le contenu, ou que la demande est déclarée sans binôme |
+| `attente-journal` | quand le développeur donne le chemin du journal de tests, que l'échange en relève un dans la boîte d'Agent2Test, ou que la demande est déclarée sans binôme |
 | `correction` | à l'acceptation V4 de la dernière correction, vers une nouvelle remise |
 | `tracabilite` | à l'acceptation V5 |
 | `suspendue` | à la reprise, décision humaine |
