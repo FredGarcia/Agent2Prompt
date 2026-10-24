@@ -23,7 +23,7 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
   - 1.1.0 ratifiée telle que proposée : configuration par l'environnement active, service MCP réservé, section de lecture 12 facteurs ;
   - poste : Java et Angular sous Windows, PostgreSQL dans WSL2 ;
   - le back Java passe par Liquibase pour PostgreSQL (commentaire sur la pull request n° 11).
-- Soumis à ratification :
+- Décisions ratifiées (pull request n° 11) :
   - le skill tourne sous Windows, du côté du git du développeur ; depuis WSL, un agent l'appelle par `node.exe` plutôt que de lancer le Node de WSL sur `/mnt/c` ;
   - un avertissement, et non un refus, pour un worktree Windows lu depuis WSL ;
   - la correspondance proposée entre facteurs et phases 7E (section 5) ;
