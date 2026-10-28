@@ -1,6 +1,6 @@
 ---
 name: recette
-description: Recette du skill (npm test, sous Windows, Linux et, sans écran, sous xvfb-run, profil et dossiers temporaires, faux Jira local avec API REST paginée, SSO simulé, backlogs à sections IA et DEV chargés au défilement ou virtualisés, tableau à couloirs, pages de tickets et session expirée, table des 20 scénarios R1 à R20 rattachés aux invariants de D1 à D4, D6, D8, D11 et D12 et aux points d'extension, ticket seul par son adresse, contrôle de la recette par dix-sept défauts réintroduits, recette en CI sur ubuntu-latest et windows-latest, sources de tests/fake-jira.mjs et tests/run-tests.mjs). À lire pour installer le skill, et avant de publier une version.
+description: Recette du skill (npm test, sous Windows, Linux et, sans écran, sous xvfb-run, profil et dossiers temporaires, faux Jira local avec API REST paginée, SSO simulé, backlogs à sections IA et DEV chargés au défilement ou virtualisés, tableau à couloirs, pages de tickets et session expirée, table des 20 scénarios R1 à R20 rattachés aux invariants de D1 à D4, D6, D8, D11 et D12 et aux points d'extension, ticket seul par son adresse, contrôle de la recette par dix-neuf défauts réintroduits, recette en CI sur ubuntu-latest et windows-latest, sources de tests/fake-jira.mjs et tests/run-tests.mjs). À lire pour installer le skill, et avant de publier une version.
 dimensions: [D1, D2, D3, D4, D6, D8, D11, D12]
 status: active
 ---
@@ -18,7 +18,7 @@ npm test
 - Python : la variable `PYTHON`, à défaut `py` sous Windows et `python3` ailleurs ; s'il manque, R7 est sauté.
 - La recette travaille sur un profil et des dossiers temporaires : la session et les captures du dossier du skill ne sont pas touchées. Elle efface ses dossiers temporaires si tout passe ; sinon, ou avec `KEEP_TMP=1`, elle les garde et en donne le chemin, avec une capture d'écran de l'interface.
 - Durée : environ 6 min, dont 51 s pour la capture du backlog chargé au défilement et 77 s pour le backlog virtualisé.
-- Bilan attendu : `20 scénarios, 130 contrôles, 130 réussis, 0 en échec, 0 sautés` ; sans Python, `126 contrôles, 125 réussis, 0 en échec, 1 sautés`, R7 étant sauté.
+- Bilan attendu : `20 scénarios, 132 contrôles, 132 réussis, 0 en échec, 0 sautés` ; sans Python, `128 contrôles, 127 réussis, 0 en échec, 1 sautés`, R7 étant sauté.
 
 ## 2. Le faux Jira
 
@@ -62,7 +62,7 @@ Place des tickets du sprint dans le backlog 42 :
 | R12 | Navigateur rouvert sans nouveau passage par le SSO | D2.INV-2 |
 | R13 | Backlog virtualisé, dans une zone de 80 pixels, en-têtes compris : mêmes contrôles que R10 ; puis relevé du backlog 42 dans une fenêtre de 100 pixels de haut, agrandie avant le relevé : 72 tickets | D3.INV-1, D4.INV-1, D11.INV-2 |
 | R14 | Cinq tickets à session expirée, sans section : trois erreurs, capture arrêtée, navigateur gardé ouvert, deux avertissements | D4.INV-1, D4.INV-4, D6.INV-4, D11.INV-6 |
-| R15 | « Fermer le navigateur » pendant le relevé : capture arrêtée sans rapport, avec un message qui le dit ; puis pendant la capture des tickets : capture arrêtée, rapport partiel | D4.INV-4, D6.INV-2 |
+| R15 | « Fermer le navigateur » pendant le relevé : capture arrêtée sans rapport, avec un message qui le dit ; puis pendant la capture des tickets : capture arrêtée, rapport partiel ; faux onglet qui ne répond plus : capture du ticket en échec dès la fermeture de la page ou du navigateur, ou au délai maximal | D4.INV-4, D6.INV-2 |
 | R16 | Page de l'interface pilotée comme par le développeur : bouton activé, avancement, boutons bloqués, bilan, résumé par section, une ligne par ticket avec l'en-tête de sa section, avertissement, valeurs retrouvées après rechargement ; ticket seul : dossier proposé d'après le rapport, puis changé et capturé | D6.INV-2, D6.INV-3, D12.INV-2 |
 | R17 | Ligne de commande : adresse manquante et numéro invalide (code 2), un ticket capturé directement dans le dossier de sa section (code 0), un ticket en erreur (code 1) ; `--dossier` sans `--ticket` et adresse de ticket sans clé (code 2), `--ticket` sans `--dossier` (« à classer », ticket absent du dernier rapport), puis avec `--dossier IA` | D6.INV-5, D4.INV-1, D12.INV-2 |
 | R18 | Point d'extension E1 : champs du rapport, `markers` compris, d'un ticket capturé, d'un ticket en erreur | D11.INV-5 |
@@ -71,12 +71,12 @@ Place des tickets du sprint dans le backlog 42 :
 
 ## 4. Contrôle de la recette elle-même
 
-Dix-sept défauts, réintroduits un à un dans le code, font chacun échouer la recette par le scénario attendu (essai du 28 octobre 2026, Node 22.23.4) :
+Dix-neuf défauts, réintroduits un à un dans le code, font chacun échouer la recette par le scénario attendu (essai du 28 octobre 2026, Node 22.23.4) :
 
 | ID | Défaut réintroduit | Scénarios en échec | Contrôles en échec |
 |---|---|---|---|
 | M1 | les liens de la navigation sont relevés : le ticket récent de l'en-tête est capturé | R10, R11, R13, R16 | 17 |
-| M2 | la copie d'un ticket recapturé reste dans son ancien dossier | R11, R15, R16, R17, R20 | 12 |
+| M2 | la copie d'un ticket recapturé reste dans son ancien dossier | R11, R16, R17, R20 | 5 |
 | M3 | les en-têtes de la navigation comptent : le filtre rapide `DEV` de l'en-tête de la page range en `DEV` le ticket placé avant le premier en-tête | R10, R11, R13, R14, R16 | 17 |
 | M4 | l'origine des requêtes n'est plus contrôlée | R8 | 1 |
 | M5 | une page est enregistrée sans vérifier qu'elle est celle du ticket : la page de connexion prend le nom du ticket | R10, R11, R13, R14, R16, R17, R18, R20 | 18 |
@@ -92,6 +92,8 @@ Dix-sept défauts, réintroduits un à un dans le code, font chacun échouer la 
 | M15 | après un ticket seul, le navigateur reste sur la page du ticket : la capture du sprint qui suit ne relève aucun ticket | R13 | 17 |
 | M16 | le dossier proposé ignore le dernier rapport : toujours `à classer` | R16, R20 | 2 |
 | M17 | le rapport n'est pas mis à jour après un ticket seul | R20 | 3 |
+| M18 | la fermeture de la page ou du navigateur n'interrompt plus la capture d'un ticket : elle attend le délai maximal | R15 | 1 |
+| M19 | plus de délai maximal : la capture d'un ticket dont le navigateur ne répond plus reste en cours sans fin | R15 | 1 |
 
 Chaque défaut a été retiré après son essai ; la recette du code publié passe en entier.
 
@@ -898,6 +900,26 @@ try {
   c = await cli(['--ticket', `${fake.url}/browse/DEMOAB-4500`, '--dossier', 'IA', '--sortie', join(TMP, 'cli')]);
   check('--ticket --dossier IA : rangé dans IA', c.status === 0 && existsSync(join(TMP, 'cli', 'IA', 'DEMOAB-4500.mhtml'))
     && !existsSync(join(TMP, 'cli', UNCLASSIFIED, 'DEMOAB-4500.mhtml')), c.stdout.trim().split('\n').at(-1));
+
+  scenario('R15', 'capture d\'un ticket qui ne répond plus');
+  // Faux onglet dont le navigateur ne répond plus : chaque appel reste en attente
+  const { EventEmitter } = await import('node:events');
+  const stuckPage = () => Object.assign(new EventEmitter(), { isClosed: () => false, goto: () => new Promise(() => {}), url: () => 'about:blank' });
+  const stuckCtx = new EventEmitter();
+  let p1 = stuckPage();
+  let t0 = Date.now();
+  setTimeout(() => p1.emit('close'), 300);
+  // Sans réponse en 10 s, le contrôle échoue au lieu de bloquer la recette
+  const within = (promise) => Promise.race([promise.then(() => null, (e) => e.message), sleep(10_000).then(() => 'toujours en cours après 10 s')]);
+  let err1 = await within(core.captureTicket(stuckCtx, p1, { key: 'DEMO-1', url: 'http://127.0.0.1/browse/DEMO-1' }, { maxMs: 60_000 }));
+  const p2 = stuckPage();
+  setTimeout(() => stuckCtx.emit('close'), 300);
+  const err2 = await within(core.captureTicket(stuckCtx, p2, { key: 'DEMO-1', url: 'http://127.0.0.1/browse/DEMO-1' }, { maxMs: 60_000 }));
+  check('page ou navigateur fermé : la capture du ticket échoue aussitôt', /navigateur fermé/.test(err1 ?? '') && /navigateur fermé/.test(err2 ?? '')
+    && Date.now() - t0 < 5000, `${err1} · ${err2}`);
+  t0 = Date.now();
+  err1 = await within(core.captureTicket(new EventEmitter(), stuckPage(), { key: 'DEMO-1', url: 'http://127.0.0.1/browse/DEMO-1' }, { maxMs: 500 }));
+  check('navigateur muet : la capture du ticket est abandonnée au délai maximal', /bloquée/.test(err1 ?? '') && Date.now() - t0 < 5000, err1);
 
   scenario('R19', "point d'extension E2 : capture pilotable par un autre outil");
   const exported = Object.keys(core).filter((k) => typeof core[k] === 'function').sort();
