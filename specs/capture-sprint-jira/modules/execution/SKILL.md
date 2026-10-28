@@ -80,7 +80,7 @@ Treize fichiers sont tirés des blocs annotés `<!-- fichier : chemin -->` des m
 | `package.json` | `execution`, § 9 | `e01fa603cc88fab8699767cc10f2451bce6b9d54e02462ee863b10a7b65960ad` |
 | `package-lock.json` | `execution`, § 9 | `28c00829c50edb775801fc626de22df4bfc1161621cfe1bfcc612a5153b10434` |
 | `.gitignore` | `execution`, § 9 | `b163b109241838c4ff48e7cc27de427a4fb4e7f9aebdb16c8a5ad3fbb7a02613` |
-| `scripts/jira-capture-core.mjs` | `execution`, § 10 | `7a2d7dac386217a48dc92859408a72d4d21cd0e85a75f1b267259da7ab9e8b2d` |
+| `scripts/jira-capture-core.mjs` | `execution`, § 10 | `1ee8c6ffd07cd8ed7777253c3b89f5a438215a9f127301ffca32ed2fe9be4b19` |
 | `scripts/jira-capture-app.mjs` | `interface`, § 8 | `5e4dc65d1e3a51bbf4fd2dabfafcf0ef2c97d48ae17ea4571532bec05d2c76bd` |
 | `scripts/public/capture.html` | `interface`, § 8 | `75a01f40c2a3c70922eb75cd6150e600fea9d7cfe1c88fb0a7e0791cdbd48674` |
 | `scripts/jira-capture-mhtml.mjs` | `interface`, § 8 | `3bc8af65e15e703d1aff04efff70ca3f276e2bce128d9add1b705e3bf12fc02e` |
@@ -89,12 +89,12 @@ Treize fichiers sont tirés des blocs annotés `<!-- fichier : chemin -->` des m
 | `scripts/public/index.html` | `export-api`, § 6 | `f69c6d601212d9a7e746181957a8c281f00a3d42decd488de25c54fdbb8abd91` |
 | `scripts/jira_sprint_export.py` | `export-api`, § 6 | `60b6953199cbc21443572212fee36de21adc4522e86feb2215f38ba474b91782` |
 | `tests/fake-jira.mjs` | `recette`, § 6 | `eb8de8e8bb1b46ad5a4c6e83cd6f8acdd812a494b8559d017d87b93907d4f83d` |
-| `tests/run-tests.mjs` | `recette`, § 6 | `cac3fa3345aacd6f6ecd6eb3bcf5c6006f8fb65ead3a325ecf48e5449d56992f` |
+| `tests/run-tests.mjs` | `recette`, § 6 | `714aa4450678f3cd2a5ac090ab1e99465706cd7962a1cf5f27d0a3649fcbd6a6` |
 
 Depuis le dossier du skill, cette commande d'une ligne écrit les treize fichiers, compare leurs empreintes à celles du tableau et sort avec le code 1 au moindre écart ou à la moindre absence. Elle ne contient ni `$`, ni accent grave, ni `!`, ni `%`, ni guillemet intérieur : elle se colle telle quelle dans bash, zsh, CMD ou PowerShell, et dans un fichier `.cmd`. Elle lit aussi des modules aux fins de ligne CRLF.
 
 ```text
-node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'package.json': 'e01fa603cc88fab8699767cc10f2451bce6b9d54e02462ee863b10a7b65960ad', 'package-lock.json': '28c00829c50edb775801fc626de22df4bfc1161621cfe1bfcc612a5153b10434', '.gitignore': 'b163b109241838c4ff48e7cc27de427a4fb4e7f9aebdb16c8a5ad3fbb7a02613', 'scripts/jira-capture-core.mjs': '7a2d7dac386217a48dc92859408a72d4d21cd0e85a75f1b267259da7ab9e8b2d', 'scripts/jira-capture-app.mjs': '5e4dc65d1e3a51bbf4fd2dabfafcf0ef2c97d48ae17ea4571532bec05d2c76bd', 'scripts/public/capture.html': '75a01f40c2a3c70922eb75cd6150e600fea9d7cfe1c88fb0a7e0791cdbd48674', 'scripts/jira-capture-mhtml.mjs': '3bc8af65e15e703d1aff04efff70ca3f276e2bce128d9add1b705e3bf12fc02e', 'agent/capteur-sprint.md': '02851f3d135190d35b74dfcdb0e29556dacae788585a2ea2889adf53ffdfca79', 'scripts/jira-sprint-app.mjs': '14005092304d4d368c869d7ee801ca922529848325255054768e86f37c418ea8', 'scripts/public/index.html': 'f69c6d601212d9a7e746181957a8c281f00a3d42decd488de25c54fdbb8abd91', 'scripts/jira_sprint_export.py': '60b6953199cbc21443572212fee36de21adc4522e86feb2215f38ba474b91782', 'tests/fake-jira.mjs': 'eb8de8e8bb1b46ad5a4c6e83cd6f8acdd812a494b8559d017d87b93907d4f83d', 'tests/run-tests.mjs': 'cac3fa3345aacd6f6ecd6eb3bcf5c6006f8fb65ead3a325ecf48e5449d56992f' }; const vus = new Set(); let ecarts = 0; for (const module of ['modules/execution/SKILL.md', 'modules/interface/SKILL.md', 'modules/agent/SKILL.md', 'modules/export-api/SKILL.md', 'modules/recette/SKILL.md']) { const texte = fs.readFileSync(module, 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); vus.add(m[1]); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (conforme === false) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } } for (const f of Object.keys(attendu)) { if (vus.has(f) === false) { ecarts++; console.log('ABSENT    ' + f); } } if (ecarts > 0) process.exitCode = 1;"
+node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'package.json': 'e01fa603cc88fab8699767cc10f2451bce6b9d54e02462ee863b10a7b65960ad', 'package-lock.json': '28c00829c50edb775801fc626de22df4bfc1161621cfe1bfcc612a5153b10434', '.gitignore': 'b163b109241838c4ff48e7cc27de427a4fb4e7f9aebdb16c8a5ad3fbb7a02613', 'scripts/jira-capture-core.mjs': '1ee8c6ffd07cd8ed7777253c3b89f5a438215a9f127301ffca32ed2fe9be4b19', 'scripts/jira-capture-app.mjs': '5e4dc65d1e3a51bbf4fd2dabfafcf0ef2c97d48ae17ea4571532bec05d2c76bd', 'scripts/public/capture.html': '75a01f40c2a3c70922eb75cd6150e600fea9d7cfe1c88fb0a7e0791cdbd48674', 'scripts/jira-capture-mhtml.mjs': '3bc8af65e15e703d1aff04efff70ca3f276e2bce128d9add1b705e3bf12fc02e', 'agent/capteur-sprint.md': '02851f3d135190d35b74dfcdb0e29556dacae788585a2ea2889adf53ffdfca79', 'scripts/jira-sprint-app.mjs': '14005092304d4d368c869d7ee801ca922529848325255054768e86f37c418ea8', 'scripts/public/index.html': 'f69c6d601212d9a7e746181957a8c281f00a3d42decd488de25c54fdbb8abd91', 'scripts/jira_sprint_export.py': '60b6953199cbc21443572212fee36de21adc4522e86feb2215f38ba474b91782', 'tests/fake-jira.mjs': 'eb8de8e8bb1b46ad5a4c6e83cd6f8acdd812a494b8559d017d87b93907d4f83d', 'tests/run-tests.mjs': '714aa4450678f3cd2a5ac090ab1e99465706cd7962a1cf5f27d0a3649fcbd6a6' }; const vus = new Set(); let ecarts = 0; for (const module of ['modules/execution/SKILL.md', 'modules/interface/SKILL.md', 'modules/agent/SKILL.md', 'modules/export-api/SKILL.md', 'modules/recette/SKILL.md']) { const texte = fs.readFileSync(module, 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); vus.add(m[1]); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (conforme === false) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } } for (const f of Object.keys(attendu)) { if (vus.has(f) === false) { ecarts++; console.log('ABSENT    ' + f); } } if (ecarts > 0) process.exitCode = 1;"
 ```
 
 Puis, depuis le même dossier :
@@ -181,7 +181,7 @@ Le module commun porte tout ce que font la capture et le classement ; l'interfac
 
 | Fonction | Rôle | Module |
 |---|---|---|
-| `launchBrowser()`, `browserChannel()`, `profileDir()` | fenêtre visible sur le profil dédié | `session` |
+| `launchBrowser()`, `browserChannel()`, `profileDir()`, `ensureUsableWindow()` | fenêtre visible sur le profil dédié, agrandie si elle est trop petite pour le relevé | `session`, `releve` |
 | `loadAllTickets(page, { categories })`, `parseFilter()`, `matchesFilter()` | relevé des liens et de leur section, filtre | `releve` |
 | `captureTicket()`, `captureMhtml()`, `pageTimeoutMs()` | capture d'une page de ticket | `capture` |
 | `addSectionLinks()`, `sectionWarnings()`, `parseCategories()`, `normalizeText()` | sections, avertissements, catégories | `classement` |
@@ -480,6 +480,26 @@ export async function loadAllTickets(page, { categories = DEFAULT_CATEGORIES, pa
   return { links: [...seen.values()], markers };
 }
 
+/**
+ * Fenêtre trop petite pour afficher la liste du sprint : sans écran réel, la première fenêtre s'ouvre parfois presque
+ * sans hauteur, et une liste sans hauteur ne défile pas. Elle est alors remise à 1280 × 900. Une fenêtre déjà assez
+ * grande n'est pas touchée. Rend true si la fenêtre a été agrandie.
+ */
+export async function ensureUsableWindow(context, page, { min = 300 } = {}) {
+  const [width, height] = await page.evaluate(() => [innerWidth, innerHeight]);
+  if (width >= min && height >= min) return false;
+  const cdp = await context.newCDPSession(page);
+  try {
+    const { windowId } = await cdp.send('Browser.getWindowForTarget');
+    await cdp.send('Browser.setWindowBounds', { windowId, bounds: { windowState: 'normal' } });
+    await cdp.send('Browser.setWindowBounds', { windowId, bounds: { width: 1280, height: 900 } });
+  } finally {
+    await cdp.detach().catch(() => {});
+  }
+  await page.waitForTimeout(500);
+  return true;
+}
+
 /** Instantané MHTML de la page, comme « Enregistrer sous… », format « Page Web, un seul fichier ». */
 export async function captureMhtml(context, page) {
   const cdp = await context.newCDPSession(page);
@@ -575,6 +595,8 @@ export async function captureSprintTickets(context, page, {
 } = {}) {
   onProgress({ step: 'liste', done: 0, total: 0, key: null });
   const sprintUrl = page.url();
+  await page.bringToFront().catch(() => {}); // la fenêtre du sprint passe devant : le développeur suit la capture
+  await ensureUsableWindow(context, page);
   const list = await loadAllTickets(page, { categories });
   await mkdir(folder, { recursive: true });
   await writeFile(join(folder, 'sprint.mhtml'), await captureMhtml(context, page));

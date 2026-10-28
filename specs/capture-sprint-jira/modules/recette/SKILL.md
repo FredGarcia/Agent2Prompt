@@ -1,6 +1,6 @@
 ---
 name: recette
-description: Recette du skill (npm test, sous Windows, Linux et, sans écran, sous xvfb-run, profil et dossiers temporaires, faux Jira local avec API REST paginée, SSO simulé, backlogs à sections IA et DEV chargés au défilement ou virtualisés, tableau à couloirs, pages de tickets et session expirée, table des 19 scénarios R1 à R19 rattachés aux invariants de D1 à D4, D6, D8 et D11 et aux points d'extension, contrôle de la recette par douze défauts réintroduits, recette en CI sur ubuntu-latest et windows-latest, sources de tests/fake-jira.mjs et tests/run-tests.mjs). À lire pour installer le skill, et avant de publier une version.
+description: Recette du skill (npm test, sous Windows, Linux et, sans écran, sous xvfb-run, profil et dossiers temporaires, faux Jira local avec API REST paginée, SSO simulé, backlogs à sections IA et DEV chargés au défilement ou virtualisés, tableau à couloirs, pages de tickets et session expirée, table des 19 scénarios R1 à R19 rattachés aux invariants de D1 à D4, D6, D8 et D11 et aux points d'extension, contrôle de la recette par treize défauts réintroduits, recette en CI sur ubuntu-latest et windows-latest, sources de tests/fake-jira.mjs et tests/run-tests.mjs). À lire pour installer le skill, et avant de publier une version.
 dimensions: [D1, D2, D3, D4, D6, D8, D11]
 status: active
 ---
@@ -17,8 +17,8 @@ npm test
 - Le navigateur est celui de `JIRA_CAPTURE_CHANNEL` : Chrome par défaut ; `chromium` après `npx playwright-core install chromium`.
 - Python : la variable `PYTHON`, à défaut `py` sous Windows et `python3` ailleurs ; s'il manque, R7 est sauté.
 - La recette travaille sur un profil et des dossiers temporaires : la session et les captures du dossier du skill ne sont pas touchées. Elle efface ses dossiers temporaires si tout passe ; sinon, ou avec `KEEP_TMP=1`, elle les garde et en donne le chemin, avec une capture d'écran de l'interface.
-- Durée : environ 4 min 30 s, dont 51 s pour la capture du backlog chargé au défilement et 77 s pour le backlog virtualisé.
-- Bilan attendu : `19 scénarios, 115 contrôles, 115 réussis, 0 en échec, 0 sautés` ; sans Python, `111 contrôles, 110 réussis, 0 en échec, 1 sautés`, R7 étant sauté.
+- Durée : environ 4 min 40 s, dont 51 s pour la capture du backlog chargé au défilement et 77 s pour le backlog virtualisé.
+- Bilan attendu : `19 scénarios, 116 contrôles, 116 réussis, 0 en échec, 0 sautés` ; sans Python, `112 contrôles, 111 réussis, 0 en échec, 1 sautés`, R7 étant sauté.
 
 ## 2. Le faux Jira
 
@@ -60,7 +60,7 @@ Place des tickets du sprint dans le backlog 42 :
 | R10 | Backlog chargé au défilement : 72 tickets relevés, navigation exclue, 8 retenus et triés, les huit cas du § 2, dossiers `IA`, `DEV` et `à classer` directement dans le dossier choisi, MHTML de Chrome par ticket, commentaire chargé au défilement, `sprint.mhtml` et `rapport.json`, décompte, un en-tête compté par section ; une seule capture à la fois ; navigateur gardé ouvert après l'erreur | D3.INV-1, D3.INV-3, D4.INV-1, D4.INV-2, D4.INV-3, D11.INV-1, D11.INV-2, D11.INV-3, D11.INV-5, D6.INV-2, D6.INV-4 |
 | R11 | Nouvelle capture dans le même dossier : retour à la page du sprint après une erreur ; puis, le ticket passé dans la section `DEV` de Jira, ticket rangé dans sa nouvelle section, copie précédente retirée, autres tickets en place, navigateur fermé sans erreur | D11.INV-3, D6.INV-4 |
 | R12 | Navigateur rouvert sans nouveau passage par le SSO | D2.INV-2 |
-| R13 | Backlog virtualisé, dans une zone de 80 pixels, en-têtes compris : mêmes contrôles que R10 | D3.INV-1, D4.INV-1, D11.INV-2 |
+| R13 | Backlog virtualisé, dans une zone de 80 pixels, en-têtes compris : mêmes contrôles que R10 ; puis relevé du backlog 42 dans une fenêtre de 100 pixels de haut, agrandie avant le relevé : 72 tickets | D3.INV-1, D4.INV-1, D11.INV-2 |
 | R14 | Cinq tickets à session expirée, sans section : trois erreurs, capture arrêtée, navigateur gardé ouvert, deux avertissements | D4.INV-1, D4.INV-4, D6.INV-4, D11.INV-6 |
 | R15 | « Fermer le navigateur » pendant le relevé : capture arrêtée sans rapport, avec un message qui le dit ; puis pendant la capture des tickets : capture arrêtée, rapport partiel | D4.INV-4, D6.INV-2 |
 | R16 | Page de l'interface pilotée comme par le développeur : bouton activé, avancement, boutons bloqués, bilan, résumé par section, une ligne par ticket avec l'en-tête de sa section, avertissement, valeurs retrouvées après rechargement | D6.INV-2, D6.INV-3 |
@@ -70,22 +70,23 @@ Place des tickets du sprint dans le backlog 42 :
 
 ## 4. Contrôle de la recette elle-même
 
-Douze défauts, réintroduits un à un dans le code, font chacun échouer la recette par le scénario attendu (essai du 28 octobre 2026, Node 22.23.4) :
+Treize défauts, réintroduits un à un dans le code, font chacun échouer la recette par le scénario attendu (essai du 28 octobre 2026, Node 22.23.4) :
 
 | ID | Défaut réintroduit | Scénarios en échec | Contrôles en échec |
 |---|---|---|---|
-| M1 | les liens de la navigation sont relevés : le ticket récent de l'en-tête est capturé | R10, R11, R13, R16 | 15 |
+| M1 | les liens de la navigation sont relevés : le ticket récent de l'en-tête est capturé | R10, R11, R13, R16 | 16 |
 | M2 | la copie d'un ticket recapturé reste dans son ancien dossier | R11 | 1 |
 | M3 | les en-têtes de la navigation comptent : le filtre rapide `DEV` de l'en-tête de la page range en `DEV` le ticket placé avant le premier en-tête | R10, R11, R13, R14, R16 | 17 |
 | M4 | l'origine des requêtes n'est plus contrôlée | R8 | 1 |
-| M5 | une page est enregistrée sans vérifier qu'elle est celle du ticket : la page de connexion prend le nom du ticket | R10, R11, R13 à R18 | 18 |
-| M6 | les liens ne sont relevés qu'avant le défilement : seuls les premiers tickets du backlog sont vus | R10, R11, R13, R15 à R18 | 47 |
+| M5 | une page est enregistrée sans vérifier qu'elle est celle du ticket : la page de connexion prend le nom du ticket | R10, R11, R13, R14, R16, R17, R18 | 16 |
+| M6 | les liens ne sont relevés qu'avant le défilement : seuls les premiers tickets du backlog sont vus | R10, R11, R13, R15 à R18 | 48 |
 | M7 | pas de défilement fixe de 1 200 pixels, plus grand que la zone affichée : des cartes de la liste virtualisée sont sautées | R13 | 11 |
 | M8 | seuls les blocs de 100 pixels de haut au moins défilent, comme en 1.0.0 : la liste virtualisée de 80 pixels n'est pas parcourue | R13 | 16 |
 | M9 | la section n'est pas reportée d'un pas à l'autre : dans la liste virtualisée, les tickets dont l'en-tête est sorti de la page vont dans `à classer` | R3, R13 | 7 |
 | M10 | un en-tête masqué compte : le `DEV` caché dans une carte de la section `IA` range en `DEV` le ticket suivant | R10, R13, R16, R17 | 10 |
 | M11 | aucun bloc d'en-tête : la section va toujours jusqu'à l'en-tête suivant, et le couloir `Autres` du tableau 44 rejoint `DEV` | R3 | 1 |
 | M12 | le bloc d'un en-tête englobe les tickets placés avant lui : tant que `DEV` n'est pas chargé, la liste entière passe en `IA`, ticket sans section compris | R3, R10, R11, R13, R16 | 11 |
+| M13 | la fenêtre n'est pas agrandie avant le relevé : dans une fenêtre de 100 pixels de haut, la liste n'a aucune hauteur, et 31 tickets sur 72 sont relevés | R13 | 1 |
 
 Chaque défaut a été retiré après son essai ; la recette du code publié passe en entier.
 
@@ -367,8 +368,8 @@ import * as core from '../scripts/jira-capture-core.mjs';
 import { BOARD_42, TICKETS, startFakeJira } from './fake-jira.mjs';
 
 const {
-  DEFAULT_CATEGORIES, UNCLASSIFIED, addSectionLinks, browserChannel, loadAllTickets, matchesFilter, outputFolder,
-  pageTimeoutMs, parseCategories, parseFilter, profileDir, sectionWarnings,
+  DEFAULT_CATEGORIES, UNCLASSIFIED, addSectionLinks, browserChannel, captureSprintTickets, loadAllTickets, matchesFilter,
+  outputFolder, pageTimeoutMs, parseCategories, parseFilter, profileDir, sectionWarnings,
 } = core;
 const SKILL = fileURLToPath(new URL('..', import.meta.url));
 const TMP = mkdtempSync(join(tmpdir(), 'capture-sprint-jira-'));
@@ -723,13 +724,27 @@ try {
   r = await post(port, '/api/open', { url: `${backlog}?mode=virtual` });
   check('navigateur rouvert sans nouveau passage par le SSO', r.status === 200 && fake.stats.ssoLogins === 1, `${fake.stats.ssoLogins}`);
 
-  scenario('R13', 'capture d\'un backlog virtualisé');
+  scenario('R13', 'capture d\'un backlog virtualisé ; relevé dans une fenêtre trop petite');
   const virtual = join(TMP, 'sortie-virtuelle');
   started = Date.now();
   await post(port, '/api/capture', { ...filter, folder: virtual });
   status = await waitForJob(port);
   check('terminée', status.job.state === 'done', `${((Date.now() - started) / 1000).toFixed(1)} s ${status.job.error ?? ''}`);
   if (status.job.report) verifyRun(status.job.report, virtual);
+  // Fenêtre presque sans hauteur, comme parfois la première fenêtre sans écran réel : la liste n'aurait aucune hauteur
+  const tiny = await chromium.launchPersistentContext(join(TMP, 'profil-petit'), {
+    channel: browserChannel(), headless: false, viewport: null, args: ['--window-size=1280,100'],
+  });
+  try {
+    await tiny.addCookies([{ name: 'sso', value: 'ok', url: fake.url }]);
+    const page = tiny.pages()[0] ?? (await tiny.newPage());
+    await page.goto(backlog);
+    const small = await captureSprintTickets(tiny, page, { folder: join(TMP, 'sortie-petite'), filter: parseFilter({ prefix: 'AUCUN' }) });
+    const size = await page.evaluate(() => `${innerWidth} × ${innerHeight}`);
+    check('fenêtre trop petite : agrandie avant le relevé, 72 tickets relevés', small.listed === BOARD_42.length + 1, `${small.listed}, ${size}`);
+  } finally {
+    await tiny.close();
+  }
 
   scenario('R14', 'arrêt après trois échecs de suite');
   await post(port, '/api/open', { url: `${fake.url}/jira/software/c/projects/DEMO/boards/43/backlog` });
@@ -822,7 +837,7 @@ try {
   scenario('R19', "point d'extension E2 : capture pilotable par un autre outil");
   const exported = Object.keys(core).filter((k) => typeof core[k] === 'function').sort();
   check('fonctions exportées par le module commun', ['captureSprintTickets', 'loadAllTickets', 'captureTicket', 'captureMhtml', 'launchBrowser',
-    'addSectionLinks', 'sectionWarnings', 'parseFilter', 'matchesFilter', 'parseCategories'].every((k) => exported.includes(k)), exported.join(', '));
+    'addSectionLinks', 'sectionWarnings', 'ensureUsableWindow', 'parseFilter', 'matchesFilter', 'parseCategories'].every((k) => exported.includes(k)), exported.join(', '));
 } catch (err) {
   check('exécution', false, err.stack);
 } finally {

@@ -21,6 +21,8 @@ Jira charge souvent les cartes au fur et à mesure du défilement, et peut retir
 
 Le défilement est programmé (position des blocs), et non simulé à la molette : il ne dépend ni de la place du pointeur ni de la taille de la fenêtre. Une première version, à pas fixe de 1 200 pixels sous le pointeur, ne relevait que 11 tickets sur 72 d'une liste virtualisée de 300 pixels de haut (recette, R13 et M7). En 1.0.0, seuls les blocs de 100 pixels de haut au moins défilaient : sur un runner de CI, où la fenêtre s'ouvrait à une taille imprévue, le relevé s'est arrêté à 31 tickets sur 72. Depuis 1.0.1, un bloc qui contient un lien de ticket défile quelle que soit sa hauteur (recette, R13 et M8), et la fenêtre s'ouvre en 1 280 × 900 pixels (module `session`).
 
+Le même échec est revenu en 1.1.0 sur un runner, avec la cause réelle : la première fenêtre, sans écran réel, s'ouvrait presque sans hauteur, et la liste du sprint, sans hauteur, ne défilait pas ; 31 tickets sur 72 relevés en 5 s. Depuis 1.1.0, avant le relevé, la fenêtre du sprint passe au premier plan, et une fenêtre de moins de 300 pixels de large ou de haut est remise à 1 280 × 900 (recette, R13 et M13). Une fenêtre déjà assez grande n'est pas touchée.
+
 ## 3. Liens et clés (D3.INV-1, D3.INV-3)
 
 - Seuls comptent les liens `<a href>` dont l'adresse contient `/browse/<CLÉ>`, où la clé est `PROJET-NUMÉRO`.

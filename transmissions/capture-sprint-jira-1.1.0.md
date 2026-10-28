@@ -25,7 +25,7 @@ Lis `SKILL.md`, `manifest.json`, puis les modules actifs dans l'ordre indiqué p
 1. Depuis le dossier du skill, écris les fichiers exécutables à partir des blocs annotés des modules, par la commande d'extraction du module `execution`, § 8. Elle se colle telle quelle dans bash, CMD ou PowerShell. Ne recopie pas les fichiers à la main.
 2. La commande vérifie elle-même leurs empreintes : elle écrit `conforme` pour chaque fichier, ou `ECART` ou `ABSENT`, et sort alors avec le code 1. Un écart arrête l'installation.
 3. Vérifie la version de Node (20 ou plus récent), puis installe la dépendance : `npm ci`. Elle ne télécharge aucun navigateur ; Chrome doit être installé sur le poste (module `execution`, § 2).
-4. Lance la recette : `npm test` ; sous Linux sans écran, `xvfb-run -a npm test`. Attendu : 19 scénarios, 115 contrôles réussis, aucun échec ; sans Python, R7 est sauté. Rapporte au développeur le bilan ; un échec arrête l'installation et se rapporte tel quel, sans modifier les scripts.
+4. Lance la recette : `npm test` ; sous Linux sans écran, `xvfb-run -a npm test`. Attendu : 19 scénarios, 116 contrôles réussis, aucun échec ; sans Python, R7 est sauté. Rapporte au développeur le bilan ; un échec arrête l'installation et se rapporte tel quel, sans modifier les scripts.
 
 ## Étape 3 : l'agent
 
@@ -200,7 +200,7 @@ Points d'extension, actifs depuis la version indiquée :
 
 ## 8. Critères d'acceptation
 
-- La recette du module `recette` passe en entier : `npm test`, 19 scénarios et 115 contrôles avec Python ; sans Python, R7 est sauté.
+- La recette du module `recette` passe en entier : `npm test`, 19 scénarios et 116 contrôles avec Python ; sans Python, R7 est sauté.
 - La recette passe en intégration continue sur `ubuntu-latest` et `windows-latest`, avec Node 20 et Node 22, après extraction par la commande du module `execution`, § 8, sous bash et sous CMD, puis `npm ci`.
 - Les fichiers tirés des modules ont exactement les empreintes de la table du module `execution`, § 8.
 - Les scénarios A1 à A5 du module `agent` sont rejoués avec le développeur avant que l'agent capture un sprint réel.
@@ -221,7 +221,7 @@ Points d'extension, actifs depuis la version indiquée :
 
 **D3 : relevé**
 
-- **D3.INV-1** : la page du sprint défile par pas de 80 % de la hauteur affichée de chaque bloc qui défile, jusqu'à ce que, quatre pas de suite, rien ne défile plus et qu'aucun ticket nouveau n'apparaisse ; les liens `/browse/<CLÉ>` sont relevés à chaque pas, hors navigation (menus, éléments récents), si bien qu'une liste virtualisée ne fait perdre aucun ticket, même dans une petite fenêtre.
+- **D3.INV-1** : la page du sprint défile par pas de 80 % de la hauteur affichée de chaque bloc qui défile, jusqu'à ce que, quatre pas de suite, rien ne défile plus et qu'aucun ticket nouveau n'apparaisse ; les liens `/browse/<CLÉ>` sont relevés à chaque pas, hors navigation (menus, éléments récents), si bien qu'une liste virtualisée ne fait perdre aucun ticket, même dans une petite fenêtre ; une fenêtre trop petite pour afficher la liste est agrandie avant le relevé.
 - **D3.INV-2** : un ticket est retenu si la partie projet de sa clé commence par le préfixe et si son numéro est entre les bornes, comprises ; un préfixe et des bornes vides retiennent tout ; une valeur invalide est refusée avant toute capture.
 - **D3.INV-3** : chaque clé n'est capturée qu'une fois, quelle que soit la forme de ses liens (relatif, absolu, casse) ; les tickets retenus sont capturés un à un, par numéro croissant.
 
@@ -292,7 +292,7 @@ Le préfixe, les numéros et l'adresse du Jira du développeur ne figurent dans 
 
 **1.0.1** (2026-10-28) : correctif, après la recette en CI de la version 1.0.0 fusionnée, en échec sur les deux jobs Node 20. Relevé : tout bloc qui défile et contient un lien de ticket est parcouru, quelle que soit sa hauteur, et non plus seulement ceux de 100 pixels au moins ; sur `ubuntu-latest`, où la fenêtre s'ouvrait à une taille imprévue, le relevé s'arrêtait à 31 tickets sur 72 (D3.INV-1). La fenêtre s'ouvre en 1 280 × 900 pixels (module `session`). Fermé pendant le relevé, avant tout ticket, le navigateur arrête la capture avec un message qui le dit, et non plus sur un message technique (D4.INV-4, précisé). Recette : faux Jira qui charge la suite tant que la liste ne remplit pas sa zone, comme Jira, liste virtualisée de 80 pixels, R15 étendu à la fermeture pendant le relevé, R16 qui attend l'interface sans s'interrompre ; 110 contrôles ; huit défauts réintroduits, dont M8, le seuil de 100 pixels.
 
-**1.1.0** (2026-10-28) : classement par section de la page du sprint. Dimension D11 active ; D5, la recherche d'un terme clé dans la page du ticket, passe à `superseded`, remplacée par D11 : le développeur a vérifié sur son Jira que les deux parties du sprint s'annoncent sur la page du sprint par un `<span>IA</span>` et un `<span>DEV</span>`. Catégories par défaut `IA` et `DEV`, qui nomment aussi les dossiers. Un en-tête est un élément visible dont tout le texte est le nom d'une catégorie, hors navigation ; sa section est le couloir qui le contient ou, dans une liste plate, ce qui le suit jusqu'à l'en-tête suivant ; la section de chaque ticket est relevée à chaque pas du défilement, et reportée dans une liste virtualisée. Avertissement en fin de capture pour une section introuvable ou répétée (D11.INV-6). Point d'extension E1 étendu : champ `markers` du rapport. Interface : champ des sections, sous une nouvelle clé de stockage local. Recette : faux Jira à sections, tableau à couloirs, R3 réécrit, R11 et R14 étendus ; 115 contrôles ; douze défauts réintroduits, dont M3 redéfini et M9 à M12 nouveaux. Section de migration dans le module `classement`.
+**1.1.0** (2026-10-28) : classement par section de la page du sprint. Dimension D11 active ; D5, la recherche d'un terme clé dans la page du ticket, passe à `superseded`, remplacée par D11 : le développeur a vérifié sur son Jira que les deux parties du sprint s'annoncent sur la page du sprint par un `<span>IA</span>` et un `<span>DEV</span>`. Catégories par défaut `IA` et `DEV`, qui nomment aussi les dossiers. Un en-tête est un élément visible dont tout le texte est le nom d'une catégorie, hors navigation ; sa section est le couloir qui le contient ou, dans une liste plate, ce qui le suit jusqu'à l'en-tête suivant ; la section de chaque ticket est relevée à chaque pas du défilement, et reportée dans une liste virtualisée. Avertissement en fin de capture pour une section introuvable ou répétée (D11.INV-6). Point d'extension E1 étendu : champ `markers` du rapport. Interface : champ des sections, sous une nouvelle clé de stockage local. Relevé : la fenêtre du sprint passe au premier plan, et une fenêtre presque sans hauteur est agrandie à 1 280 × 900 : c'était la cause réelle de l'échec en CI à 31 tickets sur 72, revenu sur la pull request de cette version (D3.INV-1, précisé). Recette : faux Jira à sections, tableau à couloirs, R3 réécrit, R11, R13 et R14 étendus ; 116 contrôles ; treize défauts réintroduits, dont M3 redéfini et M9 à M13 nouveaux. Section de migration dans le module `classement`.
 <<<FIN SKILL.md>>>
 
 <<<FICHIER modules/execution/SKILL.md>>>
@@ -378,7 +378,7 @@ Treize fichiers sont tirés des blocs annotés `<!-- fichier : chemin -->` des m
 | `package.json` | `execution`, § 9 | `e01fa603cc88fab8699767cc10f2451bce6b9d54e02462ee863b10a7b65960ad` |
 | `package-lock.json` | `execution`, § 9 | `28c00829c50edb775801fc626de22df4bfc1161621cfe1bfcc612a5153b10434` |
 | `.gitignore` | `execution`, § 9 | `b163b109241838c4ff48e7cc27de427a4fb4e7f9aebdb16c8a5ad3fbb7a02613` |
-| `scripts/jira-capture-core.mjs` | `execution`, § 10 | `7a2d7dac386217a48dc92859408a72d4d21cd0e85a75f1b267259da7ab9e8b2d` |
+| `scripts/jira-capture-core.mjs` | `execution`, § 10 | `1ee8c6ffd07cd8ed7777253c3b89f5a438215a9f127301ffca32ed2fe9be4b19` |
 | `scripts/jira-capture-app.mjs` | `interface`, § 8 | `5e4dc65d1e3a51bbf4fd2dabfafcf0ef2c97d48ae17ea4571532bec05d2c76bd` |
 | `scripts/public/capture.html` | `interface`, § 8 | `75a01f40c2a3c70922eb75cd6150e600fea9d7cfe1c88fb0a7e0791cdbd48674` |
 | `scripts/jira-capture-mhtml.mjs` | `interface`, § 8 | `3bc8af65e15e703d1aff04efff70ca3f276e2bce128d9add1b705e3bf12fc02e` |
@@ -387,12 +387,12 @@ Treize fichiers sont tirés des blocs annotés `<!-- fichier : chemin -->` des m
 | `scripts/public/index.html` | `export-api`, § 6 | `f69c6d601212d9a7e746181957a8c281f00a3d42decd488de25c54fdbb8abd91` |
 | `scripts/jira_sprint_export.py` | `export-api`, § 6 | `60b6953199cbc21443572212fee36de21adc4522e86feb2215f38ba474b91782` |
 | `tests/fake-jira.mjs` | `recette`, § 6 | `eb8de8e8bb1b46ad5a4c6e83cd6f8acdd812a494b8559d017d87b93907d4f83d` |
-| `tests/run-tests.mjs` | `recette`, § 6 | `cac3fa3345aacd6f6ecd6eb3bcf5c6006f8fb65ead3a325ecf48e5449d56992f` |
+| `tests/run-tests.mjs` | `recette`, § 6 | `714aa4450678f3cd2a5ac090ab1e99465706cd7962a1cf5f27d0a3649fcbd6a6` |
 
 Depuis le dossier du skill, cette commande d'une ligne écrit les treize fichiers, compare leurs empreintes à celles du tableau et sort avec le code 1 au moindre écart ou à la moindre absence. Elle ne contient ni `$`, ni accent grave, ni `!`, ni `%`, ni guillemet intérieur : elle se colle telle quelle dans bash, zsh, CMD ou PowerShell, et dans un fichier `.cmd`. Elle lit aussi des modules aux fins de ligne CRLF.
 
 ```text
-node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'package.json': 'e01fa603cc88fab8699767cc10f2451bce6b9d54e02462ee863b10a7b65960ad', 'package-lock.json': '28c00829c50edb775801fc626de22df4bfc1161621cfe1bfcc612a5153b10434', '.gitignore': 'b163b109241838c4ff48e7cc27de427a4fb4e7f9aebdb16c8a5ad3fbb7a02613', 'scripts/jira-capture-core.mjs': '7a2d7dac386217a48dc92859408a72d4d21cd0e85a75f1b267259da7ab9e8b2d', 'scripts/jira-capture-app.mjs': '5e4dc65d1e3a51bbf4fd2dabfafcf0ef2c97d48ae17ea4571532bec05d2c76bd', 'scripts/public/capture.html': '75a01f40c2a3c70922eb75cd6150e600fea9d7cfe1c88fb0a7e0791cdbd48674', 'scripts/jira-capture-mhtml.mjs': '3bc8af65e15e703d1aff04efff70ca3f276e2bce128d9add1b705e3bf12fc02e', 'agent/capteur-sprint.md': '02851f3d135190d35b74dfcdb0e29556dacae788585a2ea2889adf53ffdfca79', 'scripts/jira-sprint-app.mjs': '14005092304d4d368c869d7ee801ca922529848325255054768e86f37c418ea8', 'scripts/public/index.html': 'f69c6d601212d9a7e746181957a8c281f00a3d42decd488de25c54fdbb8abd91', 'scripts/jira_sprint_export.py': '60b6953199cbc21443572212fee36de21adc4522e86feb2215f38ba474b91782', 'tests/fake-jira.mjs': 'eb8de8e8bb1b46ad5a4c6e83cd6f8acdd812a494b8559d017d87b93907d4f83d', 'tests/run-tests.mjs': 'cac3fa3345aacd6f6ecd6eb3bcf5c6006f8fb65ead3a325ecf48e5449d56992f' }; const vus = new Set(); let ecarts = 0; for (const module of ['modules/execution/SKILL.md', 'modules/interface/SKILL.md', 'modules/agent/SKILL.md', 'modules/export-api/SKILL.md', 'modules/recette/SKILL.md']) { const texte = fs.readFileSync(module, 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); vus.add(m[1]); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (conforme === false) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } } for (const f of Object.keys(attendu)) { if (vus.has(f) === false) { ecarts++; console.log('ABSENT    ' + f); } } if (ecarts > 0) process.exitCode = 1;"
+node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'package.json': 'e01fa603cc88fab8699767cc10f2451bce6b9d54e02462ee863b10a7b65960ad', 'package-lock.json': '28c00829c50edb775801fc626de22df4bfc1161621cfe1bfcc612a5153b10434', '.gitignore': 'b163b109241838c4ff48e7cc27de427a4fb4e7f9aebdb16c8a5ad3fbb7a02613', 'scripts/jira-capture-core.mjs': '1ee8c6ffd07cd8ed7777253c3b89f5a438215a9f127301ffca32ed2fe9be4b19', 'scripts/jira-capture-app.mjs': '5e4dc65d1e3a51bbf4fd2dabfafcf0ef2c97d48ae17ea4571532bec05d2c76bd', 'scripts/public/capture.html': '75a01f40c2a3c70922eb75cd6150e600fea9d7cfe1c88fb0a7e0791cdbd48674', 'scripts/jira-capture-mhtml.mjs': '3bc8af65e15e703d1aff04efff70ca3f276e2bce128d9add1b705e3bf12fc02e', 'agent/capteur-sprint.md': '02851f3d135190d35b74dfcdb0e29556dacae788585a2ea2889adf53ffdfca79', 'scripts/jira-sprint-app.mjs': '14005092304d4d368c869d7ee801ca922529848325255054768e86f37c418ea8', 'scripts/public/index.html': 'f69c6d601212d9a7e746181957a8c281f00a3d42decd488de25c54fdbb8abd91', 'scripts/jira_sprint_export.py': '60b6953199cbc21443572212fee36de21adc4522e86feb2215f38ba474b91782', 'tests/fake-jira.mjs': 'eb8de8e8bb1b46ad5a4c6e83cd6f8acdd812a494b8559d017d87b93907d4f83d', 'tests/run-tests.mjs': '714aa4450678f3cd2a5ac090ab1e99465706cd7962a1cf5f27d0a3649fcbd6a6' }; const vus = new Set(); let ecarts = 0; for (const module of ['modules/execution/SKILL.md', 'modules/interface/SKILL.md', 'modules/agent/SKILL.md', 'modules/export-api/SKILL.md', 'modules/recette/SKILL.md']) { const texte = fs.readFileSync(module, 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); vus.add(m[1]); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (conforme === false) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } } for (const f of Object.keys(attendu)) { if (vus.has(f) === false) { ecarts++; console.log('ABSENT    ' + f); } } if (ecarts > 0) process.exitCode = 1;"
 ```
 
 Puis, depuis le même dossier :
@@ -479,7 +479,7 @@ Le module commun porte tout ce que font la capture et le classement ; l'interfac
 
 | Fonction | Rôle | Module |
 |---|---|---|
-| `launchBrowser()`, `browserChannel()`, `profileDir()` | fenêtre visible sur le profil dédié | `session` |
+| `launchBrowser()`, `browserChannel()`, `profileDir()`, `ensureUsableWindow()` | fenêtre visible sur le profil dédié, agrandie si elle est trop petite pour le relevé | `session`, `releve` |
 | `loadAllTickets(page, { categories })`, `parseFilter()`, `matchesFilter()` | relevé des liens et de leur section, filtre | `releve` |
 | `captureTicket()`, `captureMhtml()`, `pageTimeoutMs()` | capture d'une page de ticket | `capture` |
 | `addSectionLinks()`, `sectionWarnings()`, `parseCategories()`, `normalizeText()` | sections, avertissements, catégories | `classement` |
@@ -778,6 +778,26 @@ export async function loadAllTickets(page, { categories = DEFAULT_CATEGORIES, pa
   return { links: [...seen.values()], markers };
 }
 
+/**
+ * Fenêtre trop petite pour afficher la liste du sprint : sans écran réel, la première fenêtre s'ouvre parfois presque
+ * sans hauteur, et une liste sans hauteur ne défile pas. Elle est alors remise à 1280 × 900. Une fenêtre déjà assez
+ * grande n'est pas touchée. Rend true si la fenêtre a été agrandie.
+ */
+export async function ensureUsableWindow(context, page, { min = 300 } = {}) {
+  const [width, height] = await page.evaluate(() => [innerWidth, innerHeight]);
+  if (width >= min && height >= min) return false;
+  const cdp = await context.newCDPSession(page);
+  try {
+    const { windowId } = await cdp.send('Browser.getWindowForTarget');
+    await cdp.send('Browser.setWindowBounds', { windowId, bounds: { windowState: 'normal' } });
+    await cdp.send('Browser.setWindowBounds', { windowId, bounds: { width: 1280, height: 900 } });
+  } finally {
+    await cdp.detach().catch(() => {});
+  }
+  await page.waitForTimeout(500);
+  return true;
+}
+
 /** Instantané MHTML de la page, comme « Enregistrer sous… », format « Page Web, un seul fichier ». */
 export async function captureMhtml(context, page) {
   const cdp = await context.newCDPSession(page);
@@ -873,6 +893,8 @@ export async function captureSprintTickets(context, page, {
 } = {}) {
   onProgress({ step: 'liste', done: 0, total: 0, key: null });
   const sprintUrl = page.url();
+  await page.bringToFront().catch(() => {}); // la fenêtre du sprint passe devant : le développeur suit la capture
+  await ensureUsableWindow(context, page);
   const list = await loadAllTickets(page, { categories });
   await mkdir(folder, { recursive: true });
   await writeFile(join(folder, 'sprint.mhtml'), await captureMhtml(context, page));
@@ -945,7 +967,7 @@ Phase 7E couverte : Environnement.
 
 ## 1. Principe
 
-Derrière un SSO, ni l'API REST de Jira ni un script ne peuvent se connecter avec un mot de passe : la connexion passe par le fournisseur d'identité de l'entreprise, souvent avec une validation sur un second appareil. Le skill ne cherche donc pas à se connecter. Il ouvre une fenêtre visible du navigateur du poste sur la page du sprint, et le développeur s'y connecte lui-même, comme d'habitude (D2.INV-1). La fenêtre s'ouvre en 1 280 × 900 pixels, quelle que soit la taille qu'elle avait gardée : sans écran réel, elle pouvait s'ouvrir à une taille imprévue. Le développeur peut ensuite l'agrandir. Le skill ne voit ni identifiant, ni mot de passe, ni code de validation : il n'a aucun champ pour les recevoir, et l'agent refuse de les prendre (module `agent`, A5).
+Derrière un SSO, ni l'API REST de Jira ni un script ne peuvent se connecter avec un mot de passe : la connexion passe par le fournisseur d'identité de l'entreprise, souvent avec une validation sur un second appareil. Le skill ne cherche donc pas à se connecter. Il ouvre une fenêtre visible du navigateur du poste sur la page du sprint, et le développeur s'y connecte lui-même, comme d'habitude (D2.INV-1). La fenêtre s'ouvre en 1 280 × 900 pixels, quelle que soit la taille qu'elle avait gardée : sans écran réel, elle pouvait s'ouvrir à une taille imprévue. Le développeur peut ensuite l'agrandir. Au moment de la capture, elle passe au premier plan, et une fenêtre restée presque sans hauteur est remise à 1 280 × 900 (module `releve`). Le skill ne voit ni identifiant, ni mot de passe, ni code de validation : il n'a aucun champ pour les recevoir, et l'agent refuse de les prendre (module `agent`, A5).
 
 ## 2. Profil dédié (D2.INV-2)
 
@@ -995,6 +1017,8 @@ Jira charge souvent les cartes au fur et à mesure du défilement, et peut retir
 À chaque pas, le relevé note aussi la section de chaque lien, d'après les en-têtes de catégorie présents (`IA`, `DEV`…) : une liste virtualisée retire un en-tête comme une carte, et la section d'un ticket ne se perd pas avec lui (module `classement`, D11.INV-1, D11.INV-2).
 
 Le défilement est programmé (position des blocs), et non simulé à la molette : il ne dépend ni de la place du pointeur ni de la taille de la fenêtre. Une première version, à pas fixe de 1 200 pixels sous le pointeur, ne relevait que 11 tickets sur 72 d'une liste virtualisée de 300 pixels de haut (recette, R13 et M7). En 1.0.0, seuls les blocs de 100 pixels de haut au moins défilaient : sur un runner de CI, où la fenêtre s'ouvrait à une taille imprévue, le relevé s'est arrêté à 31 tickets sur 72. Depuis 1.0.1, un bloc qui contient un lien de ticket défile quelle que soit sa hauteur (recette, R13 et M8), et la fenêtre s'ouvre en 1 280 × 900 pixels (module `session`).
+
+Le même échec est revenu en 1.1.0 sur un runner, avec la cause réelle : la première fenêtre, sans écran réel, s'ouvrait presque sans hauteur, et la liste du sprint, sans hauteur, ne défilait pas ; 31 tickets sur 72 relevés en 5 s. Depuis 1.1.0, avant le relevé, la fenêtre du sprint passe au premier plan, et une fenêtre de moins de 300 pixels de large ou de haut est remise à 1 280 × 900 (recette, R13 et M13). Une fenêtre déjà assez grande n'est pas touchée.
 
 ## 3. Liens et clés (D3.INV-1, D3.INV-3)
 
@@ -2585,7 +2609,7 @@ if __name__ == "__main__":
 <<<FICHIER modules/recette/SKILL.md>>>
 ---
 name: recette
-description: Recette du skill (npm test, sous Windows, Linux et, sans écran, sous xvfb-run, profil et dossiers temporaires, faux Jira local avec API REST paginée, SSO simulé, backlogs à sections IA et DEV chargés au défilement ou virtualisés, tableau à couloirs, pages de tickets et session expirée, table des 19 scénarios R1 à R19 rattachés aux invariants de D1 à D4, D6, D8 et D11 et aux points d'extension, contrôle de la recette par douze défauts réintroduits, recette en CI sur ubuntu-latest et windows-latest, sources de tests/fake-jira.mjs et tests/run-tests.mjs). À lire pour installer le skill, et avant de publier une version.
+description: Recette du skill (npm test, sous Windows, Linux et, sans écran, sous xvfb-run, profil et dossiers temporaires, faux Jira local avec API REST paginée, SSO simulé, backlogs à sections IA et DEV chargés au défilement ou virtualisés, tableau à couloirs, pages de tickets et session expirée, table des 19 scénarios R1 à R19 rattachés aux invariants de D1 à D4, D6, D8 et D11 et aux points d'extension, contrôle de la recette par treize défauts réintroduits, recette en CI sur ubuntu-latest et windows-latest, sources de tests/fake-jira.mjs et tests/run-tests.mjs). À lire pour installer le skill, et avant de publier une version.
 dimensions: [D1, D2, D3, D4, D6, D8, D11]
 status: active
 ---
@@ -2602,8 +2626,8 @@ npm test
 - Le navigateur est celui de `JIRA_CAPTURE_CHANNEL` : Chrome par défaut ; `chromium` après `npx playwright-core install chromium`.
 - Python : la variable `PYTHON`, à défaut `py` sous Windows et `python3` ailleurs ; s'il manque, R7 est sauté.
 - La recette travaille sur un profil et des dossiers temporaires : la session et les captures du dossier du skill ne sont pas touchées. Elle efface ses dossiers temporaires si tout passe ; sinon, ou avec `KEEP_TMP=1`, elle les garde et en donne le chemin, avec une capture d'écran de l'interface.
-- Durée : environ 4 min 30 s, dont 51 s pour la capture du backlog chargé au défilement et 77 s pour le backlog virtualisé.
-- Bilan attendu : `19 scénarios, 115 contrôles, 115 réussis, 0 en échec, 0 sautés` ; sans Python, `111 contrôles, 110 réussis, 0 en échec, 1 sautés`, R7 étant sauté.
+- Durée : environ 4 min 40 s, dont 51 s pour la capture du backlog chargé au défilement et 77 s pour le backlog virtualisé.
+- Bilan attendu : `19 scénarios, 116 contrôles, 116 réussis, 0 en échec, 0 sautés` ; sans Python, `112 contrôles, 111 réussis, 0 en échec, 1 sautés`, R7 étant sauté.
 
 ## 2. Le faux Jira
 
@@ -2645,7 +2669,7 @@ Place des tickets du sprint dans le backlog 42 :
 | R10 | Backlog chargé au défilement : 72 tickets relevés, navigation exclue, 8 retenus et triés, les huit cas du § 2, dossiers `IA`, `DEV` et `à classer` directement dans le dossier choisi, MHTML de Chrome par ticket, commentaire chargé au défilement, `sprint.mhtml` et `rapport.json`, décompte, un en-tête compté par section ; une seule capture à la fois ; navigateur gardé ouvert après l'erreur | D3.INV-1, D3.INV-3, D4.INV-1, D4.INV-2, D4.INV-3, D11.INV-1, D11.INV-2, D11.INV-3, D11.INV-5, D6.INV-2, D6.INV-4 |
 | R11 | Nouvelle capture dans le même dossier : retour à la page du sprint après une erreur ; puis, le ticket passé dans la section `DEV` de Jira, ticket rangé dans sa nouvelle section, copie précédente retirée, autres tickets en place, navigateur fermé sans erreur | D11.INV-3, D6.INV-4 |
 | R12 | Navigateur rouvert sans nouveau passage par le SSO | D2.INV-2 |
-| R13 | Backlog virtualisé, dans une zone de 80 pixels, en-têtes compris : mêmes contrôles que R10 | D3.INV-1, D4.INV-1, D11.INV-2 |
+| R13 | Backlog virtualisé, dans une zone de 80 pixels, en-têtes compris : mêmes contrôles que R10 ; puis relevé du backlog 42 dans une fenêtre de 100 pixels de haut, agrandie avant le relevé : 72 tickets | D3.INV-1, D4.INV-1, D11.INV-2 |
 | R14 | Cinq tickets à session expirée, sans section : trois erreurs, capture arrêtée, navigateur gardé ouvert, deux avertissements | D4.INV-1, D4.INV-4, D6.INV-4, D11.INV-6 |
 | R15 | « Fermer le navigateur » pendant le relevé : capture arrêtée sans rapport, avec un message qui le dit ; puis pendant la capture des tickets : capture arrêtée, rapport partiel | D4.INV-4, D6.INV-2 |
 | R16 | Page de l'interface pilotée comme par le développeur : bouton activé, avancement, boutons bloqués, bilan, résumé par section, une ligne par ticket avec l'en-tête de sa section, avertissement, valeurs retrouvées après rechargement | D6.INV-2, D6.INV-3 |
@@ -2655,22 +2679,23 @@ Place des tickets du sprint dans le backlog 42 :
 
 ## 4. Contrôle de la recette elle-même
 
-Douze défauts, réintroduits un à un dans le code, font chacun échouer la recette par le scénario attendu (essai du 28 octobre 2026, Node 22.23.4) :
+Treize défauts, réintroduits un à un dans le code, font chacun échouer la recette par le scénario attendu (essai du 28 octobre 2026, Node 22.23.4) :
 
 | ID | Défaut réintroduit | Scénarios en échec | Contrôles en échec |
 |---|---|---|---|
-| M1 | les liens de la navigation sont relevés : le ticket récent de l'en-tête est capturé | R10, R11, R13, R16 | 15 |
+| M1 | les liens de la navigation sont relevés : le ticket récent de l'en-tête est capturé | R10, R11, R13, R16 | 16 |
 | M2 | la copie d'un ticket recapturé reste dans son ancien dossier | R11 | 1 |
 | M3 | les en-têtes de la navigation comptent : le filtre rapide `DEV` de l'en-tête de la page range en `DEV` le ticket placé avant le premier en-tête | R10, R11, R13, R14, R16 | 17 |
 | M4 | l'origine des requêtes n'est plus contrôlée | R8 | 1 |
-| M5 | une page est enregistrée sans vérifier qu'elle est celle du ticket : la page de connexion prend le nom du ticket | R10, R11, R13 à R18 | 18 |
-| M6 | les liens ne sont relevés qu'avant le défilement : seuls les premiers tickets du backlog sont vus | R10, R11, R13, R15 à R18 | 47 |
+| M5 | une page est enregistrée sans vérifier qu'elle est celle du ticket : la page de connexion prend le nom du ticket | R10, R11, R13, R14, R16, R17, R18 | 16 |
+| M6 | les liens ne sont relevés qu'avant le défilement : seuls les premiers tickets du backlog sont vus | R10, R11, R13, R15 à R18 | 48 |
 | M7 | pas de défilement fixe de 1 200 pixels, plus grand que la zone affichée : des cartes de la liste virtualisée sont sautées | R13 | 11 |
 | M8 | seuls les blocs de 100 pixels de haut au moins défilent, comme en 1.0.0 : la liste virtualisée de 80 pixels n'est pas parcourue | R13 | 16 |
 | M9 | la section n'est pas reportée d'un pas à l'autre : dans la liste virtualisée, les tickets dont l'en-tête est sorti de la page vont dans `à classer` | R3, R13 | 7 |
 | M10 | un en-tête masqué compte : le `DEV` caché dans une carte de la section `IA` range en `DEV` le ticket suivant | R10, R13, R16, R17 | 10 |
 | M11 | aucun bloc d'en-tête : la section va toujours jusqu'à l'en-tête suivant, et le couloir `Autres` du tableau 44 rejoint `DEV` | R3 | 1 |
 | M12 | le bloc d'un en-tête englobe les tickets placés avant lui : tant que `DEV` n'est pas chargé, la liste entière passe en `IA`, ticket sans section compris | R3, R10, R11, R13, R16 | 11 |
+| M13 | la fenêtre n'est pas agrandie avant le relevé : dans une fenêtre de 100 pixels de haut, la liste n'a aucune hauteur, et 31 tickets sur 72 sont relevés | R13 | 1 |
 
 Chaque défaut a été retiré après son essai ; la recette du code publié passe en entier.
 
@@ -2952,8 +2977,8 @@ import * as core from '../scripts/jira-capture-core.mjs';
 import { BOARD_42, TICKETS, startFakeJira } from './fake-jira.mjs';
 
 const {
-  DEFAULT_CATEGORIES, UNCLASSIFIED, addSectionLinks, browserChannel, loadAllTickets, matchesFilter, outputFolder,
-  pageTimeoutMs, parseCategories, parseFilter, profileDir, sectionWarnings,
+  DEFAULT_CATEGORIES, UNCLASSIFIED, addSectionLinks, browserChannel, captureSprintTickets, loadAllTickets, matchesFilter,
+  outputFolder, pageTimeoutMs, parseCategories, parseFilter, profileDir, sectionWarnings,
 } = core;
 const SKILL = fileURLToPath(new URL('..', import.meta.url));
 const TMP = mkdtempSync(join(tmpdir(), 'capture-sprint-jira-'));
@@ -3308,13 +3333,27 @@ try {
   r = await post(port, '/api/open', { url: `${backlog}?mode=virtual` });
   check('navigateur rouvert sans nouveau passage par le SSO', r.status === 200 && fake.stats.ssoLogins === 1, `${fake.stats.ssoLogins}`);
 
-  scenario('R13', 'capture d\'un backlog virtualisé');
+  scenario('R13', 'capture d\'un backlog virtualisé ; relevé dans une fenêtre trop petite');
   const virtual = join(TMP, 'sortie-virtuelle');
   started = Date.now();
   await post(port, '/api/capture', { ...filter, folder: virtual });
   status = await waitForJob(port);
   check('terminée', status.job.state === 'done', `${((Date.now() - started) / 1000).toFixed(1)} s ${status.job.error ?? ''}`);
   if (status.job.report) verifyRun(status.job.report, virtual);
+  // Fenêtre presque sans hauteur, comme parfois la première fenêtre sans écran réel : la liste n'aurait aucune hauteur
+  const tiny = await chromium.launchPersistentContext(join(TMP, 'profil-petit'), {
+    channel: browserChannel(), headless: false, viewport: null, args: ['--window-size=1280,100'],
+  });
+  try {
+    await tiny.addCookies([{ name: 'sso', value: 'ok', url: fake.url }]);
+    const page = tiny.pages()[0] ?? (await tiny.newPage());
+    await page.goto(backlog);
+    const small = await captureSprintTickets(tiny, page, { folder: join(TMP, 'sortie-petite'), filter: parseFilter({ prefix: 'AUCUN' }) });
+    const size = await page.evaluate(() => `${innerWidth} × ${innerHeight}`);
+    check('fenêtre trop petite : agrandie avant le relevé, 72 tickets relevés', small.listed === BOARD_42.length + 1, `${small.listed}, ${size}`);
+  } finally {
+    await tiny.close();
+  }
 
   scenario('R14', 'arrêt après trois échecs de suite');
   await post(port, '/api/open', { url: `${fake.url}/jira/software/c/projects/DEMO/boards/43/backlog` });
@@ -3407,7 +3446,7 @@ try {
   scenario('R19', "point d'extension E2 : capture pilotable par un autre outil");
   const exported = Object.keys(core).filter((k) => typeof core[k] === 'function').sort();
   check('fonctions exportées par le module commun', ['captureSprintTickets', 'loadAllTickets', 'captureTicket', 'captureMhtml', 'launchBrowser',
-    'addSectionLinks', 'sectionWarnings', 'parseFilter', 'matchesFilter', 'parseCategories'].every((k) => exported.includes(k)), exported.join(', '));
+    'addSectionLinks', 'sectionWarnings', 'ensureUsableWindow', 'parseFilter', 'matchesFilter', 'parseCategories'].every((k) => exported.includes(k)), exported.join(', '));
 } catch (err) {
   check('exécution', false, err.stack);
 } finally {
@@ -3490,15 +3529,15 @@ Le développeur prévoit d'intégrer le skill à Gemini CLI depuis GeminiBoard. 
 Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichiers ont été matérialisés.
 
     62413f27f7a55d91a4364e395ed92f21406c76210e1742b365085b9e7b2561b3  manifest.json
-    4a214d5534866a85c6ecf80e57725d8283e2bd5465ae541911e62994e6c0f708  SKILL.md
-    b3f92025ffd367e57b86085f4bdec613d87f1b56aaa634cff5776b5168e76566  modules/execution/SKILL.md
-    594571b2345a3e4816b4ec3e95b895629981ab584804aed5c0392d0386b9c034  modules/session/SKILL.md
-    f86b87559b69a49ace38e2539054f04720d55068e1a28dcc557f76bfb19c7fca  modules/releve/SKILL.md
+    db03d61c3239307a8771262d23148985b1ac881a0ca8f0498b606acd62e4c7ab  SKILL.md
+    f68a93218a6f3154881073be7fa0a5a7f4b44366667ddbf4a9d47ecf821e3e74  modules/execution/SKILL.md
+    95a5c518496e11aebc52075d577d1e8f6a9d8a94208d3fd564bed42eb8e321ff  modules/session/SKILL.md
+    ab941f1785aa2abd3a7eb6f077097937bdda245969f1466f7c3a7adbe8bb0a0c  modules/releve/SKILL.md
     bb71b88835ac6ee58f2950f6202d3e53ef11f4df15828cfb3111baf8896603b6  modules/capture/SKILL.md
     17e5e4f9053018df95cae866ffbc91f12229d81d7606394e78e0764a7c830ca4  modules/classement/SKILL.md
     157baae007529f360fc3422045bd8e6b247e1fdb641656b65f105c1dde3d7c2c  modules/interface/SKILL.md
     ddf3697ea57522bceb758f62bdd97fb030feff0d465f39ec0e29d9b5bc502ee5  modules/agent/SKILL.md
     ce5aa772b75fa711d8d80e58325c410ce6231b5a1795761b16738d00a5d0f462  modules/export-api/SKILL.md
-    0bac510267540e014026f772c06cf181151128790be455e11eb026417046df31  modules/recette/SKILL.md
+    e23df788b9b51a0315b1b2a311680ebec2e46b2bc334c2b1ff4db075faf48f7b  modules/recette/SKILL.md
     17dee2fb5440281bc19b6a9f1b20d26235c7a21bcfcdc1157b7de644472babb5  modules/remise/SKILL.md
     660a89b2fe74bb933b2e0c5c2d57b560d2295ce574ad16ca2d7af3940a1fbff3  modules/pilotage/SKILL.md

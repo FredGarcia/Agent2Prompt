@@ -11,7 +11,7 @@ Phase 7E couverte : Environnement.
 
 ## 1. Principe
 
-Derrière un SSO, ni l'API REST de Jira ni un script ne peuvent se connecter avec un mot de passe : la connexion passe par le fournisseur d'identité de l'entreprise, souvent avec une validation sur un second appareil. Le skill ne cherche donc pas à se connecter. Il ouvre une fenêtre visible du navigateur du poste sur la page du sprint, et le développeur s'y connecte lui-même, comme d'habitude (D2.INV-1). La fenêtre s'ouvre en 1 280 × 900 pixels, quelle que soit la taille qu'elle avait gardée : sans écran réel, elle pouvait s'ouvrir à une taille imprévue. Le développeur peut ensuite l'agrandir. Le skill ne voit ni identifiant, ni mot de passe, ni code de validation : il n'a aucun champ pour les recevoir, et l'agent refuse de les prendre (module `agent`, A5).
+Derrière un SSO, ni l'API REST de Jira ni un script ne peuvent se connecter avec un mot de passe : la connexion passe par le fournisseur d'identité de l'entreprise, souvent avec une validation sur un second appareil. Le skill ne cherche donc pas à se connecter. Il ouvre une fenêtre visible du navigateur du poste sur la page du sprint, et le développeur s'y connecte lui-même, comme d'habitude (D2.INV-1). La fenêtre s'ouvre en 1 280 × 900 pixels, quelle que soit la taille qu'elle avait gardée : sans écran réel, elle pouvait s'ouvrir à une taille imprévue. Le développeur peut ensuite l'agrandir. Au moment de la capture, elle passe au premier plan, et une fenêtre restée presque sans hauteur est remise à 1 280 × 900 (module `releve`). Le skill ne voit ni identifiant, ni mot de passe, ni code de validation : il n'a aucun champ pour les recevoir, et l'agent refuse de les prendre (module `agent`, A5).
 
 ## 2. Profil dédié (D2.INV-2)
 
