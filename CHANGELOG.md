@@ -4,6 +4,15 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-10-28 : capture-sprint-jira 1.1.0
+
+- **capture-sprint-jira 1.1.0** : classement par section de la page du sprint. Après vérification sur son Jira, le développeur précise que les deux parties du sprint s'annoncent sur la page du sprint par un `<span>IA</span>` et un `<span>DEV</span>`, et non dans la page de chaque ticket, et que les dossiers prennent ces noms.
+  - D11, active : classement par section de la page du sprint, dossiers et rapport. Catégories par défaut `IA` et `DEV`. La section d'un ticket est le couloir de l'en-tête qui le contient ou, dans une liste plate, le dernier en-tête qui le précède ; elle est relevée à chaque pas du défilement, et gardée dans une liste virtualisée. Un ticket sans section va dans `à classer`. Une section introuvable, ou une catégorie qui précède plusieurs groupes de tickets, est signalée en fin de capture, sans l'arrêter.
+  - D5, recherche d'un terme clé dans la page du ticket : `superseded`, remplacée par D11. Ses invariants restent pour lire une capture 1.0 ; le module `classement` a une section de migration.
+- Point d'extension E1 étendu : `markers`, les en-têtes comptés par catégorie. Au total : 11 modules, 35 invariants, dont les six de D5, qui ne sont plus en vigueur, 19 scénarios de recette (115 contrôles).
+- Essayé avec Node 20.20.2 et 22.23.4, Chrome for Testing 153 et Python 3.13 : 115 contrôles sur 115, après extraction depuis la transmission 1.1.0. Douze défauts réintroduits un à un font chacun échouer le scénario attendu.
+- Version 1.0.1 archivée sous `specs/capture-sprint-jira/archives/SKILL-v1.0.1.md` ; sa transmission reste telle qu'elle a été publiée. README mis à jour.
+
 ### 2026-10-28 : capture-sprint-jira 1.0.1
 
 - **capture-sprint-jira 1.0.1** : correctif. Une fois la version 1.0.0 fusionnée, sa recette en CI échouait sur les deux jobs Node 20 : sur `ubuntu-latest`, le relevé s'arrêtait à 31 tickets sur 72 ; sur `windows-latest`, R15 et R16 dépendaient de la vitesse du runner.

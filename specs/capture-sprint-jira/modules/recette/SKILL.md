@@ -1,11 +1,11 @@
 ---
 name: recette
-description: Recette du skill (npm test, sous Windows, Linux et, sans écran, sous xvfb-run, profil et dossiers temporaires, faux Jira local avec API REST paginée, SSO simulé, backlogs chargés au défilement ou virtualisés, pages de tickets pour chaque cas de classement et session expirée, table des 19 scénarios R1 à R19 rattachés aux invariants de D1 à D6 et D8 et aux points d'extension, contrôle de la recette par huit défauts réintroduits, recette en CI sur ubuntu-latest et windows-latest, sources de tests/fake-jira.mjs et tests/run-tests.mjs). À lire pour installer le skill, et avant de publier une version.
-dimensions: [D1, D2, D3, D4, D5, D6, D8]
+description: Recette du skill (npm test, sous Windows, Linux et, sans écran, sous xvfb-run, profil et dossiers temporaires, faux Jira local avec API REST paginée, SSO simulé, backlogs à sections IA et DEV chargés au défilement ou virtualisés, tableau à couloirs, pages de tickets et session expirée, table des 19 scénarios R1 à R19 rattachés aux invariants de D1 à D4, D6, D8 et D11 et aux points d'extension, contrôle de la recette par douze défauts réintroduits, recette en CI sur ubuntu-latest et windows-latest, sources de tests/fake-jira.mjs et tests/run-tests.mjs). À lire pour installer le skill, et avant de publier une version.
+dimensions: [D1, D2, D3, D4, D6, D8, D11]
 status: active
 ---
 
-# Module `recette` (D1 à D6, D8)
+# Module `recette` (D1 à D4, D6, D8, D11)
 
 ## 1. Lancer la recette
 
@@ -17,8 +17,8 @@ npm test
 - Le navigateur est celui de `JIRA_CAPTURE_CHANNEL` : Chrome par défaut ; `chromium` après `npx playwright-core install chromium`.
 - Python : la variable `PYTHON`, à défaut `py` sous Windows et `python3` ailleurs ; s'il manque, R7 est sauté.
 - La recette travaille sur un profil et des dossiers temporaires : la session et les captures du dossier du skill ne sont pas touchées. Elle efface ses dossiers temporaires si tout passe ; sinon, ou avec `KEEP_TMP=1`, elle les garde et en donne le chemin, avec une capture d'écran de l'interface.
-- Durée : environ 4 min 20 s, dont 51 s pour la capture du backlog chargé au défilement et 76 s pour le backlog virtualisé.
-- Bilan attendu : `19 scénarios, 110 contrôles, 110 réussis, 0 en échec, 0 sautés` ; sans Python, `106 contrôles, 105 réussis, 0 en échec, 1 sautés`, R7 étant sauté.
+- Durée : environ 4 min 30 s, dont 51 s pour la capture du backlog chargé au défilement et 77 s pour le backlog virtualisé.
+- Bilan attendu : `19 scénarios, 115 contrôles, 115 réussis, 0 en échec, 0 sautés` ; sans Python, `111 contrôles, 110 réussis, 0 en échec, 1 sautés`, R7 étant sauté.
 
 ## 2. Le faux Jira
 
@@ -26,59 +26,66 @@ npm test
 
 - une API REST Agile : deux tableaux aux noms proches, trois sprints futurs paginés deux par deux, 120 tickets paginés cinquante par cinquante, descriptions en texte ou en ADF, authentification Basic ou Bearer ;
 - un SSO simulé : sans cookie, un détour par `/sso/login`, qui pose un cookie persistant et compte ses passages ;
-- le backlog 42 : 71 cartes (60 hors plage, trois hors filtre, puis les huit du sprint, en fin de liste), une épopée liée en lien absolu et en minuscules, et un ticket récent, dans la plage, cité dans l'en-tête de la page ; chargé quinze cartes par quinze au défilement, et tant que la liste ne remplit pas sa zone, comme Jira, ou virtualisé avec `?mode=virtual`, dans une zone de 80 pixels de haut, comme dans une fenêtre réduite ;
-- le backlog 43 : cinq tickets dont la session a expiré ;
-- les pages de tickets, rendues 400 ms après le chargement, comme une application monopage, chacune avec un menu latéral qui cite « Ticket avec IA » :
+- le backlog 42, liste plate : 71 cartes (60 hors plage, trois hors filtre, les huit du sprint) et deux lignes d'en-tête, `<span>IA</span> · 3 tickets` et `<span>DEV</span> · 4 tickets` ; dix cartes hors plage ouvrent la section `IA`, plus longue que la zone virtualisée, si bien que son en-tête sort de la page avant ses tickets ; une épopée liée en lien absolu et en minuscules ; l'en-tête de la page cite un ticket récent, dans la plage, et des filtres rapides `IA` et `DEV` ; chargé quinze lignes par quinze au défilement, et tant que la liste ne remplit pas sa zone, comme Jira, ou virtualisé avec `?mode=virtual`, dans une zone de 80 pixels de haut, comme dans une fenêtre réduite, qui retire les en-têtes sortis de l'écran comme les cartes ;
+- le backlog 43 : cinq tickets dont la session a expiré, sans section ;
+- le tableau 44, à couloirs : `IA` (`DEMOAB-3500`, `DEMOAB-3502`), `DEV` (`DEMOCD-3501`) et `Autres` (`DEMOEF-3600`), chacun avec son en-tête et ses cartes, sous une barre de filtres rapides `IA` et `DEV` hors navigation ;
+- les pages de tickets, rendues 400 ms après le chargement, comme une application monopage, chacune avec un menu de navigation qui cite `IA` et `DEV`.
 
-| Ticket | Contenu de la page | Résultat attendu |
+Place des tickets du sprint dans le backlog 42 :
+
+| Ticket | Place dans le backlog | Résultat attendu |
 |---|---|---|
-| `DEMOAB-3500` | « Étiquettes : ticket-avec-ia » | `ticket avec ia`, contenu |
-| `DEMOCD-3501` | « Épopée : Ticket sans IA » | `ticket sans ia`, contenu |
-| `DEMOAB-3502` | « Composants : TicketAvecIA » | `ticket avec ia`, contenu |
-| `DEMOEF-3600` | « Catégorie : ticket sans ia », dans un panneau replié | `ticket sans ia`, contenu masqué |
-| `DEMOAB-3700` | aucun terme, hors du menu latéral | `à classer` |
-| `DEMOAB-3800` | « ticket_avec_ia, ticket_sans_ia » | `à classer`, deux termes |
-| `DEMOAB-3900` | renvoi vers la page de connexion d'une autre origine | erreur, session expirée |
-| `DEMOAB-4500` | « Ticket avec IA », et un commentaire chargé au défilement | `ticket avec ia`, commentaire dans le fichier |
+| `DEMOAB-3700` | avant le premier en-tête | `à classer` |
+| `DEMOAB-3500` | section `IA` | `IA` |
+| `DEMOAB-3502` | section `IA` ; un `DEV` masqué dans sa carte | `IA`, le `DEV` masqué ignoré |
+| `DEMOAB-4500` | section `IA` ; un commentaire chargé au défilement dans sa page | `IA`, commentaire dans le fichier |
+| `DEMOCD-3501` | section `DEV` | `DEV` |
+| `DEMOEF-3600` | section `DEV` | `DEV` |
+| `DEMOAB-3800` | section `DEV` | `DEV` |
+| `DEMOAB-3900` | section `DEV` ; renvoi vers la page de connexion d'une autre origine | erreur, session expirée |
 
 ## 3. Scénarios
 
 | ID | Scénario | Invariants |
 |---|---|---|
 | R1 | Filtre : préfixe mis en majuscules, filtre vide qui retient tout, bornes comprises, préfixe porté sur la partie projet, valeurs invalides refusées | D3.INV-2 |
-| R2 | Catégories : défaut, texte à une catégorie par ligne ou séparées par « ; », nom de dossier invalide, doublon, `à classer` et liste vide refusés | D5.INV-5 |
-| R3 | Classement : quatre graphies et les accents, mots entiers, deux catégories, ordre des textes, extrait | D5.INV-1, D5.INV-2, D5.INV-3 |
+| R2 | Catégories : `IA` et `DEV` par défaut, texte à une catégorie par ligne ou séparées par « ; », nom de dossier invalide, doublon une fois normalisé, `à classer` et liste vide refusés | D11.INV-4 |
+| R3 | Sections : en-tête, ticket avant le premier en-tête, section reportée d'un pas à l'autre d'une liste virtualisée, ticket déjà relevé inchangé, fin d'un couloir, avertissements ; tableau 44 à couloirs, couloir `Autres` à classer, filtres rapides ignorés, un en-tête compté par couloir ; liste plate dont seul l'en-tête `IA` est présent | D11.INV-1, D11.INV-2, D11.INV-6 |
 | R4 | Réglages et emplacements : dossier de sortie, profil, canal, délai ; variables vides | D1.INV-2, D1.INV-3 |
 | R5 | Dépendance unique à version exacte ; `.gitignore` du skill | D1.INV-1, D1.INV-2 |
 | R6 | Export Node : hôte, origine, type de contenu ; prochain sprint ; 120 tickets sur trois pages ; ADF ; tableau par identifiant ; tableau ambigu ; mot de passe refusé ; aucun mot de passe dans le journal | D6.INV-1, D8.INV-1, D8.INV-2, D8.INV-3 |
 | R7 | Export Python : e-mail et jeton (Basic), jeton personnel (Bearer), CSV pour Excel, aucun jeton dans la sortie, jeton refusé | D8.INV-1, D8.INV-2, D8.INV-3 |
 | R8 | Interface de capture : hôte, origine, type de contenu ; aucun champ d'identifiant | D6.INV-1, D2.INV-1 |
-| R9 | Interface de capture : capture refusée sans sprint, adresse non http refusée, ouverture après le SSO, préfixe invalide et catégorie réservée refusés | D2.INV-1, D3.INV-2, D5.INV-5 |
-| R10 | Backlog chargé au défilement : 72 tickets relevés, navigation exclue, 8 retenus et triés, les huit cas du § 2, dossiers directement dans le dossier choisi, MHTML de Chrome par ticket, commentaire chargé au défilement, `sprint.mhtml` et `rapport.json`, décompte ; une seule capture à la fois ; navigateur gardé ouvert après l'erreur | D3.INV-1, D3.INV-3, D4.INV-1, D4.INV-2, D4.INV-3, D5.INV-2, D5.INV-3, D5.INV-4, D5.INV-6, D6.INV-2, D6.INV-4 |
-| R11 | Nouvelle capture dans le même dossier, après un changement de catégorie dans Jira : retour à la page du sprint, ticket rangé dans sa nouvelle catégorie, copie précédente retirée, autres tickets en place, navigateur fermé sans erreur | D5.INV-4, D6.INV-4 |
+| R9 | Interface de capture : capture refusée sans sprint, adresse non http refusée, ouverture après le SSO, préfixe invalide et catégorie réservée refusés | D2.INV-1, D3.INV-2, D11.INV-4 |
+| R10 | Backlog chargé au défilement : 72 tickets relevés, navigation exclue, 8 retenus et triés, les huit cas du § 2, dossiers `IA`, `DEV` et `à classer` directement dans le dossier choisi, MHTML de Chrome par ticket, commentaire chargé au défilement, `sprint.mhtml` et `rapport.json`, décompte, un en-tête compté par section ; une seule capture à la fois ; navigateur gardé ouvert après l'erreur | D3.INV-1, D3.INV-3, D4.INV-1, D4.INV-2, D4.INV-3, D11.INV-1, D11.INV-2, D11.INV-3, D11.INV-5, D6.INV-2, D6.INV-4 |
+| R11 | Nouvelle capture dans le même dossier : retour à la page du sprint après une erreur ; puis, le ticket passé dans la section `DEV` de Jira, ticket rangé dans sa nouvelle section, copie précédente retirée, autres tickets en place, navigateur fermé sans erreur | D11.INV-3, D6.INV-4 |
 | R12 | Navigateur rouvert sans nouveau passage par le SSO | D2.INV-2 |
-| R13 | Backlog virtualisé, dans une zone de 80 pixels : mêmes contrôles que R10 | D3.INV-1, D4.INV-1, D5.INV-3 |
-| R14 | Cinq tickets à session expirée : trois erreurs, capture arrêtée, navigateur gardé ouvert | D4.INV-1, D4.INV-4, D6.INV-4 |
+| R13 | Backlog virtualisé, dans une zone de 80 pixels, en-têtes compris : mêmes contrôles que R10 | D3.INV-1, D4.INV-1, D11.INV-2 |
+| R14 | Cinq tickets à session expirée, sans section : trois erreurs, capture arrêtée, navigateur gardé ouvert, deux avertissements | D4.INV-1, D4.INV-4, D6.INV-4, D11.INV-6 |
 | R15 | « Fermer le navigateur » pendant le relevé : capture arrêtée sans rapport, avec un message qui le dit ; puis pendant la capture des tickets : capture arrêtée, rapport partiel | D4.INV-4, D6.INV-2 |
-| R16 | Page de l'interface pilotée comme par le développeur : bouton activé, avancement, boutons bloqués, bilan, résumé, une ligne par ticket, avertissement, valeurs retrouvées après rechargement | D6.INV-2, D6.INV-3 |
-| R17 | Ligne de commande : adresse manquante et numéro invalide (code 2), un ticket capturé directement dans le dossier (code 0), un ticket en erreur (code 1) | D6.INV-5, D4.INV-1 |
-| R18 | Point d'extension E1 : champs du rapport, d'un ticket capturé, d'un ticket en erreur | D5.INV-6 |
-| R19 | Point d'extension E2 : fonctions exportées par le module commun, dont `captureSprintTickets` | |
+| R16 | Page de l'interface pilotée comme par le développeur : bouton activé, avancement, boutons bloqués, bilan, résumé par section, une ligne par ticket avec l'en-tête de sa section, avertissement, valeurs retrouvées après rechargement | D6.INV-2, D6.INV-3 |
+| R17 | Ligne de commande : adresse manquante et numéro invalide (code 2), un ticket capturé directement dans le dossier de sa section (code 0), un ticket en erreur (code 1) | D6.INV-5, D4.INV-1 |
+| R18 | Point d'extension E1 : champs du rapport, `markers` compris, d'un ticket capturé, d'un ticket en erreur | D11.INV-5 |
+| R19 | Point d'extension E2 : fonctions exportées par le module commun, dont `captureSprintTickets`, `addSectionLinks` et `sectionWarnings` | |
 
 ## 4. Contrôle de la recette elle-même
 
-Huit défauts, réintroduits un à un dans le code, font chacun échouer la recette par le scénario attendu (essai du 28 octobre 2026, Node 22.23.4) :
+Douze défauts, réintroduits un à un dans le code, font chacun échouer la recette par le scénario attendu (essai du 28 octobre 2026, Node 22.23.4) :
 
 | ID | Défaut réintroduit | Scénarios en échec | Contrôles en échec |
 |---|---|---|---|
 | M1 | les liens de la navigation sont relevés : le ticket récent de l'en-tête est capturé | R10, R11, R13, R16 | 15 |
 | M2 | la copie d'un ticket recapturé reste dans son ancien dossier | R11 | 1 |
-| M3 | le classement lit toute la page, navigation comprise : le menu latéral classe les tickets sans terme et rend les autres ambigus | R10, R11, R13, R16 | 14 |
+| M3 | les en-têtes de la navigation comptent : le filtre rapide `DEV` de l'en-tête de la page range en `DEV` le ticket placé avant le premier en-tête | R10, R11, R13, R14, R16 | 17 |
 | M4 | l'origine des requêtes n'est plus contrôlée | R8 | 1 |
-| M5 | une page est enregistrée sans vérifier qu'elle est celle du ticket : la page de connexion prend le nom du ticket | R10, R11, R13, R14, R15, R16, R17, R18 | 19 |
-| M6 | les liens ne sont relevés qu'avant le défilement : seuls les premiers tickets du backlog sont vus | R10, R11, R13, R15, R16, R17, R18 | 45 |
-| M7 | pas de défilement fixe de 1 200 pixels, plus grand que la zone affichée : des cartes de la liste virtualisée sont sautées | R13 | 8 |
-| M8 | seuls les blocs de 100 pixels de haut au moins défilent, comme en 1.0.0 : la liste virtualisée de 80 pixels n'est pas parcourue | R13 | 15 |
+| M5 | une page est enregistrée sans vérifier qu'elle est celle du ticket : la page de connexion prend le nom du ticket | R10, R11, R13 à R18 | 18 |
+| M6 | les liens ne sont relevés qu'avant le défilement : seuls les premiers tickets du backlog sont vus | R10, R11, R13, R15 à R18 | 47 |
+| M7 | pas de défilement fixe de 1 200 pixels, plus grand que la zone affichée : des cartes de la liste virtualisée sont sautées | R13 | 11 |
+| M8 | seuls les blocs de 100 pixels de haut au moins défilent, comme en 1.0.0 : la liste virtualisée de 80 pixels n'est pas parcourue | R13 | 16 |
+| M9 | la section n'est pas reportée d'un pas à l'autre : dans la liste virtualisée, les tickets dont l'en-tête est sorti de la page vont dans `à classer` | R3, R13 | 7 |
+| M10 | un en-tête masqué compte : le `DEV` caché dans une carte de la section `IA` range en `DEV` le ticket suivant | R10, R13, R16, R17 | 10 |
+| M11 | aucun bloc d'en-tête : la section va toujours jusqu'à l'en-tête suivant, et le couloir `Autres` du tableau 44 rejoint `DEV` | R3 | 1 |
+| M12 | le bloc d'un en-tête englobe les tickets placés avant lui : tant que `DEV` n'est pas chargé, la liste entière passe en `IA`, ticket sans section compris | R3, R10, R11, R13, R16 | 11 |
 
 Chaque défaut a été retiré après son essai ; la recette du code publié passe en entier.
 
@@ -95,7 +102,8 @@ Le workflow `.github/workflows/recette-capture-sprint-jira.yml` du dépôt Agent
 // fake-jira.mjs : faux Jira local pour la recette du skill capture-sprint-jira, sans réseau ni compte.
 //   API REST Agile : tableaux, sprints et tickets paginés, authentification Basic ou Bearer.
 //   SSO simulé : sans cookie, détour par /sso/login, qui pose un cookie persistant.
-//   Backlogs : 42, liste chargée au défilement (?mode=virtual : affichage virtualisé) ; 43, tickets à session expirée.
+//   Backlogs : 42, liste plate à sections IA et DEV, chargée au défilement (?mode=virtual : affichage virtualisé) ;
+//   43, tickets à session expirée, sans section. Tableau 44 : couloirs IA, DEV et Autres.
 //   Pages de tickets /browse/<CLÉ> : contenu rendu après 400 ms, comme une application monopage.
 import http from 'node:http';
 
@@ -105,25 +113,36 @@ const ACCEPTED = new Set([
   'Bearer pat-demo',
 ]);
 
-// Pages de tickets : où se trouve le terme clé
+// Tickets du sprint : section du backlog 42 (null : avant tout en-tête), et cas particuliers
 export const TICKETS = {
-  'DEMOAB-3500': { visible: 'Étiquettes : ticket-avec-ia' },
-  'DEMOCD-3501': { visible: 'Épopée : Ticket sans IA' },
-  'DEMOAB-3502': { visible: 'Composants : TicketAvecIA' },
-  'DEMOEF-3600': { hidden: 'Catégorie : ticket sans ia' }, // panneau replié
-  'DEMOAB-3700': {}, // aucun terme dans le contenu ; le menu latéral en cite un
-  'DEMOAB-3800': { visible: 'Étiquettes : ticket_avec_ia, ticket_sans_ia' },
-  'DEMOAB-3900': { expired: true },
-  'DEMOAB-4500': { visible: 'Étiquettes : Ticket avec IA', lazyComment: true },
+  'DEMOAB-3500': { section: 'IA' },
+  'DEMOCD-3501': { section: 'DEV' },
+  'DEMOAB-3502': { section: 'IA', hiddenLabel: 'DEV' }, // un « DEV » masqué dans la carte ne compte pas
+  'DEMOEF-3600': { section: 'DEV' },
+  'DEMOAB-3700': { section: null },
+  'DEMOAB-3800': { section: 'DEV' },
+  'DEMOAB-3900': { section: 'DEV', expired: true },
+  'DEMOAB-4500': { section: 'IA', lazyComment: true },
 };
-// Backlog 42 : 60 tickets hors plage, trois hors filtre, puis ceux du sprint, en fin de liste. L'en-tête de la page
-// cite en plus DEMOAB-3650, dans la plage : un élément récent de la navigation, qui ne doit pas être capturé.
+// Backlog 42, liste plate : 50 tickets hors plage, trois hors filtre, le ticket du sprint d'aucune section, puis
+// l'en-tête IA, dix tickets hors plage et ceux du sprint de la section IA (une section plus longue que la zone
+// virtualisée : son en-tête sort de la page avant ses tickets), puis l'en-tête DEV et les siens. L'en-tête de la page
+// cite en plus DEMOAB-3650, dans la plage, et des filtres rapides IA et DEV : la navigation ne compte pas.
 export const BOARD_42 = [
   ...Array.from({ length: 60 }, (_, i) => `DEMOZZ-${i + 1}`),
   'DEMOAB-3499', 'AUTRE-3600', 'DEMOAB-4501',
   ...Object.keys(TICKETS),
 ];
+const board42Rows = () => {
+  const of = (section) => Object.keys(TICKETS).filter((k) => TICKETS[k].section === section);
+  return [
+    ...BOARD_42.slice(0, 50), ...BOARD_42.slice(60, 63), ...of(null),
+    { section: 'IA' }, ...BOARD_42.slice(50, 60), ...of('IA'), { section: 'DEV' }, ...of('DEV'),
+  ];
+};
 export const BOARD_43 = ['DEMOXP-3501', 'DEMOXP-3502', 'DEMOXP-3503', 'DEMOXP-3504', 'DEMOXP-3505'];
+// Tableau 44, à couloirs : chaque couloir contient son en-tête et ses cartes ; le dernier n'est pas une catégorie
+export const BOARD_44 = { IA: ['DEMOAB-3500', 'DEMOAB-3502'], DEV: ['DEMOCD-3501'], Autres: ['DEMOEF-3600'] };
 const EXPIRED = new Set(['DEMOAB-3900', ...BOARD_43]);
 
 // API REST
@@ -152,28 +171,39 @@ const apiIssue = (n, sprint) => ({
 });
 const ISSUES = { 6: Array.from({ length: 120 }, (_, i) => apiIssue(i + 1, 7)), 7: [1, 2, 3].map((n) => apiIssue(n, 8)), 9: [] };
 
-function boardHtml(keys) {
+function boardHtml(rows) {
+  const hidden = Object.fromEntries(Object.entries(TICKETS).filter(([, s]) => s.hiddenLabel).map(([k, s]) => [k, s.hiddenLabel]));
+  const sizes = {};
+  for (const r of rows) if (typeof r === 'string' && TICKETS[r]) sizes[TICKETS[r].section] = (sizes[TICKETS[r].section] ?? 0) + 1;
   return `<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Backlog - DEMO</title>
 <style>body{margin:0;font-family:sans-serif} header{height:56px;background:#0052cc;color:#fff}
-#list{height:calc(100vh - 56px);overflow:auto} .card{height:40px;padding:4px;border-bottom:1px solid #ddd}</style></head>
-<body><header>Jira (faux) · Récents : <a href="/browse/DEMOAB-3650">DEMOAB-3650</a></header><main id="list"></main>
+#list{height:calc(100vh - 56px);overflow:auto} .card{height:40px;padding:4px;border-bottom:1px solid #ddd}
+.section{font-weight:bold;background:#f4f5f7}</style></head>
+<body><header>Jira (faux) · Récents : <a href="/browse/DEMOAB-3650">DEMOAB-3650</a> · Filtres rapides : <span>IA</span> <span>DEV</span></header>
+<main id="list"></main>
 <script>
-const KEYS = ${JSON.stringify(keys)};
+const ROWS = ${JSON.stringify(rows)};
+const HIDDEN = ${JSON.stringify(hidden)};
+const SIZES = ${JSON.stringify(sizes)};
 const MODE = new URLSearchParams(location.search).get('mode');
 const H = 49;
 const list = document.getElementById('list');
-const card = (i) => '<div class="card"><a href="/browse/' + KEYS[i] + '">' + KEYS[i] + '</a> Ticket ' + (i + 1)
-  + (i < 10 ? ' · <a href="https://jira.example.com/browse/demoe-100?focus=1">DEMOE-100</a>' : '') + '</div>';
+// Une ligne : l'en-tête d'une section, ou la carte d'un ticket
+const card = (i) => typeof ROWS[i] === 'object'
+  ? '<div class="card section"><span>' + ROWS[i].section + '</span> · ' + (SIZES[ROWS[i].section] ?? 0) + ' tickets</div>'
+  : '<div class="card"><a href="/browse/' + ROWS[i] + '">' + ROWS[i] + '</a> Ticket ' + (i + 1)
+    + (i < 10 ? ' · <a href="https://jira.example.com/browse/demoe-100?focus=1">DEMOE-100</a>' : '')
+    + (HIDDEN[ROWS[i]] ? ' <span style="display:none">' + HIDDEN[ROWS[i]] + '</span>' : '') + '</div>';
 if (MODE === 'virtual') {
   // Zone de 80 pixels, comme dans une fenêtre réduite : un pas plus grand que la zone sauterait des cartes,
   // et un bloc aussi bas ne doit pas être ignoré
   list.style.height = '80px';
   const spacer = document.createElement('div');
-  spacer.style.cssText = 'position:relative;height:' + KEYS.length * H + 'px';
+  spacer.style.cssText = 'position:relative;height:' + ROWS.length * H + 'px';
   list.appendChild(spacer);
   const render = () => {
     const first = Math.max(0, Math.floor(list.scrollTop / H) - 3);
-    const last = Math.min(KEYS.length, Math.ceil((list.scrollTop + list.clientHeight) / H) + 3);
+    const last = Math.min(ROWS.length, Math.ceil((list.scrollTop + list.clientHeight) / H) + 3);
     spacer.innerHTML = '';
     for (let i = first; i < last; i++) {
       const d = document.createElement('div');
@@ -187,7 +217,7 @@ if (MODE === 'virtual') {
 } else {
   let shown = 0, loading = false;
   const more = () => {
-    const n = Math.min(KEYS.length, shown + 15);
+    const n = Math.min(ROWS.length, shown + 15);
     let html = '';
     for (let i = shown; i < n; i++) html += card(i);
     list.insertAdjacentHTML('beforeend', html);
@@ -195,11 +225,11 @@ if (MODE === 'virtual') {
   };
   more(); more();
   // Comme Jira : tant que la liste ne déborde pas de sa zone, d'autres cartes se chargent
-  const fill = () => { while (shown < KEYS.length && list.scrollHeight <= list.clientHeight) more(); };
+  const fill = () => { while (shown < ROWS.length && list.scrollHeight <= list.clientHeight) more(); };
   fill();
   window.addEventListener('resize', fill);
   list.addEventListener('scroll', () => {
-    if (loading || shown >= KEYS.length) return;
+    if (loading || shown >= ROWS.length) return;
     if (list.scrollTop + list.clientHeight >= list.scrollHeight - 200) {
       loading = true;
       setTimeout(() => { more(); loading = false; }, 300);
@@ -209,9 +239,16 @@ if (MODE === 'virtual') {
 </script></body></html>`;
 }
 
+function swimlanesHtml() {
+  const lane = (name, keys) => `<div class="couloir"><div class="entete"><span>${name}</span> · ${keys.length} tickets</div>`
+    + `<div class="cartes">${keys.map((k) => `<div class="card"><a href="/browse/${k}">${k}</a> Ticket</div>`).join('')}</div></div>`;
+  return `<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Tableau - DEMO</title></head>
+<body><header>Jira (faux) · Filtres rapides : <span>IA</span> <span>DEV</span></header>
+<main><div class="filtres">Filtres rapides : <span>IA</span> <span>DEV</span></div>
+<div class="couloirs">${Object.entries(BOARD_44).map(([name, keys]) => lane(name, keys)).join('')}</div></main></body></html>`;
+}
+
 function ticketHtml(key, spec = {}) {
-  const fields = (spec.visible ? `<p>${spec.visible}</p>` : '')
-    + (spec.hidden ? `<details><summary>Autres champs</summary><p>${spec.hidden}</p></details>` : '');
   const lazy = spec.lazyComment ? `
   let loaded = false;
   window.addEventListener('scroll', () => {
@@ -220,11 +257,11 @@ function ticketHtml(key, spec = {}) {
     setTimeout(() => { document.getElementById('activite').innerHTML = '<p>Commentaire chargé au défilement</p>'; }, 200);
   });` : '';
   return `<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>[${key}] Ticket de démonstration - Jira (faux)</title></head>
-<body><nav>Filtres enregistrés : Ticket avec IA · Mes tickets ouverts</nav>
+<body><nav>Filtres enregistrés : IA · DEV · Mes tickets ouverts</nav>
 <main id="contenu">Chargement…</main>
 <script>
 setTimeout(() => {
-  document.getElementById('contenu').innerHTML = '<h1>${key} : ticket de démonstration</h1>' + ${JSON.stringify(fields)}
+  document.getElementById('contenu').innerHTML = '<h1>${key} : ticket de démonstration</h1>'
     + '<div>' + '<p>Paragraphe de description.</p>'.repeat(80) + '</div><div id="activite"></div>';${lazy}
 }, 400);
 </script></body></html>`;
@@ -257,8 +294,9 @@ export function startFakeJira({ port = 0 } = {}) {
       if (!/(?:^|;\s*)sso=ok/.test(req.headers.cookie ?? '')) {
         return send(302, '', { Location: `/sso/login?next=${encodeURIComponent(url.pathname + url.search)}` });
       }
-      if (url.pathname === '/jira/software/c/projects/DEMO/boards/42/backlog') return send(200, boardHtml(BOARD_42));
+      if (url.pathname === '/jira/software/c/projects/DEMO/boards/42/backlog') return send(200, boardHtml(board42Rows()));
       if (url.pathname === '/jira/software/c/projects/DEMO/boards/43/backlog') return send(200, boardHtml(BOARD_43));
+      if (url.pathname === '/jira/software/c/projects/DEMO/boards/44') return send(200, swimlanesHtml());
       const key = url.pathname.match(/^\/browse\/([A-Z][A-Z0-9_]*-\d+)$/)?.[1];
       if (!key) return send(404, 'introuvable');
       // Session expirée : renvoi vers le fournisseur d'identité, sur une autre origine
@@ -329,8 +367,8 @@ import * as core from '../scripts/jira-capture-core.mjs';
 import { BOARD_42, TICKETS, startFakeJira } from './fake-jira.mjs';
 
 const {
-  DEFAULT_CATEGORIES, UNCLASSIFIED, browserChannel, classify, matchesFilter, outputFolder, pageTimeoutMs,
-  parseCategories, parseFilter, profileDir,
+  DEFAULT_CATEGORIES, UNCLASSIFIED, addSectionLinks, browserChannel, loadAllTickets, matchesFilter, outputFolder,
+  pageTimeoutMs, parseCategories, parseFilter, profileDir, sectionWarnings,
 } = core;
 const SKILL = fileURLToPath(new URL('..', import.meta.url));
 const TMP = mkdtempSync(join(tmpdir(), 'capture-sprint-jira-'));
@@ -444,17 +482,17 @@ async function waitForJob(port, timeoutMs = 240_000) {
 
 // Résultat attendu de chaque ticket du backlog 42 (tests/fake-jira.mjs)
 const EXPECTED = {
-  'DEMOAB-3500': { category: 'ticket avec ia', where: 'contenu' },
-  'DEMOCD-3501': { category: 'ticket sans ia', where: 'contenu' },
-  'DEMOAB-3502': { category: 'ticket avec ia', where: 'contenu' },
-  'DEMOEF-3600': { category: 'ticket sans ia', where: 'contenu masqué' },
-  'DEMOAB-3700': { category: null, found: 0 },
-  'DEMOAB-3800': { category: null, found: 2 },
+  'DEMOAB-3500': { category: 'IA' },
+  'DEMOCD-3501': { category: 'DEV' },
+  'DEMOAB-3502': { category: 'IA' },
+  'DEMOEF-3600': { category: 'DEV' },
+  'DEMOAB-3700': { category: null },
+  'DEMOAB-3800': { category: 'DEV' },
   'DEMOAB-3900': { error: true },
-  'DEMOAB-4500': { category: 'ticket avec ia', where: 'contenu' },
+  'DEMOAB-4500': { category: 'IA' },
 };
 // Champs stables du rapport (point d'extension E1)
-const REPORT_FIELDS = ['date', 'sprintUrl', 'folder', 'filter', 'categories', 'listed', 'selected', 'ignored', 'ignoredSample', 'counts', 'errors', 'aborted', 'tickets'];
+const REPORT_FIELDS = ['date', 'sprintUrl', 'folder', 'filter', 'categories', 'markers', 'listed', 'selected', 'ignored', 'ignoredSample', 'counts', 'errors', 'aborted', 'tickets'];
 const TICKET_FIELDS = ['key', 'url', 'category', 'found', 'where', 'excerpt', 'file', 'movedFrom'];
 
 /** Vérifie le rapport et les fichiers d'une capture du backlog 42 filtrée sur DEMO, 3500 à 4500, dans `folder`. */
@@ -471,26 +509,29 @@ function verifyRun(report, folder) {
       ok = /session SSO expirée/.test(t.error ?? '') && !t.file && !existsSync(join(folder, UNCLASSIFIED, `${key}.mhtml`));
       detail = t.error;
     } else if (exp.category) {
-      ok = t.category === exp.category && t.where === exp.where && existsSync(join(folder, t.file ?? '-'));
-      detail = `${t.file} (${t.where}) ${t.excerpt ?? ''}`;
+      ok = t.category === exp.category && t.where === 'section du sprint' && t.found?.join() === exp.category
+        && t.excerpt?.startsWith(`${exp.category} · `) && t.file === `${exp.category}/${key}.mhtml` && existsSync(join(folder, t.file));
+      detail = `${t.file} (${t.excerpt})`;
     } else {
-      ok = t.category === null && t.found?.length === exp.found && t.file === `${UNCLASSIFIED}/${key}.mhtml` && existsSync(join(folder, t.file));
-      detail = `${t.file}, trouvé : ${(t.found ?? []).join(' + ') || 'rien'}`;
+      ok = t.category === null && t.found?.length === 0 && t.where === null && t.file === `${UNCLASSIFIED}/${key}.mhtml` && existsSync(join(folder, t.file));
+      detail = `${t.file} (${t.excerpt ?? 'aucun en-tête'})`;
     }
     check(`${key}${TICKETS[key].expired ? ' (session expirée)' : ''}`, ok, detail);
   }
   check('dossiers de catégorie directement dans le dossier choisi', report.folder === folder
-    && sameSet(readdirSync(folder), ['ticket avec ia', 'ticket sans ia', UNCLASSIFIED, 'sprint.mhtml', 'rapport.json']), readdirSync(folder).join(', '));
+    && sameSet(readdirSync(folder), ['IA', 'DEV', UNCLASSIFIED, 'sprint.mhtml', 'rapport.json']), readdirSync(folder).join(', '));
   const files = report.tickets.filter((t) => t.file).map((t) => join(folder, t.file));
   check('chaque fichier est la page MHTML de son ticket', files.length === 7
     && files.every((f) => { const s = mhtml(f); return /^From: <Saved by Blink>/m.test(s) && s.includes(f.match(/([A-Z]+-\d+)\.mhtml$/)[1]); }));
-  const lazy = join(folder, 'ticket avec ia', 'DEMOAB-4500.mhtml');
+  const lazy = join(folder, 'IA', 'DEMOAB-4500.mhtml');
   check('commentaire chargé au défilement capturé', existsSync(lazy) && mhtml(lazy).includes('Commentaire charg'));
   const onDisk = JSON.parse(readFileSync(join(folder, 'rapport.json'), 'utf8'));
   check('page du sprint et rapport.json écrits', /^From: <Saved by Blink>/m.test(mhtml(join(folder, 'sprint.mhtml')))
     && JSON.stringify(onDisk.counts) === JSON.stringify(report.counts) && onDisk.tickets.length === 8);
-  check('décompte', JSON.stringify(report.counts) === JSON.stringify({ 'ticket avec ia': 3, 'ticket sans ia': 2, [UNCLASSIFIED]: 2 })
+  check('décompte', JSON.stringify(report.counts) === JSON.stringify({ IA: 3, DEV: 3, [UNCLASSIFIED]: 1 })
     && report.errors === 1 && report.aborted === false, `${JSON.stringify(report.counts)}, erreurs : ${report.errors}`);
+  check('un en-tête par section, filtres rapides et « DEV » masqué ignorés', JSON.stringify(report.markers) === '{"IA":1,"DEV":1}',
+    JSON.stringify(report.markers));
   return onDisk;
 }
 
@@ -508,21 +549,31 @@ try {
     && throws(() => parseFilter({ min: 'abc' })) && throws(() => parseFilter({ min: '10', max: '5' })));
 
   scenario('R2', 'catégories');
-  check('par défaut : ticket avec ia, ticket sans ia', parseCategories().join('|') === DEFAULT_CATEGORIES.join('|'));
+  check('par défaut : IA, DEV', parseCategories().join('|') === 'IA|DEV' && DEFAULT_CATEGORIES.join('|') === 'IA|DEV');
   check('texte : une par ligne, ou séparées par « ; »', parseCategories('a\r\n b ;c').join('|') === 'a|b|c');
   check('nom de dossier invalide, doublon, « à classer » ou liste vide refusés',
-    [['a/b'], ['x:'], ['.cache'], ['ticket avec ia', 'Ticket-avec-IA'], [UNCLASSIFIED], []].every((c) => throws(() => parseCategories(c))));
+    [['a/b'], ['x:'], ['.cache'], ['IA', 'ia'], ['Dév', 'DEV'], [UNCLASSIFIED], []].every((c) => throws(() => parseCategories(c))));
 
-  scenario('R3', 'classement');
-  const cls = (text) => classify([['contenu', text]], DEFAULT_CATEGORIES);
-  check('graphies reconnues', ['ticket avec ia', 'Ticket-avec-IA', 'TICKET_AVEC_IA', 'TicketAvecIA', 'tîcket avec ïa']
-    .every((s) => cls(s).category === 'ticket avec ia'));
-  check('mots entiers seulement', ['tickets avec ia', 'ticket avec iam', 'unticket avec ia'].every((s) => cls(s).category === null));
-  check('deux catégories : aucune retenue', cls('ticket avec ia, ticket sans ia').category === null
-    && cls('ticket avec ia, ticket sans ia').found.length === 2);
-  const ordered = classify([['contenu', 'rien'], ['contenu masqué', 'ticket sans ia'], ['page', 'ticket avec ia']], DEFAULT_CATEGORIES);
-  check('le premier texte qui contient un terme décide', ordered.category === 'ticket sans ia' && ordered.where === 'contenu masqué');
-  check('extrait autour du terme', /ticket avec ia/.test(cls('Étiquettes : ticket-avec-ia').excerpt ?? ''));
+  scenario('R3', 'classement par section de la page du sprint');
+  const seen = new Map();
+  let carry = addSectionLinks(seen, [
+    { key: 'A-1', url: 'u1', section: null, excerpt: null, open: true },
+    { key: 'A-2', url: 'u2', section: 'IA', excerpt: 'IA · 3', open: false },
+  ]);
+  carry = addSectionLinks(seen, [
+    { key: 'A-2', url: 'u2', section: null, excerpt: null, open: true }, // en-tête sorti de la page
+    { key: 'A-3', url: 'u3', section: null, excerpt: null, open: true },
+    { key: 'A-4', url: 'u4', section: 'DEV', excerpt: 'DEV', open: false },
+    { key: 'A-5', url: 'u5', section: null, excerpt: null, open: false }, // après la fin d'un couloir
+  ], carry);
+  check('section de son en-tête ; aucun en-tête avant : à classer', seen.get('A-1').section === null
+    && seen.get('A-2').section === 'IA' && seen.get('A-4').section === 'DEV');
+  check('liste virtualisée : section reportée sur un ticket ouvert, ticket déjà relevé inchangé', seen.get('A-3').section === 'IA'
+    && seen.get('A-3').excerpt === 'IA · 3' && seen.get('A-2').section === 'IA');
+  check('après la fin d\'un couloir : à classer, et reporté au pas suivant', seen.get('A-5').section === null && carry.section === null);
+  const warn = (markers) => sectionWarnings({ categories: ['IA', 'DEV'], markers, listed: 10 });
+  check('avertissements : section introuvable, ou plusieurs groupes', warn({ IA: 1, DEV: 1 }).length === 0
+    && /« DEV »/.test(warn({ IA: 1, DEV: 0 }).join(' ')) && /3 groupes/.test(warn({ IA: 3, DEV: 1 }).join(' ')));
 
   scenario('R4', 'réglages et emplacements');
   check('dossier de sortie : relatif au dossier du skill, mhtml/ si vide', outputFolder('') === resolve(SKILL, 'mhtml')
@@ -544,6 +595,29 @@ try {
 
   fake = await startFakeJira();
   const backlog = `${fake.url}/jira/software/c/projects/DEMO/boards/42/backlog`;
+
+  scenario('R3', 'classement par section : tableau à couloirs');
+  const probe = await chromium.launch({ channel: browserChannel(), headless: true });
+  try {
+    const ctx = await probe.newContext();
+    await ctx.addCookies([{ name: 'sso', value: 'ok', url: fake.url }]); // session déjà ouverte, sans passer par le SSO
+    const page = await ctx.newPage();
+    await page.goto(`${fake.url}/jira/software/c/projects/DEMO/boards/44`);
+    const lanes = await loadAllTickets(page, { categories: DEFAULT_CATEGORIES, pauseMs: 100 });
+    const sec = Object.fromEntries(lanes.links.map((l) => [l.key, l.section]));
+    check('chaque couloir donne sa section ; couloir Autres à classer ; filtres rapides ignorés', sec['DEMOAB-3500'] === 'IA'
+      && sec['DEMOAB-3502'] === 'IA' && sec['DEMOCD-3501'] === 'DEV' && sec['DEMOEF-3600'] === null, JSON.stringify(sec));
+    check('un en-tête compté par couloir', JSON.stringify(lanes.markers) === '{"IA":1,"DEV":1}', JSON.stringify(lanes.markers));
+    // Liste plate dont seul l'en-tête IA est présent (DEV pas encore chargé) : il ne couvre que ce qui le suit
+    await page.setContent('<div id="liste"><div><a href="https://jira.example.com/browse/DEMOAB-3700">DEMOAB-3700</a></div>'
+      + '<div><span>IA</span> · 1 ticket</div><div><a href="https://jira.example.com/browse/DEMOAB-3500">DEMOAB-3500</a></div></div>');
+    const flat = await loadAllTickets(page, { categories: DEFAULT_CATEGORIES, pauseMs: 50, stableSteps: 1 });
+    const flatSec = Object.fromEntries(flat.links.map((l) => [l.key, l.section]));
+    check('liste plate : un ticket placé avant le premier en-tête reste à classer', flatSec['DEMOAB-3700'] === null
+      && flatSec['DEMOAB-3500'] === 'IA', JSON.stringify(flatSec));
+  } finally {
+    await probe.close();
+  }
 
   // ------------------------------------------------------------------ export par l'API (Node.js)
   scenario('R6', "export par l'API, interface Node.js");
@@ -605,11 +679,11 @@ try {
   check('un passage par le SSO', fake.stats.ssoLogins === 1, `${fake.stats.ssoLogins}`);
   r = await post(port, '/api/capture', { prefix: '1AB' });
   check('préfixe invalide refusé', r.status === 400, r.json?.error);
-  r = await post(port, '/api/capture', { categories: 'ticket avec ia\nà classer' });
+  r = await post(port, '/api/capture', { categories: 'IA\nà classer' });
   check('catégorie réservée refusée', r.status === 400, r.json?.error);
 
   scenario('R10', 'capture d\'un backlog chargé au défilement');
-  const filter = { prefix: 'demo', min: '3500', max: '4500', categories: 'ticket avec ia\nticket sans ia' };
+  const filter = { prefix: 'demo', min: '3500', max: '4500', categories: 'IA\nDEV' };
   const out = join(TMP, 'sortie');
   let started = Date.now();
   r = await post(port, '/api/capture', { ...filter, folder: out });
@@ -627,18 +701,23 @@ try {
   check('champs d\'un ticket en erreur', sameSet(Object.keys(onDisk?.tickets.find((t) => t.error) ?? {}), ['key', 'url', 'category', 'error']));
 
   scenario('R11', 'nouvelle capture dans le même dossier');
-  TICKETS['DEMOAB-3700'] = { visible: 'Étiquettes : ticket-sans-ia' }; // la catégorie du ticket a changé dans Jira
   await post(port, '/api/capture', { ...filter, min: '3700', max: '3700', folder: out });
   status = await waitForJob(port);
-  const again = status.job.report ?? { tickets: [] };
-  check('revenu à la page du sprint après une erreur : le ticket est retrouvé', again.selected === 1 && again.listed === BOARD_42.length + 1, `${again.selected} sur ${again.listed}`);
-  check('le ticket rejoint sa nouvelle catégorie, sa copie précédente est retirée',
-    existsSync(join(out, 'ticket sans ia', 'DEMOAB-3700.mhtml')) && !existsSync(join(out, UNCLASSIFIED, 'DEMOAB-3700.mhtml'))
+  let again = status.job.report ?? { tickets: [] };
+  check('revenu à la page du sprint après une erreur : le ticket est retrouvé', again.selected === 1 && again.listed === BOARD_42.length + 1
+    && status.browser === false, `${again.selected} sur ${again.listed}`);
+  TICKETS['DEMOAB-3700'].section = 'DEV'; // le ticket rejoint la section DEV dans Jira
+  await post(port, '/api/open', { url: backlog });
+  await post(port, '/api/capture', { ...filter, min: '3700', max: '3700', folder: out });
+  status = await waitForJob(port);
+  again = status.job.report ?? { tickets: [] };
+  check('le ticket rejoint sa nouvelle section, sa copie précédente est retirée',
+    existsSync(join(out, 'DEV', 'DEMOAB-3700.mhtml')) && !existsSync(join(out, UNCLASSIFIED, 'DEMOAB-3700.mhtml'))
     && JSON.stringify(again.tickets[0]?.movedFrom) === JSON.stringify([UNCLASSIFIED]), JSON.stringify(again.tickets[0]?.movedFrom));
-  check('les autres tickets restent en place, sans sous-dossier', existsSync(join(out, 'ticket avec ia', 'DEMOAB-3500.mhtml'))
-    && sameSet(readdirSync(out), ['ticket avec ia', 'ticket sans ia', UNCLASSIFIED, 'sprint.mhtml', 'rapport.json']));
+  check('les autres tickets restent en place, sans sous-dossier', existsSync(join(out, 'IA', 'DEMOAB-3500.mhtml'))
+    && sameSet(readdirSync(out), ['IA', 'DEV', UNCLASSIFIED, 'sprint.mhtml', 'rapport.json']));
   check('sans erreur, le navigateur se ferme', again.errors === 0 && status.browser === false);
-  TICKETS['DEMOAB-3700'] = {};
+  TICKETS['DEMOAB-3700'].section = null;
 
   scenario('R12', 'session SSO gardée dans le profil');
   r = await post(port, '/api/open', { url: `${backlog}?mode=virtual` });
@@ -660,6 +739,8 @@ try {
   check('trois erreurs sur cinq tickets, capture arrêtée', expired.aborted === true && expired.errors === 3 && expired.selected === 5
     && expired.tickets.length === 3, `${expired.errors} erreurs sur ${expired.selected}, arrêt : ${expired.aborted}`);
   check('le navigateur reste ouvert', status.browser === true);
+  check('page sans section : deux avertissements', status.job.warnings?.length === 2 && /« IA »/.test(status.job.warnings[0]),
+    (status.job.warnings ?? []).join(' '));
 
   scenario('R15', 'arrêt par « Fermer le navigateur »');
   await post(port, '/api/open', { url: backlog });
@@ -707,10 +788,12 @@ try {
     const statusText = await page.textContent('#status');
     check('bilan de fin', /Capture terminée : 7 tickets enregistrés sur 8, 1 en erreur/.test(statusText), statusText);
     const summary = (await page.textContent('#report-summary')).replace(/\s+/g, ' ');
-    check('résumé du rapport', /retenus par le filtre : 8/.test(summary) && /ticket avec ia : 3/.test(summary) && /à classer : 2/.test(summary), summary);
+    check('résumé du rapport', /retenus par le filtre : 8/.test(summary) && /IA : 3/.test(summary) && /DEV : 3/.test(summary)
+      && /à classer : 1/.test(summary), summary);
     const rows = await page.$$eval('#report-rows tr', (trs) => trs.map((tr) => [...tr.cells].map((td) => td.textContent)));
-    check('une ligne par ticket, erreur signalée', rows.length === 8
-      && rows.find((x) => x[0] === 'DEMOAB-3900')?.[3].includes('session SSO') && rows.find((x) => x[0] === 'DEMOAB-3700')?.[1] === UNCLASSIFIED, `${rows.length} lignes`);
+    check('une ligne par ticket, en-tête de section, erreur signalée', rows.length === 8
+      && rows.find((x) => x[0] === 'DEMOAB-3500')?.[2].startsWith('IA · ') && rows.find((x) => x[0] === 'DEMOAB-3900')?.[2].includes('session SSO')
+      && rows.find((x) => x[0] === 'DEMOAB-3700')?.[1] === UNCLASSIFIED, `${rows.length} lignes`);
     check('avertissement après une erreur', await page.isVisible('#report-warning'));
     await page.screenshot({ path: join(TMP, 'interface.png'), fullPage: true });
     await page.reload();
@@ -732,14 +815,14 @@ try {
   check('numéro invalide : code 2', c.status === 2 && /Numéro minimal invalide/.test(c.stderr));
   c = await cli([backlog, '--prefixe', 'demoab', '--min', '4500', '--max', '4500', '--sortie', join(TMP, 'cli')]);
   check('un ticket capturé et classé, directement dans le dossier', c.status === 0 && /retenus par le filtre : 1 /.test(c.stdout)
-    && existsSync(join(TMP, 'cli', 'ticket avec ia', 'DEMOAB-4500.mhtml')), `${c.status} ${c.stderr.trim().split('\n')[0] ?? ''}`);
+    && existsSync(join(TMP, 'cli', 'IA', 'DEMOAB-4500.mhtml')), `${c.status} ${c.stderr.trim().split('\n')[0] ?? ''}`);
   c = await cli([backlog, '--prefixe', 'demoab', '--min', '3900', '--max', '3900', '--sortie', join(TMP, 'cli')]);
   check('un ticket en erreur : code 1', c.status === 1 && /DEMOAB-3900 : page du ticket non affichée/.test(c.stdout), `${c.status}`);
 
   scenario('R19', "point d'extension E2 : capture pilotable par un autre outil");
   const exported = Object.keys(core).filter((k) => typeof core[k] === 'function').sort();
   check('fonctions exportées par le module commun', ['captureSprintTickets', 'loadAllTickets', 'captureTicket', 'captureMhtml', 'launchBrowser',
-    'classify', 'parseFilter', 'matchesFilter', 'parseCategories'].every((k) => exported.includes(k)), exported.join(', '));
+    'addSectionLinks', 'sectionWarnings', 'parseFilter', 'matchesFilter', 'parseCategories'].every((k) => exported.includes(k)), exported.join(', '));
 } catch (err) {
   check('exécution', false, err.stack);
 } finally {

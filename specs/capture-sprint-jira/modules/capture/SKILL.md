@@ -20,7 +20,7 @@ Jira affiche ses pages en plusieurs temps, et le SSO peut s'interposer. Le skill
 - la page est celle du ticket : son adresse contient `/browse/<CLÉ>`, ou son titre contient la clé ;
 - la clé est affichée dans le texte de la page.
 
-Il vérifie ces conditions toutes les 400 ms, en tolérant les navigations en cours, par exemple un aller-retour par le fournisseur d'identité. Passé le délai, 20 s par défaut (`JIRA_CAPTURE_PAGE_TIMEOUT_MS`), le ticket est en erreur : « page du ticket non affichée après 20 s (session SSO expirée ?) ». Rien n'est écrit pour lui, et une capture précédente du même ticket reste en place (D5.INV-4). Une page de connexion, une page d'erreur ou la page d'un autre ticket ne sont donc jamais enregistrées sous le nom du ticket.
+Il vérifie ces conditions toutes les 400 ms, en tolérant les navigations en cours, par exemple un aller-retour par le fournisseur d'identité. Passé le délai, 20 s par défaut (`JIRA_CAPTURE_PAGE_TIMEOUT_MS`), le ticket est en erreur : « page du ticket non affichée après 20 s (session SSO expirée ?) ». Rien n'est écrit pour lui, et une capture précédente du même ticket reste en place (D11.INV-3). Une page de connexion, une page d'erreur ou la page d'un autre ticket ne sont donc jamais enregistrées sous le nom du ticket.
 
 ## 3. Une page complète (D4.INV-2, D4.INV-3)
 
@@ -37,7 +37,7 @@ Il vérifie ces conditions toutes les 400 ms, en tolérant les navigations en co
 
 ## 5. Durée
 
-Le faux Jira de la recette se capture en 51 s pour huit tickets, relevé d'un backlog de 72 cartes compris, soit 5 à 6 s par ticket ; en 76 s quand le backlog est une liste virtualisée de 80 pixels de haut, que le relevé parcourt à petits pas. Un vrai Jira, plus lent à afficher, demande davantage : une vingtaine de tickets prend quelques minutes, à mesurer sur le poste.
+Le faux Jira de la recette se capture en 51 s pour huit tickets, relevé d'un backlog de 72 cartes compris, soit 5 à 6 s par ticket ; en 77 s quand le backlog est une liste virtualisée de 80 pixels de haut, que le relevé parcourt à petits pas. Un vrai Jira, plus lent à afficher, demande davantage : une vingtaine de tickets prend quelques minutes, à mesurer sur le poste.
 
 ## 6. Pièges connus
 

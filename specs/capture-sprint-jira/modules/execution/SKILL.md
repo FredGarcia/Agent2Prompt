@@ -77,24 +77,24 @@ Treize fichiers sont tirés des blocs annotés `<!-- fichier : chemin -->` des m
 
 | Fichier | Module, section | Empreinte sha256 |
 |---|---|---|
-| `package.json` | `execution`, § 9 | `f8c5c38fa4b6d681f16f41a5676398511cbd8fe5a31942755f0117d09b4a7205` |
-| `package-lock.json` | `execution`, § 9 | `20809741731462e5ea8827b639ed8a66dd13300af6e2e20077be030bc4116d98` |
+| `package.json` | `execution`, § 9 | `e01fa603cc88fab8699767cc10f2451bce6b9d54e02462ee863b10a7b65960ad` |
+| `package-lock.json` | `execution`, § 9 | `28c00829c50edb775801fc626de22df4bfc1161621cfe1bfcc612a5153b10434` |
 | `.gitignore` | `execution`, § 9 | `b163b109241838c4ff48e7cc27de427a4fb4e7f9aebdb16c8a5ad3fbb7a02613` |
-| `scripts/jira-capture-core.mjs` | `execution`, § 10 | `b0f7745e6aedbbc44b5349156fb64f2084b500292c80a4909c03eb563c1a9d14` |
-| `scripts/jira-capture-app.mjs` | `interface`, § 8 | `a9745efa6c2d34fc7600173f732628716b5b35ceb3658e2cead55602eebc40d3` |
-| `scripts/public/capture.html` | `interface`, § 8 | `f8c7a637f8c2dafc62b9b360e9eb504f24d59d86667c27904059f213081e3abb` |
-| `scripts/jira-capture-mhtml.mjs` | `interface`, § 8 | `ad9a2a8d7926b215366ad9d8564527428657f8116ca18d759b52084662b88779` |
-| `agent/capteur-sprint.md` | `agent`, § 7 | `8a5b262ecbfc00b60c6e2702246bf0563a5402d7b4828eca7445d8d43db01ec0` |
+| `scripts/jira-capture-core.mjs` | `execution`, § 10 | `7a2d7dac386217a48dc92859408a72d4d21cd0e85a75f1b267259da7ab9e8b2d` |
+| `scripts/jira-capture-app.mjs` | `interface`, § 8 | `5e4dc65d1e3a51bbf4fd2dabfafcf0ef2c97d48ae17ea4571532bec05d2c76bd` |
+| `scripts/public/capture.html` | `interface`, § 8 | `75a01f40c2a3c70922eb75cd6150e600fea9d7cfe1c88fb0a7e0791cdbd48674` |
+| `scripts/jira-capture-mhtml.mjs` | `interface`, § 8 | `3bc8af65e15e703d1aff04efff70ca3f276e2bce128d9add1b705e3bf12fc02e` |
+| `agent/capteur-sprint.md` | `agent`, § 7 | `02851f3d135190d35b74dfcdb0e29556dacae788585a2ea2889adf53ffdfca79` |
 | `scripts/jira-sprint-app.mjs` | `export-api`, § 6 | `14005092304d4d368c869d7ee801ca922529848325255054768e86f37c418ea8` |
 | `scripts/public/index.html` | `export-api`, § 6 | `f69c6d601212d9a7e746181957a8c281f00a3d42decd488de25c54fdbb8abd91` |
 | `scripts/jira_sprint_export.py` | `export-api`, § 6 | `60b6953199cbc21443572212fee36de21adc4522e86feb2215f38ba474b91782` |
-| `tests/fake-jira.mjs` | `recette`, § 6 | `c99fd4a4ceee0486170b8e8d0635ae9fd309735d6c6a9556f3f34190d8278b41` |
-| `tests/run-tests.mjs` | `recette`, § 6 | `fb8eeb2fc1a73ec4d04338b1a2da8379fca7cc833ea9598f31626866bce5f526` |
+| `tests/fake-jira.mjs` | `recette`, § 6 | `eb8de8e8bb1b46ad5a4c6e83cd6f8acdd812a494b8559d017d87b93907d4f83d` |
+| `tests/run-tests.mjs` | `recette`, § 6 | `cac3fa3345aacd6f6ecd6eb3bcf5c6006f8fb65ead3a325ecf48e5449d56992f` |
 
 Depuis le dossier du skill, cette commande d'une ligne écrit les treize fichiers, compare leurs empreintes à celles du tableau et sort avec le code 1 au moindre écart ou à la moindre absence. Elle ne contient ni `$`, ni accent grave, ni `!`, ni `%`, ni guillemet intérieur : elle se colle telle quelle dans bash, zsh, CMD ou PowerShell, et dans un fichier `.cmd`. Elle lit aussi des modules aux fins de ligne CRLF.
 
 ```text
-node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'package.json': 'f8c5c38fa4b6d681f16f41a5676398511cbd8fe5a31942755f0117d09b4a7205', 'package-lock.json': '20809741731462e5ea8827b639ed8a66dd13300af6e2e20077be030bc4116d98', '.gitignore': 'b163b109241838c4ff48e7cc27de427a4fb4e7f9aebdb16c8a5ad3fbb7a02613', 'scripts/jira-capture-core.mjs': 'b0f7745e6aedbbc44b5349156fb64f2084b500292c80a4909c03eb563c1a9d14', 'scripts/jira-capture-app.mjs': 'a9745efa6c2d34fc7600173f732628716b5b35ceb3658e2cead55602eebc40d3', 'scripts/public/capture.html': 'f8c7a637f8c2dafc62b9b360e9eb504f24d59d86667c27904059f213081e3abb', 'scripts/jira-capture-mhtml.mjs': 'ad9a2a8d7926b215366ad9d8564527428657f8116ca18d759b52084662b88779', 'agent/capteur-sprint.md': '8a5b262ecbfc00b60c6e2702246bf0563a5402d7b4828eca7445d8d43db01ec0', 'scripts/jira-sprint-app.mjs': '14005092304d4d368c869d7ee801ca922529848325255054768e86f37c418ea8', 'scripts/public/index.html': 'f69c6d601212d9a7e746181957a8c281f00a3d42decd488de25c54fdbb8abd91', 'scripts/jira_sprint_export.py': '60b6953199cbc21443572212fee36de21adc4522e86feb2215f38ba474b91782', 'tests/fake-jira.mjs': 'c99fd4a4ceee0486170b8e8d0635ae9fd309735d6c6a9556f3f34190d8278b41', 'tests/run-tests.mjs': 'fb8eeb2fc1a73ec4d04338b1a2da8379fca7cc833ea9598f31626866bce5f526' }; const vus = new Set(); let ecarts = 0; for (const module of ['modules/execution/SKILL.md', 'modules/interface/SKILL.md', 'modules/agent/SKILL.md', 'modules/export-api/SKILL.md', 'modules/recette/SKILL.md']) { const texte = fs.readFileSync(module, 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); vus.add(m[1]); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (conforme === false) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } } for (const f of Object.keys(attendu)) { if (vus.has(f) === false) { ecarts++; console.log('ABSENT    ' + f); } } if (ecarts > 0) process.exitCode = 1;"
+node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'package.json': 'e01fa603cc88fab8699767cc10f2451bce6b9d54e02462ee863b10a7b65960ad', 'package-lock.json': '28c00829c50edb775801fc626de22df4bfc1161621cfe1bfcc612a5153b10434', '.gitignore': 'b163b109241838c4ff48e7cc27de427a4fb4e7f9aebdb16c8a5ad3fbb7a02613', 'scripts/jira-capture-core.mjs': '7a2d7dac386217a48dc92859408a72d4d21cd0e85a75f1b267259da7ab9e8b2d', 'scripts/jira-capture-app.mjs': '5e4dc65d1e3a51bbf4fd2dabfafcf0ef2c97d48ae17ea4571532bec05d2c76bd', 'scripts/public/capture.html': '75a01f40c2a3c70922eb75cd6150e600fea9d7cfe1c88fb0a7e0791cdbd48674', 'scripts/jira-capture-mhtml.mjs': '3bc8af65e15e703d1aff04efff70ca3f276e2bce128d9add1b705e3bf12fc02e', 'agent/capteur-sprint.md': '02851f3d135190d35b74dfcdb0e29556dacae788585a2ea2889adf53ffdfca79', 'scripts/jira-sprint-app.mjs': '14005092304d4d368c869d7ee801ca922529848325255054768e86f37c418ea8', 'scripts/public/index.html': 'f69c6d601212d9a7e746181957a8c281f00a3d42decd488de25c54fdbb8abd91', 'scripts/jira_sprint_export.py': '60b6953199cbc21443572212fee36de21adc4522e86feb2215f38ba474b91782', 'tests/fake-jira.mjs': 'eb8de8e8bb1b46ad5a4c6e83cd6f8acdd812a494b8559d017d87b93907d4f83d', 'tests/run-tests.mjs': 'cac3fa3345aacd6f6ecd6eb3bcf5c6006f8fb65ead3a325ecf48e5449d56992f' }; const vus = new Set(); let ecarts = 0; for (const module of ['modules/execution/SKILL.md', 'modules/interface/SKILL.md', 'modules/agent/SKILL.md', 'modules/export-api/SKILL.md', 'modules/recette/SKILL.md']) { const texte = fs.readFileSync(module, 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); vus.add(m[1]); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (conforme === false) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } } for (const f of Object.keys(attendu)) { if (vus.has(f) === false) { ecarts++; console.log('ABSENT    ' + f); } } if (ecarts > 0) process.exitCode = 1;"
 ```
 
 Puis, depuis le même dossier :
@@ -112,7 +112,7 @@ npm test
 ```json
 {
   "name": "capture-sprint-jira",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "private": true,
   "description": "Capture en MHTML des tickets d'un sprint Jira derrière un SSO, rangés par catégorie (skill capture-sprint-jira)",
   "engines": {
@@ -134,13 +134,13 @@ npm test
 ```json
 {
   "name": "capture-sprint-jira",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "lockfileVersion": 3,
   "requires": true,
   "packages": {
     "": {
       "name": "capture-sprint-jira",
-      "version": "1.0.1",
+      "version": "1.1.0",
       "dependencies": {
         "playwright-core": "1.63.0"
       },
@@ -182,9 +182,9 @@ Le module commun porte tout ce que font la capture et le classement ; l'interfac
 | Fonction | Rôle | Module |
 |---|---|---|
 | `launchBrowser()`, `browserChannel()`, `profileDir()` | fenêtre visible sur le profil dédié | `session` |
-| `loadAllTickets(page)`, `parseFilter()`, `matchesFilter()` | relevé des liens et filtre | `releve` |
+| `loadAllTickets(page, { categories })`, `parseFilter()`, `matchesFilter()` | relevé des liens et de leur section, filtre | `releve` |
 | `captureTicket()`, `captureMhtml()`, `pageTimeoutMs()` | capture d'une page de ticket | `capture` |
-| `classify()`, `parseCategories()`, `normalizeText()`, `termPattern()` | classement | `classement` |
+| `addSectionLinks()`, `sectionWarnings()`, `parseCategories()`, `normalizeText()` | sections, avertissements, catégories | `classement` |
 | `captureSprintTickets(context, page, options)` | capture complète d'un sprint, rapport | `classement` |
 | `outputFolder()` | dossier de sortie saisi | `interface` |
 
@@ -192,9 +192,10 @@ Le module commun porte tout ce que font la capture et le classement ; l'interfac
 ```javascript
 // jira-capture-core.mjs : capture en MHTML des tickets d'un sprint Jira protégé par un SSO (skill capture-sprint-jira).
 // Le navigateur s'ouvre sur un profil dédié ; l'utilisateur s'y connecte lui-même (SSO, MFA) : aucun identifiant ne
-// passe par ce module. Sur la page du sprint, chaque lien /browse/<CLÉ> retenu par le filtre (préfixe, numéros) est
-// ouvert ; la page du ticket est enregistrée en MHTML dans le dossier de sa catégorie, reconnue au terme clé qu'elle
-// contient. Module commun à jira-capture-app.mjs (interface) et à jira-capture-mhtml.mjs (ligne de commande).
+// passe par ce module. Sur la page du sprint, chaque lien /browse/<CLÉ> retenu par le filtre (préfixe, numéros) prend
+// la catégorie de sa section : l'en-tête (IA, DEV…) qui le précède sur la page. La page du ticket est enregistrée en
+// MHTML dans le dossier de cette catégorie. Module commun à jira-capture-app.mjs (interface) et à
+// jira-capture-mhtml.mjs (ligne de commande).
 import { existsSync } from 'node:fs';
 import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
@@ -207,10 +208,10 @@ export const SKILL_DIR = fileURLToPath(new URL('..', import.meta.url));
 /** Dossier des captures par défaut, écarté par le .gitignore du skill. */
 export const DEFAULT_OUT_DIR = join(SKILL_DIR, 'mhtml');
 
-/** Catégories par défaut : termes clés cherchés dans la page de chaque ticket, et noms de leurs dossiers. */
-export const DEFAULT_CATEGORIES = ['ticket avec ia', 'ticket sans ia'];
+/** Catégories par défaut : texte des en-têtes de section de la page du sprint, et noms de leurs dossiers. */
+export const DEFAULT_CATEGORIES = ['IA', 'DEV'];
 
-/** Dossier des tickets dont la page ne contient aucun terme clé, ou en contient plusieurs. */
+/** Dossier des tickets qu'aucun en-tête de catégorie ne précède sur la page du sprint. */
 export const UNCLASSIFIED = 'à classer';
 
 /** Arrêt de la capture après ce nombre d'échecs consécutifs : le plus souvent, la session SSO a expiré. */
@@ -223,7 +224,6 @@ export const profileDir = (env = process.env) => resolve(SKILL_DIR, env.JIRA_CAP
 export const pageTimeoutMs = (env = process.env) => Number(env.JIRA_CAPTURE_PAGE_TIMEOUT_MS) || 20_000;
 
 export const firstLine = (err) => String(err?.message ?? err).split('\n')[0];
-const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 // ---------------------------------------------------------------------------------------------
 // Navigateur
@@ -295,16 +295,16 @@ const byNumber = (a, b) => {
 };
 
 /** Minuscules, sans accents, séparateurs (blancs, _ et -) réduits à une espace. */
-export const normalizeText = (s) => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '')
+export const normalizeText = (s) => String(s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
   .toLowerCase().replace(/[\s_-]+/g, ' ').trim();
-
-/** Motif d'un terme clé : mots entiers, séparés par une espace, un tiret, un _ ou rien (« TicketAvecIA »). */
-export const termPattern = (term) => new RegExp(`(?<![a-z0-9])${normalizeText(term).split(' ').map(escapeRe).join(' ?')}(?![a-z0-9])`);
 
 // Interdit dans un nom de dossier sous Windows ou Linux
 const BAD_FOLDER_NAME = /[<>:"/\\|?*\u0000-\u001f]/;
 
-/** Lit les catégories (liste, ou texte à une catégorie par ligne ou séparées par « ; ») ; elles nomment les dossiers. */
+/**
+ * Lit les catégories (liste, ou texte à une catégorie par ligne ou séparées par « ; ») : chacune est le texte d'un
+ * en-tête de section de la page du sprint, et le nom de son dossier.
+ */
 export function parseCategories(raw = DEFAULT_CATEGORIES) {
   const list = (Array.isArray(raw) ? raw : String(raw ?? '').split(/\r?\n|;/))
     .map((c) => String(c).trim().replace(/\s+/g, ' ')).filter(Boolean);
@@ -321,29 +321,20 @@ export function parseCategories(raw = DEFAULT_CATEGORIES) {
   return list;
 }
 
-const excerptAround = (hay, m) => {
-  const start = Math.max(0, m.index - 40);
-  const end = Math.min(hay.length, m.index + m[0].length + 40);
-  return `${start > 0 ? '…' : ''}${hay.slice(start, end)}${end < hay.length ? '…' : ''}`;
-};
-
 /**
- * Catégorie d'un ticket d'après les textes de sa page, pris dans l'ordre : [[où, texte], …]. Le premier texte
- * qui contient au moins un terme clé décide : une seule catégorie trouvée est retenue ; plusieurs, aucune.
- * Rend { category, where, found, excerpt } ; category vaut null si le ticket est à classer.
+ * Avertissements sur les sections de la page du sprint, d'après les en-têtes comptés au relevé (`markers`) : une
+ * catégorie dont aucun en-tête n'est suivi de tickets (la section porte-t-elle un autre nom ?), ou dont plusieurs le
+ * sont (une étiquette de carte porte peut-être ce nom). Rend une liste de phrases, vide si chaque catégorie ouvre
+ * une seule section.
  */
-export function classify(sources, categories) {
-  for (const [where, text] of sources) {
-    const hay = normalizeText(text);
-    const hits = [];
-    for (const c of categories) {
-      const m = termPattern(c).exec(hay);
-      if (m) hits.push({ c, m });
-    }
-    if (hits.length === 1) return { category: hits[0].c, where, found: [hits[0].c], excerpt: excerptAround(hay, hits[0].m) };
-    if (hits.length > 1) return { category: null, where, found: hits.map((h) => h.c), excerpt: null };
+export function sectionWarnings({ categories = [], markers = {}, listed = 0 } = {}) {
+  const notes = [];
+  for (const c of categories) {
+    const n = markers[c] ?? 0;
+    if (n === 0 && listed > 0) notes.push(`Aucun en-tête « ${c} » suivi de tickets sur la page du sprint : vérifiez que la section porte ce nom.`);
+    if (n > 1) notes.push(`« ${c} » précède ${n} groupes de tickets sur la page du sprint : une étiquette de carte porte peut-être ce nom ; vérifiez le classement dans rapport.json.`);
   }
-  return { category: null, where: null, found: [], excerpt: null };
+  return notes;
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -383,41 +374,110 @@ async function scrollToTop(page, pauseMs) {
 }
 
 /**
- * Liens des tickets de la page, hors navigation (menus, éléments récents) : [{ key, url }], une entrée par clé,
- * adresse ramenée à …/browse/<CLÉ>.
+ * Liens des tickets présents dans la page, hors navigation (menus, éléments récents), dans l'ordre de la page, une
+ * entrée par clé, adresse ramenée à …/browse/<CLÉ>, chacun avec sa section.
+ *   En-tête : élément visible dont tout le texte est le nom d'une catégorie, hors navigation et hors lien de ticket.
+ *   Bloc d'un en-tête : son plus haut ancêtre qui ne contient ni autre en-tête, ni ticket placé avant lui. S'il
+ *   contient des tickets (couloir, sprint), la section est ce bloc, et un ticket placé après lui, hors de tout
+ *   bloc, n'a pas de section. Sinon (liste plate), la section va de l'en-tête jusqu'au suivant, dans l'ordre de
+ *   la page.
+ * Un ticket qu'aucun en-tête présent ne précède est dit ouvert : sa section est peut-être sortie de la page
+ * (liste virtualisée). Compte aussi, par catégorie, les en-têtes suivis d'au moins un ticket : un filtre rapide
+ * nommé comme une catégorie, en haut de la page, ne compte pas.
+ * Rend { links: [{ key, url, section, excerpt, open }], markers: { <catégorie>: n } }.
  */
-const ticketLinks = (page) => page.evaluate(() => {
+const sprintLinks = (page, categories) => page.evaluate((cats) => {
   const NAV = 'nav, header, aside, [role="navigation"], [role="banner"]';
+  const SKIP = /^(?:SCRIPT|STYLE|NOSCRIPT|TEMPLATE|TITLE|OPTION)$/;
+  const TICKET = 'a[href*="/browse/"]';
+  const norm = (s) => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .toLowerCase().replace(/[\s_-]+/g, ' ').trim();
+  const visible = (el) => (el.checkVisibility ? el.checkVisibility() : el.offsetParent !== null);
+  const byName = new Map(cats.map((c) => [norm(c), c]));
+  const heads = [];
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  while (walker.nextNode()) {
+    const el = walker.currentNode.parentElement;
+    const cat = byName.get(norm(walker.currentNode.nodeValue));
+    if (!cat || !el || SKIP.test(el.tagName) || norm(el.textContent) !== norm(cat)) continue;
+    if (el.closest(NAV) || el.closest(TICKET) || !visible(el)) continue;
+    const line = (el.parentElement ?? el).innerText.replace(/\s+/g, ' ').trim();
+    heads.push({ el, cat, excerpt: line.length > 80 ? `${line.slice(0, 80)}…` : line });
+  }
+  const precedes = (node, el) => Boolean(node && node.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_FOLLOWING);
+  for (const head of heads) {
+    let box = head.el;
+    for (let up = box.parentElement; up && up !== document.body; up = up.parentElement) {
+      if (heads.some((o) => o !== head && up.contains(o.el)) || precedes(up.querySelector(TICKET), head.el)) break;
+      box = up;
+    }
+    head.box = box.querySelector(TICKET) ? box : null;
+  }
   const links = new Map();
-  for (const a of document.querySelectorAll('a[href*="/browse/"]')) {
+  const used = new Set(); // en-têtes suivis d'un ticket
+  let h = -1; // dernier en-tête qui précède le lien courant
+  for (const a of document.querySelectorAll(TICKET)) {
+    while (h + 1 < heads.length && (heads[h + 1].el.compareDocumentPosition(a) & Node.DOCUMENT_POSITION_FOLLOWING)) h++;
     if (a.closest(NAV)) continue;
     const m = (a.getAttribute('href') ?? '').match(/^(.*?\/browse\/)([A-Za-z][A-Za-z0-9_]*-\d+)/);
     if (!m) continue;
     const key = m[2].toUpperCase();
-    if (!links.has(key)) links.set(key, new URL(m[1] + key, document.baseURI).href);
+    const head = heads.find((x) => x.box?.contains(a)) ?? (h >= 0 && !heads[h].box ? heads[h] : null);
+    if (head) used.add(head);
+    if (!links.has(key)) {
+      links.set(key, {
+        key, url: new URL(m[1] + key, document.baseURI).href,
+        section: head?.cat ?? null, excerpt: head?.excerpt ?? null, open: !head && h < 0,
+      });
+    }
   }
-  return [...links].map(([key, url]) => ({ key, url }));
-});
+  const markers = Object.fromEntries(cats.map((c) => [c, 0]));
+  for (const head of used) markers[head.cat]++;
+  return { links: [...links.values()], markers };
+}, categories);
+
+/**
+ * Ajoute à `seen` (Map clé → lien) les liens d'un pas de défilement, dans l'ordre de la page. Un lien ouvert, qu'aucun
+ * en-tête présent ne précède, prend la section où s'arrêtait le pas précédent, `carry` : une liste virtualisée retire
+ * de la page l'en-tête d'une section dès qu'il sort de l'écran. Une clé déjà relevée garde sa section. Rend la
+ * section du dernier lien du pas, { section, excerpt }, à reporter au pas suivant.
+ */
+export function addSectionLinks(seen, links, carry = { section: null, excerpt: null }) {
+  let last = carry;
+  for (const l of links) {
+    const resolved = l.open ? carry : { section: l.section ?? null, excerpt: l.excerpt ?? null };
+    if (!seen.has(l.key)) seen.set(l.key, { key: l.key, url: l.url, ...resolved });
+    last = resolved;
+  }
+  return last;
+}
 
 /**
  * Fait défiler la page jusqu'à ce que, `stableSteps` pas de suite, elle ne défile plus et qu'aucun ticket nouveau
- * n'apparaisse : le bas est atteint et plus rien ne s'y charge. Revient ensuite en haut. Les liens sont relevés à
- * chaque pas : un affichage virtualisé, qui retire de la page les cartes sorties de l'écran, ne fait donc perdre
- * aucun ticket. Rend { seen, present, links }.
+ * n'apparaisse : le bas est atteint et plus rien ne s'y charge. Revient ensuite en haut. Les liens et leurs sections
+ * sont relevés à chaque pas : un affichage virtualisé, qui retire de la page les cartes et les en-têtes sortis de
+ * l'écran, ne fait donc perdre ni ticket ni section. Rend { links: [{ key, url, section, excerpt }], markers }, où
+ * markers donne, pour chaque catégorie, le plus grand nombre de ses en-têtes suivis d'un ticket vus à la fois.
  */
-export async function loadAllTickets(page, { pauseMs = 700, maxSteps = 150, stableSteps = 4 } = {}) {
+export async function loadAllTickets(page, { categories = DEFAULT_CATEGORIES, pauseMs = 700, maxSteps = 150, stableSteps = 4 } = {}) {
   const seen = new Map();
-  const add = (links) => { for (const l of links) if (!seen.has(l.key)) seen.set(l.key, l.url); };
-  add(await ticketLinks(page));
+  const markers = Object.fromEntries(categories.map((c) => [c, 0]));
+  let carry;
+  const add = async () => {
+    const step = await sprintLinks(page, categories);
+    for (const c of categories) markers[c] = Math.max(markers[c], step.markers[c]);
+    carry = addSectionLinks(seen, step.links, carry);
+  };
+  await add();
   for (let i = 0, stable = 0; i < maxSteps && stable < stableSteps; i++) {
     const moved = await page.evaluate(scrollStep, true);
     await page.waitForTimeout(pauseMs);
     const before = seen.size;
-    add(await ticketLinks(page));
+    await add();
     stable = seen.size === before && !moved ? stable + 1 : 0;
   }
   await scrollToTop(page, pauseMs);
-  return { seen: seen.size, present: (await ticketLinks(page)).length, links: [...seen].map(([key, url]) => ({ key, url })) };
+  return { links: [...seen.values()], markers };
 }
 
 /** Instantané MHTML de la page, comme « Enregistrer sous… », format « Page Web, un seul fichier ». */
@@ -481,35 +541,7 @@ async function waitForStableText(page, { pauseMs = 500, maxMs = 10_000 } = {}) {
   }
 }
 
-/**
- * Textes où chercher la catégorie, du plus sûr au moins sûr : le contenu principal (main), visible ; le même,
- * panneaux repliés compris ; la page visible, hors navigation, si elle n'a pas de contenu principal. La
- * navigation (filtres enregistrés, éléments récents) peut citer un terme clé sans rapport avec le ticket.
- */
-const pageTexts = (page) => page.evaluate(() => {
-  const SKIP = /^(?:SCRIPT|STYLE|NOSCRIPT|TEMPLATE)$/;
-  const NAV = 'nav, header, aside, [role="navigation"], [role="banner"]';
-  const collect = (root, { visibleOnly, skipNav }) => {
-    const parts = [];
-    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-    while (walker.nextNode()) {
-      const el = walker.currentNode.parentElement;
-      if (!el || SKIP.test(el.tagName)) continue;
-      if (skipNav && el.closest(NAV)) continue;
-      if (visibleOnly && !(el.checkVisibility ? el.checkVisibility() : el.offsetParent !== null)) continue;
-      parts.push(walker.currentNode.nodeValue);
-    }
-    return parts.join(' ');
-  };
-  const main = document.querySelector('main, [role="main"]');
-  return [
-    ['contenu', main ? collect(main, { visibleOnly: true }) : ''],
-    ['contenu masqué', main ? collect(main, { visibleOnly: false }) : ''],
-    ['page', collect(document.body, { visibleOnly: true, skipNav: true })],
-  ];
-});
-
-/** Ouvre la page du ticket, la charge en entier et la capture : rend { data, texts }. */
+/** Ouvre la page du ticket, la charge en entier et la capture : rend { data }, le MHTML. */
 export async function captureTicket(context, page, { key, url }, { timeoutMs = pageTimeoutMs() } = {}) {
   let navError = null;
   await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60_000 }).catch((err) => { navError = err; });
@@ -520,8 +552,7 @@ export async function captureTicket(context, page, { key, url }, { timeoutMs = p
   }
   await scrollThrough(page);
   await waitForStableText(page);
-  const texts = await pageTexts(page);
-  return { data: await captureMhtml(context, page), texts };
+  return { data: await captureMhtml(context, page) };
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -530,10 +561,10 @@ export async function captureTicket(context, page, { key, url }, { timeoutMs = p
 
 /**
  * Capture les tickets de la page du sprint affichée dans `page`, directement dans `folder` :
- *   <catégorie>/<CLÉ>.mhtml   un fichier par ticket retenu, dans le dossier de sa catégorie
- *   à classer/<CLÉ>.mhtml     aucun terme clé trouvé, ou plusieurs
- *   sprint.mhtml              la page du sprint, d'où viennent les liens
- *   rapport.json              filtre, catégories, et pour chaque ticket : catégorie, extrait trouvé ou erreur
+ *   <catégorie>/<CLÉ>.mhtml   un fichier par ticket retenu, dans le dossier de la section où il figure
+ *   à classer/<CLÉ>.mhtml     aucun en-tête de catégorie ne le précède sur la page du sprint
+ *   sprint.mhtml              la page du sprint, d'où viennent les liens et les sections
+ *   rapport.json              filtre, catégories, en-têtes vus, et pour chaque ticket : catégorie, en-tête ou erreur
  * Une nouvelle capture d'un ticket remplace son fichier et retire sa copie d'un autre dossier de catégorie ;
  * un ticket en erreur garde sa capture précédente. onProgress({ step, done, total, key }) suit l'avancement.
  * Rend le rapport.
@@ -544,7 +575,7 @@ export async function captureSprintTickets(context, page, {
 } = {}) {
   onProgress({ step: 'liste', done: 0, total: 0, key: null });
   const sprintUrl = page.url();
-  const list = await loadAllTickets(page);
+  const list = await loadAllTickets(page, { categories });
   await mkdir(folder, { recursive: true });
   await writeFile(join(folder, 'sprint.mhtml'), await captureMhtml(context, page));
 
@@ -557,9 +588,8 @@ export async function captureSprintTickets(context, page, {
   for (const [i, ticket] of selected.entries()) {
     onProgress({ step: 'tickets', done: i, total: selected.length, key: ticket.key });
     try {
-      const { data, texts } = await captureTicket(context, page, ticket, { timeoutMs });
-      const c = classify(texts, categories);
-      const dir = c.category ?? UNCLASSIFIED;
+      const { data } = await captureTicket(context, page, ticket, { timeoutMs });
+      const dir = ticket.section ?? UNCLASSIFIED;
       await mkdir(join(folder, dir), { recursive: true });
       await writeFile(join(folder, dir, `${ticket.key}.mhtml`), data);
       const movedFrom = [];
@@ -570,10 +600,13 @@ export async function captureSprintTickets(context, page, {
           movedFrom.push(other);
         }
       }
-      tickets.push({ ...ticket, category: c.category, found: c.found, where: c.where, excerpt: c.excerpt, file: `${dir}/${ticket.key}.mhtml`, movedFrom });
+      tickets.push({
+        key: ticket.key, url: ticket.url, category: ticket.section, found: ticket.section ? [ticket.section] : [],
+        where: ticket.section ? 'section du sprint' : null, excerpt: ticket.excerpt, file: `${dir}/${ticket.key}.mhtml`, movedFrom,
+      });
       failuresInRow = 0;
     } catch (err) {
-      tickets.push({ ...ticket, category: null, error: firstLine(err) });
+      tickets.push({ key: ticket.key, url: ticket.url, category: null, error: firstLine(err) });
       failuresInRow++;
       if (page.isClosed() || failuresInRow >= MAX_FAILURES_IN_ROW) {
         aborted = i + 1 < selected.length;
@@ -589,7 +622,7 @@ export async function captureSprintTickets(context, page, {
     else counts[t.category ?? UNCLASSIFIED]++;
   }
   const report = {
-    date: now.toISOString(), sprintUrl, folder, filter, categories,
+    date: now.toISOString(), sprintUrl, folder, filter, categories, markers: list.markers,
     listed: list.links.length, selected: selected.length, ignored: ignored.length, ignoredSample: ignored.slice(0, 20),
     counts, errors, aborted, tickets,
   };
