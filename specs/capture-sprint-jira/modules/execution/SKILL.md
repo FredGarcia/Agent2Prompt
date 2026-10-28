@@ -17,10 +17,10 @@ Toutes se lancent depuis le dossier du skill.
 |---|---|---|
 | `npm ci` | installe `playwright-core` 1.63.0, sans navigateur | ce module |
 | `npm run capture` | interface de capture, sur http://127.0.0.1:3100 | `interface` |
-| `npm run capture:cli -- "<page du sprint>" [options]` | capture en ligne de commande | `interface` |
+| `npm run capture:cli -- "<page du sprint>" [options]`, ou `-- --ticket "<adresse du ticket>"` | capture en ligne de commande, d'un sprint ou d'un ticket seul | `interface`, `ticket` |
 | `npm run export` | export par l'API, sur http://127.0.0.1:3000 | `export-api` |
 | `python3 scripts/jira_sprint_export.py --board <tableau>` | export par l'API, en Python (sous Windows : `py`) | `export-api` |
-| `npm test` | recette, 19 scénarios contre un faux Jira local | `recette` |
+| `npm test` | recette, 20 scénarios contre un faux Jira local | `recette` |
 
 ## 2. Installation
 
@@ -77,24 +77,24 @@ Treize fichiers sont tirés des blocs annotés `<!-- fichier : chemin -->` des m
 
 | Fichier | Module, section | Empreinte sha256 |
 |---|---|---|
-| `package.json` | `execution`, § 9 | `e01fa603cc88fab8699767cc10f2451bce6b9d54e02462ee863b10a7b65960ad` |
-| `package-lock.json` | `execution`, § 9 | `28c00829c50edb775801fc626de22df4bfc1161621cfe1bfcc612a5153b10434` |
+| `package.json` | `execution`, § 9 | `583f34df011bd073096782d08aae5baa971f40db0481f349d262c9bed4bb23a1` |
+| `package-lock.json` | `execution`, § 9 | `abb2891317bd04289350dc10e3ea4e5acca90881568bbdf0db33de0af35fd253` |
 | `.gitignore` | `execution`, § 9 | `b163b109241838c4ff48e7cc27de427a4fb4e7f9aebdb16c8a5ad3fbb7a02613` |
-| `scripts/jira-capture-core.mjs` | `execution`, § 10 | `832d84831bb1ce776fecd459bab1345a79dd49208aa540202f2e37b465866180` |
-| `scripts/jira-capture-app.mjs` | `interface`, § 8 | `5e4dc65d1e3a51bbf4fd2dabfafcf0ef2c97d48ae17ea4571532bec05d2c76bd` |
-| `scripts/public/capture.html` | `interface`, § 8 | `75a01f40c2a3c70922eb75cd6150e600fea9d7cfe1c88fb0a7e0791cdbd48674` |
-| `scripts/jira-capture-mhtml.mjs` | `interface`, § 8 | `3bc8af65e15e703d1aff04efff70ca3f276e2bce128d9add1b705e3bf12fc02e` |
-| `agent/capteur-sprint.md` | `agent`, § 7 | `02851f3d135190d35b74dfcdb0e29556dacae788585a2ea2889adf53ffdfca79` |
+| `scripts/jira-capture-core.mjs` | `execution`, § 10 | `b99424fab45483ffbb607bd12c5f50b59c8d3324e6ade3e4feef5b135c77f609` |
+| `scripts/jira-capture-app.mjs` | `interface`, § 8 | `02ffc1ae5d4cffc2c45e7f0112701564c5f36e00435e53194e49712e5e57c439` |
+| `scripts/public/capture.html` | `interface`, § 8 | `0a42f8ad4f4c21bb4d8e9f3f15d437e9622e63fab1d23971d3fdf38a3b98c25a` |
+| `scripts/jira-capture-mhtml.mjs` | `interface`, § 8 | `1aa5f7399a3e19d7a52bb10bec6ce3e3c66162521ff3941a6d32837176763d5c` |
+| `agent/capteur-sprint.md` | `agent`, § 7 | `dee4eb0114f49c29a529a07a21d6e5c5aa0e80e9eb72930a80f8f0122040c37f` |
 | `scripts/jira-sprint-app.mjs` | `export-api`, § 6 | `14005092304d4d368c869d7ee801ca922529848325255054768e86f37c418ea8` |
 | `scripts/public/index.html` | `export-api`, § 6 | `f69c6d601212d9a7e746181957a8c281f00a3d42decd488de25c54fdbb8abd91` |
 | `scripts/jira_sprint_export.py` | `export-api`, § 6 | `60b6953199cbc21443572212fee36de21adc4522e86feb2215f38ba474b91782` |
 | `tests/fake-jira.mjs` | `recette`, § 6 | `eb8de8e8bb1b46ad5a4c6e83cd6f8acdd812a494b8559d017d87b93907d4f83d` |
-| `tests/run-tests.mjs` | `recette`, § 6 | `7e2be5605a254977b236f4a1c6543c5cf2441c4c0a91fd36805c5579cceccc8f` |
+| `tests/run-tests.mjs` | `recette`, § 6 | `9162478c39077d1ce9c9a397cc50e13838a84fd7b03b1ad4fe6a210df12c8d8f` |
 
 Depuis le dossier du skill, cette commande d'une ligne écrit les treize fichiers, compare leurs empreintes à celles du tableau et sort avec le code 1 au moindre écart ou à la moindre absence. Elle ne contient ni `$`, ni accent grave, ni `!`, ni `%`, ni guillemet intérieur : elle se colle telle quelle dans bash, zsh, CMD ou PowerShell, et dans un fichier `.cmd`. Elle lit aussi des modules aux fins de ligne CRLF.
 
 ```text
-node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'package.json': 'e01fa603cc88fab8699767cc10f2451bce6b9d54e02462ee863b10a7b65960ad', 'package-lock.json': '28c00829c50edb775801fc626de22df4bfc1161621cfe1bfcc612a5153b10434', '.gitignore': 'b163b109241838c4ff48e7cc27de427a4fb4e7f9aebdb16c8a5ad3fbb7a02613', 'scripts/jira-capture-core.mjs': '832d84831bb1ce776fecd459bab1345a79dd49208aa540202f2e37b465866180', 'scripts/jira-capture-app.mjs': '5e4dc65d1e3a51bbf4fd2dabfafcf0ef2c97d48ae17ea4571532bec05d2c76bd', 'scripts/public/capture.html': '75a01f40c2a3c70922eb75cd6150e600fea9d7cfe1c88fb0a7e0791cdbd48674', 'scripts/jira-capture-mhtml.mjs': '3bc8af65e15e703d1aff04efff70ca3f276e2bce128d9add1b705e3bf12fc02e', 'agent/capteur-sprint.md': '02851f3d135190d35b74dfcdb0e29556dacae788585a2ea2889adf53ffdfca79', 'scripts/jira-sprint-app.mjs': '14005092304d4d368c869d7ee801ca922529848325255054768e86f37c418ea8', 'scripts/public/index.html': 'f69c6d601212d9a7e746181957a8c281f00a3d42decd488de25c54fdbb8abd91', 'scripts/jira_sprint_export.py': '60b6953199cbc21443572212fee36de21adc4522e86feb2215f38ba474b91782', 'tests/fake-jira.mjs': 'eb8de8e8bb1b46ad5a4c6e83cd6f8acdd812a494b8559d017d87b93907d4f83d', 'tests/run-tests.mjs': '7e2be5605a254977b236f4a1c6543c5cf2441c4c0a91fd36805c5579cceccc8f' }; const vus = new Set(); let ecarts = 0; for (const module of ['modules/execution/SKILL.md', 'modules/interface/SKILL.md', 'modules/agent/SKILL.md', 'modules/export-api/SKILL.md', 'modules/recette/SKILL.md']) { const texte = fs.readFileSync(module, 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); vus.add(m[1]); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (conforme === false) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } } for (const f of Object.keys(attendu)) { if (vus.has(f) === false) { ecarts++; console.log('ABSENT    ' + f); } } if (ecarts > 0) process.exitCode = 1;"
+node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'package.json': '583f34df011bd073096782d08aae5baa971f40db0481f349d262c9bed4bb23a1', 'package-lock.json': 'abb2891317bd04289350dc10e3ea4e5acca90881568bbdf0db33de0af35fd253', '.gitignore': 'b163b109241838c4ff48e7cc27de427a4fb4e7f9aebdb16c8a5ad3fbb7a02613', 'scripts/jira-capture-core.mjs': 'b99424fab45483ffbb607bd12c5f50b59c8d3324e6ade3e4feef5b135c77f609', 'scripts/jira-capture-app.mjs': '02ffc1ae5d4cffc2c45e7f0112701564c5f36e00435e53194e49712e5e57c439', 'scripts/public/capture.html': '0a42f8ad4f4c21bb4d8e9f3f15d437e9622e63fab1d23971d3fdf38a3b98c25a', 'scripts/jira-capture-mhtml.mjs': '1aa5f7399a3e19d7a52bb10bec6ce3e3c66162521ff3941a6d32837176763d5c', 'agent/capteur-sprint.md': 'dee4eb0114f49c29a529a07a21d6e5c5aa0e80e9eb72930a80f8f0122040c37f', 'scripts/jira-sprint-app.mjs': '14005092304d4d368c869d7ee801ca922529848325255054768e86f37c418ea8', 'scripts/public/index.html': 'f69c6d601212d9a7e746181957a8c281f00a3d42decd488de25c54fdbb8abd91', 'scripts/jira_sprint_export.py': '60b6953199cbc21443572212fee36de21adc4522e86feb2215f38ba474b91782', 'tests/fake-jira.mjs': 'eb8de8e8bb1b46ad5a4c6e83cd6f8acdd812a494b8559d017d87b93907d4f83d', 'tests/run-tests.mjs': '9162478c39077d1ce9c9a397cc50e13838a84fd7b03b1ad4fe6a210df12c8d8f' }; const vus = new Set(); let ecarts = 0; for (const module of ['modules/execution/SKILL.md', 'modules/interface/SKILL.md', 'modules/agent/SKILL.md', 'modules/export-api/SKILL.md', 'modules/recette/SKILL.md']) { const texte = fs.readFileSync(module, 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); vus.add(m[1]); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (conforme === false) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } } for (const f of Object.keys(attendu)) { if (vus.has(f) === false) { ecarts++; console.log('ABSENT    ' + f); } } if (ecarts > 0) process.exitCode = 1;"
 ```
 
 Puis, depuis le même dossier :
@@ -112,7 +112,7 @@ npm test
 ```json
 {
   "name": "capture-sprint-jira",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": true,
   "description": "Capture en MHTML des tickets d'un sprint Jira derrière un SSO, rangés par catégorie (skill capture-sprint-jira)",
   "engines": {
@@ -134,13 +134,13 @@ npm test
 ```json
 {
   "name": "capture-sprint-jira",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "lockfileVersion": 3,
   "requires": true,
   "packages": {
     "": {
       "name": "capture-sprint-jira",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "dependencies": {
         "playwright-core": "1.63.0"
       },
@@ -186,6 +186,7 @@ Le module commun porte tout ce que font la capture et le classement ; l'interfac
 | `captureTicket()`, `captureMhtml()`, `pageTimeoutMs()` | capture d'une page de ticket | `capture` |
 | `addSectionLinks()`, `sectionWarnings()`, `parseCategories()`, `normalizeText()` | sections, avertissements, catégories | `classement` |
 | `captureSprintTickets(context, page, options)` | capture complète d'un sprint, rapport | `classement` |
+| `captureSingleTicket()`, `proposedFolder()`, `parseTicketUrl()` | capture d'un ticket seul par son adresse, dossier proposé | `ticket` |
 | `outputFolder()` | dossier de sortie saisi | `interface` |
 
 <!-- fichier : scripts/jira-capture-core.mjs -->
@@ -195,9 +196,10 @@ Le module commun porte tout ce que font la capture et le classement ; l'interfac
 // passe par ce module. Sur la page du sprint, chaque lien /browse/<CLÉ> retenu par le filtre (préfixe, numéros) prend
 // la catégorie de sa section : l'en-tête (IA, DEV…) qui le précède sur la page. La page du ticket est enregistrée en
 // MHTML dans le dossier de cette catégorie. Module commun à jira-capture-app.mjs (interface) et à
-// jira-capture-mhtml.mjs (ligne de commande).
+// jira-capture-mhtml.mjs (ligne de commande). Un ticket se capture aussi seul, par son adresse, dans le dossier
+// que choisit le développeur.
 import { existsSync } from 'node:fs';
-import { mkdir, rm, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright-core';
@@ -586,6 +588,24 @@ export async function captureTicket(context, page, { key, url }, { timeoutMs = p
 // ---------------------------------------------------------------------------------------------
 
 /**
+ * Écrit le MHTML d'un ticket dans `folder`/`dir`, et retire sa copie d'un autre des dossiers `folders` (capture
+ * précédente, rangée ailleurs). Rend la liste des dossiers d'où une copie a été retirée.
+ */
+async function storeTicket(folder, folders, dir, key, data) {
+  await mkdir(join(folder, dir), { recursive: true });
+  await writeFile(join(folder, dir, `${key}.mhtml`), data);
+  const movedFrom = [];
+  for (const other of folders) {
+    const old = join(folder, other, `${key}.mhtml`);
+    if (other !== dir && existsSync(old)) {
+      await rm(old, { force: true });
+      movedFrom.push(other);
+    }
+  }
+  return movedFrom;
+}
+
+/**
  * Capture les tickets de la page du sprint affichée dans `page`, directement dans `folder` :
  *   <catégorie>/<CLÉ>.mhtml   un fichier par ticket retenu, dans le dossier de la section où il figure
  *   à classer/<CLÉ>.mhtml     aucun en-tête de catégorie ne le précède sur la page du sprint
@@ -618,16 +638,7 @@ export async function captureSprintTickets(context, page, {
     try {
       const { data } = await captureTicket(context, page, ticket, { timeoutMs });
       const dir = ticket.section ?? UNCLASSIFIED;
-      await mkdir(join(folder, dir), { recursive: true });
-      await writeFile(join(folder, dir, `${ticket.key}.mhtml`), data);
-      const movedFrom = [];
-      for (const other of folders) { // copie d'une capture précédente, rangée ailleurs
-        const old = join(folder, other, `${ticket.key}.mhtml`);
-        if (other !== dir && existsSync(old)) {
-          await rm(old, { force: true });
-          movedFrom.push(other);
-        }
-      }
+      const movedFrom = await storeTicket(folder, folders, dir, ticket.key, data);
       tickets.push({
         key: ticket.key, url: ticket.url, category: ticket.section, found: ticket.section ? [ticket.section] : [],
         where: ticket.section ? 'section du sprint' : null, excerpt: ticket.excerpt, file: `${dir}/${ticket.key}.mhtml`, movedFrom,
@@ -657,5 +668,92 @@ export async function captureSprintTickets(context, page, {
   await writeFile(join(folder, 'rapport.json'), `${JSON.stringify(report, null, 2)}\n`);
   onProgress({ step: 'fin', done: tickets.length, total: selected.length, key: null });
   return report;
+}
+
+// ---------------------------------------------------------------------------------------------
+// Un ticket seul, par son adresse
+// ---------------------------------------------------------------------------------------------
+
+/** Clé et adresse ramenée à …/browse/<CLÉ> d'une adresse de ticket ; erreur si l'adresse n'en contient pas. */
+export function parseTicketUrl(raw) {
+  let u;
+  try {
+    u = new URL(String(raw ?? '').trim());
+  } catch {
+    throw new Error("Adresse de ticket invalide : …/browse/<CLÉ> attendu");
+  }
+  const m = ['http:', 'https:'].includes(u.protocol) && u.pathname.match(/^(.*\/browse\/)([A-Za-z][A-Za-z0-9_]*-\d+)\/?$/);
+  if (!m) throw new Error("Adresse de ticket invalide : …/browse/<CLÉ> attendu");
+  const key = m[2].toUpperCase();
+  return { key, url: new URL(m[1] + key, u).href };
+}
+
+/** Lit rapport.json dans `folder` ; null s'il manque ou est illisible. */
+async function readReport(folder) {
+  try {
+    return JSON.parse(await readFile(join(folder, 'rapport.json'), 'utf8'));
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Dossier proposé pour un ticket capturé seul : celui où le range le dernier rapport.json de `folder`, s'il y figure
+ * sans erreur, et si ce dossier est encore une des `categories` (ou « à classer ») ; sinon « à classer ».
+ * Rend { key, folder, known } : known dit si le ticket figure dans le rapport.
+ */
+export async function proposedFolder(folder, rawUrl, categories = DEFAULT_CATEGORIES) {
+  const { key } = parseTicketUrl(rawUrl);
+  const entry = (await readReport(folder))?.tickets?.find((t) => t.key === key && !t.error);
+  const dir = entry ? (entry.category ?? UNCLASSIFIED) : UNCLASSIFIED;
+  return { key, folder: [...categories, UNCLASSIFIED].includes(dir) ? dir : UNCLASSIFIED, known: Boolean(entry) };
+}
+
+/**
+ * Capture un ticket seul, par son adresse, dans la session ouverte : mêmes attentes et même MHTML que dans la capture
+ * d'un sprint (captureTicket). Le fichier va dans `folder`/`category`, une des `categories` ou « à classer », choisi
+ * par le développeur ; une copie rangée dans un autre dossier est retirée. L'entrée du ticket dans rapport.json est
+ * remplacée ou ajoutée, et les décomptes recalculés ; sans rapport, un rapport à ce seul ticket est créé. En cas
+ * d'erreur, rien n'est écrit. La page revient ensuite à l'adresse où elle était. Rend l'entrée du ticket.
+ */
+export async function captureSingleTicket(context, page, {
+  url, folder = DEFAULT_OUT_DIR, category = UNCLASSIFIED, categories = DEFAULT_CATEGORIES, now = new Date(),
+  timeoutMs = pageTimeoutMs(),
+} = {}) {
+  const ticket = parseTicketUrl(url);
+  const folders = [...categories, UNCLASSIFIED];
+  const dir = String(category ?? '').trim() || UNCLASSIFIED;
+  if (!folders.includes(dir)) throw new Error(`Dossier « ${dir} » : une des catégories ou « ${UNCLASSIFIED} » attendu`);
+  const back = page.url();
+  try {
+    const { data } = await captureTicket(context, page, ticket, { timeoutMs });
+    const movedFrom = await storeTicket(folder, folders, dir, ticket.key, data);
+    const chosen = dir === UNCLASSIFIED ? null : dir;
+    const entry = {
+      key: ticket.key, url: ticket.url, category: chosen, found: chosen ? [chosen] : [],
+      where: chosen ? 'choisi par le développeur' : null, excerpt: null, file: `${dir}/${ticket.key}.mhtml`, movedFrom,
+    };
+    const report = (await readReport(folder)) ?? {
+      date: now.toISOString(), sprintUrl: null, folder, filter: { prefix: '', min: null, max: null }, categories,
+      markers: Object.fromEntries(categories.map((c) => [c, 0])), listed: 0, selected: 0, ignored: 0, ignoredSample: [],
+      counts: {}, errors: 0, aborted: false, tickets: [],
+    };
+    const i = report.tickets.findIndex((t) => t.key === ticket.key);
+    if (i >= 0) report.tickets[i] = entry;
+    else {
+      report.tickets.push(entry);
+      report.selected += 1;
+    }
+    const counts = Object.fromEntries([...new Set([...(report.categories ?? []), ...folders])].map((c) => [c, 0]));
+    for (const t of report.tickets) if (!t.error) counts[t.category ?? UNCLASSIFIED] = (counts[t.category ?? UNCLASSIFIED] ?? 0) + 1;
+    report.counts = counts;
+    report.errors = report.tickets.filter((t) => t.error).length;
+    await writeFile(join(folder, 'rapport.json'), `${JSON.stringify(report, null, 2)}\n`);
+    return entry;
+  } finally {
+    if (!page.isClosed() && back && back !== page.url()) {
+      await page.goto(back, { waitUntil: 'domcontentloaded', timeout: 60_000 }).catch(() => {});
+    }
+  }
 }
 ```

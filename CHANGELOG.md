@@ -4,6 +4,15 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-10-28 : capture-sprint-jira 1.2.0
+
+- **capture-sprint-jira 1.2.0** : capture d'un ticket seul par son adresse, à la demande du développeur, pour recapturer ou ajouter un ticket sans relancer le sprint.
+  - D12, active, module `ticket` : l'adresse `…/browse/<CLÉ>` est ramenée à sa clé, une adresse sans clé est refusée ; la page est attendue et enregistrée comme dans la capture du sprint. Le dossier est choisi par le développeur parmi les catégories et `à classer`, proposé d'après le dernier `rapport.json` du dossier de sortie ; la copie d'un autre dossier est retirée ; l'entrée du rapport est remplacée ou ajoutée, avec le choix noté, ou le rapport est créé ; rien n'est écrit en cas d'erreur ; le navigateur revient à la page d'avant.
+  - Interface : section « Un ticket seul », `POST /api/ticket` et `GET /api/section`. Ligne de commande : `--ticket` et `--dossier`. Agent : protocole du ticket seul, scénario A6.
+- Point d'extension E2 : `captureSingleTicket()` exportée. Au total : 12 modules, 39 invariants, dont les six de D5, qui ne sont plus en vigueur, 20 scénarios de recette (130 contrôles).
+- Essayé avec Node 20.20.2 et 22.23.4, Chrome for Testing 153, Google Chrome 156 et Python 3.13 : 130 contrôles sur 130, après extraction depuis la transmission 1.2.0. Dix-sept défauts réintroduits un à un font chacun échouer le scénario attendu.
+- Version 1.1.0 archivée sous `specs/capture-sprint-jira/archives/SKILL-v1.1.0.md` ; sa transmission reste telle qu'elle a été publiée. README mis à jour.
+
 ### 2026-10-28 : capture-sprint-jira 1.1.0
 
 - **capture-sprint-jira 1.1.0** : classement par section de la page du sprint. Après vérification sur son Jira, le développeur précise que les deux parties du sprint s'annoncent sur la page du sprint par un `<span>IA</span>` et un `<span>DEV</span>`, et non dans la page de chaque ticket, et que les dossiers prennent ces noms.
