@@ -18,7 +18,7 @@ npm test
 - Python : la variable `PYTHON`, à défaut `py` sous Windows et `python3` ailleurs ; s'il manque, R7 est sauté.
 - La recette travaille sur un profil et des dossiers temporaires : la session et les captures du dossier du skill ne sont pas touchées. Elle efface ses dossiers temporaires si tout passe ; sinon, ou avec `KEEP_TMP=1`, elle les garde et en donne le chemin, avec une capture d'écran de l'interface.
 - Durée : environ 3 min 40 s, dont 46 s pour la capture du backlog chargé au défilement et 53 s pour le backlog virtualisé.
-- Bilan attendu : `19 scénarios, 108 contrôles, 108 réussis, 0 en échec, 0 sautés` ; sans Python, `104 contrôles, 103 réussis, 0 en échec, 1 sautés`, R7 étant sauté.
+- Bilan attendu : `19 scénarios, 110 contrôles, 110 réussis, 0 en échec, 0 sautés` ; sans Python, `106 contrôles, 105 réussis, 0 en échec, 1 sautés`, R7 étant sauté.
 
 ## 2. Le faux Jira
 
@@ -59,7 +59,7 @@ npm test
 | R12 | Navigateur rouvert sans nouveau passage par le SSO | D2.INV-2 |
 | R13 | Backlog virtualisé, dans une zone de 300 pixels : mêmes contrôles que R10 | D3.INV-1, D4.INV-1, D5.INV-3 |
 | R14 | Cinq tickets à session expirée : trois erreurs, capture arrêtée, navigateur gardé ouvert | D4.INV-1, D4.INV-4, D6.INV-4 |
-| R15 | « Fermer le navigateur » pendant la capture : capture arrêtée, rapport partiel | D4.INV-4, D6.INV-2 |
+| R15 | « Fermer le navigateur » pendant le relevé : capture arrêtée sans rapport, avec un message qui le dit ; puis pendant la capture des tickets : capture arrêtée, rapport partiel | D4.INV-4, D6.INV-2 |
 | R16 | Page de l'interface pilotée comme par le développeur : bouton activé, avancement, boutons bloqués, bilan, résumé, une ligne par ticket, avertissement, valeurs retrouvées après rechargement | D6.INV-2, D6.INV-3 |
 | R17 | Ligne de commande : adresse manquante et numéro invalide (code 2), un ticket capturé directement dans le dossier (code 0), un ticket en erreur (code 1) | D6.INV-5, D4.INV-1 |
 | R18 | Point d'extension E1 : champs du rapport, d'un ticket capturé, d'un ticket en erreur | D5.INV-6 |
@@ -76,7 +76,7 @@ Sept défauts, réintroduits un à un dans le code, font chacun échouer la rece
 | M3 | le classement lit toute la page, navigation comprise : le menu latéral classe les tickets sans terme et rend les autres ambigus | R10, R11, R13, R16 | 14 |
 | M4 | l'origine des requêtes n'est plus contrôlée | R8 | 1 |
 | M5 | une page est enregistrée sans vérifier qu'elle est celle du ticket : la page de connexion prend le nom du ticket | R10, R11, R13, R14, R16, R17, R18 | 17 |
-| M6 | les liens ne sont relevés qu'avant le défilement : seuls les premiers tickets du backlog sont vus | R10, R11, R13, R15, R16, R17, R18 | 44 |
+| M6 | les liens ne sont relevés qu'avant le défilement : seuls les premiers tickets du backlog sont vus | R10, R11, R13, R15, R16, R17, R18 | 45 |
 | M7 | pas de défilement fixe de 1 200 pixels, plus grand que la zone affichée : des cartes de la liste virtualisée sont sautées | R13 | 1 |
 
 Chaque défaut a été retiré après son essai ; la recette du code publié passe en entier.
@@ -657,12 +657,21 @@ try {
 
   scenario('R15', 'arrêt par « Fermer le navigateur »');
   await post(port, '/api/open', { url: backlog });
+  await post(port, '/api/capture', { ...filter, folder: join(TMP, 'sortie-fermee-au-releve') });
+  await sleep(1000); // pendant le relevé de la page du sprint
+  await post(port, '/api/close', {});
+  status = await waitForJob(port);
+  check('fermé pendant le relevé : capture arrêtée, sans rapport, et dit', status.job.state === 'failed'
+    && /fermé pendant le relevé/.test(status.job.error ?? '') && !status.job.report, status.job.error ?? status.job.state);
+  await post(port, '/api/open', { url: backlog });
   await post(port, '/api/capture', { ...filter, folder: join(TMP, 'sortie-arretee') });
-  for (let i = 0; i < 120; i++) { // attend le deuxième ticket
+  let second = false;
+  for (let i = 0; i < 480 && !second; i++) { // attend le deuxième ticket, deux minutes au plus
     const { json } = await request(port, { path: '/api/status' });
-    if (json.job.step === 'tickets' && json.job.done >= 1) break;
-    await sleep(250);
+    second = json.job.step === 'tickets' && json.job.done >= 1;
+    if (!second) await sleep(250);
   }
+  check('deuxième ticket atteint', second);
   r = await post(port, '/api/close', {});
   check('la fermeture arrête la capture', r.status === 200 && /arrêtée/.test(r.json?.message ?? ''), r.json?.message);
   status = await waitForJob(port);
@@ -682,10 +691,10 @@ try {
     await page.fill('#min', '3500');
     await page.fill('#max', '4500');
     await page.fill('#folder', join(TMP, 'interface'));
-    await page.click('#open');
+    await page.click('#open', { timeout: 10_000 }).catch(() => {});
     const opened = await waitUi(() => /ouvert sur le sprint/.test(document.getElementById('status').textContent), 30_000);
     check("« Capturer les tickets » activé après l'ouverture", opened && await page.isEnabled('#capture'));
-    await page.click('#capture');
+    await page.click('#capture', { timeout: 10_000 }).catch(() => {});
     const progress = await waitUi(() => /^Ticket \d+ sur 8 : DEMO/.test(document.getElementById('status').textContent), 60_000);
     check('avancement affiché, boutons bloqués', progress && await page.isVisible('#progress') && await page.isDisabled('#open') && await page.isDisabled('#capture'));
     await waitUi(() => !document.getElementById('report').hidden, 180_000);

@@ -25,7 +25,7 @@ Lis `SKILL.md`, `manifest.json`, puis les modules actifs dans l'ordre indiqué p
 1. Depuis le dossier du skill, écris les fichiers exécutables à partir des blocs annotés des modules, par la commande d'extraction du module `execution`, § 8. Elle se colle telle quelle dans bash, CMD ou PowerShell. Ne recopie pas les fichiers à la main.
 2. La commande vérifie elle-même leurs empreintes : elle écrit `conforme` pour chaque fichier, ou `ECART` ou `ABSENT`, et sort alors avec le code 1. Un écart arrête l'installation.
 3. Vérifie la version de Node (20 ou plus récent), puis installe la dépendance : `npm ci`. Elle ne télécharge aucun navigateur ; Chrome doit être installé sur le poste (module `execution`, § 2).
-4. Lance la recette : `npm test` ; sous Linux sans écran, `xvfb-run -a npm test`. Attendu : 19 scénarios, 108 contrôles réussis, aucun échec ; sans Python, R7 est sauté. Rapporte au développeur le bilan ; un échec arrête l'installation et se rapporte tel quel, sans modifier les scripts.
+4. Lance la recette : `npm test` ; sous Linux sans écran, `xvfb-run -a npm test`. Attendu : 19 scénarios, 110 contrôles réussis, aucun échec ; sans Python, R7 est sauté. Rapporte au développeur le bilan ; un échec arrête l'installation et se rapporte tel quel, sans modifier les scripts.
 
 ## Étape 3 : l'agent
 
@@ -194,7 +194,7 @@ Points d'extension, actifs depuis la version indiquée :
 
 ## 8. Critères d'acceptation
 
-- La recette du module `recette` passe en entier : `npm test`, 19 scénarios et 108 contrôles avec Python ; sans Python, R7 est sauté.
+- La recette du module `recette` passe en entier : `npm test`, 19 scénarios et 110 contrôles avec Python ; sans Python, R7 est sauté.
 - La recette passe en intégration continue sur `ubuntu-latest` et `windows-latest`, avec Node 20 et Node 22, après extraction par la commande du module `execution`, § 8, sous bash et sous CMD, puis `npm ci`.
 - Les fichiers tirés des modules ont exactement les empreintes de la table du module `execution`, § 8.
 - Les scénarios A1 à A5 du module `agent` sont rejoués avec le développeur avant que l'agent capture un sprint réel.
@@ -224,7 +224,7 @@ Points d'extension, actifs depuis la version indiquée :
 - **D4.INV-1** : une page n'est capturée que si elle est celle du ticket : adresse `…/browse/<CLÉ>` ou titre qui la contient, et clé affichée ; sinon, passé le délai, le ticket est en erreur et rien n'est écrit pour lui.
 - **D4.INV-2** : avant la capture, la page du ticket défile tant que son texte s'allonge, puis attend qu'il ne change plus : un contenu chargé à l'affichage figure dans le fichier.
 - **D4.INV-3** : chaque fichier est un MHTML de Chrome, au format « Page Web, un seul fichier » d'« Enregistrer sous… », nommé par la clé du ticket.
-- **D4.INV-4** : une erreur n'arrête pas la capture ; trois erreurs de suite, ou la fermeture du navigateur, l'arrêtent ; le rapport dit ce qui a été capturé et que la capture s'est arrêtée.
+- **D4.INV-4** : une erreur n'arrête pas la capture ; trois erreurs de suite, ou la fermeture du navigateur, l'arrêtent ; le rapport dit ce qui a été capturé et que la capture s'est arrêtée ; fermé pendant le relevé, avant tout ticket, le navigateur arrête la capture sans rapport, avec un message qui le dit.
 
 **D5 : classement**
 
@@ -270,7 +270,7 @@ Le préfixe, les numéros et l'adresse du Jira du développeur ne figurent dans 
 
 ## 11. Journal de révision
 
-**1.0.0** (2026-10-28) : première version. Dimensions D1 à D8 actives, D9 et D10 réservées. Points d'extension E1 et E2. Module commun, interface, ligne de commande, exports par l'API, recette de 19 scénarios (108 contrôles) contre un faux Jira local et agent `capteur-sprint`, écrits en entier dans les modules `execution`, `interface`, `export-api`, `recette` et `agent`. Tirée des outils du dossier `utils/` de `geminiboard-cadrage` (section 10).
+**1.0.0** (2026-10-28) : première version. Dimensions D1 à D8 actives, D9 et D10 réservées. Points d'extension E1 et E2. Module commun, interface, ligne de commande, exports par l'API, recette de 19 scénarios (110 contrôles) contre un faux Jira local et agent `capteur-sprint`, écrits en entier dans les modules `execution`, `interface`, `export-api`, `recette` et `agent`. Tirée des outils du dossier `utils/` de `geminiboard-cadrage` (section 10).
 <<<FIN SKILL.md>>>
 
 <<<FICHIER modules/execution/SKILL.md>>>
@@ -357,7 +357,7 @@ Treize fichiers sont tirés des blocs annotés `<!-- fichier : chemin -->` des m
 | `package-lock.json` | `execution`, § 9 | `80d7bb928817d7ca7ba7600b5292371ad49fa95d25c5af0316766f2a675c788a` |
 | `.gitignore` | `execution`, § 9 | `b163b109241838c4ff48e7cc27de427a4fb4e7f9aebdb16c8a5ad3fbb7a02613` |
 | `scripts/jira-capture-core.mjs` | `execution`, § 10 | `173c7b918feec11b3f271c3146c0ac2e30b0015793b8ee75eea9b4548c087f4d` |
-| `scripts/jira-capture-app.mjs` | `interface`, § 8 | `07dab20b9b5ea116e1be03d228709896c46439fff26c9fb7bc81eb8de9a6f8f5` |
+| `scripts/jira-capture-app.mjs` | `interface`, § 8 | `a9745efa6c2d34fc7600173f732628716b5b35ceb3658e2cead55602eebc40d3` |
 | `scripts/public/capture.html` | `interface`, § 8 | `f8c7a637f8c2dafc62b9b360e9eb504f24d59d86667c27904059f213081e3abb` |
 | `scripts/jira-capture-mhtml.mjs` | `interface`, § 8 | `ad9a2a8d7926b215366ad9d8564527428657f8116ca18d759b52084662b88779` |
 | `agent/capteur-sprint.md` | `agent`, § 7 | `758d783b13566506f00f7a52405a49adfc7543ad23adcc6d526bec0efb23ef9c` |
@@ -365,12 +365,12 @@ Treize fichiers sont tirés des blocs annotés `<!-- fichier : chemin -->` des m
 | `scripts/public/index.html` | `export-api`, § 6 | `f69c6d601212d9a7e746181957a8c281f00a3d42decd488de25c54fdbb8abd91` |
 | `scripts/jira_sprint_export.py` | `export-api`, § 6 | `60b6953199cbc21443572212fee36de21adc4522e86feb2215f38ba474b91782` |
 | `tests/fake-jira.mjs` | `recette`, § 6 | `8264199f3020af430970c17cae538f115287a3bba8b69b67729351927c5a663f` |
-| `tests/run-tests.mjs` | `recette`, § 6 | `22de1b311e48fcefac770db87920cebbdde5407e41ee7ad299271e4da405cb55` |
+| `tests/run-tests.mjs` | `recette`, § 6 | `fb8eeb2fc1a73ec4d04338b1a2da8379fca7cc833ea9598f31626866bce5f526` |
 
 Depuis le dossier du skill, cette commande d'une ligne écrit les treize fichiers, compare leurs empreintes à celles du tableau et sort avec le code 1 au moindre écart ou à la moindre absence. Elle ne contient ni `$`, ni accent grave, ni `!`, ni `%`, ni guillemet intérieur : elle se colle telle quelle dans bash, zsh, CMD ou PowerShell, et dans un fichier `.cmd`. Elle lit aussi des modules aux fins de ligne CRLF.
 
 ```text
-node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'package.json': '7493a4af4ad23c1e13b92c66ba242c9bca40b3be0f9ba8ab77434c924306eb77', 'package-lock.json': '80d7bb928817d7ca7ba7600b5292371ad49fa95d25c5af0316766f2a675c788a', '.gitignore': 'b163b109241838c4ff48e7cc27de427a4fb4e7f9aebdb16c8a5ad3fbb7a02613', 'scripts/jira-capture-core.mjs': '173c7b918feec11b3f271c3146c0ac2e30b0015793b8ee75eea9b4548c087f4d', 'scripts/jira-capture-app.mjs': '07dab20b9b5ea116e1be03d228709896c46439fff26c9fb7bc81eb8de9a6f8f5', 'scripts/public/capture.html': 'f8c7a637f8c2dafc62b9b360e9eb504f24d59d86667c27904059f213081e3abb', 'scripts/jira-capture-mhtml.mjs': 'ad9a2a8d7926b215366ad9d8564527428657f8116ca18d759b52084662b88779', 'agent/capteur-sprint.md': '758d783b13566506f00f7a52405a49adfc7543ad23adcc6d526bec0efb23ef9c', 'scripts/jira-sprint-app.mjs': '14005092304d4d368c869d7ee801ca922529848325255054768e86f37c418ea8', 'scripts/public/index.html': 'f69c6d601212d9a7e746181957a8c281f00a3d42decd488de25c54fdbb8abd91', 'scripts/jira_sprint_export.py': '60b6953199cbc21443572212fee36de21adc4522e86feb2215f38ba474b91782', 'tests/fake-jira.mjs': '8264199f3020af430970c17cae538f115287a3bba8b69b67729351927c5a663f', 'tests/run-tests.mjs': '22de1b311e48fcefac770db87920cebbdde5407e41ee7ad299271e4da405cb55' }; const vus = new Set(); let ecarts = 0; for (const module of ['modules/execution/SKILL.md', 'modules/interface/SKILL.md', 'modules/agent/SKILL.md', 'modules/export-api/SKILL.md', 'modules/recette/SKILL.md']) { const texte = fs.readFileSync(module, 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); vus.add(m[1]); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (conforme === false) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } } for (const f of Object.keys(attendu)) { if (vus.has(f) === false) { ecarts++; console.log('ABSENT    ' + f); } } if (ecarts > 0) process.exitCode = 1;"
+node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'package.json': '7493a4af4ad23c1e13b92c66ba242c9bca40b3be0f9ba8ab77434c924306eb77', 'package-lock.json': '80d7bb928817d7ca7ba7600b5292371ad49fa95d25c5af0316766f2a675c788a', '.gitignore': 'b163b109241838c4ff48e7cc27de427a4fb4e7f9aebdb16c8a5ad3fbb7a02613', 'scripts/jira-capture-core.mjs': '173c7b918feec11b3f271c3146c0ac2e30b0015793b8ee75eea9b4548c087f4d', 'scripts/jira-capture-app.mjs': 'a9745efa6c2d34fc7600173f732628716b5b35ceb3658e2cead55602eebc40d3', 'scripts/public/capture.html': 'f8c7a637f8c2dafc62b9b360e9eb504f24d59d86667c27904059f213081e3abb', 'scripts/jira-capture-mhtml.mjs': 'ad9a2a8d7926b215366ad9d8564527428657f8116ca18d759b52084662b88779', 'agent/capteur-sprint.md': '758d783b13566506f00f7a52405a49adfc7543ad23adcc6d526bec0efb23ef9c', 'scripts/jira-sprint-app.mjs': '14005092304d4d368c869d7ee801ca922529848325255054768e86f37c418ea8', 'scripts/public/index.html': 'f69c6d601212d9a7e746181957a8c281f00a3d42decd488de25c54fdbb8abd91', 'scripts/jira_sprint_export.py': '60b6953199cbc21443572212fee36de21adc4522e86feb2215f38ba474b91782', 'tests/fake-jira.mjs': '8264199f3020af430970c17cae538f115287a3bba8b69b67729351927c5a663f', 'tests/run-tests.mjs': 'fb8eeb2fc1a73ec4d04338b1a2da8379fca7cc833ea9598f31626866bce5f526' }; const vus = new Set(); let ecarts = 0; for (const module of ['modules/execution/SKILL.md', 'modules/interface/SKILL.md', 'modules/agent/SKILL.md', 'modules/export-api/SKILL.md', 'modules/recette/SKILL.md']) { const texte = fs.readFileSync(module, 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); vus.add(m[1]); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (conforme === false) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } } for (const f of Object.keys(attendu)) { if (vus.has(f) === false) { ecarts++; console.log('ABSENT    ' + f); } } if (ecarts > 0) process.exitCode = 1;"
 ```
 
 Puis, depuis le même dossier :
@@ -996,7 +996,7 @@ Il vérifie ces conditions toutes les 400 ms, en tolérant les navigations en co
 
 - Une erreur sur un ticket est notée dans le rapport, avec son message ; la capture passe au ticket suivant.
 - Trois erreurs de suite arrêtent la capture : c'est presque toujours une session expirée, et les tickets suivants échoueraient de même. Le rapport le dit (`aborted`), et le navigateur reste ouvert sur le sprint pour se reconnecter (D6.INV-4).
-- Fermer le navigateur, par le bouton de l'interface ou à la main, arrête aussi la capture ; le rapport garde ce qui a été capturé.
+- Fermer le navigateur, par le bouton de l'interface ou à la main, arrête aussi la capture ; le rapport garde ce qui a été capturé. Fermé pendant le relevé, avant le premier ticket, il n'y a rien à rapporter : l'interface affiche « Capture arrêtée : le navigateur a été fermé pendant le relevé des tickets, avant toute capture ».
 
 ## 5. Durée
 
@@ -1142,7 +1142,7 @@ Aucun identifiant ne passe par l'interface : la page n'a aucun champ d'identifia
 
 - Une seule capture à la fois : une seconde demande est refusée (409).
 - L'avancement se lit par `GET /api/status`, que la page interroge chaque seconde. Rechargée, la page reprend l'affichage d'une capture en cours.
-- Fermer le navigateur, par le bouton ou à la main, arrête la capture : le rapport partiel reste affiché (D4.INV-4).
+- Fermer le navigateur, par le bouton ou à la main, arrête la capture : le rapport partiel reste affiché ; fermé pendant le relevé, avant le premier ticket, un message le dit, sans rapport (D4.INV-4).
 - Sans erreur, le navigateur se ferme à la fin. Après une erreur ou un arrêt, il reste ouvert et revient à la page du sprint : le développeur vérifie sa session, puis relance la capture dans le même dossier, qui remplace les fichiers des tickets recapturés (D5.INV-4).
 
 ## 5. Ligne de commande (D6.INV-5)
@@ -1302,8 +1302,12 @@ function startCapture(body) {
     else if (!page.isClosed()) await page.goto(report.sprintUrl, { waitUntil: 'domcontentloaded' }).catch(() => {});
     Object.assign(current, { state: 'done', report });
   }).catch((err) => {
-    console.error(err);
-    Object.assign(current, { state: 'failed', error: `Capture interrompue (${firstLine(err)})` });
+    // Navigateur fermé pendant le relevé, avant tout ticket : rien n'a été capturé, il n'y a pas de rapport
+    const error = page.isClosed()
+      ? 'Capture arrêtée : le navigateur a été fermé pendant le relevé des tickets, avant toute capture'
+      : `Capture interrompue (${firstLine(err)})`;
+    if (!page.isClosed()) console.error(err);
+    Object.assign(current, { state: 'failed', error });
   });
 }
 
@@ -2512,7 +2516,7 @@ npm test
 - Python : la variable `PYTHON`, à défaut `py` sous Windows et `python3` ailleurs ; s'il manque, R7 est sauté.
 - La recette travaille sur un profil et des dossiers temporaires : la session et les captures du dossier du skill ne sont pas touchées. Elle efface ses dossiers temporaires si tout passe ; sinon, ou avec `KEEP_TMP=1`, elle les garde et en donne le chemin, avec une capture d'écran de l'interface.
 - Durée : environ 3 min 40 s, dont 46 s pour la capture du backlog chargé au défilement et 53 s pour le backlog virtualisé.
-- Bilan attendu : `19 scénarios, 108 contrôles, 108 réussis, 0 en échec, 0 sautés` ; sans Python, `104 contrôles, 103 réussis, 0 en échec, 1 sautés`, R7 étant sauté.
+- Bilan attendu : `19 scénarios, 110 contrôles, 110 réussis, 0 en échec, 0 sautés` ; sans Python, `106 contrôles, 105 réussis, 0 en échec, 1 sautés`, R7 étant sauté.
 
 ## 2. Le faux Jira
 
@@ -2553,7 +2557,7 @@ npm test
 | R12 | Navigateur rouvert sans nouveau passage par le SSO | D2.INV-2 |
 | R13 | Backlog virtualisé, dans une zone de 300 pixels : mêmes contrôles que R10 | D3.INV-1, D4.INV-1, D5.INV-3 |
 | R14 | Cinq tickets à session expirée : trois erreurs, capture arrêtée, navigateur gardé ouvert | D4.INV-1, D4.INV-4, D6.INV-4 |
-| R15 | « Fermer le navigateur » pendant la capture : capture arrêtée, rapport partiel | D4.INV-4, D6.INV-2 |
+| R15 | « Fermer le navigateur » pendant le relevé : capture arrêtée sans rapport, avec un message qui le dit ; puis pendant la capture des tickets : capture arrêtée, rapport partiel | D4.INV-4, D6.INV-2 |
 | R16 | Page de l'interface pilotée comme par le développeur : bouton activé, avancement, boutons bloqués, bilan, résumé, une ligne par ticket, avertissement, valeurs retrouvées après rechargement | D6.INV-2, D6.INV-3 |
 | R17 | Ligne de commande : adresse manquante et numéro invalide (code 2), un ticket capturé directement dans le dossier (code 0), un ticket en erreur (code 1) | D6.INV-5, D4.INV-1 |
 | R18 | Point d'extension E1 : champs du rapport, d'un ticket capturé, d'un ticket en erreur | D5.INV-6 |
@@ -2570,7 +2574,7 @@ Sept défauts, réintroduits un à un dans le code, font chacun échouer la rece
 | M3 | le classement lit toute la page, navigation comprise : le menu latéral classe les tickets sans terme et rend les autres ambigus | R10, R11, R13, R16 | 14 |
 | M4 | l'origine des requêtes n'est plus contrôlée | R8 | 1 |
 | M5 | une page est enregistrée sans vérifier qu'elle est celle du ticket : la page de connexion prend le nom du ticket | R10, R11, R13, R14, R16, R17, R18 | 17 |
-| M6 | les liens ne sont relevés qu'avant le défilement : seuls les premiers tickets du backlog sont vus | R10, R11, R13, R15, R16, R17, R18 | 44 |
+| M6 | les liens ne sont relevés qu'avant le défilement : seuls les premiers tickets du backlog sont vus | R10, R11, R13, R15, R16, R17, R18 | 45 |
 | M7 | pas de défilement fixe de 1 200 pixels, plus grand que la zone affichée : des cartes de la liste virtualisée sont sautées | R13 | 1 |
 
 Chaque défaut a été retiré après son essai ; la recette du code publié passe en entier.
@@ -3151,12 +3155,21 @@ try {
 
   scenario('R15', 'arrêt par « Fermer le navigateur »');
   await post(port, '/api/open', { url: backlog });
+  await post(port, '/api/capture', { ...filter, folder: join(TMP, 'sortie-fermee-au-releve') });
+  await sleep(1000); // pendant le relevé de la page du sprint
+  await post(port, '/api/close', {});
+  status = await waitForJob(port);
+  check('fermé pendant le relevé : capture arrêtée, sans rapport, et dit', status.job.state === 'failed'
+    && /fermé pendant le relevé/.test(status.job.error ?? '') && !status.job.report, status.job.error ?? status.job.state);
+  await post(port, '/api/open', { url: backlog });
   await post(port, '/api/capture', { ...filter, folder: join(TMP, 'sortie-arretee') });
-  for (let i = 0; i < 120; i++) { // attend le deuxième ticket
+  let second = false;
+  for (let i = 0; i < 480 && !second; i++) { // attend le deuxième ticket, deux minutes au plus
     const { json } = await request(port, { path: '/api/status' });
-    if (json.job.step === 'tickets' && json.job.done >= 1) break;
-    await sleep(250);
+    second = json.job.step === 'tickets' && json.job.done >= 1;
+    if (!second) await sleep(250);
   }
+  check('deuxième ticket atteint', second);
   r = await post(port, '/api/close', {});
   check('la fermeture arrête la capture', r.status === 200 && /arrêtée/.test(r.json?.message ?? ''), r.json?.message);
   status = await waitForJob(port);
@@ -3176,10 +3189,10 @@ try {
     await page.fill('#min', '3500');
     await page.fill('#max', '4500');
     await page.fill('#folder', join(TMP, 'interface'));
-    await page.click('#open');
+    await page.click('#open', { timeout: 10_000 }).catch(() => {});
     const opened = await waitUi(() => /ouvert sur le sprint/.test(document.getElementById('status').textContent), 30_000);
     check("« Capturer les tickets » activé après l'ouverture", opened && await page.isEnabled('#capture'));
-    await page.click('#capture');
+    await page.click('#capture', { timeout: 10_000 }).catch(() => {});
     const progress = await waitUi(() => /^Ticket \d+ sur 8 : DEMO/.test(document.getElementById('status').textContent), 60_000);
     check('avancement affiché, boutons bloqués', progress && await page.isVisible('#progress') && await page.isDisabled('#open') && await page.isDisabled('#capture'));
     await waitUi(() => !document.getElementById('report').hidden, 180_000);
@@ -3301,15 +3314,15 @@ Le développeur prévoit d'intégrer le skill à Gemini CLI depuis GeminiBoard. 
 Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichiers ont été matérialisés.
 
     e2a100648b6f3b20bb4d6e9cce3988bffab7a8f634de73e13e03d9f1ca8e88c2  manifest.json
-    5e447ffde4db2ef6e3e72638f7b2a74322b96a0c62ade6b79604f61568c18ea4  SKILL.md
-    46546d9da67bbae912933237be1e5448fd76e46c01ab8d36fcb5d289f97b0966  modules/execution/SKILL.md
+    5a142faff8571e57e1c12f3960464cff2cefe401f5be4d833606935672d80e6e  SKILL.md
+    5377e3b9a8765222798bf73a96fcefccbf2cf70d6c8000ed1a5ecaa4387f8728  modules/execution/SKILL.md
     fe7f3e89a693889c3cf0c1e97f7bfa8d2c01f3ec5da6c56ddf56f10e949bfb8b  modules/session/SKILL.md
     4ddc43cbed3cee279a524a56703b1d129abebda7230d46ae325b11b1978cee8a  modules/releve/SKILL.md
-    6e3ef43ae8a3b88ab5398d4c21ecc9e533f41dd3bf462bbc900229458ffb3b53  modules/capture/SKILL.md
+    48e45e5147c815fcf309b8a719d3151473b5f3859cbbb5f9a28c9bad1dcb393d  modules/capture/SKILL.md
     075cab0e4c49d0b5622bc5806b03b95c6eeafc60785eef501dce23166ea9df8e  modules/classement/SKILL.md
-    93df16f2229d7bf048e767315b8f72a2a29921f0c955af37d191801da005688c  modules/interface/SKILL.md
+    dc4965c4e3ceda993412ee58c4f14e4623e5e7cc3c28f765775b7fc710ef5087  modules/interface/SKILL.md
     1d21fe8ed58b668d401847aec725f122051798cbe75ad92e0c9f23b1ba465e15  modules/agent/SKILL.md
     ce5aa772b75fa711d8d80e58325c410ce6231b5a1795761b16738d00a5d0f462  modules/export-api/SKILL.md
-    d847e37500dc023e892e8de02ae69526b67c5c23cc75727906fb9c59afd659a3  modules/recette/SKILL.md
+    b46369cd48e0e9c6d1cc53240d588d390522c1c2029832d7d93439f118aee1f5  modules/recette/SKILL.md
     f8839f9774c2099a9a8ed4259f5e461b7d0f9b8c424a664dfdcb9ff90af4f3e8  modules/remise/SKILL.md
     469e7591327de004f79be36da387704962de141bb04345e3e9c8ca27b07a43a8  modules/pilotage/SKILL.md
