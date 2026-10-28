@@ -80,7 +80,7 @@ Treize fichiers sont tirés des blocs annotés `<!-- fichier : chemin -->` des m
 | `package.json` | `execution`, § 9 | `e01fa603cc88fab8699767cc10f2451bce6b9d54e02462ee863b10a7b65960ad` |
 | `package-lock.json` | `execution`, § 9 | `28c00829c50edb775801fc626de22df4bfc1161621cfe1bfcc612a5153b10434` |
 | `.gitignore` | `execution`, § 9 | `b163b109241838c4ff48e7cc27de427a4fb4e7f9aebdb16c8a5ad3fbb7a02613` |
-| `scripts/jira-capture-core.mjs` | `execution`, § 10 | `1ee8c6ffd07cd8ed7777253c3b89f5a438215a9f127301ffca32ed2fe9be4b19` |
+| `scripts/jira-capture-core.mjs` | `execution`, § 10 | `832d84831bb1ce776fecd459bab1345a79dd49208aa540202f2e37b465866180` |
 | `scripts/jira-capture-app.mjs` | `interface`, § 8 | `5e4dc65d1e3a51bbf4fd2dabfafcf0ef2c97d48ae17ea4571532bec05d2c76bd` |
 | `scripts/public/capture.html` | `interface`, § 8 | `75a01f40c2a3c70922eb75cd6150e600fea9d7cfe1c88fb0a7e0791cdbd48674` |
 | `scripts/jira-capture-mhtml.mjs` | `interface`, § 8 | `3bc8af65e15e703d1aff04efff70ca3f276e2bce128d9add1b705e3bf12fc02e` |
@@ -89,12 +89,12 @@ Treize fichiers sont tirés des blocs annotés `<!-- fichier : chemin -->` des m
 | `scripts/public/index.html` | `export-api`, § 6 | `f69c6d601212d9a7e746181957a8c281f00a3d42decd488de25c54fdbb8abd91` |
 | `scripts/jira_sprint_export.py` | `export-api`, § 6 | `60b6953199cbc21443572212fee36de21adc4522e86feb2215f38ba474b91782` |
 | `tests/fake-jira.mjs` | `recette`, § 6 | `eb8de8e8bb1b46ad5a4c6e83cd6f8acdd812a494b8559d017d87b93907d4f83d` |
-| `tests/run-tests.mjs` | `recette`, § 6 | `714aa4450678f3cd2a5ac090ab1e99465706cd7962a1cf5f27d0a3649fcbd6a6` |
+| `tests/run-tests.mjs` | `recette`, § 6 | `7e2be5605a254977b236f4a1c6543c5cf2441c4c0a91fd36805c5579cceccc8f` |
 
 Depuis le dossier du skill, cette commande d'une ligne écrit les treize fichiers, compare leurs empreintes à celles du tableau et sort avec le code 1 au moindre écart ou à la moindre absence. Elle ne contient ni `$`, ni accent grave, ni `!`, ni `%`, ni guillemet intérieur : elle se colle telle quelle dans bash, zsh, CMD ou PowerShell, et dans un fichier `.cmd`. Elle lit aussi des modules aux fins de ligne CRLF.
 
 ```text
-node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'package.json': 'e01fa603cc88fab8699767cc10f2451bce6b9d54e02462ee863b10a7b65960ad', 'package-lock.json': '28c00829c50edb775801fc626de22df4bfc1161621cfe1bfcc612a5153b10434', '.gitignore': 'b163b109241838c4ff48e7cc27de427a4fb4e7f9aebdb16c8a5ad3fbb7a02613', 'scripts/jira-capture-core.mjs': '1ee8c6ffd07cd8ed7777253c3b89f5a438215a9f127301ffca32ed2fe9be4b19', 'scripts/jira-capture-app.mjs': '5e4dc65d1e3a51bbf4fd2dabfafcf0ef2c97d48ae17ea4571532bec05d2c76bd', 'scripts/public/capture.html': '75a01f40c2a3c70922eb75cd6150e600fea9d7cfe1c88fb0a7e0791cdbd48674', 'scripts/jira-capture-mhtml.mjs': '3bc8af65e15e703d1aff04efff70ca3f276e2bce128d9add1b705e3bf12fc02e', 'agent/capteur-sprint.md': '02851f3d135190d35b74dfcdb0e29556dacae788585a2ea2889adf53ffdfca79', 'scripts/jira-sprint-app.mjs': '14005092304d4d368c869d7ee801ca922529848325255054768e86f37c418ea8', 'scripts/public/index.html': 'f69c6d601212d9a7e746181957a8c281f00a3d42decd488de25c54fdbb8abd91', 'scripts/jira_sprint_export.py': '60b6953199cbc21443572212fee36de21adc4522e86feb2215f38ba474b91782', 'tests/fake-jira.mjs': 'eb8de8e8bb1b46ad5a4c6e83cd6f8acdd812a494b8559d017d87b93907d4f83d', 'tests/run-tests.mjs': '714aa4450678f3cd2a5ac090ab1e99465706cd7962a1cf5f27d0a3649fcbd6a6' }; const vus = new Set(); let ecarts = 0; for (const module of ['modules/execution/SKILL.md', 'modules/interface/SKILL.md', 'modules/agent/SKILL.md', 'modules/export-api/SKILL.md', 'modules/recette/SKILL.md']) { const texte = fs.readFileSync(module, 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); vus.add(m[1]); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (conforme === false) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } } for (const f of Object.keys(attendu)) { if (vus.has(f) === false) { ecarts++; console.log('ABSENT    ' + f); } } if (ecarts > 0) process.exitCode = 1;"
+node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'package.json': 'e01fa603cc88fab8699767cc10f2451bce6b9d54e02462ee863b10a7b65960ad', 'package-lock.json': '28c00829c50edb775801fc626de22df4bfc1161621cfe1bfcc612a5153b10434', '.gitignore': 'b163b109241838c4ff48e7cc27de427a4fb4e7f9aebdb16c8a5ad3fbb7a02613', 'scripts/jira-capture-core.mjs': '832d84831bb1ce776fecd459bab1345a79dd49208aa540202f2e37b465866180', 'scripts/jira-capture-app.mjs': '5e4dc65d1e3a51bbf4fd2dabfafcf0ef2c97d48ae17ea4571532bec05d2c76bd', 'scripts/public/capture.html': '75a01f40c2a3c70922eb75cd6150e600fea9d7cfe1c88fb0a7e0791cdbd48674', 'scripts/jira-capture-mhtml.mjs': '3bc8af65e15e703d1aff04efff70ca3f276e2bce128d9add1b705e3bf12fc02e', 'agent/capteur-sprint.md': '02851f3d135190d35b74dfcdb0e29556dacae788585a2ea2889adf53ffdfca79', 'scripts/jira-sprint-app.mjs': '14005092304d4d368c869d7ee801ca922529848325255054768e86f37c418ea8', 'scripts/public/index.html': 'f69c6d601212d9a7e746181957a8c281f00a3d42decd488de25c54fdbb8abd91', 'scripts/jira_sprint_export.py': '60b6953199cbc21443572212fee36de21adc4522e86feb2215f38ba474b91782', 'tests/fake-jira.mjs': 'eb8de8e8bb1b46ad5a4c6e83cd6f8acdd812a494b8559d017d87b93907d4f83d', 'tests/run-tests.mjs': '7e2be5605a254977b236f4a1c6543c5cf2441c4c0a91fd36805c5579cceccc8f' }; const vus = new Set(); let ecarts = 0; for (const module of ['modules/execution/SKILL.md', 'modules/interface/SKILL.md', 'modules/agent/SKILL.md', 'modules/export-api/SKILL.md', 'modules/recette/SKILL.md']) { const texte = fs.readFileSync(module, 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); vus.add(m[1]); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (conforme === false) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } } for (const f of Object.keys(attendu)) { if (vus.has(f) === false) { ecarts++; console.log('ABSENT    ' + f); } } if (ecarts > 0) process.exitCode = 1;"
 ```
 
 Puis, depuis le même dossier :
@@ -345,7 +345,9 @@ export function sectionWarnings({ categories = [], markers = {}, listed = 0 } = 
  * Un pas de défilement, exécuté dans la page : la fenêtre, si elle défile, et chaque bloc qui défile avancent de
  * 80 % de leur hauteur visible, si bien qu'aucune carte n'est sautée, même dans une petite fenêtre. Avec
  * `withLinks`, seuls comptent les blocs qui contiennent un lien de ticket, quelle que soit leur hauteur ; sans,
- * les blocs de 100 pixels de haut au moins. Rend true si l'un d'eux a bougé.
+ * les blocs de 100 pixels de haut au moins. Chaque défilement est aussi signalé à la page par un événement
+ * `scroll` : une page qui ne rend pas d'image (premier lancement lent, fenêtre masquée) ne l'émettrait pas, et une
+ * liste chargée au défilement ne chargerait pas la suite. Rend true si l'un des blocs a bougé.
  */
 function scrollStep(withLinks) {
   const root = document.scrollingElement ?? document.documentElement;
@@ -360,7 +362,9 @@ function scrollStep(withLinks) {
   for (const el of targets) {
     const before = el.scrollTop;
     el.scrollTop = before + Math.max(80, Math.round(el.clientHeight * 0.8));
-    if (el.scrollTop !== before) moved = true;
+    if (el.scrollTop === before) continue;
+    moved = true;
+    (el === root ? document : el).dispatchEvent(new Event('scroll', { bubbles: el === root }));
   }
   return moved;
 }
@@ -460,6 +464,8 @@ export function addSectionLinks(seen, links, carry = { section: null, excerpt: n
  * markers donne, pour chaque catégorie, le plus grand nombre de ses en-têtes suivis d'un ticket vus à la fois.
  */
 export async function loadAllTickets(page, { categories = DEFAULT_CATEGORIES, pauseMs = 700, maxSteps = 150, stableSteps = 4 } = {}) {
+  // Une image rendue d'abord : au premier lancement, sans écran réel, le rendu peut tarder ; 5 s au plus
+  await page.evaluate(() => new Promise((done) => { requestAnimationFrame(() => done()); setTimeout(done, 5000); })).catch(() => {});
   const seen = new Map();
   const markers = Object.fromEntries(categories.map((c) => [c, 0]));
   let carry;

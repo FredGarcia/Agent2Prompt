@@ -1,6 +1,6 @@
 ---
 name: recette
-description: Recette du skill (npm test, sous Windows, Linux et, sans écran, sous xvfb-run, profil et dossiers temporaires, faux Jira local avec API REST paginée, SSO simulé, backlogs à sections IA et DEV chargés au défilement ou virtualisés, tableau à couloirs, pages de tickets et session expirée, table des 19 scénarios R1 à R19 rattachés aux invariants de D1 à D4, D6, D8 et D11 et aux points d'extension, contrôle de la recette par treize défauts réintroduits, recette en CI sur ubuntu-latest et windows-latest, sources de tests/fake-jira.mjs et tests/run-tests.mjs). À lire pour installer le skill, et avant de publier une version.
+description: Recette du skill (npm test, sous Windows, Linux et, sans écran, sous xvfb-run, profil et dossiers temporaires, faux Jira local avec API REST paginée, SSO simulé, backlogs à sections IA et DEV chargés au défilement ou virtualisés, tableau à couloirs, pages de tickets et session expirée, table des 19 scénarios R1 à R19 rattachés aux invariants de D1 à D4, D6, D8 et D11 et aux points d'extension, contrôle de la recette par quatorze défauts réintroduits, recette en CI sur ubuntu-latest et windows-latest, sources de tests/fake-jira.mjs et tests/run-tests.mjs). À lire pour installer le skill, et avant de publier une version.
 dimensions: [D1, D2, D3, D4, D6, D8, D11]
 status: active
 ---
@@ -18,7 +18,7 @@ npm test
 - Python : la variable `PYTHON`, à défaut `py` sous Windows et `python3` ailleurs ; s'il manque, R7 est sauté.
 - La recette travaille sur un profil et des dossiers temporaires : la session et les captures du dossier du skill ne sont pas touchées. Elle efface ses dossiers temporaires si tout passe ; sinon, ou avec `KEEP_TMP=1`, elle les garde et en donne le chemin, avec une capture d'écran de l'interface.
 - Durée : environ 4 min 40 s, dont 51 s pour la capture du backlog chargé au défilement et 77 s pour le backlog virtualisé.
-- Bilan attendu : `19 scénarios, 116 contrôles, 116 réussis, 0 en échec, 0 sautés` ; sans Python, `112 contrôles, 111 réussis, 0 en échec, 1 sautés`, R7 étant sauté.
+- Bilan attendu : `19 scénarios, 117 contrôles, 117 réussis, 0 en échec, 0 sautés` ; sans Python, `113 contrôles, 112 réussis, 0 en échec, 1 sautés`, R7 étant sauté.
 
 ## 2. Le faux Jira
 
@@ -50,7 +50,7 @@ Place des tickets du sprint dans le backlog 42 :
 |---|---|---|
 | R1 | Filtre : préfixe mis en majuscules, filtre vide qui retient tout, bornes comprises, préfixe porté sur la partie projet, valeurs invalides refusées | D3.INV-2 |
 | R2 | Catégories : `IA` et `DEV` par défaut, texte à une catégorie par ligne ou séparées par « ; », nom de dossier invalide, doublon une fois normalisé, `à classer` et liste vide refusés | D11.INV-4 |
-| R3 | Sections : en-tête, ticket avant le premier en-tête, section reportée d'un pas à l'autre d'une liste virtualisée, ticket déjà relevé inchangé, fin d'un couloir, avertissements ; tableau 44 à couloirs, couloir `Autres` à classer, filtres rapides ignorés, un en-tête compté par couloir ; liste plate dont seul l'en-tête `IA` est présent | D11.INV-1, D11.INV-2, D11.INV-6 |
+| R3 | Sections : en-tête, ticket avant le premier en-tête, section reportée d'un pas à l'autre d'une liste virtualisée, ticket déjà relevé inchangé, fin d'un couloir, avertissements ; tableau 44 à couloirs, couloir `Autres` à classer, filtres rapides ignorés, un en-tête compté par couloir ; liste plate dont seul l'en-tête `IA` est présent ; chaque pas de défilement signalé à la page par un événement `scroll` | D11.INV-1, D11.INV-2, D11.INV-6, D3.INV-1 |
 | R4 | Réglages et emplacements : dossier de sortie, profil, canal, délai ; variables vides | D1.INV-2, D1.INV-3 |
 | R5 | Dépendance unique à version exacte ; `.gitignore` du skill | D1.INV-1, D1.INV-2 |
 | R6 | Export Node : hôte, origine, type de contenu ; prochain sprint ; 120 tickets sur trois pages ; ADF ; tableau par identifiant ; tableau ambigu ; mot de passe refusé ; aucun mot de passe dans le journal | D6.INV-1, D8.INV-1, D8.INV-2, D8.INV-3 |
@@ -70,7 +70,7 @@ Place des tickets du sprint dans le backlog 42 :
 
 ## 4. Contrôle de la recette elle-même
 
-Treize défauts, réintroduits un à un dans le code, font chacun échouer la recette par le scénario attendu (essai du 28 octobre 2026, Node 22.23.4) :
+Quatorze défauts, réintroduits un à un dans le code, font chacun échouer la recette par le scénario attendu (essai du 28 octobre 2026, Node 22.23.4) :
 
 | ID | Défaut réintroduit | Scénarios en échec | Contrôles en échec |
 |---|---|---|---|
@@ -87,6 +87,7 @@ Treize défauts, réintroduits un à un dans le code, font chacun échouer la re
 | M11 | aucun bloc d'en-tête : la section va toujours jusqu'à l'en-tête suivant, et le couloir `Autres` du tableau 44 rejoint `DEV` | R3 | 1 |
 | M12 | le bloc d'un en-tête englobe les tickets placés avant lui : tant que `DEV` n'est pas chargé, la liste entière passe en `IA`, ticket sans section compris | R3, R10, R11, R13, R16 | 11 |
 | M13 | la fenêtre n'est pas agrandie avant le relevé : dans une fenêtre de 100 pixels de haut, la liste n'a aucune hauteur, et 31 tickets sur 72 sont relevés | R13 | 1 |
+| M14 | les pas de défilement ne sont plus signalés à la page : une page qui ne rend pas d'image ne chargerait pas la suite | R3 | 1 |
 
 Chaque défaut a été retiré après son essai ; la recette du code publié passe en entier.
 
@@ -616,6 +617,13 @@ try {
     const flatSec = Object.fromEntries(flat.links.map((l) => [l.key, l.section]));
     check('liste plate : un ticket placé avant le premier en-tête reste à classer', flatSec['DEMOAB-3700'] === null
       && flatSec['DEMOAB-3500'] === 'IA', JSON.stringify(flatSec));
+    // Chaque pas de défilement est aussi signalé à la page : sans image rendue, le navigateur n'émettrait pas l'événement
+    await page.setContent('<div id="zone" style="height:100px;overflow:auto"><div style="height:1000px">'
+      + '<a href="https://jira.example.com/browse/DEMOAB-1">DEMOAB-1</a></div></div>'
+      + '<script>window.signals = 0; document.getElementById("zone").addEventListener("scroll", (e) => { if (!e.isTrusted) window.signals++; });</script>');
+    await loadAllTickets(page, { categories: DEFAULT_CATEGORIES, pauseMs: 50, stableSteps: 1 });
+    const signals = await page.evaluate(() => window.signals);
+    check('chaque pas de défilement est signalé à la page par un événement scroll', signals > 0, `${signals}`);
   } finally {
     await probe.close();
   }
