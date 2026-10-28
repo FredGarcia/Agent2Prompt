@@ -4,6 +4,18 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-10-28 : capture-sprint-jira 1.1.0
+
+- **capture-sprint-jira 1.1.0** : classement par section de la page du sprint. Après vérification sur son Jira, le développeur précise que les deux parties du sprint s'annoncent sur la page du sprint par un `<span>IA</span>` et un `<span>DEV</span>`, et non dans la page de chaque ticket, et que les dossiers prennent ces noms.
+  - D11, active : classement par section de la page du sprint, dossiers et rapport. Catégories par défaut `IA` et `DEV`. La section d'un ticket est le couloir de l'en-tête qui le contient ou, dans une liste plate, le dernier en-tête qui le précède ; elle est relevée à chaque pas du défilement, et gardée dans une liste virtualisée. Un ticket sans section va dans `à classer`. Une section introuvable, ou une catégorie qui précède plusieurs groupes de tickets, est signalée en fin de capture, sans l'arrêter.
+  - D5, recherche d'un terme clé dans la page du ticket : `superseded`, remplacée par D11. Ses invariants restent pour lire une capture 1.0 ; le module `classement` a une section de migration.
+- Point d'extension E1 étendu : `markers`, les en-têtes comptés par catégorie. Au total : 11 modules, 35 invariants, dont les six de D5, qui ne sont plus en vigueur, 19 scénarios de recette (117 contrôles).
+- Relevé (D3.INV-1, précisé). Sur la pull request de cette version, le job `ubuntu-latest` Node 22 a refait l'échec de la 1.0.0 : 31 tickets sur 72 relevés en 5 s, au premier lancement du navigateur. Le skill couvre désormais les deux causes qui produisent cet échec :
+  - une fenêtre presque sans hauteur, où la liste du sprint ne défile pas (reproduit dans une fenêtre de 100 pixels de haut) : la fenêtre du sprint passe au premier plan, et elle est agrandie à 1 280 × 900 si elle est trop petite ;
+  - une page qui ne rend pas encore d'image, où le navigateur n'émet pas l'événement `scroll` qui fait charger la suite : le relevé attend une première image, 5 s au plus, et signale lui-même chaque pas de défilement à la page.
+- Essayé avec Node 20.20.2 et 22.23.4, Chrome for Testing 153, Google Chrome 156 et Python 3.13 : 117 contrôles sur 117, après extraction depuis la transmission 1.1.0. Quatorze défauts réintroduits un à un font chacun échouer le scénario attendu.
+- Version 1.0.1 archivée sous `specs/capture-sprint-jira/archives/SKILL-v1.0.1.md` ; sa transmission reste telle qu'elle a été publiée. README mis à jour.
+
 ### 2026-10-28 : capture-sprint-jira 1.0.1
 
 - **capture-sprint-jira 1.0.1** : correctif. Une fois la version 1.0.0 fusionnée, sa recette en CI échouait sur les deux jobs Node 20 : sur `ubuntu-latest`, le relevé s'arrêtait à 31 tickets sur 72 ; sur `windows-latest`, R15 et R16 dépendaient de la vitesse du runner.

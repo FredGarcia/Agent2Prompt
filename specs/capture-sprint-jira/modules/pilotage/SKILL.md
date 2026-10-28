@@ -13,7 +13,7 @@ Phase 7E couverte : Évolutif.
 
 Le développeur prévoit d'intégrer le skill à Gemini CLI depuis GeminiBoard. D10 permettra à un autre outil de lancer et de suivre une capture sans la page de l'interface : GeminiBoard, une commande Gemini CLI, ou un service MCP.
 
-## Ce qui existe déjà en 1.0.0
+## Ce qui existe déjà en 1.1.0
 
 - Le point d'extension E2 : `captureSprintTickets(context, page, options)` est une fonction du module commun, qui signale son avancement par `onProgress` et rend le rapport. L'interface et la ligne de commande n'en sont que deux appelants.
 - L'API HTTP de l'interface (module `interface`, § 2), que l'agent `capteur-sprint` pilote déjà.

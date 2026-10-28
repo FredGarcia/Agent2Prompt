@@ -26,7 +26,7 @@ La colonne « Repris dans » cite les modules de la spécification qui reprennen
 | [`agents-paralleles-gitlab`](#agents-paralleles-gitlab-101) | 1.0.1 | 5 | 2 | 20 |
 | [`analyse-projet`](#analyse-projet-102) | 1.0.2 | 5 | 1 | 16 |
 | [`angular`](#angular-101) | 1.0.1 | 8 | 2 | 30 |
-| [`capture-sprint-jira`](#capture-sprint-jira-101) | 1.0.1 | 8 | 2 | 29 |
+| [`capture-sprint-jira`](#capture-sprint-jira-110) | 1.1.0 | 8 | 2 | 35 |
 | [`java`](#java-111) | 1.1.1 | 7 | 1 | 29 |
 | [`skill4appli`](#skill4appli-110) | 1.1.0 | 9 | 3 | 34 |
 | [`socle-back-front`](#socle-back-front-101) | 1.0.1 | 6 | 1 | 15 |
@@ -770,9 +770,9 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 
 Dimension réservée : aucun invariant en vigueur dans cette version.
 
-## capture-sprint-jira 1.0.1
+## capture-sprint-jira 1.1.0
 
-Capture en MHTML des tickets du prochain sprint d'un Jira protégé par un SSO, rangés dans un dossier par catégorie : connexion faite à la main dans le navigateur du poste, relevé et filtre des tickets, une page MHTML par ticket, classement par terme clé, rapport, interface locale, ligne de commande, agent capteur-sprint, export par l'API REST sans SSO. Point d'entrée : [`specs/capture-sprint-jira/SKILL.md`](specs/capture-sprint-jira/SKILL.md).
+Capture en MHTML des tickets du prochain sprint d'un Jira protégé par un SSO, rangés dans un dossier par catégorie : connexion faite à la main dans le navigateur du poste, relevé et filtre des tickets, une page MHTML par ticket, classement par section de la page du sprint (IA et DEV par défaut), rapport, interface locale, ligne de commande, agent capteur-sprint, export par l'API REST sans SSO. Point d'entrée : [`specs/capture-sprint-jira/SKILL.md`](specs/capture-sprint-jira/SKILL.md).
 
 ### D1 : Exécution : installation, dépendance, emplacements, réglages (active)
 
@@ -793,7 +793,7 @@ Capture en MHTML des tickets du prochain sprint d'un Jira protégé par un SSO, 
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D3.INV-1** | la page du sprint défile par pas de 80 % de la hauteur affichée de chaque bloc qui défile, jusqu'à ce que, quatre pas de suite, rien ne défile plus et qu'aucun ticket nouveau n'apparaisse ; les liens `/browse/<CLÉ>` sont relevés à chaque pas, hors navigation (menus, éléments récents), si bien qu'une liste virtualisée ne fait perdre aucun ticket, même dans une petite fenêtre. | `releve`, `recette` |
+| **D3.INV-1** | la page du sprint défile par pas de 80 % de la hauteur affichée de chaque bloc qui défile, jusqu'à ce que, quatre pas de suite, rien ne défile plus et qu'aucun ticket nouveau n'apparaisse ; les liens `/browse/<CLÉ>` sont relevés à chaque pas, hors navigation (menus, éléments récents), si bien qu'une liste virtualisée ne fait perdre aucun ticket, même dans une petite fenêtre ; une fenêtre trop petite pour afficher la liste est agrandie avant le relevé, et chaque pas de défilement est signalé à la page par un événement `scroll`. | `releve`, `recette` |
 | **D3.INV-2** | un ticket est retenu si la partie projet de sa clé commence par le préfixe et si son numéro est entre les bornes, comprises ; un préfixe et des bornes vides retiennent tout ; une valeur invalide est refusée avant toute capture. | `releve`, `recette` |
 | **D3.INV-3** | chaque clé n'est capturée qu'une fois, quelle que soit la forme de ses liens (relatif, absolu, casse) ; les tickets retenus sont capturés un à un, par numéro croissant. | `releve`, `recette` |
 
@@ -806,16 +806,16 @@ Capture en MHTML des tickets du prochain sprint d'un Jira protégé par un SSO, 
 | **D4.INV-3** | chaque fichier est un MHTML de Chrome, au format « Page Web, un seul fichier » d'« Enregistrer sous… », nommé par la clé du ticket. | `capture`, `recette` |
 | **D4.INV-4** | une erreur n'arrête pas la capture ; trois erreurs de suite, ou la fermeture du navigateur, l'arrêtent ; le rapport dit ce qui a été capturé et que la capture s'est arrêtée ; fermé pendant le relevé, avant tout ticket, le navigateur arrête la capture sans rapport, avec un message qui le dit. | `execution`, `capture`, `interface`, `recette` |
 
-### D5 : Classement par catégorie, dossiers et rapport (active)
+### D5 : Classement par terme clé dans la page du ticket, dossiers et rapport (superseded)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D5.INV-1** | la catégorie d'un ticket est le terme clé trouvé dans sa page, sans tenir compte de la casse ni des accents, ses mots séparés par une espace, un tiret, un `_` ou rien, et pris entiers. | `classement`, `recette` |
-| **D5.INV-2** | les textes de la page sont lus dans cet ordre : contenu principal visible, contenu principal avec ses panneaux repliés, page visible hors navigation ; le premier qui contient un terme décide ; la navigation de Jira n'est jamais lue. | `classement`, `recette` |
-| **D5.INV-3** | un seul terme trouvé : le ticket va dans le dossier de sa catégorie ; aucun, ou plusieurs : dans `à classer` ; aucune catégorie n'est jamais devinée. | `classement`, `agent`, `recette` |
-| **D5.INV-4** | les dossiers de catégorie sont créés directement dans le dossier de sortie choisi ; une nouvelle capture d'un ticket remplace son fichier et retire sa copie d'un autre dossier de catégorie ; un ticket en erreur garde sa capture précédente. | `capture`, `classement`, `interface`, `recette` |
-| **D5.INV-5** | une catégorie est un nom de dossier valide sous Windows et sous Linux ; une catégorie en double, ou nommée `à classer`, est refusée. | `classement`, `recette` |
-| **D5.INV-6** | chaque capture écrit `sprint.mhtml`, la page du sprint, et `rapport.json` : filtre, catégories et, pour chaque ticket, sa catégorie, l'endroit et l'extrait où le terme a été trouvé, ou son erreur. | `classement`, `recette` |
+| **D5.INV-1** | la catégorie d'un ticket est le terme clé trouvé dans sa page, sans tenir compte de la casse ni des accents, ses mots séparés par une espace, un tiret, un `_` ou rien, et pris entiers. | `classement` |
+| **D5.INV-2** | les textes de la page sont lus dans cet ordre : contenu principal visible, contenu principal avec ses panneaux repliés, page visible hors navigation ; le premier qui contient un terme décide ; la navigation de Jira n'est jamais lue. | `classement` |
+| **D5.INV-3** | un seul terme trouvé : le ticket va dans le dossier de sa catégorie ; aucun, ou plusieurs : dans `à classer` ; aucune catégorie n'est jamais devinée. | `classement` |
+| **D5.INV-4** | les dossiers de catégorie sont créés directement dans le dossier de sortie choisi ; une nouvelle capture d'un ticket remplace son fichier et retire sa copie d'un autre dossier de catégorie ; un ticket en erreur garde sa capture précédente. | `classement` |
+| **D5.INV-5** | une catégorie est un nom de dossier valide sous Windows et sous Linux ; une catégorie en double, ou nommée `à classer`, est refusée. | `classement` |
+| **D5.INV-6** | chaque capture écrit `sprint.mhtml`, la page du sprint, et `rapport.json` : filtre, catégories et, pour chaque ticket, sa catégorie, l'endroit et l'extrait où le terme a été trouvé, ou son erreur. | `classement` |
 
 ### D6 : Interfaces : page locale et ligne de commande (active)
 
@@ -832,7 +832,7 @@ Capture en MHTML des tickets du prochain sprint d'un Jira protégé par un SSO, 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
 | **D7.INV-1** | l'agent ne demande, ne lit ni ne saisit aucun identifiant ; il laisse le développeur se connecter et attend sa confirmation avant de lancer la capture. | `agent` |
-| **D7.INV-2** | l'agent rend le bilan du rapport (tickets par catégorie, tickets à classer avec ce qui a été trouvé, erreurs, arrêt) et ne déplace, ne renomme ni ne supprime aucun fichier capturé sans l'accord du développeur. | `classement`, `agent` |
+| **D7.INV-2** | l'agent rend le bilan du rapport (tickets par catégorie, tickets à classer, avertissements sur les sections, erreurs, arrêt) et ne déplace, ne renomme ni ne supprime aucun fichier capturé sans l'accord du développeur. | `classement`, `agent` |
 | **D7.INV-3** | l'agent n'écrit ni l'adresse, ni le préfixe, ni les numéros du Jira du développeur dans un fichier du skill ou d'un dépôt. | `agent` |
 
 ### D8 : Export par l'API REST, sans SSO (active)
@@ -850,6 +850,17 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 ### D10 : Pilotage de la capture par un autre outil (reserved)
 
 Dimension réservée : aucun invariant en vigueur dans cette version.
+
+### D11 : Classement par section de la page du sprint, dossiers et rapport (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D11.INV-1** | la catégorie d'un ticket est celle de sa section sur la page du sprint ; un en-tête de section est un élément visible dont tout le texte est le nom d'une catégorie, sans tenir compte de la casse ni des accents, hors navigation et hors lien de ticket ; la section d'un ticket est le bloc d'en-tête qui le contient (couloir, sprint) ou, dans une liste plate, le dernier en-tête qui le précède. | `releve`, `classement`, `recette` |
+| **D11.INV-2** | un ticket qu'aucun en-tête ne précède, ou placé après la fin d'un couloir de catégorie, va dans `à classer` ; aucune catégorie n'est jamais devinée ; dans une liste virtualisée, un ticket garde la section de l'en-tête sorti de la page. | `releve`, `classement`, `agent`, `recette` |
+| **D11.INV-3** | les dossiers de catégorie sont créés directement dans le dossier de sortie choisi ; une nouvelle capture d'un ticket remplace son fichier et retire sa copie d'un autre dossier de catégorie ; un ticket en erreur garde sa capture précédente. | `capture`, `classement`, `interface`, `recette` |
+| **D11.INV-4** | une catégorie est un nom de dossier valide sous Windows et sous Linux ; une catégorie en double une fois normalisée, ou nommée `à classer`, est refusée. | `classement`, `recette` |
+| **D11.INV-5** | chaque capture écrit `sprint.mhtml`, la page du sprint, et `rapport.json` : filtre, catégories, en-têtes comptés et, pour chaque ticket, sa catégorie et la ligne de l'en-tête de sa section, ou son erreur. | `classement`, `recette` |
+| **D11.INV-6** | une catégorie dont aucun en-tête n'est suivi de tickets, ou dont plusieurs le sont, est signalée à la fin de la capture, dans l'interface et en ligne de commande, sans l'arrêter. | `classement`, `interface`, `agent`, `recette` |
 
 ## java 1.1.1
 

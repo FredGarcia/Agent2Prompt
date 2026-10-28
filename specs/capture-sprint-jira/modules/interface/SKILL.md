@@ -1,6 +1,6 @@
 ---
 name: interface
-description: Interfaces de la capture (page locale sur 127.0.0.1:3100, champs de l'adresse, du filtre, des catégories et du dossier gardés dans le navigateur, API HTTP open, capture, status et close, contrôle de l'hôte, de l'origine et du type de contenu, capture unique en tâche de fond, avancement et rapport, navigateur fermé ou gardé ouvert selon le résultat, arrêt par fermeture, ligne de commande et ses codes de sortie, sources de scripts/jira-capture-app.mjs, scripts/public/capture.html et scripts/jira-capture-mhtml.mjs). À lire pour lancer une capture, ou pour piloter l'interface depuis un agent.
+description: Interfaces de la capture (page locale sur 127.0.0.1:3100, champs de l'adresse, du filtre, des sections et du dossier gardés dans le navigateur, API HTTP open, capture, status et close, contrôle de l'hôte, de l'origine et du type de contenu, capture unique en tâche de fond, avancement et rapport, navigateur fermé ou gardé ouvert selon le résultat, arrêt par fermeture, ligne de commande et ses codes de sortie, sources de scripts/jira-capture-app.mjs, scripts/public/capture.html et scripts/jira-capture-mhtml.mjs). À lire pour lancer une capture, ou pour piloter l'interface depuis un agent.
 dimensions: [D6]
 status: active
 ---
@@ -15,12 +15,12 @@ Phase 7E couverte : Expression.
 
 - l'adresse de la page du sprint : le backlog pour le prochain sprint (`…/boards/<n>/backlog` sur Jira Cloud, `RapidBoard.jspa?rapidView=<n>&view=planning` sur Data Center), le tableau pour le sprint en cours ;
 - le préfixe des clés de tickets et les numéros de début et de fin (module `releve`) ;
-- les catégories, une par ligne, `ticket avec ia` et `ticket sans ia` par défaut (module `classement`) ;
+- les sections de la page du sprint, une par ligne, `IA` et `DEV` par défaut : le texte de l'en-tête qui ouvre chaque section, et le nom de son dossier (module `classement`) ;
 - le dossier de sortie : `mhtml` par défaut, relatif au dossier du skill, ou un chemin absolu.
 
-Trois boutons : « Ouvrir le sprint », « Capturer les tickets », actif une fois le sprint ouvert, et « Fermer le navigateur ». Pendant la capture, une barre et une ligne d'état donnent l'avancement (« Ticket 3 sur 20 : ABCDE-3512… »). À la fin, la page affiche le rapport : nombre de tickets sur la page, retenus et ignorés, nombre par dossier, erreurs, puis une ligne par ticket avec son dossier, le terme trouvé et l'endroit, et l'extrait ou l'erreur. La ligne d'état est une région `aria-live` : un lecteur d'écran annonce l'avancement et le bilan.
+Trois boutons : « Ouvrir le sprint », « Capturer les tickets », actif une fois le sprint ouvert, et « Fermer le navigateur ». Pendant la capture, une barre et une ligne d'état donnent l'avancement (« Ticket 3 sur 20 : ABCDE-3512… »). À la fin, la page affiche le rapport : nombre de tickets sur la page, retenus et ignorés, nombre par dossier, erreurs, avertissements sur les sections (D11.INV-6), puis une ligne par ticket avec son dossier et la ligne de l'en-tête de sa section, ou l'erreur. La ligne d'état est une région `aria-live` : un lecteur d'écran annonce l'avancement et le bilan.
 
-Les valeurs saisies restent dans le navigateur du développeur, en stockage local, pour les fois suivantes (D6.INV-3). Ni la page ni le serveur ne les écrivent ailleurs que dans `rapport.json`, avec la capture.
+Les valeurs saisies restent dans le navigateur du développeur, en stockage local, pour les fois suivantes (D6.INV-3). Les sections y ont leur propre clé depuis 1.1.0 : les catégories saisies en 1.0 ne sont pas reprises (module `classement`, § 7). Ni la page ni le serveur ne les écrivent ailleurs que dans `rapport.json`, avec la capture.
 
 ## 2. API HTTP
 
@@ -28,9 +28,9 @@ La page appelle le serveur ; un agent peut l'appeler de même (module `agent`). 
 
 | Appel | Réponse | Effet |
 |---|---|---|
-| `GET /api/status` | `{ browser, job }` | `browser` : navigateur ouvert ; `job.state` : `idle`, `running`, `done` ou `failed` ; `step`, `done`, `total`, `key` pendant la capture ; `report` à la fin ; `error` en cas d'échec |
+| `GET /api/status` | `{ browser, job }` | `browser` : navigateur ouvert ; `job.state` : `idle`, `running`, `done` ou `failed` ; `step`, `done`, `total`, `key` pendant la capture ; `report` et `warnings`, les avertissements sur les sections, à la fin ; `error` en cas d'échec |
 | `POST /api/open` `{ url }` | 200, message | ouvre le navigateur sur la page ; 400 si l'adresse n'est pas en http ou https ; 409 pendant une capture |
-| `POST /api/capture` `{ prefix, min, max, categories, folder }` | 202 | lance la capture en tâche de fond ; 409 sans sprint ouvert ou pendant une capture ; 400 pour un filtre ou une catégorie invalides |
+| `POST /api/capture` `{ prefix, min, max, categories, folder }` | 202 | lance la capture en tâche de fond ; `categories` : un en-tête de section par ligne ; 409 sans sprint ouvert ou pendant une capture ; 400 pour un filtre ou une catégorie invalides |
 | `POST /api/close` | 200, message | ferme le navigateur ; pendant une capture, l'arrête (« capture arrêtée ») |
 
 ## 3. Sécurité (D6.INV-1)
@@ -48,7 +48,7 @@ Aucun identifiant ne passe par l'interface : la page n'a aucun champ d'identifia
 - Une seule capture à la fois : une seconde demande est refusée (409).
 - L'avancement se lit par `GET /api/status`, que la page interroge chaque seconde. Rechargée, la page reprend l'affichage d'une capture en cours.
 - Fermer le navigateur, par le bouton ou à la main, arrête la capture : le rapport partiel reste affiché ; fermé pendant le relevé, avant le premier ticket, un message le dit, sans rapport (D4.INV-4).
-- Sans erreur, le navigateur se ferme à la fin. Après une erreur ou un arrêt, il reste ouvert et revient à la page du sprint : le développeur vérifie sa session, puis relance la capture dans le même dossier, qui remplace les fichiers des tickets recapturés (D5.INV-4).
+- Sans erreur, le navigateur se ferme à la fin. Après une erreur ou un arrêt, il reste ouvert et revient à la page du sprint : le développeur vérifie sa session, puis relance la capture dans le même dossier, qui remplace les fichiers des tickets recapturés (D11.INV-3).
 
 ## 5. Ligne de commande (D6.INV-5)
 
@@ -56,13 +56,13 @@ Aucun identifiant ne passe par l'interface : la page n'a aucun champ d'identifia
 npm run capture:cli -- "https://jira.example.com/jira/software/c/projects/ABC/boards/42/backlog" --prefixe ABC --min 3500 --max 4500
 ```
 
-Le navigateur s'ouvre sur la page ; une fois les tickets affichés, Entrée dans le terminal lance la capture, qui s'affiche ticket par ticket, puis le bilan.
+Le navigateur s'ouvre sur la page ; une fois les tickets affichés, Entrée dans le terminal lance la capture, qui s'affiche ticket par ticket, puis le bilan et les avertissements sur les sections.
 
 | Option | Rôle | Défaut |
 |---|---|---|
 | `--prefixe` | préfixe des clés | aucun : tous les tickets |
 | `--min`, `--max` | numéros de début et de fin, compris | aucune borne |
-| `--categorie` | une catégorie, répétable | `ticket avec ia` et `ticket sans ia` |
+| `--categorie` | un en-tête de section, répétable | `IA` et `DEV` |
 | `--sortie` | dossier de sortie, relatif au dossier courant | `mhtml/` du dossier du skill |
 
 Codes de sortie : 0 ; 1 si un ticket est en erreur ; 2 pour une adresse manquante ou une option invalide. Un second argument sans option vaut `--sortie`.
@@ -70,6 +70,7 @@ Codes de sortie : 0 ; 1 si un ticket est en erreur ; 2 pour une adresse manquant
 ## 6. Pièges connus
 
 - **Page du sprint mal choisie** : un rapport à 0 ticket retenu signale le plus souvent que la page affichée n'était pas encore celle du sprint (connexion inachevée) ou que le filtre ne correspond pas aux clés.
+- **Section introuvable** : « Aucun en-tête « DEV » suivi de tickets » signale une section qui porte un autre nom sur la page, ou une page qui n'est pas celle du sprint ; tous ses tickets sont alors dans `à classer` (module `classement`, § 4).
 - **Deux interfaces** : la capture (3100) et l'export (3000) ont chacune leur port ; un port occupé se change par `PORT`.
 
 ## 7. Contrôle de sortie
@@ -88,8 +89,8 @@ Codes de sortie : 0 ; 1 si un ticket est en erreur ; 2 pour une adresse manquant
 // (skill capture-sprint-jira).
 //   1. « Ouvrir le sprint » : le navigateur s'ouvre sur un profil dédié ; on s'y connecte soi-même (SSO, MFA).
 //   2. « Capturer les tickets » : sur la page du sprint, chaque lien /browse/<CLÉ> retenu par le filtre
-//      (préfixe, numéros) est ouvert, enregistré en MHTML et rangé dans le dossier de sa catégorie, reconnue
-//      au terme clé que contient la page du ticket. La page suit l'avancement, puis affiche le rapport.
+//      (préfixe, numéros) est ouvert, enregistré en MHTML et rangé dans le dossier de sa section, nommée par
+//      l'en-tête (IA, DEV…) qui le précède sur la page du sprint. La page suit l'avancement, puis affiche le rapport.
 // Aucun identifiant ne passe par l'application. Session SSO dans .jira-profile/ et captures dans mhtml/ par
 // défaut, dans le dossier du skill, que son .gitignore écarte.
 // Node.js 20, playwright-core et Chrome installé sur le poste (ou Edge : JIRA_CAPTURE_CHANNEL=msedge).
@@ -99,6 +100,7 @@ import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import {
   DEFAULT_CATEGORIES, captureSprintTickets, firstLine, launchBrowser, outputFolder, parseCategories, parseFilter,
+  sectionWarnings,
 } from './jira-capture-core.mjs';
 
 const HOST = '127.0.0.1';
@@ -205,7 +207,7 @@ function startCapture(body) {
     // n'est déclarée terminée qu'ensuite : une relance immédiate part de la page du sprint, chargée.
     if (!report.errors && !report.aborted) await closeSession();
     else if (!page.isClosed()) await page.goto(report.sprintUrl, { waitUntil: 'domcontentloaded' }).catch(() => {});
-    Object.assign(current, { state: 'done', report });
+    Object.assign(current, { state: 'done', report, warnings: sectionWarnings(report) });
   }).catch((err) => {
     // Navigateur fermé pendant le relevé, avant tout ticket : rien n'a été capturé, il n'y a pas de rapport
     const error = page.isClosed()
@@ -323,7 +325,7 @@ process.on('SIGINT', async () => {
 
 <ol>
   <li>Collez l'adresse de la page du sprint, puis cliquez sur « Ouvrir le sprint » : le navigateur s'ouvre, connectez-vous via le SSO.</li>
-  <li>Quand les tickets sont affichés, cliquez sur « Capturer les tickets ». Chaque ticket retenu par le filtre est ouvert, enregistré en MHTML et rangé dans le dossier de sa catégorie.</li>
+  <li>Quand les tickets sont affichés, cliquez sur « Capturer les tickets ». Chaque ticket retenu par le filtre est ouvert, enregistré en MHTML et rangé dans le dossier de sa section (IA, DEV…).</li>
 </ol>
 
 <div class="grid">
@@ -342,10 +344,10 @@ process.on('SIGINT', async () => {
     <label>à <input id="max" type="number" min="0" step="1" inputmode="numeric"></label>
   </fieldset>
 
-  <label>Catégories (une par ligne)
-    <textarea id="categories" aria-describedby="categories-hint">ticket avec ia
-ticket sans ia</textarea>
-    <span id="categories-hint" class="hint">Terme clé cherché dans la page du ticket, et nom du dossier ; sans terme, ou avec plusieurs : « à classer ».</span>
+  <label>Sections de la page du sprint (une par ligne)
+    <textarea id="sections" aria-describedby="sections-hint">IA
+DEV</textarea>
+    <span id="sections-hint" class="hint">Texte de l'en-tête qui ouvre la section, et nom du dossier ; un ticket qu'aucun en-tête ne précède va dans « à classer ».</span>
   </label>
 
   <label>Dossier de sortie
@@ -371,14 +373,14 @@ ticket sans ia</textarea>
   <p id="report-warning" class="warn" hidden></p>
   <table>
     <caption>Tickets capturés</caption>
-    <thead><tr><th scope="col">Ticket</th><th scope="col">Dossier</th><th scope="col">Terme trouvé</th><th scope="col">Extrait ou erreur</th></tr></thead>
+    <thead><tr><th scope="col">Ticket</th><th scope="col">Dossier</th><th scope="col">En-tête de section ou erreur</th></tr></thead>
     <tbody id="report-rows"></tbody>
   </table>
 </section>
 
 <script>
   const $ = (id) => document.getElementById(id);
-  const FIELDS = ['url', 'prefix', 'min', 'max', 'categories', 'folder'];
+  const FIELDS = ['url', 'prefix', 'min', 'max', 'sections', 'folder'];
   const STORE = 'jira-capture:';
   let opened = false;
   let running = false;
@@ -424,7 +426,7 @@ ticket sans ia</textarea>
     return node;
   }
 
-  function renderReport(report) {
+  function renderReport(report, warnings = []) {
     $('report').hidden = false;
     $('report-folder').textContent = `Dossier : ${report.folder}`;
     const summary = $('report-summary');
@@ -435,7 +437,7 @@ ticket sans ia</textarea>
     summary.append(el('li', `erreurs : ${report.errors}`));
 
     const warning = $('report-warning');
-    const notes = [];
+    const notes = [...warnings];
     if (report.selected === 0) notes.push('Aucun ticket ne passe le filtre : vérifiez le préfixe et les numéros, et que la page affichée est bien celle du sprint.');
     if (report.aborted) notes.push('Capture arrêtée après plusieurs échecs de suite : vérifiez la session dans le navigateur, resté ouvert sur le sprint, puis relancez.');
     else if (report.errors) notes.push('Des tickets ont échoué : le navigateur est resté ouvert sur le sprint, relancez la capture.');
@@ -455,8 +457,7 @@ ticket sans ia</textarea>
       tr.append(keyCell);
       const moved = t.movedFrom?.length ? ` (copie précédente retirée de ${t.movedFrom.join(', ')})` : '';
       tr.append(el('td', t.error ? '—' : (t.category ?? 'à classer') + moved));
-      tr.append(el('td', t.error ? '—' : t.found.length ? `${t.found.join(' + ')} (${t.where})` : 'aucun'));
-      tr.append(t.error ? el('td', t.error, 'err') : el('td', t.excerpt ?? (t.found.length > 1 ? 'plusieurs catégories trouvées' : 'aucun terme clé dans la page')));
+      tr.append(t.error ? el('td', t.error, 'err') : el('td', t.excerpt ?? 'aucun en-tête de section avant ce ticket sur la page du sprint'));
       rows.append(tr);
     }
   }
@@ -487,7 +488,7 @@ ticket sans ia</textarea>
         if (job.state === 'done') {
           const r = job.report;
           setStatus(`Capture terminée : ${r.tickets.length - r.errors} tickets enregistrés sur ${r.selected}${r.errors ? `, ${r.errors} en erreur` : ''}.`, r.errors > 0 || r.aborted);
-          renderReport(r);
+          renderReport(r, job.warnings);
         } else if (job.state === 'failed') {
           setStatus(job.error, true);
         }
@@ -520,7 +521,7 @@ ticket sans ia</textarea>
     try {
       await call('POST', '/api/capture', {
         prefix: $('prefix').value, min: $('min').value, max: $('max').value,
-        categories: $('categories').value, folder: $('folder').value,
+        categories: $('sections').value, folder: $('folder').value,
       });
       running = true;
       refreshButtons();
@@ -560,19 +561,21 @@ ticket sans ia</textarea>
 // .jira-profile/, dans le dossier du skill.
 // Usage, depuis le dossier du skill :
 //   npm run capture:cli -- "<adresse de la page du sprint>" [--prefixe ABC] [--min 100] [--max 200]
-//                          [--categorie "ticket avec ia" --categorie "ticket sans ia"] [--sortie <dossier>]
-// Sortie : relative au dossier courant ; mhtml/ du dossier du skill par défaut. Les dossiers de catégorie y sont
-// créés directement. Code de sortie : 0, 1 si un ticket est en erreur, 2 pour une option invalide.
+//                          [--categorie IA --categorie DEV] [--sortie <dossier>]
+// Une catégorie est le texte d'un en-tête de section de la page du sprint, et le nom de son dossier (IA et DEV par
+// défaut). Sortie : relative au dossier courant ; mhtml/ du dossier du skill par défaut. Les dossiers de catégorie y
+// sont créés directement. Code de sortie : 0, 1 si un ticket est en erreur, 2 pour une option invalide.
 import { resolve } from 'node:path';
 import { stdin as input, stdout as output } from 'node:process';
 import readline from 'node:readline/promises';
 import { parseArgs } from 'node:util';
 import {
   DEFAULT_CATEGORIES, DEFAULT_OUT_DIR, captureSprintTickets, launchBrowser, parseCategories, parseFilter,
+  sectionWarnings,
 } from './jira-capture-core.mjs';
 
 const USAGE = 'Usage : node jira-capture-mhtml.mjs "<adresse de la page du sprint>" [--prefixe ABC] [--min N] [--max N] '
-  + '[--categorie "<terme>"]… [--sortie <dossier>]';
+  + '[--categorie "<en-tête de section>"]… [--sortie <dossier>]';
 
 let options;
 try {
@@ -625,8 +628,9 @@ try {
   console.log(`  erreurs : ${report.errors}`);
   for (const t of report.tickets) {
     if (t.error) console.log(`  ${t.key} : ${t.error}`);
-    else if (!t.category) console.log(`  ${t.key} : à classer (${t.found.length ? `trouvé : ${t.found.join(' + ')}` : 'aucun terme clé'})`);
+    else if (!t.category) console.log(`  ${t.key} : à classer (aucun en-tête de section avant ce ticket)`);
   }
+  for (const note of sectionWarnings(report)) console.log(`Attention : ${note}`);
   if (report.aborted) console.log('Capture arrêtée après plusieurs échecs de suite : vérifiez la session, puis relancez.');
   process.exitCode = report.errors ? 1 : 0;
 } finally {

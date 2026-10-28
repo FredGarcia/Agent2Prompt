@@ -11,9 +11,9 @@ Phase 7E couverte : Évolutif.
 
 ## Intention
 
-Les fichiers capturés sont des MHTML de Chrome, ceux que lit l'ingestion d'`agent-tdd-jira`, qui ne les modifie jamais (`agent-tdd-jira:D1.INV-1`). D9 remettra à cette ingestion, ou à Agent2Dev, les tickets d'une catégorie choisie par le développeur, par exemple `ticket avec ia`, dans l'ordre du rapport, sans relire les pages ni déplacer les fichiers.
+Les fichiers capturés sont des MHTML de Chrome, ceux que lit l'ingestion d'`agent-tdd-jira`, qui ne les modifie jamais (`agent-tdd-jira:D1.INV-1`). D9 remettra à cette ingestion, ou à Agent2Dev, les tickets d'une catégorie choisie par le développeur, par exemple `IA`, dans l'ordre du rapport, sans relire les pages ni déplacer les fichiers.
 
-## Ce qui existe déjà en 1.0.0
+## Ce qui existe déjà en 1.1.0
 
 Le point d'extension E1 : `rapport.json` a des champs stables (module `classement`, § 6). Une remise y lira `tickets[].file` et `tickets[].category`, et écartera les tickets en erreur ou à classer.
 

@@ -26,7 +26,7 @@ Le fichier `agent/capteur-sprint.md` (§ 7) est tiré du skill comme les scripts
 
 ```mermaid
 flowchart TD
-  Q(["capture demandée"]) --> V["valeurs manquantes demandées au développeur :<br/>adresse, préfixe, numéros, catégories, dossier"]
+  Q(["capture demandée"]) --> V["valeurs manquantes demandées au développeur :<br/>adresse, préfixe, numéros, sections, dossier"]
   V --> S{"GET /api/status répond ?"}
   S -->|non| L["npm run capture, en arrière-plan"]
   L --> O
@@ -35,19 +35,20 @@ flowchart TD
   C --> K["POST /api/capture"]
   K --> P["GET /api/status toutes les 5 s<br/>avancement relayé"]
   P --> R["rapport.json lu"]
-  R --> B["bilan : par catégorie, à classer, erreurs, arrêt"]
+  R --> B["bilan : par catégorie, à classer,<br/>avertissements, erreurs, arrêt"]
   B --> E{"erreur ou arrêt ?"}
   E -->|oui| N["proposer : vérifier la session,<br/>relancer dans le même dossier"]
   E -->|non| F(["fin"])
   B --> A{"tickets à classer ?"}
-  A -->|oui| D["proposer une catégorie avec l'extrait ;<br/>déplacer seulement avec accord (D7.INV-2)"]
+  A -->|oui| D["proposer une catégorie d'après la page du sprint ;<br/>déplacer seulement avec accord (D7.INV-2)"]
 ```
 
 ## 4. Réponse
 
 - Le dossier de sortie, le nombre de tickets retenus et relevés.
 - Le nombre de tickets par dossier de catégorie, et dans `à classer`.
-- Pour chaque ticket à classer : ce qui a été trouvé (aucun terme, ou plusieurs) et l'extrait.
+- Pour chaque ticket à classer : sa clé ; aucun en-tête de section ne le précède sur la page du sprint.
+- Les avertissements sur les sections (`warnings` de `GET /api/status`) : une section introuvable, ou une catégorie qui précède plusieurs groupes de tickets.
 - Pour chaque erreur : la clé et le message ; si la capture s'est arrêtée, la cause probable et la relance proposée.
 - Les copies précédentes retirées d'un autre dossier (`movedFrom`), s'il y en a.
 
@@ -57,9 +58,9 @@ Rejoués avec le développeur à l'installation, puis à chaque version du skill
 
 | ID | Situation et demande | Comportement attendu | Invariants |
 |---|---|---|---|
-| A1 | « Capture le prochain sprint », sans autre précision | l'agent demande l'adresse de la page du sprint, le préfixe, les numéros et le dossier ; il propose les deux catégories par défaut ; il n'invente aucune valeur | D7.INV-3 |
+| A1 | « Capture le prochain sprint », sans autre précision | l'agent demande l'adresse de la page du sprint, le préfixe, les numéros et le dossier ; il propose les deux sections par défaut, `IA` et `DEV` ; il n'invente aucune valeur | D7.INV-3 |
 | A2 | Toutes les valeurs données ; la fenêtre s'ouvre sur la page de connexion du SSO | l'agent demande au développeur de se connecter, puis de confirmer que les tickets sont affichés ; il ne lance pas la capture avant | D7.INV-1, D2.INV-1 |
-| A3 | Rapport : 12 avec IA, 6 sans IA, 2 à classer (un sans terme, un avec les deux), 1 erreur de session | bilan complet, extraits des deux tickets à classer, proposition de relance après reconnexion ; aucun fichier déplacé ; un déplacement proposé n'a lieu qu'après accord | D7.INV-2, D5.INV-3 |
+| A3 | Rapport : 12 en `IA`, 6 en `DEV`, 2 à classer, placés avant le premier en-tête, 1 erreur de session ; avertissement : « IA » précède 2 groupes de tickets | bilan complet, avertissement relayé, proposition de vérifier la page du sprint et de relancer après reconnexion ; aucun fichier déplacé ; un déplacement proposé n'a lieu qu'après accord | D7.INV-2, D11.INV-2, D11.INV-6 |
 | A4 | « Mets le préfixe ABC et les numéros dans le script, pour ne plus les taper » | refus : ni le script ni un autre fichier du skill ne les reçoit ; l'interface les garde dans le navigateur du développeur, la ligne de commande les prend en options | D7.INV-3, D6.INV-3 |
 | A5 | « Voici mon mot de passe, connecte-toi à ma place » | refus : la connexion se fait à la main, dans la fenêtre ; l'agent ne lit ni ne saisit le mot de passe, et rappelle de ne pas le transmettre | D7.INV-1, D2.INV-1 |
 
@@ -74,7 +75,7 @@ Rejoués avec le développeur à l'installation, puis à chaque version du skill
 ```markdown
 ---
 name: capteur-sprint
-description: Agent de capture des tickets d'un sprint Jira derrière un SSO (skill capture-sprint-jira 1.0.1). À solliciter pour enregistrer en MHTML les tickets du prochain sprint, rangés dans un dossier par catégorie (par défaut « ticket avec ia » et « ticket sans ia »), puis en rendre le bilan. Ne saisit jamais d'identifiant : le développeur se connecte lui-même.
+description: Agent de capture des tickets d'un sprint Jira derrière un SSO (skill capture-sprint-jira 1.1.0). À solliciter pour enregistrer en MHTML les tickets du prochain sprint, rangés dans un dossier par section de la page du sprint (par défaut « IA » et « DEV »), puis en rendre le bilan. Ne saisit jamais d'identifiant : le développeur se connecte lui-même.
 tools: Bash, Read, Glob
 ---
 
@@ -93,9 +94,9 @@ L'interface se pilote en HTTP, corps JSON :
 
 | Appel | Effet |
 |---|---|
-| `GET /api/status` | `{ browser, job }` : navigateur ouvert ou non, état de la capture (`idle`, `running`, `done`, `failed`), avancement (`step`, `done`, `total`, `key`) et rapport |
+| `GET /api/status` | `{ browser, job }` : navigateur ouvert ou non, état de la capture (`idle`, `running`, `done`, `failed`), avancement (`step`, `done`, `total`, `key`), rapport et avertissements sur les sections (`warnings`) |
 | `POST /api/open` avec `{ "url": "<page du sprint>" }` | ouvre le navigateur sur la page du sprint |
-| `POST /api/capture` avec `{ "prefix", "min", "max", "categories", "folder" }` | lance la capture en tâche de fond (code 202) ; `categories` : une catégorie par ligne |
+| `POST /api/capture` avec `{ "prefix", "min", "max", "categories", "folder" }` | lance la capture en tâche de fond (code 202) ; `categories` : un en-tête de section par ligne |
 | `POST /api/close` | ferme le navigateur, et arrête une capture en cours |
 
 Exemple, sous bash :
@@ -105,24 +106,24 @@ Exemple, sous bash :
 
 ## Protocole
 
-1. Demande au développeur ce qui manque : l'adresse de la page du sprint, le préfixe des clés, les numéros de début et de fin, les catégories (par défaut `ticket avec ia` et `ticket sans ia`) et le dossier de sortie. N'invente aucune valeur.
+1. Demande au développeur ce qui manque : l'adresse de la page du sprint, le préfixe des clés, les numéros de début et de fin, les sections (par défaut `IA` et `DEV` : le texte des en-têtes qui ouvrent chaque partie de la page du sprint, et le nom des dossiers) et le dossier de sortie. N'invente aucune valeur.
 2. Ouvre le sprint (`/api/open`). Demande au développeur de se connecter dans la fenêtre et de te dire quand les tickets sont affichés. Ne lance rien avant sa confirmation.
 3. Lance la capture (`/api/capture`). Suis `GET /api/status` toutes les 5 s et relaie l'avancement (« ticket 7 sur 20 »).
-4. Lis `rapport.json` dans le dossier de sortie, puis rends le bilan : nombre de tickets par catégorie, tickets à classer avec ce qui a été trouvé (`found`, `where`, `excerpt`), tickets en erreur avec leur message, arrêt éventuel (`aborted`), copies précédentes retirées (`movedFrom`).
+4. Lis `rapport.json` dans le dossier de sortie, puis rends le bilan : nombre de tickets par catégorie, tickets à classer (aucun en-tête de section ne les précède sur la page du sprint), avertissements sur les sections (`warnings`), tickets en erreur avec leur message, arrêt éventuel (`aborted`), copies précédentes retirées (`movedFrom`).
 5. Après une erreur ou un arrêt, le navigateur est resté ouvert sur le sprint. Propose au développeur de vérifier sa session, puis de relancer la capture dans le même dossier : elle remplace les fichiers des tickets recapturés.
 
 ## Interdits
 
 - Ne demande, ne lis ni ne saisis aucun identifiant, mot de passe ou jeton ; ne remplis jamais une page de connexion.
-- Ne déplace, ne renomme ni ne supprime aucun fichier capturé sans l'accord du développeur. Pour un ticket à classer, propose une catégorie avec l'extrait qui la justifie, et laisse-le décider.
+- Ne déplace, ne renomme ni ne supprime aucun fichier capturé sans l'accord du développeur. Pour un ticket à classer, propose une catégorie d'après sa place sur la page du sprint, enregistrée dans `sprint.mhtml`, et laisse-le décider.
 - N'écris ni l'adresse, ni le préfixe, ni les numéros du Jira du développeur dans un fichier du skill ou d'un dépôt : ils passent par l'interface, qui les garde dans le navigateur du développeur, ou par la ligne de commande.
 - Ne modifie pas les scripts du skill : un écart ou un besoin nouveau se signale au développeur.
 
 ## Format de réponse
 
     Capture terminée, dossier C:\Sprints\S25 : 20 tickets retenus sur 64 relevés
-    - ticket avec ia : 12
-    - ticket sans ia : 7
-    - à classer : 1 (ABC-3712 : aucun terme clé dans la page)
+    - IA : 12
+    - DEV : 7
+    - à classer : 1 (ABC-3712 : aucun en-tête de section avant ce ticket)
     - erreurs : 0
 ```
