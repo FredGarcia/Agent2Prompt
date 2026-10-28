@@ -1,6 +1,6 @@
 ---
 name: recette
-description: Recette du skill (npm test, sous Windows, Linux et, sans écran, sous xvfb-run, profil et dossiers temporaires, faux Jira local avec API REST paginée, SSO simulé, backlogs chargés au défilement ou virtualisés, pages de tickets pour chaque cas de classement et session expirée, table des 19 scénarios R1 à R19 rattachés aux invariants de D1 à D6 et D8 et aux points d'extension, contrôle de la recette par six défauts réintroduits, recette en CI sur ubuntu-latest et windows-latest, sources de tests/fake-jira.mjs et tests/run-tests.mjs). À lire pour installer le skill, et avant de publier une version.
+description: Recette du skill (npm test, sous Windows, Linux et, sans écran, sous xvfb-run, profil et dossiers temporaires, faux Jira local avec API REST paginée, SSO simulé, backlogs chargés au défilement ou virtualisés, pages de tickets pour chaque cas de classement et session expirée, table des 19 scénarios R1 à R19 rattachés aux invariants de D1 à D6 et D8 et aux points d'extension, contrôle de la recette par huit défauts réintroduits, recette en CI sur ubuntu-latest et windows-latest, sources de tests/fake-jira.mjs et tests/run-tests.mjs). À lire pour installer le skill, et avant de publier une version.
 dimensions: [D1, D2, D3, D4, D5, D6, D8]
 status: active
 ---
@@ -17,8 +17,8 @@ npm test
 - Le navigateur est celui de `JIRA_CAPTURE_CHANNEL` : Chrome par défaut ; `chromium` après `npx playwright-core install chromium`.
 - Python : la variable `PYTHON`, à défaut `py` sous Windows et `python3` ailleurs ; s'il manque, R7 est sauté.
 - La recette travaille sur un profil et des dossiers temporaires : la session et les captures du dossier du skill ne sont pas touchées. Elle efface ses dossiers temporaires si tout passe ; sinon, ou avec `KEEP_TMP=1`, elle les garde et en donne le chemin, avec une capture d'écran de l'interface.
-- Durée : environ 3 min 40 s, dont 46 s pour la capture du backlog chargé au défilement et 53 s pour le backlog virtualisé.
-- Bilan attendu : `19 scénarios, 108 contrôles, 108 réussis, 0 en échec, 0 sautés` ; sans Python, `104 contrôles, 103 réussis, 0 en échec, 1 sautés`, R7 étant sauté.
+- Durée : environ 4 min 20 s, dont 51 s pour la capture du backlog chargé au défilement et 76 s pour le backlog virtualisé.
+- Bilan attendu : `19 scénarios, 110 contrôles, 110 réussis, 0 en échec, 0 sautés` ; sans Python, `106 contrôles, 105 réussis, 0 en échec, 1 sautés`, R7 étant sauté.
 
 ## 2. Le faux Jira
 
@@ -26,7 +26,7 @@ npm test
 
 - une API REST Agile : deux tableaux aux noms proches, trois sprints futurs paginés deux par deux, 120 tickets paginés cinquante par cinquante, descriptions en texte ou en ADF, authentification Basic ou Bearer ;
 - un SSO simulé : sans cookie, un détour par `/sso/login`, qui pose un cookie persistant et compte ses passages ;
-- le backlog 42 : 71 cartes (60 hors plage, trois hors filtre, puis les huit du sprint, en fin de liste), une épopée liée en lien absolu et en minuscules, et un ticket récent, dans la plage, cité dans l'en-tête de la page ; chargé quinze cartes par quinze au défilement, ou virtualisé avec `?mode=virtual`, dans une zone de 300 pixels de haut, comme dans une fenêtre réduite ;
+- le backlog 42 : 71 cartes (60 hors plage, trois hors filtre, puis les huit du sprint, en fin de liste), une épopée liée en lien absolu et en minuscules, et un ticket récent, dans la plage, cité dans l'en-tête de la page ; chargé quinze cartes par quinze au défilement, et tant que la liste ne remplit pas sa zone, comme Jira, ou virtualisé avec `?mode=virtual`, dans une zone de 80 pixels de haut, comme dans une fenêtre réduite ;
 - le backlog 43 : cinq tickets dont la session a expiré ;
 - les pages de tickets, rendues 400 ms après le chargement, comme une application monopage, chacune avec un menu latéral qui cite « Ticket avec IA » :
 
@@ -57,9 +57,9 @@ npm test
 | R10 | Backlog chargé au défilement : 72 tickets relevés, navigation exclue, 8 retenus et triés, les huit cas du § 2, dossiers directement dans le dossier choisi, MHTML de Chrome par ticket, commentaire chargé au défilement, `sprint.mhtml` et `rapport.json`, décompte ; une seule capture à la fois ; navigateur gardé ouvert après l'erreur | D3.INV-1, D3.INV-3, D4.INV-1, D4.INV-2, D4.INV-3, D5.INV-2, D5.INV-3, D5.INV-4, D5.INV-6, D6.INV-2, D6.INV-4 |
 | R11 | Nouvelle capture dans le même dossier, après un changement de catégorie dans Jira : retour à la page du sprint, ticket rangé dans sa nouvelle catégorie, copie précédente retirée, autres tickets en place, navigateur fermé sans erreur | D5.INV-4, D6.INV-4 |
 | R12 | Navigateur rouvert sans nouveau passage par le SSO | D2.INV-2 |
-| R13 | Backlog virtualisé, dans une zone de 300 pixels : mêmes contrôles que R10 | D3.INV-1, D4.INV-1, D5.INV-3 |
+| R13 | Backlog virtualisé, dans une zone de 80 pixels : mêmes contrôles que R10 | D3.INV-1, D4.INV-1, D5.INV-3 |
 | R14 | Cinq tickets à session expirée : trois erreurs, capture arrêtée, navigateur gardé ouvert | D4.INV-1, D4.INV-4, D6.INV-4 |
-| R15 | « Fermer le navigateur » pendant la capture : capture arrêtée, rapport partiel | D4.INV-4, D6.INV-2 |
+| R15 | « Fermer le navigateur » pendant le relevé : capture arrêtée sans rapport, avec un message qui le dit ; puis pendant la capture des tickets : capture arrêtée, rapport partiel | D4.INV-4, D6.INV-2 |
 | R16 | Page de l'interface pilotée comme par le développeur : bouton activé, avancement, boutons bloqués, bilan, résumé, une ligne par ticket, avertissement, valeurs retrouvées après rechargement | D6.INV-2, D6.INV-3 |
 | R17 | Ligne de commande : adresse manquante et numéro invalide (code 2), un ticket capturé directement dans le dossier (code 0), un ticket en erreur (code 1) | D6.INV-5, D4.INV-1 |
 | R18 | Point d'extension E1 : champs du rapport, d'un ticket capturé, d'un ticket en erreur | D5.INV-6 |
@@ -67,7 +67,7 @@ npm test
 
 ## 4. Contrôle de la recette elle-même
 
-Sept défauts, réintroduits un à un dans le code, font chacun échouer la recette par le scénario attendu (essai du 28 octobre 2026, Node 22.23.4) :
+Huit défauts, réintroduits un à un dans le code, font chacun échouer la recette par le scénario attendu (essai du 28 octobre 2026, Node 22.23.4) :
 
 | ID | Défaut réintroduit | Scénarios en échec | Contrôles en échec |
 |---|---|---|---|
@@ -75,9 +75,10 @@ Sept défauts, réintroduits un à un dans le code, font chacun échouer la rece
 | M2 | la copie d'un ticket recapturé reste dans son ancien dossier | R11 | 1 |
 | M3 | le classement lit toute la page, navigation comprise : le menu latéral classe les tickets sans terme et rend les autres ambigus | R10, R11, R13, R16 | 14 |
 | M4 | l'origine des requêtes n'est plus contrôlée | R8 | 1 |
-| M5 | une page est enregistrée sans vérifier qu'elle est celle du ticket : la page de connexion prend le nom du ticket | R10, R11, R13, R14, R16, R17, R18 | 17 |
-| M6 | les liens ne sont relevés qu'avant le défilement : seuls les premiers tickets du backlog sont vus | R10, R11, R13, R15, R16, R17, R18 | 44 |
-| M7 | pas de défilement fixe de 1 200 pixels, plus grand que la zone affichée : des cartes de la liste virtualisée sont sautées | R13 | 1 |
+| M5 | une page est enregistrée sans vérifier qu'elle est celle du ticket : la page de connexion prend le nom du ticket | R10, R11, R13, R14, R15, R16, R17, R18 | 19 |
+| M6 | les liens ne sont relevés qu'avant le défilement : seuls les premiers tickets du backlog sont vus | R10, R11, R13, R15, R16, R17, R18 | 45 |
+| M7 | pas de défilement fixe de 1 200 pixels, plus grand que la zone affichée : des cartes de la liste virtualisée sont sautées | R13 | 8 |
+| M8 | seuls les blocs de 100 pixels de haut au moins défilent, comme en 1.0.0 : la liste virtualisée de 80 pixels n'est pas parcourue | R13 | 15 |
 
 Chaque défaut a été retiré après son essai ; la recette du code publié passe en entier.
 
@@ -164,8 +165,9 @@ const list = document.getElementById('list');
 const card = (i) => '<div class="card"><a href="/browse/' + KEYS[i] + '">' + KEYS[i] + '</a> Ticket ' + (i + 1)
   + (i < 10 ? ' · <a href="https://jira.example.com/browse/demoe-100?focus=1">DEMOE-100</a>' : '') + '</div>';
 if (MODE === 'virtual') {
-  // Zone de 300 pixels, comme dans une fenêtre réduite : un pas de défilement plus grand sauterait des cartes
-  list.style.height = '300px';
+  // Zone de 80 pixels, comme dans une fenêtre réduite : un pas plus grand que la zone sauterait des cartes,
+  // et un bloc aussi bas ne doit pas être ignoré
+  list.style.height = '80px';
   const spacer = document.createElement('div');
   spacer.style.cssText = 'position:relative;height:' + KEYS.length * H + 'px';
   list.appendChild(spacer);
@@ -192,6 +194,10 @@ if (MODE === 'virtual') {
     shown = n;
   };
   more(); more();
+  // Comme Jira : tant que la liste ne déborde pas de sa zone, d'autres cartes se chargent
+  const fill = () => { while (shown < KEYS.length && list.scrollHeight <= list.clientHeight) more(); };
+  fill();
+  window.addEventListener('resize', fill);
   list.addEventListener('scroll', () => {
     if (loading || shown >= KEYS.length) return;
     if (list.scrollTop + list.clientHeight >= list.scrollHeight - 200) {
@@ -657,12 +663,21 @@ try {
 
   scenario('R15', 'arrêt par « Fermer le navigateur »');
   await post(port, '/api/open', { url: backlog });
+  await post(port, '/api/capture', { ...filter, folder: join(TMP, 'sortie-fermee-au-releve') });
+  await sleep(1000); // pendant le relevé de la page du sprint
+  await post(port, '/api/close', {});
+  status = await waitForJob(port);
+  check('fermé pendant le relevé : capture arrêtée, sans rapport, et dit', status.job.state === 'failed'
+    && /fermé pendant le relevé/.test(status.job.error ?? '') && !status.job.report, status.job.error ?? status.job.state);
+  await post(port, '/api/open', { url: backlog });
   await post(port, '/api/capture', { ...filter, folder: join(TMP, 'sortie-arretee') });
-  for (let i = 0; i < 120; i++) { // attend le deuxième ticket
+  let second = false;
+  for (let i = 0; i < 480 && !second; i++) { // attend le deuxième ticket, deux minutes au plus
     const { json } = await request(port, { path: '/api/status' });
-    if (json.job.step === 'tickets' && json.job.done >= 1) break;
-    await sleep(250);
+    second = json.job.step === 'tickets' && json.job.done >= 1;
+    if (!second) await sleep(250);
   }
+  check('deuxième ticket atteint', second);
   r = await post(port, '/api/close', {});
   check('la fermeture arrête la capture', r.status === 200 && /arrêtée/.test(r.json?.message ?? ''), r.json?.message);
   status = await waitForJob(port);
@@ -682,10 +697,10 @@ try {
     await page.fill('#min', '3500');
     await page.fill('#max', '4500');
     await page.fill('#folder', join(TMP, 'interface'));
-    await page.click('#open');
+    await page.click('#open', { timeout: 10_000 }).catch(() => {});
     const opened = await waitUi(() => /ouvert sur le sprint/.test(document.getElementById('status').textContent), 30_000);
     check("« Capturer les tickets » activé après l'ouverture", opened && await page.isEnabled('#capture'));
-    await page.click('#capture');
+    await page.click('#capture', { timeout: 10_000 }).catch(() => {});
     const progress = await waitUi(() => /^Ticket \d+ sur 8 : DEMO/.test(document.getElementById('status').textContent), 60_000);
     check('avancement affiché, boutons bloqués', progress && await page.isVisible('#progress') && await page.isDisabled('#open') && await page.isDisabled('#capture'));
     await waitUi(() => !document.getElementById('report').hidden, 180_000);

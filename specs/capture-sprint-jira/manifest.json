@@ -1,6 +1,6 @@
 {
   "name": "capture-sprint-jira",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "specSchema": 1,
   "language": "fr",
   "description": "Capture en MHTML des tickets du prochain sprint d'un Jira protégé par un SSO, rangés dans un dossier par catégorie : connexion faite à la main dans le navigateur du poste, relevé et filtre des tickets, une page MHTML par ticket, classement par terme clé, rapport, interface locale, ligne de commande, agent capteur-sprint, export par l'API REST sans SSO.",
@@ -26,5 +26,7 @@
     { "id": "pilotage", "path": "modules/pilotage/SKILL.md", "dimensions": ["D10"], "status": "reserved" }
   ],
   "extensionPoints": ["E1", "E2"],
-  "previousVersions": []
+  "previousVersions": [
+    { "version": "1.0.0", "file": "archives/SKILL-v1.0.0.md" }
+  ]
 }

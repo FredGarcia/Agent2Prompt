@@ -47,7 +47,7 @@ Aucun identifiant ne passe par l'interface : la page n'a aucun champ d'identifia
 
 - Une seule capture à la fois : une seconde demande est refusée (409).
 - L'avancement se lit par `GET /api/status`, que la page interroge chaque seconde. Rechargée, la page reprend l'affichage d'une capture en cours.
-- Fermer le navigateur, par le bouton ou à la main, arrête la capture : le rapport partiel reste affiché (D4.INV-4).
+- Fermer le navigateur, par le bouton ou à la main, arrête la capture : le rapport partiel reste affiché ; fermé pendant le relevé, avant le premier ticket, un message le dit, sans rapport (D4.INV-4).
 - Sans erreur, le navigateur se ferme à la fin. Après une erreur ou un arrêt, il reste ouvert et revient à la page du sprint : le développeur vérifie sa session, puis relance la capture dans le même dossier, qui remplace les fichiers des tickets recapturés (D5.INV-4).
 
 ## 5. Ligne de commande (D6.INV-5)
@@ -207,8 +207,12 @@ function startCapture(body) {
     else if (!page.isClosed()) await page.goto(report.sprintUrl, { waitUntil: 'domcontentloaded' }).catch(() => {});
     Object.assign(current, { state: 'done', report });
   }).catch((err) => {
-    console.error(err);
-    Object.assign(current, { state: 'failed', error: `Capture interrompue (${firstLine(err)})` });
+    // Navigateur fermé pendant le relevé, avant tout ticket : rien n'a été capturé, il n'y a pas de rapport
+    const error = page.isClosed()
+      ? 'Capture arrêtée : le navigateur a été fermé pendant le relevé des tickets, avant toute capture'
+      : `Capture interrompue (${firstLine(err)})`;
+    if (!page.isClosed()) console.error(err);
+    Object.assign(current, { state: 'failed', error });
   });
 }
 

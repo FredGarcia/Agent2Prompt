@@ -4,6 +4,15 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-10-28 : capture-sprint-jira 1.0.1
+
+- **capture-sprint-jira 1.0.1** : correctif. Une fois la version 1.0.0 fusionnée, sa recette en CI échouait sur les deux jobs Node 20 : sur `ubuntu-latest`, le relevé s'arrêtait à 31 tickets sur 72 ; sur `windows-latest`, R15 et R16 dépendaient de la vitesse du runner.
+  - Relevé (D3.INV-1) : tout bloc qui défile et contient un lien de ticket est parcouru, quelle que soit sa hauteur, et non plus seulement ceux de 100 pixels au moins. La fenêtre s'ouvre en 1 280 × 900 pixels, quelle que soit la taille gardée par le profil.
+  - Capture (D4.INV-4, précisé) : fermé pendant le relevé, avant tout ticket, le navigateur arrête la capture avec un message qui le dit, et non plus sur un message technique.
+  - Recette : le faux Jira charge des cartes tant que la liste ne remplit pas sa zone, comme Jira, et sa liste virtualisée tient dans 80 pixels ; R15 couvre la fermeture pendant le relevé ; R16 attend l'interface sans s'interrompre au premier délai dépassé. 110 contrôles, contre 108 en 1.0.0. Huit défauts réintroduits un à un font chacun échouer le scénario attendu ; M8, le seuil de 100 pixels, est nouveau.
+- Essayé avec Node 20.20.2 et 22.23.4, Chrome for Testing 153 et Python 3.13 : 110 contrôles sur 110, après extraction depuis la transmission 1.0.1, sur l'écran virtuel par défaut comme sur un grand écran.
+- Version 1.0.0 archivée sous `specs/capture-sprint-jira/archives/SKILL-v1.0.0.md` ; sa transmission reste telle qu'elle a été publiée. README mis à jour.
+
 ### 2026-10-28 : capture-sprint-jira 1.0.0
 
 - **capture-sprint-jira 1.0.0** : nouveau skill. Il capture en MHTML les tickets du prochain sprint d'un Jira protégé par un SSO et les range dans un dossier par catégorie, `ticket avec ia` et `ticket sans ia` par défaut. Le développeur les enregistrait jusque-là un à un, à la main. Dimensions :
