@@ -1,0 +1,30 @@
+{
+  "name": "capture-sprint-jira",
+  "version": "1.0.0",
+  "specSchema": 1,
+  "language": "fr",
+  "description": "Capture en MHTML des tickets du prochain sprint d'un Jira protégé par un SSO, rangés dans un dossier par catégorie : connexion faite à la main dans le navigateur du poste, relevé et filtre des tickets, une page MHTML par ticket, classement par terme clé, rapport, interface locale, ligne de commande, agent capteur-sprint, export par l'API REST sans SSO.",
+  "entry": "SKILL.md",
+  "targets": {
+    "node": ">=20",
+    "dependencies": "playwright-core 1.63.0, seule dépendance",
+    "browser": "Chrome installé sur le poste, ou Edge, ou le Chromium de Playwright",
+    "python": "3, pour le seul script d'export facultatif ; recette essayée avec 3.13",
+    "os": "Windows natif, Linux et WSL2 ; recette en CI sur ubuntu-latest et windows-latest"
+  },
+  "modules": [
+    { "id": "execution", "path": "modules/execution/SKILL.md", "dimensions": ["D1"], "status": "active" },
+    { "id": "session", "path": "modules/session/SKILL.md", "dimensions": ["D2"], "status": "active" },
+    { "id": "releve", "path": "modules/releve/SKILL.md", "dimensions": ["D3"], "status": "active" },
+    { "id": "capture", "path": "modules/capture/SKILL.md", "dimensions": ["D4"], "status": "active" },
+    { "id": "classement", "path": "modules/classement/SKILL.md", "dimensions": ["D5"], "status": "active" },
+    { "id": "interface", "path": "modules/interface/SKILL.md", "dimensions": ["D6"], "status": "active" },
+    { "id": "agent", "path": "modules/agent/SKILL.md", "dimensions": ["D7"], "status": "active" },
+    { "id": "export-api", "path": "modules/export-api/SKILL.md", "dimensions": ["D8"], "status": "active" },
+    { "id": "recette", "path": "modules/recette/SKILL.md", "dimensions": ["D1", "D2", "D3", "D4", "D5", "D6", "D8"], "status": "active" },
+    { "id": "remise", "path": "modules/remise/SKILL.md", "dimensions": ["D9"], "status": "reserved" },
+    { "id": "pilotage", "path": "modules/pilotage/SKILL.md", "dimensions": ["D10"], "status": "reserved" }
+  ],
+  "extensionPoints": ["E1", "E2"],
+  "previousVersions": []
+}
