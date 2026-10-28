@@ -26,7 +26,7 @@ La colonne « Repris dans » cite les modules de la spécification qui reprennen
 | [`agents-paralleles-gitlab`](#agents-paralleles-gitlab-101) | 1.0.1 | 5 | 2 | 20 |
 | [`analyse-projet`](#analyse-projet-102) | 1.0.2 | 5 | 1 | 16 |
 | [`angular`](#angular-101) | 1.0.1 | 8 | 2 | 30 |
-| [`capture-sprint-jira`](#capture-sprint-jira-100) | 1.0.0 | 8 | 2 | 29 |
+| [`capture-sprint-jira`](#capture-sprint-jira-101) | 1.0.1 | 8 | 2 | 29 |
 | [`java`](#java-111) | 1.1.1 | 7 | 1 | 29 |
 | [`skill4appli`](#skill4appli-110) | 1.1.0 | 9 | 3 | 34 |
 | [`socle-back-front`](#socle-back-front-101) | 1.0.1 | 6 | 1 | 15 |
@@ -770,7 +770,7 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 
 Dimension réservée : aucun invariant en vigueur dans cette version.
 
-## capture-sprint-jira 1.0.0
+## capture-sprint-jira 1.0.1
 
 Capture en MHTML des tickets du prochain sprint d'un Jira protégé par un SSO, rangés dans un dossier par catégorie : connexion faite à la main dans le navigateur du poste, relevé et filtre des tickets, une page MHTML par ticket, classement par terme clé, rapport, interface locale, ligne de commande, agent capteur-sprint, export par l'API REST sans SSO. Point d'entrée : [`specs/capture-sprint-jira/SKILL.md`](specs/capture-sprint-jira/SKILL.md).
 
@@ -804,7 +804,7 @@ Capture en MHTML des tickets du prochain sprint d'un Jira protégé par un SSO, 
 | **D4.INV-1** | une page n'est capturée que si elle est celle du ticket : adresse `…/browse/<CLÉ>` ou titre qui la contient, et clé affichée ; sinon, passé le délai, le ticket est en erreur et rien n'est écrit pour lui. | `execution`, `capture`, `recette` |
 | **D4.INV-2** | avant la capture, la page du ticket défile tant que son texte s'allonge, puis attend qu'il ne change plus : un contenu chargé à l'affichage figure dans le fichier. | `capture`, `recette` |
 | **D4.INV-3** | chaque fichier est un MHTML de Chrome, au format « Page Web, un seul fichier » d'« Enregistrer sous… », nommé par la clé du ticket. | `capture`, `recette` |
-| **D4.INV-4** | une erreur n'arrête pas la capture ; trois erreurs de suite, ou la fermeture du navigateur, l'arrêtent ; le rapport dit ce qui a été capturé et que la capture s'est arrêtée. | `execution`, `capture`, `interface`, `recette` |
+| **D4.INV-4** | une erreur n'arrête pas la capture ; trois erreurs de suite, ou la fermeture du navigateur, l'arrêtent ; le rapport dit ce qui a été capturé et que la capture s'est arrêtée ; fermé pendant le relevé, avant tout ticket, le navigateur arrête la capture sans rapport, avec un message qui le dit. | `execution`, `capture`, `interface`, `recette` |
 
 ### D5 : Classement par catégorie, dossiers et rapport (active)
 

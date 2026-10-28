@@ -1,10 +1,10 @@
 ---
 name: capture-sprint-jira
 description: Capture en MHTML des tickets du prochain sprint d'un Jira protégé par un SSO, rangés dans un dossier par catégorie (connexion faite à la main dans le navigateur du poste, profil dédié, relevé des liens de la page du sprint, filtre par préfixe de clé et plage de numéros, une page MHTML par ticket, classement par terme clé, dossier « à classer », rapport JSON, interface locale et ligne de commande, agent capteur-sprint, export par l'API REST quand un mot de passe ou un jeton est accepté). À utiliser pour récupérer les tickets d'un sprint avant de les analyser, sans les enregistrer un à un à la main.
-version: 1.0.0
+version: 1.0.1
 ---
 
-# Capture des tickets d'un sprint Jira, version 1.0.0
+# Capture des tickets d'un sprint Jira, version 1.0.1
 
 Ce document est le point d'entrée du skill. Le skill enregistre en MHTML, comme « Enregistrer sous… » de Chrome, chaque ticket du prochain sprint d'un Jira protégé par un SSO, et le range dans le dossier de sa catégorie (par défaut `ticket avec ia` et `ticket sans ia`). Le développeur se connecte lui-même dans une fenêtre du navigateur de son poste ; le skill ne voit aucun identifiant. Les fichiers produits sont ceux qu'attend l'ingestion d'`agent-tdd-jira`. Les règles détaillées sont dans `modules/`.
 
@@ -74,7 +74,7 @@ Clause de second ordre : le classement n'est pas neutre. Ce que le skill range d
 
 ## 5. Registre des dimensions
 
-| ID | Dimension | Introduite | Statut 1.0.0 | Dépend de | Module |
+| ID | Dimension | Introduite | Statut 1.0.1 | Dépend de | Module |
 |---|---|---|---|---|---|
 | D1 | Exécution : installation, dépendance, emplacements, réglages | 1.0 | active | | `execution`, `recette` |
 | D2 | Session SSO : connexion à la main, profil dédié | 1.0 | active | D1 | `session`, `recette` |
@@ -107,7 +107,7 @@ Points d'extension, actifs depuis la version indiquée :
 
 ## 8. Critères d'acceptation
 
-- La recette du module `recette` passe en entier : `npm test`, 19 scénarios et 108 contrôles avec Python ; sans Python, R7 est sauté.
+- La recette du module `recette` passe en entier : `npm test`, 19 scénarios et 110 contrôles avec Python ; sans Python, R7 est sauté.
 - La recette passe en intégration continue sur `ubuntu-latest` et `windows-latest`, avec Node 20 et Node 22, après extraction par la commande du module `execution`, § 8, sous bash et sous CMD, puis `npm ci`.
 - Les fichiers tirés des modules ont exactement les empreintes de la table du module `execution`, § 8.
 - Les scénarios A1 à A5 du module `agent` sont rejoués avec le développeur avant que l'agent capture un sprint réel.
@@ -137,7 +137,7 @@ Points d'extension, actifs depuis la version indiquée :
 - **D4.INV-1** : une page n'est capturée que si elle est celle du ticket : adresse `…/browse/<CLÉ>` ou titre qui la contient, et clé affichée ; sinon, passé le délai, le ticket est en erreur et rien n'est écrit pour lui.
 - **D4.INV-2** : avant la capture, la page du ticket défile tant que son texte s'allonge, puis attend qu'il ne change plus : un contenu chargé à l'affichage figure dans le fichier.
 - **D4.INV-3** : chaque fichier est un MHTML de Chrome, au format « Page Web, un seul fichier » d'« Enregistrer sous… », nommé par la clé du ticket.
-- **D4.INV-4** : une erreur n'arrête pas la capture ; trois erreurs de suite, ou la fermeture du navigateur, l'arrêtent ; le rapport dit ce qui a été capturé et que la capture s'est arrêtée.
+- **D4.INV-4** : une erreur n'arrête pas la capture ; trois erreurs de suite, ou la fermeture du navigateur, l'arrêtent ; le rapport dit ce qui a été capturé et que la capture s'est arrêtée ; fermé pendant le relevé, avant tout ticket, le navigateur arrête la capture sans rapport, avec un message qui le dit.
 
 **D5 : classement**
 
@@ -184,3 +184,5 @@ Le préfixe, les numéros et l'adresse du Jira du développeur ne figurent dans 
 ## 11. Journal de révision
 
 **1.0.0** (2026-10-28) : première version. Dimensions D1 à D8 actives, D9 et D10 réservées. Points d'extension E1 et E2. Module commun, interface, ligne de commande, exports par l'API, recette de 19 scénarios (108 contrôles) contre un faux Jira local et agent `capteur-sprint`, écrits en entier dans les modules `execution`, `interface`, `export-api`, `recette` et `agent`. Tirée des outils du dossier `utils/` de `geminiboard-cadrage` (section 10).
+
+**1.0.1** (2026-10-28) : correctif, après la recette en CI de la version 1.0.0 fusionnée, en échec sur les deux jobs Node 20. Relevé : tout bloc qui défile et contient un lien de ticket est parcouru, quelle que soit sa hauteur, et non plus seulement ceux de 100 pixels au moins ; sur `ubuntu-latest`, où la fenêtre s'ouvrait à une taille imprévue, le relevé s'arrêtait à 31 tickets sur 72 (D3.INV-1). La fenêtre s'ouvre en 1 280 × 900 pixels (module `session`). Fermé pendant le relevé, avant tout ticket, le navigateur arrête la capture avec un message qui le dit, et non plus sur un message technique (D4.INV-4, précisé). Recette : faux Jira qui charge la suite tant que la liste ne remplit pas sa zone, comme Jira, liste virtualisée de 80 pixels, R15 étendu à la fermeture pendant le relevé, R16 qui attend l'interface sans s'interrompre ; 110 contrôles ; huit défauts réintroduits, dont M8, le seuil de 100 pixels.

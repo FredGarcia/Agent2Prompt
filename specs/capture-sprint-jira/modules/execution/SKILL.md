@@ -77,24 +77,24 @@ Treize fichiers sont tirés des blocs annotés `<!-- fichier : chemin -->` des m
 
 | Fichier | Module, section | Empreinte sha256 |
 |---|---|---|
-| `package.json` | `execution`, § 9 | `7493a4af4ad23c1e13b92c66ba242c9bca40b3be0f9ba8ab77434c924306eb77` |
-| `package-lock.json` | `execution`, § 9 | `80d7bb928817d7ca7ba7600b5292371ad49fa95d25c5af0316766f2a675c788a` |
+| `package.json` | `execution`, § 9 | `f8c5c38fa4b6d681f16f41a5676398511cbd8fe5a31942755f0117d09b4a7205` |
+| `package-lock.json` | `execution`, § 9 | `20809741731462e5ea8827b639ed8a66dd13300af6e2e20077be030bc4116d98` |
 | `.gitignore` | `execution`, § 9 | `b163b109241838c4ff48e7cc27de427a4fb4e7f9aebdb16c8a5ad3fbb7a02613` |
-| `scripts/jira-capture-core.mjs` | `execution`, § 10 | `173c7b918feec11b3f271c3146c0ac2e30b0015793b8ee75eea9b4548c087f4d` |
-| `scripts/jira-capture-app.mjs` | `interface`, § 8 | `07dab20b9b5ea116e1be03d228709896c46439fff26c9fb7bc81eb8de9a6f8f5` |
+| `scripts/jira-capture-core.mjs` | `execution`, § 10 | `b0f7745e6aedbbc44b5349156fb64f2084b500292c80a4909c03eb563c1a9d14` |
+| `scripts/jira-capture-app.mjs` | `interface`, § 8 | `a9745efa6c2d34fc7600173f732628716b5b35ceb3658e2cead55602eebc40d3` |
 | `scripts/public/capture.html` | `interface`, § 8 | `f8c7a637f8c2dafc62b9b360e9eb504f24d59d86667c27904059f213081e3abb` |
 | `scripts/jira-capture-mhtml.mjs` | `interface`, § 8 | `ad9a2a8d7926b215366ad9d8564527428657f8116ca18d759b52084662b88779` |
-| `agent/capteur-sprint.md` | `agent`, § 7 | `758d783b13566506f00f7a52405a49adfc7543ad23adcc6d526bec0efb23ef9c` |
+| `agent/capteur-sprint.md` | `agent`, § 7 | `8a5b262ecbfc00b60c6e2702246bf0563a5402d7b4828eca7445d8d43db01ec0` |
 | `scripts/jira-sprint-app.mjs` | `export-api`, § 6 | `14005092304d4d368c869d7ee801ca922529848325255054768e86f37c418ea8` |
 | `scripts/public/index.html` | `export-api`, § 6 | `f69c6d601212d9a7e746181957a8c281f00a3d42decd488de25c54fdbb8abd91` |
 | `scripts/jira_sprint_export.py` | `export-api`, § 6 | `60b6953199cbc21443572212fee36de21adc4522e86feb2215f38ba474b91782` |
-| `tests/fake-jira.mjs` | `recette`, § 6 | `8264199f3020af430970c17cae538f115287a3bba8b69b67729351927c5a663f` |
-| `tests/run-tests.mjs` | `recette`, § 6 | `22de1b311e48fcefac770db87920cebbdde5407e41ee7ad299271e4da405cb55` |
+| `tests/fake-jira.mjs` | `recette`, § 6 | `c99fd4a4ceee0486170b8e8d0635ae9fd309735d6c6a9556f3f34190d8278b41` |
+| `tests/run-tests.mjs` | `recette`, § 6 | `fb8eeb2fc1a73ec4d04338b1a2da8379fca7cc833ea9598f31626866bce5f526` |
 
 Depuis le dossier du skill, cette commande d'une ligne écrit les treize fichiers, compare leurs empreintes à celles du tableau et sort avec le code 1 au moindre écart ou à la moindre absence. Elle ne contient ni `$`, ni accent grave, ni `!`, ni `%`, ni guillemet intérieur : elle se colle telle quelle dans bash, zsh, CMD ou PowerShell, et dans un fichier `.cmd`. Elle lit aussi des modules aux fins de ligne CRLF.
 
 ```text
-node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'package.json': '7493a4af4ad23c1e13b92c66ba242c9bca40b3be0f9ba8ab77434c924306eb77', 'package-lock.json': '80d7bb928817d7ca7ba7600b5292371ad49fa95d25c5af0316766f2a675c788a', '.gitignore': 'b163b109241838c4ff48e7cc27de427a4fb4e7f9aebdb16c8a5ad3fbb7a02613', 'scripts/jira-capture-core.mjs': '173c7b918feec11b3f271c3146c0ac2e30b0015793b8ee75eea9b4548c087f4d', 'scripts/jira-capture-app.mjs': '07dab20b9b5ea116e1be03d228709896c46439fff26c9fb7bc81eb8de9a6f8f5', 'scripts/public/capture.html': 'f8c7a637f8c2dafc62b9b360e9eb504f24d59d86667c27904059f213081e3abb', 'scripts/jira-capture-mhtml.mjs': 'ad9a2a8d7926b215366ad9d8564527428657f8116ca18d759b52084662b88779', 'agent/capteur-sprint.md': '758d783b13566506f00f7a52405a49adfc7543ad23adcc6d526bec0efb23ef9c', 'scripts/jira-sprint-app.mjs': '14005092304d4d368c869d7ee801ca922529848325255054768e86f37c418ea8', 'scripts/public/index.html': 'f69c6d601212d9a7e746181957a8c281f00a3d42decd488de25c54fdbb8abd91', 'scripts/jira_sprint_export.py': '60b6953199cbc21443572212fee36de21adc4522e86feb2215f38ba474b91782', 'tests/fake-jira.mjs': '8264199f3020af430970c17cae538f115287a3bba8b69b67729351927c5a663f', 'tests/run-tests.mjs': '22de1b311e48fcefac770db87920cebbdde5407e41ee7ad299271e4da405cb55' }; const vus = new Set(); let ecarts = 0; for (const module of ['modules/execution/SKILL.md', 'modules/interface/SKILL.md', 'modules/agent/SKILL.md', 'modules/export-api/SKILL.md', 'modules/recette/SKILL.md']) { const texte = fs.readFileSync(module, 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); vus.add(m[1]); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (conforme === false) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } } for (const f of Object.keys(attendu)) { if (vus.has(f) === false) { ecarts++; console.log('ABSENT    ' + f); } } if (ecarts > 0) process.exitCode = 1;"
+node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'package.json': 'f8c5c38fa4b6d681f16f41a5676398511cbd8fe5a31942755f0117d09b4a7205', 'package-lock.json': '20809741731462e5ea8827b639ed8a66dd13300af6e2e20077be030bc4116d98', '.gitignore': 'b163b109241838c4ff48e7cc27de427a4fb4e7f9aebdb16c8a5ad3fbb7a02613', 'scripts/jira-capture-core.mjs': 'b0f7745e6aedbbc44b5349156fb64f2084b500292c80a4909c03eb563c1a9d14', 'scripts/jira-capture-app.mjs': 'a9745efa6c2d34fc7600173f732628716b5b35ceb3658e2cead55602eebc40d3', 'scripts/public/capture.html': 'f8c7a637f8c2dafc62b9b360e9eb504f24d59d86667c27904059f213081e3abb', 'scripts/jira-capture-mhtml.mjs': 'ad9a2a8d7926b215366ad9d8564527428657f8116ca18d759b52084662b88779', 'agent/capteur-sprint.md': '8a5b262ecbfc00b60c6e2702246bf0563a5402d7b4828eca7445d8d43db01ec0', 'scripts/jira-sprint-app.mjs': '14005092304d4d368c869d7ee801ca922529848325255054768e86f37c418ea8', 'scripts/public/index.html': 'f69c6d601212d9a7e746181957a8c281f00a3d42decd488de25c54fdbb8abd91', 'scripts/jira_sprint_export.py': '60b6953199cbc21443572212fee36de21adc4522e86feb2215f38ba474b91782', 'tests/fake-jira.mjs': 'c99fd4a4ceee0486170b8e8d0635ae9fd309735d6c6a9556f3f34190d8278b41', 'tests/run-tests.mjs': 'fb8eeb2fc1a73ec4d04338b1a2da8379fca7cc833ea9598f31626866bce5f526' }; const vus = new Set(); let ecarts = 0; for (const module of ['modules/execution/SKILL.md', 'modules/interface/SKILL.md', 'modules/agent/SKILL.md', 'modules/export-api/SKILL.md', 'modules/recette/SKILL.md']) { const texte = fs.readFileSync(module, 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); vus.add(m[1]); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (conforme === false) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } } for (const f of Object.keys(attendu)) { if (vus.has(f) === false) { ecarts++; console.log('ABSENT    ' + f); } } if (ecarts > 0) process.exitCode = 1;"
 ```
 
 Puis, depuis le même dossier :
@@ -112,7 +112,7 @@ npm test
 ```json
 {
   "name": "capture-sprint-jira",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "Capture en MHTML des tickets d'un sprint Jira derrière un SSO, rangés par catégorie (skill capture-sprint-jira)",
   "engines": {
@@ -134,13 +134,13 @@ npm test
 ```json
 {
   "name": "capture-sprint-jira",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "lockfileVersion": 3,
   "requires": true,
   "packages": {
     "": {
       "name": "capture-sprint-jira",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "dependencies": {
         "playwright-core": "1.63.0"
       },
@@ -238,12 +238,17 @@ export function browserChannel(env = process.env) {
   return channel === 'chromium' ? undefined : channel;
 }
 
-/** Ouvre une fenêtre visible sur le profil dédié : la connexion SSO s'y fait à la main. */
+/**
+ * Ouvre une fenêtre visible sur le profil dédié : la connexion SSO s'y fait à la main. La fenêtre s'ouvre en
+ * 1280 × 900, quelle que soit la taille qu'elle avait gardée, ou l'écran (sans écran réel, elle peut s'ouvrir
+ * minuscule) ; le développeur peut ensuite la redimensionner.
+ */
 export function launchBrowser() {
   return chromium.launchPersistentContext(profileDir(), {
     channel: browserChannel(),
     headless: false,
     viewport: null, // la page prend la taille de la fenêtre
+    args: ['--window-size=1280,900'],
   });
 }
 
@@ -346,16 +351,17 @@ export function classify(sources, categories) {
 // ---------------------------------------------------------------------------------------------
 
 /**
- * Un pas de défilement, exécuté dans la page : la fenêtre, si elle défile, et chaque bloc qui défile (100 pixels
- * de haut au moins ; avec `withLinks`, seulement s'il contient un lien de ticket) avancent de 80 % de leur hauteur
- * visible, si bien qu'aucune carte n'est sautée, même dans une petite fenêtre. Rend true si l'un d'eux a bougé.
+ * Un pas de défilement, exécuté dans la page : la fenêtre, si elle défile, et chaque bloc qui défile avancent de
+ * 80 % de leur hauteur visible, si bien qu'aucune carte n'est sautée, même dans une petite fenêtre. Avec
+ * `withLinks`, seuls comptent les blocs qui contiennent un lien de ticket, quelle que soit leur hauteur ; sans,
+ * les blocs de 100 pixels de haut au moins. Rend true si l'un d'eux a bougé.
  */
 function scrollStep(withLinks) {
   const root = document.scrollingElement ?? document.documentElement;
   const scrolls = (el) => el.scrollHeight > el.clientHeight + 1 && (el === root || /(auto|scroll|overlay)/.test(getComputedStyle(el).overflowY));
   const targets = scrolls(root) ? [root] : [];
   for (const el of document.querySelectorAll('body *')) {
-    if (el.clientHeight < 100 || !scrolls(el)) continue;
+    if (el.clientHeight < (withLinks ? 1 : 100) || !scrolls(el)) continue;
     if (withLinks && !el.querySelector('a[href*="/browse/"]')) continue;
     targets.push(el);
   }

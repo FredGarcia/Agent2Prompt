@@ -33,11 +33,11 @@ Il vérifie ces conditions toutes les 400 ms, en tolérant les navigations en co
 
 - Une erreur sur un ticket est notée dans le rapport, avec son message ; la capture passe au ticket suivant.
 - Trois erreurs de suite arrêtent la capture : c'est presque toujours une session expirée, et les tickets suivants échoueraient de même. Le rapport le dit (`aborted`), et le navigateur reste ouvert sur le sprint pour se reconnecter (D6.INV-4).
-- Fermer le navigateur, par le bouton de l'interface ou à la main, arrête aussi la capture ; le rapport garde ce qui a été capturé.
+- Fermer le navigateur, par le bouton de l'interface ou à la main, arrête aussi la capture ; le rapport garde ce qui a été capturé. Fermé pendant le relevé, avant le premier ticket, il n'y a rien à rapporter : l'interface affiche « Capture arrêtée : le navigateur a été fermé pendant le relevé des tickets, avant toute capture ».
 
 ## 5. Durée
 
-Le faux Jira de la recette se capture en 46 s pour huit tickets, relevé d'un backlog de 72 cartes compris, soit 4 à 5 s par ticket. Un vrai Jira, plus lent à afficher, demande davantage : une vingtaine de tickets prend quelques minutes, à mesurer sur le poste.
+Le faux Jira de la recette se capture en 51 s pour huit tickets, relevé d'un backlog de 72 cartes compris, soit 5 à 6 s par ticket ; en 76 s quand le backlog est une liste virtualisée de 80 pixels de haut, que le relevé parcourt à petits pas. Un vrai Jira, plus lent à afficher, demande davantage : une vingtaine de tickets prend quelques minutes, à mesurer sur le poste.
 
 ## 6. Pièges connus
 
