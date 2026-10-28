@@ -4,6 +4,14 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-10-28 : capture-sprint-jira 1.2.1
+
+- **capture-sprint-jira 1.2.1** : correctif. Une fois la version 1.2.0 fusionnée, sa recette en CI a échoué sur `ubuntu-latest` Node 22 : après la fermeture du navigateur pendant la capture (R15), la capture est restée en cours sur le deuxième ticket, et les scénarios suivants en ont échoué (8 contrôles). Les trois autres jobs passaient.
+  - Capture (D4.INV-4) : la capture d'un ticket échoue aussitôt si la page ou le navigateur se ferment, et au plus tard après le délai d'affichage plus deux minutes, si le navigateur ne répond plus. Le ticket est alors en erreur, et la capture s'arrête ou passe au suivant.
+  - Le blocage n'a pas été reproduit hors de la CI, en trente fermetures pendant la capture, avec Chromium et Google Chrome : le correctif rend ce blocage impossible, sans en prouver la cause.
+  - Recette : deux contrôles en R15, sur un faux onglet qui ne répond plus ; 132 contrôles. Dix-neuf défauts réintroduits ; M18 et M19, les gardes retirées, sont nouveaux.
+- Version 1.2.0 archivée ; sa transmission reste telle qu'elle a été publiée. README mis à jour.
+
 ### 2026-10-28 : capture-sprint-jira 1.2.0
 
 - **capture-sprint-jira 1.2.0** : capture d'un ticket seul par son adresse, à la demande du développeur, pour recapturer ou ajouter un ticket sans relancer le sprint.

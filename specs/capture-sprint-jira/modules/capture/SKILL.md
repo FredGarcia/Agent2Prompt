@@ -32,6 +32,7 @@ Il vérifie ces conditions toutes les 400 ms, en tolérant les navigations en co
 ## 4. Erreurs et arrêt (D4.INV-4)
 
 - Une erreur sur un ticket est notée dans le rapport, avec son message ; la capture passe au ticket suivant.
+- La capture d'un ticket échoue aussitôt si la page ou le navigateur se ferment, et au plus tard après le délai d'affichage plus deux minutes, si le navigateur ne répond plus : un appel au navigateur pourrait sinon ne jamais aboutir, et la capture resterait en cours sans fin. Le ticket est alors en erreur (« capture du ticket bloquée, abandonnée après 140 s »). Depuis 1.2.1 : la version 1.2.0, fusionnée, est restée bloquée sur le deuxième ticket après la fermeture du navigateur, dans un job de CI.
 - Trois erreurs de suite arrêtent la capture : c'est presque toujours une session expirée, et les tickets suivants échoueraient de même. Le rapport le dit (`aborted`), et le navigateur reste ouvert sur le sprint pour se reconnecter (D6.INV-4).
 - Fermer le navigateur, par le bouton de l'interface ou à la main, arrête aussi la capture ; le rapport garde ce qui a été capturé. Fermé pendant le relevé, avant le premier ticket, il n'y a rien à rapporter : l'interface affiche « Capture arrêtée : le navigateur a été fermé pendant le relevé des tickets, avant toute capture ».
 

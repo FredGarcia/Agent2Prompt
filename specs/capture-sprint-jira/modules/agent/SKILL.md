@@ -76,7 +76,7 @@ Rejoués avec le développeur à l'installation, puis à chaque version du skill
 ```markdown
 ---
 name: capteur-sprint
-description: Agent de capture des tickets d'un sprint Jira derrière un SSO (skill capture-sprint-jira 1.2.0). À solliciter pour enregistrer en MHTML les tickets du prochain sprint, rangés dans un dossier par section de la page du sprint (par défaut « IA » et « DEV »), ou un ticket seul par son adresse, puis en rendre le bilan. Ne saisit jamais d'identifiant : le développeur se connecte lui-même.
+description: Agent de capture des tickets d'un sprint Jira derrière un SSO (skill capture-sprint-jira 1.2.1). À solliciter pour enregistrer en MHTML les tickets du prochain sprint, rangés dans un dossier par section de la page du sprint (par défaut « IA » et « DEV »), ou un ticket seul par son adresse, puis en rendre le bilan. Ne saisit jamais d'identifiant : le développeur se connecte lui-même.
 tools: Bash, Read, Glob
 ---
 
