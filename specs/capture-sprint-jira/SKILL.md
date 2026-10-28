@@ -1,29 +1,29 @@
 ---
 name: capture-sprint-jira
-description: Capture en MHTML des tickets du prochain sprint d'un Jira protégé par un SSO, rangés dans un dossier par catégorie (connexion faite à la main dans le navigateur du poste, profil dédié, relevé des liens de la page du sprint, filtre par préfixe de clé et plage de numéros, une page MHTML par ticket, classement par section de la page du sprint (en-têtes IA et DEV par défaut), dossier « à classer », rapport JSON, interface locale et ligne de commande, agent capteur-sprint, export par l'API REST quand un mot de passe ou un jeton est accepté). À utiliser pour récupérer les tickets d'un sprint avant de les analyser, sans les enregistrer un à un à la main.
-version: 1.1.0
+description: Capture en MHTML des tickets du prochain sprint d'un Jira protégé par un SSO, rangés dans un dossier par catégorie (connexion faite à la main dans le navigateur du poste, profil dédié, relevé des liens de la page du sprint, filtre par préfixe de clé et plage de numéros, une page MHTML par ticket, classement par section de la page du sprint (en-têtes IA et DEV par défaut), dossier « à classer », capture d'un ticket seul par son adresse, rapport JSON, interface locale et ligne de commande, agent capteur-sprint, export par l'API REST quand un mot de passe ou un jeton est accepté). À utiliser pour récupérer les tickets d'un sprint avant de les analyser, sans les enregistrer un à un à la main.
+version: 1.2.0
 ---
 
-# Capture des tickets d'un sprint Jira, version 1.1.0
+# Capture des tickets d'un sprint Jira, version 1.2.0
 
-Ce document est le point d'entrée du skill. Le skill enregistre en MHTML, comme « Enregistrer sous… » de Chrome, chaque ticket du prochain sprint d'un Jira protégé par un SSO, et le range dans le dossier de sa section sur la page du sprint (par défaut `IA` et `DEV`, les en-têtes des deux parties du sprint). Le développeur se connecte lui-même dans une fenêtre du navigateur de son poste ; le skill ne voit aucun identifiant. Les fichiers produits sont ceux qu'attend l'ingestion d'`agent-tdd-jira`. Les règles détaillées sont dans `modules/`.
+Ce document est le point d'entrée du skill. Le skill enregistre en MHTML, comme « Enregistrer sous… » de Chrome, chaque ticket du prochain sprint d'un Jira protégé par un SSO, et le range dans le dossier de sa section sur la page du sprint (par défaut `IA` et `DEV`, les en-têtes des deux parties du sprint). Un ticket se capture aussi seul, par son adresse, dans le dossier que choisit le développeur. Le développeur se connecte lui-même dans une fenêtre du navigateur de son poste ; le skill ne voit aucun identifiant. Les fichiers produits sont ceux qu'attend l'ingestion d'`agent-tdd-jira`. Les règles détaillées sont dans `modules/`.
 
 ## 1. Ordre de lecture
 
 1. Ce document, en entier.
 2. `manifest.json` : modules, versions visées, plateformes.
-3. Les modules actifs, dans cet ordre : `execution`, `session`, `releve`, `capture`, `classement`, `interface`, `agent`, `export-api`, `recette`.
+3. Les modules actifs, dans cet ordre : `execution`, `session`, `releve`, `capture`, `classement`, `ticket`, `interface`, `agent`, `export-api`, `recette`.
 4. `modules/remise/SKILL.md` et `modules/pilotage/SKILL.md` : seulement pour comprendre les points d'extension. Ne pas les appliquer en 1.x.
 
 ## 2. Ce que fait le skill
 
 | Outil | Commande, depuis le dossier du skill | Rôle | Module |
 |---|---|---|---|
-| Interface de capture | `npm run capture`, puis http://127.0.0.1:3100 | ouvre le sprint, capture les tickets en tâche de fond, affiche l'avancement et le rapport | `interface` |
-| Capture en ligne de commande | `npm run capture:cli -- "<page du sprint>" [options]` | la même capture, Entrée dans le terminal remplaçant le bouton | `interface` |
+| Interface de capture | `npm run capture`, puis http://127.0.0.1:3100 | ouvre le sprint, capture les tickets en tâche de fond, affiche l'avancement et le rapport ; capture aussi un ticket seul | `interface`, `ticket` |
+| Capture en ligne de commande | `npm run capture:cli -- "<page du sprint>" [options]`, ou `-- --ticket "<adresse du ticket>" [--dossier IA]` | la même capture, Entrée dans le terminal remplaçant le bouton | `interface`, `ticket` |
 | Module commun | `scripts/jira-capture-core.mjs` | navigateur, relevé, capture, classement, rapport | `execution` |
 | Export par l'API | `npm run export`, ou `scripts/jira_sprint_export.py` | tableau et CSV des tickets, quand Jira accepte un mot de passe ou un jeton | `export-api` |
-| Recette | `npm test` | 19 scénarios contre un faux Jira local | `recette` |
+| Recette | `npm test` | 20 scénarios contre un faux Jira local | `recette` |
 | Agent | `agent/capteur-sprint.md` | pilote l'interface pour le développeur et rend le bilan | `agent` |
 
 ```mermaid
@@ -65,7 +65,7 @@ Une nouvelle capture dans le même dossier remplace le fichier de chaque ticket 
 | Éléments | les tickets : clés, liens, pages, en-têtes de section | `releve`, `classement` |
 | Espace | la page du sprint, le profil du navigateur, le dossier de sortie | `session`, `releve`, `execution` |
 | Engendrent | les relations : lien vers ticket, ticket vers catégorie, capture vers rapport | `releve`, `classement` |
-| État | l'avancement de la capture, la session SSO, le contenu du dossier de sortie | `capture`, `session`, `interface` |
+| État | l'avancement de la capture, la session SSO, le contenu du dossier de sortie, recapturé ticket par ticket | `capture`, `session`, `ticket`, `interface` |
 | Expression | les fichiers MHTML, `rapport.json`, la page de l'interface, le bilan de l'agent | `capture`, `classement`, `interface`, `agent` |
 | Évolutif | versions du skill, dimensions réservées D9 et D10, points d'extension E1 et E2 | `remise`, `pilotage` |
 | Environnement | le Jira et son SSO, le navigateur du poste, le développeur qui se connecte et tranche, les agents qui lisent les captures | `session`, `agent` |
@@ -87,6 +87,7 @@ Clause de second ordre : le classement n'est pas neutre. Ce que le skill range d
 | D9 | Remise des tickets capturés à agent-tdd-jira | 1.0 | reserved | D11 | `remise` |
 | D10 | Pilotage de la capture par un autre outil | 1.0 | reserved | D6 | `pilotage` |
 | D11 | Classement par section de la page du sprint, dossiers et rapport | 1.1 | active | D3, D4 | `classement`, `recette` |
+| D12 | Capture d'un ticket seul par son adresse | 1.2 | active | D2, D4, D11 | `ticket`, `recette` |
 
 Statuts : `active` (implémentée et testée), `reserved` (points d'extension posés, fonctionnalité absente), `superseded` (remplacée ; la version de remplacement est indiquée).
 
@@ -97,7 +98,7 @@ Le skill suit le contrat de version de `EVOLUTION.md` du dépôt Agent2Prompt. I
 Points d'extension, actifs depuis la version indiquée :
 
 - **E1** (1.0.0, étendu en 1.1.0) : `rapport.json` a des champs stables, au niveau de la capture (`date`, `sprintUrl`, `folder`, `filter`, `categories`, `markers` depuis 1.1.0, `listed`, `selected`, `ignored`, `ignoredSample`, `counts`, `errors`, `aborted`, `tickets`) et de chaque ticket (`key`, `url`, `category`, `found`, `where`, `excerpt`, `file`, `movedFrom`, ou `error`). D9 s'en servira pour remettre les tickets d'une catégorie à agent-tdd-jira sans relire les pages.
-- **E2** (1.0.0) : la capture complète est une fonction du module commun, `captureSprintTickets(context, page, options)`, qui signale son avancement par `onProgress` et rend le rapport ; l'interface et la ligne de commande n'en sont que deux appelants. D10 en ajoutera d'autres, par exemple GeminiBoard pour Gemini CLI, sans modifier la capture.
+- **E2** (1.0.0) : la capture complète est une fonction du module commun, `captureSprintTickets(context, page, options)`, qui signale son avancement par `onProgress` et rend le rapport ; l'interface et la ligne de commande n'en sont que deux appelants. D10 en ajoutera d'autres, par exemple GeminiBoard pour Gemini CLI, sans modifier la capture. Depuis 1.2.0, `captureSingleTicket(context, page, options)` capture de même un ticket seul (D12).
 
 ## 7. Règles globales
 
@@ -110,10 +111,10 @@ Points d'extension, actifs depuis la version indiquée :
 
 ## 8. Critères d'acceptation
 
-- La recette du module `recette` passe en entier : `npm test`, 19 scénarios et 117 contrôles avec Python ; sans Python, R7 est sauté.
+- La recette du module `recette` passe en entier : `npm test`, 20 scénarios et 130 contrôles avec Python ; sans Python, R7 est sauté.
 - La recette passe en intégration continue sur `ubuntu-latest` et `windows-latest`, avec Node 20 et Node 22, après extraction par la commande du module `execution`, § 8, sous bash et sous CMD, puis `npm ci`.
 - Les fichiers tirés des modules ont exactement les empreintes de la table du module `execution`, § 8.
-- Les scénarios A1 à A5 du module `agent` sont rejoués avec le développeur avant que l'agent capture un sprint réel.
+- Les scénarios A1 à A6 du module `agent` sont rejoués avec le développeur avant que l'agent capture un sprint réel.
 - Une première capture d'un sprint réel est faite avec le développeur, sans avertissement sur les sections ; chaque ticket à classer ou en erreur est examiné avec lui.
 
 ## 9. Invariants
@@ -182,6 +183,13 @@ Ces invariants ne sont plus en vigueur : la catégorie ne se cherche plus dans l
 - **D11.INV-5** : chaque capture écrit `sprint.mhtml`, la page du sprint, et `rapport.json` : filtre, catégories, en-têtes comptés et, pour chaque ticket, sa catégorie et la ligne de l'en-tête de sa section, ou son erreur.
 - **D11.INV-6** : une catégorie dont aucun en-tête n'est suivi de tickets, ou dont plusieurs le sont, est signalée à la fin de la capture, dans l'interface et en ligne de commande, sans l'arrêter.
 
+**D12 : ticket seul**
+
+- **D12.INV-1** : un ticket se capture seul par son adresse `…/browse/<CLÉ>`, dans la session du navigateur ouvert, avec les mêmes attentes et le même MHTML que dans la capture d'un sprint ; une adresse sans clé est refusée avant toute capture.
+- **D12.INV-2** : le dossier d'un ticket capturé seul est choisi par le développeur parmi les catégories et `à classer`, tout autre nom refusé ; il est proposé d'après le dossier du ticket dans le dernier `rapport.json` du dossier de sortie, sinon `à classer` ; la section n'est jamais devinée.
+- **D12.INV-3** : la capture d'un ticket seul remplace son fichier, retire sa copie d'un autre dossier de catégorie, et remplace ou ajoute son entrée dans `rapport.json`, avec le choix noté et les décomptes recalculés, ou crée ce rapport ; en cas d'erreur, rien n'est écrit.
+- **D12.INV-4** : après la capture d'un ticket seul, réussie ou non, le navigateur revient à la page où il était.
+
 ## 10. Filiation
 
 Le skill reprend les outils écrits avec le développeur les 27 et 28 octobre 2026 et déposés d'abord dans le dossier `utils/` du dépôt `geminiboard-cadrage` (pull request n° 10, close sans fusion au profit de ce skill). Le développeur enregistrait jusque-là chaque ticket du sprint à la main, en MHTML, dans deux dossiers.
@@ -192,7 +200,8 @@ Le skill reprend les outils écrits avec le développeur les 27 et 28 octobre 20
 2. capture en MHTML de la page du sprint, connexion faite à la main dans le navigateur (D2), puis interface locale (D6) ;
 3. capture de chaque ticket du sprint, retenu par préfixe de clé et plage de numéros (D3, D4), et classement dans deux dossiers nommés par les termes clés `ticket avec ia` et `ticket sans ia` (D5) ;
 4. dossiers de catégorie créés directement dans le chemin choisi dans l'interface, sans sous-dossier daté (D5.INV-4) ; skill et agent rangés dans Agent2Prompt, pour être intégrés ensuite à Gemini CLI depuis GeminiBoard (D10, réservée).
-5. après vérification sur son Jira, le développeur précise que les deux parties du sprint s'annoncent sur la page du sprint par un `<span>IA</span>` et un `<span>DEV</span>`, et que les dossiers prennent ces noms : classement par section de la page du sprint (D11, version 1.1.0), qui remplace la recherche d'un terme dans la page du ticket (D5).
+5. après vérification sur son Jira, le développeur précise que les deux parties du sprint s'annoncent sur la page du sprint par un `<span>IA</span>` et un `<span>DEV</span>`, et que les dossiers prennent ces noms : classement par section de la page du sprint (D11, version 1.1.0), qui remplace la recherche d'un terme dans la page du ticket (D5) ;
+6. capture d'un ticket seul par son adresse, dans le dossier que choisit le développeur, proposé d'après le dernier rapport (D12, version 1.2.0).
 
 Le préfixe, les numéros et l'adresse du Jira du développeur ne figurent dans aucun fichier du skill : il les saisit dans l'interface, qui les garde dans son navigateur (D6.INV-3).
 
@@ -203,3 +212,5 @@ Le préfixe, les numéros et l'adresse du Jira du développeur ne figurent dans 
 **1.0.1** (2026-10-28) : correctif, après la recette en CI de la version 1.0.0 fusionnée, en échec sur les deux jobs Node 20. Relevé : tout bloc qui défile et contient un lien de ticket est parcouru, quelle que soit sa hauteur, et non plus seulement ceux de 100 pixels au moins ; sur `ubuntu-latest`, où la fenêtre s'ouvrait à une taille imprévue, le relevé s'arrêtait à 31 tickets sur 72 (D3.INV-1). La fenêtre s'ouvre en 1 280 × 900 pixels (module `session`). Fermé pendant le relevé, avant tout ticket, le navigateur arrête la capture avec un message qui le dit, et non plus sur un message technique (D4.INV-4, précisé). Recette : faux Jira qui charge la suite tant que la liste ne remplit pas sa zone, comme Jira, liste virtualisée de 80 pixels, R15 étendu à la fermeture pendant le relevé, R16 qui attend l'interface sans s'interrompre ; 110 contrôles ; huit défauts réintroduits, dont M8, le seuil de 100 pixels.
 
 **1.1.0** (2026-10-28) : classement par section de la page du sprint. Dimension D11 active ; D5, la recherche d'un terme clé dans la page du ticket, passe à `superseded`, remplacée par D11 : le développeur a vérifié sur son Jira que les deux parties du sprint s'annoncent sur la page du sprint par un `<span>IA</span>` et un `<span>DEV</span>`. Catégories par défaut `IA` et `DEV`, qui nomment aussi les dossiers. Un en-tête est un élément visible dont tout le texte est le nom d'une catégorie, hors navigation ; sa section est le couloir qui le contient ou, dans une liste plate, ce qui le suit jusqu'à l'en-tête suivant ; la section de chaque ticket est relevée à chaque pas du défilement, et reportée dans une liste virtualisée. Avertissement en fin de capture pour une section introuvable ou répétée (D11.INV-6). Point d'extension E1 étendu : champ `markers` du rapport. Interface : champ des sections, sous une nouvelle clé de stockage local. Relevé (D3.INV-1, précisé) : la fenêtre du sprint passe au premier plan, une fenêtre presque sans hauteur est agrandie à 1 280 × 900, le relevé attend une première image rendue, 5 s au plus, et signale chaque pas de défilement à la page par un événement `scroll` ; le job `ubuntu-latest` Node 22 de la pull request refaisait l'échec de la 1.0.0, 31 tickets sur 72 relevés au premier lancement du navigateur. Recette : faux Jira à sections, tableau à couloirs, R3 réécrit, R11, R13 et R14 étendus ; 117 contrôles ; quatorze défauts réintroduits, dont M3 redéfini et M9 à M14 nouveaux. Section de migration dans le module `classement`.
+
+**1.2.0** (2026-10-28) : capture d'un ticket seul par son adresse. Dimension D12 active, module `ticket`. L'adresse `…/browse/<CLÉ>` est ramenée à sa clé ; la page est attendue et enregistrée comme dans la capture d'un sprint. Le dossier est choisi par le développeur parmi les catégories et `à classer`, proposé d'après le dernier `rapport.json` du dossier de sortie ; la copie d'un autre dossier est retirée, l'entrée du rapport remplacée ou ajoutée ; rien n'est écrit en cas d'erreur ; le navigateur revient à la page d'avant. Interface : section « Un ticket seul » et `POST /api/ticket`, `GET /api/section` ; ligne de commande : `--ticket` et `--dossier` ; agent : protocole du ticket seul. Point d'extension E2 : `captureSingleTicket()` exportée. Recette : scénario R20, R16 et R17 étendus ; 20 scénarios, 130 contrôles ; dix-sept défauts réintroduits, dont M15 à M17 nouveaux.

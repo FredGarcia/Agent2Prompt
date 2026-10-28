@@ -20,6 +20,8 @@ Phase 7E couverte : Expression.
 
 Trois boutons : « Ouvrir le sprint », « Capturer les tickets », actif une fois le sprint ouvert, et « Fermer le navigateur ». Pendant la capture, une barre et une ligne d'état donnent l'avancement (« Ticket 3 sur 20 : ABCDE-3512… »). À la fin, la page affiche le rapport : nombre de tickets sur la page, retenus et ignorés, nombre par dossier, erreurs, avertissements sur les sections (D11.INV-6), puis une ligne par ticket avec son dossier et la ligne de l'en-tête de sa section, ou l'erreur. La ligne d'état est une région `aria-live` : un lecteur d'écran annonce l'avancement et le bilan.
 
+Une section « Un ticket seul » capture un ticket par son adresse (module `ticket`) : champ de l'adresse, liste « Dossier », pré-remplie d'après le dernier `rapport.json` du dossier de sortie avec une phrase qui dit d'où vient la proposition, et bouton « Capturer ce ticket », actif une fois le navigateur ouvert. La ligne d'état donne le fichier écrit (« Ticket ABCDE-3512 enregistré : IA/ABCDE-3512.mhtml »).
+
 Les valeurs saisies restent dans le navigateur du développeur, en stockage local, pour les fois suivantes (D6.INV-3). Les sections y ont leur propre clé depuis 1.1.0 : les catégories saisies en 1.0 ne sont pas reprises (module `classement`, § 7). Ni la page ni le serveur ne les écrivent ailleurs que dans `rapport.json`, avec la capture.
 
 ## 2. API HTTP
@@ -31,6 +33,8 @@ La page appelle le serveur ; un agent peut l'appeler de même (module `agent`). 
 | `GET /api/status` | `{ browser, job }` | `browser` : navigateur ouvert ; `job.state` : `idle`, `running`, `done` ou `failed` ; `step`, `done`, `total`, `key` pendant la capture ; `report` et `warnings`, les avertissements sur les sections, à la fin ; `error` en cas d'échec |
 | `POST /api/open` `{ url }` | 200, message | ouvre le navigateur sur la page ; 400 si l'adresse n'est pas en http ou https ; 409 pendant une capture |
 | `POST /api/capture` `{ prefix, min, max, categories, folder }` | 202 | lance la capture en tâche de fond ; `categories` : un en-tête de section par ligne ; 409 sans sprint ouvert ou pendant une capture ; 400 pour un filtre ou une catégorie invalides |
+| `POST /api/ticket` `{ url, category, categories, folder }` | 202 | capture un ticket seul en tâche de fond, dans le dossier `category` (module `ticket`) ; 409 sans navigateur ouvert ou pendant une capture ; 400 pour une adresse sans clé ou un dossier hors des catégories et d'`à classer` ; `job.kind` vaut `ticket`, et `job.ticket` donne l'entrée du ticket à la fin |
+| `GET /api/section?url=…&folder=…&categories=…` | `{ key, folder, known }` | dossier proposé pour ce ticket, d'après le dernier `rapport.json` du dossier de sortie ; 400 pour une adresse sans clé |
 | `POST /api/close` | 200, message | ferme le navigateur ; pendant une capture, l'arrête (« capture arrêtée ») |
 
 ## 3. Sécurité (D6.INV-1)
@@ -64,8 +68,14 @@ Le navigateur s'ouvre sur la page ; une fois les tickets affichés, Entrée dans
 | `--min`, `--max` | numéros de début et de fin, compris | aucune borne |
 | `--categorie` | un en-tête de section, répétable | `IA` et `DEV` |
 | `--sortie` | dossier de sortie, relatif au dossier courant | `mhtml/` du dossier du skill |
+| `--ticket` | adresse d'un ticket à capturer seul, au lieu de l'adresse du sprint (module `ticket`) | aucun |
+| `--dossier` | avec `--ticket` : une des catégories ou `à classer` | celui du dernier `rapport.json` du dossier de sortie, sinon `à classer` |
 
-Codes de sortie : 0 ; 1 si un ticket est en erreur ; 2 pour une adresse manquante ou une option invalide. Un second argument sans option vaut `--sortie`.
+Codes de sortie : 0 ; 1 si un ticket est en erreur ; 2 pour une adresse manquante ou une option invalide, dont `--dossier` sans `--ticket` et une adresse de ticket sans clé. Un second argument sans option vaut `--sortie`.
+
+```bash
+npm run capture:cli -- --ticket "https://jira.example.com/browse/ABC-3512" --dossier IA --sortie C:\Sprints\S25
+```
 
 ## 6. Pièges connus
 
@@ -75,7 +85,7 @@ Codes de sortie : 0 ; 1 si un ticket est en erreur ; 2 pour une adresse manquant
 
 ## 7. Contrôle de sortie
 
-- R8, R9, R10, R11, R14, R15, R16 et R17 du module `recette` passent.
+- R8, R9, R10, R11, R14, R15, R16, R17 et R20 du module `recette` passent.
 - Le développeur voit l'avancement, puis le rapport, et retrouve ses valeurs à la visite suivante.
 
 ## 8. Sources
@@ -91,6 +101,8 @@ Codes de sortie : 0 ; 1 si un ticket est en erreur ; 2 pour une adresse manquant
 //   2. « Capturer les tickets » : sur la page du sprint, chaque lien /browse/<CLÉ> retenu par le filtre
 //      (préfixe, numéros) est ouvert, enregistré en MHTML et rangé dans le dossier de sa section, nommée par
 //      l'en-tête (IA, DEV…) qui le précède sur la page du sprint. La page suit l'avancement, puis affiche le rapport.
+//   3. « Capturer ce ticket » : un ticket seul, par son adresse, dans le dossier choisi (proposé d'après le dernier
+//      rapport du dossier) ; le navigateur revient ensuite à la page où il était.
 // Aucun identifiant ne passe par l'application. Session SSO dans .jira-profile/ et captures dans mhtml/ par
 // défaut, dans le dossier du skill, que son .gitignore écarte.
 // Node.js 20, playwright-core et Chrome installé sur le poste (ou Edge : JIRA_CAPTURE_CHANNEL=msedge).
@@ -99,8 +111,8 @@ import http from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import {
-  DEFAULT_CATEGORIES, captureSprintTickets, firstLine, launchBrowser, outputFolder, parseCategories, parseFilter,
-  sectionWarnings,
+  DEFAULT_CATEGORIES, captureSingleTicket, captureSprintTickets, firstLine, launchBrowser, outputFolder,
+  parseCategories, parseFilter, parseTicketUrl, proposedFolder, sectionWarnings, UNCLASSIFIED,
 } from './jira-capture-core.mjs';
 
 const HOST = '127.0.0.1';
@@ -218,6 +230,34 @@ function startCapture(body) {
   });
 }
 
+/** Lance la capture d'un ticket seul, par son adresse, en tâche de fond ; même suivi par GET /api/status. */
+function startTicket(body) {
+  if (!session) throw new HttpError(409, "Ouvrez d'abord le navigateur et connectez-vous");
+  if (busy()) throw new HttpError(409, 'Une capture est déjà en cours');
+  let ticket;
+  let categories;
+  try {
+    ticket = parseTicketUrl(body.url);
+    categories = parseCategories(body.categories ?? DEFAULT_CATEGORIES);
+    const dir = String(body.category ?? '').trim() || UNCLASSIFIED;
+    if (![...categories, UNCLASSIFIED].includes(dir)) throw new Error(`Dossier « ${dir} » : une des catégories ou « ${UNCLASSIFIED} » attendu`);
+  } catch (err) {
+    throw new HttpError(400, err.message);
+  }
+  const { context } = session;
+  const page = session.page.isClosed() ? context.pages().at(-1) : session.page;
+  if (!page) throw new HttpError(409, 'Aucun onglet ouvert : rouvrez le navigateur');
+  const current = { state: 'running', kind: 'ticket', step: 'ticket', done: 0, total: 1, key: ticket.key, startedAt: Date.now() };
+  job = current;
+  captureSingleTicket(context, page, {
+    url: ticket.url, folder: outputFolder(body.folder), category: body.category, categories,
+  }).then((entry) => {
+    Object.assign(current, { state: 'done', done: 1, ticket: entry });
+  }).catch((err) => {
+    Object.assign(current, { state: 'failed', error: `${ticket.key} : ${firstLine(err)}` });
+  });
+}
+
 async function readJson(req) {
   let raw = '';
   for await (const chunk of req) {
@@ -257,6 +297,19 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'POST' && req.url === '/api/capture') {
       startCapture(await readJson(req));
       return sendJson(res, 202, { message: 'Capture lancée' });
+    }
+    if (req.method === 'POST' && req.url === '/api/ticket') {
+      startTicket(await readJson(req));
+      return sendJson(res, 202, { message: 'Capture du ticket lancée' });
+    }
+    if (req.method === 'GET' && req.url.startsWith('/api/section?')) {
+      const q = new URL(req.url, 'http://127.0.0.1').searchParams;
+      try {
+        const categories = parseCategories(q.get('categories') ?? DEFAULT_CATEGORIES);
+        return sendJson(res, 200, await proposedFolder(outputFolder(q.get('folder')), q.get('url'), categories));
+      } catch (err) {
+        throw new HttpError(400, err.message);
+      }
     }
     if (req.method === 'POST' && req.url === '/api/close') {
       const stopping = busy(); // fermer le navigateur arrête la capture en cours, qui rend un rapport partiel
@@ -301,7 +354,7 @@ process.on('SIGINT', async () => {
   label, legend { display: flex; flex-direction: column; gap: .3rem; font-size: .95rem; }
   fieldset { border: 0; margin: 0; padding: 0; display: flex; gap: .75rem; align-items: end; }
   legend { margin-bottom: .3rem; }
-  input, textarea { padding: .5rem; font: inherit; border: 1px solid #9aa5b1; border-radius: 4px; }
+  input, textarea, select { padding: .5rem; font: inherit; border: 1px solid #9aa5b1; border-radius: 4px; }
   textarea { min-height: 3.5rem; resize: vertical; }
   .hint { font-size: .85rem; color: #52606d; }
   .buttons { display: flex; gap: .75rem; flex-wrap: wrap; margin: 1.25rem 0 .5rem; }
@@ -363,6 +416,21 @@ DEV</textarea>
 </div>
 <p class="hint">Les valeurs saisies sont gardées dans ce navigateur, pas dans le dépôt. Fermer le navigateur arrête une capture en cours.</p>
 
+<h2>Un ticket seul</h2>
+<p class="hint">Le navigateur doit être ouvert et connecté. Le ticket va dans le dossier de sortie ci-dessus, sous le dossier choisi ; le navigateur revient ensuite à la page où il était.</p>
+<div class="grid">
+  <label class="wide">Adresse du ticket
+    <input id="ticket-url" type="url" placeholder="https://votre-org.atlassian.net/browse/ABC-123" spellcheck="false">
+  </label>
+  <label>Dossier
+    <select id="ticket-folder" aria-describedby="ticket-folder-hint"></select>
+    <span id="ticket-folder-hint" class="hint">Proposé d'après le dernier rapport du dossier de sortie ; « à classer » pour un ticket qu'il ne connaît pas.</span>
+  </label>
+</div>
+<div class="buttons">
+  <button id="ticket" type="button" disabled>Capturer ce ticket</button>
+</div>
+
 <progress id="progress" max="1" value="0" aria-label="Avancement de la capture" hidden></progress>
 <div id="status" role="status" aria-live="polite"></div>
 
@@ -380,7 +448,8 @@ DEV</textarea>
 
 <script>
   const $ = (id) => document.getElementById(id);
-  const FIELDS = ['url', 'prefix', 'min', 'max', 'sections', 'folder'];
+  const FIELDS = ['url', 'prefix', 'min', 'max', 'sections', 'folder', 'ticket-url'];
+  const UNCLASSIFIED = 'à classer';
   const STORE = 'jira-capture:';
   let opened = false;
   let running = false;
@@ -406,6 +475,33 @@ DEV</textarea>
   function refreshButtons() {
     $('open').disabled = running;
     $('capture').disabled = running || !opened;
+    $('ticket').disabled = running || !opened;
+  }
+
+  // Dossiers proposés pour un ticket seul : les sections saisies, puis « à classer »
+  function fillFolders(selected) {
+    const names = $('sections').value.split(/\r?\n|;/).map((s) => s.trim()).filter(Boolean);
+    const select = $('ticket-folder');
+    const keep = selected ?? select.value;
+    select.replaceChildren(...[...names, UNCLASSIFIED].map((n) => { const o = el('option', n); o.value = n; return o; }));
+    select.value = [...names, UNCLASSIFIED].includes(keep) ? keep : UNCLASSIFIED;
+  }
+
+  // Dossier du ticket dans le dernier rapport du dossier de sortie, s'il y figure
+  async function proposeFolder() {
+    fillFolders();
+    const url = $('ticket-url').value.trim();
+    if (!url) return;
+    const q = new URLSearchParams({ url, folder: $('folder').value, categories: $('sections').value });
+    try {
+      const data = await call('GET', '/api/section?' + q);
+      fillFolders(data.folder);
+      $('ticket-folder-hint').textContent = data.known
+        ? `${data.key} figure dans le dernier rapport : dossier « ${data.folder} » proposé.`
+        : `${data.key} ne figure pas dans le dernier rapport du dossier : « à classer » proposé.`;
+    } catch (err) {
+      $('ticket-folder-hint').textContent = err.message;
+    }
   }
 
   async function call(method, url, body) {
@@ -465,7 +561,10 @@ DEV</textarea>
   function showProgress(job) {
     const bar = $('progress');
     bar.hidden = false;
-    if (job.step === 'tickets' && job.total) {
+    if (job.step === 'ticket') {
+      bar.removeAttribute('value');
+      setStatus(`Capture du ticket ${job.key}…`);
+    } else if (job.step === 'tickets' && job.total) {
       bar.max = job.total;
       bar.value = job.done;
       setStatus(`Ticket ${job.done + 1} sur ${job.total} : ${job.key}…`);
@@ -485,7 +584,11 @@ DEV</textarea>
         setTimeout(poll, 1000);
       } else {
         $('progress').hidden = true;
-        if (job.state === 'done') {
+        if (job.state === 'done' && job.kind === 'ticket') {
+          const t = job.ticket;
+          const moved = t.movedFrom?.length ? ` (copie précédente retirée de ${t.movedFrom.join(', ')})` : '';
+          setStatus(`Ticket ${t.key} enregistré : ${t.file}${moved}. Le rapport du dossier est à jour.`);
+        } else if (job.state === 'done') {
           const r = job.report;
           setStatus(`Capture terminée : ${r.tickets.length - r.errors} tickets enregistrés sur ${r.selected}${r.errors ? `, ${r.errors} en erreur` : ''}.`, r.errors > 0 || r.aborted);
           renderReport(r, job.warnings);
@@ -531,6 +634,21 @@ DEV</textarea>
     }
   });
 
+  $('ticket').addEventListener('click', async () => {
+    remember();
+    try {
+      await call('POST', '/api/ticket', {
+        url: $('ticket-url').value.trim(), category: $('ticket-folder').value,
+        categories: $('sections').value, folder: $('folder').value,
+      });
+      running = true;
+      refreshButtons();
+      poll();
+    } catch (err) {
+      setStatus('Erreur : ' + err.message, true);
+    }
+  });
+
   $('close').addEventListener('click', async () => {
     try {
       const data = await call('POST', '/api/close', {});
@@ -543,7 +661,9 @@ DEV</textarea>
   });
 
   for (const id of FIELDS) $(id).addEventListener('change', remember);
+  for (const id of ['ticket-url', 'sections', 'folder']) $(id).addEventListener('change', proposeFolder);
   restore();
+  proposeFolder();
   poll(); // reprend l'avancement d'une capture en cours si la page est rechargée
 </script>
 </body>
@@ -562,6 +682,9 @@ DEV</textarea>
 // Usage, depuis le dossier du skill :
 //   npm run capture:cli -- "<adresse de la page du sprint>" [--prefixe ABC] [--min 100] [--max 200]
 //                          [--categorie IA --categorie DEV] [--sortie <dossier>]
+//   npm run capture:cli -- --ticket "<adresse du ticket>" [--dossier IA] [--categorie …] [--sortie <dossier>]
+//     un ticket seul : rangé sous --dossier (une catégorie ou « à classer ») ; par défaut, le dossier où le range le
+//     dernier rapport.json du dossier de sortie, sinon « à classer ».
 // Une catégorie est le texte d'un en-tête de section de la page du sprint, et le nom de son dossier (IA et DEV par
 // défaut). Sortie : relative au dossier courant ; mhtml/ du dossier du skill par défaut. Les dossiers de catégorie y
 // sont créés directement. Code de sortie : 0, 1 si un ticket est en erreur, 2 pour une option invalide.
@@ -570,12 +693,13 @@ import { stdin as input, stdout as output } from 'node:process';
 import readline from 'node:readline/promises';
 import { parseArgs } from 'node:util';
 import {
-  DEFAULT_CATEGORIES, DEFAULT_OUT_DIR, captureSprintTickets, launchBrowser, parseCategories, parseFilter,
-  sectionWarnings,
+  DEFAULT_CATEGORIES, DEFAULT_OUT_DIR, UNCLASSIFIED, captureSingleTicket, captureSprintTickets, launchBrowser,
+  parseCategories, parseFilter, parseTicketUrl, proposedFolder, sectionWarnings,
 } from './jira-capture-core.mjs';
 
 const USAGE = 'Usage : node jira-capture-mhtml.mjs "<adresse de la page du sprint>" [--prefixe ABC] [--min N] [--max N] '
-  + '[--categorie "<en-tête de section>"]… [--sortie <dossier>]';
+  + '[--categorie "<en-tête de section>"]… [--sortie <dossier>]\n'
+  + '        node jira-capture-mhtml.mjs --ticket "<adresse du ticket>" [--dossier <catégorie ou à classer>] [--categorie …] [--sortie <dossier>]';
 
 let options;
 try {
@@ -587,18 +711,55 @@ try {
       max: { type: 'string' },
       categorie: { type: 'string', multiple: true },
       sortie: { type: 'string' },
+      ticket: { type: 'string' },
+      dossier: { type: 'string' },
     },
   });
-  if (positionals.length < 1 || positionals.length > 2) throw new Error('une adresse de page attendue');
-  options = {
-    url: positionals[0],
-    folder: values.sortie ?? positionals[1], // second argument : ancienne forme, toujours acceptée
-    filter: parseFilter({ prefix: values.prefixe, min: values.min, max: values.max }),
-    categories: parseCategories(values.categorie ?? DEFAULT_CATEGORIES),
-  };
+  if (values.ticket !== undefined) {
+    if (positionals.length) throw new Error('--ticket : aucune adresse de sprint attendue');
+    const categories = parseCategories(values.categorie ?? DEFAULT_CATEGORIES);
+    const dossier = values.dossier?.trim();
+    if (dossier && ![...categories, UNCLASSIFIED].includes(dossier)) {
+      throw new Error(`Dossier « ${dossier} » : une des catégories ou « ${UNCLASSIFIED} » attendu`);
+    }
+    options = { ticket: parseTicketUrl(values.ticket), dossier, categories, folder: values.sortie };
+  } else {
+    if (values.dossier !== undefined) throw new Error('--dossier ne sert qu\'avec --ticket');
+    if (positionals.length < 1 || positionals.length > 2) throw new Error('une adresse de page attendue');
+    options = {
+      url: positionals[0],
+      folder: values.sortie ?? positionals[1], // second argument : ancienne forme, toujours acceptée
+      filter: parseFilter({ prefix: values.prefixe, min: values.min, max: values.max }),
+      categories: parseCategories(values.categorie ?? DEFAULT_CATEGORIES),
+    };
+  }
 } catch (err) {
   console.error(`${err.message}\n${USAGE}`);
   process.exit(2);
+}
+
+if (options.ticket) {
+  const folder = options.folder ? resolve(options.folder) : DEFAULT_OUT_DIR;
+  const dossier = options.dossier ?? (await proposedFolder(folder, options.ticket.url, options.categories)).folder;
+  const context = await launchBrowser();
+  try {
+    const page = context.pages()[0] ?? (await context.newPage());
+    await page.goto(options.ticket.url, { waitUntil: 'domcontentloaded', timeout: 60_000 }).catch(() => {
+      console.log("La page n'a pas fini de charger : terminez la connexion dans la fenêtre.");
+    });
+    const rl = readline.createInterface({ input, output });
+    await rl.question(`Connectez-vous dans la fenêtre si besoin, puis appuyez sur Entrée pour capturer ${options.ticket.key} dans « ${dossier} »… `);
+    rl.close();
+    const entry = await captureSingleTicket(context, page, { url: options.ticket.url, folder, category: dossier, categories: options.categories });
+    const moved = entry.movedFrom.length ? ` (copie précédente retirée de ${entry.movedFrom.join(', ')})` : '';
+    console.log(`Ticket ${entry.key} enregistré : ${resolve(folder, entry.file)}${moved}`);
+  } catch (err) {
+    console.log(`${options.ticket.key} : ${err.message}`);
+    process.exitCode = 1;
+  } finally {
+    await context.close();
+  }
+  process.exit(process.exitCode ?? 0);
 }
 
 const context = await launchBrowser();
