@@ -26,6 +26,7 @@ La colonne « Repris dans » cite les modules de la spécification qui reprennen
 | [`agents-paralleles-gitlab`](#agents-paralleles-gitlab-101) | 1.0.1 | 5 | 2 | 20 |
 | [`analyse-projet`](#analyse-projet-102) | 1.0.2 | 5 | 1 | 16 |
 | [`angular`](#angular-101) | 1.0.1 | 8 | 2 | 30 |
+| [`capture-sprint-jira`](#capture-sprint-jira-100) | 1.0.0 | 8 | 2 | 29 |
 | [`java`](#java-111) | 1.1.1 | 7 | 1 | 29 |
 | [`skill4appli`](#skill4appli-110) | 1.1.0 | 9 | 3 | 34 |
 | [`socle-back-front`](#socle-back-front-101) | 1.0.1 | 6 | 1 | 15 |
@@ -40,9 +41,9 @@ Agent de développement TDD : demande Jira en MHTML, analyse avec commentaires, 
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D1.INV-1** | le fichier MHTML n'est jamais modifié ; l'extraction travaille en lecture seule et enregistre l'empreinte sha256 de la source. | `ingestion-jira`, `parallele`, `agent2dev`, `agent2dev/cadrage` |
+| **D1.INV-1** | le fichier MHTML n'est jamais modifié ; l'extraction travaille en lecture seule et enregistre l'empreinte sha256 de la source. | `ingestion-jira`, `parallele`, `agent2dev`, `agent2dev/cadrage`, `capture-sprint-jira/remise` |
 | **D1.INV-2** | le résumé de l'extraction (clé, titre, description, nombre de commentaires, pièces, limites) est confirmé par le développeur avant toute analyse. | `ingestion-jira`, `agent2dev`, `agent2dev/cadrage` |
-| **D1.INV-3** | toute partie non extraite ou incertaine (commentaires repliés, pièces absentes, page non reconnue) est déclarée comme limite. | `ingestion-jira` |
+| **D1.INV-3** | toute partie non extraite ou incertaine (commentaires repliés, pièces absentes, page non reconnue) est déclarée comme limite. | `ingestion-jira`, `capture-sprint-jira/capture` |
 
 ### D2 : Analyse et scénarios Gherkin (active)
 
@@ -766,6 +767,87 @@ Expert Angular 20 : produire et relire du code conforme à des invariants vérif
 Dimension réservée : aucun invariant en vigueur dans cette version.
 
 ### D10 : BFF Node entre Angular et les API (reserved)
+
+Dimension réservée : aucun invariant en vigueur dans cette version.
+
+## capture-sprint-jira 1.0.0
+
+Capture en MHTML des tickets du prochain sprint d'un Jira protégé par un SSO, rangés dans un dossier par catégorie : connexion faite à la main dans le navigateur du poste, relevé et filtre des tickets, une page MHTML par ticket, classement par terme clé, rapport, interface locale, ligne de commande, agent capteur-sprint, export par l'API REST sans SSO. Point d'entrée : [`specs/capture-sprint-jira/SKILL.md`](specs/capture-sprint-jira/SKILL.md).
+
+### D1 : Exécution : installation, dépendance, emplacements, réglages (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D1.INV-1** | le skill demande Node 20 ou plus récent et une seule dépendance, `playwright-core` à version exacte, qui pilote le navigateur installé sur le poste sans en télécharger ; Python 3 n'est demandé que par le script d'export facultatif. | `execution`, `recette` |
+| **D1.INV-2** | tout ce que le skill écrit par défaut reste dans son dossier : profil (`.jira-profile/`), captures (`mhtml/`) et exports (`exports/`) ; son `.gitignore` les écarte, avec `node_modules/` et tout fichier `.mhtml`. | `execution`, `session`, `classement`, `recette` |
+| **D1.INV-3** | chaque réglage de déploiement se lit dans sa variable `JIRA_CAPTURE_CHANNEL`, `JIRA_CAPTURE_PROFILE` ou `JIRA_CAPTURE_PAGE_TIMEOUT_MS`, ou prend son défaut ; une variable vide vaut absente. | `execution`, `recette` |
+
+### D2 : Session SSO : connexion à la main, profil dédié (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D2.INV-1** | aucun outil de capture ne demande, ne lit ni ne stocke d'identifiant, de mot de passe ou de jeton : la connexion se fait à la main, dans une fenêtre visible du navigateur. | `session`, `interface`, `agent`, `recette`, `pilotage` |
+| **D2.INV-2** | la session vit dans un profil de navigateur dédié, réutilisé d'une ouverture à l'autre : un SSO aux cookies persistants ne redemande pas la connexion. | `session`, `recette` |
+
+### D3 : Relevé des tickets sur la page du sprint, filtre (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D3.INV-1** | la page du sprint défile par pas de 80 % de la hauteur affichée de chaque bloc qui défile, jusqu'à ce que, quatre pas de suite, rien ne défile plus et qu'aucun ticket nouveau n'apparaisse ; les liens `/browse/<CLÉ>` sont relevés à chaque pas, hors navigation (menus, éléments récents), si bien qu'une liste virtualisée ne fait perdre aucun ticket, même dans une petite fenêtre. | `releve`, `recette` |
+| **D3.INV-2** | un ticket est retenu si la partie projet de sa clé commence par le préfixe et si son numéro est entre les bornes, comprises ; un préfixe et des bornes vides retiennent tout ; une valeur invalide est refusée avant toute capture. | `releve`, `recette` |
+| **D3.INV-3** | chaque clé n'est capturée qu'une fois, quelle que soit la forme de ses liens (relatif, absolu, casse) ; les tickets retenus sont capturés un à un, par numéro croissant. | `releve`, `recette` |
+
+### D4 : Capture des pages de tickets en MHTML (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D4.INV-1** | une page n'est capturée que si elle est celle du ticket : adresse `…/browse/<CLÉ>` ou titre qui la contient, et clé affichée ; sinon, passé le délai, le ticket est en erreur et rien n'est écrit pour lui. | `execution`, `capture`, `recette` |
+| **D4.INV-2** | avant la capture, la page du ticket défile tant que son texte s'allonge, puis attend qu'il ne change plus : un contenu chargé à l'affichage figure dans le fichier. | `capture`, `recette` |
+| **D4.INV-3** | chaque fichier est un MHTML de Chrome, au format « Page Web, un seul fichier » d'« Enregistrer sous… », nommé par la clé du ticket. | `capture`, `recette` |
+| **D4.INV-4** | une erreur n'arrête pas la capture ; trois erreurs de suite, ou la fermeture du navigateur, l'arrêtent ; le rapport dit ce qui a été capturé et que la capture s'est arrêtée. | `execution`, `capture`, `interface`, `recette` |
+
+### D5 : Classement par catégorie, dossiers et rapport (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D5.INV-1** | la catégorie d'un ticket est le terme clé trouvé dans sa page, sans tenir compte de la casse ni des accents, ses mots séparés par une espace, un tiret, un `_` ou rien, et pris entiers. | `classement`, `recette` |
+| **D5.INV-2** | les textes de la page sont lus dans cet ordre : contenu principal visible, contenu principal avec ses panneaux repliés, page visible hors navigation ; le premier qui contient un terme décide ; la navigation de Jira n'est jamais lue. | `classement`, `recette` |
+| **D5.INV-3** | un seul terme trouvé : le ticket va dans le dossier de sa catégorie ; aucun, ou plusieurs : dans `à classer` ; aucune catégorie n'est jamais devinée. | `classement`, `agent`, `recette` |
+| **D5.INV-4** | les dossiers de catégorie sont créés directement dans le dossier de sortie choisi ; une nouvelle capture d'un ticket remplace son fichier et retire sa copie d'un autre dossier de catégorie ; un ticket en erreur garde sa capture précédente. | `capture`, `classement`, `interface`, `recette` |
+| **D5.INV-5** | une catégorie est un nom de dossier valide sous Windows et sous Linux ; une catégorie en double, ou nommée `à classer`, est refusée. | `classement`, `recette` |
+| **D5.INV-6** | chaque capture écrit `sprint.mhtml`, la page du sprint, et `rapport.json` : filtre, catégories et, pour chaque ticket, sa catégorie, l'endroit et l'extrait où le terme a été trouvé, ou son erreur. | `classement`, `recette` |
+
+### D6 : Interfaces : page locale et ligne de commande (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D6.INV-1** | les interfaces locales écoutent sur `127.0.0.1` seulement ; elles refusent un hôte autre que `127.0.0.1` ou `localhost` et une origine autre que la leur (403), et un corps qui n'est pas du JSON (415). | `interface`, `export-api`, `recette` |
+| **D6.INV-2** | une seule capture à la fois, en tâche de fond ; son avancement et son rapport se lisent par `GET /api/status` ; fermer le navigateur l'arrête. | `interface`, `recette` |
+| **D6.INV-3** | les valeurs saisies dans la page (adresse, préfixe, numéros, catégories, dossier) restent dans le navigateur du développeur, en stockage local ; le serveur ne les écrit que dans le rapport de la capture. | `interface`, `agent`, `recette` |
+| **D6.INV-4** | après une capture sans erreur, le navigateur se ferme ; après une erreur ou un arrêt, il reste ouvert et revient à la page du sprint, pour une nouvelle tentative. | `capture`, `interface`, `recette` |
+| **D6.INV-5** | la ligne de commande fait la même capture, avec les mêmes filtre, catégories et dossier de sortie ; elle sort avec le code 2 sur une option invalide, 1 si un ticket est en erreur, 0 sinon. | `interface`, `recette` |
+
+### D7 : Agent capteur-sprint (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D7.INV-1** | l'agent ne demande, ne lit ni ne saisit aucun identifiant ; il laisse le développeur se connecter et attend sa confirmation avant de lancer la capture. | `agent` |
+| **D7.INV-2** | l'agent rend le bilan du rapport (tickets par catégorie, tickets à classer avec ce qui a été trouvé, erreurs, arrêt) et ne déplace, ne renomme ni ne supprime aucun fichier capturé sans l'accord du développeur. | `classement`, `agent` |
+| **D7.INV-3** | l'agent n'écrit ni l'adresse, ni le préfixe, ni les numéros du Jira du développeur dans un fichier du skill ou d'un dépôt. | `agent` |
+
+### D8 : Export par l'API REST, sans SSO (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D8.INV-1** | l'identifiant, le mot de passe ou le jeton ne servent qu'à la requête en cours vers Jira : ils ne sont écrits ni sur le disque, ni dans un journal, ni dans une sortie. | `export-api`, `recette` |
+| **D8.INV-2** | le prochain sprint est le sprint futur qui démarre le plus tôt ; la pagination de l'API est suivie jusqu'au dernier élément ; un tableau ambigu est signalé, sans choix arbitraire. | `export-api`, `recette` |
+| **D8.INV-3** | l'export donne un ticket par ligne, description au format ADF mise à plat et ticket non assigné nommé comme tel ; le CSV du script Python est en UTF-8 avec BOM et séparateur « ; », pour Excel. | `export-api`, `recette` |
+
+### D9 : Remise des tickets capturés à agent-tdd-jira (reserved)
+
+Dimension réservée : aucun invariant en vigueur dans cette version.
+
+### D10 : Pilotage de la capture par un autre outil (reserved)
 
 Dimension réservée : aucun invariant en vigueur dans cette version.
 

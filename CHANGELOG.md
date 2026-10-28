@@ -4,6 +4,18 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-10-28 : capture-sprint-jira 1.0.0
+
+- **capture-sprint-jira 1.0.0** : nouveau skill. Il capture en MHTML les tickets du prochain sprint d'un Jira protégé par un SSO et les range dans un dossier par catégorie, `ticket avec ia` et `ticket sans ia` par défaut. Le développeur les enregistrait jusque-là un à un, à la main. Dimensions :
+  - D1 à D8, actives : exécution (Node 20, `playwright-core` 1.63.0 seule dépendance, Chrome du poste, variables `JIRA_CAPTURE_*`) ; session SSO (connexion faite à la main dans une fenêtre visible, profil dédié, aucun identifiant) ; relevé des liens `/browse/<CLÉ>` de la page du sprint, navigation exclue, liste virtualisée comprise, filtre par préfixe de clé et plage de numéros ; capture de chaque page de ticket, attendue par son adresse ou son titre et par la clé affichée ; classement par terme clé, dossier `à classer` quand aucun terme ou plusieurs, dossiers créés directement dans le dossier de sortie, rapport JSON ; interface locale et ligne de commande ; agent `capteur-sprint` ; export par l'API REST pour un Jira sans SSO.
+  - D9 et D10, réservées : remise des tickets capturés à `agent-tdd-jira`, pilotage de la capture par un autre outil, comme GeminiBoard pour Gemini CLI.
+- Points d'extension E1 (champs stables de `rapport.json`) et E2 (`captureSprintTickets()` exportée). Au total : 11 modules, 29 invariants, 19 scénarios de recette (108 contrôles), scénarios d'agent A1 à A5.
+- Treize fichiers tirés des modules par une commande d'extraction à empreintes, valable sous bash, CMD et PowerShell, qui signale aussi un fichier absent.
+- Tiré des outils déposés d'abord dans `utils/` de `geminiboard-cadrage` (pull request n° 10 de ce dépôt, close sans fusion). Le préfixe, les numéros et l'adresse du Jira du développeur ne figurent dans aucun fichier : l'interface les garde dans son navigateur.
+- Essayé avec Node 20.20.2 et 22.23.4, Chrome for Testing 153 et Python 3.13 : 108 contrôles sur 108, après extraction depuis la transmission, sur un grand écran comme sur l'écran virtuel par défaut. Sept défauts réintroduits un à un font chacun échouer le scénario attendu.
+- La première exécution en CI a révélé deux défauts, corrigés avant publication. Le défilement à la molette, à pas fixe de 1 200 pixels, sautait des cartes d'une liste virtualisée dans une petite fenêtre : il est devenu programmé, à 80 % de la hauteur affichée, jusqu'en bas (D3.INV-1). La capture était déclarée terminée avant le retour du navigateur au sprint : une relance immédiate pouvait partir d'une page en chargement (D6.INV-4). La recette lit aussi la sortie de Python en UTF-8 sous Windows.
+- Outillage : workflow `.github/workflows/recette-capture-sprint-jira.yml`, qui rejoue ce chemin sur `ubuntu-latest` et `windows-latest`, avec Node 20 et 22 : extraction sous bash et sous CMD, `npm ci`, recette, bilan et échecs en annotations. README mis à jour.
+
 ### 2026-10-24 : skill4appli 1.1.0
 
 - **skill4appli 1.1.0** : inscription du skill dans le cycle 7E et les douze facteurs. Dans la section 5 du point d'entrée, chaque facteur est rattaché à une phase et prouvé par un invariant et ses tests, ou déclaré non couvert. Nouvelles dimensions :

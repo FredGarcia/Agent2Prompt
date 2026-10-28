@@ -1,0 +1,134 @@
+name: Recette de capture-sprint-jira
+
+# La spécification capture-sprint-jira contient ses scripts, sa recette et son agent. Ce workflow suit le chemin de
+# l'IA du développeur, sous Linux et sous Windows : matérialiser la transmission courante, extraire les fichiers par
+# la commande du module execution, § 8, installer la dépendance par npm ci, puis lancer la recette contre le faux
+# Jira local, avec le Chrome des images GitHub (sous écran virtuel pour Linux).
+
+on:
+  pull_request:
+    paths:
+      - 'specs/capture-sprint-jira/**'
+      - 'transmissions/capture-sprint-jira-*.md'
+      - 'tools/bundle.mjs'
+      - '.github/workflows/recette-capture-sprint-jira.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'specs/capture-sprint-jira/**'
+      - 'transmissions/capture-sprint-jira-*.md'
+      - 'tools/bundle.mjs'
+      - '.github/workflows/recette-capture-sprint-jira.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  recette:
+    name: recette (${{ matrix.os }}, Node ${{ matrix.node }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node: [20, 22]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Matérialiser la transmission courante, comme l'IA du développeur
+        shell: bash
+        run: |
+          cat > "$RUNNER_TEMP/materialiser.mjs" <<'FIN'
+          import { createHash } from 'node:crypto';
+          import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+          import { dirname, join } from 'node:path';
+          import { pathToFileURL } from 'node:url';
+          const depot = process.env.GITHUB_WORKSPACE;
+          // Sous Windows, actions/checkout extrait en CRLF : la transmission est relue en LF, comme elle a été écrite.
+          const lire = (chemin) => readFileSync(join(depot, chemin), 'utf8').replace(/\r\n/g, '\n');
+          const { relire } = await import(pathToFileURL(join(depot, 'tools', 'bundle.mjs')).href);
+          const { version } = JSON.parse(lire('specs/capture-sprint-jira/manifest.json'));
+          const { fichiers, sommes } = relire(lire(`transmissions/capture-sprint-jira-${version}.md`));
+          const cible = join(process.env.RUNNER_TEMP, 'capture-sprint-jira');
+          for (const f of fichiers) {
+            mkdirSync(dirname(join(cible, f.rel)), { recursive: true });
+            writeFileSync(join(cible, f.rel), f.contenu);
+          }
+          const attendues = new Map(sommes.map((s) => [s.rel, s.empreinte]));
+          const ecarts = fichiers.filter((f) => createHash('sha256').update(readFileSync(join(cible, f.rel))).digest('hex') !== attendues.get(f.rel));
+          for (const f of ecarts) console.log(`::error title=Intégrité de la transmission::${f.rel}`);
+          const execution = readFileSync(join(cible, 'modules/execution/SKILL.md'), 'utf8');
+          const section = execution.split('## 8. Matérialiser les fichiers exécutables')[1]?.split('\n## 9.')[0] ?? '';
+          const commande = /```text\n(node -e .+)\n```/.exec(section)?.[1];
+          if (!commande) {
+            console.log('::error title=Extraction::commande introuvable dans le module execution, § 8');
+            process.exit(1);
+          }
+          writeFileSync(join(cible, 'extraire.sh'), `${commande}\n`);
+          writeFileSync(join(cible, 'extraire.cmd'), `@echo off\r\n${commande}\r\nif errorlevel 1 exit /b 1\r\n`);
+          console.log(`capture-sprint-jira ${version} : ${fichiers.length} fichiers matérialisés dans ${cible}`);
+          if (ecarts.length > 0) process.exit(1);
+          FIN
+          cat > "$RUNNER_TEMP/annoter.mjs" <<'FIN'
+          import { readFileSync } from 'node:fs';
+          // Bilan et échecs de la recette (lignes « KO Rn · … ») en annotations de la pull request.
+          const [fichier, libelle] = process.argv.slice(2);
+          const texte = readFileSync(fichier, 'utf8').replace(/\r\n/g, '\n');
+          const donnee = (s) => s.replace(/%/g, '%25').replace(/\r/g, '%0D').replace(/\n/g, '%0A');
+          const propriete = (s) => donnee(s).replace(/:/g, '%3A').replace(/,/g, '%2C');
+          for (const ligne of texte.split('\n')) {
+            const ko = /^KO\s+(R\d+) · (.*)$/.exec(ligne);
+            if (ko) console.log(`::error title=${propriete(`Recette ${libelle} : ${ko[1]}`)}::${donnee(ko[2].slice(0, 3000))}`);
+          }
+          const bilan = /^Bilan : .*$/m.exec(texte)?.[0] ?? 'bilan absent';
+          console.log(`::notice title=${propriete(`Recette ${libelle}`)}::${donnee(bilan)}`);
+          FIN
+          node "$RUNNER_TEMP/materialiser.mjs"
+
+      - name: Extraire les scripts, la recette et l'agent sous bash
+        if: runner.os != 'Windows'
+        shell: bash
+        working-directory: ${{ runner.temp }}/capture-sprint-jira
+        run: bash extraire.sh
+
+      - name: Extraire les scripts, la recette et l'agent sous CMD
+        if: runner.os == 'Windows'
+        shell: cmd
+        working-directory: ${{ runner.temp }}\capture-sprint-jira
+        run: call extraire.cmd
+
+      - name: Installer la dépendance
+        shell: bash
+        working-directory: ${{ runner.temp }}/capture-sprint-jira
+        run: npm ci
+
+      - name: Recette sous Linux, écran virtuel
+        if: runner.os != 'Windows'
+        shell: bash
+        working-directory: ${{ runner.temp }}/capture-sprint-jira
+        run: |
+          node --version
+          google-chrome --version || true
+          statut=0
+          xvfb-run -a npm test > recette.txt 2>&1 || statut=$?
+          cat recette.txt
+          node "$RUNNER_TEMP/annoter.mjs" recette.txt "${{ runner.os }}, Node ${{ matrix.node }}"
+          exit $statut
+
+      - name: Recette sous Windows
+        if: runner.os == 'Windows'
+        shell: bash
+        working-directory: ${{ runner.temp }}/capture-sprint-jira
+        env:
+          PYTHON: python
+        run: |
+          node --version
+          statut=0
+          npm test > recette.txt 2>&1 || statut=$?
+          cat recette.txt
+          node "$RUNNER_TEMP/annoter.mjs" recette.txt "${{ runner.os }}, Node ${{ matrix.node }}"
+          exit $statut
