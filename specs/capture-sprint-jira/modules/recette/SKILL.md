@@ -17,7 +17,7 @@ npm test
 - Le navigateur est celui de `JIRA_CAPTURE_CHANNEL` : Chrome par défaut ; `chromium` après `npx playwright-core install chromium`.
 - Python : la variable `PYTHON`, à défaut `py` sous Windows et `python3` ailleurs ; s'il manque, R7 est sauté.
 - La recette travaille sur un profil et des dossiers temporaires : la session et les captures du dossier du skill ne sont pas touchées. Elle efface ses dossiers temporaires si tout passe ; sinon, ou avec `KEEP_TMP=1`, elle les garde et en donne le chemin, avec une capture d'écran de l'interface.
-- Durée : environ 2 min 30 s, dont 35 s par capture des huit tickets du faux backlog.
+- Durée : environ 3 min 40 s, dont 46 s pour la capture du backlog chargé au défilement et 53 s pour le backlog virtualisé.
 - Bilan attendu : `19 scénarios, 108 contrôles, 108 réussis, 0 en échec, 0 sautés` ; sans Python, `104 contrôles, 103 réussis, 0 en échec, 1 sautés`, R7 étant sauté.
 
 ## 2. Le faux Jira
@@ -26,7 +26,7 @@ npm test
 
 - une API REST Agile : deux tableaux aux noms proches, trois sprints futurs paginés deux par deux, 120 tickets paginés cinquante par cinquante, descriptions en texte ou en ADF, authentification Basic ou Bearer ;
 - un SSO simulé : sans cookie, un détour par `/sso/login`, qui pose un cookie persistant et compte ses passages ;
-- le backlog 42 : 71 cartes (60 hors plage, trois hors filtre, puis les huit du sprint, en fin de liste), une épopée liée en lien absolu et en minuscules, et un ticket récent, dans la plage, cité dans l'en-tête de la page ; chargé quinze cartes par quinze au défilement, ou virtualisé avec `?mode=virtual` ;
+- le backlog 42 : 71 cartes (60 hors plage, trois hors filtre, puis les huit du sprint, en fin de liste), une épopée liée en lien absolu et en minuscules, et un ticket récent, dans la plage, cité dans l'en-tête de la page ; chargé quinze cartes par quinze au défilement, ou virtualisé avec `?mode=virtual`, dans une zone de 300 pixels de haut, comme dans une fenêtre réduite ;
 - le backlog 43 : cinq tickets dont la session a expiré ;
 - les pages de tickets, rendues 400 ms après le chargement, comme une application monopage, chacune avec un menu latéral qui cite « Ticket avec IA » :
 
@@ -57,7 +57,7 @@ npm test
 | R10 | Backlog chargé au défilement : 72 tickets relevés, navigation exclue, 8 retenus et triés, les huit cas du § 2, dossiers directement dans le dossier choisi, MHTML de Chrome par ticket, commentaire chargé au défilement, `sprint.mhtml` et `rapport.json`, décompte ; une seule capture à la fois ; navigateur gardé ouvert après l'erreur | D3.INV-1, D3.INV-3, D4.INV-1, D4.INV-2, D4.INV-3, D5.INV-2, D5.INV-3, D5.INV-4, D5.INV-6, D6.INV-2, D6.INV-4 |
 | R11 | Nouvelle capture dans le même dossier, après un changement de catégorie dans Jira : retour à la page du sprint, ticket rangé dans sa nouvelle catégorie, copie précédente retirée, autres tickets en place, navigateur fermé sans erreur | D5.INV-4, D6.INV-4 |
 | R12 | Navigateur rouvert sans nouveau passage par le SSO | D2.INV-2 |
-| R13 | Backlog virtualisé : mêmes contrôles que R10 | D3.INV-1, D4.INV-1, D5.INV-3 |
+| R13 | Backlog virtualisé, dans une zone de 300 pixels : mêmes contrôles que R10 | D3.INV-1, D4.INV-1, D5.INV-3 |
 | R14 | Cinq tickets à session expirée : trois erreurs, capture arrêtée, navigateur gardé ouvert | D4.INV-1, D4.INV-4, D6.INV-4 |
 | R15 | « Fermer le navigateur » pendant la capture : capture arrêtée, rapport partiel | D4.INV-4, D6.INV-2 |
 | R16 | Page de l'interface pilotée comme par le développeur : bouton activé, avancement, boutons bloqués, bilan, résumé, une ligne par ticket, avertissement, valeurs retrouvées après rechargement | D6.INV-2, D6.INV-3 |
@@ -67,7 +67,7 @@ npm test
 
 ## 4. Contrôle de la recette elle-même
 
-Six défauts, réintroduits un à un dans le code, font chacun échouer la recette par le scénario attendu (essai du 28 octobre 2026, Node 22.23.4) :
+Sept défauts, réintroduits un à un dans le code, font chacun échouer la recette par le scénario attendu (essai du 28 octobre 2026, Node 22.23.4) :
 
 | ID | Défaut réintroduit | Scénarios en échec | Contrôles en échec |
 |---|---|---|---|
@@ -77,6 +77,7 @@ Six défauts, réintroduits un à un dans le code, font chacun échouer la recet
 | M4 | l'origine des requêtes n'est plus contrôlée | R8 | 1 |
 | M5 | une page est enregistrée sans vérifier qu'elle est celle du ticket : la page de connexion prend le nom du ticket | R10, R11, R13, R14, R16, R17, R18 | 17 |
 | M6 | les liens ne sont relevés qu'avant le défilement : seuls les premiers tickets du backlog sont vus | R10, R11, R13, R15, R16, R17, R18 | 44 |
+| M7 | pas de défilement fixe de 1 200 pixels, plus grand que la zone affichée : des cartes de la liste virtualisée sont sautées | R13 | 1 |
 
 Chaque défaut a été retiré après son essai ; la recette du code publié passe en entier.
 
@@ -163,6 +164,8 @@ const list = document.getElementById('list');
 const card = (i) => '<div class="card"><a href="/browse/' + KEYS[i] + '">' + KEYS[i] + '</a> Ticket ' + (i + 1)
   + (i < 10 ? ' · <a href="https://jira.example.com/browse/demoe-100?focus=1">DEMOE-100</a>' : '') + '</div>';
 if (MODE === 'virtual') {
+  // Zone de 300 pixels, comme dans une fenêtre réduite : un pas de défilement plus grand sauterait des cartes
+  list.style.height = '300px';
   const spacer = document.createElement('div');
   spacer.style.cssText = 'position:relative;height:' + KEYS.length * H + 'px';
   list.appendChild(spacer);
@@ -563,7 +566,10 @@ try {
     skip('export Python', `${PY} introuvable`);
   } else {
     // Entrée vide : une invite éventuelle (variable vide supprimée par Windows) reçoit une réponse vide
-    const py = (args, env) => run(PY, [join(SKILL, 'scripts', 'jira_sprint_export.py'), ...args], { env: { ...process.env, JIRA_URL: fake.url, ...env }, input: '\n' });
+    // PYTHONUTF8 : sous Windows, Python écrirait sa sortie en cp1252
+    const py = (args, env) => run(PY, [join(SKILL, 'scripts', 'jira_sprint_export.py'), ...args], {
+      env: { ...process.env, PYTHONUTF8: '1', JIRA_URL: fake.url, ...env }, input: '\n',
+    });
     let p = await py(['--board', 'Équipe démo', '--out', join(TMP, 'py')], { JIRA_EMAIL: 'jean.dupont@example.com', JIRA_TOKEN: 'jeton-demo' });
     const csv = existsSync(join(TMP, 'py')) ? readdirSync(join(TMP, 'py')).find((x) => x.endsWith('.csv')) : null;
     const rows = csv ? readFileSync(join(TMP, 'py', csv), 'utf8').trimEnd().split('\n') : []; // trim() ôterait le BOM

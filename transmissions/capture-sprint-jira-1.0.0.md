@@ -215,7 +215,7 @@ Points d'extension, actifs depuis la version indiquée :
 
 **D3 : relevé**
 
-- **D3.INV-1** : la page du sprint défile jusqu'à ce qu'aucun ticket nouveau n'apparaisse pendant quatre pas ; les liens `/browse/<CLÉ>` sont relevés à chaque pas, hors navigation (menus, éléments récents), si bien qu'une liste virtualisée ne fait perdre aucun ticket.
+- **D3.INV-1** : la page du sprint défile par pas de 80 % de la hauteur affichée de chaque bloc qui défile, jusqu'à ce que, quatre pas de suite, rien ne défile plus et qu'aucun ticket nouveau n'apparaisse ; les liens `/browse/<CLÉ>` sont relevés à chaque pas, hors navigation (menus, éléments récents), si bien qu'une liste virtualisée ne fait perdre aucun ticket, même dans une petite fenêtre.
 - **D3.INV-2** : un ticket est retenu si la partie projet de sa clé commence par le préfixe et si son numéro est entre les bornes, comprises ; un préfixe et des bornes vides retiennent tout ; une valeur invalide est refusée avant toute capture.
 - **D3.INV-3** : chaque clé n'est capturée qu'une fois, quelle que soit la forme de ses liens (relatif, absolu, casse) ; les tickets retenus sont capturés un à un, par numéro croissant.
 
@@ -356,21 +356,21 @@ Treize fichiers sont tirés des blocs annotés `<!-- fichier : chemin -->` des m
 | `package.json` | `execution`, § 9 | `7493a4af4ad23c1e13b92c66ba242c9bca40b3be0f9ba8ab77434c924306eb77` |
 | `package-lock.json` | `execution`, § 9 | `80d7bb928817d7ca7ba7600b5292371ad49fa95d25c5af0316766f2a675c788a` |
 | `.gitignore` | `execution`, § 9 | `b163b109241838c4ff48e7cc27de427a4fb4e7f9aebdb16c8a5ad3fbb7a02613` |
-| `scripts/jira-capture-core.mjs` | `execution`, § 10 | `80e3d4ae4cfdd9d51ad111fe1d99ba44217105d52afabb381720b8d1aa657e30` |
-| `scripts/jira-capture-app.mjs` | `interface`, § 8 | `f476f4e0acf4b0a5635802dfff4ddace4429b094ec1aade65c1ed909a66d2350` |
+| `scripts/jira-capture-core.mjs` | `execution`, § 10 | `173c7b918feec11b3f271c3146c0ac2e30b0015793b8ee75eea9b4548c087f4d` |
+| `scripts/jira-capture-app.mjs` | `interface`, § 8 | `07dab20b9b5ea116e1be03d228709896c46439fff26c9fb7bc81eb8de9a6f8f5` |
 | `scripts/public/capture.html` | `interface`, § 8 | `f8c7a637f8c2dafc62b9b360e9eb504f24d59d86667c27904059f213081e3abb` |
 | `scripts/jira-capture-mhtml.mjs` | `interface`, § 8 | `ad9a2a8d7926b215366ad9d8564527428657f8116ca18d759b52084662b88779` |
 | `agent/capteur-sprint.md` | `agent`, § 7 | `758d783b13566506f00f7a52405a49adfc7543ad23adcc6d526bec0efb23ef9c` |
 | `scripts/jira-sprint-app.mjs` | `export-api`, § 6 | `14005092304d4d368c869d7ee801ca922529848325255054768e86f37c418ea8` |
 | `scripts/public/index.html` | `export-api`, § 6 | `f69c6d601212d9a7e746181957a8c281f00a3d42decd488de25c54fdbb8abd91` |
 | `scripts/jira_sprint_export.py` | `export-api`, § 6 | `60b6953199cbc21443572212fee36de21adc4522e86feb2215f38ba474b91782` |
-| `tests/fake-jira.mjs` | `recette`, § 6 | `3bea3adc914ed0ade02860ca16b5af976a92308d8a39f53841cff395aceedd61` |
-| `tests/run-tests.mjs` | `recette`, § 6 | `6a4bbb06c4c9cd2c5761b7a01288b1f5fe988f8243024f537b66fff1f3018cd9` |
+| `tests/fake-jira.mjs` | `recette`, § 6 | `8264199f3020af430970c17cae538f115287a3bba8b69b67729351927c5a663f` |
+| `tests/run-tests.mjs` | `recette`, § 6 | `22de1b311e48fcefac770db87920cebbdde5407e41ee7ad299271e4da405cb55` |
 
 Depuis le dossier du skill, cette commande d'une ligne écrit les treize fichiers, compare leurs empreintes à celles du tableau et sort avec le code 1 au moindre écart ou à la moindre absence. Elle ne contient ni `$`, ni accent grave, ni `!`, ni `%`, ni guillemet intérieur : elle se colle telle quelle dans bash, zsh, CMD ou PowerShell, et dans un fichier `.cmd`. Elle lit aussi des modules aux fins de ligne CRLF.
 
 ```text
-node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'package.json': '7493a4af4ad23c1e13b92c66ba242c9bca40b3be0f9ba8ab77434c924306eb77', 'package-lock.json': '80d7bb928817d7ca7ba7600b5292371ad49fa95d25c5af0316766f2a675c788a', '.gitignore': 'b163b109241838c4ff48e7cc27de427a4fb4e7f9aebdb16c8a5ad3fbb7a02613', 'scripts/jira-capture-core.mjs': '80e3d4ae4cfdd9d51ad111fe1d99ba44217105d52afabb381720b8d1aa657e30', 'scripts/jira-capture-app.mjs': 'f476f4e0acf4b0a5635802dfff4ddace4429b094ec1aade65c1ed909a66d2350', 'scripts/public/capture.html': 'f8c7a637f8c2dafc62b9b360e9eb504f24d59d86667c27904059f213081e3abb', 'scripts/jira-capture-mhtml.mjs': 'ad9a2a8d7926b215366ad9d8564527428657f8116ca18d759b52084662b88779', 'agent/capteur-sprint.md': '758d783b13566506f00f7a52405a49adfc7543ad23adcc6d526bec0efb23ef9c', 'scripts/jira-sprint-app.mjs': '14005092304d4d368c869d7ee801ca922529848325255054768e86f37c418ea8', 'scripts/public/index.html': 'f69c6d601212d9a7e746181957a8c281f00a3d42decd488de25c54fdbb8abd91', 'scripts/jira_sprint_export.py': '60b6953199cbc21443572212fee36de21adc4522e86feb2215f38ba474b91782', 'tests/fake-jira.mjs': '3bea3adc914ed0ade02860ca16b5af976a92308d8a39f53841cff395aceedd61', 'tests/run-tests.mjs': '6a4bbb06c4c9cd2c5761b7a01288b1f5fe988f8243024f537b66fff1f3018cd9' }; const vus = new Set(); let ecarts = 0; for (const module of ['modules/execution/SKILL.md', 'modules/interface/SKILL.md', 'modules/agent/SKILL.md', 'modules/export-api/SKILL.md', 'modules/recette/SKILL.md']) { const texte = fs.readFileSync(module, 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); vus.add(m[1]); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (conforme === false) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } } for (const f of Object.keys(attendu)) { if (vus.has(f) === false) { ecarts++; console.log('ABSENT    ' + f); } } if (ecarts > 0) process.exitCode = 1;"
+node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'package.json': '7493a4af4ad23c1e13b92c66ba242c9bca40b3be0f9ba8ab77434c924306eb77', 'package-lock.json': '80d7bb928817d7ca7ba7600b5292371ad49fa95d25c5af0316766f2a675c788a', '.gitignore': 'b163b109241838c4ff48e7cc27de427a4fb4e7f9aebdb16c8a5ad3fbb7a02613', 'scripts/jira-capture-core.mjs': '173c7b918feec11b3f271c3146c0ac2e30b0015793b8ee75eea9b4548c087f4d', 'scripts/jira-capture-app.mjs': '07dab20b9b5ea116e1be03d228709896c46439fff26c9fb7bc81eb8de9a6f8f5', 'scripts/public/capture.html': 'f8c7a637f8c2dafc62b9b360e9eb504f24d59d86667c27904059f213081e3abb', 'scripts/jira-capture-mhtml.mjs': 'ad9a2a8d7926b215366ad9d8564527428657f8116ca18d759b52084662b88779', 'agent/capteur-sprint.md': '758d783b13566506f00f7a52405a49adfc7543ad23adcc6d526bec0efb23ef9c', 'scripts/jira-sprint-app.mjs': '14005092304d4d368c869d7ee801ca922529848325255054768e86f37c418ea8', 'scripts/public/index.html': 'f69c6d601212d9a7e746181957a8c281f00a3d42decd488de25c54fdbb8abd91', 'scripts/jira_sprint_export.py': '60b6953199cbc21443572212fee36de21adc4522e86feb2215f38ba474b91782', 'tests/fake-jira.mjs': '8264199f3020af430970c17cae538f115287a3bba8b69b67729351927c5a663f', 'tests/run-tests.mjs': '22de1b311e48fcefac770db87920cebbdde5407e41ee7ad299271e4da405cb55' }; const vus = new Set(); let ecarts = 0; for (const module of ['modules/execution/SKILL.md', 'modules/interface/SKILL.md', 'modules/agent/SKILL.md', 'modules/export-api/SKILL.md', 'modules/recette/SKILL.md']) { const texte = fs.readFileSync(module, 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); vus.add(m[1]); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (conforme === false) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } } for (const f of Object.keys(attendu)) { if (vus.has(f) === false) { ecarts++; console.log('ABSENT    ' + f); } } if (ecarts > 0) process.exitCode = 1;"
 ```
 
 Puis, depuis le même dossier :
@@ -621,9 +621,27 @@ export function classify(sources, categories) {
 // Page du sprint
 // ---------------------------------------------------------------------------------------------
 
-async function centerMouse(page) {
-  const { width, height } = await page.evaluate(() => ({ width: window.innerWidth, height: window.innerHeight }));
-  await page.mouse.move(Math.round(width / 2), Math.round(height / 2)); // la molette fait défiler le bloc sous le pointeur
+/**
+ * Un pas de défilement, exécuté dans la page : la fenêtre, si elle défile, et chaque bloc qui défile (100 pixels
+ * de haut au moins ; avec `withLinks`, seulement s'il contient un lien de ticket) avancent de 80 % de leur hauteur
+ * visible, si bien qu'aucune carte n'est sautée, même dans une petite fenêtre. Rend true si l'un d'eux a bougé.
+ */
+function scrollStep(withLinks) {
+  const root = document.scrollingElement ?? document.documentElement;
+  const scrolls = (el) => el.scrollHeight > el.clientHeight + 1 && (el === root || /(auto|scroll|overlay)/.test(getComputedStyle(el).overflowY));
+  const targets = scrolls(root) ? [root] : [];
+  for (const el of document.querySelectorAll('body *')) {
+    if (el.clientHeight < 100 || !scrolls(el)) continue;
+    if (withLinks && !el.querySelector('a[href*="/browse/"]')) continue;
+    targets.push(el);
+  }
+  let moved = false;
+  for (const el of targets) {
+    const before = el.scrollTop;
+    el.scrollTop = before + Math.max(80, Math.round(el.clientHeight * 0.8));
+    if (el.scrollTop !== before) moved = true;
+  }
+  return moved;
 }
 
 async function scrollToTop(page, pauseMs) {
@@ -652,21 +670,21 @@ const ticketLinks = (page) => page.evaluate(() => {
 });
 
 /**
- * Fait défiler la page jusqu'à ce qu'aucun ticket nouveau n'apparaisse pendant `stableSteps` pas, puis revient
- * en haut. Les liens sont relevés à chaque pas : un affichage virtualisé, qui retire de la page les cartes
- * sorties de l'écran, ne fait donc perdre aucun ticket. Rend { seen, present, links }.
+ * Fait défiler la page jusqu'à ce que, `stableSteps` pas de suite, elle ne défile plus et qu'aucun ticket nouveau
+ * n'apparaisse : le bas est atteint et plus rien ne s'y charge. Revient ensuite en haut. Les liens sont relevés à
+ * chaque pas : un affichage virtualisé, qui retire de la page les cartes sorties de l'écran, ne fait donc perdre
+ * aucun ticket. Rend { seen, present, links }.
  */
-export async function loadAllTickets(page, { step = 1200, pauseMs = 700, maxSteps = 80, stableSteps = 4 } = {}) {
+export async function loadAllTickets(page, { pauseMs = 700, maxSteps = 150, stableSteps = 4 } = {}) {
   const seen = new Map();
   const add = (links) => { for (const l of links) if (!seen.has(l.key)) seen.set(l.key, l.url); };
   add(await ticketLinks(page));
-  await centerMouse(page);
   for (let i = 0, stable = 0; i < maxSteps && stable < stableSteps; i++) {
-    await page.mouse.wheel(0, step);
+    const moved = await page.evaluate(scrollStep, true);
     await page.waitForTimeout(pauseMs);
     const before = seen.size;
     add(await ticketLinks(page));
-    stable = seen.size === before ? stable + 1 : 0;
+    stable = seen.size === before && !moved ? stable + 1 : 0;
   }
   await scrollToTop(page, pauseMs);
   return { seen: seen.size, present: (await ticketLinks(page)).length, links: [...seen].map(([key, url]) => ({ key, url })) };
@@ -704,16 +722,18 @@ async function waitForTicket(page, key, timeoutMs) {
   }
 }
 
-/** Fait défiler la page tant que son texte s'allonge (commentaires chargés à l'affichage), puis revient en haut. */
-async function scrollThrough(page, { step = 1200, pauseMs = 500, maxSteps = 15, stableSteps = 2 } = {}) {
+/**
+ * Fait défiler la page jusqu'en bas, tant que son texte s'allonge (commentaires chargés à l'affichage) : elle
+ * s'arrête quand, `stableSteps` pas de suite, rien ne défile ni ne s'ajoute. Revient ensuite en haut.
+ */
+async function scrollThrough(page, { pauseMs = 500, maxSteps = 40, stableSteps = 2 } = {}) {
   const length = () => page.evaluate(() => document.body?.innerText.length ?? 0);
-  await centerMouse(page);
   let last = await length();
   for (let i = 0, stable = 0; i < maxSteps && stable < stableSteps; i++) {
-    await page.mouse.wheel(0, step);
+    const moved = await page.evaluate(scrollStep, false);
     await page.waitForTimeout(pauseMs);
     const now = await length();
-    stable = now === last ? stable + 1 : 0;
+    stable = now === last && !moved ? stable + 1 : 0;
     last = now;
   }
   await scrollToTop(page, pauseMs);
@@ -909,7 +929,9 @@ Le relevé part de la page affichée dans la fenêtre au moment de la capture. P
 
 ## 2. Défilement (D3.INV-1)
 
-Jira charge souvent les cartes au fur et à mesure du défilement, et peut retirer de la page celles qui sortent de l'écran (affichage virtualisé). Le skill place donc le pointeur au centre de la fenêtre, fait défiler la page par pas de 1 200 pixels, toutes les 700 ms, et relève à chaque pas les liens présents. Il s'arrête quand quatre pas de suite n'apportent aucun ticket nouveau, ou au bout de 80 pas. Les liens relevés à chaque pas s'additionnent : une carte retirée de la page reste relevée. La page revient ensuite en haut, où le backlog affiche ses sprints, et c'est cet état qui est enregistré dans `sprint.mhtml`.
+Jira charge souvent les cartes au fur et à mesure du défilement, et peut retirer de la page celles qui sortent de l'écran (affichage virtualisé). Le skill fait donc défiler, toutes les 700 ms, la fenêtre si elle défile et chaque bloc qui défile et contient un lien de ticket, de 80 % de sa hauteur affichée : deux pas se recouvrent, et aucune carte n'est sautée, même dans une petite fenêtre. Il relève à chaque pas les liens présents. Il s'arrête quand, quatre pas de suite, rien ne défile plus et aucun ticket nouveau n'apparaît : le bas est atteint et plus rien ne s'y charge ; au plus tard au bout de 150 pas. Les liens relevés à chaque pas s'additionnent : une carte retirée de la page reste relevée. La page revient ensuite en haut, où le backlog affiche ses sprints, et c'est cet état qui est enregistré dans `sprint.mhtml`.
+
+Le défilement est programmé (position des blocs), et non simulé à la molette : il ne dépend ni de la place du pointeur ni de la taille de la fenêtre. Une première version, à pas fixe de 1 200 pixels sous le pointeur, ne relevait que 11 tickets sur 72 d'une liste virtualisée de 300 pixels de haut (recette, R13 et M7).
 
 ## 3. Liens et clés (D3.INV-1, D3.INV-3)
 
@@ -965,7 +987,7 @@ Il vérifie ces conditions toutes les 400 ms, en tolérant les navigations en co
 
 ## 3. Une page complète (D4.INV-2, D4.INV-3)
 
-1. La page défile par pas de 1 200 pixels, toutes les 500 ms, jusqu'à deux pas de suite sans que son texte s'allonge, quinze pas au plus : les commentaires et l'activité chargés à l'affichage apparaissent.
+1. La page défile jusqu'en bas, toutes les 500 ms, par pas de 80 % de la hauteur affichée de chaque bloc qui défile (module `releve`, § 2), jusqu'à ce que, deux pas de suite, rien ne défile ni ne s'ajoute à son texte, quarante pas au plus : les commentaires et l'activité chargés à l'affichage apparaissent.
 2. Elle revient en haut, puis le skill attend que la longueur de son texte soit la même sur trois relevés espacés de 500 ms, 10 s au plus.
 3. La page est enregistrée par le protocole Chrome DevTools (`Page.captureSnapshot`, format `mhtml`) : le fichier est le même que celui d'« Enregistrer sous… », type « Page Web, un seul fichier », que lit l'ingestion d'`agent-tdd-jira`. Il commence par `From: <Saved by Blink>` et contient la page, ses styles et ses images.
 4. Le fichier s'appelle `<CLÉ>.mhtml` et va dans le dossier de sa catégorie (module `classement`).
@@ -978,7 +1000,7 @@ Il vérifie ces conditions toutes les 400 ms, en tolérant les navigations en co
 
 ## 5. Durée
 
-Le faux Jira de la recette se capture en 35 s pour huit tickets, page du sprint comprise, soit 3 à 4 s par ticket. Un vrai Jira, plus lent à afficher, demande davantage : une vingtaine de tickets prend quelques minutes, à mesurer sur le poste.
+Le faux Jira de la recette se capture en 46 s pour huit tickets, relevé d'un backlog de 72 cartes compris, soit 4 à 5 s par ticket. Un vrai Jira, plus lent à afficher, demande davantage : une vingtaine de tickets prend quelques minutes, à mesurer sur le poste.
 
 ## 6. Pièges connus
 
@@ -1274,10 +1296,11 @@ function startCapture(body) {
   captureSprintTickets(context, page, {
     folder: outputFolder(body.folder), filter, categories, onProgress: (p) => Object.assign(current, p),
   }).then(async (report) => {
-    Object.assign(current, { state: 'done', report });
-    // Sans échec, le navigateur se ferme ; sinon, il revient au sprint pour une nouvelle tentative
+    // Sans échec, le navigateur se ferme ; sinon, il revient au sprint pour une nouvelle tentative. La capture
+    // n'est déclarée terminée qu'ensuite : une relance immédiate part de la page du sprint, chargée.
     if (!report.errors && !report.aborted) await closeSession();
     else if (!page.isClosed()) await page.goto(report.sprintUrl, { waitUntil: 'domcontentloaded' }).catch(() => {});
+    Object.assign(current, { state: 'done', report });
   }).catch((err) => {
     console.error(err);
     Object.assign(current, { state: 'failed', error: `Capture interrompue (${firstLine(err)})` });
@@ -2488,7 +2511,7 @@ npm test
 - Le navigateur est celui de `JIRA_CAPTURE_CHANNEL` : Chrome par défaut ; `chromium` après `npx playwright-core install chromium`.
 - Python : la variable `PYTHON`, à défaut `py` sous Windows et `python3` ailleurs ; s'il manque, R7 est sauté.
 - La recette travaille sur un profil et des dossiers temporaires : la session et les captures du dossier du skill ne sont pas touchées. Elle efface ses dossiers temporaires si tout passe ; sinon, ou avec `KEEP_TMP=1`, elle les garde et en donne le chemin, avec une capture d'écran de l'interface.
-- Durée : environ 2 min 30 s, dont 35 s par capture des huit tickets du faux backlog.
+- Durée : environ 3 min 40 s, dont 46 s pour la capture du backlog chargé au défilement et 53 s pour le backlog virtualisé.
 - Bilan attendu : `19 scénarios, 108 contrôles, 108 réussis, 0 en échec, 0 sautés` ; sans Python, `104 contrôles, 103 réussis, 0 en échec, 1 sautés`, R7 étant sauté.
 
 ## 2. Le faux Jira
@@ -2497,7 +2520,7 @@ npm test
 
 - une API REST Agile : deux tableaux aux noms proches, trois sprints futurs paginés deux par deux, 120 tickets paginés cinquante par cinquante, descriptions en texte ou en ADF, authentification Basic ou Bearer ;
 - un SSO simulé : sans cookie, un détour par `/sso/login`, qui pose un cookie persistant et compte ses passages ;
-- le backlog 42 : 71 cartes (60 hors plage, trois hors filtre, puis les huit du sprint, en fin de liste), une épopée liée en lien absolu et en minuscules, et un ticket récent, dans la plage, cité dans l'en-tête de la page ; chargé quinze cartes par quinze au défilement, ou virtualisé avec `?mode=virtual` ;
+- le backlog 42 : 71 cartes (60 hors plage, trois hors filtre, puis les huit du sprint, en fin de liste), une épopée liée en lien absolu et en minuscules, et un ticket récent, dans la plage, cité dans l'en-tête de la page ; chargé quinze cartes par quinze au défilement, ou virtualisé avec `?mode=virtual`, dans une zone de 300 pixels de haut, comme dans une fenêtre réduite ;
 - le backlog 43 : cinq tickets dont la session a expiré ;
 - les pages de tickets, rendues 400 ms après le chargement, comme une application monopage, chacune avec un menu latéral qui cite « Ticket avec IA » :
 
@@ -2528,7 +2551,7 @@ npm test
 | R10 | Backlog chargé au défilement : 72 tickets relevés, navigation exclue, 8 retenus et triés, les huit cas du § 2, dossiers directement dans le dossier choisi, MHTML de Chrome par ticket, commentaire chargé au défilement, `sprint.mhtml` et `rapport.json`, décompte ; une seule capture à la fois ; navigateur gardé ouvert après l'erreur | D3.INV-1, D3.INV-3, D4.INV-1, D4.INV-2, D4.INV-3, D5.INV-2, D5.INV-3, D5.INV-4, D5.INV-6, D6.INV-2, D6.INV-4 |
 | R11 | Nouvelle capture dans le même dossier, après un changement de catégorie dans Jira : retour à la page du sprint, ticket rangé dans sa nouvelle catégorie, copie précédente retirée, autres tickets en place, navigateur fermé sans erreur | D5.INV-4, D6.INV-4 |
 | R12 | Navigateur rouvert sans nouveau passage par le SSO | D2.INV-2 |
-| R13 | Backlog virtualisé : mêmes contrôles que R10 | D3.INV-1, D4.INV-1, D5.INV-3 |
+| R13 | Backlog virtualisé, dans une zone de 300 pixels : mêmes contrôles que R10 | D3.INV-1, D4.INV-1, D5.INV-3 |
 | R14 | Cinq tickets à session expirée : trois erreurs, capture arrêtée, navigateur gardé ouvert | D4.INV-1, D4.INV-4, D6.INV-4 |
 | R15 | « Fermer le navigateur » pendant la capture : capture arrêtée, rapport partiel | D4.INV-4, D6.INV-2 |
 | R16 | Page de l'interface pilotée comme par le développeur : bouton activé, avancement, boutons bloqués, bilan, résumé, une ligne par ticket, avertissement, valeurs retrouvées après rechargement | D6.INV-2, D6.INV-3 |
@@ -2538,7 +2561,7 @@ npm test
 
 ## 4. Contrôle de la recette elle-même
 
-Six défauts, réintroduits un à un dans le code, font chacun échouer la recette par le scénario attendu (essai du 28 octobre 2026, Node 22.23.4) :
+Sept défauts, réintroduits un à un dans le code, font chacun échouer la recette par le scénario attendu (essai du 28 octobre 2026, Node 22.23.4) :
 
 | ID | Défaut réintroduit | Scénarios en échec | Contrôles en échec |
 |---|---|---|---|
@@ -2548,6 +2571,7 @@ Six défauts, réintroduits un à un dans le code, font chacun échouer la recet
 | M4 | l'origine des requêtes n'est plus contrôlée | R8 | 1 |
 | M5 | une page est enregistrée sans vérifier qu'elle est celle du ticket : la page de connexion prend le nom du ticket | R10, R11, R13, R14, R16, R17, R18 | 17 |
 | M6 | les liens ne sont relevés qu'avant le défilement : seuls les premiers tickets du backlog sont vus | R10, R11, R13, R15, R16, R17, R18 | 44 |
+| M7 | pas de défilement fixe de 1 200 pixels, plus grand que la zone affichée : des cartes de la liste virtualisée sont sautées | R13 | 1 |
 
 Chaque défaut a été retiré après son essai ; la recette du code publié passe en entier.
 
@@ -2634,6 +2658,8 @@ const list = document.getElementById('list');
 const card = (i) => '<div class="card"><a href="/browse/' + KEYS[i] + '">' + KEYS[i] + '</a> Ticket ' + (i + 1)
   + (i < 10 ? ' · <a href="https://jira.example.com/browse/demoe-100?focus=1">DEMOE-100</a>' : '') + '</div>';
 if (MODE === 'virtual') {
+  // Zone de 300 pixels, comme dans une fenêtre réduite : un pas de défilement plus grand sauterait des cartes
+  list.style.height = '300px';
   const spacer = document.createElement('div');
   spacer.style.cssText = 'position:relative;height:' + KEYS.length * H + 'px';
   list.appendChild(spacer);
@@ -3034,7 +3060,10 @@ try {
     skip('export Python', `${PY} introuvable`);
   } else {
     // Entrée vide : une invite éventuelle (variable vide supprimée par Windows) reçoit une réponse vide
-    const py = (args, env) => run(PY, [join(SKILL, 'scripts', 'jira_sprint_export.py'), ...args], { env: { ...process.env, JIRA_URL: fake.url, ...env }, input: '\n' });
+    // PYTHONUTF8 : sous Windows, Python écrirait sa sortie en cp1252
+    const py = (args, env) => run(PY, [join(SKILL, 'scripts', 'jira_sprint_export.py'), ...args], {
+      env: { ...process.env, PYTHONUTF8: '1', JIRA_URL: fake.url, ...env }, input: '\n',
+    });
     let p = await py(['--board', 'Équipe démo', '--out', join(TMP, 'py')], { JIRA_EMAIL: 'jean.dupont@example.com', JIRA_TOKEN: 'jeton-demo' });
     const csv = existsSync(join(TMP, 'py')) ? readdirSync(join(TMP, 'py')).find((x) => x.endsWith('.csv')) : null;
     const rows = csv ? readFileSync(join(TMP, 'py', csv), 'utf8').trimEnd().split('\n') : []; // trim() ôterait le BOM
@@ -3272,15 +3301,15 @@ Le développeur prévoit d'intégrer le skill à Gemini CLI depuis GeminiBoard. 
 Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichiers ont été matérialisés.
 
     e2a100648b6f3b20bb4d6e9cce3988bffab7a8f634de73e13e03d9f1ca8e88c2  manifest.json
-    bab1da5977f0ad9e855ab2645876310fa501a7781ac926cb23a8410be7541ed6  SKILL.md
-    5b7337365502f487a93e28c23f5033cd478e1f47713e2dcccc60770e58b903dc  modules/execution/SKILL.md
+    5e447ffde4db2ef6e3e72638f7b2a74322b96a0c62ade6b79604f61568c18ea4  SKILL.md
+    46546d9da67bbae912933237be1e5448fd76e46c01ab8d36fcb5d289f97b0966  modules/execution/SKILL.md
     fe7f3e89a693889c3cf0c1e97f7bfa8d2c01f3ec5da6c56ddf56f10e949bfb8b  modules/session/SKILL.md
-    eacbc1422ae02d488ca720d62213755e779f64b925048da884807c943d20e12b  modules/releve/SKILL.md
-    93f93892091c0d6b7abd46d29cb272317cd3b998ba0a602e220c2f77bc09520c  modules/capture/SKILL.md
+    4ddc43cbed3cee279a524a56703b1d129abebda7230d46ae325b11b1978cee8a  modules/releve/SKILL.md
+    6e3ef43ae8a3b88ab5398d4c21ecc9e533f41dd3bf462bbc900229458ffb3b53  modules/capture/SKILL.md
     075cab0e4c49d0b5622bc5806b03b95c6eeafc60785eef501dce23166ea9df8e  modules/classement/SKILL.md
-    51d48a937b6eeba6305aa9f0fcf1adbb666f320a83aaecfb12253a83246ee816  modules/interface/SKILL.md
+    93df16f2229d7bf048e767315b8f72a2a29921f0c955af37d191801da005688c  modules/interface/SKILL.md
     1d21fe8ed58b668d401847aec725f122051798cbe75ad92e0c9f23b1ba465e15  modules/agent/SKILL.md
     ce5aa772b75fa711d8d80e58325c410ce6231b5a1795761b16738d00a5d0f462  modules/export-api/SKILL.md
-    1a2ac843d72b6feadde1aa3608bf2ee4ac157d7fad7e715a75828a87dbb04457  modules/recette/SKILL.md
+    d847e37500dc023e892e8de02ae69526b67c5c23cc75727906fb9c59afd659a3  modules/recette/SKILL.md
     f8839f9774c2099a9a8ed4259f5e461b7d0f9b8c424a664dfdcb9ff90af4f3e8  modules/remise/SKILL.md
     469e7591327de004f79be36da387704962de141bb04345e3e9c8ca27b07a43a8  modules/pilotage/SKILL.md

@@ -201,10 +201,11 @@ function startCapture(body) {
   captureSprintTickets(context, page, {
     folder: outputFolder(body.folder), filter, categories, onProgress: (p) => Object.assign(current, p),
   }).then(async (report) => {
-    Object.assign(current, { state: 'done', report });
-    // Sans échec, le navigateur se ferme ; sinon, il revient au sprint pour une nouvelle tentative
+    // Sans échec, le navigateur se ferme ; sinon, il revient au sprint pour une nouvelle tentative. La capture
+    // n'est déclarée terminée qu'ensuite : une relance immédiate part de la page du sprint, chargée.
     if (!report.errors && !report.aborted) await closeSession();
     else if (!page.isClosed()) await page.goto(report.sprintUrl, { waitUntil: 'domcontentloaded' }).catch(() => {});
+    Object.assign(current, { state: 'done', report });
   }).catch((err) => {
     console.error(err);
     Object.assign(current, { state: 'failed', error: `Capture interrompue (${firstLine(err)})` });

@@ -24,7 +24,7 @@ Il vérifie ces conditions toutes les 400 ms, en tolérant les navigations en co
 
 ## 3. Une page complète (D4.INV-2, D4.INV-3)
 
-1. La page défile par pas de 1 200 pixels, toutes les 500 ms, jusqu'à deux pas de suite sans que son texte s'allonge, quinze pas au plus : les commentaires et l'activité chargés à l'affichage apparaissent.
+1. La page défile jusqu'en bas, toutes les 500 ms, par pas de 80 % de la hauteur affichée de chaque bloc qui défile (module `releve`, § 2), jusqu'à ce que, deux pas de suite, rien ne défile ni ne s'ajoute à son texte, quarante pas au plus : les commentaires et l'activité chargés à l'affichage apparaissent.
 2. Elle revient en haut, puis le skill attend que la longueur de son texte soit la même sur trois relevés espacés de 500 ms, 10 s au plus.
 3. La page est enregistrée par le protocole Chrome DevTools (`Page.captureSnapshot`, format `mhtml`) : le fichier est le même que celui d'« Enregistrer sous… », type « Page Web, un seul fichier », que lit l'ingestion d'`agent-tdd-jira`. Il commence par `From: <Saved by Blink>` et contient la page, ses styles et ses images.
 4. Le fichier s'appelle `<CLÉ>.mhtml` et va dans le dossier de sa catégorie (module `classement`).
@@ -37,7 +37,7 @@ Il vérifie ces conditions toutes les 400 ms, en tolérant les navigations en co
 
 ## 5. Durée
 
-Le faux Jira de la recette se capture en 35 s pour huit tickets, page du sprint comprise, soit 3 à 4 s par ticket. Un vrai Jira, plus lent à afficher, demande davantage : une vingtaine de tickets prend quelques minutes, à mesurer sur le poste.
+Le faux Jira de la recette se capture en 46 s pour huit tickets, relevé d'un backlog de 72 cartes compris, soit 4 à 5 s par ticket. Un vrai Jira, plus lent à afficher, demande davantage : une vingtaine de tickets prend quelques minutes, à mesurer sur le poste.
 
 ## 6. Pièges connus
 

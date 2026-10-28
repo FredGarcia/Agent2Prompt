@@ -80,21 +80,21 @@ Treize fichiers sont tirés des blocs annotés `<!-- fichier : chemin -->` des m
 | `package.json` | `execution`, § 9 | `7493a4af4ad23c1e13b92c66ba242c9bca40b3be0f9ba8ab77434c924306eb77` |
 | `package-lock.json` | `execution`, § 9 | `80d7bb928817d7ca7ba7600b5292371ad49fa95d25c5af0316766f2a675c788a` |
 | `.gitignore` | `execution`, § 9 | `b163b109241838c4ff48e7cc27de427a4fb4e7f9aebdb16c8a5ad3fbb7a02613` |
-| `scripts/jira-capture-core.mjs` | `execution`, § 10 | `80e3d4ae4cfdd9d51ad111fe1d99ba44217105d52afabb381720b8d1aa657e30` |
-| `scripts/jira-capture-app.mjs` | `interface`, § 8 | `f476f4e0acf4b0a5635802dfff4ddace4429b094ec1aade65c1ed909a66d2350` |
+| `scripts/jira-capture-core.mjs` | `execution`, § 10 | `173c7b918feec11b3f271c3146c0ac2e30b0015793b8ee75eea9b4548c087f4d` |
+| `scripts/jira-capture-app.mjs` | `interface`, § 8 | `07dab20b9b5ea116e1be03d228709896c46439fff26c9fb7bc81eb8de9a6f8f5` |
 | `scripts/public/capture.html` | `interface`, § 8 | `f8c7a637f8c2dafc62b9b360e9eb504f24d59d86667c27904059f213081e3abb` |
 | `scripts/jira-capture-mhtml.mjs` | `interface`, § 8 | `ad9a2a8d7926b215366ad9d8564527428657f8116ca18d759b52084662b88779` |
 | `agent/capteur-sprint.md` | `agent`, § 7 | `758d783b13566506f00f7a52405a49adfc7543ad23adcc6d526bec0efb23ef9c` |
 | `scripts/jira-sprint-app.mjs` | `export-api`, § 6 | `14005092304d4d368c869d7ee801ca922529848325255054768e86f37c418ea8` |
 | `scripts/public/index.html` | `export-api`, § 6 | `f69c6d601212d9a7e746181957a8c281f00a3d42decd488de25c54fdbb8abd91` |
 | `scripts/jira_sprint_export.py` | `export-api`, § 6 | `60b6953199cbc21443572212fee36de21adc4522e86feb2215f38ba474b91782` |
-| `tests/fake-jira.mjs` | `recette`, § 6 | `3bea3adc914ed0ade02860ca16b5af976a92308d8a39f53841cff395aceedd61` |
-| `tests/run-tests.mjs` | `recette`, § 6 | `6a4bbb06c4c9cd2c5761b7a01288b1f5fe988f8243024f537b66fff1f3018cd9` |
+| `tests/fake-jira.mjs` | `recette`, § 6 | `8264199f3020af430970c17cae538f115287a3bba8b69b67729351927c5a663f` |
+| `tests/run-tests.mjs` | `recette`, § 6 | `22de1b311e48fcefac770db87920cebbdde5407e41ee7ad299271e4da405cb55` |
 
 Depuis le dossier du skill, cette commande d'une ligne écrit les treize fichiers, compare leurs empreintes à celles du tableau et sort avec le code 1 au moindre écart ou à la moindre absence. Elle ne contient ni `$`, ni accent grave, ni `!`, ni `%`, ni guillemet intérieur : elle se colle telle quelle dans bash, zsh, CMD ou PowerShell, et dans un fichier `.cmd`. Elle lit aussi des modules aux fins de ligne CRLF.
 
 ```text
-node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'package.json': '7493a4af4ad23c1e13b92c66ba242c9bca40b3be0f9ba8ab77434c924306eb77', 'package-lock.json': '80d7bb928817d7ca7ba7600b5292371ad49fa95d25c5af0316766f2a675c788a', '.gitignore': 'b163b109241838c4ff48e7cc27de427a4fb4e7f9aebdb16c8a5ad3fbb7a02613', 'scripts/jira-capture-core.mjs': '80e3d4ae4cfdd9d51ad111fe1d99ba44217105d52afabb381720b8d1aa657e30', 'scripts/jira-capture-app.mjs': 'f476f4e0acf4b0a5635802dfff4ddace4429b094ec1aade65c1ed909a66d2350', 'scripts/public/capture.html': 'f8c7a637f8c2dafc62b9b360e9eb504f24d59d86667c27904059f213081e3abb', 'scripts/jira-capture-mhtml.mjs': 'ad9a2a8d7926b215366ad9d8564527428657f8116ca18d759b52084662b88779', 'agent/capteur-sprint.md': '758d783b13566506f00f7a52405a49adfc7543ad23adcc6d526bec0efb23ef9c', 'scripts/jira-sprint-app.mjs': '14005092304d4d368c869d7ee801ca922529848325255054768e86f37c418ea8', 'scripts/public/index.html': 'f69c6d601212d9a7e746181957a8c281f00a3d42decd488de25c54fdbb8abd91', 'scripts/jira_sprint_export.py': '60b6953199cbc21443572212fee36de21adc4522e86feb2215f38ba474b91782', 'tests/fake-jira.mjs': '3bea3adc914ed0ade02860ca16b5af976a92308d8a39f53841cff395aceedd61', 'tests/run-tests.mjs': '6a4bbb06c4c9cd2c5761b7a01288b1f5fe988f8243024f537b66fff1f3018cd9' }; const vus = new Set(); let ecarts = 0; for (const module of ['modules/execution/SKILL.md', 'modules/interface/SKILL.md', 'modules/agent/SKILL.md', 'modules/export-api/SKILL.md', 'modules/recette/SKILL.md']) { const texte = fs.readFileSync(module, 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); vus.add(m[1]); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (conforme === false) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } } for (const f of Object.keys(attendu)) { if (vus.has(f) === false) { ecarts++; console.log('ABSENT    ' + f); } } if (ecarts > 0) process.exitCode = 1;"
+node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'package.json': '7493a4af4ad23c1e13b92c66ba242c9bca40b3be0f9ba8ab77434c924306eb77', 'package-lock.json': '80d7bb928817d7ca7ba7600b5292371ad49fa95d25c5af0316766f2a675c788a', '.gitignore': 'b163b109241838c4ff48e7cc27de427a4fb4e7f9aebdb16c8a5ad3fbb7a02613', 'scripts/jira-capture-core.mjs': '173c7b918feec11b3f271c3146c0ac2e30b0015793b8ee75eea9b4548c087f4d', 'scripts/jira-capture-app.mjs': '07dab20b9b5ea116e1be03d228709896c46439fff26c9fb7bc81eb8de9a6f8f5', 'scripts/public/capture.html': 'f8c7a637f8c2dafc62b9b360e9eb504f24d59d86667c27904059f213081e3abb', 'scripts/jira-capture-mhtml.mjs': 'ad9a2a8d7926b215366ad9d8564527428657f8116ca18d759b52084662b88779', 'agent/capteur-sprint.md': '758d783b13566506f00f7a52405a49adfc7543ad23adcc6d526bec0efb23ef9c', 'scripts/jira-sprint-app.mjs': '14005092304d4d368c869d7ee801ca922529848325255054768e86f37c418ea8', 'scripts/public/index.html': 'f69c6d601212d9a7e746181957a8c281f00a3d42decd488de25c54fdbb8abd91', 'scripts/jira_sprint_export.py': '60b6953199cbc21443572212fee36de21adc4522e86feb2215f38ba474b91782', 'tests/fake-jira.mjs': '8264199f3020af430970c17cae538f115287a3bba8b69b67729351927c5a663f', 'tests/run-tests.mjs': '22de1b311e48fcefac770db87920cebbdde5407e41ee7ad299271e4da405cb55' }; const vus = new Set(); let ecarts = 0; for (const module of ['modules/execution/SKILL.md', 'modules/interface/SKILL.md', 'modules/agent/SKILL.md', 'modules/export-api/SKILL.md', 'modules/recette/SKILL.md']) { const texte = fs.readFileSync(module, 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); vus.add(m[1]); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (conforme === false) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } } for (const f of Object.keys(attendu)) { if (vus.has(f) === false) { ecarts++; console.log('ABSENT    ' + f); } } if (ecarts > 0) process.exitCode = 1;"
 ```
 
 Puis, depuis le même dossier :
@@ -345,9 +345,27 @@ export function classify(sources, categories) {
 // Page du sprint
 // ---------------------------------------------------------------------------------------------
 
-async function centerMouse(page) {
-  const { width, height } = await page.evaluate(() => ({ width: window.innerWidth, height: window.innerHeight }));
-  await page.mouse.move(Math.round(width / 2), Math.round(height / 2)); // la molette fait défiler le bloc sous le pointeur
+/**
+ * Un pas de défilement, exécuté dans la page : la fenêtre, si elle défile, et chaque bloc qui défile (100 pixels
+ * de haut au moins ; avec `withLinks`, seulement s'il contient un lien de ticket) avancent de 80 % de leur hauteur
+ * visible, si bien qu'aucune carte n'est sautée, même dans une petite fenêtre. Rend true si l'un d'eux a bougé.
+ */
+function scrollStep(withLinks) {
+  const root = document.scrollingElement ?? document.documentElement;
+  const scrolls = (el) => el.scrollHeight > el.clientHeight + 1 && (el === root || /(auto|scroll|overlay)/.test(getComputedStyle(el).overflowY));
+  const targets = scrolls(root) ? [root] : [];
+  for (const el of document.querySelectorAll('body *')) {
+    if (el.clientHeight < 100 || !scrolls(el)) continue;
+    if (withLinks && !el.querySelector('a[href*="/browse/"]')) continue;
+    targets.push(el);
+  }
+  let moved = false;
+  for (const el of targets) {
+    const before = el.scrollTop;
+    el.scrollTop = before + Math.max(80, Math.round(el.clientHeight * 0.8));
+    if (el.scrollTop !== before) moved = true;
+  }
+  return moved;
 }
 
 async function scrollToTop(page, pauseMs) {
@@ -376,21 +394,21 @@ const ticketLinks = (page) => page.evaluate(() => {
 });
 
 /**
- * Fait défiler la page jusqu'à ce qu'aucun ticket nouveau n'apparaisse pendant `stableSteps` pas, puis revient
- * en haut. Les liens sont relevés à chaque pas : un affichage virtualisé, qui retire de la page les cartes
- * sorties de l'écran, ne fait donc perdre aucun ticket. Rend { seen, present, links }.
+ * Fait défiler la page jusqu'à ce que, `stableSteps` pas de suite, elle ne défile plus et qu'aucun ticket nouveau
+ * n'apparaisse : le bas est atteint et plus rien ne s'y charge. Revient ensuite en haut. Les liens sont relevés à
+ * chaque pas : un affichage virtualisé, qui retire de la page les cartes sorties de l'écran, ne fait donc perdre
+ * aucun ticket. Rend { seen, present, links }.
  */
-export async function loadAllTickets(page, { step = 1200, pauseMs = 700, maxSteps = 80, stableSteps = 4 } = {}) {
+export async function loadAllTickets(page, { pauseMs = 700, maxSteps = 150, stableSteps = 4 } = {}) {
   const seen = new Map();
   const add = (links) => { for (const l of links) if (!seen.has(l.key)) seen.set(l.key, l.url); };
   add(await ticketLinks(page));
-  await centerMouse(page);
   for (let i = 0, stable = 0; i < maxSteps && stable < stableSteps; i++) {
-    await page.mouse.wheel(0, step);
+    const moved = await page.evaluate(scrollStep, true);
     await page.waitForTimeout(pauseMs);
     const before = seen.size;
     add(await ticketLinks(page));
-    stable = seen.size === before ? stable + 1 : 0;
+    stable = seen.size === before && !moved ? stable + 1 : 0;
   }
   await scrollToTop(page, pauseMs);
   return { seen: seen.size, present: (await ticketLinks(page)).length, links: [...seen].map(([key, url]) => ({ key, url })) };
@@ -428,16 +446,18 @@ async function waitForTicket(page, key, timeoutMs) {
   }
 }
 
-/** Fait défiler la page tant que son texte s'allonge (commentaires chargés à l'affichage), puis revient en haut. */
-async function scrollThrough(page, { step = 1200, pauseMs = 500, maxSteps = 15, stableSteps = 2 } = {}) {
+/**
+ * Fait défiler la page jusqu'en bas, tant que son texte s'allonge (commentaires chargés à l'affichage) : elle
+ * s'arrête quand, `stableSteps` pas de suite, rien ne défile ni ne s'ajoute. Revient ensuite en haut.
+ */
+async function scrollThrough(page, { pauseMs = 500, maxSteps = 40, stableSteps = 2 } = {}) {
   const length = () => page.evaluate(() => document.body?.innerText.length ?? 0);
-  await centerMouse(page);
   let last = await length();
   for (let i = 0, stable = 0; i < maxSteps && stable < stableSteps; i++) {
-    await page.mouse.wheel(0, step);
+    const moved = await page.evaluate(scrollStep, false);
     await page.waitForTimeout(pauseMs);
     const now = await length();
-    stable = now === last ? stable + 1 : 0;
+    stable = now === last && !moved ? stable + 1 : 0;
     last = now;
   }
   await scrollToTop(page, pauseMs);
