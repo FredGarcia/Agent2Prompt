@@ -56,6 +56,14 @@ flowchart LR
   CSJ -.->|"tickets du dossier IA"| C7E
 ```
 
+## Documents
+
+Ces documents ne sont pas des spécifications : le vérificateur ne les contrôle pas.
+
+| Document | Formats | Objet |
+|---|---|---|
+| [Mécénat ou investissement ?](docs/presentation-valeur-ia/presentation-valeur-ia.md) | Markdown avec schémas Mermaid ; [PowerPoint](docs/presentation-valeur-ia/presentation-valeur-ia.pptx) avec notes du présentateur | Justifier auprès d'un client la valeur de l'IA dans le développement de ses applications : définition du mécénat, constats publics sourcés, contrepartie par ticket, garde-fous, seuil de rentabilité, protocole de mesure, pilote avec règle d'arrêt |
+
 ## Structure du dépôt
 
 ```
@@ -73,10 +81,12 @@ Agent2Prompt/
 │       └── archives/SKILL-vX.Y.Z.md versions antérieures figées
 ├── transmissions/
 │   └── <nom>-X.Y.Z.md           texte unique remis à l'IA, une par version
-└── tools/
-    ├── bundle.mjs               assemblage d'une transmission (Node)
-    ├── glossaire.mjs            génération de glossaire.md
-    └── verifier.mjs             vérification structurelle de toutes les spécifications
+├── tools/
+│   ├── bundle.mjs               assemblage d'une transmission (Node)
+│   ├── glossaire.mjs            génération de glossaire.md
+│   └── verifier.mjs             vérification structurelle de toutes les spécifications
+└── docs/
+    └── presentation-valeur-ia/  présentation « Mécénat ou investissement ? », en Markdown et en PowerPoint
 ```
 
 ## Transmettre une spécification
