@@ -257,6 +257,29 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 - Décisions ratifiées : les experts produisent et relisent ; versions cibles Java 21, Spring Boot 3.5, Angular 20 ; l'analyste laisse le développeur choisir son livrable ; skills autonomes avec un socle commun.
 - Point d'attention consigné dans les skills : la branche Spring Boot 3.5 n'a plus de support open source depuis le 30 juin 2026, et Angular 20 arrive en fin de support long terme vers la fin novembre 2026. Les migrations correspondantes sont les dimensions réservées D8 (Java) et D9 (Angular).
 
+## Documents
+
+### 2026-10-31 : présentation « Mécénat ou investissement ? »
+
+- **`docs/presentation-valeur-ia/`** : une présentation qui justifie auprès d'un client la valeur de l'IA dans le développement de ses applications, quand il y voit du mécénat. Deux formats :
+  - `presentation-valeur-ia.md`, avec cinq schémas Mermaid ;
+  - `presentation-valeur-ia.pptx`, dix-sept diapositives avec notes du présentateur.
+- Argumentaire :
+  - la définition officielle du mécénat (arrêté du 6 janvier 1989), dont aucun des trois critères n'est rempli ;
+  - les constats publics qui fondent la prudence du client (MIT NANDA, Gartner, METR), et ce qui distingue les projets qui créent de la valeur (MIT NANDA, les sept capacités de DORA 2025) ;
+  - la contrepartie de chaque ticket, ce qui reste dans les dépôts du client et les garde-fous, repris d'`orchestrateur-c7e` 3.1.0 ;
+  - un seuil de rentabilité calculé sur des hypothèses données en exemple, la valeur nette selon le gain mesuré, un protocole de mesure et un pilote avec règle d'arrêt.
+- Vérifications :
+  - le calcul du seuil et des scénarios, rejoué ;
+  - chaque chiffre public, confronté à sa source, listée en annexe ;
+  - les schémas Mermaid, rendus ;
+  - le PowerPoint, validé et relu diapositive par diapositive ;
+  - aucun nom de client ni de mission.
+- Soumis à ratification :
+  - un dossier `docs/` pour les documents qui ne sont pas des spécifications, hors du vérificateur ;
+  - les hypothèses du seuil (journée à 600 €, licence à 50 €, 15 jours de mise en place, équipe de cinq), à remplacer par les chiffres réels ;
+  - la publication, dans ce dépôt public, d'un argumentaire destiné à un client, sans nom de client ni de mission.
+
 ## Outils
 
 ### 2026-10-21 : citations entre skills vérifiées
