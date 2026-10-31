@@ -63,6 +63,7 @@ Ces documents ne sont pas des spécifications : le vérificateur ne les contrôl
 | Document | Formats | Objet |
 |---|---|---|
 | [L'IA, un investissement mesurable](docs/presentation-valeur-ia/presentation-valeur-ia.md) | Markdown avec schémas Mermaid ; [PowerPoint](docs/presentation-valeur-ia/presentation-valeur-ia.pptx) avec notes du présentateur | Montrer à un client ce que son investissement dans l'IA rapporte au développement de ses applications : constats publics sourcés, contrepartie par ticket, garde-fous, seuil de rentabilité, protocole de mesure, pilote avec règle d'arrêt |
+| [Mode d'emploi de l'orchestrateur C7E](docs/orchestrateur-c7e/mode-emploi.md) | Markdown avec un schéma Mermaid | Installer `orchestrateur-c7e` 3.1.0 et le faire appeler au lancement de Gemini CLI : toujours actif, ou au choix au démarrage entre plusieurs modèles méso, avec une commande par modèle ; vérifications, usage quotidien, limites et dépannage |
 
 ## Structure du dépôt
 
@@ -86,7 +87,8 @@ Agent2Prompt/
 │   ├── glossaire.mjs            génération de glossaire.md
 │   └── verifier.mjs             vérification structurelle de toutes les spécifications
 └── docs/
-    └── presentation-valeur-ia/  présentation « L'IA, un investissement mesurable », en Markdown et en PowerPoint
+    ├── presentation-valeur-ia/  présentation « L'IA, un investissement mesurable », en Markdown et en PowerPoint
+    └── orchestrateur-c7e/       mode d'emploi du lancement de l'orchestrateur C7E dans Gemini CLI
 ```
 
 ## Transmettre une spécification

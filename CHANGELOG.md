@@ -259,6 +259,19 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Documents
 
+### 2026-10-31 : mode d'emploi de l'orchestrateur C7E
+
+- **`docs/orchestrateur-c7e/mode-emploi.md`** : installer `orchestrateur-c7e` 3.1.0 dans un projet et le faire appeler au lancement de Gemini CLI, selon deux modes :
+  - A, toujours actif : le fichier de démarrage importe le skill et le fichier d'invariants ;
+  - B, au choix : le skill installé comme skill de Gemini CLI, chargé seulement s'il est activé ; un menu au démarrage et une commande `/c7e:<modèle>` par modèle méso, rangé dans `docs/c7e/meso/`.
+- Aussi : la déclaration du fichier de démarrage dans `context.fileName`, les vérifications (`/skills list`, `/memory show`, `/commands list`), l'usage quotidien, les limites connues et un tableau de dépannage.
+- Compatible avec la version 3.1.0, sans la modifier : l'emplacement du skill est laissé au développeur par l'en-tête, et le modèle méso choisi tient lieu du fichier d'invariants pour la session.
+- Vérifications : comportements de Gemini CLI confrontés à sa documentation (fichiers de contexte, imports, skills, commandes personnalisées) ; schéma Mermaid rendu ; liens du dépôt valides.
+- Soumis à ratification :
+  - le mode B comme mode recommandé dès qu'il y a plusieurs modèles méso ;
+  - les emplacements `.gemini/skills/orchestrateur-c7e/` et `docs/c7e/meso/<modèle>.md` ;
+  - des registres communs à tous les modèles, chaque entrée nommant son modèle.
+
 ### 2026-10-31 : présentation « L'IA, un investissement mesurable »
 
 - **`docs/presentation-valeur-ia/`**, remaniée :
