@@ -267,7 +267,7 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
   - dans le Markdown, un schéma de la boucle de l'investissement accompagne le message ;
   - un thème clair : fond blanc sur toutes les diapositives, tons bleus, la valeur nette en bleu pâle sous le seuil et en bleu soutenu au-dessus.
 - Vérifications : aucune mention de l'objection dans le texte, les notes et les métadonnées ; schémas Mermaid rendus ; PowerPoint validé et relu diapositive par diapositive.
-- Soumis à ratification :
+- Décisions ratifiées (pull request n° 22) :
   - le titre « L'IA, un investissement mesurable » ;
   - le retrait de la diapositive de définition ;
   - l'entrée de la première version, reformulée pour que le dépôt ne nomme plus l'objection.
