@@ -22,7 +22,7 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
   - la commande d'extraction, rejouée dans un projet factice, redonne le fichier et son empreinte ;
   - l'exemple d'instance respecte les huit règles de validation, et huit écarts introduits volontairement sont tous rejetés ;
   - vérificateur, glossaire et transmission, à huit fichiers, à jour.
-- Soumis à ratification :
+- Décisions ratifiées (pull request n° 25) :
   - le référentiel intégré comme dimension D10 de l'orchestrateur, avec un modèle à installer dans `docs/c7e/` et une instance `ticket.toml` par ticket ;
   - l'option « évolution de schéma », ajoutée au contrat CRUD demandé ;
   - les méso-contrats transverses T01 à T03, appliqués d'office ;
