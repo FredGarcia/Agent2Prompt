@@ -62,7 +62,7 @@ Ces documents ne sont pas des spécifications : le vérificateur ne les contrôl
 
 | Document | Formats | Objet |
 |---|---|---|
-| [Mécénat ou investissement ?](docs/presentation-valeur-ia/presentation-valeur-ia.md) | Markdown avec schémas Mermaid ; [PowerPoint](docs/presentation-valeur-ia/presentation-valeur-ia.pptx) avec notes du présentateur | Justifier auprès d'un client la valeur de l'IA dans le développement de ses applications : définition du mécénat, constats publics sourcés, contrepartie par ticket, garde-fous, seuil de rentabilité, protocole de mesure, pilote avec règle d'arrêt |
+| [L'IA, un investissement mesurable](docs/presentation-valeur-ia/presentation-valeur-ia.md) | Markdown avec schémas Mermaid ; [PowerPoint](docs/presentation-valeur-ia/presentation-valeur-ia.pptx) avec notes du présentateur | Montrer à un client ce que son investissement dans l'IA rapporte au développement de ses applications : constats publics sourcés, contrepartie par ticket, garde-fous, seuil de rentabilité, protocole de mesure, pilote avec règle d'arrêt |
 
 ## Structure du dépôt
 
@@ -86,7 +86,7 @@ Agent2Prompt/
 │   ├── glossaire.mjs            génération de glossaire.md
 │   └── verifier.mjs             vérification structurelle de toutes les spécifications
 └── docs/
-    └── presentation-valeur-ia/  présentation « Mécénat ou investissement ? », en Markdown et en PowerPoint
+    └── presentation-valeur-ia/  présentation « L'IA, un investissement mesurable », en Markdown et en PowerPoint
 ```
 
 ## Transmettre une spécification
