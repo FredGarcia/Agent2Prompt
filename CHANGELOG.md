@@ -4,6 +4,32 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-10-31 : orchestrateur-c7e 3.2.0
+
+- **orchestrateur-c7e 3.2.0** : le référentiel des méso-contrats remis par le développeur, en TOML, intégré à l'orchestrateur comme dimension D10, active.
+  - Module `referentiel` : rôle, emplacements, étapes à l'analyse de chaque ticket, correspondance des options avec les slots, modèle du référentiel à installer dans le projet (`docs/c7e/referentiel-meso-contrats.toml`) avec son empreinte et sa commande d'extraction, exemple de `ticket.toml`.
+  - Options au choix par couche : évolution de schéma et contrat CRUD (PostgreSQL) ; règles, fonctionnalités et endpoints (Java) ; éléments graphiques et fonctionnalités (Angular) ; analyse d'une image PNG de l'objectif pour toute option front. Chaque option nomme son slot et les preuves qu'elle apporte aux tests déduits.
+  - Catégories M01 à M03 reprises du modèle remis ; méso-contrats transverses T01 à T03 (socle back-front, accessibilité, migration sûre), appliqués d'office ; règles de validation d'un ticket.
+  - Démarrage au choix du développeur : chargement permanent ou au choix, menu, commande `/c7e` ; description du skill corrigée en conséquence.
+  - Invariants D2.INV-3 et D10.INV-1 à D10.INV-5, soit vingt-six ; scénarios R11 à R14.
+  - Archives : `SKILL-v3.1.0.md` ; modèle remis, `referentiel-meso-contrats-v2.0.0.toml`. La section 16 du point d'entrée donne chaque changement apporté au modèle et sa raison.
+- Mode d'emploi (`docs/orchestrateur-c7e/mode-emploi.md`) aligné :
+  - les « modèles méso » sont les catégories du référentiel, et non des fichiers d'invariants par périmètre ;
+  - un menu à deux choix et une commande `/c7e` unique, au lieu d'une commande par modèle ;
+  - des chargements nommés « permanent » et « au choix », pour ne pas les confondre avec les modes de modulation A, B et C.
+- Vérifications :
+  - le modèle et le modèle remis se lisent en TOML ;
+  - la commande d'extraction, rejouée dans un projet factice, redonne le fichier et son empreinte ;
+  - l'exemple d'instance respecte les huit règles de validation, et huit écarts introduits volontairement sont tous rejetés ;
+  - vérificateur, glossaire et transmission, à huit fichiers, à jour.
+- Soumis à ratification :
+  - le référentiel intégré comme dimension D10 de l'orchestrateur, avec un modèle à installer dans `docs/c7e/` et une instance `ticket.toml` par ticket ;
+  - l'option « évolution de schéma », ajoutée au contrat CRUD demandé ;
+  - les méso-contrats transverses T01 à T03, appliqués d'office ;
+  - le démarrage au choix du développeur (D2.INV-3) et la commande `/c7e` unique ;
+  - dans le mode d'emploi, les catégories du référentiel à la place des modèles méso par fichier (`docs/c7e/meso/`) ;
+  - le modèle remis, archivé dans `previousVersions` sous sa propre version, 2.0.0.
+
 ### 2026-10-31 : orchestrateur-c7e 3.1.0
 
 - **orchestrateur-c7e 3.1.0** : l'orchestrateur fractal C7E et son fichier d'invariants du projet, remis par le développeur en 3.0.0 pour être chargés au lancement de l'IA locale, corrigés et mis au format du dépôt.
