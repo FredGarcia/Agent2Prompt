@@ -33,7 +33,7 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
   - la transmission, relue comme le ferait l'IA, redonne les sept fichiers à l'identique.
 - La liste du socle des skills qui l'incluent ne nomme pas encore `orchestrateur-c7e` : elle sera complétée à la prochaine version du socle, pour ne pas monter cinq spécifications pour une mention.
 - Décisions du développeur (31 octobre 2026) : les deux fichiers sont destinés au lancement de l'IA locale ; ils sont analysés, corrigés et ajoutés au dépôt Agent2Prompt.
-- Soumis à ratification :
+- Décisions ratifiées (pull request n° 19) :
   - les noms des slots É0, É6 et É7 rendus à l'Axiome 7E ;
   - le principe de résonance énoncé selon sa formulation, la remontée de cause en devenant la conséquence au premier ordre ;
   - une méthode en un seul fichier, D1 à D7 sans modules séparés, pour le lancement ;
@@ -275,7 +275,7 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
   - les schémas Mermaid, rendus ;
   - le PowerPoint, validé et relu diapositive par diapositive ;
   - aucun nom de client ni de mission.
-- Soumis à ratification :
+- Décisions ratifiées (pull request n° 20) :
   - un dossier `docs/` pour les documents qui ne sont pas des spécifications, hors du vérificateur ;
   - les hypothèses du seuil (journée à 600 €, licence à 50 €, 15 jours de mise en place, équipe de cinq), à remplacer par les chiffres réels ;
   - la publication, dans ce dépôt public, d'un argumentaire destiné à un client, sans nom de client ni de mission.
