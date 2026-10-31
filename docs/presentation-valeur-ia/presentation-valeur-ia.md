@@ -1,6 +1,6 @@
-# Mécénat ou investissement ?
+# L'IA, un investissement mesurable
 
-**La valeur de l'IA dans le développement de vos applications : ce que vous financez, ce que vous en retirez, et comment le vérifier**
+**Ce que vous financez dans le développement de vos applications, ce que vous en retirez, et comment le vérifier**
 
 > Ce document accompagne la présentation : ses sections suivent l'ordre des diapositives et en donnent les explications. Les schémas sont écrits en Mermaid, que GitLab, GitHub et la plupart des éditeurs affichent. Les chiffres publics sont sourcés en annexe B. Les chiffres du modèle de rentabilité sont des hypothèses, à remplacer par les vôtres.
 
@@ -8,13 +8,19 @@
 
 ## 1. Le message
 
-**Ce n'est pas du mécénat.**
+**Ce que vous financez vous revient.**
 
 1. **La contrepartie est directe.** Chaque ticket livre son code, ses tests et ses preuves.
 2. **Elle se mesure.** Sur vos tickets, contre un groupe témoin, et non sur des promesses.
 3. **Elle reste chez vous.** Tests, fiches, registres et connaissances sont versionnés dans vos dépôts.
 
 Et vous gardez la décision : nous proposons un pilote mesuré, avec une règle d'arrêt fixée d'avance.
+
+```mermaid
+flowchart LR
+  C["Vous"] -- "licences, mise en place,<br/>temps de validation" --> P["Vos tickets,<br/>traités avec la méthode"]
+  P -- "code, tests, preuves,<br/>connaissances" --> C
+```
 
 ---
 
@@ -55,35 +61,7 @@ DORA identifie sept capacités qui amplifient l'effet positif de l'IA. Voici ce 
 
 ---
 
-## 5. Mécénat : la définition ne s'applique pas
-
-Le mécénat est « le soutien matériel apporté, sans contrepartie directe de la part du bénéficiaire, à une œuvre ou à une personne pour l'exercice d'activités présentant un intérêt général » (arrêté du 6 janvier 1989).
-
-| Critère du mécénat | Ce que vous financez |
-|---|---|
-| Aucune contrepartie directe | Une contrepartie à chaque ticket : code livré, tests, preuves |
-| Un bénéficiaire tiers | Le bénéficiaire, c'est vous : vos applications et vos équipes |
-| Une activité d'intérêt général | Votre propre production, suivie par vos propres indicateurs |
-
-Aucun des trois critères n'est rempli. La seule question légitime est celle de tout investissement : rapporte-t-il plus qu'il ne coûte ? Les sections 10 à 13 y répondent par le calcul, puis par la mesure.
-
-```mermaid
-flowchart TB
-  subgraph M["Mécénat : rien ne revient au donateur"]
-    direction LR
-    D1["Donateur"] -- "soutien matériel" --> B1["Bénéficiaire tiers<br/>activité d'intérêt général"]
-  end
-  subgraph I["Votre investissement : tout revient à vous"]
-    direction LR
-    C["Vous"] -- "licences, mise en place,<br/>temps de validation" --> P["Vos tickets,<br/>traités avec la méthode"]
-    P -- "code, tests, preuves,<br/>connaissances" --> C
-  end
-  M ~~~ I
-```
-
----
-
-## 6. Ce qui change dans un ticket
+## 5. Ce qui change dans un ticket
 
 Sans méthode, l'IA reçoit une consigne et rend du code ; le travail s'arrête quand les tests passent, et rien ne revient. Avec la méthode, deux retours referment la boucle : l'un corrige le système, l'autre corrige la méthode, et ce second retour passe par vos équipes.
 
@@ -113,7 +91,7 @@ La question posée change elle aussi :
 
 ---
 
-## 7. La contrepartie, ticket par ticket
+## 6. La contrepartie, ticket par ticket
 
 ```mermaid
 flowchart LR
@@ -140,7 +118,7 @@ Chaque fiche consigne les cinq indices, chacun entre 0 et 1, avec leur calcul. L
 
 ---
 
-## 8. Ce qui reste chez vous
+## 7. Ce qui reste chez vous
 
 ```
 votre dépôt
@@ -154,13 +132,13 @@ votre dépôt
 └── code et tests               une branche par ticket, aucun test supprimé sans accord
 ```
 
-Si l'équipe change demain, tout cela reste : la connaissance du projet ne part plus avec les personnes. C'est l'inverse du mécénat : un actif, versionné, qui s'enrichit à chaque ticket.
+Si l'équipe change demain, tout cela reste : la connaissance du projet ne part plus avec les personnes. C'est un actif, versionné, qui s'enrichit à chaque ticket.
 
 Ce qui est générique, la méthode et les outils, ne contient aucune donnée de votre projet. Ce qui est propre à votre projet est dans vos dépôts.
 
 ---
 
-## 9. Les garde-fous : l'IA propose, vos équipes décident
+## 8. Les garde-fous : l'IA propose, vos équipes décident
 
 ```mermaid
 flowchart LR
@@ -183,7 +161,7 @@ Le risque reste du côté de vos équipes, là où se trouve la responsabilité.
 
 ---
 
-## 10. Le seuil de rentabilité
+## 9. Le seuil de rentabilité
 
 La question n'est pas « combien l'IA fait-elle gagner ? », mais « combien faut-il gagner pour que l'investissement soit remboursé ? ».
 
@@ -204,7 +182,7 @@ Exemple chiffré, sur des hypothèses à remplacer par les vôtres :
 
 Coût mensuel par développeur : 50 + 2 × 75 + 150 = **350 €**. Seuil : 350 ÷ 75 = **4 h 40 par mois**, soit **2,9 %** du temps de travail. Pour l'équipe de cinq : 1 750 € par mois, 21 000 € par an. L'annexe C reprend la formule, à remplir avec vos chiffres.
 
-## 11. La valeur nette selon le gain mesuré
+## 10. La valeur nette selon le gain mesuré
 
 | Gain de temps mesuré | Heures par mois | Valeur nette par développeur et par mois |
 |---|---|---|
@@ -229,7 +207,7 @@ Ce calcul ne compte que le temps : la qualité, la traçabilité et la capitalis
 
 ---
 
-## 12. Comment nous le mesurons
+## 11. Comment nous le mesurons
 
 Votre sprint distingue déjà des tickets « IA » et des tickets « DEV » : la base de comparaison existe. Pour le pilote, des tickets comparables (même taille, même domaine) sont répartis par tirage au sort entre un groupe traité avec la méthode et un groupe témoin, au moins dix de chaque côté. Le tirage au sort évite de comparer des tickets choisis pour l'IA parce qu'ils semblaient plus simples.
 
@@ -246,7 +224,7 @@ Un évaluateur qui ne participe pas au pilote, par exemple le PO, valide les mes
 
 ---
 
-## 13. Notre proposition : un pilote avec règle d'arrêt
+## 12. Notre proposition : un pilote avec règle d'arrêt
 
 ```mermaid
 flowchart LR
@@ -265,7 +243,7 @@ flowchart LR
 
 ---
 
-## 14. En résumé
+## 13. En résumé
 
 | | |
 |---|---|
@@ -302,7 +280,6 @@ La méthode est elle-même contrôlée : 13 spécifications versionnées et 489 
 - METR, [*Measuring the Impact of Early-2025 AI on Experienced Open-Source Developer Productivity*](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/) (10 juillet 2025), et la mise à jour de 2026 sur la fiabilité des nouvelles données, [*We are Changing our Developer Productivity Experiment Design*](https://conffab.com/?p=10163).
 - Peng, Kalliamvakou, Cihon et Demirer, [*The Impact of AI on Developer Productivity: Evidence from GitHub Copilot*](https://arxiv.org/abs/2302.06590) (2023).
 - DORA, [*2025 State of AI-assisted Software Development*](https://cloud.google.com/blog/products/ai-machine-learning/announcing-the-2025-dora-report), avec [l'article de Google](https://blog.google/technology/developers/dora-report-2025/) et la [synthèse de Splunk](https://www.splunk.com/en_us/blog/learn/state-of-devops.html), qui nomme les sept capacités.
-- Ministère de la Culture, [*Qu'est-ce que le mécénat ?*](https://www.culture.gouv.fr/regions/drac-grand-est/services/direction_missions_transversales/mecenat-drac-grand-est/qu-est-ce-que-le-mecenat), qui cite l'arrêté du 6 janvier 1989.
 - Google Cloud, [tarifs de Gemini pour Google Cloud](https://cloud.google.com/products/gemini/pricing) : prix horaires de Gemini Code Assist, ramenés au mois sur 730 heures.
 
 ## Annexe C. Le modèle de seuil, pour vos propres chiffres

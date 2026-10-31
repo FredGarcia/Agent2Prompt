@@ -259,13 +259,26 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Documents
 
-### 2026-10-31 : présentation « Mécénat ou investissement ? »
+### 2026-10-31 : présentation « L'IA, un investissement mesurable »
 
-- **`docs/presentation-valeur-ia/`** : une présentation qui justifie auprès d'un client la valeur de l'IA dans le développement de ses applications, quand il y voit du mécénat. Deux formats :
+- **`docs/presentation-valeur-ia/`**, remaniée :
+  - titre et argumentaire centrés sur l'investissement et sa contrepartie, sans nommer l'objection du client ;
+  - la diapositive et la section de définition retirées, avec leur source : seize diapositives, treize sections ;
+  - dans le Markdown, un schéma de la boucle de l'investissement accompagne le message ;
+  - un thème clair : fond blanc sur toutes les diapositives, tons bleus, la valeur nette en bleu pâle sous le seuil et en bleu soutenu au-dessus.
+- Vérifications : aucune mention de l'objection dans le texte, les notes et les métadonnées ; schémas Mermaid rendus ; PowerPoint validé et relu diapositive par diapositive.
+- Soumis à ratification :
+  - le titre « L'IA, un investissement mesurable » ;
+  - le retrait de la diapositive de définition ;
+  - l'entrée de la première version, reformulée pour que le dépôt ne nomme plus l'objection.
+
+### 2026-10-31 : présentation de la valeur de l'IA, première version
+
+- **`docs/presentation-valeur-ia/`** : une présentation qui justifie auprès d'un client la valeur de l'IA dans le développement de ses applications, quand il doute de sa contrepartie. Deux formats :
   - `presentation-valeur-ia.md`, avec cinq schémas Mermaid ;
   - `presentation-valeur-ia.pptx`, dix-sept diapositives avec notes du présentateur.
 - Argumentaire :
-  - la définition officielle du mécénat (arrêté du 6 janvier 1989), dont aucun des trois critères n'est rempli ;
+  - une diapositive de définition, retirée dans la version suivante ;
   - les constats publics qui fondent la prudence du client (MIT NANDA, Gartner, METR), et ce qui distingue les projets qui créent de la valeur (MIT NANDA, les sept capacités de DORA 2025) ;
   - la contrepartie de chaque ticket, ce qui reste dans les dépôts du client et les garde-fous, repris d'`orchestrateur-c7e` 3.1.0 ;
   - un seuil de rentabilité calculé sur des hypothèses données en exemple, la valeur nette selon le gain mesuré, un protocole de mesure et un pilote avec règle d'arrêt.
