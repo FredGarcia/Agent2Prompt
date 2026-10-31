@@ -4,6 +4,49 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-10-31 : orchestrateur-c7e 3.1.0
+
+- **orchestrateur-c7e 3.1.0** : l'orchestrateur fractal C7E et son fichier d'invariants du projet, remis par le développeur en 3.0.0 pour être chargés au lancement de l'IA locale, corrigés et mis au format du dépôt.
+  - `SKILL.md` garde toute la méthode en un fichier, avec la structure de la 3.0.0 : cycle 7E, profondeurs du CRI, concepts, matrice, pipeline, Git, gates et tests, second ordre, modes, registre, valeur, anti-patterns, fiche. `meso-contrats.md` en est le module D8.
+  - Dimensions D1 à D8 actives, D9 (campagne de mesure de la valeur) réservée ; vingt invariants, dix scénarios de recette, points d'extension E1 à E3.
+  - Socle back-front 1.0.1 inclus ; experts `java` 1.1.1 et `angular` 1.0.1 inclus comme référentiels ; `agents-paralleles-gitlab` 1.0.1 et `agent-tdd-jira` 1.3.2 référencés pour leurs conventions Git et la numérotation des critères.
+  - Les deux fichiers de la 3.0.0 sont archivés tels quels ; la section 16 du point d'entrée donne chaque correction et sa raison.
+- Corrections principales :
+  - **Git** : la branche par slot `feature/7e-e<SLOT>-…` et le message `[É<SLOT>-<DOMAINE>] …`, rejoués avec les hooks du kit, sont refusés par `pre-commit` et `commit-msg`. Désormais une branche par ticket `<type>/<CLÉ>-<slug>`, des commits `<CLÉ> : [É<n>-<DOMAINE>] <type>(<portée>): …`, et aucun push, fusion ni tag par l'IA. Le tag `release/vX.Y.Z`, ambigu à côté d'une branche `release/*`, devient la convention du projet.
+  - **Axiome 7E** : le tableau des slots nommait É0 « Environnement (hors-axiome) », É6 « Évaluation » et É7 « Évolution ». Les numéros et les fonctions sont gardés, les noms rendus à l'axiome : É0 Outillage, É6 Évolutif, É7 Environnement.
+  - **Méthode** :
+    - une analyse et une fiche validées avant toute modification, puis une gate contrats avant tout code ;
+    - des tests déduits avant le code, et aucun test existant supprimé ;
+    - le commit de rétroaction rangé au premier ordre, le second ordre étant une entrée `proposed` du registre ;
+    - des poids déclarés comme priorités et des indicateurs normalisés ;
+    - des emplacements dans le projet et un registre de départ de quatre concepts.
+  - **Fichier d'invariants** :
+    - aligné sur le socle : RFC 9457 au lieu de RFC 7807, `400` pour la validation, extensions `code`, `traceId`, `errors[]`, pagination `{ content, page }` ;
+    - aligné sur les référentiels : DTO en `record`, nommage d'Angular 20, `exhaustMap` contre le double clic, accessibilité ;
+    - Liquibase : `runOnChange` n'est pas un rollback ; trois changesets pour un rattrapage ; `CREATE INDEX CONCURRENTLY` hors transaction ;
+    - registre des écarts dans un fichier distinct, le fichier d'invariants n'étant jamais modifié par l'IA ; accents rétablis.
+  - **Lancement** : fichier de contexte de l'IA locale avec les imports `@` de Gemini CLI (`GEMINI.md`, ou `README.md` nommé dans `context.fileName`) et de Claude Code, y compris dans la disposition du kit.
+- Vérifié :
+  - les six exemples de commits et l'exemple de branche passent les hooks `pre-commit` et `commit-msg` du kit 1.0.1, rejoués dans un dépôt de demande `ABCDE-3512` ;
+  - `docs/c7e/` et `docs/demandes/` y sont acceptés, `.skills/` refusé ;
+  - frontmatters en YAML, registre de départ et exemple de Problem Details en JSON, exemple de changeset en YAML ;
+  - la transmission, relue comme le ferait l'IA, redonne les sept fichiers à l'identique.
+- La liste du socle des skills qui l'incluent ne nomme pas encore `orchestrateur-c7e` : elle sera complétée à la prochaine version du socle, pour ne pas monter cinq spécifications pour une mention.
+- Décisions du développeur (31 octobre 2026) : les deux fichiers sont destinés au lancement de l'IA locale ; ils sont analysés, corrigés et ajoutés au dépôt Agent2Prompt.
+- Soumis à ratification :
+  - les noms des slots É0, É6 et É7 rendus à l'Axiome 7E ;
+  - le principe de résonance énoncé selon sa formulation, la remontée de cause en devenant la conséquence au premier ordre ;
+  - une méthode en un seul fichier, D1 à D7 sans modules séparés, pour le lancement ;
+  - le nom `orchestrateur-c7e`, à la place de `c7e_fractal_orchestrator`, et la version 3.1.0, qui prolonge la 3.0.0 remise ;
+  - la validation de la fiche et la gate contrats dans tous les modes, B compris ;
+  - les conventions Git du kit, et l'interdiction pour l'IA de pousser, fusionner ou poser un tag ;
+  - l'inclusion du socle et des référentiels Java et Angular, qui font foi devant le fichier d'invariants ;
+  - les quatre concepts de départ au statut `validated` par la ratification de cette version ;
+  - `clarity=0.9`, sans définition, remplacé par la règle « synthèse d'abord » ; `rigor=0.95` défini comme part des décisions prouvées ;
+  - les emplacements par défaut : `.skills/orchestrateur-c7e/`, `docs/c7e/`, `docs/demandes/<CLÉ>/` ;
+  - les défauts du fichier d'invariants alignés sur le socle et les référentiels (versions, codes d'erreur, pagination, DTO, nommage, double clic) ;
+  - l'archivage des deux fichiers de la 3.0.0 dans le dépôt public.
+
 ### 2026-10-28 : capture-sprint-jira 1.2.1
 
 - **capture-sprint-jira 1.2.1** : correctif. Une fois la version 1.2.0 fusionnée, sa recette en CI a échoué sur `ubuntu-latest` Node 22 : après la fermeture du navigateur pendant la capture (R15), la capture est restée en cours sur le deuxième ticket, et les scénarios suivants en ont échoué (8 contrôles). Les trois autres jobs passaient.

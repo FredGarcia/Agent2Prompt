@@ -1,0 +1,35 @@
+{
+  "name": "orchestrateur-c7e",
+  "version": "3.1.0",
+  "specSchema": 1,
+  "language": "fr",
+  "description": "Orchestrateur fractal C7E : résolution d'un ticket full-stack comme transformation maîtrisée d'un système vivant, avec le cycle de l'Axiome 7E, quatre profondeurs de déclinaison, des concepts paramétrables, une fiche validée avant toute modification, des tests déduits des risques, des conventions Git compatibles avec le kit des agents parallèles, une boucle de second ordre bornée par un registre et un fichier d'invariants du projet ; chargé au lancement de l'IA locale.",
+  "entry": "SKILL.md",
+  "modes": ["externe", "autonome", "hybride"],
+  "targets": {
+    "ia": "IA locale qui charge un fichier de contexte à son lancement (Gemini CLI, Claude Code)",
+    "entree": "ticket Jira en MHTML (dossier IA de capture-sprint-jira) ou texte",
+    "adaptateur": "Java 21, Spring Boot 3.5, PostgreSQL, Liquibase, Angular 20",
+    "git": "une branche par ticket, commits préfixés par la clé, compatibles avec les hooks d'agents-paralleles-gitlab"
+  },
+  "shared": [
+    { "path": "socle/SKILL.md", "from": "specs/socle-back-front/SKILL.md", "version": "1.0.1" },
+    { "path": "references/java.md", "from": "specs/java/SKILL.md", "version": "1.1.1" },
+    { "path": "references/angular.md", "from": "specs/angular/SKILL.md", "version": "1.0.1" }
+  ],
+  "references": [
+    { "name": "java", "version": "1.1.1" },
+    { "name": "angular", "version": "1.0.1" },
+    { "name": "agents-paralleles-gitlab", "version": "1.0.1" },
+    { "name": "agent-tdd-jira", "version": "1.3.2" }
+  ],
+  "modules": [
+    { "id": "meso-contrats", "path": "meso-contrats.md", "dimensions": ["D8"], "status": "active" },
+    { "id": "mesure", "path": "modules/mesure/SKILL.md", "dimensions": ["D9"], "status": "reserved" }
+  ],
+  "extensionPoints": ["E1", "E2", "E3"],
+  "previousVersions": [
+    { "version": "3.0.0", "file": "archives/SKILL-v3.0.0.md" },
+    { "version": "3.0.0", "file": "archives/meso-contrats-v3.0.0.md" }
+  ]
+}
