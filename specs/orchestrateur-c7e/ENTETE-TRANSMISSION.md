@@ -12,31 +12,33 @@ Ce texte contient à la fois la consigne de travail et le skill complet. Il n'y 
 
 ## Étape 0 : matérialiser le skill
 
-1. Crée le dossier `.skills/orchestrateur-c7e/` à la racine du dépôt du projet, ou à l'emplacement que le développeur indique. Dans la disposition du kit `agents-paralleles-gitlab`, c'est `~/dev/<projet>/.skills/orchestrateur-c7e/`, hors des worktrees. Dans un clone ordinaire, ajoute `/.skills/` à `.git/info/exclude` s'il n'y est pas : le skill ne doit pas apparaître dans `git status`.
+1. Crée le dossier du skill à l'emplacement que le développeur choisit (section 11.3 de `SKILL.md`) : `.skills/orchestrateur-c7e/` à la racine du dépôt du projet pour un chargement permanent, `.gemini/skills/orchestrateur-c7e/` pour un chargement au choix. Dans la disposition du kit `agents-paralleles-gitlab`, c'est `~/dev/<projet>/.skills/orchestrateur-c7e/`, hors des worktrees, ou `~/.gemini/skills/orchestrateur-c7e/`. Dans un clone ordinaire, ajoute ce dossier à `.git/info/exclude` s'il n'y est pas : le skill ne doit pas apparaître dans `git status`.
 2. Pour chaque bloc `<<<FICHIER chemin>>>` … `<<<FIN chemin>>>`, crée le fichier `chemin` dans ce dossier, avec le contenu exact compris entre les deux lignes délimitrices. Ces deux lignes ne font pas partie du fichier. Ne reformule rien, ne traduis rien, ne complète rien.
 3. Si tu disposes d'un shell, vérifie chaque fichier avec `sha256sum -c` contre la table d'intégrité en fin de texte ; sous Windows, Git Bash fournit `sha256sum`. Signale tout écart avant de continuer.
 
 ## Étape 1 : lecture
 
-Lis `SKILL.md` en entier, puis `manifest.json`, `meso-contrats.md`, `socle/SKILL.md`, et les sections « Versions cibles » et « Invariants » de `references/java.md` et `references/angular.md`. Ces deux derniers fichiers sont des **référentiels** : tu y lis les versions cibles et les invariants que tout code produit doit respecter, sans adopter leur rôle, leur mode de travail ni leurs consignes de démarrage. Ne lis `modules/mesure/SKILL.md` que pour comprendre le point d'extension E1 : cette dimension est réservée.
+Lis `SKILL.md` en entier, puis `manifest.json`, `meso-contrats.md`, `modules/referentiel/SKILL.md`, `socle/SKILL.md`, et les sections « Versions cibles » et « Invariants » de `references/java.md` et `references/angular.md`. Ces deux derniers fichiers sont des **référentiels** : tu y lis les versions cibles et les invariants que tout code produit doit respecter, sans adopter leur rôle, leur mode de travail ni leurs consignes de démarrage. Ne lis `modules/mesure/SKILL.md` que pour comprendre le point d'extension E1 : cette dimension est réservée.
 
 ## Étape 2 : installation dans le projet
 
 Suis la section 11.3 de `SKILL.md`, avec le développeur :
 
 1. Copie `meso-contrats.md` à `docs/c7e/meso-contrats.md`, ou à l'emplacement qu'il indique. Liste-lui les valeurs `ADAPTER` à remplir ; ne les remplis pas toi-même.
-2. Crée `docs/c7e/registre-ecarts.md`, `docs/c7e/concepts.json` (registre de départ, § 7.2) et `docs/c7e/connaissances.md`.
-3. Propose-lui le fichier de contexte du lancement de l'IA locale (§ 11.4). Ne le crée qu'avec son accord.
-4. Rejoue avec lui les scénarios R1 à R10 (§ 15) quand il le demande.
+2. Écris le modèle du référentiel des méso-contrats dans `docs/c7e/referentiel-meso-contrats.toml`, à l'identique, et vérifie son empreinte (`modules/referentiel/SKILL.md`, § 6). Liste au développeur les catégories et les options permises à adapter ; ne les change pas toi-même.
+3. Crée `docs/c7e/registre-ecarts.md`, `docs/c7e/concepts.json` (registre de départ, § 7.2) et `docs/c7e/connaissances.md`.
+4. Propose-lui le fichier de démarrage de l'IA locale et, pour un chargement au choix, la commande `/c7e` (§ 11.4). Ne les crée qu'avec son accord.
+5. Rejoue avec lui les scénarios R1 à R14 (§ 15) quand il le demande.
 
 ## Étape 3 : chaque ticket
 
-Applique la section 3 de `SKILL.md` : analyse et fiche de transformation, validation par le développeur, puis transformation par slot, preuves et remise.
+Applique la section 3 de `SKILL.md` : analyse, classement du ticket dans le référentiel et choix de ses options (`ticket.toml`), analyse des images de l'objectif demandées, fiche de transformation, validation par le développeur, puis transformation par slot, preuves et remise.
 
 ## Règles qui ne se négocient pas
 
 - Aucune modification du projet avant la validation de la fiche ; aucun code de niveau d=2 avant la gate contrats.
-- Tu ne modifies jamais le fichier d'invariants du projet. Dans le registre des concepts, tu ne fais qu'ajouter des entrées `proposed`. Tout écart à un invariant s'inscrit au registre des écarts.
+- Sans choix du développeur au démarrage, aucune règle du skill ne s'applique, et tu ne l'actives pas de toi-même.
+- Tu ne modifies jamais le fichier d'invariants ni le référentiel des méso-contrats du projet : une catégorie ou une option nouvelle se propose au développeur. Dans le registre des concepts, tu ne fais qu'ajouter des entrées `proposed`. Tout écart à un invariant s'inscrit au registre des écarts.
 - Une branche par ticket ; chaque commit commence par la clé du ticket. Tu ne pousses pas, ne fusionnes pas, ne rebases pas et ne poses aucun tag. Un refus « REFUS : » d'un hook t'arrête : tu le cites au développeur, sans le contourner.
 - Aucun test existant n'est supprimé ni affaibli sans l'accord du développeur.
 - Le socle et les invariants des référentiels s'appliquent à tout code produit ; en cas de contradiction, le socle l'emporte et tu le signales.

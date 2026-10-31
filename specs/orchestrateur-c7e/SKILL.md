@@ -1,12 +1,12 @@
 ---
 name: orchestrateur-c7e
-description: Orchestrateur fractal C7E, qui pilote la résolution d'un ticket full-stack comme la transformation maîtrisée d'un système vivant (cycle de l'Axiome 7E, déclinaison récursive imbriquée sur quatre profondeurs, concepts paramétrables, fiche de transformation validée avant toute modification, tests déduits des risques, traçabilité Git compatible avec le kit des agents parallèles, boucle de second ordre bornée par un registre, valeur annoncée comme une hypothèse tant qu'elle n'est pas mesurée), avec le fichier des invariants du projet, meso-contrats. Adaptateur par défaut Java, Spring Boot, PostgreSQL, Liquibase et Angular. À charger au lancement de l'IA locale, pour chaque ticket qu'elle traite.
-version: 3.1.0
+description: Orchestrateur fractal C7E, qui pilote la résolution d'un ticket full-stack comme la transformation maîtrisée d'un système vivant (cycle de l'Axiome 7E, déclinaison récursive imbriquée sur quatre profondeurs, concepts paramétrables, référentiel des méso-contrats qui classe chaque ticket et en fixe les options par couche, analyse des images PNG de l'objectif, fiche de transformation validée avant toute modification, tests déduits des risques, traçabilité Git compatible avec le kit des agents parallèles, boucle de second ordre bornée par un registre, valeur annoncée comme une hypothèse tant qu'elle n'est pas mesurée), avec le fichier des invariants du projet, meso-contrats. Adaptateur par défaut Java, Spring Boot, PostgreSQL, Liquibase et Angular. À activer au démarrage de l'IA locale, sur choix du développeur, pour les tickets qu'il lui confie.
+version: 3.2.0
 ---
 
-# Orchestrateur fractal C7E, version 3.1.0
+# Orchestrateur fractal C7E, version 3.2.0
 
-Ce document est le point d'entrée du skill et contient toute la méthode. Il se charge au lancement de l'IA locale avec le fichier des invariants du projet, copie remplie du modèle `meso-contrats.md` (section 11). Ces deux fichiers suffisent au lancement ; les autres se lisent quand un ticket touche leur domaine.
+Ce document est le point d'entrée du skill et contient la méthode. Il s'active au démarrage de l'IA locale, sur choix du développeur (§ 11.4), avec le fichier des invariants du projet, copie remplie du modèle `meso-contrats.md`. Ces deux fichiers suffisent au démarrage ; le référentiel des méso-contrats se lit à l'analyse de chaque ticket, et les autres fichiers quand un ticket touche leur domaine.
 
 Fichiers du skill :
 
@@ -14,9 +14,10 @@ Fichiers du skill :
 - `meso-contrats.md` : modèle des invariants du projet (dimension D8), pré-rempli pour l'adaptateur par défaut, à copier dans le projet et à remplir par le développeur ;
 - `socle/SKILL.md` : socle commun back-front (contrat OpenAPI, erreurs RFC 9457, formats, pagination, sécurité, traçabilité, accessibilité), inclus à une version épinglée ;
 - `references/java.md` et `references/angular.md` : points d'entrée des experts Java et Angular. Ce sont des **référentiels** : l'IA y lit les versions cibles et les invariants que tout code produit doit respecter, sans adopter leur mode de travail ;
+- `modules/referentiel/SKILL.md` : dimension D10, le référentiel des méso-contrats : catégories de tickets, options au choix par couche, analyse des images de l'objectif, modèle à installer dans le projet ;
 - `modules/mesure/SKILL.md` : dimension réservée D9, à lire seulement pour comprendre le point d'extension E1.
 
-Ordre de lecture au premier lancement : ce document en entier ; la copie du projet du fichier d'invariants ; `socle/SKILL.md` ; les sections « Versions cibles » et « Invariants » des deux référentiels. Aux lancements suivants, ce document et la copie du projet suffisent ; le socle et les référentiels se relisent quand un ticket touche leur domaine.
+Ordre de lecture au premier lancement : ce document en entier ; la copie du projet du fichier d'invariants ; `modules/referentiel/SKILL.md` ; `socle/SKILL.md` ; les sections « Versions cibles » et « Invariants » des deux référentiels. Aux lancements suivants, ce document et la copie du projet suffisent ; le module `referentiel` et le référentiel du projet se lisent à l'analyse de chaque ticket, le socle et les référentiels quand un ticket touche leur domaine.
 
 ---
 
@@ -125,9 +126,10 @@ Pour chaque ticket, l'orchestrateur produit une **fiche de transformation** (§ 
 1. Lire le ticket (§ 11.1) et ses critères d'acceptation ; les numéroter `<CLÉ>-CAnn` s'ils ne le sont pas déjà, au format d'`agent-tdd-jira` (agent-tdd-jira:D10.INV-1).
 2. Lire l'architecture réelle : code, contrat, migrations, tests existants, conventions du projet. Si le skill `skill4appli` est installé, ses emplacements `chemin:ligne` accélèrent la lecture ; le disque fait foi.
 3. Cartographier l'impact : dépendances explicites et détectées, autres consommateurs (écrans, batchs, autres services).
-4. Choisir la configuration (§ 2, § 7.1).
-5. Déduire les tests des critères et des risques (§ 5.2).
-6. Présenter la fiche au développeur : objectif, critères, invariants, configuration, cartographie, stratégie et tests déduits. **Point de validation** : rien n'est modifié avant sa réponse (D3.INV-1).
+4. Classer le ticket dans le référentiel des méso-contrats du projet, choisir ses options par couche et analyser les images de l'objectif demandées ; le tout s'écrit dans `ticket.toml` et `analyse-image.md` (module `referentiel`, D10.INV-1, D10.INV-2, D10.INV-4).
+5. Choisir la configuration (§ 2, § 7.1).
+6. Déduire les tests des critères et des risques, y compris les preuves des options retenues (§ 5.2, D10.INV-3).
+7. Présenter la fiche au développeur : objectif, critères, méso-contrat et options, invariants, configuration, cartographie, stratégie et tests déduits, avec `ticket.toml` et l'analyse d'image s'il y en a une. **Point de validation** : rien n'est modifié avant sa réponse (D3.INV-1).
 
 **Transformation, après la validation**
 
@@ -219,6 +221,8 @@ Le niveau de preuve exigé suit la criticité du ticket (grille du fichier d'inv
 | Batch ou autre consommateur | Absence d'impact, vérifiée par ses tests ou par la cartographie |
 
 Chaque test **proposé pour le ticket** prouve un critère d'acceptation `<CLÉ>-CAnn` ou un risque de la cartographie ; un test qui ne prouve ni l'un ni l'autre n'est pas écrit (D5.INV-1). Les tests déduits le sont à l'analyse, avant toute modification, pour que le code ne les façonne pas ; les tests existants du projet ne sont jamais supprimés ni affaiblis sans l'accord du développeur (D5.INV-2).
+
+Les options retenues dans `ticket.toml` apportent les preuves que le référentiel leur associe, et les méso-contrats transverses des couches touchées leurs exigences : elles entrent dans les tests déduits, comme preuves des risques que portent ces options (D10.INV-2, D10.INV-3).
 
 ---
 
@@ -373,6 +377,8 @@ Rangée à `docs/demandes/<CLÉ>/fiche-transformation.md` (§ 11.2). La premièr
 **Synthèse** : une page au plus
 **Objectif Macro (d=0, É7)** : ...
 **Critères d'acceptation** : <CLÉ>-CA01, <CLÉ>-CA02 ... (provenance de chacun)
+**Méso-contrat** : identifiant, code, version du référentiel ; options retenues par couche (`ticket.toml`) ; méso-contrats transverses appliqués
+**Analyse d'image** : `analyse-image.md`, s'il y a lieu ; questions posées au développeur
 **Invariants** : SLA, normes, sécurité ; version lue du fichier d'invariants du projet
 **Configuration retenue** : mode ; concepts × poids × paramètres ; profondeur ; niveau de preuve ; justification par la criticité
 **Cartographie d'impact** : dépendances explicites et détectées, consommateurs
@@ -391,7 +397,7 @@ Rangée à `docs/demandes/<CLÉ>/fiche-transformation.md` (§ 11.2). La premièr
 
 ---
 
-## 11. Entrées, emplacements et lancement
+## 11. Entrées, emplacements et démarrage
 
 ### 11.1 Entrées
 
@@ -401,25 +407,39 @@ Un ticket : sa capture MHTML, par défaut celle du dossier `IA/` que produit le 
 
 | Fichier | Rôle | Qui l'écrit | Emplacement par défaut |
 |---|---|---|---|
-| le skill | méthode, modèle, socle, référentiels | personne après l'installation : il reste identique à la transmission | `.skills/orchestrateur-c7e/`, hors de l'arbre suivi |
+| le skill | méthode, modèles, socle, référentiels | personne après l'installation : il reste identique à la transmission | `.skills/orchestrateur-c7e/`, ou `.gemini/skills/orchestrateur-c7e/` pour un chargement au choix (§ 11.4) ; hors de l'arbre suivi |
 | invariants du projet | copie remplie de `meso-contrats.md` | le développeur seul | `docs/c7e/meso-contrats.md` |
 | registre des écarts | un écart par ligne, avec sa décision | l'IA ajoute des lignes ; le développeur décide | `docs/c7e/registre-ecarts.md` |
 | registre des concepts | bibliothèque de concepts (§ 7.2) | l'IA ajoute des entrées `proposed` ; le développeur promeut | `docs/c7e/concepts.json` |
 | base de connaissances | conventions, dépendances, échecs récurrents, stratégies efficaces | l'IA ajoute ; le développeur relit | `docs/c7e/connaissances.md` |
 | fiche de transformation | une par ticket (§ 10) | l'IA | `docs/demandes/<CLÉ>/fiche-transformation.md` |
+| référentiel des méso-contrats | catégories de tickets, options par couche, transverses (D10) | le développeur, à partir du modèle du module `referentiel` | `docs/c7e/referentiel-meso-contrats.toml` |
+| instance du ticket | méso-contrat et options retenues | l'IA propose ; le développeur valide avec la fiche | `docs/demandes/<CLÉ>/ticket.toml` |
+| analyse d'image | une par ticket qui la demande | l'IA ; validée avec la fiche | `docs/demandes/<CLÉ>/analyse-image.md` |
+| images de l'objectif | maquettes ou captures PNG | le développeur ou le PO | `docs/demandes/<CLÉ>/maquettes/` |
 
 Les fichiers de `docs/` sont versionnés avec le projet : ce qu'un ticket capitalise devient commun à la fusion de sa branche, après revue. Si l'équipe ne les versionne pas, le fichier d'invariants du projet en fixe d'autres emplacements (`meso-contrats.md`, § 6).
 
 ### 11.3 Installation, une fois par projet
 
-1. Matérialiser le skill dans `.skills/orchestrateur-c7e/`, à l'identique de la transmission, hors de l'arbre suivi : `.git/info/exclude` d'un clone ordinaire, ou exclusion commune du kit `agents-paralleles-gitlab`.
+1. Matérialiser le skill à l'identique de la transmission, hors de l'arbre suivi : dans `.skills/orchestrateur-c7e/` pour un chargement permanent, dans `.gemini/skills/orchestrateur-c7e/` pour un chargement au choix, ou au niveau utilisateur avec le kit `agents-paralleles-gitlab` (§ 11.4) ; exclusion par `.git/info/exclude` d'un clone ordinaire, ou exclusion commune du kit.
 2. Copier `meso-contrats.md` à `docs/c7e/meso-contrats.md` ; le développeur remplit les valeurs `ADAPTER`, et l'IA lui liste celles qui restent (D8.INV-1).
-3. Créer `docs/c7e/registre-ecarts.md` (modèle à la fin de `meso-contrats.md`), `docs/c7e/concepts.json` (registre de départ, § 7.2) et `docs/c7e/connaissances.md`, vide.
-4. Proposer le fichier de contexte du lancement (§ 11.4), et ne le créer qu'avec l'accord du développeur.
+3. Écrire le modèle du référentiel des méso-contrats dans `docs/c7e/referentiel-meso-contrats.toml`, à l'identique, et en vérifier l'empreinte (module `referentiel`, § 6) ; le développeur y adapte les catégories et les options permises.
+4. Créer `docs/c7e/registre-ecarts.md` (modèle à la fin de `meso-contrats.md`), `docs/c7e/concepts.json` (registre de départ, § 7.2) et `docs/c7e/connaissances.md`, vide.
+5. Proposer le fichier de démarrage et, pour un chargement au choix, la commande `/c7e` (§ 11.4) ; ne les créer qu'avec l'accord du développeur.
 
-### 11.4 Lancement de l'IA locale
+### 11.4 Démarrage de l'IA locale
 
-Le fichier de contexte que l'IA lit à chaque lancement importe les deux fichiers :
+Le skill ne s'applique qu'au choix du développeur (D2.INV-3), selon l'un de deux chargements :
+
+| Chargement | Le choix se fait | Au démarrage, le contexte contient |
+|---|---|---|
+| permanent | une fois, par l'import du fichier de démarrage | ce document et le fichier d'invariants |
+| au choix | à chaque session, au menu ou par la commande `/c7e` | le nom et la description du skill, et le menu |
+
+Le chargement au choix convient dès que toutes les sessions ne traitent pas leurs tickets par la méthode. Ces deux chargements ne sont pas les modes de modulation A, B et C du § 7.1, qui règlent la méthode une fois le skill choisi.
+
+**Chargement permanent.** Le fichier de démarrage importe les deux fichiers :
 
 ```markdown
 # IA locale du projet
@@ -431,9 +451,45 @@ Pour chaque ticket confié, applique l'orchestrateur C7E : fiche de transformati
 validation par le développeur, puis transformation par slot.
 ```
 
-- **Gemini CLI** lit `GEMINI.md` à chaque lancement, global, du projet et de ses dossiers parents, et y importe les fichiers désignés par `@chemin`. Pour qu'un `README.md` serve de fichier de contexte, le nommer dans `context.fileName` de `.gemini/settings.json`, qui accepte une liste : `{ "context": { "fileName": ["GEMINI.md", "README.md"] } }`. Gemini CLI cherche aussi les fichiers de contexte des dossiers que ses outils lisent : nommé `README.md`, le contexte s'enrichirait des autres `README.md` du projet ; un nom propre à l'IA locale l'évite. `/memory show` affiche le contexte chargé ; `/memory reload` le relit après une modification.
+**Chargement au choix.** Le skill est installé comme skill de Gemini CLI, dans `.gemini/skills/orchestrateur-c7e/` : seuls son nom et sa description se chargent au démarrage, le reste à son activation, que Gemini CLI fait confirmer. Le fichier de démarrage propose le choix, sans rien importer du skill :
+
+```markdown
+# IA locale du projet
+
+À ton premier message, avant tout autre travail, propose ce choix et attends la réponse :
+
+0. Sans orchestrateur.
+1. Avec l'orchestrateur C7E.
+
+- N'active jamais le skill orchestrateur-c7e sans ce choix.
+- Avec l'orchestrateur : active le skill et lis docs/c7e/meso-contrats.md ; pour chaque ticket
+  confié, classe-le dans docs/c7e/referentiel-meso-contrats.toml et présente ticket.toml
+  avec la fiche.
+- Sans orchestrateur : n'applique aucune règle du skill.
+```
+
+La commande `/c7e` fait le même choix sans passer par le menu, et confie le ticket d'un même geste : `/c7e ABCDE-3512`, ou `/c7e ABCDE-3512 M01` pour imposer le méso-contrat. Fichier `.gemini/commands/c7e.toml` :
+
+```toml
+description = "Orchestrateur C7E : activer le skill et traiter le ticket donné"
+prompt = """
+Active le skill orchestrateur-c7e pour la suite de la session.
+Fichier d'invariants du projet :
+@{docs/c7e/meso-contrats.md}
+Référentiel des méso-contrats du projet :
+@{docs/c7e/referentiel-meso-contrats.toml}
+Ticket, et méso-contrat imposé s'il est précisé : {{args}}
+"""
+```
+
+- **Gemini CLI** lit `GEMINI.md` au démarrage : le fichier global, celui du projet et ceux de ses dossiers parents ; il y développe les imports `@chemin`. Un autre nom se déclare dans `context.fileName` de `.gemini/settings.json`, qui accepte une liste, avec la casse exacte du fichier : `{ "context": { "fileName": ["GEMINI.md", "README.md"] } }`. Gemini CLI cherche aussi les fichiers de ce nom dans les dossiers que ses outils lisent : nommé `README.md`, le contexte s'enrichirait des autres `README.md` du projet ; un nom propre à l'IA locale l'évite.
+- **Commandes de Gemini CLI** : elles injectent les `@{…}` en respectant `.gitignore`. Le skill, exclu de Git, passe donc par son activation, jamais par une injection ; les fichiers de `docs/c7e/` et les images de l'objectif, versionnés, s'injectent.
+- **Vérifications** : `/memory show` affiche le fichier de démarrage, `/skills list` le skill, `/commands list` la commande ; après une modification, `/memory reload`, `/skills reload` ou `/commands reload`.
 - **Claude Code** lit `CLAUDE.md` et y importe de même les fichiers désignés par `@chemin`.
-- **Disposition du kit `agents-paralleles-gitlab`** : le fichier de contexte se pose à la racine du kit, dossier parent des worktrees, que Gemini CLI lit aussi. Il importe `@./.skills/orchestrateur-c7e/SKILL.md` et `@./main/docs/c7e/meso-contrats.md`, la copie du worktree de référence, jamais celle d'une demande en cours.
+- **Kit `agents-paralleles-gitlab`** : en chargement permanent, le fichier de démarrage se pose à la racine du kit, dossier parent des worktrees, que Gemini CLI lit aussi ; il importe `@./.skills/orchestrateur-c7e/SKILL.md` et `@./main/docs/c7e/meso-contrats.md`, la copie du worktree de référence, jamais celle d'une demande en cours. En chargement au choix, le skill et la commande vont au niveau utilisateur, `~/.gemini/skills/` et `~/.gemini/commands/` : une installation sert tous les worktrees, et les chemins `docs/c7e/…` se lisent dans le worktree où Gemini CLI est lancé.
+- **Lancement sans interface**, par un outil qui relance Gemini CLI à chaque message : l'outil retient le choix et le rejoue à chaque appel, la confirmation d'activation supposant une interface.
+
+Le mode d'emploi du dépôt Agent2Prompt, `docs/orchestrateur-c7e/mode-emploi.md`, détaille ces étapes.
 
 ### 11.5 Précédence des règles
 
@@ -449,10 +505,10 @@ Une contradiction entre deux niveaux se signale et s'inscrit au registre des éc
 
 ## 12. Registre des dimensions
 
-| ID | Dimension | Introduite | Statut 3.1.0 | Dépend de | Où |
+| ID | Dimension | Introduite | Statut 3.2.0 | Dépend de | Où |
 |---|---|---|---|---|---|
 | D1 | Ontologie : cycle 7E, profondeurs du CRI, concepts paramétrables | 3.1 | active | | `SKILL.md`, § 1 |
-| D2 | Configuration : matrice d'activation, modes de modulation | 3.1 | active | D1 | § 2, § 7.1 |
+| D2 | Configuration : matrice d'activation, modes de modulation, choix du démarrage | 3.1 | active | D1 | § 2, § 7.1, § 11.4 |
 | D3 | Pipeline par slot et fiche de transformation | 3.1 | active | D1, D2 | § 3, § 10 |
 | D4 | Traçabilité Git | 3.1 | active | D3 | § 4 |
 | D5 | Gates et tests déduits des risques | 3.1 | active | D3, socle | § 5 |
@@ -460,17 +516,18 @@ Une contradiction entre deux niveaux se signale et s'inscrit au registre des éc
 | D7 | Valeur annoncée et indicateurs | 3.1 | active | D3 | § 8 |
 | D8 | Invariants du projet | 3.1 | active | D1 à D7, socle | `meso-contrats.md` |
 | D9 | Campagne de mesure de la valeur | 3.1 | reserved | D7 | `modules/mesure/SKILL.md` |
+| D10 | Référentiel des méso-contrats : catégories de tickets, options par couche, analyse des images de l'objectif | 3.2 | active | D3, D5, D8 | `modules/referentiel/SKILL.md` |
 
-La méthode tient en un seul fichier pour se charger au lancement de l'IA locale : D1 à D7 sont décrites dans ce document plutôt que dans des modules séparés ; D8 est le modèle du fichier d'invariants du projet.
+La méthode tient en un seul fichier pour se charger au démarrage : D1 à D7 sont décrites dans ce document plutôt que dans des modules séparés ; D8 est le modèle du fichier d'invariants du projet ; D10, qui se lit à l'analyse de chaque ticket, est un module.
 
 ## 13. Contrat de version et points d'extension
 
-Le skill suit le contrat de version de `EVOLUTION.md` du dépôt Agent2Prompt. La version 3.0.0, remise par le développeur, est archivée telle quelle avec son fichier d'invariants (`archives/`). Le socle et les deux référentiels sont épinglés dans `manifest.json`.
+Le skill suit le contrat de version de `EVOLUTION.md` du dépôt Agent2Prompt. La version 3.0.0, remise par le développeur, est archivée telle quelle avec son fichier d'invariants (`archives/`), comme la version 3.1.0 et le modèle de référentiel remis en 2.0.0. Le socle et les deux référentiels sont épinglés dans `manifest.json`.
 
 Points d'extension, actifs dès 3.1.0 :
 
 - **E1** : chaque fiche consigne la configuration retenue et les indicateurs Q, R, T, C, A avec leur calcul ; la campagne de mesure (D9) les agrégera sans réécrire de fiche.
-- **E2** : un adaptateur de stack est la colonne « Adaptateur par défaut » du § 1.1, le fichier d'invariants du projet et les référentiels de la stack ; une autre stack s'ajoute par un autre fichier d'invariants et d'autres référentiels, sans changer D1 à D7.
+- **E2** : un adaptateur de stack est la colonne « Adaptateur par défaut » du § 1.1, le fichier d'invariants du projet, les référentiels de la stack, et les technologies et options du référentiel des méso-contrats ; une autre stack s'ajoute par d'autres fichiers de ce type, sans changer D1 à D7.
 - **E3** : le registre des concepts porte `schemaVersion` ; un registre partagé entre projets pourra le lire sans conversion.
 
 ## 14. Invariants
@@ -484,6 +541,7 @@ Points d'extension, actifs dès 3.1.0 :
 
 - **D2.INV-1** : la fiche déclare le mode, les concepts activés avec leurs poids et leurs paramètres, la profondeur et le niveau de preuve, et justifie cette configuration par la criticité du ticket, selon la grille du fichier d'invariants du projet.
 - **D2.INV-2** : dans tous les modes, les invariants du projet, du socle et des référentiels s'appliquent ; un mode ne règle que des paramètres opérationnels.
+- **D2.INV-3** : le skill ne s'applique qu'au choix du développeur : en chargement permanent, par l'import de son fichier de démarrage ; en chargement au choix, par sa réponse au menu ou par la commande `/c7e`. Sans ce choix, l'IA n'applique aucune règle du skill et ne l'active pas d'elle-même.
 
 **D3 : pipeline et fiche**
 
@@ -519,6 +577,14 @@ Points d'extension, actifs dès 3.1.0 :
 - **D8.INV-1** : la copie du projet du fichier d'invariants est lue avant chaque ticket ; une valeur `ADAPTER` restée telle est signalée au développeur avant la fiche, jamais devinée.
 - **D8.INV-2** : le fichier d'invariants précise le socle et les référentiels sans les contredire ; une contradiction se signale et s'inscrit au registre des écarts, et le socle l'emporte jusqu'à la décision du développeur.
 
+**D10 : référentiel des méso-contrats**
+
+- **D10.INV-1** : chaque ticket est classé dans un méso-contrat du référentiel du projet ; l'IA propose la catégorie et les options dans `ticket.toml`, que le développeur valide avec la fiche ; un ticket qu'aucune catégorie ne couvre se signale dans la fiche, sans catégorie inventée.
+- **D10.INV-2** : les options choisies respectent l'empreinte du méso-contrat : chacune figure parmi les options permises de sa couche ; une couche à l'impact `requis` en porte au moins une, une couche à l'impact `aucun` n'en porte aucune ; les méso-contrats transverses des couches touchées s'appliquent d'office.
+- **D10.INV-3** : chaque option retenue apporte aux tests déduits les preuves que le référentiel lui associe, reliées à un critère ou à un risque.
+- **D10.INV-4** : une option front qui désigne une image PNG de l'objectif et en demande l'analyse donne lieu à `analyse-image.md`, rédigée avant la fiche et validée avec elle ; chaque élément de l'image y est rattaché à une option ou posé en question, et les tailles et couleurs lues sur l'image y sont des estimations.
+- **D10.INV-5** : `ticket.toml` épingle la version du référentiel qu'il suit ; l'IA ne modifie jamais le référentiel du projet : une catégorie ou une option nouvelle se propose au développeur, qui seul l'ajoute.
+
 ## 15. Scénarios de recette
 
 Rejoués avec le développeur à l'installation, puis à chaque version du skill. Chacun décrit une situation, une demande et le comportement attendu.
@@ -535,10 +601,15 @@ Rejoués avec le développeur à l'installation, puis à chaque version du skill
 | R8 | Le développeur choisit le mode B pour un ticket | l'IA règle seule la méthode et ses paramètres ; les invariants du projet et du socle s'appliquent ; la fiche est validée avant toute modification | D2.INV-2, D3.INV-1 |
 | R9 | « Combien de temps la méthode fait-elle gagner ? » | réponse étiquetée « hypothèse », avec les indicateurs disponibles et la campagne de mesure à mener | D7.INV-1, D7.INV-2 |
 | R10 | Le fichier d'invariants du projet exige `422` pour une entrée invalide | contradiction avec le socle (`400`) signalée et inscrite au registre ; le socle s'applique jusqu'à la décision du développeur | D8.INV-2 |
+| R11 | Ticket fil rouge, référentiel installé | méso-contrat M01 proposé ; options : schéma (colonne), CRUD `read`, endpoint `GET`, fonctionnalité et règle d'habilitation, bouton et chargement au clic ; preuves des options et exigences des transverses (socle, accessibilité, migration sûre) dans les tests déduits ; `ticket.toml` épinglé à la version du référentiel, validé avec la fiche | D10.INV-1, D10.INV-2, D10.INV-3, D10.INV-5 |
+| R12 | Une option front désigne `maquettes/ecran-cible.png` et demande `structure`, `composants` et `etats` | `analyse-image.md` rédigée avant la fiche : extractions demandées, chaque élément rattaché à une option ou posé en question, estimations signalées ; validée avec la fiche | D10.INV-4 |
+| R13 | Ticket classé M03 dont l'analyse montre une donnée nouvelle à persister | aucune option de persistance sous M03, à l'impact `aucun` ; l'IA signale que le ticket sort de M03, propose M01 ou une catégorie nouvelle, et ne modifie pas le référentiel | D10.INV-2, D10.INV-5 |
+| R14 | Chargement au choix ; le développeur répond « sans orchestrateur », puis confie un ticket | le skill n'est pas activé ; ni fiche C7E ni règle du skill ; seules les règles du projet s'appliquent | D2.INV-3 |
 
 Critères d'acceptation du skill :
 
-- R1 à R10 rejoués avec le développeur, à l'installation et à chaque version ;
+- R1 à R14 rejoués avec le développeur, à l'installation et à chaque version ;
+- le modèle du référentiel se lit en TOML, sa commande d'extraction redonne l'empreinte publiée, et l'exemple d'instance respecte ses règles de validation ;
 - les exemples de branches et de commits de ce skill passent les hooks du kit `agents-paralleles-gitlab` (vérifié à la publication, section 16) ;
 - `docs/c7e/concepts.json` est un JSON valide, de `schemaVersion` 1.
 
@@ -600,8 +671,34 @@ Vérifications faites à la publication :
 - les hooks `pre-commit` et `commit-msg` du kit `agents-paralleles-gitlab` 1.0.1, rejoués dans un dépôt de demande `ABCDE-3512`, refusent la branche et le message de la 3.0.0 et acceptent ceux de la 3.1.0, avec et sans numéro de scénario ;
 - le frontmatter de ces deux fichiers se lit en YAML, et le registre de départ en JSON.
 
+### Référentiel des méso-contrats et démarrage, en 3.2.0
+
+Le référentiel (D10) reprend le modèle TOML remis par le développeur le 31 octobre 2026, en version 2.0.0, archivé tel quel : `archives/referentiel-meso-contrats-v2.0.0.toml`. Ses identifiants, ses codes, ses catégories M01 à M03 et leurs descriptions sont conservés.
+
+| Dans le modèle remis (2.0.0) | En 3.2.0 | Invariant ou section |
+|---|---|---|
+| aucune option par couche | options au choix : évolution de schéma et contrat CRUD (PostgreSQL) ; règles, fonctionnalités et endpoints (Java) ; éléments graphiques et fonctionnalités (Angular) ; analyse d'une image PNG de l'objectif pour toute option front ; chacune avec son slot et ses preuves | D10.INV-2, D10.INV-3, D10.INV-4 |
+| un contrat CRUD seul ne couvrirait ni la colonne nouvelle de M01 ni l'index de M02 | option « évolution de schéma » | module `referentiel`, § 6 |
+| empreinte en texte libre : « Java (Optionnel) », « Aucun » | impact `requis`, `optionnel` ou `aucun`, technologies et options permises | D10.INV-2 |
+| `[ticket_actif]` dans le référentiel : une section commune, modifiée par chaque ticket, en conflit d'une branche à l'autre | un `ticket.toml` par ticket, qui épingle la version du référentiel | D10.INV-5 |
+| `statut = "EN_COURS"`, copie de l'état Jira | retiré : Jira reste la source de l'état | |
+| aucun méso-contrat transverse | socle back-front, accessibilité, migration sûre, appliqués d'office | D10.INV-2 |
+| aucune règle de validation | section `[validation]` | module `referentiel`, § 8 |
+| « Évolution ergonomique et ergonomie front-end pure » | « Évolution ergonomique du front-end » | |
+| exemple `ARCH-1042` | exemple `ABCDE-3512`, le ticket fil rouge de ce skill | module `referentiel`, § 7 |
+
+Le démarrage change aussi. La description de la 3.1.0 disait « à charger au lancement de l'IA locale, pour chaque ticket », alors que le développeur veut pouvoir s'en passer : en 3.2.0, le skill s'active sur son choix (D2.INV-3), en chargement permanent ou au choix (§ 11.4). Ces deux chargements sont nommés à part des modes de modulation A, B et C, pour ne pas les confondre.
+
+Vérifications faites à la publication de la 3.2.0 :
+
+- le modèle du référentiel et le modèle remis se lisent en TOML ;
+- la commande d'extraction du module, rejouée dans un projet factice, redonne le fichier et son empreinte ;
+- l'exemple d'instance respecte les huit règles de validation du référentiel, et huit écarts introduits volontairement sont tous rejetés.
+
 ## 17. Journal de révision
 
 **3.0.0** : version remise par le développeur le 31 octobre 2026, hors dépôt, avec son fichier `meso-contrats.md`. Archives : `archives/SKILL-v3.0.0.md` et `archives/meso-contrats-v3.0.0.md`.
 
 **3.1.0** (2026-10-31) : première version du dépôt. Méthode corrigée (section 16) et formalisée : dimensions D1 à D8 actives, D9 (campagne de mesure de la valeur) réservée ; points d'extension E1 à E3 ; vingt invariants et dix scénarios de recette. Socle back-front 1.0.1 épinglé ; experts `java` 1.1.1 et `angular` 1.0.1 inclus comme référentiels ; conventions Git alignées sur `agents-paralleles-gitlab` 1.0.1 et `agent-tdd-jira` 1.3.2. Fichier d'invariants aligné sur le socle et sur les référentiels.
+
+**3.2.0** (2026-10-31) : dimension D10 active, le référentiel des méso-contrats : modèle à installer dans le projet, catégories M01 à M03 et transverses T01 à T03, options au choix par couche, analyse des images PNG de l'objectif, `ticket.toml` par ticket ; invariants D10.INV-1 à D10.INV-5. Démarrage au choix du développeur (D2.INV-3) : chargement permanent ou au choix, menu et commande `/c7e`. Scénarios R11 à R14 ; vingt-six invariants. Archives : `archives/SKILL-v3.1.0.md` ; modèle de référentiel remis, `archives/referentiel-meso-contrats-v2.0.0.toml`.

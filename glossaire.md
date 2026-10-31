@@ -28,7 +28,7 @@ La colonne « Repris dans » cite les modules de la spécification qui reprennen
 | [`angular`](#angular-101) | 1.0.1 | 8 | 2 | 30 |
 | [`capture-sprint-jira`](#capture-sprint-jira-121) | 1.2.1 | 9 | 2 | 39 |
 | [`java`](#java-111) | 1.1.1 | 7 | 1 | 29 |
-| [`orchestrateur-c7e`](#orchestrateur-c7e-310) | 3.1.0 | 8 | 1 | 20 |
+| [`orchestrateur-c7e`](#orchestrateur-c7e-320) | 3.2.0 | 9 | 1 | 26 |
 | [`skill4appli`](#skill4appli-110) | 1.1.0 | 9 | 3 | 34 |
 | [`socle-back-front`](#socle-back-front-101) | 1.0.1 | 6 | 1 | 15 |
 | [`sonarqube`](#sonarqube-102) | 1.0.2 | 6 | 2 | 22 |
@@ -944,9 +944,9 @@ Expert Java 21, Spring Boot 3.5 et PostgreSQL : produire et relire du code confo
 
 Dimension réservée : aucun invariant en vigueur dans cette version.
 
-## orchestrateur-c7e 3.1.0
+## orchestrateur-c7e 3.2.0
 
-Orchestrateur fractal C7E : résolution d'un ticket full-stack comme transformation maîtrisée d'un système vivant, avec le cycle de l'Axiome 7E, quatre profondeurs de déclinaison, des concepts paramétrables, une fiche validée avant toute modification, des tests déduits des risques, des conventions Git compatibles avec le kit des agents parallèles, une boucle de second ordre bornée par un registre et un fichier d'invariants du projet ; chargé au lancement de l'IA locale. Point d'entrée : [`specs/orchestrateur-c7e/SKILL.md`](specs/orchestrateur-c7e/SKILL.md).
+Orchestrateur fractal C7E : résolution d'un ticket full-stack comme transformation maîtrisée d'un système vivant, avec le cycle de l'Axiome 7E, quatre profondeurs de déclinaison, des concepts paramétrables, un référentiel des méso-contrats qui classe chaque ticket et en fixe les options par couche, l'analyse des images PNG de l'objectif, une fiche validée avant toute modification, des tests déduits des risques, des conventions Git compatibles avec le kit des agents parallèles, une boucle de second ordre bornée par un registre et un fichier d'invariants du projet ; activé au démarrage de l'IA locale, sur choix du développeur. Point d'entrée : [`specs/orchestrateur-c7e/SKILL.md`](specs/orchestrateur-c7e/SKILL.md).
 
 ### D1 : Ontologie : cycle 7E, profondeurs du CRI, concepts paramétrables (active)
 
@@ -955,18 +955,19 @@ Orchestrateur fractal C7E : résolution d'un ticket full-stack comme transformat
 | **D1.INV-1** | chaque modification du ticket est rattachée à un slot (É1 à É7) et à une profondeur (d=0 à d=3), dans la fiche et dans le message de son commit. | `meso-contrats` |
 | **D1.INV-2** | les slots É1 à É7 portent les sept termes de l'Axiome 7E, dans leur ordre ; É0, l'Outillage, est une précondition hors axiome, qui ne livre rien. | `meso-contrats` |
 
-### D2 : Configuration : matrice d'activation, modes de modulation (active)
+### D2 : Configuration : matrice d'activation, modes de modulation, choix du démarrage (active)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
 | **D2.INV-1** | la fiche déclare le mode, les concepts activés avec leurs poids et leurs paramètres, la profondeur et le niveau de preuve, et justifie cette configuration par la criticité du ticket, selon la grille du fichier d'invariants du projet. | `meso-contrats` |
 | **D2.INV-2** | dans tous les modes, les invariants du projet, du socle et des référentiels s'appliquent ; un mode ne règle que des paramètres opérationnels. | `meso-contrats` |
+| **D2.INV-3** | le skill ne s'applique qu'au choix du développeur : en chargement permanent, par l'import de son fichier de démarrage ; en chargement au choix, par sa réponse au menu ou par la commande `/c7e`. Sans ce choix, l'IA n'applique aucune règle du skill et ne l'active pas d'elle-même. | `referentiel` |
 
 ### D3 : Pipeline par slot et fiche de transformation (active)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D3.INV-1** | aucune modification du code, du schéma ni de la configuration du projet avant que le développeur ait validé la fiche : objectif, critères, invariants, configuration, cartographie d'impact, stratégie et tests déduits. | `meso-contrats` |
+| **D3.INV-1** | aucune modification du code, du schéma ni de la configuration du projet avant que le développeur ait validé la fiche : objectif, critères, invariants, configuration, cartographie d'impact, stratégie et tests déduits. | `meso-contrats`, `referentiel` |
 | **D3.INV-2** | les contrats de niveau d=1, schéma exposé (É1) et contrat OpenAPI (É3), sont validés avant toute implémentation de niveau d=2 ou d=3. | `meso-contrats` |
 | **D3.INV-3** | à la remise, la fiche est complète (modifications, dossier de preuves, écarts, boucle, capitalisation, indicateurs) et rangée à son emplacement. | `meso-contrats` |
 
@@ -982,7 +983,7 @@ Orchestrateur fractal C7E : résolution d'un ticket full-stack comme transformat
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D5.INV-1** | chaque test proposé pour le ticket prouve un critère d'acceptation numéroté (agent-tdd-jira:D10.INV-1) ou un risque de la cartographie ; le dossier de preuves relie chaque test à son critère ou à son risque, et à son résultat. | `meso-contrats` |
+| **D5.INV-1** | chaque test proposé pour le ticket prouve un critère d'acceptation numéroté (agent-tdd-jira:D10.INV-1) ou un risque de la cartographie ; le dossier de preuves relie chaque test à son critère ou à son risque, et à son résultat. | `meso-contrats`, `referentiel` |
 | **D5.INV-2** | les tests sont déduits des risques avant toute modification ; aucun test existant n'est supprimé ni affaibli sans l'accord du développeur. | `meso-contrats` |
 | **D5.INV-3** | la remise n'a lieu qu'après les gates de la profondeur visée, au niveau de preuve de la criticité : build et tests ciblés à chaque commit ; conformité du contrat, migrations jouées, annulées et rejouées, intégration et sécurité avant la remise. | `meso-contrats` |
 
@@ -1011,6 +1012,16 @@ Orchestrateur fractal C7E : résolution d'un ticket full-stack comme transformat
 ### D9 : Campagne de mesure de la valeur (reserved)
 
 Dimension réservée : aucun invariant en vigueur dans cette version.
+
+### D10 : Référentiel des méso-contrats : catégories de tickets, options par couche, analyse des images de l'objectif (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D10.INV-1** | chaque ticket est classé dans un méso-contrat du référentiel du projet ; l'IA propose la catégorie et les options dans `ticket.toml`, que le développeur valide avec la fiche ; un ticket qu'aucune catégorie ne couvre se signale dans la fiche, sans catégorie inventée. | `referentiel` |
+| **D10.INV-2** | les options choisies respectent l'empreinte du méso-contrat : chacune figure parmi les options permises de sa couche ; une couche à l'impact `requis` en porte au moins une, une couche à l'impact `aucun` n'en porte aucune ; les méso-contrats transverses des couches touchées s'appliquent d'office. | `referentiel` |
+| **D10.INV-3** | chaque option retenue apporte aux tests déduits les preuves que le référentiel lui associe, reliées à un critère ou à un risque. | `referentiel` |
+| **D10.INV-4** | une option front qui désigne une image PNG de l'objectif et en demande l'analyse donne lieu à `analyse-image.md`, rédigée avant la fiche et validée avec elle ; chaque élément de l'image y est rattaché à une option ou posé en question, et les tailles et couleurs lues sur l'image y sont des estimations. | `referentiel` |
+| **D10.INV-5** | `ticket.toml` épingle la version du référentiel qu'il suit ; l'IA ne modifie jamais le référentiel du projet : une catégorie ou une option nouvelle se propose au développeur, qui seul l'ajoute. | `referentiel` |
 
 ## skill4appli 1.1.0
 

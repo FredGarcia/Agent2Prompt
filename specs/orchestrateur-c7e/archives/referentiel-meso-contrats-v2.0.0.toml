@@ -1,0 +1,65 @@
+# ==============================================================================
+# RÉFÉRENTIEL DES MÉSO-CONTRATS ET CATÉGORIES DE TICKETS
+# ==============================================================================
+
+[meta]
+version = "2.0.0"
+domaine = "Software Factory & Architecture"
+description = "Taxonomie des méso-contrats structurant les évolutions logicielles de la stack (PostgreSQL, Java, Angular)."
+
+# ------------------------------------------------------------------------------
+# 1. CATALOGUE DES MÉSO-CONTRATS (LES DIFFÉRENTES CATÉGORIES)
+# ------------------------------------------------------------------------------
+
+[[meso_contrats]]
+id = "M01"
+code = "EVOL_PARADIGME_PULL"
+nom = "Transition Eager vers Lazy (Piloté par l'intention)"
+description = "Tickets impliquant une modification verticale complète : Schéma (Liquibase/PG) -> API (Java) -> UI (Angular à la demande)."
+complexite_moyenne = "Élevée"
+
+[meso_contrats.empreinte_technique]
+persistance = "Liquibase + PostgreSQL"
+backend = "Java / API Endpoint"
+frontend = "Angular (State / Event-driven)"
+
+
+[[meso_contrats]]
+id = "M02"
+code = "OPTIMISATION_DONNEES"
+nom = "Optimisation de requêtage et indexation base de données"
+description = "Tickets axés sur l'amélioration des performances de stockage, la création d'index ou la restructuration de tables sans rupture d'API."
+complexite_moyenne = "Moyenne"
+
+[meso_contrats.empreinte_technique]
+persistance = "Liquibase + PostgreSQL"
+backend = "Java (Optionnel)"
+frontend = "Aucun"
+
+
+[[meso_contrats]]
+id = "M03"
+code = "REFONTE_UI_COMPOSANT"
+nom = "Évolution ergonomique et ergonomie front-end pure"
+description = "Tickets modifiant l'expérience utilisateur ou l'état local dans l'IHM sans impact sur le schéma de persistance."
+complexite_moyenne = "Faible"
+
+[meso_contrats.empreinte_technique]
+persistance = "Aucune"
+backend = "Aucun"
+frontend = "Angular (Components & Signals)"
+
+
+# ------------------------------------------------------------------------------
+# 2. INSTANCIATION D'UN TICKET CONCRET DANS LE SYSTÈME
+# ------------------------------------------------------------------------------
+[ticket_actif]
+reference = "ARCH-1042"
+meso_contrat_id = "M01"
+titre = "Remplacement du chargement automatique par un déclencheur utilisateur (Bouton)"
+statut = "EN_COURS"
+
+[ticket_actif.specifications_metier]
+element_persiste = "Nouvelle colonne en base (Liquibase)"
+exposition_api = "GET /api/v1/ressources/{id}/detail"
+interaction_ihm = "Click Event -> Data Pull"
