@@ -17,8 +17,21 @@ Une fois l'orchestrateur choisi, chaque ticket est classé dans le **référenti
 
 - Gemini CLI, lancé à la racine du projet.
 - Pour le chargement au choix, la prise en charge des skills : la commande `/skills list` doit répondre.
-- La transmission [`transmissions/orchestrateur-c7e-3.2.1.md`](../../transmissions/orchestrateur-c7e-3.2.1.md).
-- Node 20 ou plus récent pour extraire le référentiel, et `sha256sum`, fourni par Git Bash sous Windows, pour vérifier les fichiers.
+- Un clone du dépôt Agent2Prompt, pour l'installateur `tools/installer.mjs`. À défaut, la transmission seule : [`transmissions/orchestrateur-c7e-3.2.1.md`](../../transmissions/orchestrateur-c7e-3.2.1.md).
+- Node 20 ou plus récent, pour l'installateur et pour extraire le référentiel, et `sha256sum`, fourni par Git Bash sous Windows, pour vérifier les fichiers.
+
+Deux dépôts interviennent :
+
+- **Agent2Prompt** contient la spécification (`specs/orchestrateur-c7e/`) et sa transmission. Il ne contient aucun fichier de `docs/c7e/` : ceux-là appartiennent au projet.
+- **Le dépôt du projet** reçoit le skill, puis les fichiers du projet, que l'IA y crée à l'installation à partir des modèles du skill (§ 3).
+
+Le dossier `transmissions/` d'Agent2Prompt contient un fichier par version de chaque spécification, que génère `tools/bundle.mjs` à partir de `specs/`. Ce texte unique comprend :
+
+1. la consigne donnée à l'IA ;
+2. chaque fichier du skill, entre `<<<FICHIER chemin>>>` et `<<<FIN chemin>>>` ;
+3. une table d'empreintes sha256.
+
+L'installateur lit ce fichier ; sans clone, on le colle tel quel dans Gemini CLI. Les transmissions des versions précédentes y restent, comme trace exacte de ce qui a été remis à une IA.
 
 ## 2. Installer le skill
 
@@ -46,20 +59,31 @@ Une fois l'orchestrateur choisi, chaque ticket est classé dans le **référenti
    Inutile au niveau utilisateur, hors de tout dépôt.
 5. Pour le chargement au choix, vérifier que le dossier du skill porte le nom de son `name` : `orchestrateur-c7e`.
 
+**Mettre à jour le skill.** Après `git pull` dans le clone d'Agent2Prompt, relancer la même commande. La nouvelle version remplace l'ancienne d'un bloc, et `--liste` montre la version du dépôt à côté de la version installée.
+
+- L'installateur refuse si des fichiers du skill ont changé depuis l'installation ; `--forcer` les remplace.
+- Un skill collé par l'IA, sans `integrite.sha256`, n'est remplacé qu'avec `--forcer`.
+- Les fichiers du projet (§ 3) ne changent pas. Pour savoir si une version en change les modèles, lire son entrée au journal de révision du skill (§ 17).
+
+**Retirer le skill** : `--retirer orchestrateur-c7e`, qui retire aussi ses lignes de `.git/info/exclude` et de `.geminiignore`.
+
 ## 3. Préparer les fichiers du projet
 
-| Fichier | Emplacement | Qui l'écrit |
-|---|---|---|
-| invariants du projet | `docs/c7e/meso-contrats.md` | le développeur, à partir de `meso-contrats.md` du skill : il remplit les valeurs `ADAPTER` |
-| référentiel des méso-contrats | `docs/c7e/referentiel-meso-contrats.toml` | le développeur, à partir du modèle du module `referentiel` |
-| registre des écarts | `docs/c7e/registre-ecarts.md` | l'IA ajoute, le développeur décide |
-| registre des concepts | `docs/c7e/concepts.json` | l'IA propose, le développeur promeut |
-| base de connaissances | `docs/c7e/connaissances.md` | l'IA ajoute, le développeur relit |
-| instance de chaque ticket | `docs/demandes/<CLÉ>/ticket.toml` | l'IA propose, le développeur valide avec la fiche |
-| analyse d'image | `docs/demandes/<CLÉ>/analyse-image.md` | l'IA, validée avec la fiche |
-| images de l'objectif | `docs/demandes/<CLÉ>/maquettes/*.png` | le développeur ou le PO |
+Ces fichiers appartiennent au dépôt du projet, pas à Agent2Prompt. L'IA crée ceux de `docs/c7e/` à l'installation, étape 2 de la consigne, et ceux de `docs/demandes/<CLÉ>/` à chaque ticket, à partir des modèles du skill. Dans Agent2Prompt, ces modèles se trouvent sous `specs/orchestrateur-c7e/`, aux mêmes chemins.
 
-À l'installation, l'IA écrit le modèle du référentiel et vérifie son empreinte. La commande qui le fait aussi à la main est au § 6 du module `referentiel`.
+| Fichier | Emplacement | Qui l'écrit | Modèle, dans le skill |
+|---|---|---|---|
+| invariants du projet | `docs/c7e/meso-contrats.md` | le développeur, qui remplit les valeurs `ADAPTER` | `meso-contrats.md` |
+| référentiel des méso-contrats | `docs/c7e/referentiel-meso-contrats.toml` | le développeur, qui adapte catégories et options | `modules/referentiel/SKILL.md`, § 6 |
+| registre des écarts | `docs/c7e/registre-ecarts.md` | l'IA ajoute, le développeur décide | `meso-contrats.md`, § 7 |
+| registre des concepts | `docs/c7e/concepts.json` | l'IA propose, le développeur promeut | `SKILL.md`, § 7.2, registre de départ |
+| base de connaissances | `docs/c7e/connaissances.md` | l'IA ajoute, le développeur relit | aucun : créée vide |
+| fiche de transformation | `docs/demandes/<CLÉ>/fiche-transformation.md` | l'IA, validée par le développeur | `SKILL.md`, § 10 |
+| instance de chaque ticket | `docs/demandes/<CLÉ>/ticket.toml` | l'IA propose, le développeur valide avec la fiche | `modules/referentiel/SKILL.md`, § 7, exemple |
+| analyse d'image | `docs/demandes/<CLÉ>/analyse-image.md` | l'IA, validée avec la fiche | aucun |
+| images de l'objectif | `docs/demandes/<CLÉ>/maquettes/*.png` | le développeur ou le PO | aucun |
+
+À l'installation, l'IA écrit le modèle du référentiel et vérifie son empreinte. La commande qui le fait aussi à la main est au § 6 du module `referentiel` ; elle suppose le skill dans `.skills/orchestrateur-c7e/`, à remplacer par `.gemini/skills/orchestrateur-c7e/` en chargement au choix.
 
 Le développeur adapte ensuite son référentiel :
 
@@ -140,7 +164,7 @@ Ticket, et méso-contrat imposé s'il est précisé : {{args}}
 
 - `/c7e ABCDE-3512` : l'IA propose le méso-contrat du ticket.
 - `/c7e ABCDE-3512 M01` : le méso-contrat est imposé ; l'IA signale seulement s'il ne couvre pas le ticket.
-- Le skill passe par l'activation, jamais par `@{…}` : les commandes ignorent les fichiers exclus de Git, comme le dossier du skill.
+- Le skill passe par l'activation, jamais par `@{…}` : l'activation livre son `SKILL.md` et la liste de ses fichiers, que l'IA lit ensuite.
 - Avec le kit, les chemins `docs/c7e/…` se lisent dans le worktree où Gemini CLI est lancé.
 
 ### 5.3 Vérifier
@@ -210,6 +234,9 @@ Si l'IA signale qu'aucune catégorie ne couvre le ticket, choisir la plus proche
 | `/skills list` ne montre pas le skill | dossier mal placé ou mal nommé | le dossier doit s'appeler `orchestrateur-c7e`, sous `.gemini/skills/` ou `~/.gemini/skills/`, puis `/skills reload` |
 | `/skills list` ne montre aucun skill du workspace | dossier pas de confiance, ou Gemini CLI lancé ailleurs | accorder la confiance au dossier ; lancer Gemini CLI là où se trouve `.gemini/` |
 | le skill s'active, mais ses modules sont refusés (« ignored by configured ignore patterns ») | skill exclu de Git sans négation dans `.geminiignore` | relancer l'installateur, ou ajouter les négations du § 2, point 4 |
+| l'installateur refuse : « il n'a pas été installé par cet outil » | skill collé par l'IA, sans `integrite.sha256` | relancer avec `--forcer` |
+| l'installateur refuse : fichiers changés depuis l'installation | skill retouché, ou scripts ajoutés dans son dossier | relancer avec `--forcer`, après avoir mis de côté ce qui doit l'être |
+| un fichier de `docs/c7e/` introuvable | cherché dans Agent2Prompt, ou étape 2 de la consigne pas encore faite | ces fichiers sont dans le dépôt du projet ; demander à l'IA de faire l'étape 2 |
 | le menu n'apparaît pas | fichier de démarrage non déclaré, ou casse différente | § 6, puis `/memory show` |
 | `/memory show` montre les lignes `@` sans le contenu | chemin faux, ou fichier envoyé comme message | chemins relatifs au fichier de démarrage ; le charger comme fichier de contexte |
 | la commande ne trouve pas le référentiel ou les invariants | fichier absent ou exclu de Git | les fichiers de `docs/c7e/` doivent exister et être versionnés |
