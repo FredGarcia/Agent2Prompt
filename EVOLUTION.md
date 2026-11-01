@@ -123,7 +123,7 @@ flowchart LR
 ```
 
 - Le fichier partagé n'existe qu'une fois dans le dépôt. `bundle.mjs` l'insère dans chaque transmission, sous le chemin déclaré (`socle/SKILL.md`).
-- La version épinglée est vérifiée à chaque assemblage. Faire évoluer le socle oblige donc chaque skill dépendant à décider explicitement de monter son épinglage : c'est voulu, une règle commune ne change pas en silence sous un skill.
+- La version épinglée est vérifiée à chaque assemblage : `bundle.mjs` prend la version courante du fichier partagé si elle est épinglée, sinon son archive de cette version, déclarée dans les `previousVersions` du manifeste de la source. Faire évoluer le socle ne change donc rien sous un skill : chaque skill dépendant décide explicitement de monter son épinglage, dans une version à lui. C'est voulu, une règle commune ne change pas en silence sous un skill.
 - Un socle se marque `"transmissible": false` : il n'a de sens qu'inclus.
 - Une référence (`references`) cite un skill dont on reprend les règles, à une version donnée. Si le skill référencé change de version, le skill qui le cite doit être revu et sa référence mise à jour.
 - Les identifiants d'un autre skill sont toujours préfixés par son nom (`java:D4.INV-2`), pour ne jamais se confondre avec les invariants locaux. Le vérificateur s'assure que chacun est défini dans le point d'entrée du skill qu'il nomme.

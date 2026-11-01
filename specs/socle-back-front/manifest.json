@@ -1,14 +1,15 @@
 {
   "name": "socle-back-front",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "specSchema": 1,
   "language": "fr",
-  "description": "Socle commun back-front : contrat OpenAPI, erreurs RFC 9457, formats de données, sécurité, traçabilité, accessibilité.",
+  "description": "Socle commun back-front : contrat OpenAPI, erreurs RFC 9457, formats de données, sécurité, traçabilité, accessibilité, événements temps réel par WebSocket STOMP (AsyncAPI, CloudEvents).",
   "entry": "SKILL.md",
   "transmissible": false,
-  "usedBy": ["java", "angular", "analyse-projet", "sonarqube", "agent-tdd-jira"],
+  "usedBy": ["java", "angular", "analyse-projet", "sonarqube", "agent-tdd-jira", "orchestrateur-c7e"],
   "modules": [],
   "previousVersions": [
-    { "version": "1.0.0", "file": "archives/SKILL-v1.0.0.md" }
+    { "version": "1.0.0", "file": "archives/SKILL-v1.0.0.md" },
+    { "version": "1.0.1", "file": "archives/SKILL-v1.0.1.md" }
   ]
 }

@@ -4,6 +4,32 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-11-01 : orchestrateur-c7e 3.4.0 et socle-back-front 1.1.0
+
+- **orchestrateur-c7e 3.4.0** : catégorie M04, variante de représentation d'une ressource, deuxième exemple de méso-contrat donné par le développeur après le CRUD en base, son endpoint Java et sa lecture depuis le front : « Trouver le endpoint d'une URI avec le type de donnée ; sa composition contient un champ avec une liste ou un record. Réaliser une variante de ce type avec ce champ en moins. Réaliser une variante avec la même URI où ce champ ne sera pas intégré ; les informations le concernant seront uniquement la date et l'heure du dernier enregistrement. » Complément : le champ, une liste de records appelée au travers d'une URI existante, est mis à jour en temps réel.
+  - M04, `VARIANTE_REPRESENTATION` : backend requis, persistance et frontend optionnels ; aucune catégorie existante ne convenait.
+  - Option `representations` (slot É3) : repérage depuis l'URI (opération, contrôleur, type de réponse, champ, URI existante du champ, entité, colonne de date-heure), variante sans champ, variante résumée à la même URI dont la date-heure se calcule en base sans charger les éléments ; huit preuves.
+  - Option `evenements` (slot É3) : la liste, à son URI existante, et la date-heure du résumé tenues à jour par WebSocket STOMP selon le socle 1.1.0 ; chaque événement porte la date-heure recalculée, suppressions comprises ; courtier `simple` ou `relais`, nommé dans le fichier d'invariants du projet ; sept preuves.
+  - Point d'extension E4 : paramètres d'option au choix par ticket (mécanisme de sélection `parametre_vue`, `negociation_contenu` ou `remplacement` ; exposition de la variante sans champ `base`, `meme_uri` ou `uri_propre` ; mécanisme et courtier des événements) ; possibilités requises d'un méso-contrat, prises en compte par la règle de choix.
+  - Modèle du référentiel 3.2.0 : possibilités `variante_representation` et `temps_reel`, `lecture` étendue aux projections et agrégats, dix-sept possibilités ; trois règles de validation de plus, quinze en tout ; T01 couvre les événements temps réel ; second exemple d'instance, `ABCDE-3620`.
+  - Fichier d'invariants du projet : section « Événements temps réel (SC7) », courtier à adapter ; gate É3 étendue au contrat AsyncAPI.
+  - Invariant D10.INV-6 : réponse actuelle inchangée sans sélection, champ absent et non `null`, date-heure au format Instant du socle, remplacement refusé pour une version d'API publiée. Trente-deux invariants. Scénarios R19, temps réel compris, et R20.
+- **socle-back-front 1.1.0** : dimension SC7 active, les événements temps réel vers le front. WebSocket et STOMP 1.2 ; contrat AsyncAPI 3.0 dont les schémas renvoient au contrat OpenAPI ; enveloppe CloudEvents 1.0 avec `sequence` et `traceparent` ; publication après commit ; reprise par instantané REST dont l'`ETag` est la dernière séquence ; connexion `wss://` à origines explicites, jeton dans la trame `CONNECT` et jamais dans l'URL, droit de lecture vérifié à chaque abonnement ; erreurs en Problem Details dans une trame `ERROR` ; annonce `aria-live`. SSE, messages entre services et commandes du client restent réservés. Invariants SC7.INV-1 à SC7.INV-6. Épinglé par `orchestrateur-c7e` 3.4.0 ; les autres skills gardent la 1.0.1, archivée.
+- Outils : `bundle.mjs` et `verifier.mjs` prennent un fichier partagé à sa version épinglée, courante ou archivée dans les `previousVersions` de sa source ; une évolution du socle n'oblige plus tous les skills à monter ensemble, chacun décide (EVOLUTION.md, section 8).
+- Vérifications :
+  - le modèle se lit en TOML et la commande d'extraction redonne sa nouvelle empreinte ;
+  - les deux exemples d'instance respectent les quinze règles, et dix écarts volontaires dans l'exemple M04 sont tous rejetés ;
+  - la règle de choix retient les mêmes catégories qu'en 3.3.0 pour les six demandes types de la 3.3.0, M04 pour six variantes de représentation, et aucune pour le temps réel sans variante ;
+  - les transmissions publiées des skills qui gardent le socle 1.0.1 restent fidèles ;
+  - vérificateur, glossaire, transmission et recette de l'installateur à jour.
+- `docs/orchestrateur-c7e/mode-emploi.md` : version 3.4.0, options `representations` et `evenements`, trois cas de dépannage.
+- Décisions ratifiées :
+  - une catégorie nouvelle, M04, plutôt qu'un élargissement de M01 ;
+  - le mécanisme de sélection à la même URI et l'exposition de la variante sans champ au choix par ticket ;
+  - en temps réel, la liste et la date-heure du résumé, par WebSocket STOMP ;
+  - l'activation de SC7 dans le socle plutôt qu'un écart par ticket ;
+  - une version mineure, pour le point d'extension E4.
+
 ### 2026-11-01 : sonarqube 1.1.0
 
 - **sonarqube 1.1.0** : dimensions D9 et D10 actives, l'examen local avant GitLab et son interface de pilotage, à la demande du développeur. Cinquième mission, « Examiner en local » : le code est examiné avant son envoi sur GitLab, selon les règles du profil qualité du projet sur l'instance, en accédant à SonarQube par le jeton du compte Sonar.
