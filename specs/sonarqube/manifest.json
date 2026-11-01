@@ -1,16 +1,16 @@
 {
   "name": "sonarqube",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "specSchema": 1,
   "language": "fr",
-  "description": "Expert SonarQube Server 2026.x : configurer l'analyse et la CI, trier, corriger ou planifier, gouverner la qualité, pour des projets Java et Angular sur GitLab.",
+  "description": "Expert SonarQube Server 2026.x : configurer l'analyse et la CI, examiner le code local avant GitLab selon les règles du profil, trier, corriger ou planifier, gouverner la qualité, pour des projets Java et Angular sur GitLab.",
   "entry": "SKILL.md",
   "targets": {
     "sonarqubeServer": "2026.1 LTA, 2026.5 LTA",
     "edition": "Developer ou supérieure",
     "ci": "GitLab CI"
   },
-  "missions": ["configurer", "trier", "corriger-ou-planifier", "gouverner"],
+  "missions": ["configurer", "examiner-en-local", "trier", "corriger-ou-planifier", "gouverner"],
   "shared": [
     { "path": "socle/SKILL.md", "from": "specs/socle-back-front/SKILL.md", "version": "1.0.1" },
     { "path": "references/java.md", "from": "specs/java/SKILL.md", "version": "1.1.1" },
@@ -23,6 +23,7 @@
   "modules": [
     { "id": "cadrage-acces", "path": "modules/cadrage-acces/SKILL.md", "dimensions": ["D1"], "status": "active" },
     { "id": "configuration-analyse", "path": "modules/configuration-analyse/SKILL.md", "dimensions": ["D2"], "status": "active" },
+    { "id": "examen-local", "path": "modules/examen-local/SKILL.md", "dimensions": ["D9"], "status": "active" },
     { "id": "triage", "path": "modules/triage/SKILL.md", "dimensions": ["D3"], "status": "active" },
     { "id": "correction", "path": "modules/correction/SKILL.md", "dimensions": ["D4"], "status": "active" },
     { "id": "gouvernance", "path": "modules/gouvernance/SKILL.md", "dimensions": ["D5"], "status": "active" },
@@ -33,6 +34,7 @@
   "extensionPoints": ["E1", "E2", "E3"],
   "previousVersions": [
     { "version": "1.0.0", "file": "archives/SKILL-v1.0.0.md" },
-    { "version": "1.0.1", "file": "archives/SKILL-v1.0.1.md" }
+    { "version": "1.0.1", "file": "archives/SKILL-v1.0.1.md" },
+    { "version": "1.0.2", "file": "archives/SKILL-v1.0.2.md" }
   ]
 }

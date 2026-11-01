@@ -12,7 +12,7 @@ Chaque spécification est un package modulaire versionné : un point d'entrée, 
 | [`java`](specs/java/SKILL.md) | 1.1.1 | [`transmissions/java-1.1.1.md`](transmissions/java-1.1.1.md) | Produire et relire un back Java 21, Spring Boot 3.5, PostgreSQL, migrations Flyway ou Liquibase |
 | [`angular`](specs/angular/SKILL.md) | 1.0.1 | [`transmissions/angular-1.0.1.md`](transmissions/angular-1.0.1.md) | Produire et relire un front Angular 20, accessibilité RGAA et WCAG comprise |
 | [`analyse-projet`](specs/analyse-projet/SKILL.md) | 1.0.2 | [`transmissions/analyse-projet-1.0.2.md`](transmissions/analyse-projet-1.0.2.md) | Analyser un projet back et front en lecture seule : cartographie, rapport et feuille de route, ou plans d'action |
-| [`sonarqube`](specs/sonarqube/SKILL.md) | 1.0.2 | [`transmissions/sonarqube-1.0.2.md`](transmissions/sonarqube-1.0.2.md) | SonarQube Server 2026.x : configurer l'analyse et la CI GitLab, trier, corriger ou planifier, gouverner la qualité |
+| [`sonarqube`](specs/sonarqube/SKILL.md) | 1.1.0 | [`transmissions/sonarqube-1.1.0.md`](transmissions/sonarqube-1.1.0.md) | SonarQube Server 2026.x : configurer l'analyse et la CI GitLab, examiner le code local avant le push selon les règles du profil (analyse éphémère, moteur SonarLint ou relecture), trier, corriger ou planifier, gouverner la qualité |
 | [`agent-tdd-jira`](specs/agent-tdd-jira/SKILL.md) | 1.3.2 | [`transmissions/agent-tdd-jira-1.3.2.md`](transmissions/agent-tdd-jira-1.3.2.md) | Développement TDD à partir d'une demande Jira en MHTML : analyse avec commentaires, US et critères d'acceptation numérotés, scénarios Gherkin par critère, variantes back et front, cycle rouge, vert, remanié, traçabilité jusqu'aux critères ; binôme avec Agent2Test, verdict d'acceptation par critère ; mode parallèle dans un worktree géré |
 | [`agent2test`](specs/agent2test/SKILL.md) | 1.2.0 | [`transmissions/agent2test-1.2.0.md`](transmissions/agent2test-1.2.0.md) | Agent2Test, système de tests en binôme avec agent-tdd-jira : choisir, préparer et jouer avec Playwright les tests essentiels d'une demande sur l'application lancée, un verdict prouvé par critère d'acceptation, points de contrôle humains, apprentissage sous gouvernance, un fichier SQLite unique ouvert par un agent médiateur, remise reçue en fichier ou par un échange par dossiers facultatif, exécution locale |
 | [`agent2dev`](specs/agent2dev/SKILL.md) | 1.1.0 | [`transmissions/agent2dev-1.1.0.md`](transmissions/agent2dev-1.1.0.md) | Agent2Dev, système de développement qui applique agent-tdd-jira comme méthode : de la demande Jira au rapport, cycle TDD scénario par scénario, binôme avec Agent2Test ; le moteur rédige, des agents déterministes écrivent et exécutent, le développeur valide à chaque point ; copie de travail et patchs par défaut, un fichier SQLite unique ouvert par un agent médiateur, échange par dossiers facultatif, journal chaîné, apprentissage sous gouvernance, exécution locale |
@@ -34,7 +34,7 @@ flowchart LR
   SOCLE -->|"inclus, épinglé"| AN["analyse-projet 1.0.2"]
   AN -.->|"référence, plans d'action"| J
   AN -.->|"référence, plans d'action"| A
-  SOCLE -->|"inclus, épinglé"| SQ["sonarqube 1.0.2"]
+  SOCLE -->|"inclus, épinglé"| SQ["sonarqube 1.1.0"]
   J -->|"inclus comme référentiel"| SQ
   A -->|"inclus comme référentiel"| SQ
   SQ -.->|"plans d'action"| J

@@ -1,6 +1,6 @@
 ---
 name: rapport
-description: Rapports de l'expert SonarQube (en-tête de traçabilité, rapport de configuration, de triage, de correction et de gouvernance, chiffres issus de l'API, liste des appels, écritures effectuées). À lire avant de remettre le résultat de toute mission.
+description: Rapports de l'expert SonarQube (en-tête de traçabilité, rapport de configuration, d'examen local, de triage, de correction et de gouvernance, chiffres issus de l'API, liste des appels, écritures effectuées). À lire avant de remettre le résultat de toute mission.
 dimensions: [D6]
 status: active
 ---
@@ -28,14 +28,22 @@ Chaque intervention se termine par un rapport. Il doit permettre à un tiers de 
 ```mermaid
 flowchart LR
   H["En-tête commun"] --> CFG["Configurer<br/>fichiers modifiés,<br/>contrôles du § 5 de configuration-analyse"]
+  H --> EXL["Examiner en local<br/>périmètre, moteurs,<br/>constats par moteur"]
   H --> TRI["Trier<br/>décisions par constat,<br/>questions ouvertes"]
   H --> COR["Corriger ou planifier<br/>corrections, plans,<br/>constats fermés ou en attente"]
   H --> GOU["Gouverner<br/>propositions, décisions,<br/>entrées du journal, signaux de second ordre"]
   CFG --> F["Écritures, appels, limites"]
+  EXL --> F
   TRI --> F
   COR --> F
   GOU --> F
 ```
+
+### Examiner en local
+
+- en-tête : `HEAD` examiné, branche cible et base de fusion, modifications non commitées éventuelles, moteurs retenus et où est parti le code ;
+- si l'analyse éphémère a tourné : nom de la branche de travail, état du quality gate et mesures du nouveau code lus sur cette branche, confirmation de sa suppression ;
+- tableau des constats avec une colonne **Moteur** (module `examen-local`, § 8) ; les constats de relecture portent leur niveau de confiance et ne figurent dans aucun total issu de l'API (D9.INV-1, D6.INV-2).
 
 ### Trier
 

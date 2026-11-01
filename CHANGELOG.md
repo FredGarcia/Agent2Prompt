@@ -4,6 +4,22 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-11-01 : sonarqube 1.1.0
+
+- **sonarqube 1.1.0** : dimension D9 active, l'examen local avant GitLab, à la demande du développeur. Cinquième mission, « Examiner en local » : le code est examiné avant son envoi sur GitLab, selon les règles du profil qualité du projet sur l'instance, en accédant à SonarQube par le jeton du compte Sonar.
+  - Module `examen-local` : périmètre réduit au diff entre `HEAD` et la base de fusion avec la branche cible lue sur le dépôt distant ; trois moteurs au choix, que le développeur combine :
+    - **analyse éphémère** : scanner Maven ou npm lancé en local sous une branche de travail `local-<login>-<HEAD>`, nouveau code défini par la branche cible, quality gate et constats lus sur cette branche, puis branche supprimée ; analyse et suppression forment un seul lot validé ;
+    - **moteur SonarLint** : analyseurs de SonarQube for IDE en mode connecté, avec les règles du profil, pilotés par l'outil `analyze_file_list` du serveur MCP de Sonar, sans envoi du code ; `analyze_code_snippet`, déprécié, seulement en repli signalé ;
+    - **relecture par les règles** : relecture du diff contre les règles actives du profil, lues par l'API et gardées en cache tant que le profil n'a pas changé ; constats étiquetés avec un niveau de confiance, jamais comptés comme des issues.
+  - Catalogue d'appels (point E1) : règles actives d'un profil, analyse sous une branche de travail, suppression d'une branche, outil MCP admis ; le reste de D7 demeure réservé.
+  - Rapport : mission « Examiner en local », constats par moteur.
+  - Invariants D9.INV-1 à D9.INV-6 ; vingt-huit invariants. Archive : `archives/SKILL-v1.0.2.md`.
+- Décisions ratifiées :
+  - les trois moteurs, au choix du développeur, plutôt qu'un seul ;
+  - le périmètre limité au diff avec la branche cible ;
+  - un examen lancé à la demande, sans hook `pre-push` ;
+  - une livraison par pull request.
+
 ### 2026-11-01 : orchestrateur-c7e 3.3.0
 
 - **orchestrateur-c7e 3.3.0** : dimension D11 active, la qualification de la demande, à la demande du développeur. À l'ouverture d'un ticket, la première chose à faire est de trouver son méso-contrat, avec un modèle générique de la demande, à partir du contenu du ticket, en posant des questions complémentaires si besoin. Le modèle est une combinaison de possibilités, fondées sur les modifications de l'application construite sur la pile PostgreSQL, Java et Angular, établies à son analyse.

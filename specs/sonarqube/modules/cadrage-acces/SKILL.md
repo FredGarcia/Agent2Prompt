@@ -1,6 +1,6 @@
 ---
 name: cadrage-acces
-description: Cadrage d'une intervention SonarQube et accès à l'instance (choix des missions et du périmètre, détection de la version, de l'édition et du mode, jeton du compte Sonar en variable d'environnement, appels de lecture libres, appels d'écriture validés, catalogue des appels d'API). À lire avant tout appel à SonarQube.
+description: Cadrage d'une intervention SonarQube et accès à l'instance (choix des missions et du périmètre, détection de la version, de l'édition et du mode, jeton du compte Sonar en variable d'environnement, appels de lecture libres, appels d'écriture validés, catalogue des appels d'API, analyse sous une branche de travail et outil MCP admis pour l'examen local). À lire avant tout appel à SonarQube.
 dimensions: [D1]
 status: active
 ---
@@ -91,6 +91,7 @@ Tout accès à SonarQube passe par ce catalogue. Avant un appel d'écriture, l'e
 | Quality gate du projet | `GET /api/qualitygates/get_by_project?project=<clé>`, puis `GET /api/qualitygates/show?name=<nom>` |
 | Profils du projet | `GET /api/qualityprofiles/search?project=<clé>` |
 | Définition du nouveau code | `GET /api/new_code_periods/show?project=<clé>&branch=<b>` |
+| Règles actives d'un profil (examen local) | `GET /api/rules/search?qprofile=<clé du profil>&activation=true&ps=500&p=<n>` |
 
 `/api/issues/search` renvoie au plus 500 éléments par page et ne permet pas de parcourir au-delà de 10 000 résultats. Au-delà, l'expert découpe la requête (par qualité logicielle, par gravité, par date de création) au lieu de conclure sur un échantillon tronqué.
 
@@ -104,6 +105,8 @@ Tout accès à SonarQube passe par ce catalogue. Avant un appel d'écriture, l'e
 | Créer ou modifier un quality gate | `POST /api/qualitygates/create`, `/create_condition`, `/update_condition`, `/select` | Administer Quality Gates |
 | Créer ou modifier un profil | `POST /api/qualityprofiles/copy`, `/change_parent`, `/activate_rule`, `/add_project` | Administer Quality Profiles |
 | Définir le nouveau code | `POST /api/new_code_periods/set` | Administer sur le projet |
+| Analyser le code local sous une branche de travail (examen local) | scanner Maven ou npm avec `sonar.branch.name=local-…` (module `examen-local`, § 5) | Execute Analysis sur le projet |
+| Supprimer la branche de travail (examen local) | `POST /api/project_branches/delete` (`project`, `branch`) | Administer sur le projet |
 
 ### 4.3 Proposition d'écriture (D1.INV-3)
 
@@ -122,6 +125,17 @@ Valider ?
 
 Un lot de transitions est présenté sous forme de tableau, avec une validation pour le lot entier, et l'expert rejoue la lecture après application pour vérifier le résultat.
 
+### 4.4 Outil MCP admis (examen local)
+
+Un seul outil du serveur MCP de Sonar entre au catalogue en 1.1 : l'analyse locale par SonarQube for IDE, pour le moteur SonarLint de l'examen local (module `examen-local`, § 6). Le reste de la dimension D7 demeure réservé.
+
+| Besoin | Outil | Condition |
+|---|---|---|
+| Analyser des fichiers locaux avec les règles du profil, sans envoi | `analyze_file_list` (toolset `ide`) | SonarQube for IDE ouvert, en mode connecté à l'instance ; jeton utilisateur |
+| Repli, si `analyze_file_list` est indisponible | `analyze_code_snippet` (toolset `analysis`), avec `projectKey` | outil déprécié, à signaler à chaque usage |
+
+Le jeton est transmis au serveur MCP par la variable `SONARQUBE_TOKEN`, reprise de `SONAR_TOKEN` dans l'environnement, jamais en argument (D1.INV-2). L'expert lit les paramètres de ces outils dans la liste exposée par le serveur MCP, à sa version installée.
+
 ## 5. Détection de l'instance (D1.INV-4)
 
 | Élément | Comment | Effet |
@@ -138,6 +152,7 @@ Si un élément ne peut pas être relevé (permission insuffisante), l'expert le
 - **Jeton d'analyse confondu avec un jeton utilisateur** : un jeton d'analyse de projet ou global sert au scanner, pas aux appels de l'API de triage. Le jeton du compte Sonar sert ici aux deux, ce qui en élargit l'usage : raison de plus pour le protéger.
 - **Résultats tronqués** : voir la limite de 10 000 au § 4.1.
 - **Branche implicite** : sans paramètre `branch`, l'API répond pour la branche principale. Toujours préciser la branche ou la MR du périmètre.
+- **Scanner local sans branche** : la même règle vaut pour le scanner ; lancé en local sans `sonar.branch.name`, il écrit sur la branche principale (module `examen-local`, D9.INV-2).
 
 ## 7. Contrôle de sortie
 

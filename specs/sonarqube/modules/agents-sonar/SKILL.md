@@ -7,7 +7,7 @@ status: reserved
 
 # Module `agents-sonar` (D7, réservé)
 
-Statut : `reserved`. En version 1.x, l'expert accède à SonarQube uniquement par l'API web et le jeton du compte Sonar (module `cadrage-acces`).
+Statut : `reserved`. En version 1.x, l'expert accède à SonarQube par l'API web et le jeton du compte Sonar (module `cadrage-acces`). Depuis 1.1.0, une exception est inscrite au catalogue : l'outil MCP d'analyse locale par SonarQube for IDE, pour l'examen local (D9, module `cadrage-acces`, § 4.4). Elle ne rend pas cette dimension active.
 
 ## 1. Pourquoi cette dimension existe
 
@@ -25,4 +25,4 @@ SonarQube Server 2026 propose un serveur MCP qui permet à un agent d'interroger
 
 ## 4. Test d'inertie en 1.x
 
-Aucun appel à SonarQube hors du catalogue du module `cadrage-acces` (E1).
+Aucun appel à SonarQube hors du catalogue du module `cadrage-acces` (E1). Aucun outil MCP n'est employé hors de ceux que le catalogue inscrit (§ 4.4).
