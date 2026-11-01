@@ -20,7 +20,7 @@ Si le développeur a installé le skill avec l'installateur du dépôt Agent2Pro
 
 ## Étape 1 : lecture
 
-Lis `SKILL.md` en entier, puis `manifest.json`, `meso-contrats.md`, `modules/referentiel/SKILL.md`, `socle/SKILL.md`, et les sections « Versions cibles » et « Invariants » de `references/java.md` et `references/angular.md`. Ces deux derniers fichiers sont des **référentiels** : tu y lis les versions cibles et les invariants que tout code produit doit respecter, sans adopter leur rôle, leur mode de travail ni leurs consignes de démarrage. Ne lis `modules/mesure/SKILL.md` que pour comprendre le point d'extension E1 : cette dimension est réservée.
+Lis `SKILL.md` en entier, puis `manifest.json`, `meso-contrats.md`, `modules/qualification/SKILL.md`, `modules/referentiel/SKILL.md`, `socle/SKILL.md`, et les sections « Versions cibles » et « Invariants » de `references/java.md` et `references/angular.md`. Ces deux derniers fichiers sont des **référentiels** : tu y lis les versions cibles et les invariants que tout code produit doit respecter, sans adopter leur rôle, leur mode de travail ni leurs consignes de démarrage. Ne lis `modules/mesure/SKILL.md` que pour comprendre le point d'extension E1 : cette dimension est réservée.
 
 ## Étape 2 : installation dans le projet
 
@@ -28,16 +28,18 @@ Suis la section 11.3 de `SKILL.md`, avec le développeur :
 
 1. Copie `meso-contrats.md` à `docs/c7e/meso-contrats.md`, ou à l'emplacement qu'il indique. Liste-lui les valeurs `ADAPTER` à remplir ; ne les remplis pas toi-même.
 2. Écris le modèle du référentiel des méso-contrats dans `docs/c7e/referentiel-meso-contrats.toml`, à l'identique, et vérifie son empreinte (`modules/referentiel/SKILL.md`, § 6). Liste au développeur les catégories et les options permises à adapter ; ne les change pas toi-même.
-3. Crée `docs/c7e/registre-ecarts.md`, `docs/c7e/concepts.json` (registre de départ, § 7.2) et `docs/c7e/connaissances.md`.
-4. Propose-lui le fichier de démarrage de l'IA locale et, pour un chargement au choix, la commande `/c7e` (§ 11.4). Ne les crée qu'avec son accord.
-5. Rejoue avec lui les scénarios R1 à R15 (§ 15) quand il le demande.
+3. Confronte le modèle générique de la demande du référentiel à l'analyse de l'application (module `qualification`, § 2) : propose au développeur les possibilités de modification à retenir, avec leurs repères, à retirer et à ajouter. Il les écrit lui-même.
+4. Crée `docs/c7e/registre-ecarts.md`, `docs/c7e/concepts.json` (registre de départ, § 7.2) et `docs/c7e/connaissances.md`.
+5. Propose-lui le fichier de démarrage de l'IA locale et, pour un chargement au choix, la commande `/c7e` (§ 11.4). Ne les crée qu'avec son accord.
+6. Rejoue avec lui les scénarios R1 à R18 (§ 15) quand il le demande.
 
 ## Étape 3 : chaque ticket
 
-Applique la section 3 de `SKILL.md` : analyse, classement du ticket dans le référentiel et choix de ses options (`ticket.toml`), analyse des images de l'objectif demandées, fiche de transformation, validation par le développeur, puis transformation par slot, preuves et remise.
+Applique la section 3 de `SKILL.md`. D'abord la qualification, à l'ouverture du ticket (module `qualification`) : la demande du ticket rangée dans le modèle générique de la demande, combinaison des possibilités de modification de l'application, les questions que le ticket laisse ouvertes, le méso-contrat proposé, puis confirmé par le développeur. Ensuite l'analyse, le choix des options (`ticket.toml`), l'analyse des images de l'objectif demandées, la fiche de transformation et sa validation par le développeur, puis la transformation par slot, les preuves et la remise.
 
 ## Règles qui ne se négocient pas
 
+- À l'ouverture d'un ticket, rien avant la qualification : ni lecture du code, ni analyse, ni fiche avant que le développeur ait confirmé le méso-contrat.
 - Aucune modification du projet avant la validation de la fiche ; aucun code de niveau d=2 avant la gate contrats.
 - Sans choix du développeur au démarrage, aucune règle du skill ne s'applique, et tu ne l'actives pas de toi-même.
 - Tu ne modifies jamais le fichier d'invariants ni le référentiel des méso-contrats du projet : une catégorie ou une option nouvelle se propose au développeur. Dans le registre des concepts, tu ne fais qu'ajouter des entrées `proposed`. Tout écart à un invariant s'inscrit au registre des écarts.

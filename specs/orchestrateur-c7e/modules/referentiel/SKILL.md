@@ -1,13 +1,13 @@
 ---
 name: referentiel
-description: Dimension D10, le référentiel des méso-contrats du projet. Catégories de tickets avec leur empreinte technique par couche, options au choix (évolution de schéma et contrat CRUD pour PostgreSQL, règles, fonctionnalités et endpoints pour Java, éléments graphiques et fonctionnalités pour Angular, analyse d'une image PNG de l'objectif pour toute option front), méso-contrats transverses, et instance de chaque ticket dans ticket.toml. À lire à l'installation et à l'analyse de chaque ticket.
+description: Dimension D10, le référentiel des méso-contrats du projet. Catégories de tickets avec leur empreinte technique par couche, options au choix (évolution de schéma et contrat CRUD pour PostgreSQL, règles, fonctionnalités et endpoints pour Java, éléments graphiques et fonctionnalités pour Angular, analyse d'une image PNG de l'objectif pour toute option front), méso-contrats transverses, modèle générique de la demande dont part la qualification de chaque ticket (D11), et instance de chaque ticket dans ticket.toml. À lire à l'installation, à l'ouverture et à l'analyse de chaque ticket.
 dimensions: [D10]
 status: active
 ---
 
 # Module `referentiel` (D10)
 
-Statut : `active`, depuis la version 3.2.0.
+Statut : `active`, depuis la version 3.2.0. Modèle du référentiel en 3.1.0 depuis la version 3.3.0 du skill : modèle générique de la demande ajouté.
 
 ## 1. Rôle
 
@@ -18,12 +18,14 @@ Deux fichiers du projet encadrent un ticket :
 
 Un méso-contrat est une catégorie de tickets, définie par son empreinte technique : pour chaque couche (persistance, backend, frontend), un impact `requis`, `optionnel` ou `aucun`, et les options permises. Le ticket choisit ses options parmi celles-ci ; chaque option engage un slot et des preuves. Les méso-contrats transverses (socle back-front, accessibilité, migration sûre) ne se choisissent pas : ils s'appliquent d'office aux couches touchées.
 
+Le référentiel porte aussi le **modèle générique de la demande** (section 0) : une combinaison de possibilités de modification de l'application, couche par couche, chacune avec son option et ses repères, établies à l'analyse de l'application, et la règle de choix du méso-contrat. La qualification de chaque ticket, à son ouverture, part de ce modèle (module `qualification`, D11).
+
 ## 2. Emplacements
 
 | Fichier | Rôle | Qui l'écrit | Emplacement |
 |---|---|---|---|
-| référentiel du projet | catégories, options, transverses, règles de validation | le développeur, à partir du modèle du § 6 ; jamais l'IA (D10.INV-5) | `docs/c7e/referentiel-meso-contrats.toml` |
-| instance du ticket | méso-contrat, options choisies, version du référentiel | l'IA propose ; le développeur valide avec la fiche (D10.INV-1) | `docs/demandes/<CLÉ>/ticket.toml` |
+| référentiel du projet | modèle générique de la demande, catégories, options, transverses, règles de validation | le développeur, à partir du modèle du § 6 ; jamais l'IA (D10.INV-5) | `docs/c7e/referentiel-meso-contrats.toml` |
+| instance du ticket | demande remplie, méso-contrat confirmé, options choisies, version du référentiel | l'IA propose ; le développeur confirme le méso-contrat à la qualification (D11.INV-3), puis valide les options avec la fiche (D10.INV-1) | `docs/demandes/<CLÉ>/ticket.toml` |
 | analyse d'image | extractions, correspondances, questions, écarts | l'IA ; validée avec la fiche (D10.INV-4) | `docs/demandes/<CLÉ>/analyse-image.md` |
 | images de l'objectif | maquettes ou captures au format PNG | le développeur ou le PO | `docs/demandes/<CLÉ>/maquettes/` |
 
@@ -31,10 +33,10 @@ Les images sont versionnées avec la demande : les commandes de Gemini CLI n'inj
 
 ## 3. À l'analyse de chaque ticket (d=0)
 
-Ces étapes prennent place dans l'analyse du § 3 du point d'entrée, après la cartographie d'impact et avant la fiche.
+Ces étapes prennent place dans l'analyse du § 3 du point d'entrée, après la cartographie d'impact et avant la fiche. Le ticket a déjà été qualifié à son ouverture : son méso-contrat est confirmé, et `ticket.toml` porte la demande remplie et la version du référentiel (module `qualification`).
 
-1. Lire le référentiel du projet et noter sa version (`meta.version`).
-2. Classer le ticket : proposer le méso-contrat dont l'empreinte couvre les couches que touche la cartographie d'impact. Si aucun ne convient, le dire dans la fiche et proposer au développeur une catégorie nouvelle, sans l'écrire (D10.INV-1, D10.INV-5).
+1. Partir du méso-contrat confirmé. Si la cartographie d'impact montre que la demande sort de son empreinte, revenir à la qualification : compléter la demande, proposer un autre méso-contrat et le faire confirmer, sans en changer de soi-même ni écrire de catégorie nouvelle (D11.INV-4, D10.INV-5).
+2. Prendre pour point de départ les options que signale la demande remplie.
 3. Choisir les options, couche par couche, parmi les options permises du méso-contrat (D10.INV-2) :
    - persistance : évolution de schéma (tables, colonnes, index, contraintes) ; contrat CRUD, avec ses opérations et, si `delete` est retenu, le mode de suppression ;
    - backend : endpoints, règles métier, fonctionnalités ;
@@ -46,7 +48,7 @@ Ces étapes prennent place dans l'analyse du § 3 du point d'entrée, après la 
    - les écarts avec l'écran actuel, si sa capture est fournie (`image_actuelle`) ;
    - les tailles et les couleurs, données comme estimations à confirmer avec le système de design ; ce qu'une image ne montre pas (focus, annonces aux technologies d'assistance, comportement) reste à prouver par les tests.
 5. Ajouter aux tests déduits les preuves de chaque option retenue et les exigences des méso-contrats transverses des couches touchées (D10.INV-2, D10.INV-3). Chaque preuve garde son lien à un critère ou à un risque (D5.INV-1).
-6. Écrire `ticket.toml`, qui épingle la version du référentiel (D10.INV-5), et le présenter avec la fiche et l'analyse : un seul point de validation, avant toute modification (D3.INV-1).
+6. Compléter `ticket.toml` des options choisies, et le présenter avec la fiche et l'analyse : un point de validation, avant toute modification (D3.INV-1).
 
 ## 4. Des options aux slots
 
@@ -61,7 +63,7 @@ Ces étapes prennent place dans l'analyse du § 3 du point d'entrée, après la 
 
 ## 5. Au démarrage
 
-Le référentiel ne sert que si le développeur a choisi l'orchestrateur (D2.INV-3, § 11.4 du point d'entrée). Il se lit à l'analyse de chaque ticket, pas au démarrage : dans un chargement permanent, seul le fichier d'invariants accompagne le point d'entrée.
+Le référentiel ne sert que si le développeur a choisi l'orchestrateur (D2.INV-3, § 11.4 du point d'entrée). Il se lit à l'ouverture et à l'analyse de chaque ticket, pas au démarrage : dans un chargement permanent, seul le fichier d'invariants accompagne le point d'entrée.
 
 ## 6. Modèle du référentiel
 
@@ -69,21 +71,33 @@ Le référentiel ne sert que si le développeur a choisi l'orchestrateur (D2.INV
 
 | Fichier | Empreinte sha256 |
 |---|---|
-| `docs/c7e/referentiel-meso-contrats.toml` | `f7a7bea03485fe5cc8fbb38c00ac4b135763f3f957436dbe6c7442dc491dfd76` |
+| `docs/c7e/referentiel-meso-contrats.toml` | `fa83ac127aa748f71fba06504c5634ff418ec4bfffa5f878eccd691414ca3073` |
 
 Commande d'extraction et de vérification, depuis la racine du projet (Node 20 ou plus récent, sans dépendance). Elle suppose le skill dans `.skills/orchestrateur-c7e/` ; pour un autre emplacement, comme `.gemini/skills/orchestrateur-c7e/` en chargement au choix, remplacer ce chemin :
 
 ```bash
-node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const texte = fs.readFileSync('.skills/orchestrateur-c7e/modules/referentiel/SKILL.md', 'utf8').replace(/\r\n/g, '\n'); const m = /^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/m.exec(texte); const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === 'f7a7bea03485fe5cc8fbb38c00ac4b135763f3f957436dbe6c7442dc491dfd76'; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); if (!conforme) process.exitCode = 1;"
+node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const texte = fs.readFileSync('.skills/orchestrateur-c7e/modules/referentiel/SKILL.md', 'utf8').replace(/\r\n/g, '\n'); const m = /^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/m.exec(texte); const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === 'fa83ac127aa748f71fba06504c5634ff418ec4bfffa5f878eccd691414ca3073'; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); if (!conforme) process.exitCode = 1;"
 ```
 
-Le développeur adapte ensuite sa copie : catégories `M04` et suivantes, technologies, options permises, transverses. Il change `meta.version` à chaque modification ; les tickets déjà instanciés gardent la version qu'ils ont épinglée.
+Le développeur adapte ensuite sa copie : possibilités du modèle générique de la demande, confrontées à l'analyse de l'application (module `qualification`, § 2), catégories `M04` et suivantes, technologies, options permises, transverses. Il change `meta.version` à chaque modification ; les tickets déjà instanciés gardent la version qu'ils ont épinglée.
+
+Un référentiel installé avant la version 3.3.0 du skill n'a pas de section `[modele_demande]` : le développeur l'y ajoute, copiée de ce modèle. D'ici là, la qualification prend celle du modèle et le signale (module `qualification`, § 2).
 
 <!-- fichier : docs/c7e/referentiel-meso-contrats.toml -->
 ```toml
 # ==============================================================================
 # RÉFÉRENTIEL DES MÉSO-CONTRATS ET CATÉGORIES DE TICKETS
 # ==============================================================================
+#
+# 3.1.0 (1er novembre 2026)
+#   - Modèle générique de la demande (section 0) : une combinaison de
+#     possibilités, les modifications qu'un ticket peut demander à l'application,
+#     couche par couche (PostgreSQL, Java, Angular), établies à l'analyse de
+#     l'application. À l'ouverture de chaque ticket, sa demande est la
+#     combinaison des possibilités qu'il implique ; elle désigne le méso-contrat
+#     par la règle de choix, et le développeur le confirme avant tout le reste.
+#   - Le ticket garde sa demande dans [ticket.demande] ; règles de validation
+#     correspondantes (section 4).
 #
 # 3.0.0 (31 octobre 2026)
 #   - Options au choix par couche (section 1) :
@@ -100,7 +114,7 @@ Le développeur adapte ensuite sa copie : catégories `M04` et suivantes, techno
 # ==============================================================================
 
 [meta]
-version = "3.0.0"
+version = "3.1.0"
 domaine = "Software Factory & Architecture"
 description = "Taxonomie des méso-contrats structurant les évolutions logicielles de la stack (PostgreSQL, Java, Angular), avec les options au choix de chaque couche."
 
@@ -108,6 +122,150 @@ description = "Taxonomie des méso-contrats structurant les évolutions logiciel
 impact = ["requis", "optionnel", "aucun"]
 complexite = ["Faible", "Moyenne", "Élevée"]
 couches = ["persistance", "backend", "frontend"]
+
+# ------------------------------------------------------------------------------
+# 0. MODÈLE GÉNÉRIQUE DE LA DEMANDE
+#    Une combinaison de possibilités : les modifications qu'un ticket peut
+#    demander à l'application, couche par couche. La liste ci-dessous vaut pour
+#    une application PostgreSQL, Java et Angular ; à l'installation, l'IA la
+#    confronte à l'analyse de l'application et propose au développeur les
+#    possibilités à retenir, à préciser (repères) ou à ajouter (batch, message,
+#    export…). Le développeur seul les écrit ici.
+#    À l'ouverture de chaque ticket, chaque possibilité vaut oui, non ou
+#    inconnu d'après le contenu du ticket, avec sa source ; la combinaison des
+#    possibilités à oui désigne le méso-contrat par la règle de choix. Une
+#    possibilité inconnue dont la réponse changerait le méso-contrat ou ses
+#    options devient une question au développeur, qui confirme ensuite le
+#    méso-contrat avant toute autre étape.
+# ------------------------------------------------------------------------------
+
+[modele_demande]
+valeurs = ["oui", "non", "inconnu"]
+choix = [
+  "toute couche d'une possibilité à oui a, dans l'empreinte du méso-contrat, l'impact requis ou optionnel",
+  "toute couche à l'impact requis dans l'empreinte porte au moins une possibilité à oui",
+  "l'option de chaque possibilité à oui figure parmi les options permises de sa couche",
+  "un seul méso-contrat convient : il est proposé ; plusieurs : une question les départage ; aucun : le ticket est signalé, sans catégorie inventée",
+]
+
+[modele_demande.intention]
+question = "Quel changement le demandeur attend-il, en une phrase ?"
+
+[modele_demande.maquette]
+question = "Une maquette ou une capture PNG montre-t-elle l'objectif ?"
+couche = "frontend"
+note = "L'image s'analyse avec l'option front qu'elle illustre (analyse_image)."
+
+# Persistance : PostgreSQL et Liquibase
+
+[[modele_demande.possibilites]]
+id = "table"
+couche = "persistance"
+modification = "Créer une table"
+option = "schema"
+reperes = ["changelog Liquibase"]
+
+[[modele_demande.possibilites]]
+id = "colonne"
+couche = "persistance"
+modification = "Ajouter ou modifier une colonne"
+option = "schema"
+reperes = ["changelog Liquibase", "entité JPA"]
+
+[[modele_demande.possibilites]]
+id = "index"
+couche = "persistance"
+modification = "Ajouter ou modifier un index, pour la performance d'une requête"
+option = "schema"
+reperes = ["changelog Liquibase", "plan d'exécution"]
+
+[[modele_demande.possibilites]]
+id = "contrainte"
+couche = "persistance"
+modification = "Ajouter ou modifier une contrainte : clé, unicité, NOT NULL"
+option = "schema"
+reperes = ["changelog Liquibase"]
+
+[[modele_demande.possibilites]]
+id = "lecture"
+couche = "persistance"
+modification = "Lire les données d'une entité : filtre, tri, pagination"
+option = "crud"
+reperes = ["repository Spring Data", "requête"]
+
+[[modele_demande.possibilites]]
+id = "ecriture"
+couche = "persistance"
+modification = "Créer, modifier ou supprimer les données d'une entité"
+option = "crud"
+reperes = ["repository Spring Data", "transaction"]
+
+# Backend : Java et Spring Boot
+
+[[modele_demande.possibilites]]
+id = "endpoint_nouveau"
+couche = "backend"
+modification = "Ajouter un endpoint"
+option = "endpoints"
+reperes = ["contrat OpenAPI", "contrôleur REST"]
+
+[[modele_demande.possibilites]]
+id = "endpoint_modifie"
+couche = "backend"
+modification = "Modifier le contrat d'un endpoint : paramètres, réponse, erreurs"
+option = "endpoints"
+reperes = ["contrat OpenAPI", "contrôleur REST", "DTO"]
+
+[[modele_demande.possibilites]]
+id = "regle"
+couche = "backend"
+modification = "Ajouter ou modifier une règle métier ou une habilitation"
+option = "regles"
+reperes = ["service du domaine", "sécurité des méthodes"]
+
+[[modele_demande.possibilites]]
+id = "service"
+couche = "backend"
+modification = "Ajouter ou modifier un cas d'usage côté serveur"
+option = "fonctionnalites"
+reperes = ["service applicatif"]
+
+# Frontend : Angular
+
+[[modele_demande.possibilites]]
+id = "ecran_nouveau"
+couche = "frontend"
+modification = "Créer un écran ou un composant"
+option = "elements_graphiques"
+reperes = ["composant Angular", "routes"]
+
+[[modele_demande.possibilites]]
+id = "ecran_modifie"
+couche = "frontend"
+modification = "Modifier un composant : mise en page, libellés, états visuels"
+option = "elements_graphiques"
+reperes = ["gabarit et styles du composant"]
+
+[[modele_demande.possibilites]]
+id = "formulaire"
+couche = "frontend"
+modification = "Ajouter ou modifier un formulaire ou ses validations"
+option = "fonctionnalites"
+reperes = ["formulaire réactif", "validateurs"]
+
+[[modele_demande.possibilites]]
+id = "comportement"
+couche = "frontend"
+modification = "Modifier un comportement : déclencheur, état local, appel d'API"
+option = "fonctionnalites"
+reperes = ["signals", "service HTTP"]
+
+[[modele_demande.possibilites]]
+id = "navigation"
+couche = "frontend"
+modification = "Ajouter ou modifier une navigation ou une route"
+option = "fonctionnalites"
+reperes = ["routes", "gardes"]
 
 # ------------------------------------------------------------------------------
 # 1. OPTIONS AU CHOIX, PAR COUCHE
@@ -281,6 +439,10 @@ exigences = "Un changeset par fichier, un rollback par changeset, migration jou�
 [validation]
 regles = [
   "le ticket nomme un méso-contrat du catalogue et la version du référentiel qu'il suit",
+  "la section demande répond à l'intention et à chaque possibilité du modèle générique, et cite la source de chaque réponse autre qu'inconnu",
+  "le méso-contrat respecte la règle de choix du modèle générique, appliquée aux possibilités à oui",
+  "aucune possibilité ne reste inconnue si sa réponse pouvait changer le méso-contrat",
+  "aucune option n'est choisie tant que le méso-contrat n'est pas confirmé (meso_contrat_confirme)",
   "chaque couche à l'impact requis porte au moins une option choisie",
   "aucune option n'est choisie sur une couche à l'impact aucun",
   "chaque option choisie figure parmi les options permises de sa couche",
@@ -293,19 +455,37 @@ regles = [
 
 ## 7. Exemple d'instance
 
-`docs/demandes/ABCDE-3512/ticket.toml`, pour le ticket fil rouge du point d'entrée (§ 15, R3 et R11) :
+`docs/demandes/ABCDE-3512/ticket.toml`, pour le ticket fil rouge du point d'entrée (§ 15, R3, R11 et R16). La section `[ticket.demande]` vient de la qualification, à l'ouverture du ticket ; les options, de l'analyse :
 
 ```toml
 [ticket]
 reference = "ABCDE-3512"
-referentiel = "3.0.0"
+referentiel = "3.1.0"
 meso_contrat = "M01"
+meso_contrat_confirme = true
 titre = "Charger les données au clic plutôt qu'à l'ouverture de l'écran"
 
-[ticket.specifications_metier]
-element_persiste = "Colonne mode_chargement de la table donnee (Liquibase)"
-exposition_api = "GET /api/v1/donnees"
-interaction_ihm = "Clic sur le bouton, puis appel de l'API"
+# Demande : la combinaison des possibilités de modification que le ticket implique,
+# établie à son ouverture (qualification, D11). Les possibilités que le ticket
+# n'évoque pas restent inconnues : aucune ne changerait le méso-contrat ni ses options.
+[ticket.demande]
+intention = { reponse = "Charger les données au clic plutôt qu'à l'ouverture de l'écran", source = "ticket : titre" }
+maquette = { reponse = "oui", precision = "maquettes/ecran-cible.png et maquettes/parcours-cible.png", source = "ticket : pièces jointes" }
+table = { reponse = "inconnu" }
+colonne = { reponse = "oui", precision = "mode_chargement, AUTO ou CLIC, dans la table donnee", source = "ticket : description" }
+index = { reponse = "inconnu" }
+contrainte = { reponse = "inconnu" }
+lecture = { reponse = "oui", precision = "données paginées", source = "ticket : critères d'acceptation" }
+ecriture = { reponse = "inconnu" }
+endpoint_nouveau = { reponse = "non", source = "développeur : question 1" }
+endpoint_modifie = { reponse = "oui", precision = "GET /api/v1/donnees, paginé", source = "développeur : question 1" }
+regle = { reponse = "oui", precision = "seul un utilisateur habilité obtient les données", source = "ticket : critères d'acceptation" }
+service = { reponse = "oui", precision = "fournir les données à la demande", source = "ticket : description" }
+ecran_nouveau = { reponse = "inconnu" }
+ecran_modifie = { reponse = "oui", precision = "bouton « Charger les données »", source = "ticket : critères d'acceptation" }
+formulaire = { reponse = "inconnu" }
+comportement = { reponse = "oui", precision = "chargement au clic, et non dans ngOnInit", source = "ticket : titre" }
+navigation = { reponse = "inconnu" }
 
 [[ticket.persistance.schema]]
 changement = "colonne"
@@ -346,6 +526,6 @@ analyse_image = ["structure", "etats"]
 
 ## 8. Contrôles
 
-- La section `[validation]` du référentiel énumère les règles d'un ticket ; l'IA les vérifie avant de présenter `ticket.toml` (D10.INV-2).
-- Scénarios R11 à R14 du point d'entrée.
+- La section `[validation]` du référentiel énumère les règles d'un ticket, celles de la demande remplie comprises ; l'IA les vérifie avant de présenter `ticket.toml` (D10.INV-2).
+- Scénarios R11 à R14 du point d'entrée ; R16 à R18 pour le modèle générique de la demande.
 - À la publication : le modèle se lit en TOML, et l'exemple d'instance respecte toutes ses règles de validation (point d'entrée, section 16).
