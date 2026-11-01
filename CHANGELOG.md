@@ -4,6 +4,25 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-11-01 : orchestrateur-c7e 3.5.0
+
+- **orchestrateur-c7e 3.5.0** : composition de méso-contrats, à la demande du développeur : « Il peut y avoir plusieurs méso-contrats. »
+  - Un ticket engage un méso-contrat principal, celui qui porte le plus de possibilités de sa demande parmi ceux dont les couches requises et les possibilités requises sont remplies, et, si le principal ne porte pas tout, des compléments, en plus petit nombre, chacun justifié par une possibilité que le principal ne porte pas (D11.INV-6). Une égalité devient une question ; une possibilité que rien ne porte est signalée.
+  - L'union l'emporte : une couche à l'impact `aucun` dans un méso-contrat peut être couverte par un autre du ticket. Chaque option est rattachée au méso-contrat qui la permet, le principal par défaut, sinon celui que nomme sa clé `meso_contrat`.
+  - Point d'extension E5. Modèle du référentiel 3.3.0 : règle de choix et règles de validation réécrites, quatorze règles ; `complements` dans `ticket.toml` ; troisième exemple, `ABCDE-3655`, M04 avec le complément M01 pour une règle d'habilitation.
+  - Qualification : gabarit de la composition, composition imposée par `/c7e ABCDE-3655 M04 M01`, trois exemples nouveaux. Fiche : méso-contrats et rattachement des options.
+  - D10.INV-1, D10.INV-2, D11.INV-3 et D11.INV-4 remplacés pour la composition, identiques pour un ticket à un seul méso-contrat ; D11.INV-6 ; trente-trois invariants. Scénarios R21 et R22 ; R13 revu.
+- Vérifications :
+  - le modèle se lit en TOML et la commande d'extraction redonne sa nouvelle empreinte ;
+  - les trois exemples d'instance respectent les quatorze règles, et sept écarts volontaires dans la composition sont tous rejetés ;
+  - la règle de choix redonne, sans complément, le même méso-contrat qu'en 3.4.0 pour les douze demandes types à un seul méso-contrat, et compose ou signale correctement cinq demandes nouvelles ;
+  - vérificateur, glossaire, transmission et recette de l'installateur à jour.
+- `docs/orchestrateur-c7e/mode-emploi.md` : version 3.5.0, composition dans la qualification, la commande, les options et le dépannage.
+- Décisions ratifiées :
+  - une composition par ticket plutôt qu'un choix entre méso-contrats ;
+  - un principal et des compléments plutôt qu'une couverture sans hiérarchie ;
+  - l'union des empreintes, chaque option rattachée au méso-contrat qui la permet.
+
 ### 2026-11-01 : orchestrateur-c7e 3.4.0 et socle-back-front 1.1.0
 
 - **orchestrateur-c7e 3.4.0** : catégorie M04, variante de représentation d'une ressource, deuxième exemple de méso-contrat donné par le développeur après le CRUD en base, son endpoint Java et sa lecture depuis le front : « Trouver le endpoint d'une URI avec le type de donnée ; sa composition contient un champ avec une liste ou un record. Réaliser une variante de ce type avec ce champ en moins. Réaliser une variante avec la même URI où ce champ ne sera pas intégré ; les informations le concernant seront uniquement la date et l'heure du dernier enregistrement. » Complément : le champ, une liste de records appelée au travers d'une URI existante, est mis à jour en temps réel.

@@ -1,6 +1,6 @@
 # Mode d'emploi : lancer l'orchestrateur C7E dans Gemini CLI
 
-Ce mode d'emploi installe la spécification [`orchestrateur-c7e`](../../specs/orchestrateur-c7e/SKILL.md) 3.4.0 dans un projet et la fait appeler au démarrage de l'IA locale, Gemini CLI. Le skill ne s'applique qu'au choix du développeur, selon l'un de deux chargements :
+Ce mode d'emploi installe la spécification [`orchestrateur-c7e`](../../specs/orchestrateur-c7e/SKILL.md) 3.5.0 dans un projet et la fait appeler au démarrage de l'IA locale, Gemini CLI. Le skill ne s'applique qu'au choix du développeur, selon l'un de deux chargements :
 
 | Chargement | Le choix se fait | Au démarrage, le contexte contient |
 |---|---|---|
@@ -9,7 +9,7 @@ Ce mode d'emploi installe la spécification [`orchestrateur-c7e`](../../specs/or
 
 Ces deux chargements ne sont pas les modes de modulation A, B et C du skill, qui règlent la méthode une fois le skill choisi.
 
-Une fois l'orchestrateur choisi, chaque ticket est d'abord **qualifié**, à son ouverture. L'IA range sa demande dans le modèle générique de la demande du référentiel des méso-contrats, une combinaison de possibilités de modification de l'application établies à son analyse, pose les questions que le ticket laisse ouvertes, et propose le méso-contrat (M01 à M04, puis les catégories du projet), que vous confirmez avant tout le reste. Viennent ensuite les options au choix sur chaque couche, l'analyse des images PNG de l'objectif quand il y en a, et la fiche de transformation.
+Une fois l'orchestrateur choisi, chaque ticket est d'abord **qualifié**, à son ouverture. L'IA range sa demande dans le modèle générique de la demande du référentiel des méso-contrats, une combinaison de possibilités de modification de l'application établies à son analyse, pose les questions que le ticket laisse ouvertes, et propose le méso-contrat principal (M01 à M04, puis les catégories du projet), avec au besoin des compléments pour ce qu'il ne porte pas, que vous confirmez avant tout le reste. Viennent ensuite les options au choix sur chaque couche, l'analyse des images PNG de l'objectif quand il y en a, et la fiche de transformation.
 
 ---
 
@@ -17,7 +17,7 @@ Une fois l'orchestrateur choisi, chaque ticket est d'abord **qualifié**, à son
 
 - Gemini CLI, lancé à la racine du projet.
 - Pour le chargement au choix, la prise en charge des skills : la commande `/skills list` doit répondre.
-- Un clone du dépôt Agent2Prompt, pour l'installateur `tools/installer.mjs`. À défaut, la transmission seule : [`transmissions/orchestrateur-c7e-3.4.0.md`](../../transmissions/orchestrateur-c7e-3.4.0.md).
+- Un clone du dépôt Agent2Prompt, pour l'installateur `tools/installer.mjs`. À défaut, la transmission seule : [`transmissions/orchestrateur-c7e-3.5.0.md`](../../transmissions/orchestrateur-c7e-3.5.0.md).
 - Node 20 ou plus récent, pour l'installateur et pour extraire le référentiel, et `sha256sum`, fourni par Git Bash sous Windows, pour vérifier les fichiers.
 
 Deux dépôts interviennent :
@@ -79,7 +79,7 @@ Ces fichiers appartiennent au dépôt du projet, pas à Agent2Prompt. L'IA crée
 | registre des concepts | `docs/c7e/concepts.json` | l'IA propose, le développeur promeut | `SKILL.md`, § 7.2, registre de départ |
 | base de connaissances | `docs/c7e/connaissances.md` | l'IA ajoute, le développeur relit | aucun : créée vide |
 | fiche de transformation | `docs/demandes/<CLÉ>/fiche-transformation.md` | l'IA, validée par le développeur | `SKILL.md`, § 10 |
-| instance de chaque ticket | `docs/demandes/<CLÉ>/ticket.toml` | l'IA, à la qualification puis à l'analyse ; le développeur confirme le méso-contrat, puis valide les options avec la fiche | `modules/referentiel/SKILL.md`, § 7, exemple |
+| instance de chaque ticket | `docs/demandes/<CLÉ>/ticket.toml` | l'IA, à la qualification puis à l'analyse ; le développeur confirme les méso-contrats, principal et compléments, puis valide les options avec la fiche | `modules/referentiel/SKILL.md`, § 7, exemple |
 | analyse d'image | `docs/demandes/<CLÉ>/analyse-image.md` | l'IA, validée avec la fiche | aucun |
 | images de l'objectif | `docs/demandes/<CLÉ>/maquettes/*.png` | le développeur ou le PO | aucun |
 
@@ -112,7 +112,7 @@ Tous ces fichiers sont versionnés avec le projet, images comprises : une comman
    ```
 
 2. Si ce fichier ne s'appelle pas `GEMINI.md`, le déclarer dans `.gemini/settings.json` (voir § 6).
-3. Lancer `gemini`, puis `/memory show` : le texte du skill doit apparaître, en commençant par « Orchestrateur fractal C7E, version 3.4.0 ».
+3. Lancer `gemini`, puis `/memory show` : le texte du skill doit apparaître, en commençant par « Orchestrateur fractal C7E, version 3.5.0 ».
 
 Les lignes `@` ne sont développées que dans un fichier de contexte. Si le fichier est envoyé comme message, l'IA ne voit que le texte des lignes, sans le contenu des fichiers. Le référentiel n'est pas importé : l'IA le lit à l'analyse de chaque ticket.
 
@@ -124,7 +124,7 @@ flowchart LR
   M -- "0" --> S["Session sans<br/>orchestrateur"]
   M -- "1" --> A["Activation du skill,<br/>confirmée par le développeur"]
   C["Commande /c7e"] --> A
-  A --> Q["À l'ouverture du ticket :<br/>demande, questions,<br/>méso-contrat confirmé"]
+  A --> Q["À l'ouverture du ticket :<br/>demande, questions,<br/>méso-contrats confirmés"]
   Q --> K["Options par couche,<br/>ticket.toml"]
   K --> I["Analyse des images<br/>de l'objectif demandées"]
   I --> V["Fiche, ticket.toml<br/>et analyse validés"]
@@ -164,12 +164,13 @@ Référentiel des méso-contrats du projet :
 @{docs/c7e/referentiel-meso-contrats.toml}
 Commence par qualifier le ticket : modèle générique de la demande, questions,
 méso-contrat à confirmer avant tout le reste.
-Ticket, et méso-contrat imposé s'il est précisé : {{args}}
+Ticket, et méso-contrats imposés s'ils sont précisés, le principal d'abord : {{args}}
 """
 ```
 
-- `/c7e ABCDE-3512` : l'IA qualifie le ticket, pose ses questions et propose le méso-contrat, à confirmer.
+- `/c7e ABCDE-3512` : l'IA qualifie le ticket, pose ses questions et propose le méso-contrat principal, avec des compléments si le principal ne porte pas toute la demande, à confirmer.
 - `/c7e ABCDE-3512 M01` : le méso-contrat est imposé ; il vaut confirmation s'il couvre la demande remplie, sinon l'IA montre l'écart et attend.
+- `/c7e ABCDE-3655 M04 M01` : la composition est imposée, le principal d'abord ; elle vaut confirmation si elle porte la demande selon la règle de choix.
 - Le skill passe par l'activation, jamais par `@{…}` : l'activation livre son `SKILL.md` et la liste de ses fichiers, que l'IA lit ensuite.
 - Avec le kit, les chemins `docs/c7e/…` se lisent dans le worktree où Gemini CLI est lancé.
 
@@ -196,7 +197,7 @@ Gemini CLI lit `GEMINI.md`. Pour un autre nom, `.gemini/settings.json` :
 
 ## 7. Les options au choix
 
-Chaque méso-contrat permet certaines options par couche ; `ticket.toml` les précise pour le ticket.
+Chaque méso-contrat permet certaines options par couche ; `ticket.toml` les précise pour le ticket. Un ticket peut engager plusieurs méso-contrats : un principal, qui porte le plus de sa demande, et des compléments pour le reste. Chaque option se rattache au méso-contrat qui la permet, le principal par défaut, sinon celui que nomme sa clé `meso_contrat` ; une couche exclue par l'un peut être couverte par un autre.
 
 | Couche | Option | Ce que précise `ticket.toml` |
 |---|---|---|
@@ -219,10 +220,10 @@ La demande remplie à la qualification signale déjà des options ; l'analyse le
 2. Lancer `gemini` à la racine du projet, ou dans le worktree de la demande avec le kit.
 3. Choisir l'orchestrateur : répondre 1 au menu, ou taper `/c7e ABCDE-3512`.
 4. Confirmer l'activation du skill quand Gemini CLI la demande.
-5. Lire la qualification du ticket, répondre à ses questions et confirmer le méso-contrat : l'IA ne lit pas le code et ne prépare pas la fiche avant.
+5. Lire la qualification du ticket, répondre à ses questions et confirmer les méso-contrats proposés, principal et compléments : l'IA ne lit pas le code et ne prépare pas la fiche avant.
 6. Relire ce que l'IA présente ensuite, en un point de validation :
    - la fiche de transformation ;
-   - `ticket.toml`, avec le méso-contrat et les options proposés ;
+   - `ticket.toml`, avec les méso-contrats et les options proposés ;
    - l'analyse d'image et ses questions.
 7. L'IA transforme ensuite le système slot par slot et dépose ses preuves.
 8. Relire, pousser et fusionner vous-même : l'IA ne pousse pas, ne fusionne pas et ne pose aucun tag.
@@ -251,6 +252,8 @@ Si l'IA signale qu'aucune catégorie ne couvre le ticket, choisir la plus proche
 | la commande ne trouve pas le référentiel ou les invariants | fichier absent ou exclu de Git | les fichiers de `docs/c7e/` doivent exister et être versionnés |
 | l'empreinte du référentiel diffère à l'installation | fichier recopié à la main ou retouché | le réécrire par la commande du module `referentiel`, § 6 |
 | l'IA ne propose aucun méso-contrat | référentiel absent, ou ticket hors de toute catégorie | installer le référentiel ; sinon, choisir une catégorie ou en ajouter une |
+| l'IA signale une possibilité qu'aucun méso-contrat ne porte | aucune catégorie ne permet son option, ou celle qui la permet requiert une autre possibilité | permettre cette option dans une catégorie de votre référentiel, ou en créer une |
+| l'IA ne propose jamais de complément | référentiel installé avant la 3.5.0 : règle de choix à un seul méso-contrat | copier la section 0 et les règles de validation du modèle (module `referentiel`, § 6), et changer `meta.version` |
 | l'IA lit le code ou prépare la fiche sans avoir qualifié le ticket | qualification sautée | l'arrêter et demander la qualification : le skill l'impose avant tout le reste (D11.INV-1) |
 | la qualification dit prendre le modèle de la demande du skill | référentiel installé avant la 3.3.0, sans section `[modele_demande]` | copier la section 0 du modèle (module `referentiel`, § 6) dans le référentiel du projet, et changer `meta.version` |
 | un ticket de variante de représentation ne trouve pas de catégorie | référentiel installé avant la 3.4.0, sans M04 | copier du modèle (module `referentiel`, § 6) le bloc M04, les options `representations` et `evenements`, les possibilités `variante_representation` et `temps_reel` et la règle de choix sur les possibilités requises, et changer `meta.version` ; pour le temps réel, renseigner le courtier dans la section 2 du fichier d'invariants |
