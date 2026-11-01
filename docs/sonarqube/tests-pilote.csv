@@ -1,0 +1,32 @@
+﻿identifiant;recette;langage du décor;scanner ou outil;scénario;invariants;instance
+P1;simulée;aucun;aucun;branche de travail préfixée local-, login assaini, empreinte courte;D9.INV-2;faux SonarQube local
+P2;simulée;aucun;aucun;deux modes d'API, Bearer ou jeton en nom d'utilisateur;D1.INV-5;faux SonarQube local
+P3;simulée;aucun;aucun;une commande de scanner ne fixe ni branche, ni MR, ni jeton;D9.INV-2, D1.INV-2;faux SonarQube local
+P4;simulée;aucun;aucun;lignes modifiées et périmètre d'un constat;D9.INV-3;faux SonarQube local
+P5;simulée;aucun;aucun;l'environnement du scanner ne contient aucune variable de merge request;D9.INV-2;faux SonarQube local
+P6;simulée;aucun;aucun;la page et l'API exigent la clé de session et un Host local;D10.INV-1;faux SonarQube local
+P7;simulée;aucun;aucun;le jeton ne parvient jamais au navigateur;D10.INV-2;faux SonarQube local
+P8;simulée;Java;aucun;"connexion par l'un ou l'autre mode d'API ; le mode retenu sert ensuite";D1.INV-4, D1.INV-5;faux SonarQube local
+P9;simulée;Java et TypeScript;aucun;"périmètre = diff avec la base de fusion de origin/<cible> ; non commité déclaré";D9.INV-3;faux SonarQube local
+P10;simulée;Java;aucun;règles actives paginées, cache réutilisé tant que le profil ne change pas;D9.INV-4;faux SonarQube local
+P11;simulée;Java;scanner personnalisé (faux);rien n'est écrit sans lot proposé, validé et non expiré;D10.INV-3;faux SonarQube local
+P12;simulée;Java;scanner personnalisé (faux);analyse éphémère sous local-, constats filtrés et étiquetés, branche supprimée et vérifiée;D9.INV-1, D9.INV-2, D10.INV-4;faux SonarQube local
+P13;simulée;Java;scanner personnalisé (faux), sortie en erreur;scanner en erreur (gate en échec) : résultats lus quand même, branche supprimée;D9.INV-2;faux SonarQube local
+P14;simulée;Java;scanner personnalisé (faux);un échec de suppression est rapporté avec le nom de la branche restante;D9.INV-2;faux SonarQube local
+P15;simulée;Java;scanner personnalisé (faux);journal sans jeton, écritures marquées;D10.INV-2, D6.INV-1;faux SonarQube local
+P16;simulée;Java;aucun;dossier de relecture avec règles actives et diff, dans .sonar-local;D9.INV-1, D9.INV-4;faux SonarQube local
+P17;simulée;TypeScript;npm : ng test puis @sonar/scan;préréglage npm, les tests du projet tournent avant l'analyse, dans le dossier du projet;D9.INV-7;faux SonarQube local
+P18;simulée;Java;Maven : mvn verify et sonar:sonar;préréglage Maven, tests JUnit et JaCoCo dans verify, échecs de tests importés plutôt que bloquants;D9.INV-7;faux SonarQube local
+P19;simulée;Java;Maven;"tests et couverture lus sur la branche de travail ; échecs signalés";D9.INV-7, D6.INV-2;faux SonarQube local
+P20;simulée;TypeScript;npm, tests non lancés;"couverture absente signalée ; tests non lancés annoncés dans le lot";D2.INV-2, D9.INV-7;faux SonarQube local
+P21;simulée;TypeScript;npm;front TypeScript dans web/, constats ramenés au dépôt et filtrés, profil TS dans son propre cache;D9.INV-1, D9.INV-3, D9.INV-4;faux SonarQube local
+P22;simulée;TypeScript;npm, tests en échec;tests du projet en échec, l'analyse continue et la branche est supprimée;D9.INV-2, D9.INV-7;faux SonarQube local
+P23;simulée;TypeScript;npm;dossier du projet et commande de tests vérifiés avant tout lot;D1.INV-2;faux SonarQube local
+P24;simulée;aucun;aucun;valeur d'une mesure, directe ou de période;D6.INV-2;faux SonarQube local
+P25;simulée;Java;scanner personnalisé, sans analyse;analyse absente de l'instance, aucun constat inventé, suppression tentée;D9.INV-1, D9.INV-2;faux SonarQube local
+P26;simulée;Java et TypeScript;API web : /api/rules/search;export CSV de toutes les règles des langages du projet, actives ou non dans son profil;D9.INV-4, D10.INV-2;faux SonarQube local
+R1;réelle;aucun;API web;connexion réelle par en-tête Bearer, relevé de l'instance;D1.INV-4, D1.INV-5;instance du développeur, édition Developer ou supérieure
+R2;réelle;aucun;API web;jeton en nom d'utilisateur, accepté ou refusé proprement selon l'instance;D1.INV-5;instance du développeur, édition Developer ou supérieure
+R3;réelle;aucun;API web;modes détectés, jeton absent de l'état;D10.INV-2;instance du développeur, édition Developer ou supérieure
+R4;réelle;JavaScript;API web;périmètre, règles actives du profil réel, cache et export CSV;D9.INV-3, D9.INV-4;instance du développeur, édition Developer ou supérieure
+R5;réelle;JavaScript;npx @sonar/scan, node --test avec couverture LCOV;analyse éphémère réelle, tests et couverture remontés, constats au périmètre, branche supprimée;D9.INV-1, D9.INV-2, D9.INV-7;instance du développeur, édition Developer ou supérieure

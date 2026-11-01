@@ -1,6 +1,6 @@
 ---
 name: pilotage
-description: Interface locale de pilotage des tests SonarQube (script Node sans dépendance servi sur la boucle locale, clé de session, détection des modes de connexion, test de connexion par l'un ou l'autre mode d'API, périmètre du diff, règles actives du profil avec cache, analyse éphémère par lot d'écritures validé, précédée des tests du projet dont les résultats et la couverture remontent dans SonarQube, dossier du projet pour un monodépôt back et front, suppression vérifiée de la branche de travail, dossier de relecture, commande du serveur MCP, constats par moteur, journal des appels sans jeton, recette de vingt-cinq scénarios contre un faux SonarQube et recette réelle de cinq scénarios contre l'instance du développeur). À lire pour piloter l'examen local depuis un navigateur.
+description: Interface locale de pilotage des tests SonarQube (script Node sans dépendance servi sur la boucle locale, clé de session, détection des modes de connexion, test de connexion par l'un ou l'autre mode d'API, périmètre du diff, règles actives du profil avec cache, analyse éphémère par lot d'écritures validé, précédée des tests du projet dont les résultats et la couverture remontent dans SonarQube, dossier du projet pour un monodépôt back et front, suppression vérifiée de la branche de travail, export CSV des règles des langages du projet, actives ou non dans son profil, dossier de relecture, commande du serveur MCP, constats par moteur, journal des appels sans jeton, recette de vingt-six scénarios contre un faux SonarQube et recette réelle de cinq scénarios contre l'instance du développeur). À lire pour piloter l'examen local depuis un navigateur.
 dimensions: [D10]
 status: active
 ---
@@ -42,7 +42,7 @@ Le pilote affiche une adresse `http://127.0.0.1:8765/?cle=<clé>` : c'est la seu
 |---|---|---|---|
 | 1. Connexion | détecte les modes du module `cadrage-acces`, § 3 bis ; teste le mode d'API retenu, Bearer ou jeton en nom d'utilisateur ; relève version, édition, compte | `/api/authentication/validate`, `/api/server/version`, `/api/navigation/global`, `/api/users/current`, `GET <hôte>/mcp` | D1.INV-4, D1.INV-5 |
 | 2. Projet et périmètre | `git fetch`, base de fusion avec `origin/<cible>`, fichiers et lignes du diff, modifications non commitées | git seulement | D9.INV-3 |
-| 3. Règles du profil | profils du projet, règles actives paginées, cache invalidé par `rulesUpdatedAt` ; dossier de relecture | `/api/qualityprofiles/search`, `/api/rules/search` | D9.INV-4 |
+| 3. Règles du profil | profils du projet, règles actives paginées, cache invalidé par `rulesUpdatedAt` ; export CSV de toutes les règles des langages du projet, avec la colonne « active dans le profil du projet » ; dossier de relecture | `/api/qualityprofiles/search`, `/api/rules/search` | D9.INV-4 |
 | 4. Analyse éphémère | propose le lot de deux écritures, avec la commande exacte, les tests du projet lancés avant et l'appel de suppression ; exécute seulement après « Valider et lancer » ; lit gate, constats, tests et couverture sur la branche de travail | tests du projet, scanner, `/api/project_branches/list`, `/api/qualitygates/project_status`, `/api/issues/search`, `/api/measures/component`, `/api/hotspots/search`, `/api/project_branches/delete` | D1.INV-3, D9.INV-2, D9.INV-7, D10.INV-3 |
 | 5. Moteur SonarLint | affiche la commande du serveur MCP, sans valeur de jeton | aucun | D1.INV-2 |
 | 6. Constats | tests et couverture lus dans SonarQube ; tableau par moteur ; constats hors périmètre comptés à part | aucun | D9.INV-1, D6.INV-2 |
@@ -60,6 +60,7 @@ Toutes les routes exigent l'en-tête `x-pilote-cle` ; la page exige le paramètr
 | `POST /api/connexion` | `{ mode: "bearer" \| "basic" }` | version, édition, login |
 | `POST /api/perimetre` | `{ cible }` | base, HEAD, fichiers, lignes, non commité |
 | `POST /api/regles` | `{ projet }` | profils et règles actives |
+| `POST /api/regles/export` | `{ projet }` | CSV (séparateur « ; », UTF-8 avec BOM), total, actives, copie dans `.sonar-local/` |
 | `POST /api/relecture` | `{ projet }` | chemin du dossier de relecture |
 | `POST /api/ephemere/proposer` | `{ projet, type: "maven" \| "npm" \| "personnalise", base?, tests?, sansTests?, dossier? }` | lot : identifiant, branche, tests du projet, écritures exactes |
 | `POST /api/ephemere/lancer` | `{ id }` | tests, gate, mesures, constats, hors périmètre, suppression, limites |
@@ -91,7 +92,7 @@ Un lot vaut dix minutes et ne sert qu'une fois ; un identifiant inconnu, expiré
 Trois fichiers sont tirés des blocs annotés `<!-- fichier : chemin -->` de ce module, à l'identique, par programme plutôt qu'à la main. Depuis le dossier où le skill est matérialisé (`.skills/sonarqube/`) :
 
 ```text
-node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'outils/pilote-sonar.mjs': 'c6c2fff3b79509e0ad5766552d6e503ec8dd7b07a3947c955d8c2d1d4ee2bfa1', 'tests/pilote-sonar.test.mjs': '50a5c7d82793406c24db712cf86b84abf14c0f75565e2e841987615974a41012', 'tests/pilote-sonar.reel.test.mjs': 'f5c83b0d203aa5e0f345fe5eea5ebb3a12fb88787e89c4cba4793c5b9025e676' }; let ecarts = 0, vus = 0; const texte = fs.readFileSync('modules/pilotage/SKILL.md', 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { vus++; const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (!conforme) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } if (vus !== Object.keys(attendu).length) { console.log('fichiers trouvés : ' + vus); ecarts++; } if (ecarts > 0) process.exitCode = 1;"
+node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'outils/pilote-sonar.mjs': 'c0f6de3fba684c75363af269ac927f3b406f85a7bba2e1f403e5720153504bf1', 'tests/pilote-sonar.test.mjs': 'b827e26b1c90ab9aa2ce104a5105f1af7802e215b46a11bc43be9c1ac302ada7', 'tests/pilote-sonar.reel.test.mjs': 'bd4ea3fb36ebe5d87185a3de777d061e0b7818d4a2a88e73686e2cc29d98fa12' }; let ecarts = 0, vus = 0; const texte = fs.readFileSync('modules/pilotage/SKILL.md', 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { vus++; const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (!conforme) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } if (vus !== Object.keys(attendu).length) { console.log('fichiers trouvés : ' + vus); ecarts++; } if (ecarts > 0) process.exitCode = 1;"
 ```
 
 Chaque fichier conforme est signalé `conforme` ; un écart arrête la commande avec un code non nul. Ne corrige pas un fichier en écart : signale-le au développeur.
@@ -106,7 +107,7 @@ Deux recettes, la première toujours, la seconde contre ton instance.
 node --test tests/pilote-sonar.test.mjs
 ```
 
-Vingt-cinq scénarios, P1 à P25, contre un faux SonarQube local, un dépôt git temporaire avec un back Java et un front TypeScript dans `web/`, un faux scanner, et de faux `mvn` et `npx` placés en tête du `PATH` ; aucun réseau externe. La CI du dépôt Agent2Prompt la rejoue sous Linux et Windows, avec Node 20 et 22, à partir de la transmission courante.
+Vingt-six scénarios, P1 à P26, contre un faux SonarQube local, un dépôt git temporaire avec un back Java et un front TypeScript dans `web/`, un faux scanner, et de faux `mvn` et `npx` placés en tête du `PATH` ; aucun réseau externe. La CI du dépôt Agent2Prompt la rejoue sous Linux et Windows, avec Node 20 et 22, à partir de la transmission courante.
 
 | Scénario | Invariants |
 |---|---|
@@ -135,8 +136,9 @@ Vingt-cinq scénarios, P1 à P25, contre un faux SonarQube local, un dépôt git
 | P23 dossier du projet et commande de tests vérifiés | D1.INV-2 |
 | P24 valeur d'une mesure, directe ou de période | D6.INV-2 |
 | P25 analyse absente : aucun constat inventé, suppression tentée | D9.INV-1, D9.INV-2 |
+| P26 export CSV des règles, actives ou non dans le profil | D9.INV-4, D10.INV-2 |
 
-Répartition par langage : le back Java sert de décor à P8 à P16, P18, P19 et P25 ; le front TypeScript à P17 et P20 à P23 ; les autres scénarios ne dépendent d'aucun langage.
+Répartition par langage : le back Java sert de décor à P8 à P16, P18, P19 et P25 ; le front TypeScript à P17 et P20 à P23 ; P9 et P26 portent sur les deux ; les autres scénarios ne dépendent d'aucun langage. La liste complète, avec les invariants, est dans `docs/sonarqube/tests-pilote.csv` du dépôt Agent2Prompt.
 
 ### 6.2 Recette réelle, contre l'instance du développeur
 
@@ -147,14 +149,14 @@ export RECETTE_SONAR_PROJET=agent2prompt-recette
 node --test tests/pilote-sonar.reel.test.mjs
 ```
 
-Cinq scénarios, R1 à R5, sur un **projet réservé à la recette**, créé à l'avance sur l'instance (édition Developer ou supérieure). Le jeton utilisateur doit y avoir Browse, Execute Analysis et Administer. La recette fabrique un petit projet JavaScript dans un dépôt temporaire, en analyse la branche principale comme décor, puis ajoute un fichier fautif et le soumet au pilote : tests avec couverture LCOV, analyse éphémère réelle, gate, constats, mesures, suppression vérifiée de la branche. Sans les trois variables, chaque scénario est sauté.
+Cinq scénarios, R1 à R5, sur un **projet réservé à la recette**, créé à l'avance sur l'instance (édition Developer ou supérieure). Le jeton utilisateur doit y avoir Browse, Execute Analysis et Administer. La recette fabrique un petit projet JavaScript dans un dépôt temporaire, en analyse la branche principale comme décor, puis ajoute un fichier qui enfreint trois règles actives de Sonar way (`S3504`, `S1481`, `S1186`) et le soumet au pilote : tests avec couverture LCOV, analyse éphémère réelle, gate, constats, mesures, suppression vérifiée de la branche. Sans les trois variables, chaque scénario est sauté.
 
 | Scénario, ce qui est prouvé contre l'instance | Invariants |
 |---|---|
 | R1 connexion Bearer, version, édition | D1.INV-4, D1.INV-5 |
 | R2 jeton en nom d'utilisateur, accepté ou refusé proprement | D1.INV-5 |
 | R3 modes détectés, jeton absent de l'état | D10.INV-2 |
-| R4 périmètre, règles actives du profil réel, cache | D9.INV-3, D9.INV-4 |
+| R4 périmètre, règles actives du profil réel, cache, export CSV | D9.INV-3, D9.INV-4 |
 | R5 analyse éphémère complète, tests et couverture remontés, constats au périmètre, branche supprimée | D9.INV-1, D9.INV-2, D9.INV-7 |
 
 Écritures sur l'instance : l'analyse de la branche principale du projet de recette, puis la branche `local-…`, supprimée ; un filet de sécurité la supprime aussi en fin de recette si un scénario a échoué. Réseau : npm, pour `@sonar/scan`, et l'instance. La CI du dépôt la lance seulement si la variable de dépôt `RECETTE_SONAR_ACTIVE` vaut `true` et que les secrets `RECETTE_SONAR_HOST_URL` et `RECETTE_SONAR_TOKEN` et la variable `RECETTE_SONAR_PROJET` sont définis ; une instance du réseau interne, injoignable depuis GitHub, se recette depuis le poste.
@@ -561,6 +563,37 @@ export class Pilote {
     });
   }
 
+  /**
+   * Export CSV des règles de l'instance pour les langages des profils du projet, avec une colonne qui dit
+   * si chaque règle est active dans le profil du projet (D9.INV-4). Séparateur « ; », UTF-8 avec BOM.
+   */
+  async exporterRegles(projet) {
+    const profils = await this.regles(projet);
+    const QUALITE = { MAINTAINABILITY: 'maintenabilité', RELIABILITY: 'fiabilité', SECURITY: 'sécurité' };
+    const GRAVITE = { BLOCKER: 'bloquante', HIGH: 'haute', MEDIUM: 'moyenne', LOW: 'basse', INFO: 'info' };
+    const lignes = [];
+    for (const p of profils) {
+      const actives = new Set(p.regles.map((x) => x.key));
+      const toutes = [];
+      for (let page = 1; page * 500 <= 10000; page++) {
+        const r = await this.appel(`/api/rules/search?languages=${encodeURIComponent(p.language)}&ps=500&p=${page}`);
+        toutes.push(...(r?.rules ?? []));
+        if (!r?.rules?.length || toutes.length >= (r.total ?? r.paging?.total ?? 0)) break;
+      }
+      for (const x of toutes) {
+        lignes.push([x.key, x.lang ?? p.language, x.name ?? '', x.type ?? '',
+          (x.impacts ?? []).map((i) => `${QUALITE[i.softwareQuality] ?? i.softwareQuality} : ${GRAVITE[i.severity] ?? i.severity}`).join(', '),
+          x.severity ?? '', x.status ?? '', actives.has(x.key) ? 'oui' : 'non', p.name, [...(x.sysTags ?? []), ...(x.tags ?? [])].join(', '), x.scope ?? '']);
+      }
+    }
+    const entete = ['clé de règle', 'langage', 'titre', 'type', 'qualité logicielle : gravité (mode MQR)', 'sévérité (mode standard)', 'statut', 'active dans le profil du projet', 'profil', 'tags', 'portée'];
+    const champ = (v) => { const t = String(v ?? ''); return /[;"\r\n]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t; };
+    const contenu = '\ufeff' + [entete, ...lignes].map((l) => l.map(champ).join(';')).join('\r\n') + '\r\n';
+    const fichier = path.join(this.racine, '.sonar-local', `regles-${String(projet).replace(/[^A-Za-z0-9_.-]/g, '_')}.csv`);
+    fs.writeFileSync(fichier, contenu);
+    return { fichier: path.relative(this.racine, fichier), total: lignes.length, actives: lignes.filter((l) => l[7] === 'oui').length, contenu };
+  }
+
   /** Dossier de relecture : diff et règles actives, pour le moteur de relecture de l'expert (D9, § 7). */
   async dossierRelecture(projet) {
     if (!this.perimetre) throw new Error('calculer d\'abord le périmètre');
@@ -637,7 +670,7 @@ label.case{font-weight:400;display:flex;gap:8px;align-items:center}input[type=ch
 <div class="etat" id="ePerimetre" role="status" aria-live="polite"></div></section>
 
 <section aria-labelledby="t-re"><h2 id="t-re">3. Règles du profil</h2>
-<button id="bRegles">Lire les règles actives</button><button id="bRelecture" class="second">Préparer le dossier de relecture</button>
+<button id="bRegles">Lire les règles actives</button><button id="bExport" class="second">Exporter les règles en CSV</button><button id="bRelecture" class="second">Préparer le dossier de relecture</button>
 <div class="etat" id="eRegles" role="status" aria-live="polite"></div></section>
 
 <section aria-labelledby="t-ep"><h2 id="t-ep">4. Analyse éphémère</h2>
@@ -679,6 +712,16 @@ async function charger() {
 $('bConnexion').onclick = async () => { try { const c = await api('/api/connexion', { mode: $('modeApi').value }); etat('eConnexion', 'Connecté : SonarQube ' + txt(c.version) + ', édition ' + txt(c.edition) + ', compte ' + txt(c.login)); } catch (e) { etat('eConnexion', txt(e.message), true); } };
 $('bPerimetre').onclick = async () => { try { const p = await api('/api/perimetre', { cible: $('cible').value.trim() }); etat('ePerimetre', p.fichiers.length + ' fichier(s), ' + p.lignes + ' ligne(s) modifiée(s) ; base ' + txt(p.base.slice(0, 8)) + ', HEAD ' + txt(p.head.slice(0, 8)) + (p.nonCommite.length ? ' — <span class="ko">' + p.nonCommite.length + ' modification(s) non commitée(s), hors examen</span>' : '') + (p.sonarLocalIgnore ? '' : ' — ajouter .sonar-local/ au .gitignore')); } catch (e) { etat('ePerimetre', txt(e.message), true); } };
 $('bRegles').onclick = async () => { try { const r = await api('/api/regles', { projet: $('projet').value.trim() }); etat('eRegles', r.map((p) => txt(p.name) + ' (' + txt(p.language) + ') : ' + p.regles.length + ' règles' + (p.depuisCache ? ', depuis le cache vérifié' : '')).join(' ; ') || 'aucun profil'); } catch (e) { etat('eRegles', txt(e.message), true); } };
+$('bExport').onclick = async () => {
+  try {
+    const projet = $('projet').value.trim();
+    const r = await api('/api/regles/export', { projet });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([r.contenu], { type: 'text/csv;charset=utf-8' }));
+    a.download = 'regles-' + projet + '.csv'; document.body.appendChild(a); a.click(); a.remove();
+    etat('eRegles', r.total + ' règles exportées, dont ' + r.actives + ' actives dans le profil du projet ; copie : <code>' + txt(r.fichier) + '</code>');
+  } catch (e) { etat('eRegles', txt(e.message), true); }
+};
 $('bRelecture').onclick = async () => { try { const r = await api('/api/relecture', { projet: $('projet').value.trim() }); etat('eRegles', 'Dossier écrit : <code>' + txt(r.fichier) + '</code> (' + r.regles + ' règles) — à remettre à l\'expert'); } catch (e) { etat('eRegles', txt(e.message), true); } };
 const TESTS_PRESETS = { maven: 'inclus dans mvn verify', npm: 'npx ng test --watch=false --code-coverage', personnalise: 'commande de tests, facultative' };
 $('scanner').onchange = () => { $('baseLibre').disabled = $('scanner').value !== 'personnalise'; $('tests').placeholder = TESTS_PRESETS[$('scanner').value]; };
@@ -743,6 +786,7 @@ export function creerServeur(pilote, { cle = crypto.randomBytes(18).toString('he
         'POST /api/perimetre': () => pilote.calculerPerimetre(corps.cible),
         'POST /api/regles': () => pilote.regles(corps.projet),
         'POST /api/relecture': () => pilote.dossierRelecture(corps.projet),
+        'POST /api/regles/export': () => pilote.exporterRegles(corps.projet),
         'POST /api/ephemere/proposer': () => pilote.proposerEphemere(corps),
         'POST /api/ephemere/lancer': () => pilote.lancerEphemere(corps.id),
       };
@@ -880,6 +924,18 @@ process.exit(Number(process.env.FAUX_CODE || 0));
     if (p === '/api/qualityprofiles/search') {
       if (url.searchParams.get('project') === 'acme-web') return json(200, { profiles: [{ key: 'AYprof-ts', name: 'Sonar way', language: 'ts', rulesUpdatedAt: '2026-09-01T08:00:00+0000' }] });
       return json(200, { profiles: [{ key: 'AYprof-java', name: 'Acme way', language: 'java', rulesUpdatedAt: etat.rulesUpdatedAt }] });
+    }
+    if (p === '/api/rules/search' && url.searchParams.get('languages')) {
+      const l = url.searchParams.get('languages');
+      const regles = l === 'ts'
+        ? [{ key: 'typescript:S1481', name: 'Variable locale inutilisée', lang: 'ts', type: 'CODE_SMELL', severity: 'MINOR', status: 'READY', impacts: [{ softwareQuality: 'MAINTAINABILITY', severity: 'LOW' }] },
+          { key: 'typescript:S1525', name: 'Instruction debugger', lang: 'ts', type: 'VULNERABILITY', severity: 'MINOR', status: 'DEPRECATED' },
+          { key: 'typescript:S9998', name: 'Règle hors profil', lang: 'ts', type: 'BUG', severity: 'MAJOR', status: 'READY', sysTags: ['suspicious'] }]
+        : [{ key: 'java:S6813', name: 'Injection par champ', lang: 'java', type: 'CODE_SMELL', severity: 'MAJOR', status: 'READY', impacts: [{ softwareQuality: 'MAINTAINABILITY', severity: 'MEDIUM' }] },
+          { key: 'java:S2077', name: 'Requête SQL "formatée"; à vérifier', lang: 'java', type: 'VULNERABILITY', severity: 'CRITICAL', status: 'READY', impacts: [{ softwareQuality: 'SECURITY', severity: 'HIGH' }] },
+          { key: 'java:S1481', name: 'Variable locale inutilisée', lang: 'java', type: 'CODE_SMELL', severity: 'MINOR', status: 'READY' },
+          { key: 'java:S9999', name: 'Règle hors profil', lang: 'java', type: 'BUG', severity: 'MAJOR', status: 'READY', scope: 'TEST' }];
+      return json(200, { total: regles.length, rules: Number(url.searchParams.get('p')) > 1 ? [] : regles });
     }
     if (p === '/api/rules/search') {
       etat.reglesLues++;
@@ -1283,6 +1339,27 @@ test('P25 : analyse absente de l\'instance, aucun constat inventé, suppression 
     assert.equal(s.pilote.journal.filter((x) => x.ecriture).length >= 1, true);
   } finally { s.fermer(); }
 });
+
+test('P26 : export CSV de toutes les règles des langages du projet, actives ou non dans son profil (D9.INV-4, D10.INV-2)', async () => {
+  const s = await demarrer();
+  try {
+    for (const [projet, total, actives, hors] of [['acme-api', 4, 3, 'java:S9999'], ['acme-web', 3, 2, 'typescript:S9998']]) {
+      const r = await s.appel('/api/regles/export', { projet });
+      assert.equal(r.status, 200, r.texte);
+      assert.equal(r.json.total, total);
+      assert.equal(r.json.actives, actives);
+      const lignes = r.json.contenu.split('\r\n');
+      assert.equal(lignes[0].charCodeAt(0), 0xfeff, 'BOM pour Excel');
+      assert.match(lignes[0], /^﻿clé de règle;langage;titre;type;qualité logicielle : gravité \(mode MQR\);/);
+      assert.ok(lignes.some((l) => l.startsWith(`${hors};`) && l.split(';')[7] === 'non'));
+      assert.equal(fs.readFileSync(path.join(depot, r.json.fichier), 'utf8'), r.json.contenu);
+      assert.equal(r.texte.includes(JETON), false);
+    }
+    const java = (await s.appel('/api/regles/export', { projet: 'acme-api' })).json.contenu;
+    assert.ok(java.includes('"Requête SQL ""formatée""; à vérifier"'), 'champ avec point-virgule et guillemets échappé');
+    assert.ok(java.includes('sécurité : haute'));
+  } finally { s.fermer(); }
+});
 ```
 
 ## 11. Recette réelle `tests/pilote-sonar.reel.test.mjs`
@@ -1358,9 +1435,10 @@ before(async () => {
   const scan = spawnSync(`${SCAN} -Dsonar.qualitygate.wait=false`, { cwd: depot, shell: true, env, encoding: 'utf8', timeout: LONG });
   assert.equal(scan.status, 0, `analyse du décor : ${(scan.stdout + scan.stderr).split(JETON).join('***').slice(-3000)}`);
 
-  // Modification à examiner : une instruction debugger et une variable inutilisée, sans test.
+  // Modification à examiner, sans test : trois règles actives de Sonar way pour JavaScript
+  // (S3504 déclaration par var, S1481 variable inutilisée, S1186 fonction vide).
   g('checkout', '-q', '-b', 'fonction-locale');
-  fs.writeFileSync(path.join(depot, 'src', 'nouveau.js'), 'export function double(x) {\n  const inutile = 42;\n  debugger;\n  return x * 2;\n}\n');
+  fs.writeFileSync(path.join(depot, 'src', 'nouveau.js'), 'export function double(x) {\n  var resultat = x * 2;\n  const inutile = 42;\n  return resultat;\n}\n\nexport function vide() {}\n');
   g('add', '.'); g('commit', '-q', '-m', 'ajoute double');
   pilote = new Pilote({ racine: depot, env });
 }, { timeout: LONG });
@@ -1399,13 +1477,16 @@ test('R3 : modes détectés, jeton absent de l\'état (D10.INV-2)', { skip: saut
   t.diagnostic(`serveur MCP hébergé : ${m.modes.find((x) => x.id === 'mcp-heberge').note}`);
 });
 
-test('R4 : périmètre et règles actives du profil réel, puis cache (D9.INV-3, D9.INV-4)', { skip: sauter }, async () => {
+test('R4 : périmètre, règles actives du profil réel, cache et export CSV (D9.INV-3, D9.INV-4)', { skip: sauter }, async () => {
   const p = await pilote.calculerPerimetre(brancheMain);
   assert.deepEqual(p.fichiers, ['src/nouveau.js']);
   const r1 = await pilote.regles(PROJET);
   assert.ok(r1.length >= 1 && r1.every((x) => x.regles.length > 0), 'au moins un profil avec des règles actives');
   const r2 = await pilote.regles(PROJET);
   assert.ok(r2.every((x) => x.depuisCache));
+  const e = await pilote.exporterRegles(PROJET);
+  assert.ok(e.total > e.actives && e.actives > 0, `export : ${e.total} règles, ${e.actives} actives`);
+  assert.equal(e.contenu.includes(JETON), false);
 }, { timeout: LONG });
 
 test('R5 : analyse éphémère réelle, tests et couverture remontés, constats au périmètre, branche supprimée (D9.INV-1, D9.INV-2, D9.INV-7)', { skip: sauter, timeout: LONG }, async () => {
@@ -1418,6 +1499,8 @@ test('R5 : analyse éphémère réelle, tests et couverture remontés, constats 
   // quality gate en échec : le scanner sort avec un code non nul, mais l'analyse a bien eu lieu
   assert.ok(r.qualityGate, `quality gate lu ; limites : ${r.limites.join(' ; ')}`);
   assert.ok(r.constats.length >= 1, `au moins un constat sur src/nouveau.js ; hors périmètre : ${r.horsPerimetre}`);
+  const attendues = ['javascript:S3504', 'javascript:S1481', 'javascript:S1186'].filter((k) => r.constats.some((c) => c.regle === k));
+  assert.ok(attendues.length >= 1, `au moins une des règles de Sonar way visées ; trouvées : ${r.constats.map((c) => c.regle).join(', ')}`);
   assert.ok(r.constats.every((c) => c.moteur === 'analyse éphémère' && c.composant.endsWith(':src/nouveau.js')));
   assert.ok(r.mesures.coverage != null || r.mesures.new_coverage != null, 'couverture importée depuis lcov.info');
   assert.deepEqual([r.suppression.faite, r.suppression.verifiee], [true, true], r.suppression.detail);

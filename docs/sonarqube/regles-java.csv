@@ -1,0 +1,781 @@
+﻿clé de règle;titre (anglais, tel que dans SonarQube);type;qualité logicielle : gravité (mode MQR);sévérité (mode standard);statut;dans Sonar way;dans Sonar agentic AI;portée;tags;effort de correction
+java:S100;Method names should comply with a naming convention;code smell;maintenabilité : basse;Minor;active;oui;non;code principal;convention;5min
+java:S101;Class names should comply with a naming convention;code smell;maintenabilité : basse;Minor;active;oui;non;code principal;convention;5min
+java:S103;Lines should not be too long;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;convention;1min
+java:S104;Files should not have too many lines of code;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;brain-overload;1h
+java:S105;Tabulation characters should not be used;code smell;maintenabilité : basse;Minor;active;non;non;code principal;convention;2min
+java:S106;Standard outputs should not be used directly to log anything;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;bad-practice, cert;10min
+java:S107;Methods should not have too many parameters;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;brain-overload;20min
+java:S108;Nested blocks of code should not be left empty;code smell;maintenabilité : moyenne;Major;active;oui;oui;tout;suspicious;5min
+java:S109;Magic numbers should not be used;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;brain-overload;5min
+java:S110;Inheritance tree of classes should not be too deep;code smell;maintenabilité : moyenne;Major;active;oui;non;code principal;;Number of parents above the defined threshold
+java:S112;Generic exceptions should never be thrown;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;cwe, error-handling, cert;20min
+java:S113;Files should end with a newline;code smell;maintenabilité : basse;Minor;active;non;non;code principal;convention;1min
+java:S114;Interface names should comply with a naming convention;code smell;maintenabilité : basse;Minor;active;oui;non;tout;convention;10min
+java:S115;Constant names should comply with a naming convention;code smell;maintenabilité : haute;Critical;active;oui;non;tout;convention;2min
+java:S116;Field names should comply with a naming convention;code smell;maintenabilité : basse;Minor;active;oui;non;tout;convention;2min
+java:S117;Local variable and method parameter names should comply with a naming convention;code smell;maintenabilité : basse;Minor;active;oui;non;tout;convention;2min
+java:S118;Abstract class names should comply with a naming convention;code smell;maintenabilité : basse;Minor;active;non;non;code principal;convention;10min
+java:S119;Type parameter names should comply with a naming convention;code smell;maintenabilité : basse;Minor;active;oui;oui;tout;convention;10min
+java:S120;Package names should comply with a naming convention;code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;convention;10min
+java:S121;Control structures should use curly braces;code smell;maintenabilité : haute;Critical;active;non;non;code principal;cert, pitfall;2min
+java:S122;Statements should be on separate lines;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;convention;1min
+java:S124;Track comments matching a regular expression;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;;0min
+java:S125;Sections of code should not be commented out;code smell;maintenabilité : moyenne;Major;active;oui;oui;tout;unused;5min
+java:S126;"""if ... else if"" constructs should end with ""else"" clauses";code smell;maintenabilité : haute;Critical;active;non;non;code principal;cert;5min
+java:S127;"""for"" loop stop conditions should be invariant";code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;pitfall;10min
+java:S128;"Switch cases should end with an unconditional ""break"" statement";code smell;maintenabilité : bloquante;Blocker;active;oui;oui;tout;cwe, cert, suspicious;10min
+java:S131;"""switch"" statements should have ""default"" clauses";code smell;maintenabilité : haute;Critical;active;oui;oui;tout;cwe, cert;5min
+java:S134;"Control flow statements ""if"", ""for"", ""while"", ""switch"" and ""try"" should not be nested too deeply";code smell;maintenabilité : haute;Critical;active;non;non;code principal;brain-overload;10min
+java:S135;"Loops should not contain more than a single ""break"" or ""continue"" statement";code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;brain-overload;"per extra [""break"" or ""continue""|""CONTINUE"", ""EXIT"", ""CHECK""] statement"
+java:S138;Methods should not have too many lines;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;brain-overload;20min
+java:S139;Comments should not be located at the end of lines of code;code smell;maintenabilité : basse;Minor;active;non;non;code principal;convention;1min
+java:S818;Literal suffixes should be upper case;code smell;maintenabilité : basse;Minor;active;non;non;code principal;convention, cert, pitfall;2min
+java:S864;Limited dependence should be placed on operator precedence;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;cwe, cert;2min
+java:S881;Increment (++) and decrement (--) operators should not be used in a method call or mixed with other operators in an expression;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;cert;5min
+java:S888;"Equality operators should not be used in ""for"" loop termination conditions";code smell;maintenabilité : haute;Critical;active;non;non;code principal;cwe, cert, suspicious;2min
+java:S899;Return values should not be ignored when they contain the operation status code;bug;fiabilité : basse;Minor;active;oui;oui;code principal;cwe, error-handling, cert;15min
+java:S909;"""continue"" should not be used";code smell;maintenabilité : basse;Minor;active;non;non;code principal;bad-practice;1h
+java:S923;Functions should not be defined with a variable number of arguments;code smell;maintenabilité : info;Info;active;non;non;code principal;cert, pitfall;1min
+java:S1065;Unused labels should be removed;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;cert, unused;2min
+java:S1066;"Mergeable ""if"" statements should be combined";code smell;maintenabilité : moyenne;Major;active;oui;non;tout;clumsy;5min
+java:S1067;Expressions should not be too complex;code smell;maintenabilité : haute;Critical;active;non;non;code principal;brain-overload;per complexity point above the threshold
+java:S1068;"Unused ""private"" fields should be removed";code smell;maintenabilité : moyenne;Major;active;oui;oui;tout;unused;5min
+java:S1075;URIs should not be hardcoded;code smell;maintenabilité : basse;Minor;active;oui;non;code principal;android, cert;20min
+java:S1104;Class variable fields should not have public accessibility;code smell;maintenabilité : basse;Minor;active;non;non;code principal;cwe;10min
+java:S1105;An open curly brace should be located at the end of a line;code smell;maintenabilité : basse;Minor;active;non;non;code principal;convention;1min
+java:S1106;An open curly brace should be located at the beginning of a line;code smell;maintenabilité : basse;Minor;active;non;non;code principal;convention;1min
+java:S1107;"Close curly brace and the next ""else"", ""catch"" and ""finally"" keywords should be located on the same line";code smell;maintenabilité : basse;Minor;active;non;non;code principal;convention;1min
+java:S1108;"Close curly brace and the next ""else"", ""catch"" and ""finally"" keywords should be on two different lines";code smell;maintenabilité : basse;Minor;active;non;non;code principal;convention;1min
+java:S1109;A close curly brace should be located at the beginning of a line;code smell;maintenabilité : basse;Minor;active;non;non;code principal;convention;1min
+java:S1110;Redundant pairs of parentheses should be removed;code smell;maintenabilité : moyenne;Major;active;oui;non;tout;confusing;1min
+java:S1111;"The ""Object.finalize()"" method should not be called";bug;fiabilité : moyenne;Major;active;oui;oui;code principal;cwe, cert;20min
+java:S1113;"The ""Object.finalize()"" method should not be overridden";code smell;maintenabilité : haute;Critical;active;oui;oui;code principal;unpredictable, cert;20min
+java:S1114;"""super.finalize()"" should be called at the end of ""Object.finalize()"" implementations";bug;;Critical;dépréciée;non;non;code principal;;5min
+java:S1116;Empty statements should be removed;code smell;maintenabilité : basse;Minor;active;oui;oui;tout;cert, unused;2min
+java:S1117;Local variables should not shadow class fields;code smell;maintenabilité : moyenne;Major;active;oui;oui;tout;cert, suspicious, pitfall;5min
+java:S1118;Utility classes should not have public constructors;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;design;5min
+java:S1119;Labels should not be used;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;confusing;30min
+java:S1120;Source code should be indented consistently;code smell;maintenabilité : basse;Minor;active;non;non;code principal;convention;1min
+java:S1121;Assignments should not be made from within sub-expressions;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;cwe, cert, suspicious;5min
+java:S1123;Deprecated elements should have both the annotation and the Javadoc tag;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;obsolete, bad-practice;5min
+java:S1124;Modifiers should be declared in the correct order;code smell;maintenabilité : basse;Minor;active;oui;non;tout;convention;2min
+java:S1125;Boolean literals should not be redundant;code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;clumsy;5min
+java:S1126;"Return of boolean expressions should not be wrapped into an ""if-then-else"" statement";code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;clumsy;2min
+java:S1128;Unnecessary imports should be removed;code smell;maintenabilité : basse;Minor;active;oui;oui;tout;unused;1min
+java:S1130;"Exceptions in ""throws"" clauses should not be superfluous";code smell;maintenabilité : basse;Minor;active;oui;oui;tout;error-handling, unused, redundant, clumsy;5min
+java:S1132;Strings literals should be placed on the left side when checking for equality;code smell;maintenabilité : basse;Minor;active;non;non;code principal;bad-practice;10min
+java:S1133;Deprecated code should be removed;code smell;maintenabilité : info;Info;active;oui;oui;code principal;obsolete;10min
+java:S1134;"Track uses of ""FIXME"" tags";code smell;maintenabilité : moyenne;Major;active;oui;oui;tout;cwe;0min
+java:S1135;"Track uses of ""TODO"" tags";code smell;maintenabilité : info;Info;active;oui;oui;tout;cwe;0min
+java:S1141;Try-catch blocks should not be nested;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;error-handling, confusing;20min
+java:S1142;Methods should not have too many return statements;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;brain-overload;20min
+java:S1143;"Jump statements should not occur in ""finally"" blocks";bug;fiabilité : haute;Critical;active;oui;oui;code principal;cwe, error-handling, cert;30min
+java:S1144;"Unused ""private"" methods should be removed";code smell;maintenabilité : moyenne;Major;active;oui;oui;tout;unused;2min
+java:S1147;Exit methods should not be called;code smell;maintenabilité : bloquante;Blocker;active;non;non;code principal;cwe, cert, suspicious;30min
+java:S1149;"Synchronized classes ""Vector"", ""Hashtable"", ""Stack"" and ""StringBuffer"" should not be used";code smell;maintenabilité : moyenne;Major;active;non;non;code principal;performance;20min
+java:S1150;"""Enumeration"" should not be implemented";code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;obsolete;30min
+java:S1151;"""switch case"" clauses should not have too many lines of code";code smell;maintenabilité : moyenne;Major;active;non;non;code principal;brain-overload;5min
+java:S1153;"""String.valueOf()"" should not be appended to a ""String""";code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;clumsy;5min
+java:S1155;"""Collection.isEmpty()"" should be used to test for emptiness";code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;clumsy;2min
+java:S1157;Case insensitive string comparisons should be made without intermediate upper or lower casing;code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;clumsy, performance;5min
+java:S1158;"Primitive wrappers should not be instantiated only for ""toString"" or ""compareTo"" calls";code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;clumsy, performance;5min
+java:S1160;Public methods should throw at most one checked exception;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;error-handling;20min
+java:S1161;"""@Override"" should be used on overriding and implementing methods";code smell;maintenabilité : moyenne;Major;active;oui;oui;tout;bad-practice;5min
+java:S1162;Checked exceptions should not be thrown;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;error-handling;1h
+java:S1163;Exceptions should not be thrown in finally blocks;code smell;maintenabilité : haute;Critical;active;oui;oui;code principal;error-handling, cert, suspicious;30min
+java:S1165;Exception classes should have final fields;code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;error-handling;15min
+java:S1166;Exception handlers should preserve the original exceptions;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;cwe, error-handling, cert, suspicious;10min
+java:S1168;Empty arrays and collections should be returned instead of null;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;cert;30min
+java:S1170;"Public constants and fields initialized at declaration should be ""static final"" rather than merely ""final""";code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;convention;2min
+java:S1171;Only static class initializers should be used;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;pitfall;30min
+java:S1172;Unused method parameters should be removed;code smell;maintenabilité : moyenne;Major;active;oui;oui;tout;cert, unused;5min
+java:S1174;"""Object.finalize()"" should remain protected (versus public) when overriding";code smell;maintenabilité : haute;Critical;active;oui;oui;code principal;cwe, cert;10min
+java:S1175;"The signature of ""finalize()"" should match that of ""Object.finalize()""";bug;fiabilité : haute;Critical;active;oui;oui;code principal;pitfall;10min
+java:S1176;Public types, methods and fields (API) should be documented with Javadoc;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;convention;10min
+java:S1181;Throwable and Error should not be caught;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;cwe, error-handling, bad-practice, cert;20min
+java:S1182;"Classes that override ""clone"" should be ""Cloneable"" and call ""super.clone()""";code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;convention, cwe, cert;20min
+java:S1185;Overriding methods should do more than simply call the same method in the super class ;code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;redundant, clumsy;2min
+java:S1186;Methods should not be empty;code smell;maintenabilité : haute;Critical;active;oui;oui;tout;suspicious;5min
+java:S1188;Anonymous classes should not have too many lines;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;;20min
+java:S1190;Future keywords should not be used as names;code smell;maintenabilité : bloquante;Blocker;active;oui;oui;code principal;obsolete, pitfall;5min
+java:S1191;"Classes from ""sun.*"" packages should not be used";code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;lock-in, pitfall;"per ""sun"" import"
+java:S1192;String literals should not be duplicated;code smell;maintenabilité : haute;Critical;active;oui;oui;code principal;design;per duplicate instance
+java:S1193;"Exception types should not be tested using ""instanceof"" in catch blocks";code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;error-handling, cert, clumsy;10min
+java:S1194;"""java.lang.Error"" should not be extended";code smell;maintenabilité : moyenne;Major;active;non;non;code principal;error-handling;10min
+java:S1195;"Array designators ""[]"" should be located after the type in method signatures";code smell;maintenabilité : basse;Minor;active;oui;non;code principal;convention;5min
+java:S1197;"Array designators ""[]"" should be on the type, not the variable";code smell;maintenabilité : basse;Minor;active;oui;non;tout;convention;5min
+java:S1199;Nested code blocks should not be used;code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;bad-practice;10min
+java:S1200;Classes should not be coupled to too many other classes;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;brain-overload;2h
+java:S1201;"""equals"" method overrides should accept ""Object"" parameters";bug;fiabilité : moyenne;Major;active;oui;oui;code principal;suspicious;10min
+java:S1206;"""equals(Object obj)"" and ""hashCode()"" should be overridden in pairs";bug;fiabilité : basse;Minor;active;oui;oui;code principal;cwe, cert;15min
+java:S1210;"""equals(Object obj)"" should be overridden along with the ""compareTo(T obj)"" method";code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;;15min
+java:S1213;The members of an interface or class declaration should appear in a pre-defined order;code smell;maintenabilité : basse;Minor;active;non;non;code principal;convention;5min
+java:S1214;Interfaces should not solely consist of constants;code smell;maintenabilité : haute;Critical;active;oui;oui;code principal;bad-practice;10min
+java:S1215;Execution of the Garbage Collector should be triggered only by the JVM;code smell;maintenabilité : haute;Critical;active;oui;oui;code principal;unpredictable, bad-practice;30min
+java:S1217;"""Thread.run()"" should not be called directly";bug;fiabilité : moyenne;Major;active;oui;oui;code principal;cwe, multi-threading, cert;20min
+java:S1219;"""switch"" statements should not contain non-case labels";code smell;maintenabilité : bloquante;Blocker;active;oui;oui;code principal;suspicious;10min
+java:S1220;The default unnamed package should not be used;code smell;maintenabilité : basse;Minor;active;oui;oui;tout;convention;10min
+java:S1221;"Methods should not be named ""tostring"", ""hashcode"" or ""equal""";bug;fiabilité : moyenne;Major;active;oui;oui;code principal;pitfall;10min
+java:S1223;Non-constructor methods should not have the same name as the enclosing class;code smell;maintenabilité : moyenne;Major;active;oui;oui;tout;pitfall;5min
+java:S1226;Method parameters, caught exceptions and foreach variables' initial values should not be ignored;bug;fiabilité : basse;Minor;active;oui;oui;code principal;;5min
+java:S1228;Packages should have a javadoc file 'package-info.java';code smell;maintenabilité : basse;Minor;active;non;non;code principal;convention;20min
+java:S1244;Floating point numbers should not be tested for equality;bug;fiabilité : moyenne;Major;active;non;non;code principal;;5min
+java:S1258;Classes and enums with private members should have a constructor;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;pitfall;5min
+java:S1264;"A ""while"" loop should be used instead of a ""for"" loop";code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;clumsy;5min
+java:S1291;"Track uses of ""NOSONAR"" comments";code smell;;Major;active;non;non;tout;bad-practice;1min
+java:S1301;"""switch"" statements should have at least 3 ""case"" clauses";code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;bad-practice;5min
+java:S1309;"Track uses of ""@SuppressWarnings"" annotations";code smell;maintenabilité : info;Info;active;non;non;code principal;;10min
+java:S1310;"Track uses of ""NOPMD"" suppression comments ";code smell;maintenabilité : basse;Minor;active;non;non;code principal;bad-practice;10min
+java:S1312;"Loggers should be ""private static final"" and should share a naming convention";code smell;maintenabilité : basse;Minor;active;non;non;code principal;convention, logging;5min
+java:S1313;IP addresses should not be hardcoded;code smell;sécurité : basse;Minor;active;oui;oui;code principal;cert, former-hotspot;30min
+java:S1314;Octal values should not be used;code smell;maintenabilité : bloquante;Blocker;active;oui;non;code principal;cert, pitfall;5min
+java:S1315;"Track uses of ""CHECKSTYLE:OFF"" suppression comments";code smell;maintenabilité : basse;Minor;active;non;non;code principal;bad-practice;5min
+java:S1317;"""StringBuilder"" and ""StringBuffer"" should not be instantiated with a character ";bug;fiabilité : moyenne;Major;active;oui;oui;code principal;pitfall;5 min
+java:S1319;"Declarations should use Java collection interfaces such as ""List"" rather than specific implementation classes such as ""LinkedList""";code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;bad-practice;10min
+java:S1444;"""public static"" fields should be constant";code smell;maintenabilité : basse;Minor;active;non;non;code principal;cwe, cert;20min
+java:S1448;Classes should not have too many methods;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;brain-overload;1h
+java:S1449;String operations should not rely on the default system locale;code smell;maintenabilité : basse;Minor;active;non;non;code principal;unpredictable, cert;5min
+java:S1450;Private fields only used as local variables in methods should become local variables;code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;pitfall;5min
+java:S1451;Track lack of copyright and license headers;code smell;maintenabilité : bloquante;Blocker;active;non;non;code principal;convention;5min
+java:S1452;Generic wildcard types should not be used in return types;code smell;maintenabilité : haute;Critical;active;oui;oui;code principal;pitfall;20min
+java:S1479;"""switch"" statements should not have too many ""case"" clauses";code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;brain-overload;30min
+java:S1481;Unused local variables should be removed;code smell;maintenabilité : basse;Minor;active;oui;oui;tout;java22, unused;5min
+java:S1488;Local variables should not be declared and then immediately returned or thrown;code smell;maintenabilité : basse;Minor;active;oui;oui;tout;clumsy;2min
+java:S1541;Methods should not be too complex;code smell;maintenabilité : haute;Critical;active;non;non;code principal;brain-overload;per complexity point above the threshold
+java:S1596;"""Collections.EMPTY_LIST"", ""EMPTY_MAP"", and ""EMPTY_SET"" should not be used";code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;obsolete, pitfall;2min
+java:S1598;Package declaration should match source file directory;code smell;maintenabilité : haute;Critical;active;oui;oui;tout;pitfall;5min
+java:S1602;Lambdas containing only one statement should not nest this statement in a block;code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;java8;5min
+java:S1604;Anonymous inner classes containing only one method should become lambdas;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;java8;5min
+java:S1607;JUnit4 @Ignored and JUnit5 @Disabled annotations should be used to disable tests and should provide a rationale;code smell;maintenabilité : moyenne;Major;active;oui;oui;tests;junit, tests, bad-practice, confusing, suspicious;10min
+java:S1610;Abstract classes without fields should be converted to interfaces;code smell;maintenabilité : basse;Minor;dépréciée;non;non;code principal;;10min
+java:S1611;Parentheses should be removed from a single lambda parameter when its type is inferred;code smell;maintenabilité : basse;Minor;active;oui;non;tout;java8;2min
+java:S1612;Lambdas should be replaced with method references;code smell;maintenabilité : basse;Minor;active;oui;oui;tout;java8;2min
+java:S1640;Maps with keys that are enum values should use the EnumMap implementation;code smell;maintenabilité : basse;Minor;active;oui;oui;tout;performance;5min
+java:S1641;Sets with elements that are enum values should be replaced with EnumSet;code smell;maintenabilité : basse;Minor;active;non;non;code principal;performance;5min
+java:S1643;Strings should not be concatenated using '+' in a loop;code smell;maintenabilité : basse;Minor;active;oui;oui;tout;performance;10min
+java:S1656;Variables should not be self-assigned;bug;fiabilité : moyenne;Major;active;oui;oui;tout;cert;3min
+java:S1659;Multiple variables should not be declared on the same line;code smell;maintenabilité : basse;Minor;active;oui;non;code principal;convention, cert;2min
+java:S1694;An abstract class should have both abstract and concrete methods;code smell;maintenabilité : basse;Minor;active;non;non;code principal;convention;5min
+java:S1695;"""NullPointerException"" should not be explicitly thrown";code smell;maintenabilité : moyenne;Major;active;oui;non;code principal;cert, convention, error-handling, pitfall;5min
+java:S1696;"""NullPointerException"" should not be caught";code smell;maintenabilité : moyenne;Major;active;non;non;code principal;cwe, error-handling, cert;5min
+java:S1698;"""=="" and ""!="" should not be used when ""equals"" is overridden";code smell;maintenabilité : basse;Minor;active;non;non;code principal;cwe, cert, suspicious;2min
+java:S1699;Constructors should only call non-overridable methods;code smell;maintenabilité : haute;Critical;active;non;non;code principal;cert, pitfall;10min
+java:S1700;A field should not duplicate the name of its containing class;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;brain-overload;10min
+java:S1710;Annotation repetitions should not be wrapped;code smell;maintenabilité : basse;Minor;active;oui;non;tout;java8;2min
+java:S1711;Standard functional interfaces should not be redefined;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;java8;10min
+java:S1751;Loops with at most one iteration should be refactored;bug;fiabilité : moyenne;Major;active;oui;oui;tout;confusing, bad-practice;5min
+java:S1764;Identical expressions should not be used on both sides of a binary operator;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;cert;2min
+java:S1774;The ternary operator should not be used;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;brain-overload;5min
+java:S1820;Classes should not have too many fields;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;brain-overload;1h
+java:S1821;"""switch"" statements and expressions should not be nested";code smell;maintenabilité : haute;Critical;active;non;non;code principal;pitfall;10min
+java:S1844;"""Object.wait"" should not be called on objects that implement ""java.util.concurrent.locks.Condition""";code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;suspicious;20min
+java:S1845;Methods and field names should not be the same or differ only by capitalization;code smell;maintenabilité : bloquante;Blocker;active;oui;oui;code principal;confusing;10min
+java:S1849;"""Iterator.hasNext()"" should not call ""Iterator.next()""";bug;fiabilité : moyenne;Major;active;oui;oui;tout;;20min
+java:S1854;Unused assignments should be removed;code smell;maintenabilité : moyenne;Major;active;oui;oui;tout;cwe, cert, unused;1min
+java:S1858;"""toString()"" should never be called on a String object";code smell;maintenabilité : basse;Minor;active;oui;oui;tout;finding, clumsy;2min
+java:S1860;Synchronization should not be done on instances of value-based classes;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;multi-threading, cert;15min
+java:S1862;"Related ""if/else if"" statements should not have the same condition";bug;fiabilité : moyenne;Major;active;oui;oui;tout;cert, unused, pitfall;10min
+java:S1871;Two branches in a conditional structure should not have exactly the same implementation;code smell;maintenabilité : moyenne;Major;active;oui;oui;tout;design, suspicious;10min
+java:S1872;Classes should not be compared by name;bug;fiabilité : moyenne;Major;active;oui;oui;tout;cwe, cert;5min
+java:S1874;"""@Deprecated"" code should not be used";code smell;maintenabilité : basse;Minor;active;non;non;tout;cwe, obsolete, cert;15min
+java:S1905;Redundant casts should not be used;code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;redundant, clumsy;5min
+java:S1939;Extensions and implementations should not be redundant;code smell;maintenabilité : basse;Minor;active;non;non;code principal;clumsy;1min
+java:S1940;Boolean checks should not be inverted;code smell;maintenabilité : basse;Minor;active;oui;oui;tout;pitfall;2min
+java:S1941;Variables should not be declared before they are relevant;code smell;maintenabilité : basse;Minor;active;non;non;code principal;brain-overload;5min
+java:S1942;Simple class names should be used;code smell;maintenabilité : basse;Minor;active;non;non;code principal;confusing, redundant;2min
+java:S1943;Classes and methods that rely on the default system encoding should not be used;code smell;maintenabilité : basse;Minor;active;non;non;code principal;unpredictable, cert, i18n;15min
+java:S1948;"Fields in a ""Serializable"" class should either be transient or serializable";code smell;maintenabilité : haute;Critical;active;oui;oui;code principal;cwe, serialization;30min
+java:S1989;Exceptions should not be thrown from servlet methods;vulnérabilité;sécurité : basse;Minor;active;oui;oui;code principal;cwe, error-handling, cert;20min
+java:S1994;"""for"" loop increment clauses should modify the loops' counters";code smell;maintenabilité : haute;Critical;active;oui;oui;tout;confusing;20min
+java:S1996;Files should contain only one top-level class or interface each;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;brain-overload;per extra type
+java:S2039;Member variable visibility should be specified;code smell;maintenabilité : basse;Minor;active;non;non;code principal;;5min
+java:S2047;"The names of methods with boolean return values should start with ""is"" or ""has""";code smell;maintenabilité : moyenne;Major;active;non;non;code principal;convention;15min
+java:S2053;Password hashing functions should use an unpredictable salt;vulnérabilité;sécurité : haute;Critical;active;oui;oui;code principal;cryptography, cwe;30min
+java:S2055;"The non-serializable super class of a ""Serializable"" class should have a no-argument constructor";bug;fiabilité : basse;Minor;active;oui;oui;code principal;serialization;30min
+java:S2057;"""Serializable"" classes should have a ""serialVersionUID""";code smell;maintenabilité : haute;Critical;active;non;non;code principal;serialization, cert, pitfall;5min
+java:S2059;"""Serializable"" inner classes of ""Serializable"" classes should be static";code smell;maintenabilité : basse;Minor;active;non;non;code principal;serialization, cert, pitfall;15min
+java:S2060;"""Externalizable"" classes should have no-arguments constructors";bug;fiabilité : moyenne;Major;active;oui;oui;code principal;;20min
+java:S2061;Custom serialization methods should have required signatures;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;cert;5min
+java:S2062;"""readResolve"" methods should be inheritable";code smell;maintenabilité : haute;Critical;active;oui;oui;code principal;pitfall;5min
+java:S2063;"Comparators should be ""Serializable""";code smell;maintenabilité : haute;Critical;active;non;non;code principal;serialization, pitfall;5min
+java:S2065;"Fields in non-serializable classes should not be ""transient""";code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;serialization, unused;2min
+java:S2066;"""Serializable"" inner classes of non-serializable outer classes should be ""static""";bug;fiabilité : basse;Minor;active;oui;oui;code principal;serialization, cert;15min
+java:S2068;Credentials should not be hard-coded;vulnérabilité;sécurité : moyenne;Major;active;oui;oui;code principal;cwe, cert, former-hotspot, secret;30min
+java:S2077;SQL queries should not be dynamically formatted;vulnérabilité;maintenabilité : basse, sécurité : moyenne;Major;active;oui;oui;code principal;cwe, spring, bad-practice, cert, hibernate, sql, former-hotspot;20min
+java:S2092;"Cookies should have the ""secure"" flag";vulnérabilité;sécurité : basse;Minor;active;oui;oui;code principal;cwe, spring, privacy, former-hotspot;5min
+java:S2093;Try-with-resources should be used;code smell;maintenabilité : haute;Critical;active;oui;oui;tout;java8, cert, pitfall;15min
+java:S2094;Classes should not be empty;code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;clumsy;5min
+java:S2096;"""main"" should not ""throw"" anything";code smell;maintenabilité : bloquante;Blocker;active;non;non;code principal;error-handling;15min
+java:S2097;"""equals(Object obj)"" should test the argument's type";bug;fiabilité : basse;Minor;active;oui;oui;code principal;;5min
+java:S2109;Reflection should not be used to check non-runtime annotations;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;;15min
+java:S2110;"Invalid ""Date"" values should not be used";bug;fiabilité : moyenne;Major;active;oui;oui;code principal;;5min
+java:S2111;"""BigDecimal(double)"" should not be used";bug;fiabilité : moyenne;Major;active;oui;oui;code principal;cert;5min
+java:S2112;"""URL.hashCode"" and ""URL.equals"" should be avoided";code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;performance;20min
+java:S2114;Collections should not be passed as arguments to their own methods;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;;15min
+java:S2115;A secure password should be used when connecting to a database;vulnérabilité;sécurité : bloquante;Blocker;active;oui;oui;code principal;cwe, secret;45min
+java:S2116;"""hashCode"" and ""toString"" should not be called on array instances";bug;fiabilité : moyenne;Major;active;oui;oui;code principal;;5min
+java:S2118;"""writeObject"" argument must implement ""Serializable""";bug;fiabilité : moyenne;Major;active;oui;oui;code principal;serialization;15min
+java:S2119;"""Random"" objects should be reused";bug;fiabilité : haute;Critical;active;oui;oui;code principal;;5min
+java:S2121;String operations with predictable outcomes should be avoided;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;clumsy;5min
+java:S2122;"""ScheduledThreadPoolExecutor"" should not have 0 core threads";bug;fiabilité : haute;Critical;active;oui;oui;code principal;;20min
+java:S2123;Values should not be uselessly incremented;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;unused;5min
+java:S2127;"""Double.longBitsToDouble"" should take ""long"" as argument";bug;fiabilité : moyenne;Major;active;oui;oui;code principal;;15min
+java:S2129;"Constructors should not be used to instantiate ""String"", ""BigInteger"", ""BigDecimal"" and primitive-wrapper classes";code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;performance;5min
+java:S2130;"Parsing should be used to convert ""Strings"" to primitives";code smell;maintenabilité : basse;Minor;active;oui;oui;tout;performance;5min
+java:S2131;"Primitives should not be boxed just for ""String"" conversion";code smell;;Major;dépréciée;non;non;code principal;;5min
+java:S2133;"Objects should not be created only to invoke ""getClass""";code smell;maintenabilité : moyenne;Major;active;oui;oui;tout;performance;5min
+java:S2134;"Classes extending java.lang.Thread should provide a specific ""run"" behavior";bug;fiabilité : moyenne;Major;active;oui;oui;code principal;multi-threading, pitfall;5min
+java:S2139;Exceptions should be either logged or rethrown but not both;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;logging, error-handling;15min
+java:S2140;"Methods of ""Random"" that return floating point values should not be used in random integer generation";code smell;maintenabilité : basse;Minor;active;oui;oui;tout;clumsy, performance;5min
+java:S2141;"Classes that don't define ""hashCode()"" should not be used in hashes";bug;fiabilité : moyenne;Major;active;non;non;code principal;;15min
+java:S2142;"""InterruptedException"" and ""ThreadDeath"" should not be ignored";bug;fiabilité : moyenne;Major;active;oui;oui;code principal;cwe, error-handling, multi-threading;15min
+java:S2143;"""java.time"" classes should be used for dates and times";code smell;maintenabilité : info;Info;active;oui;non;code principal;java8, pitfall;15min
+java:S2147;Catches should be combined;code smell;maintenabilité : basse;Minor;active;oui;oui;tout;clumsy;5min
+java:S2148;Underscores should be used to make large numbers readable;code smell;maintenabilité : basse;Minor;active;non;non;code principal;convention;5min
+java:S2151;"""runFinalizersOnExit"" should not be called";bug;fiabilité : haute;Critical;active;oui;oui;code principal;cert;20min
+java:S2153;Unnecessary boxing and unboxing should be avoided;bug;fiabilité : basse;Minor;active;oui;oui;tout;clumsy;5min
+java:S2154;Dissimilar primitive wrappers should not be used with the ternary operator without explicit casting;bug;fiabilité : moyenne;Major;active;oui;oui;tout;;5min
+java:S2156;"""final"" classes should not have ""protected"" members";code smell;maintenabilité : basse;Minor;active;non;non;code principal;confusing;5min
+java:S2157;"""Cloneables"" should implement ""clone""";code smell;maintenabilité : haute;Critical;active;oui;oui;code principal;convention, api-design;30min
+java:S2159;Unnecessary equality checks should not be made;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;cert, unused;15min
+java:S2160;"Subclasses that add fields to classes that override ""equals"" should also override ""equals""";code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;suspicious;30min
+java:S2162;"""equals"" methods should be symmetric and work for subclasses";bug;fiabilité : basse;Minor;active;non;non;code principal;cert;5min
+java:S2164;Math should not be performed on floats;bug;fiabilité : basse;Minor;active;non;non;code principal;cert;15min
+java:S2165;"""finalize"" should not set fields to ""null""";code smell;;Minor;dépréciée;non;non;code principal;;5min
+java:S2166;"Classes named like ""Exception"" should extend ""Exception"" or a subclass";code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;convention, error-handling, pitfall;5min
+java:S2167;"""compareTo"" should not return ""Integer.MIN_VALUE""";bug;fiabilité : basse;Minor;active;oui;oui;code principal;;5min
+java:S2168;Double-checked locking should not be used;bug;fiabilité : bloquante;Blocker;active;oui;oui;tout;cert, cwe, design, multi-threading, singleton;20min
+java:S2175;"Inappropriate ""Collection"" calls should not be made";bug;fiabilité : moyenne;Major;active;oui;oui;code principal;cert;15min
+java:S2176;Class names should not shadow interfaces or superclasses;code smell;maintenabilité : haute;Critical;active;oui;oui;code principal;pitfall;5min
+java:S2177;Child class methods named for parent class methods should be overrides;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;pitfall;30min
+java:S2178;Short-circuit logic should be used in boolean contexts;code smell;maintenabilité : bloquante;Blocker;active;oui;oui;tout;cert;5min
+java:S2183;Ints and longs should not be shifted by zero or more than their number of bits-1;bug;fiabilité : basse;Minor;active;oui;oui;tout;;5min
+java:S2184;Math operands should be cast before assignment;bug;fiabilité : basse;Minor;active;oui;oui;code principal;cwe, overflow, cert;5min
+java:S2185;Do not perform unnecessary mathematical operations;code smell;maintenabilité : moyenne;Major;active;oui;oui;tout;clumsy;15min
+java:S2186;"JUnit assertions should not be used in ""run"" methods";code smell;maintenabilité : haute;Critical;active;oui;oui;tests;junit, tests;30min
+java:S2187;TestCases should contain tests;code smell;maintenabilité : bloquante;Blocker;active;oui;oui;tests;junit, tests, unused, confusing;5min
+java:S2188;JUnit test cases should call super methods;code smell;maintenabilité : bloquante;Blocker;active;oui;oui;tests;junit, tests;5min
+java:S2196;"Switches should be used for sequences of simple ""String"" tests";code smell;maintenabilité : basse;Minor;active;non;non;code principal;clumsy;5min
+java:S2197;Modulus results should not be checked for direct equality;code smell;maintenabilité : haute;Critical;active;non;non;code principal;cert, suspicious;5min
+java:S2198;Unnecessary mathematical comparisons should not be made;code smell;maintenabilité : haute;Critical;active;oui;non;code principal;suspicious;15min
+java:S2200;"""compareTo"" results should not be checked for specific values";bug;fiabilité : basse;Minor;active;oui;oui;code principal;unpredictable;5min
+java:S2201;Return values from functions without side effects should not be ignored;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;cert;10min
+java:S2203;"""collect"" should be used with ""Streams"" instead of ""list::add""";code smell;maintenabilité : basse;Minor;active;non;non;code principal;java8;15min
+java:S2204;""".equals()"" should not be used to test the values of ""Atomic"" classes";bug;fiabilité : moyenne;Major;active;oui;oui;code principal;multi-threading;5min
+java:S2206;Do not mix field and getter persistence annotations;bug;fiabilité : bloquante;Blocker;active;oui;oui;code principal;jakarta;20min
+java:S2208;Wildcard imports should not be used;code smell;maintenabilité : haute;Critical;active;non;non;code principal;pitfall;5min
+java:S2209;"""static"" members should be accessed statically";code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;pitfall;5min
+java:S2211;Types should be used in lambdas;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;convention, java8;5min
+java:S2221;"""Exception"" should not be caught when not required by called methods";code smell;maintenabilité : basse;Minor;active;non;non;code principal;cwe, error-handling;15min
+java:S2225;"""toString()"" and ""clone()"" methods should not return null";bug;fiabilité : moyenne;Major;active;oui;oui;code principal;cwe, cert;5min
+java:S2226;Servlets should not have mutable instance fields;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;multi-threading, struts, cert;30min
+java:S2229;"Methods should not call same-class methods with incompatible ""@Transactional"" values";bug;fiabilité : bloquante;Blocker;active;oui;oui;code principal;spring;20min
+java:S2230;Methods with Spring proxying annotations should be public;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;spring;5min
+java:S2232;"""ResultSet.isLast()"" should not be used";code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;performance, pitfall, sql;10min
+java:S2234;Parameters should be passed in the correct order;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;;5min
+java:S2235;"""IllegalMonitorStateException"" should not be caught";code smell;maintenabilité : haute;Critical;active;oui;oui;code principal;error-handling, multi-threading;20min
+java:S2236;"Methods ""wait(...)"", ""notify()"" and ""notifyAll()"" should not be called on Thread instances";bug;fiabilité : bloquante;Blocker;active;oui;oui;code principal;multi-threading;30min
+java:S2245;Pseudorandom number generators (PRNGs) should not be used in security contexts;vulnérabilité;sécurité : moyenne;Major;active;oui;oui;code principal;cryptography, cwe, former-hotspot;10min
+java:S2250;Collection methods with O(n) performance should be used carefully;code smell;maintenabilité : basse;Minor;active;non;non;code principal;performance;15min
+java:S2251;"A ""for"" loop update clause should move the counter in the right direction";bug;fiabilité : moyenne;Major;active;oui;oui;code principal;cert;5min
+java:S2252;Loop conditions should be true at least once;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;;10min
+java:S2253;Track uses of disallowed methods;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;;0min
+java:S2254;"""HttpServletRequest.getRequestedSessionId()"" should not be used";vulnérabilité;sécurité : haute;Critical;active;oui;oui;code principal;cwe;10min
+java:S2257;Custom cryptographic algorithms should not be used;vulnérabilité;sécurité : haute;Critical;active;oui;oui;code principal;cryptography, cwe, former-hotspot;1d
+java:S2260;Java parser failure;code smell;;Major;active;non;non;tout;suspicious;30min
+java:S2272;"""Iterator.next()"" methods should throw ""NoSuchElementException""";bug;fiabilité : basse;Minor;active;oui;oui;code principal;error-handling, unpredictable;5min
+java:S2273;"""Object.wait()"", ""Object.notify()"" and ""Object.notifyAll()"" should only be called from synchronized code";bug;fiabilité : moyenne;Major;active;oui;oui;code principal;multi-threading;20min
+java:S2274;"""Object.wait(...)"" and ""Condition.await(...)"" should be called inside a ""while"" loop";code smell;maintenabilité : haute;Critical;active;oui;oui;code principal;multi-threading, cert;20min
+java:S2275;Printf-style format strings should not lead to unexpected behavior at runtime;bug;fiabilité : bloquante;Blocker;active;oui;oui;code principal;cert;10min
+java:S2276;"""wait(...)"" should be used instead of ""Thread.sleep(...)"" when a lock is held";bug;fiabilité : bloquante;Blocker;active;oui;oui;code principal;multi-threading, performance, cert;5min
+java:S2293;"The diamond operator (""<>"") should be used";code smell;maintenabilité : basse;Minor;active;non;non;code principal;clumsy;1min
+java:S2301;Public methods should not contain selector arguments;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;design;15min
+java:S2308;"""deleteOnExit"" should not be used";code smell;maintenabilité : moyenne;Major;active;non;non;code principal;performance;30min
+java:S2309;Files should not be empty;code smell;maintenabilité : basse;Minor;active;non;non;code principal;unused;5min
+java:S2325;"""private"" and ""final"" methods that don't access instance data should be ""static""";code smell;maintenabilité : basse;Minor;active;non;non;code principal;pitfall;5min
+java:S2326;Unused type parameters should be removed;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;unused;5min
+java:S2333;Redundant modifiers should not be used;code smell;maintenabilité : basse;Minor;active;non;non;code principal;finding, clumsy;2min
+java:S2384;Private mutable members should not be stored or returned directly;code smell;maintenabilité : basse;Minor;active;non;non;code principal;cwe, unpredictable, cert;5min
+java:S2386;"Mutable fields should not be ""public static""";code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;cwe, unpredictable, cert;15min
+java:S2387;Child class fields should not shadow parent class fields;code smell;maintenabilité : bloquante;Blocker;active;oui;oui;code principal;confusing;5min
+java:S2388;Inner class calls to super class methods should be unambiguous;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;pitfall;5min
+java:S2390;Classes should not access their own subclasses during class initialization;bug;fiabilité : haute;Critical;active;oui;oui;code principal;cert;20min
+java:S2437;Unnecessary bit operations should not be performed;code smell;maintenabilité : bloquante;Blocker;active;oui;oui;code principal;suspicious;5min
+java:S2438;"""Thread"" should not be used where a ""Runnable"" argument is expected";code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;multi-threading, pitfall;15min
+java:S2440;"Classes with only ""static"" methods should not be instantiated";code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;clumsy;2min
+java:S2441;"Non-serializable objects should not be stored in ""javax.servlet.http.HttpSession"" instances";bug;fiabilité : moyenne;Major;active;oui;oui;code principal;cwe;20min
+java:S2442;"Synchronizing on a ""java.util.concurrent"" object should be avoided";code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;multi-threading, cert, clumsy;15min
+java:S2444;"Lazy initialization of ""static"" fields should be ""synchronized""";code smell;maintenabilité : haute;Critical;active;non;non;code principal;multi-threading;30min
+java:S2445;"Blocks should be synchronized on ""private final"" fields";bug;fiabilité : moyenne;Major;active;oui;oui;code principal;cwe, multi-threading, cert;15min
+java:S2446;"""notifyAll()"" should be preferred over ""notify()""";bug;fiabilité : moyenne;Major;active;oui;oui;code principal;multi-threading, cert;2min
+java:S2447;"""null"" should not be returned from a ""Boolean"" method";code smell;maintenabilité : haute;Critical;active;oui;oui;code principal;cwe, cert, pitfall;20min
+java:S2479;Whitespace and control characters in literals should be explicit;code smell;maintenabilité : haute;Critical;active;oui;oui;code principal;pitfall;10min
+java:S2612;File permissions should not be set to world-accessible values;vulnérabilité;sécurité : moyenne;Major;active;oui;oui;code principal;cwe, cert, former-hotspot;5min
+java:S2629;"""Preconditions"" and logging arguments should not require evaluation";code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;performance;5min
+java:S2638;Method overrides should not change contracts;code smell;maintenabilité : haute;Critical;active;oui;oui;code principal;suspicious;15min
+java:S2639;Inappropriate regular expressions should not be used;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;;15min
+java:S2647;Basic authentication should not be used;vulnérabilité;sécurité : haute;Critical;dépréciée;non;non;code principal;;2h
+java:S2654;JEE applications should not use threads or synchronization;bug;fiabilité : haute;Critical;active;oui;oui;code principal;cwe, multi-threading, jakarta, jee;45min
+java:S2658;Classes should not be loaded dynamically;vulnérabilité;sécurité : haute;Critical;dépréciée;non;non;code principal;;45min
+java:S2674;The value returned from a stream read should be checked;bug;fiabilité : basse;Minor;active;oui;oui;code principal;cert;15min
+java:S2675;"""readObject"" should not be ""synchronized""";code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;confusing;2min
+java:S2676;"""Math.abs"" and negation should not be used on numbers that could be ""MIN_VALUE""";bug;fiabilité : basse;Minor;active;oui;oui;code principal;bug, suspicious;5min
+java:S2677;"""read"" and ""readLine"" return values should be used";bug;fiabilité : moyenne;Major;active;oui;oui;code principal;;5min
+java:S2681;Multiline blocks should be enclosed in curly braces;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;cwe, cert;5min
+java:S2692;"""indexOf"" checks should not be for positive numbers";code smell;maintenabilité : haute;Critical;active;oui;oui;code principal;suspicious;2min
+java:S2693;Threads should not be started in constructors;code smell;maintenabilité : bloquante;Blocker;active;non;non;code principal;multi-threading, cert, pitfall;30min
+java:S2694;"Inner classes which do not reference their owning classes should be ""static""";code smell;maintenabilité : moyenne;Major;active;non;non;code principal;performance;15min
+java:S2695;"""PreparedStatement"" and ""ResultSet"" methods should be called with valid indices";bug;fiabilité : bloquante;Blocker;active;oui;oui;code principal;sql;2min
+java:S2696;"Instance methods should not write to ""static"" fields";code smell;maintenabilité : haute;Critical;active;oui;oui;code principal;multi-threading;20min
+java:S2698;Test assertions should include messages;code smell;maintenabilité : basse;Minor;active;non;non;tests;junit, tests;5min
+java:S2699;Tests should include assertions;code smell;maintenabilité : bloquante;Blocker;active;oui;oui;tests;junit, tests;10min
+java:S2701;Literal boolean values and nulls should not be used in assertions;code smell;maintenabilité : basse;Minor;active;non;non;tests;junit, tests;5min
+java:S2718;"""DateUtils.truncate"" from Apache Commons Lang library should not be used";code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;performance, java8;10min
+java:S2737;"""catch"" clauses should do more than rethrow";code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;error-handling, unused, finding, clumsy;5min
+java:S2757;"Non-existent operators like ""=+"" should not be used";bug;fiabilité : moyenne;Major;active;oui;oui;code principal;;2min
+java:S2761;Unary prefix operators should not be repeated;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;;5min
+java:S2786;"Nested ""enum""s should not be declared static";code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;redundant;2min
+java:S2789;"""null"" should not be used with ""Optional""";bug;fiabilité : moyenne;Major;active;oui;oui;code principal;java8;15min
+java:S2864;"""entrySet()"" should be iterated when both the key and value are needed";code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;performance;5min
+java:S2885;Non-thread-safe fields should not be static;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;multi-threading;15min
+java:S2886;Getters and setters should be synchronized in pairs;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;multi-threading, cert;5min
+java:S2924;JUnit rules should be used;code smell;maintenabilité : basse;Minor;active;oui;oui;tests;junit, tests, unused;5min
+java:S2925;"""Thread.sleep"" should not be used in tests";code smell;maintenabilité : moyenne;Major;active;oui;oui;tests;tests, bad-practice;20min
+java:S2959;Unnecessary semicolons should be omitted;code smell;maintenabilité : basse;Minor;active;non;non;code principal;convention;1min
+java:S2970;Assertions should be complete;code smell;maintenabilité : bloquante;Blocker;active;oui;oui;tests;tests, assertj, mockito;5min
+java:S2972;Inner classes should not have too many lines of code;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;brain-overload;20min
+java:S2973;Escaped Unicode characters should not be used;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;confusing;5min
+java:S2974;"Classes without ""public"" constructors should be ""final""";code smell;maintenabilité : basse;Minor;active;non;non;code principal;design;5min
+java:S2975;"""clone"" should not be overridden";code smell;maintenabilité : bloquante;Blocker;active;oui;oui;code principal;suspicious;30min
+java:S3008;Static non-final field names should comply with a naming convention;code smell;maintenabilité : basse;Minor;active;non;non;tout;convention;2min
+java:S3010;Static fields should not be updated in constructors;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;;20min
+java:S3011;Reflection should not be used to increase accessibility of classes, methods, or fields;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;cert;30min
+java:S3012;Arrays and lists should not be copied using loops;code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;clumsy;5min
+java:S3014;"""ThreadGroup"" should not be used";code smell;maintenabilité : bloquante;Blocker;active;oui;oui;code principal;design, cert, suspicious;45min
+java:S3020;"""Collection.toArray()"" should be passed an array of the proper type";bug;fiabilité : basse;Minor;active;oui;oui;code principal;;5min
+java:S3024;"Arguments to ""append"" should not be concatenated";code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;performance, clumsy;2min
+java:S3030;"Classes should not have too many ""static"" imports";code smell;maintenabilité : moyenne;Major;active;non;non;code principal;brain-overload;30min
+java:S3032;"JEE applications should not ""getClassLoader""";bug;fiabilité : basse;Minor;active;non;non;code principal;jee;5min
+java:S3033;""".isEmpty"" should be used to test for the emptiness of StringBuffers/Builders";code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;performance, clumsy;5min
+java:S3034;Raw byte values should not be used in bitwise operations in combination with shifts;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;cert;5min
+java:S3037;Record component accessors should not be called before the fields are assigned;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;java16;5min
+java:S3038;Abstract methods should not be redundant;code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;confusing;2min
+java:S3039;"Indexes to passed to ""String"" operations should be within the string's bounds";bug;fiabilité : moyenne;Major;active;oui;oui;code principal;;15min
+java:S3042;"""writeObject"" should not be the only ""synchronized"" code in a class";code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;confusing;20min
+java:S3046;"""wait"" should not be called when multiple locks are held";bug;fiabilité : bloquante;Blocker;active;oui;oui;code principal;multi-threading, deadlock;30min
+java:S3047;Multiple loops over the same set should be combined;code smell;maintenabilité : basse;Minor;active;non;non;code principal;performance;20min
+java:S3051;"""main"" should have the right signature";code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;convention, confusing;15min
+java:S3052;Fields should not be initialized to default values;code smell;maintenabilité : basse;Minor;active;non;non;code principal;convention, finding;2min
+java:S3063;"""StringBuilder"" data should be used";code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;performance;5min
+java:S3064;Assignment of lazy-initialized members should be the last step with double-checked locking;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;multi-threading, cert;5min
+java:S3066;"""enum"" fields should not be publicly mutable";code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;bad-practice;20min
+java:S3067;"""getClass"" should not be used for synchronization";bug;fiabilité : moyenne;Major;dépréciée;non;non;code principal;multi-threading, cert;5min
+java:S3077;"Non-primitive fields should not be ""volatile""";bug;fiabilité : basse;Minor;active;oui;oui;code principal;multi-threading, cert;20min
+java:S3078;"""volatile"" variables should not be used with compound operators";bug;fiabilité : moyenne;Major;active;oui;oui;code principal;multi-threading, cert;15min
+java:S3242;Method parameters should be declared with base types;code smell;maintenabilité : basse;Minor;active;non;non;code principal;api-design;5min
+java:S3252;"""static"" base class members should not be accessed via derived types";code smell;maintenabilité : haute;Critical;active;oui;oui;code principal;confusing;5min
+java:S3254;Default annotation parameter values should not be passed as arguments;code smell;maintenabilité : basse;Minor;active;non;non;code principal;finding, clumsy;2min
+java:S3305;"Factory method injection should be used in ""@Configuration"" classes";code smell;maintenabilité : haute;Critical;active;oui;oui;code principal;spring, performance;5min
+java:S3306;Constructor injection should be used instead of field injection;bug;fiabilité : moyenne;Major;active;non;non;code principal;spring, design, jee, pitfall;5min
+java:S3329;Cipher Block Chaining IVs should be unpredictable;vulnérabilité;sécurité : haute;Critical;active;oui;oui;code principal;cryptography, cwe;15min
+java:S3330;"Cookies should have the ""HttpOnly"" flag";vulnérabilité;sécurité : basse;Minor;active;oui;oui;code principal;cwe, privacy, former-hotspot;10min
+java:S3346;"Expressions used in ""assert"" should not produce side effects";bug;fiabilité : moyenne;Major;active;oui;oui;code principal;cert;5min
+java:S3358;Ternary operators should not be nested;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;confusing;5min
+java:S3366;"""this"" should not be exposed from constructors";code smell;maintenabilité : moyenne;Major;active;non;non;code principal;multi-threading, cert, suspicious;30min
+java:S3398;"""private"" methods called only by inner classes should be moved to those classes";code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;confusing;5min
+java:S3400;Methods should not return constants;code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;confusing;5min
+java:S3414;Tests should be kept in a dedicated source directory;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;tests, suspicious;5min
+java:S3415;Assertion arguments should be passed in the correct order;code smell;maintenabilité : moyenne;Major;active;oui;oui;tests;junit, tests, suspicious;2min
+java:S3416;Loggers should be named for their enclosing classes;code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;confusing, logging;5min
+java:S3436;Value-based classes should not be used for locking;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;multi-threading, java8, lock-in;10min
+java:S3437;Value-based objects should not be serialized;code smell;maintenabilité : basse;Minor;active;non;non;code principal;serialization, java8, lock-in;2min
+java:S3457;Format strings should be used correctly;code smell;maintenabilité : moyenne;Major;active;oui;oui;tout;cert, confusing;1min
+java:S3551;Overrides should match their parent class methods in synchronization;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;multi-threading, cert;20min
+java:S3553;"""Optional"" should not be used for parameters";code smell;maintenabilité : moyenne;Major;active;non;non;code principal;clumsy;5min
+java:S3577;Test classes should comply with a naming convention;code smell;maintenabilité : basse;Minor;active;oui;oui;tests;convention, tests;5min
+java:S3578;Test methods should comply with a naming convention;code smell;maintenabilité : basse;Minor;active;non;non;tests;convention, tests;5min
+java:S3599;Double Brace Initialization should not be used;bug;fiabilité : basse;Minor;active;oui;oui;code principal;leak;5min
+java:S3626;Jump statements should not be redundant;code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;redundant, clumsy;1min
+java:S3631;"""Arrays.stream"" should be used for primitive arrays";code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;performance;5min
+java:S3658;Unit tests should throw exceptions;code smell;maintenabilité : basse;Minor;active;non;non;tests;error-handling, junit, tests, clumsy;2min
+java:S3688;Track uses of disallowed classes;code smell;maintenabilité : info;Info;active;non;non;code principal;;0min
+java:S3706;"""stream"" should not be used for Collection ""forEach"" calls";code smell;;Minor;active;oui;oui;tout;;2min
+java:S3725;"Java 8's ""Files.exists"" should not be used";code smell;maintenabilité : moyenne;Major;active;non;non;code principal;performance, java8;5min
+java:S3740;Raw types should not be used;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;pitfall;5min
+java:S3749;Members of Spring components should be injected;code smell;maintenabilité : haute;Critical;active;non;non;code principal;spring;15min
+java:S3750;"Spring ""@Controller"" classes should not use ""@Scope""";bug;fiabilité : moyenne;Major;active;non;non;code principal;spring;2min
+java:S3751;"""@RequestMapping"" methods should not be ""private""";code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;spring;2min
+java:S3752;HTTP routes should restrict allowed HTTP methods;vulnérabilité;sécurité : basse;Minor;active;oui;oui;code principal;cwe, spring, former-hotspot;5min
+java:S3753;"""@Controller"" classes that use ""@SessionAttributes"" must call ""setComplete"" on their ""SessionStatus"" objects";bug;fiabilité : bloquante;Blocker;active;oui;oui;code principal;spring;15min
+java:S3776;Cognitive Complexity of methods should not be too high;code smell;maintenabilité : haute;Critical;active;oui;oui;code principal;brain-overload;per complexity point over the threshold
+java:S3864;"""Stream.peek"" should be used with caution";code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;java8, pitfall;5min
+java:S3878;Arrays should not be created for varargs parameters;code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;clumsy;2min
+java:S3923;All branches in a conditional structure should not have exactly the same implementation;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;;15min
+java:S3937;Number patterns should be regular;code smell;maintenabilité : haute;Critical;active;non;non;code principal;suspicious;10min
+java:S3949;Calculations should not overflow;bug;fiabilité : moyenne;Major;active;non;non;tout;overflow;5min
+java:S3972;Conditionals should start on new lines;code smell;maintenabilité : haute;Critical;active;oui;oui;code principal;suspicious;10min
+java:S3973;A conditionally executed single line should be denoted by indentation;code smell;maintenabilité : haute;Critical;active;oui;oui;code principal;confusing, suspicious;10min
+java:S3981;Collection sizes and array length comparisons should make sense;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;confusing;2min
+java:S3984;Exceptions should not be created without being thrown;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;error-handling;2min
+java:S3985;"Unused ""private"" classes should be removed";code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;unused;2min
+java:S3986;"Week Year (""YYYY"") should not be used for date formatting";bug;fiabilité : moyenne;Major;active;oui;oui;code principal;suspicious;2min
+java:S4011;Track uses of disallowed constructors;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;;0min
+java:S4030;Collection contents should be used;code smell;maintenabilité : moyenne;Minor;active;oui;oui;tout;unused, suspicious, performance;2min
+java:S4032;"Packages containing only ""package-info.java"" should be removed";code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;unused;2min
+java:S4034;"""Stream"" call chains should be simplified when possible";code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;clumsy;2min
+java:S4036;OS commands should not rely on PATH resolution;vulnérabilité;sécurité : basse;Minor;active;oui;oui;code principal;cwe, former-hotspot;15min
+java:S4042;"""java.nio.Files#delete"" should be preferred";code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;error-handling, api-design;10min
+java:S4065;"""ThreadLocal.withInitial"" should be preferred";code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;java8;5min
+java:S4087;"""close()"" calls should not be redundant";code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;redundant;2min
+java:S4143;Map values should not be replaced unconditionally;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;suspicious;5min
+java:S4144;Methods should not have identical implementations;code smell;maintenabilité : moyenne;Major;active;oui;oui;tout;confusing, duplicate, suspicious;15min
+java:S4174;Local constants should follow naming conventions for constants;code smell;maintenabilité : basse;Minor;active;non;non;code principal;convention;5min
+java:S4201;"Null checks should not be used with ""instanceof""";code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;redundant;5min
+java:S4248;Regex patterns should not be created needlessly;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;regex, performance;10min
+java:S4266;"""Stream.collect()"" calls should not be redundant";code smell;maintenabilité : basse;Minor;active;non;non;code principal;clumsy;2min
+java:S4274;Asserts should not be used to check the parameters of a public method;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;pitfall;5min
+java:S4275;Getters and setters should access the expected fields;bug;fiabilité : haute;Critical;active;oui;oui;code principal;pitfall;5min
+java:S4276;Functional Interfaces should be as specialised as possible;code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;performance;5min
+java:S4288;Spring components should use constructor injection;code smell;maintenabilité : moyenne;Major;dépréciée;non;non;code principal;;2min by injected field
+java:S4347;Secure random number generators should not output predictable values;vulnérabilité;sécurité : haute;Critical;active;oui;oui;code principal;cert, cryptography, cwe, pitfall;2min
+java:S4348;"""iterator"" should not return ""this""";bug;fiabilité : moyenne;Major;active;oui;oui;code principal;pitfall;10min
+java:S4349;"""write(byte[],int,int)"" should be overridden";code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;performance;30min
+java:S4351;"""compareTo"" should not be overloaded";bug;fiabilité : moyenne;Major;active;oui;oui;code principal;pitfall;5min
+java:S4423;Weak SSL/TLS protocols should not be used;vulnérabilité;sécurité : haute;Critical;active;oui;oui;code principal;cryptography, cwe, privacy;2min
+java:S4425;"""Integer.toHexString"" should not be used to build hexadecimal strings";code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;cwe;2min
+java:S4426;Cryptographic keys should be robust;vulnérabilité;sécurité : haute;Critical;active;oui;oui;code principal;cryptography, cwe, privacy, rules;2min
+java:S4433;LDAP connections should be authenticated;vulnérabilité;sécurité : haute;Critical;active;oui;oui;code principal;cwe;15min
+java:S4434;Deserialization of Java objects from LDAP should be disabled;vulnérabilité;sécurité : moyenne;Major;active;oui;oui;code principal;cwe, former-hotspot;2min
+java:S4454;"""equals"" method parameters should not be marked ""@Nonnull""";code smell;maintenabilité : haute;Critical;active;oui;oui;code principal;;3min
+java:S4488;"Composed ""@RequestMapping"" variants should be preferred";code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;spring;2min
+java:S4502;CSRF protections should not be disabled;vulnérabilité;sécurité : haute;Critical;active;oui;oui;code principal;cwe, spring, former-hotspot;5min
+java:S4507;Debugging features should not be enabled in production;vulnérabilité;sécurité : basse;Minor;active;oui;oui;code principal;cwe, error-handling, spring, debug, user-experience, former-hotspot;1min
+java:S4512;JavaBean properties should not be populated from untrusted input;vulnérabilité;sécurité : haute;Critical;active;oui;oui;code principal;cwe, cert, former-hotspot;15min
+java:S4517;InputSteam.read() implementation should not return a signed byte;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;;10min
+java:S4524;"""default"" clauses should be last";code smell;maintenabilité : haute;Critical;active;oui;oui;code principal;;5min
+java:S4544;Jackson deserialization should not use unsafe configuration;vulnérabilité;sécurité : haute;Critical;active;oui;oui;code principal;cwe, former-hotspot;15min
+java:S4551;"Enum values should be compared with ""==""";code smell;maintenabilité : moyenne;Major;active;non;non;code principal;;5min
+java:S4601;"""HttpSecurity"" URL patterns should be correctly ordered";vulnérabilité;sécurité : haute;Critical;active;oui;oui;code principal;spring;10min
+java:S4602;"""@SpringBootApplication"" and ""@ComponentScan"" should not be used in the default package";bug;fiabilité : bloquante;Blocker;active;oui;oui;code principal;spring;5min
+java:S4604;"""@EnableAutoConfiguration"" should be fine-tuned";code smell;;Major;dépréciée;non;non;code principal;;30min
+java:S4605;"Spring beans should be considered by ""@ComponentScan""";code smell;maintenabilité : haute;Critical;active;non;non;code principal;spring, pitfall;5min
+java:S4635;String offset-based methods should be preferred for finding substrings from offsets;code smell;maintenabilité : haute;Critical;active;oui;oui;code principal;performance;5min
+java:S4682;"""@CheckForNull"" or ""@Nullable"" should not be used on primitive types";code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;;1min
+java:S4684;Database Operations should not be vulnerable to mass assignment;vulnérabilité;sécurité : haute;Critical;active;oui;oui;code principal;cwe, spring;10min
+java:S4719;"""StandardCharsets"" constants should be preferred";code smell;maintenabilité : basse;Minor;active;oui;non;code principal;java7, clumsy;1min
+java:S4738;Java features should be preferred to Guava;code smell;maintenabilité : moyenne;Major;active;oui;oui;tout;java9, java8;10min
+java:S4790;Weak hashing algorithms should not be used;vulnérabilité;sécurité : haute;Critical;active;oui;oui;code principal;cryptography, cwe, former-hotspot;30min
+java:S4830;Server certificates should be verified during SSL/TLS connections;vulnérabilité;sécurité : haute;Critical;active;oui;oui;code principal;cert, cryptography, cwe, privacy, ssl;5min
+java:S4838;An iteration on a Collection should be performed on the type handled by the Collection;code smell;maintenabilité : basse;Minor;active;oui;non;code principal;bad-practice, clumsy;1min
+java:S4925;"""Class.forName()"" should not load JDBC 4.0+ drivers";code smell;maintenabilité : moyenne;Major;active;oui;non;code principal;obsolete;5min
+java:S4926;"""serialVersionUID"" should not be declared blindly";code smell;maintenabilité : basse;Minor;active;non;non;code principal;serialization, pitfall;10min
+java:S4929;"""read(byte[],int,int)"" should be overridden";code smell;maintenabilité : basse;Minor;active;oui;non;code principal;performance;30min
+java:S4968;"The upper bound of type variables and wildcards should not be ""final"" ";code smell;maintenabilité : basse;Minor;active;oui;non;code principal;;5min
+java:S4970;Derived exceptions should not hide their parents' catch blocks;code smell;maintenabilité : haute;Critical;active;oui;oui;code principal;;5min
+java:S4973;"Strings and Boxed types should be compared using ""equals()""";bug;fiabilité : moyenne;Major;active;oui;oui;code principal;cwe, cert;5min
+java:S4977;Type parameters should not shadow other type parameters;code smell;maintenabilité : basse;Minor;active;oui;non;code principal;;5min
+java:S5042;Expanding archive files should not be done without controlling resource consumption;code smell;fiabilité : moyenne;Major;dépréciée;non;non;code principal;cwe, cert, former-hotspot;10min
+java:S5122;Cross-Origin Resource Sharing (CORS) policy should be restricted to trusted origins;vulnérabilité;sécurité : moyenne;Major;active;oui;oui;code principal;cwe, spring, former-hotspot;4h
+java:S5128;"""Bean Validation"" (JSR 380) should be properly configured";code smell;maintenabilité : haute;Critical;active;non;non;code principal;;5min
+java:S5164;"""ThreadLocal"" variables should be cleaned up when no longer used ";bug;fiabilité : moyenne;Major;active;oui;oui;code principal;leak, performance;10min
+java:S5194;"Use Java 14 ""switch"" expression";code smell;maintenabilité : basse;Minor;active;non;non;code principal;java14;5min
+java:S5247;Auto-escaping in HTML template engines should not be disabled;vulnérabilité;sécurité : moyenne;Major;active;oui;oui;code principal;cwe, former-hotspot;5min
+java:S5261;"""else"" statements should be clearly matched with an ""if""";code smell;maintenabilité : moyenne;Major;active;oui;non;code principal;confusing;1min
+java:S5301;"""ActiveMQConnectionFactory"" should not be vulnerable to malicious code deserialization";vulnérabilité;sécurité : basse;Minor;active;oui;oui;code principal;cwe;30min
+java:S5320;Intents should not be broadcast without receiver permissions;vulnérabilité;sécurité : moyenne;Major;active;oui;oui;code principal;cwe, android, former-hotspot;10min
+java:S5322;Android broadcast receivers should not be registered without a permission;vulnérabilité;sécurité : haute;Critical;active;oui;oui;code principal;cwe, android, former-hotspot;15min
+java:S5324;Sensitive data should not be stored in Android external storage;vulnérabilité;sécurité : haute;Critical;active;oui;oui;code principal;cwe, android, former-hotspot;1h
+java:S5329;Collection constructors should not be used as java.util.function.Function;code smell;maintenabilité : moyenne;Major;active;oui;non;code principal;;5min
+java:S5332;Clear-text protocols should not be used;vulnérabilité;sécurité : basse;Minor;active;oui;oui;code principal;android, cryptography, cwe, former-hotspot;30min
+java:S5344;Passwords should not be stored in plaintext or with a fast hashing algorithm;vulnérabilité;sécurité : haute;Critical;active;oui;oui;code principal;cryptography, cwe, spring;30min
+java:S5361;"""String#replace"" should be preferred to ""String#replaceAll""";code smell;maintenabilité : haute;Critical;active;oui;oui;code principal;regex, performance;2min
+java:S5411;"Avoid using boxed ""Boolean"" types directly in boolean expressions";code smell;maintenabilité : basse;Minor;active;oui;non;code principal;pitfall;5min
+java:S5413;'List.remove()' should not be used in ascending 'for' loops;code smell;maintenabilité : moyenne;Major;active;oui;non;code principal;;5min
+java:S5443;Temporary files should not be created in publicly writable directories;vulnérabilité;sécurité : haute;Critical;active;oui;oui;code principal;cwe, former-hotspot;30min
+java:S5445;Insecure temporary file creation methods should not be used;vulnérabilité;sécurité : haute;Critical;active;oui;oui;code principal;cwe;10min
+java:S5527;Server hostnames should be verified during SSL/TLS connections;vulnérabilité;sécurité : haute;Critical;active;oui;oui;code principal;cryptography, cwe, privacy, ssl;5min
+java:S5542;Encryption algorithms should be used with secure mode and padding scheme;vulnérabilité;sécurité : haute;Critical;active;oui;oui;code principal;cryptography, cwe, privacy;20min
+java:S5547;Cipher algorithms should be robust;vulnérabilité;sécurité : haute;Critical;active;oui;oui;code principal;cryptography, cwe, privacy;15min
+java:S5612;Lambdas should not have too many lines;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;;20min
+java:S5659;JWT should be signed and verified with strong cipher algorithms;vulnérabilité;sécurité : haute;Critical;active;oui;oui;code principal;cryptography, cwe, privacy;30min
+java:S5663;Simple string literal should be used for single line strings;code smell;maintenabilité : basse;Minor;active;oui;non;code principal;java14;5min
+java:S5664;Whitespace for text block indent should be consistent;code smell;maintenabilité : moyenne;Major;active;oui;non;code principal;java14;5min
+java:S5665;Escape sequences should not be used in text blocks;code smell;maintenabilité : basse;Minor;active;oui;non;code principal;java14;5min
+java:S5669;Vararg method arguments should not be confusing;code smell;maintenabilité : moyenne;Major;active;oui;non;code principal;;5min
+java:S5673;Spring components should use specialized annotations;code smell;maintenabilité : moyenne;Major;active;oui;non;tout;spring;5min
+java:S5679;OpenSAML2 should be configured to prevent authentication bypass;vulnérabilité;sécurité : moyenne;Major;active;oui;oui;code principal;spring;10min
+java:S5689;Web application technologies should not disclose version information;vulnérabilité;sécurité : basse;Minor;active;oui;oui;code principal;cwe, former-hotspot;5min
+java:S5693;HTTP request content length should be limited;vulnérabilité;sécurité : moyenne;Major;active;oui;oui;code principal;cwe, former-hotspot;5min
+java:S5738;"""@Deprecated"" code marked for removal should never be used";code smell;maintenabilité : moyenne;Major;active;oui;oui;tout;cwe, obsolete, cert;15min
+java:S5776;Exception testing via JUnit ExpectedException rule should not be mixed with other assertions;code smell;maintenabilité : moyenne;Major;active;oui;oui;tests;junit, tests;10min
+java:S5777;Exception testing via JUnit @Test annotation should be avoided;code smell;maintenabilité : basse;Minor;active;oui;oui;tests;junit, tests;5min
+java:S5778;Only one method invocation is expected when testing runtime exceptions;code smell;maintenabilité : moyenne;Major;active;oui;oui;tests;junit, tests;5min
+java:S5779;Assertion methods should not be used within the try block of a try-catch catching an Error;bug;fiabilité : haute;Critical;active;oui;oui;tests;junit, tests;5min
+java:S5783;Only one method invocation is expected when testing checked exceptions;bug;fiabilité : haute;Critical;active;oui;oui;tests;junit, tests;5min
+java:S5785;JUnit assertTrue/assertFalse should be simplified to the corresponding dedicated assertion;code smell;maintenabilité : moyenne;Major;active;oui;oui;tests;junit, tests;2min
+java:S5786;JUnit5 test methods should have default package visibility;code smell;maintenabilité : info;Info;active;oui;non;tests;junit, tests;2min
+java:S5790;JUnit5 inner test classes should be annotated with @Nested;bug;fiabilité : haute;Critical;active;oui;oui;tests;junit, tests;2min
+java:S5793;Migrate your tests from JUnit4 to the new JUnit5 annotations;code smell;maintenabilité : info;Info;active;non;non;tests;junit, tests;5min
+java:S5803;"Class members annotated with ""@VisibleForTesting"" should not be accessed from production code";code smell;maintenabilité : haute;Critical;active;oui;oui;code principal;pitfall;10min
+java:S5804;Authentication mechanisms should not permit user enumeration.;vulnérabilité;sécurité : moyenne;Major;active;oui;oui;code principal;cwe, spring, former-hotspot;10min
+java:S5808;Authorizations should be based on strong decisions;vulnérabilité;sécurité : moyenne;Major;active;oui;oui;code principal;cwe;30min
+java:S5810;JUnit5 test classes and methods should not be silently ignored;bug;fiabilité : moyenne;Major;active;oui;oui;tests;junit, tests;2min
+java:S5826;Methods setUp() and tearDown() should be correctly annotated starting with JUnit4;code smell;maintenabilité : haute;Critical;active;oui;oui;tests;junit, tests;2min
+java:S5831;AssertJ configuration should be applied;bug;fiabilité : moyenne;Major;active;oui;oui;tests;tests, assertj;5min
+java:S5833;AssertJ methods setting the assertion context should come before an assertion;bug;fiabilité : moyenne;Major;active;oui;oui;tests;tests, assertj;5min
+java:S5838;AssertJ assertions should be simplified to the corresponding dedicated assertion;code smell;maintenabilité : basse;Minor;active;oui;oui;tests;tests, assertj;5min
+java:S5841;"AssertJ assertions ""allMatch"" and ""doesNotContain"" should also test for emptiness";bug;fiabilité : basse;Minor;active;oui;non;tests;tests, assertj;5min
+java:S5842;Repeated patterns in regular expressions should not match the empty string;bug;fiabilité : basse;Minor;active;oui;oui;code principal;regex;5min
+java:S5843;Regular expressions should not be too complicated;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;regex;number of complexity points over the configurable limit
+java:S5845;Assertions comparing incompatible types should not be made;bug;fiabilité : haute;Critical;active;oui;oui;tests;tests;5min
+java:S5846;Empty lines should not be tested with regex MULTILINE flag;code smell;maintenabilité : haute;Critical;active;oui;oui;code principal;regex;15min
+java:S5850;Alternatives in regular expressions should be grouped when used with anchors;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;regex;10min
+java:S5852;Regular expressions should not cause catastrophic backtracking;vulnérabilité;sécurité : haute;Critical;active;oui;oui;code principal;cwe, regex, former-hotspot;30min
+java:S5853;"Consecutive AssertJ ""assertThat"" statements should be chained";code smell;maintenabilité : basse;Minor;active;oui;non;tests;tests, assertj;5min
+java:S5854;Regexes containing characters subject to normalization should use the CANON_EQ flag;code smell;maintenabilité : moyenne;Major;active;oui;non;code principal;regex;3min
+java:S5855;Regex alternatives should not be redundant;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;regex;5min
+java:S5856;Regular expressions should be syntactically valid;bug;fiabilité : haute;Critical;active;oui;oui;code principal;regex;15min
+java:S5857;Character classes should be preferred over reluctant quantifiers in regular expressions;code smell;maintenabilité : basse;Minor;active;oui;non;code principal;regex;3min
+java:S5860;Names of regular expressions named groups should be used;code smell;maintenabilité : moyenne;Major;active;oui;non;code principal;regex;10min
+java:S5863;Assertions should not compare an object to itself;bug;fiabilité : moyenne;Major;active;oui;oui;tests;tests;5min
+java:S5866;"Case insensitive Unicode regular expressions should enable the ""UNICODE_CASE"" flag";bug;fiabilité : moyenne;Major;active;oui;oui;code principal;regex;3min
+java:S5867;Unicode-aware versions of character classes should be preferred;code smell;maintenabilité : basse;Minor;active;non;non;code principal;regex;5min
+java:S5868;Unicode Grapheme Clusters should be avoided inside regex character classes;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;regex;5min
+java:S5869;Character classes in regular expressions should not contain the same character twice;code smell;maintenabilité : moyenne;Major;active;oui;non;code principal;regex;5min
+java:S5876;A new session should be created during user authentication;vulnérabilité;sécurité : haute;Critical;active;oui;oui;code principal;cwe, spring;5min
+java:S5917;DateTimeFormatters should not use mismatched year and week numbers;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;;10min
+java:S5958;"AssertJ ""assertThatThrownBy"" should not be used alone";code smell;maintenabilité : moyenne;Major;active;oui;non;tests;tests, assertj;5min
+java:S5960;Assertions should not be used in production code;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;;5min
+java:S5961;Test methods should not contain too many assertions;code smell;maintenabilité : moyenne;Major;active;oui;non;tests;tests;20min
+java:S5967;Tests method should not be annotated with competing annotations;bug;fiabilité : moyenne;Major;active;oui;oui;tests;tests;2min
+java:S5969;Mocking all non-private methods of a class should be avoided;code smell;maintenabilité : haute;Critical;active;oui;oui;tests;tests, mockito;10min
+java:S5970;Spring's ModelAndViewAssert assertions should be used instead of other assertions;code smell;maintenabilité : moyenne;Major;active;non;non;tests;spring, tests;5min
+java:S5973;Tests should be stable;code smell;maintenabilité : moyenne, fiabilité : moyenne;Major;active;oui;non;tests;tests, design, unpredictable;20min
+java:S5976;Similar tests should be grouped in a single Parameterized test;code smell;maintenabilité : moyenne;Major;active;oui;non;tests;tests, bad-practice, clumsy;10min
+java:S5977;Tests should use fixed data instead of randomized data;code smell;maintenabilité : moyenne;Major;active;non;non;tests;tests, design, confusing;10min
+java:S5979;Annotated Mockito objects should be initialized;bug;fiabilité : bloquante;Blocker;active;non;non;tests;tests, mockito;2min
+java:S5993;"Constructors of an ""abstract"" class should not be declared ""public""";code smell;maintenabilité : moyenne;Major;active;oui;non;code principal;design;2min
+java:S5994;Regex patterns following a possessive quantifier should not always fail;bug;fiabilité : haute;Critical;active;oui;oui;code principal;regex;15min
+java:S5996;Regex boundaries should not be used in a way that can never be matched;bug;fiabilité : haute;Critical;active;oui;oui;code principal;regex;10min
+java:S5998;Regular expressions should not overflow the stack;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;regex;20min
+java:S6001;Back references in regular expressions should only refer to capturing groups that are matched before the reference;bug;fiabilité : haute;Critical;active;oui;oui;code principal;regex;10min
+java:S6002;Regex lookahead assertions should not be contradictory;bug;fiabilité : haute;Critical;active;oui;oui;code principal;regex;20min
+java:S6019;Reluctant quantifiers in regular expressions should be followed by an expression that can't match the empty string;code smell;maintenabilité : moyenne;Major;active;oui;non;code principal;regex;10min
+java:S6035;Single-character alternations in regular expressions should be replaced with character classes;code smell;maintenabilité : moyenne;Major;active;oui;non;code principal;regex;5min
+java:S6068;"Call to Mockito method ""verify"", ""when"" or ""given"" should be simplified";code smell;maintenabilité : basse;Minor;active;oui;oui;tests;tests, mockito, clumsy;2min
+java:S6070;The regex escape sequence \cX should only be used with characters in the @-_ range;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;regex;5min
+java:S6073;Mockito argument matchers should be used on all parameters;bug;fiabilité : moyenne;Major;active;non;non;tests;tests, mockito;5min
+java:S6103;"AssertJ assertions with ""Consumer"" arguments should contain assertion inside consumers";bug;fiabilité : moyenne;Major;active;oui;oui;tests;tests;20min
+java:S6104;"Map ""computeIfAbsent()"" and ""computeIfPresent()"" should not be used to add ""null"" values.";bug;fiabilité : haute;Critical;active;oui;oui;code principal;;10min
+java:S6126;String multiline concatenation should be replaced with Text Blocks;code smell;maintenabilité : moyenne;Major;active;oui;oui;tout;java15;2min
+java:S6201;"Pattern Matching for ""instanceof"" operator should be used instead of simple ""instanceof"" + cast";code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;java16;5min
+java:S6202;"Operator ""instanceof"" should be used instead of ""A.class.isInstance()""";code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;;5min
+java:S6203;Text blocks should not be used in complex expressions;code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;;5min
+java:S6204;"""Stream.toList()"" method should be used instead of ""collectors"" when unmodifiable list needed";code smell;maintenabilité : moyenne;Major;active;oui;oui;tout;java16;5min
+java:S6205;Switch arrow labels should not use redundant keywords;code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;java14;5min
+java:S6206;Records should be used instead of ordinary classes when representing immutable data structure;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;java16;20min
+java:S6207;Redundant constructors/methods should be avoided in records;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;java16;5min
+java:S6208;Comma-separated labels should be used in Switch with colon case;code smell;maintenabilité : info;Info;active;oui;oui;tout;java14;5min
+java:S6209;Members ignored during record serialization should not be used;bug;fiabilité : haute;Critical;active;oui;oui;code principal;java16;20min
+java:S6211;Custom getter method should not be used to override record's getter behavior;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;java16;5min
+java:S6212;Local-Variable Type Inference should be used;code smell;maintenabilité : info;Info;active;non;non;code principal;java10;0min
+java:S6213;Restricted Identifiers should not be used as Identifiers;code smell;maintenabilité : moyenne;Major;active;oui;non;tout;;5min
+java:S6216;Reflection should not be used to increase accessibility of records' fields;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;java16;30min
+java:S6217;Permitted types of a sealed class should be omitted if they are declared in the same file;code smell;maintenabilité : basse;Minor;active;oui;non;code principal;java17;5min
+java:S6218;Equals method should be overridden in records containing array fields;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;java16;5min
+java:S6219;'serialVersionUID' field should not be set to '0L' in records;code smell;maintenabilité : basse;Minor;active;oui;non;code principal;java16;5min
+java:S6241;"Region should be set explicitly when creating a new ""AwsClient""";code smell;maintenabilité : moyenne;Major;active;oui;non;code principal;startup-time, aws;20min
+java:S6242;"Credentials Provider should be set explicitly when creating a new ""AwsClient""";code smell;maintenabilité : moyenne;Major;active;oui;non;code principal;startup-time, aws;20min
+java:S6243;Reusable resources should be initialized at construction time of Lambda functions;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;aws;20min
+java:S6244;Consumer Builders should be used;code smell;maintenabilité : basse;Minor;active;oui;non;code principal;aws;5min
+java:S6246;Lambdas should not invoke other lambdas synchronously;code smell;maintenabilité : basse;Minor;active;oui;non;code principal;aws;3h
+java:S6262;AWS region should not be set with a hardcoded String;code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;aws;5min
+java:S6263;Long-term AWS access keys should not be used;vulnérabilité;sécurité : moyenne;Major;active;oui;oui;code principal;aws, former-hotspot;1h
+java:S6288;Android KeyStore keys should require user authentication;vulnérabilité;sécurité : moyenne;Major;active;oui;oui;code principal;android, cryptography, cwe, former-hotspot;5min
+java:S6293;Biometric authentication should be cryptographically bound;vulnérabilité;sécurité : moyenne;Major;active;oui;oui;code principal;android, cryptography, cwe, former-hotspot;5min
+java:S6301;Mobile database encryption keys should not be disclosed;vulnérabilité;sécurité : moyenne;Major;active;oui;oui;code principal;android, cryptography, cwe;10min
+java:S6326;Regular expressions should not contain multiple spaces;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;regex;5min
+java:S6331;Regular expressions should not contain empty groups;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;regex;5min
+java:S6353;Regular expression quantifiers and character classes should be used concisely;code smell;maintenabilité : basse;Minor;active;oui;oui;code principal;regex;5min
+java:S6355;Deprecated annotations should include explanations;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;java9;5min
+java:S6362;JavaScript support should not be enabled in WebViews unless strictly necessary;vulnérabilité;sécurité : basse;Minor;dépréciée;non;non;code principal;cwe, android, former-hotspot;5min
+java:S6363;WebViews should not allow unrestricted file access;vulnérabilité;sécurité : moyenne;Major;active;oui;oui;code principal;cwe, android, former-hotspot;5min
+java:S6395;Non-capturing groups without quantifier should not be used;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;regex;5min
+java:S6396;Superfluous curly brace quantifiers should be avoided;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;regex;5min
+java:S6397;Character classes in regular expressions should not contain only one character;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;regex;5min
+java:S6411;Types used as keys in Maps should implement Comparable;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;;30min
+java:S6418;Secrets should not be hard-coded;vulnérabilité;sécurité : bloquante;Blocker;active;oui;oui;code principal;cert, cwe, former-hotspot, secret;30min
+java:S6432;Counter Mode initialization vectors should not be reused;vulnérabilité;sécurité : haute;Critical;active;oui;oui;code principal;cryptography, cwe;15min
+java:S6437;Credentials should not be hard-coded;vulnérabilité;sécurité : bloquante;Blocker;active;oui;oui;code principal;cwe, secret;60min
+java:S6485;Hash-based collections with known capacity should be initialized with the proper related static method.;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;performance;5min
+java:S6539;Classes should not depend on an excessive number of classes (aka Monster Class);code smell;maintenabilité : info;Info;active;oui;oui;code principal;design;0min
+java:S6541;Methods should not perform too many tasks (aka Brain method);code smell;maintenabilité : info;Info;dépréciée;non;non;code principal;design;0min
+java:S6548;The Singleton design pattern should be used with care;code smell;maintenabilité : info;Info;dépréciée;non;non;code principal;design;0min
+java:S6665;Redundant nullability annotations should be removed;code smell;;Major;active;non;non;tout;nullability, jspecify;10min
+java:S6804;"""@Value"" annotation should inject property or SpEL expression";code smell;maintenabilité : basse, fiabilité : moyenne;Major;active;oui;non;code principal;spring;5min
+java:S6806;Model attributes should follow the Java identifier naming convention;bug;maintenabilité : moyenne, fiabilité : moyenne;Major;active;oui;oui;code principal;;5min
+java:S6809;"Methods with Spring proxy should not be called via ""this""";code smell;maintenabilité : haute;Critical;active;oui;oui;code principal;;5min
+java:S6810;Async methods should return void or Future;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;;5min
+java:S6813;Field dependency injection should be avoided;code smell;maintenabilité : moyenne, fiabilité : moyenne;Major;active;oui;non;code principal;;5min
+java:S6814;Optional REST parameters should have an object type;code smell;fiabilité : haute;Critical;active;oui;oui;code principal;;5min
+java:S6816;Nullable injected fields and parameters should provide a default value;bug;fiabilité : haute;Critical;active;oui;oui;code principal;spring;5min
+java:S6817;"Use of the ""@Async"" annotation on methods declared within a ""@Configuration"" class in Spring Boot";bug;fiabilité : haute;Critical;active;oui;oui;code principal;spring;5min
+java:S6818;"""@Autowired"" should only be used on a single constructor";bug;maintenabilité : moyenne, fiabilité : haute;Critical;active;oui;oui;code principal;spring;5min
+java:S6829;"""@Autowired"" or ""@Inject"" should be used when multiple constructors are provided";code smell;maintenabilité : moyenne, fiabilité : moyenne;Major;active;oui;non;code principal;spring;5min
+java:S6830;Bean names should adhere to the naming conventions;code smell;maintenabilité : moyenne;Major;active;oui;non;code principal;spring;5min
+java:S6831;"""@Qualifier"" should not be used on ""@Bean"" methods";bug;maintenabilité : moyenne, fiabilité : moyenne;Major;active;oui;oui;code principal;spring;5min
+java:S6832;Non-singleton Spring beans should not be injected into singleton beans;code smell;fiabilité : moyenne;Major;active;oui;non;code principal;spring;5min
+java:S6833;"""@Controller"" should be replaced with ""@RestController""";code smell;maintenabilité : moyenne;Major;active;oui;non;code principal;spring;5min
+java:S6837;"Superfluous ""@ResponseBody"" annotations should be removed";code smell;maintenabilité : moyenne;Major;active;oui;non;code principal;spring;5min
+java:S6838;"""@Bean"" methods for Singleton should not be invoked in ""@Configuration"" when proxyBeanMethods is false";bug;fiabilité : moyenne;Major;active;oui;oui;code principal;spring;10min
+java:S6856;Path template variables should be properly bound to method parameters;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;spring;5min
+java:S6857;SpEL expression should have a valid syntax;bug;fiabilité : haute;Critical;active;oui;oui;code principal;spring;5min
+java:S6862;"Beans in ""@Configuration"" class should have different names";bug;fiabilité : moyenne;Major;dépréciée;non;non;code principal;;5min
+java:S6863;Set appropriate Status Codes on HTTP responses;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;spring, best-practice;5min
+java:S6876;Reverse iteration should utilize reversed view;code smell;maintenabilité : haute;Critical;active;oui;oui;code principal;java21;5min
+java:S6877;Reverse view should be used instead of reverse copy in read-only cases;code smell;maintenabilité : haute;Critical;active;oui;oui;code principal;java21;5min
+java:S6878;Use record pattern instead of explicit field access;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;java21;5min
+java:S6880;Use switch instead of if-else chain to compare a variable against multiple cases;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;java21;10min
+java:S6881;Virtual threads should be used for tasks that include heavy blocking operations;bug;fiabilité : haute;Critical;active;oui;oui;code principal;java21, multi-threading;5min
+java:S6885;"Use built-in ""Math.clamp"" methods";code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;java21;5min
+java:S6889;Proper Sensor Resource Management;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;sustainability, android, leak;10min
+java:S6891;Exact alarms should not be abused;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;java, android, sustainability;5min
+java:S6898;High frame rates should not be used;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;android, sustainability;5min
+java:S6901;"""setDaemon"", ""setPriority"" and ""getThreadGroup"" should not be invoked on virtual threads";bug;fiabilité : moyenne;Major;active;oui;oui;code principal;java21, bug;5min
+java:S6904;"Avoid using ""FetchType.EAGER""";code smell;maintenabilité : moyenne;Major;active;non;non;code principal;sustainability, jpa, sql;10min
+java:S6905;SQL queries should retrieve only necessary fields;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;sql, sustainability;5min
+java:S6906;Virtual threads should not run tasks that include synchronized code;bug;fiabilité : moyenne;Major;active;oui;oui;code principal;java21, multi-threading;5min
+java:S6909;"Constant parameters in a ""PreparedStatement"" should not be set more than once";code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;sql, sustainability;5min
+java:S6912;Use batch Processing in JDBC;code smell;maintenabilité : moyenne;Major;active;oui;non;code principal;sustainability, sql;5min
+java:S6913;"""Math.clamp"" should be used with correct ranges";bug;fiabilité : moyenne;Major;active;oui;oui;code principal;java21;5min
+java:S6914;Use Fused Location to optimize battery power;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;android, sustainability;15min
+java:S6915;"""String.indexOf"" should be used with correct ranges";bug;fiabilité : moyenne;Major;active;oui;oui;code principal;java21;5min
+java:S6916;Use when instead of a single if inside a pattern match body;code smell;maintenabilité : moyenne;Major;active;oui;oui;code principal;java21;5min
+java:S6923;Motion Sensor should not use gyroscope;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;android, sustainability;5min
+java:S6926;Bluetooth should be configured to use low power;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;android, sustainability;5min
+java:S7158;"""String.isEmpty()"" and ""String.isBlank()"" should be used to test for emptiness and blankness";code smell;maintenabilité : basse;Minor;active;oui;oui;tout;;2min
+java:S7177;Use appropriate @DirtiesContext modes;code smell;fiabilité : moyenne;Major;active;oui;oui;tests;spring, tests;5min
+java:S7178;Injecting data into static fields is not supported by Spring;code smell;maintenabilité : basse, fiabilité : haute, sécurité : basse;Critical;active;oui;oui;code principal;spring;5min
+java:S7179;@Cacheable and @CachePut should not be combined;code smell;fiabilité : moyenne;Major;active;oui;oui;code principal;spring;5min
+java:S7180;"""@Cache*"" annotations should only be applied on concrete classes";code smell;maintenabilité : basse, fiabilité : moyenne, sécurité : basse;Major;active;oui;oui;code principal;spring;5min
+java:S7183;@InitBinder methods should have void return type;code smell;fiabilité : moyenne, sécurité : basse;Major;active;oui;oui;tout;spring;5min
+java:S7184;"""@Scheduled"" annotation should only be applied to no-arg methods";bug;maintenabilité : basse, fiabilité : haute, sécurité : basse;Critical;active;oui;oui;tout;spring;5min
+java:S7185;@EventListener methods should have one parameter at most;bug;fiabilité : haute;Critical;active;oui;oui;tout;spring;5min
+java:S7186;"Methods returning ""Page"" or ""Slice"" must take ""Pageable"" as an input parameter";code smell;maintenabilité : basse, fiabilité : haute, sécurité : basse;Critical;active;oui;oui;tout;spring;5min
+java:S7190;"Methods annotated with ""@BeforeTransaction"" or ""@AfterTransaction"" must respect the contract";code smell;maintenabilité : basse, fiabilité : haute, sécurité : basse;Critical;active;oui;oui;tests;spring, tests;5min
+java:S7409;Native methods should not be exposed to untrusted WebView content;vulnérabilité;sécurité : moyenne;Major;active;oui;oui;tout;cwe, android, former-hotspot;30min
+java:S7435;Avoid using persistent unique identifiers;vulnérabilité;sécurité : basse;Minor;active;oui;oui;tout;android, ios, cwe, former-hotspot;5min
+java:S7438;Incompatible bit masks should not be used in comparisons;bug;fiabilité : haute;Blocker;active;oui;non;tout;;5min
+java:S7466;"Unnamed variable declarations should use the ""var"" identifier";code smell;maintenabilité : basse;Minor;active;oui;oui;tout;java22;2min
+java:S7467;Unused exception parameter should use the unnamed variable pattern;code smell;maintenabilité : basse;Minor;active;oui;oui;tout;java22;2min
+java:S7474;Markdown, HTML and Javadoc tags should be consistent;code smell;maintenabilité : basse;Minor;active;oui;oui;tout;java23, javadoc;5min
+java:S7475;Types of unused record components should be removed from pattern matching;code smell;maintenabilité : info;Info;active;oui;oui;tout;java22, unused;5min
+java:S7476;Comments should start with the appropriate number of slashes;code smell;maintenabilité : basse;Minor;active;oui;oui;tout;java23, javadoc;5min
+java:S7477;Class name should be omitted when unchanged by class transform;code smell;maintenabilité : basse;Minor;active;oui;oui;tout;java24;5min
+java:S7478;"""transformClass"" method should be used instead of ""build"" when transforming a class";code smell;maintenabilité : basse;Minor;active;oui;oui;tout;java24;5min
+java:S7479;"""ClassBuilder.withMethodBody"" should be preferred to ""ClassBuilder.withMethod""";code smell;maintenabilité : basse;Minor;active;oui;oui;tout;java24;5min
+java:S7481;Gatherer.ofSequential() should be used to build sequential gathers;code smell;maintenabilité : basse;Minor;active;oui;oui;tout;java24;1min
+java:S7482;Don't provide an initializer for a stateless stream gatherer;code smell;maintenabilité : moyenne;Major;active;oui;oui;tout;java24;5min
+java:S7629;When a defaultFinisher is passed to a Gatherer factory, use the overload that does not take a finisher;code smell;maintenabilité : basse;Minor;active;oui;oui;tout;java24;5min
+java:S8218;Instant APIs should only use supported temporal units;bug;fiabilité : moyenne;Major;active;oui;non;tout;java8, datetime, pitfall;5min
+java:S8220;Conversions between local and timezone-aware types should use explicit timezone handling;bug;fiabilité : bloquante, maintenabilité : bloquante;Blocker;active;oui;non;code principal;java8, datetime;5 min
+java:S8346;Increment and decrement operators (++/--) should not be used with floating point variables;code smell;maintenabilité : haute, fiabilité : moyenne;Major;active;oui;oui;tout;;5min
+java:S8432;"""ScopedValue.where"" results should not be ignored";code smell;maintenabilité : moyenne;Major;active;oui;oui;tout;java25;5min
+java:S8433;Validation logic should be placed in constructor prologue when possible;code smell;maintenabilité : moyenne;Major;active;oui;oui;tout;java25, suspicious;5min
+java:S8444;Excessive logic before super() should not bloat constructor;code smell;maintenabilité : moyenne;Major;active;oui;oui;tout;java25;5min
+java:S8445;Module imports should come first and imports should be grouped by kind;code smell;maintenabilité : basse;Minor;active;oui;oui;tout;convention, java25;2min
+java:S8446;"Only one ""main"" method should be defined in a class";code smell;maintenabilité : moyenne;Major;active;oui;oui;tout;java25;5min
+java:S8447;"Subclass fields should be initialized before calls to ""super()"" or ""this()""";bug;maintenabilité : basse, fiabilité : haute;Critical;active;oui;oui;tout;java25;5min
+java:S8450;"Prefer ""IO.readln()"" over ""BufferedReader"" boilerplate";code smell;maintenabilité : basse;Minor;active;oui;oui;tout;java25;5min
+java:S8465;ScopedValue instances should be assigned to a stable reference;bug;maintenabilité : haute, fiabilité : moyenne;Major;active;oui;oui;tout;java25;5min
+java:S8469;"Prefer ""IO.readln(String prompt)"" rather than ""IO.print(Object obj)"" or ""IO.println(Object obj)"" followed by ""IO.readln()""";code smell;maintenabilité : basse;Minor;active;oui;oui;tout;java25;5min
+java:S8491;Dangling Javadoc comments should be removed;code smell;maintenabilité : moyenne;Major;active;oui;non;tout;javadoc, confusing;5min
+java:S8688;"Time-based "".now()"" methods should specify a ZoneId or a Clock";code smell;maintenabilité : info, fiabilité : info;Info;active;oui;non;code principal;java8, pitfall, timezone, datetime;5min
+java:S8692;The system clock should not be used in unit tests;code smell;maintenabilité : info, fiabilité : info;Info;active;non;non;tests;java8, datetime, tests;1h
+java:S8694;"""Month"" and ""DayOfWeek"" enums should be used instead of numeric literals";code smell;maintenabilité : basse;Minor;active;oui;non;tout;java8, datetime, confusing;5min
+java:S8695;Redundant time instantiation patterns should be simplified;code smell;maintenabilité : basse;Minor;active;oui;non;tout;datetime, pitfall;5min
+java:S8696;Value-based classes should be compared using their value;bug;maintenabilité : moyenne, fiabilité : haute;Critical;active;oui;oui;tout;java8, datetime, suspicious;5min
+java:S8700;Time zone-aware types should be used to compute durations;bug;fiabilité : moyenne;Major;active;oui;non;tout;java8, datetime, suspicious, timezone;5min
+java:S8714;"Dedicated exception assertions should be used instead of ""try-catch"" with ""fail()""";code smell;maintenabilité : basse;Minor;active;oui;non;tests;tests;5min
+java:S8715;JUnit Jupiter tests should not use JUnit 4 assertions;code smell;maintenabilité : basse;Minor;active;oui;oui;tests;junit, tests;5min
+java:S8745;Test classes should not contain multiple lifecycle methods of the same type;bug;maintenabilité : basse, fiabilité : moyenne;Major;active;oui;oui;tests;junit, tests;per lifecycle method of the same type
+java:S8786;Regular expressions should not cause non-linear backtracking;code smell;fiabilité : moyenne;Major;active;oui;oui;tout;regex, performance;20min
+java:S8908;"Methods annotated with ""@CacheResult"" should not return void";code smell;maintenabilité : basse;Minor;active;oui;non;tout;api-design, confusing;5 min
+java:S8909;"""CacheKeyGenerator"" implementations should be instantiable by the framework";bug;fiabilité : haute;Critical;active;oui;non;code principal;quarkus, injection, pitfall;5min
+java:S8910;"Interfaces annotated with ""@Mapper"" should contain at least one ""@DaoFactory"" method";code smell;maintenabilité : moyenne;Major;active;oui;non;tout;quarkus, orm, api;5min
+java:S8911;"Methods annotated with ""@Startup"" should be non-static, non-producer, and parameter-free";bug;fiabilité : haute;Critical;active;oui;non;code principal;injection, lifecycle, quarkus;5min
+java:S8912;Custom CredentialsProvider implementations should be annotated with @Unremovable;bug;fiabilité : haute;Critical;active;oui;non;tout;quarkus, credentials, cdi;5 min
+java:S8913;REST Data with Panache resource interfaces should not have implementation classes;code smell;fiabilité : moyenne, maintenabilité : basse;Major;active;oui;non;tout;quarkus, rest, confusing;10min
+java:S8924;Mockito core methods should be statically imported;code smell;maintenabilité : basse;Minor;active;oui;non;tests;mockito, tests, convention;5 min
+java:S8947;JPA entity classes and methods should not be final;bug;fiabilité : haute, maintenabilité : moyenne;Critical;active;oui;non;code principal;jpa, hibernate, pitfall;5min
+java:S8948;"""@OneToMany"" relationships should use ""mappedBy"" or ""@JoinColumn""";code smell;maintenabilité : moyenne;Major;active;oui;non;tout;jpa, hibernate, performance, jakarta;5 min
+java:S8954;Bean Validation constraints should not be placed on static fields;bug;fiabilité : haute, maintenabilité : moyenne;Critical;active;oui;non;tout;validation, pitfall, bug, jakarta;5 min
+java:S8975;"The return value of ""EntityManager.merge()"" should be used";bug;fiabilité : haute, maintenabilité : moyenne;Critical;active;oui;non;code principal;jpa, jakarta, hibernate, pitfall;5 min
+java:S8983;Stateless session beans should not store mutable state in instance variables;bug;fiabilité : haute, maintenabilité : moyenne;Critical;active;oui;non;code principal;ejb, jakarta, concurrency;15min
+java:S8989;"Methods with ""@Transactional"" should specify rollback behavior for checked exceptions";code smell;fiabilité : moyenne, maintenabilité : haute;Critical;active;oui;non;code principal;spring, transaction, pitfall;5 min
+java:S9015;"Mock fields should use ""@Mock"" annotation when ""MockitoExtension"" or ""MockitoJUnitRunner"" is active";code smell;maintenabilité : moyenne;Major;active;oui;non;tests;mockito, junit, tests;5 min
+java:S9016;"Mock objects should not be created inline within ""thenReturn()""";code smell;maintenabilité : moyenne;Major;active;oui;non;tests;mockito, tests;5min
+java:S9017;Mockito stubbing chains should be complete;bug;fiabilité : haute, maintenabilité : moyenne;Critical;active;oui;non;tests;mockito, tests, junit;5 min
+java:S9021;"""@Configuration"" classes should not be final";bug;fiabilité : haute;Critical;active;oui;non;code principal;spring, pitfall;5 min
+java:S9024;"""@InjectMocks"" should be used instead of manually constructing test objects";code smell;maintenabilité : moyenne;Major;active;non;non;tests;mockito, junit, tests;5min
+java:S9068;"""@ApplicationScoped"" should be preferred over ""@Singleton"" in Quarkus applications";code smell;maintenabilité : moyenne;Major;active;oui;non;tout;jee, injection, testing;5 min
+java:S9130;Stream read results should be checked for -1 before casting;bug;fiabilité : haute, maintenabilité : moyenne;Critical;active;oui;non;code principal;pitfall;5 min
+java:S9132;"""ScheduledThreadPoolExecutor.setMaximumPoolSize"" should not be called";code smell;maintenabilité : moyenne;Major;active;oui;non;tout;concurrency, multi-threading, api;5 min
+java:S9133;Predefined mathematical constants should be used instead of hard-coded approximations;code smell;maintenabilité : moyenne;Major;active;oui;non;code principal;cwe, readability, pitfall;5 min
+java:S9142;Prepared Statements should not be created inside loops;code smell;maintenabilité : moyenne;Major;active;oui;non;tout;performance, sql;5min
+java:S9146;Apache XML RPC extensions should not be enabled;vulnérabilité;sécurité : haute;Critical;active;oui;non;tout;cwe, owasp, serialization;5 min
+java:S9147;"""NaN"" should not be tested for equality using ""=="" or ""!=""";bug;fiabilité : haute;Critical;active;oui;non;tout;pitfall, floating-point;5 min
+java:S9148;"""Float.compare"" or ""Double.compare"" should be used for floating-point comparisons";bug;fiabilité : haute, maintenabilité : moyenne;Critical;active;oui;non;tout;pitfall, floating-point;5 min
+java:S9149;Static methods should not hide methods from superclasses;code smell;maintenabilité : moyenne;Major;active;oui;non;tout;pitfall, confusing, inheritance;15min
+java:S9341;Redundant Spring annotations should be removed;code smell;maintenabilité : basse;Minor;active;oui;non;tout;spring, redundant;5 min
+java:S9342;Archive entries should not be empty;bug;fiabilité : haute;Critical;active;oui;non;code principal;pitfall;5 min
+java:S9344;Bitwise AND operations with zero should be corrected;bug;sécurité : moyenne, fiabilité : haute;Critical;active;oui;non;tout;pitfall;5min
+java:S9345;Classes with throwing constructors should be protected against Finalizer attacks;vulnérabilité;sécurité : haute;Critical;active;non;non;code principal;cert, serialization;5 min
+java:S9346;Integer values should not be cast to long for use as timestamps;bug;fiabilité : haute;Critical;active;oui;non;code principal;pitfall, datetime;5 min
+java:S9350;equals() implementations should not compare mismatched members;bug;fiabilité : moyenne;Major;active;oui;non;code principal;suspicious;5min
+java:S9351;"""BigDecimal.compareTo()"" should be used instead of ""equals()"" for numerical comparison";bug;fiabilité : haute;Major;active;oui;non;tout;unpredictable, bad-practice;5min
+java:S9352;"Bean autowiring ambiguity should be resolved using ""@Qualifier"" or ""@Primary""";bug;fiabilité : haute;Critical;active;oui;non;tout;spring, injection, configuration;5 min
+java:S9353;"A bare ""."" should not be used as a regular expression";bug;fiabilité : moyenne;Major;active;oui;non;tout;regex;5min
+java:S9354;"""Comparable.compareTo()"" and ""Comparator.compare()"" should not use subtraction on numerical fields";bug;fiabilité : moyenne;Major;active;oui;non;tout;pitfall;5min
+java:S9355;Comments containing Javadoc or HTML tags should use Javadoc syntax;code smell;maintenabilité : moyenne;Major;active;oui;non;tout;javadoc, confusing;5min
+java:S9357;Anonymous classes on functional interfaces should be lambdas;code smell;maintenabilité : moyenne;Major;active;oui;non;tout;lambda, java8, convention;5 min
+java:S9358;Conditional expressions should not duplicate operations in both branches;code smell;maintenabilité : basse;Minor;active;oui;non;tout;clumsy, redundant, confusing;5 min
+java:S9359;Octal escape sequences should not be followed by digits;code smell;maintenabilité : moyenne;Major;active;oui;non;tout;pitfall, confusing;5 min
+java:S9361;Duplicate keys or elements should not be passed to immutable collection factory methods;bug;fiabilité : haute;Major;active;oui;non;code principal;bad-practice;5min
+java:S9362;hashCode() and equals() should use consistent fields;bug;fiabilité : moyenne;Major;active;oui;non;code principal;suspicious;5min
+java:S9363;Invalid time-zone IDs should not silently fall back to GMT;bug;fiabilité : moyenne;Major;active;oui;non;tout;datetime, timezone, pitfall;5min
+java:S9364;Local variables should not span switch case groups;code smell;maintenabilité : moyenne;Major;active;oui;non;code principal;;10min
+java:S9365;Copy constructors should initialize all fields;bug;fiabilité : moyenne;Major;active;oui;non;code principal;suspicious;5min
+java:S9366;Duration conversions should agree with the supplied TimeUnit;bug;fiabilité : moyenne, maintenabilité : moyenne;Major;active;oui;non;tout;timing;5min
+java:S9386;Float literals should be used instead of casting double literals to float;code smell;maintenabilité : basse;Minor;active;oui;non;tout;convention;2 min
+java:S9387;TestNG Javadoc tags should be converted to annotations;code smell;maintenabilité : moyenne;Major;active;oui;non;tests;deprecated, convention, tests;5 min
+java:S9388;TestNG data provider methods should return valid types;bug;fiabilité : haute;Critical;active;oui;non;tests;testng, test, tests, pitfall;5min
+java:S9389;Data provider names should be unique within a class;bug;fiabilité : haute, maintenabilité : moyenne;Critical;active;oui;non;tests;testng, tests, confusing;5 min
+java:S9390;"Manual null checks should be replaced with ""Objects.equals()""";code smell;maintenabilité : moyenne;Major;active;oui;non;tout;java7, clumsy, pitfall;5 min
+java:S9391;Loops should use Stream API when performing filter, map, or collect operations;code smell;maintenabilité : moyenne;Major;active;non;non;code principal;java8, convention, readability;5 min
+java:S9392;Redundant range checks should be removed;code smell;maintenabilité : moyenne;Major;active;oui;non;tout;redundant, confusing, clarity;5min
+java:S9393;"""Duration.get()"" should only be called with SECONDS or NANOS";bug;fiabilité : moyenne;Major;active;oui;non;tout;java8, datetime, pitfall;5min
+java:S9394;"""contentEquals()"" should be used instead of ""equals()"" for ""CharSequence"" comparisons";bug;fiabilité : moyenne;Major;active;oui;non;tout;pitfall, strings;5min
+java:S9395;Numeric values should be explicitly cast when assigned to narrower types;code smell;maintenabilité : moyenne;Major;active;oui;non;tout;cert, pitfall, confusing;5min
+java:S9396;Inner class fields should not shadow outer class fields;code smell;maintenabilité : moyenne;Major;active;oui;non;tout;confusing, pitfall;5 min
+java:S9397;"""String.format()"" should not be used when simpler alternatives exist";code smell;maintenabilité : basse;Minor;active;non;non;tout;confusing, clumsy;2min
+java:S9398;Inner classes should not be declared inside interfaces;code smell;maintenabilité : moyenne;Major;active;oui;non;code principal;design, convention, confusing;5min
+java:S9399;Instance fields should not be guarded by static locks;code smell;maintenabilité : moyenne;Major;active;non;non;tout;concurrency, multi-threading, performance;5 min
+java:S9400;"Method references not fulfilling the ""Comparator"" contract should not be used as comparators";bug;fiabilité : moyenne;Major;active;oui;non;tout;pitfall;5min
+java:S9401;IdentityHashMap keys should not be boxed primitive types;bug;fiabilité : moyenne;Major;active;oui;non;tout;suspicious;5min
+java:S9402;Sorted collections should have an ordering for their element or key types;bug;fiabilité : moyenne, maintenabilité : moyenne;Major;active;oui;non;tout;;15min
+java:S9403;"""Arrays.fill()"" should not be called with an incompatible value type";bug;fiabilité : moyenne;Major;active;oui;non;tout;pitfall;5min
+java:S9404;"""Optional"" should not wrap collections, maps, or arrays";code smell;maintenabilité : moyenne;Major;active;non;non;code principal;clumsy;10min
+java:S9411;"Loops that transform list elements should use ""List.replaceAll()""";code smell;maintenabilité : moyenne;Major;active;oui;non;tout;java8, loop, readability;5 min
+java:S9412;"""Collections.sort()"" should not be used";code smell;maintenabilité : basse;Minor;active;oui;non;tout;java8, obsolete, convention;5min
+java:S9413;"Redundant ""String.format"" should be removed when native formatting is available";code smell;maintenabilité : moyenne;Major;active;oui;non;tout;slf4j, performance, logging;5 min
+java:S9427;Java assert statements should not be used in test code;bug;fiabilité : haute;Critical;active;oui;non;tests;junit, assertion, tests;5min
+java:S9428;MessageDigest instances should not be stored as fields;bug;sécurité : moyenne, fiabilité : haute, maintenabilité : moyenne;Critical;active;oui;non;tout;concurrency, cryptography, pitfall;5 min
+java:S9433;Literals should not be converted to strings using empty string concatenation;code smell;maintenabilité : moyenne;Major;active;oui;non;tout;confusing, performance;5min
+java:S9434;"Qualified ""this"" should not be used when the unqualified form is enough";code smell;maintenabilité : basse;Minor;active;oui;non;tout;clumsy;2min
+java:S9435;Ternary operator conditions should not be negated;code smell;maintenabilité : basse;Minor;active;oui;non;tout;clumsy;2min
+java:S9436;Classes should not declare more than one logger;bug;fiabilité : moyenne, maintenabilité : basse;Major;active;oui;non;code principal;logging, confusing;10min
+java:S9437;"""getInstance()"" methods should not return a new instance on every call";bug;fiabilité : haute, maintenabilité : moyenne;Major;active;oui;non;tout;design;15min
+java:S9438;"Private fields that are never reassigned after construction should be declared ""final""";code smell;maintenabilité : moyenne, fiabilité : basse;Minor;active;oui;non;code principal;design;2min
+java:S9439;"Array initializers should use the shorthand form instead of an explicit ""new"" array creation";code smell;maintenabilité : basse;Minor;active;oui;non;tout;convention;2min
