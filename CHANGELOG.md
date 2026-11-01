@@ -351,7 +351,7 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 - Recette : `tools/installer.test.mjs`, 17 tests en boîte noire, dans des dépôts Git temporaires. 10 contre-épreuves sur des copies de l'outil (négations absentes, CRLF, chemins, empreintes, changements locaux, worktrees, systèmes, sous-dossier, dossier non géré, remplacement), toutes détectées.
 - `.github/workflows/recette-installer.yml` : la recette sous Linux et Windows, Node 20 et 24, et un contrat avec le code de Gemini CLI (`.github/scripts/contrat-gemini.mjs`). Le contrat installe les huit skills installables et `analyse-projet` dans un projet où `/.gemini/skills/` était déjà exclu. Chaque skill est découvert une fois, nom et description lus tels quels, et tous ses fichiers sont lisibles. `node_modules` reste ignoré.
 - `README.md` : section « Installer un skill dans Gemini CLI ». `docs/orchestrateur-c7e/mode-emploi.md` : installation par l'outil, masquage lisible, deux lignes de dépannage.
-- Soumis à ratification :
+- Décisions ratifiées (pull request n° 27) :
   - un utilitaire déterministe plutôt qu'un agent : l'IA ne fait que les étapes qui suivent l'étape 0, à partir de `CONSIGNE.md` ;
   - le workspace par défaut ; `analyse-projet` au niveau utilisateur seulement ; les systèmes à construire refusés ;
   - le masquage par exclusion locale et négations dans `.geminiignore`, plutôt que l'exclusion globale de Git ou un skill versionné ;
