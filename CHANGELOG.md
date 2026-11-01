@@ -20,7 +20,7 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
   - installé par `tools/installer.mjs`, le skill est découvert une fois par Gemini CLI, le module `qualification` n'y devient pas un skill, et tous ses fichiers sont lisibles ;
   - vérificateur, glossaire et transmission à jour.
 - `docs/orchestrateur-c7e/mode-emploi.md` : version 3.3.0, qualification à l'ouverture du ticket dans l'introduction, le schéma, le menu, la commande, l'usage quotidien et le dépannage ; adaptation des possibilités à l'application.
-- Soumis à ratification :
+- Décisions ratifiées (pull request n° 32) :
   - une dimension nouvelle, D11, et donc une version mineure, plutôt qu'un ajout à D10 ;
   - les quinze possibilités de modification proposées pour la pile, leurs options et leurs repères, et la règle de choix ;
   - la confrontation des possibilités à l'analyse de l'application à l'installation, l'IA proposant et le développeur écrivant ;
