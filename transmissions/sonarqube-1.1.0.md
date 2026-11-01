@@ -273,7 +273,7 @@ Points d'extension, actifs dès 1.0.0 :
 Par mission :
 
 - **Configurer** : une analyse complète du back et du front aboutit, avec couverture importée ; le pipeline de merge request attend le quality gate ; aucun secret dans le dépôt.
-- **Examiner en local** : chaque constat sur le diff avec la branche cible porte son moteur ; par l'interface de pilotage, la recette de seize scénarios passe ; si l'analyse éphémère est retenue, l'état du quality gate est connu avant le push et la branche de travail est supprimée ; rien n'est poussé ni modifié dans les issues.
+- **Examiner en local** : chaque constat sur le diff avec la branche cible porte son moteur ; les tests du projet ont tourné avant l'analyse éphémère et leurs résultats figurent au rapport ; par l'interface de pilotage, la recette simulée de vingt-cinq scénarios passe, et la recette réelle de cinq scénarios passe contre l'instance quand elle est configurée ; si l'analyse éphémère est retenue, l'état du quality gate est connu avant le push et la branche de travail est supprimée ; rien n'est poussé ni modifié dans les issues.
 - **Trier** : chaque constat traité a une décision, une justification et, si une transition est appliquée, un commentaire dans SonarQube.
 - **Corriger ou planifier** : build et tests verts, constat fermé à l'analyse suivante, ou plan conforme au module `correction`.
 - **Gouverner** : chaque changement est validé, appliqué, vérifié par relecture de la configuration, et inscrit au journal.
@@ -331,6 +331,7 @@ Toute intervention se termine par un rapport conforme au module `rapport`.
 - **D9.INV-4** : seules les règles actives du ou des profils qualité du projet sur l'instance sont appliquées et citées, lues à l'examen ou depuis un cache dont la date de mise à jour du profil a été vérifiée.
 - **D9.INV-5** : avant le lancement, la fiche indique pour chaque moteur retenu où part le code, et le développeur l'a confirmée.
 - **D9.INV-6** : l'examen local ne pousse rien, ne commente aucune issue et ne change aucun statut ; ses constats passent par le triage et la correction.
+- **D9.INV-7** : une analyse éphémère est précédée des tests du projet, sauf refus annoncé dans le lot ; un test en échec n'empêche pas l'analyse ; tests et couverture sont lus sur la branche de travail et rapportés, et une couverture absente ou un test en échec est signalé, jamais tu.
 
 **D10 : pilotage**
 
@@ -347,7 +348,7 @@ Toute intervention se termine par un rapport conforme au module `rapport`.
 
 **1.0.2** (2026-10-21) : correctif. Le skill s'appelle désormais `sonarqube` (auparavant `expert-sonarqube`) : le préfixe `expert-` est retiré de tous les skills du dépôt. Référentiels renommés et montés : `references/java.md` (java 1.1.1) et `references/angular.md` (angular 1.0.1), cités sous la forme `java:Dn.INV-k` et `angular:Dn.INV-k` ; le skill se matérialise dans `.skills/sonarqube/`. Notation précisée : `java:Dn.INV-k` désigne un invariant du référentiel `java`, `java:Snnnn` une règle SonarQube. Socle back-front épinglé en 1.0.1. Aucune dimension ni aucun invariant modifié. Motif : une nouvelle notion d'expertise sera définie ensuite.
 
-**1.1.0** (2026-11-01) : dimensions D9 et D10 actives, l'examen local avant GitLab et son interface de pilotage, à la demande du développeur. Cinquième mission, « Examiner en local » : le code est examiné selon les règles du profil qualité du projet sur l'instance, avant son envoi sur GitLab, sur le diff entre `HEAD` et la base de fusion avec la branche cible. Trois moteurs au choix : analyse éphémère sous une branche de travail `local-…` supprimée après lecture, moteur SonarLint de SonarQube for IDE en mode connecté piloté par le serveur MCP de Sonar, relecture du diff par les règles actives du profil. Module `examen-local`. Catalogue d'appels (point E1) complété : règles actives d'un profil, suppression d'une branche, analyse sous une branche de travail, outil MCP `analyze_file_list` ; le reste de D7 demeure réservé. Rapport : mission « Examiner en local ». Modes de connexion au choix (module `cadrage-acces`, § 3 bis) : API web par en-tête `Bearer` ou par jeton en nom d'utilisateur, scanner, SonarQube for IDE par le serveur MCP autonome, serveur MCP hébergé par l'instance (noté, sans usage en 1.1), SonarQube CLI ; invariant D1.INV-5. Dimension D10 active, l'interface de pilotage locale : module `pilotage`, script Node sans dépendance `outils/pilote-sonar.mjs` et recette de seize scénarios `tests/pilote-sonar.test.mjs`, tirés du module par une commande à empreintes. Invariants D9.INV-1 à D9.INV-6 et D10.INV-1 à D10.INV-4 ; trente-trois invariants. Archive de la version précédente : `archives/SKILL-v1.0.2.md`.
+**1.1.0** (2026-11-01) : dimensions D9 et D10 actives, l'examen local avant GitLab et son interface de pilotage, à la demande du développeur. Cinquième mission, « Examiner en local » : le code est examiné selon les règles du profil qualité du projet sur l'instance, avant son envoi sur GitLab, sur le diff entre `HEAD` et la base de fusion avec la branche cible. Trois moteurs au choix : analyse éphémère sous une branche de travail `local-…` supprimée après lecture, moteur SonarLint de SonarQube for IDE en mode connecté piloté par le serveur MCP de Sonar, relecture du diff par les règles actives du profil. Module `examen-local`. Catalogue d'appels (point E1) complété : règles actives d'un profil, suppression d'une branche, analyse sous une branche de travail, outil MCP `analyze_file_list` ; le reste de D7 demeure réservé. Rapport : mission « Examiner en local ». Modes de connexion au choix (module `cadrage-acces`, § 3 bis) : API web par en-tête `Bearer` ou par jeton en nom d'utilisateur, scanner, SonarQube for IDE par le serveur MCP autonome, serveur MCP hébergé par l'instance (noté, sans usage en 1.1), SonarQube CLI ; invariant D1.INV-5. Dimension D10 active, l'interface de pilotage locale : module `pilotage`, script Node sans dépendance `outils/pilote-sonar.mjs`, recette simulée de vingt-cinq scénarios `tests/pilote-sonar.test.mjs` (back Java et front TypeScript) et recette réelle de cinq scénarios `tests/pilote-sonar.reel.test.mjs` contre l'instance du développeur, tirés du module par une commande à empreintes. Les tests du projet tournent avant chaque analyse éphémère et leurs résultats et la couverture remontent dans SonarQube ; dossier du projet pour un monodépôt. Invariants D9.INV-1 à D9.INV-7 et D10.INV-1 à D10.INV-4 ; trente-quatre invariants. Archive de la version précédente : `archives/SKILL-v1.0.2.md`.
 <<<FIN SKILL.md>>>
 
 <<<FICHIER socle/SKILL.md>>>
@@ -1527,6 +1528,8 @@ npx @sonar/scan \
   -Dsonar.qualitygate.wait=true
 ```
 
+- Les tests du projet tournent avant l'analyse, pour que leurs résultats et la couverture remontent dans l'instance (D9.INV-7). Côté Maven, `verify` les lance ; ajouter `-Dmaven.test.failure.ignore=true` pour qu'un test en échec soit importé au lieu d'arrêter l'examen. Côté front, la commande de tests précède le scanner ; le nombre de tests du front n'est connu de SonarQube que si le projet produit un rapport d'exécution au format générique (`sonar.testExecutionReportPaths`).
+- Avec `sonar.qualitygate.wait=true`, un quality gate en échec fait sortir le scanner en erreur : l'expert lit quand même l'instance si la branche de travail existe.
 - `sonar.newCode.referenceBranch` fait du diff avec la branche cible le nouveau code de la branche de travail. L'expert vérifie que l'instance accepte ce paramètre d'analyse (documentation de la version) et que la branche cible y est analysée ; sinon, il le signale et filtre les constats par le périmètre du § 3.
 - Aucune variable `CI_MERGE_REQUEST_*` ni propriété `sonar.pullrequest.*` ne doit être présente : le scanner croirait analyser une MR.
 - Le scanner du front exige Node.js 22 ou plus récent avec l'instance 2026.5 (module `configuration-analyse`).
@@ -1537,7 +1540,7 @@ npx @sonar/scan \
 sonar_get "/api/qualitygates/project_status?projectKey=acme-api&branch=$BRANCHE_LOCALE"
 sonar_get "/api/issues/search?components=acme-api&branch=$BRANCHE_LOCALE&inNewCodePeriod=true&issueStatuses=OPEN,CONFIRMED&ps=500&p=1"
 sonar_get "/api/hotspots/search?project=acme-api&branch=$BRANCHE_LOCALE&status=TO_REVIEW"
-sonar_get "/api/measures/component?component=acme-api&branch=$BRANCHE_LOCALE&metricKeys=new_coverage,new_duplicated_lines_density"
+sonar_get "/api/measures/component?component=acme-api&branch=$BRANCHE_LOCALE&metricKeys=tests,test_failures,test_errors,skipped_tests,coverage,new_coverage,new_duplicated_lines_density"
 
 # Écriture 2 du lot validé
 sonar_post "/api/project_branches/delete" "project=acme-api" "branch=$BRANCHE_LOCALE"
@@ -1620,12 +1623,13 @@ Le reste du rapport suit le module `rapport` (mission « Examiner en local »).
 - Les règles citées sont actives dans le profil du projet, lu à l'examen ou depuis un cache vérifié (D9.INV-4).
 - La fiche indiquait, pour chaque moteur, où part le code (D9.INV-5).
 - Aucun push, aucune transition, aucun commentaire n'a été fait par l'examen (D9.INV-6).
+- Les tests du projet ont précédé l'analyse éphémère, ou leur absence a été annoncée ; tests et couverture lus sur la branche figurent au rapport (D9.INV-7).
 <<<FIN modules/examen-local/SKILL.md>>>
 
 <<<FICHIER modules/pilotage/SKILL.md>>>
 ---
 name: pilotage
-description: Interface locale de pilotage des tests SonarQube (script Node sans dépendance servi sur la boucle locale, clé de session, détection des modes de connexion, test de connexion par l'un ou l'autre mode d'API, périmètre du diff, règles actives du profil avec cache, analyse éphémère par lot d'écritures validé puis suppression vérifiée de la branche de travail, dossier de relecture, commande du serveur MCP, constats par moteur, journal des appels sans jeton, recette de seize scénarios contre un faux SonarQube). À lire pour piloter l'examen local depuis un navigateur.
+description: Interface locale de pilotage des tests SonarQube (script Node sans dépendance servi sur la boucle locale, clé de session, détection des modes de connexion, test de connexion par l'un ou l'autre mode d'API, périmètre du diff, règles actives du profil avec cache, analyse éphémère par lot d'écritures validé, précédée des tests du projet dont les résultats et la couverture remontent dans SonarQube, dossier du projet pour un monodépôt back et front, suppression vérifiée de la branche de travail, dossier de relecture, commande du serveur MCP, constats par moteur, journal des appels sans jeton, recette de vingt-cinq scénarios contre un faux SonarQube et recette réelle de cinq scénarios contre l'instance du développeur). À lire pour piloter l'examen local depuis un navigateur.
 dimensions: [D10]
 status: active
 ---
@@ -1668,9 +1672,9 @@ Le pilote affiche une adresse `http://127.0.0.1:8765/?cle=<clé>` : c'est la seu
 | 1. Connexion | détecte les modes du module `cadrage-acces`, § 3 bis ; teste le mode d'API retenu, Bearer ou jeton en nom d'utilisateur ; relève version, édition, compte | `/api/authentication/validate`, `/api/server/version`, `/api/navigation/global`, `/api/users/current`, `GET <hôte>/mcp` | D1.INV-4, D1.INV-5 |
 | 2. Projet et périmètre | `git fetch`, base de fusion avec `origin/<cible>`, fichiers et lignes du diff, modifications non commitées | git seulement | D9.INV-3 |
 | 3. Règles du profil | profils du projet, règles actives paginées, cache invalidé par `rulesUpdatedAt` ; dossier de relecture | `/api/qualityprofiles/search`, `/api/rules/search` | D9.INV-4 |
-| 4. Analyse éphémère | propose le lot de deux écritures, avec la commande exacte et l'appel de suppression ; exécute seulement après « Valider et lancer » | scanner, `/api/qualitygates/project_status`, `/api/issues/search`, `/api/hotspots/search`, `/api/project_branches/delete`, `/api/project_branches/list` | D1.INV-3, D9.INV-2, D10.INV-3 |
+| 4. Analyse éphémère | propose le lot de deux écritures, avec la commande exacte, les tests du projet lancés avant et l'appel de suppression ; exécute seulement après « Valider et lancer » ; lit gate, constats, tests et couverture sur la branche de travail | tests du projet, scanner, `/api/project_branches/list`, `/api/qualitygates/project_status`, `/api/issues/search`, `/api/measures/component`, `/api/hotspots/search`, `/api/project_branches/delete` | D1.INV-3, D9.INV-2, D9.INV-7, D10.INV-3 |
 | 5. Moteur SonarLint | affiche la commande du serveur MCP, sans valeur de jeton | aucun | D1.INV-2 |
-| 6. Constats | tableau par moteur ; constats hors périmètre comptés à part | aucun | D9.INV-1 |
+| 6. Constats | tests et couverture lus dans SonarQube ; tableau par moteur ; constats hors périmètre comptés à part | aucun | D9.INV-1, D6.INV-2 |
 | 7. Journal | méthode, chemin, statut, écriture ou non, sans jeton | aucun | D6.INV-1, D10.INV-2 |
 
 La relecture par les règles reste le travail de l'expert : le pilote prépare `.sonar-local/relecture-<HEAD>.md`, avec le diff et les règles actives, et l'expert y répond selon le module `examen-local`, § 7.
@@ -1686,30 +1690,52 @@ Toutes les routes exigent l'en-tête `x-pilote-cle` ; la page exige le paramètr
 | `POST /api/perimetre` | `{ cible }` | base, HEAD, fichiers, lignes, non commité |
 | `POST /api/regles` | `{ projet }` | profils et règles actives |
 | `POST /api/relecture` | `{ projet }` | chemin du dossier de relecture |
-| `POST /api/ephemere/proposer` | `{ projet, type: "maven" \| "npm" \| "personnalise", base? }` | lot : identifiant, branche, écritures exactes |
-| `POST /api/ephemere/lancer` | `{ id }` | gate, constats, hors périmètre, suppression, limites |
+| `POST /api/ephemere/proposer` | `{ projet, type: "maven" \| "npm" \| "personnalise", base?, tests?, sansTests?, dossier? }` | lot : identifiant, branche, tests du projet, écritures exactes |
+| `POST /api/ephemere/lancer` | `{ id }` | tests, gate, mesures, constats, hors périmètre, suppression, limites |
 | `GET /api/journal` | | appels à l'API |
 | `GET /api/mcp` | | commande du serveur MCP |
+
+### 4.1 Les tests du projet passent par SonarQube (D9.INV-7)
+
+SonarQube n'exécute pas les tests : il importe leurs rapports. Le pilote lance donc les tests du projet juste avant l'analyse éphémère, pour que leurs résultats et la couverture remontent dans l'instance et comptent dans le quality gate de la branche de travail.
+
+| Préréglage | Tests du projet | Analyse | Ce qui remonte |
+|---|---|---|---|
+| `maven` (back) | dans `mvn verify` : JUnit, puis rapport JaCoCo | `mvn -B verify … sonar:sonar -Dmaven.test.failure.ignore=true -Dsonar.qualitygate.wait=true` | nombre de tests, échecs, erreurs, ignorés (rapports Surefire), couverture |
+| `npm` (front) | `npx ng test --watch=false --code-coverage` (modifiable) | `npx @sonar/scan -Dsonar.qualitygate.wait=true` | couverture LCOV ; le nombre de tests du front exige un rapport d'exécution au format générique (`sonar.testExecutionReportPaths`), à configurer dans le projet |
+| `personnalise` | commande libre, facultative | commande libre, sans branche, MR ni jeton | selon les rapports produits |
+
+- **Un test en échec n'arrête pas l'examen** : côté Maven, `-Dmaven.test.failure.ignore=true` laisse l'analyse se faire, et l'échec est importé ; côté npm, l'analyse suit même si la commande de tests sort en erreur. Dans les deux cas, le rapport le signale.
+- **Quality gate en échec** : avec `sonar.qualitygate.wait=true`, le scanner sort en erreur quand le gate échoue. Le pilote lit donc l'instance dès que la branche de travail existe, quel que soit le code de sortie ; si elle n'existe pas, il le dit et ne présente aucun constat.
+- **Mesures lues** : `tests`, `test_failures`, `test_errors`, `skipped_tests`, `coverage`, `new_coverage`, sur la branche de travail. Une couverture absente est signalée (D2.INV-2), un test en échec aussi.
+- **Monodépôt** : le champ « dossier du projet » (`web` pour un front dans `web/`) fixe où tournent tests et scanner, et ramène les chemins des constats à la racine du dépôt pour les filtrer au périmètre.
+- **Sans tests** : la case « Ne pas lancer les tests » est possible, mais le lot l'annonce : couverture et résultats seront absents de l'analyse.
+
+### 4.2 Validité d'un lot
 
 Un lot vaut dix minutes et ne sert qu'une fois ; un identifiant inconnu, expiré ou déjà employé renvoie 409 sans rien écrire. Une commande personnalisée qui fixerait elle-même `sonar.branch.name`, une merge request ou un jeton est refusée : le pilote ajoute toujours `-Dsonar.branch.name=local-…` et `-Dsonar.newCode.referenceBranch=<cible>`, et retire de l'environnement du scanner les variables `CI_MERGE_REQUEST_*`.
 
 ## 5. Matérialiser les fichiers exécutables
 
-Deux fichiers sont tirés des blocs annotés `<!-- fichier : chemin -->` de ce module, à l'identique, par programme plutôt qu'à la main. Depuis le dossier où le skill est matérialisé (`.skills/sonarqube/`) :
+Trois fichiers sont tirés des blocs annotés `<!-- fichier : chemin -->` de ce module, à l'identique, par programme plutôt qu'à la main. Depuis le dossier où le skill est matérialisé (`.skills/sonarqube/`) :
 
 ```text
-node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'outils/pilote-sonar.mjs': '39438776d6345d6b5e068c9a1066f071218a766626f036bc001533ccb7a52616', 'tests/pilote-sonar.test.mjs': '6ae11db5760c48cfa4864cdd0c7d210dde9fd90b8b574be99204e100a635d924' }; let ecarts = 0, vus = 0; const texte = fs.readFileSync('modules/pilotage/SKILL.md', 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { vus++; const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (!conforme) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } if (vus !== Object.keys(attendu).length) { console.log('fichiers trouvés : ' + vus); ecarts++; } if (ecarts > 0) process.exitCode = 1;"
+node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'outils/pilote-sonar.mjs': 'c6c2fff3b79509e0ad5766552d6e503ec8dd7b07a3947c955d8c2d1d4ee2bfa1', 'tests/pilote-sonar.test.mjs': '50a5c7d82793406c24db712cf86b84abf14c0f75565e2e841987615974a41012', 'tests/pilote-sonar.reel.test.mjs': 'f5c83b0d203aa5e0f345fe5eea5ebb3a12fb88787e89c4cba4793c5b9025e676' }; let ecarts = 0, vus = 0; const texte = fs.readFileSync('modules/pilotage/SKILL.md', 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { vus++; const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (!conforme) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } if (vus !== Object.keys(attendu).length) { console.log('fichiers trouvés : ' + vus); ecarts++; } if (ecarts > 0) process.exitCode = 1;"
 ```
 
 Chaque fichier conforme est signalé `conforme` ; un écart arrête la commande avec un code non nul. Ne corrige pas un fichier en écart : signale-le au développeur.
 
 ## 6. Recette
 
+Deux recettes, la première toujours, la seconde contre ton instance.
+
+### 6.1 Recette simulée
+
 ```bash
 node --test tests/pilote-sonar.test.mjs
 ```
 
-Seize scénarios, P1 à P16, contre un faux SonarQube local, un dépôt git temporaire avec un `origin` nu et un faux scanner ; aucun réseau externe. La CI du dépôt Agent2Prompt la rejoue sous Linux et Windows, avec Node 20 et 22, à partir de la transmission courante.
+Vingt-cinq scénarios, P1 à P25, contre un faux SonarQube local, un dépôt git temporaire avec un back Java et un front TypeScript dans `web/`, un faux scanner, et de faux `mvn` et `npx` placés en tête du `PATH` ; aucun réseau externe. La CI du dépôt Agent2Prompt la rejoue sous Linux et Windows, avec Node 20 et 22, à partir de la transmission courante.
 
 | Scénario | Invariants |
 |---|---|
@@ -1729,6 +1755,38 @@ Seize scénarios, P1 à P16, contre un faux SonarQube local, un dépôt git temp
 | P14 échec de suppression rapporté | D9.INV-2 |
 | P15 journal sans jeton, écriture marquée | D10.INV-2, D6.INV-1 |
 | P16 dossier de relecture | D9.INV-1, D9.INV-4 |
+| P17 préréglage npm : tests du front avant l'analyse, dans `web/` | D9.INV-7 |
+| P18 préréglage Maven : tests dans `verify`, échecs importés | D9.INV-7 |
+| P19 tests et couverture lus sur la branche, échecs signalés | D9.INV-7, D6.INV-2 |
+| P20 couverture absente signalée, tests non lancés annoncés | D2.INV-2, D9.INV-7 |
+| P21 front TypeScript : constats ramenés au dépôt, profil TS en cache propre | D9.INV-1, D9.INV-3, D9.INV-4 |
+| P22 tests en échec : analyse poursuivie, branche supprimée | D9.INV-2, D9.INV-7 |
+| P23 dossier du projet et commande de tests vérifiés | D1.INV-2 |
+| P24 valeur d'une mesure, directe ou de période | D6.INV-2 |
+| P25 analyse absente : aucun constat inventé, suppression tentée | D9.INV-1, D9.INV-2 |
+
+Répartition par langage : le back Java sert de décor à P8 à P16, P18, P19 et P25 ; le front TypeScript à P17 et P20 à P23 ; les autres scénarios ne dépendent d'aucun langage.
+
+### 6.2 Recette réelle, contre l'instance du développeur
+
+```bash
+read -rs RECETTE_SONAR_TOKEN && export RECETTE_SONAR_TOKEN
+export RECETTE_SONAR_HOST_URL=https://sonar.exemple.org
+export RECETTE_SONAR_PROJET=agent2prompt-recette
+node --test tests/pilote-sonar.reel.test.mjs
+```
+
+Cinq scénarios, R1 à R5, sur un **projet réservé à la recette**, créé à l'avance sur l'instance (édition Developer ou supérieure). Le jeton utilisateur doit y avoir Browse, Execute Analysis et Administer. La recette fabrique un petit projet JavaScript dans un dépôt temporaire, en analyse la branche principale comme décor, puis ajoute un fichier fautif et le soumet au pilote : tests avec couverture LCOV, analyse éphémère réelle, gate, constats, mesures, suppression vérifiée de la branche. Sans les trois variables, chaque scénario est sauté.
+
+| Scénario, ce qui est prouvé contre l'instance | Invariants |
+|---|---|
+| R1 connexion Bearer, version, édition | D1.INV-4, D1.INV-5 |
+| R2 jeton en nom d'utilisateur, accepté ou refusé proprement | D1.INV-5 |
+| R3 modes détectés, jeton absent de l'état | D10.INV-2 |
+| R4 périmètre, règles actives du profil réel, cache | D9.INV-3, D9.INV-4 |
+| R5 analyse éphémère complète, tests et couverture remontés, constats au périmètre, branche supprimée | D9.INV-1, D9.INV-2, D9.INV-7 |
+
+Écritures sur l'instance : l'analyse de la branche principale du projet de recette, puis la branche `local-…`, supprimée ; un filet de sécurité la supprime aussi en fin de recette si un scénario a échoué. Réseau : npm, pour `@sonar/scan`, et l'instance. La CI du dépôt la lance seulement si la variable de dépôt `RECETTE_SONAR_ACTIVE` vaut `true` et que les secrets `RECETTE_SONAR_HOST_URL` et `RECETTE_SONAR_TOKEN` et la variable `RECETTE_SONAR_PROJET` sont définis ; une instance du réseau interne, injoignable depuis GitHub, se recette depuis le poste.
 
 ## 7. Pièges connus
 
@@ -1742,6 +1800,7 @@ Seize scénarios, P1 à P16, contre un faux SonarQube local, un dépôt git temp
 - Le pilote n'a écouté que sur `127.0.0.1` et n'a servi que des requêtes portant la clé (D10.INV-1).
 - Aucune réponse, aucune ligne du journal ni de la sortie du scanner ne contient le jeton (D10.INV-2).
 - Chaque écriture vient d'un lot proposé puis validé, non expiré, employé une fois (D10.INV-3).
+- Les tests du projet ont tourné avant l'analyse, ou le lot annonçait qu'ils ne tourneraient pas ; tests et couverture lus sur la branche figurent au rapport (D9.INV-7).
 - La branche de travail est supprimée et la suppression vérifiée, ou son échec rapporté avec le nom de la branche (D10.INV-4, D9.INV-2).
 
 ## 9. Script `outils/pilote-sonar.mjs`
@@ -1796,10 +1855,32 @@ export function verifierCommande(commande, jeton = process.env.SONAR_TOKEN) {
   return c;
 }
 
-export const SCANNERS = {
-  maven: 'mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.qualitygate.wait=true',
-  npm: 'npx @sonar/scan -Dsonar.qualitygate.wait=true',
+/**
+ * Préréglages : les tests du projet tournent avant l'analyse, pour que leurs résultats et la couverture
+ * remontent dans SonarQube (D9.INV-7). Maven les lance dans verify ; un échec de test n'arrête pas
+ * l'analyse, il y est importé et rapporté.
+ */
+export const PRESETS = {
+  maven: {
+    tests: null,
+    analyse: 'mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dmaven.test.failure.ignore=true -Dsonar.qualitygate.wait=true',
+    note: 'tests JUnit et couverture JaCoCo lancés par verify',
+  },
+  npm: {
+    tests: 'npx ng test --watch=false --code-coverage',
+    analyse: 'npx @sonar/scan -Dsonar.qualitygate.wait=true',
+    note: 'tests Angular avec couverture LCOV, puis analyse',
+  },
 };
+
+/** Mesures de tests et de couverture lues sur la branche de travail. */
+export const MESURES_TESTS = ['tests', 'test_failures', 'test_errors', 'skipped_tests', 'coverage', 'new_coverage'];
+
+/** Valeur d'une mesure : `value`, ou celle de la période pour les mesures du nouveau code. */
+export function valeurMesure(m) {
+  const v = m?.value ?? m?.period?.value ?? m?.periods?.[0]?.value;
+  return v === undefined || v === null || v === '' ? null : Number(v);
+}
 
 /** Commande complète : la base retenue, plus la branche de travail et la référence du nouveau code. */
 export function commandeScanner(base, branche, cible) {
@@ -1824,13 +1905,26 @@ export function analyserDiff(texte) {
   return plages;
 }
 
-/** Un constat est dans le périmètre si son fichier est modifié et, s'il a une ligne, si elle l'est aussi. */
-export function dansPerimetre(plages, composant, ligne) {
-  const fichier = String(composant || '').includes(':') ? composant.slice(composant.indexOf(':') + 1) : composant;
+/**
+ * Un constat est dans le périmètre si son fichier est modifié et, s'il a une ligne, si elle l'est aussi.
+ * Le chemin d'un composant est relatif au dossier du projet SonarQube ; `dossier` le ramène à la racine du dépôt.
+ */
+export function dansPerimetre(plages, composant, ligne, dossier = '.') {
+  const relatif = String(composant || '').includes(':') ? composant.slice(composant.indexOf(':') + 1) : composant;
+  const fichier = path.posix.join(dossier || '.', relatif);
   const p = plages.get(fichier);
   if (!p) return false;
   if (!ligne) return true;
   return p.some(([a, b]) => ligne >= a && ligne <= b);
+}
+
+/** Dossier du projet dans le dépôt : relatif, sans remontée, existant. */
+export function dossierProjet(racine, dossier = '.') {
+  const d = String(dossier || '.').replace(/\\/g, '/').replace(/\/+$/, '') || '.';
+  if (path.posix.isAbsolute(d) || /^[A-Za-z]:/.test(d) || d.split('/').includes('..')) throw new Error('dossier du projet : chemin relatif au dépôt, sans « .. »');
+  const normal = path.posix.normalize(d);
+  if (!fs.existsSync(path.join(racine, normal))) throw new Error(`dossier du projet introuvable : ${normal}`);
+  return normal;
 }
 
 /** Environnement du scanner : sans variables de merge request, pour qu'il ne se croie pas en MR. */
@@ -1984,19 +2078,25 @@ export class Pilote {
   }
 
   /** Propose le lot d'écritures de l'analyse éphémère, sans rien exécuter (D1.INV-3, D10.INV-3). */
-  async proposerEphemere({ projet, type = 'maven', base: baseLibre }) {
+  async proposerEphemere({ projet, type = 'maven', base: baseLibre, tests: testsLibre, sansTests = false, dossier = '.' }) {
     if (!this.perimetre) throw new Error('calculer d\'abord le périmètre');
     if (!projet) throw new Error('clé de projet requise');
-    const base = type === 'personnalise' ? baseLibre : SCANNERS[type];
-    if (!base) throw new Error(`type de scanner inconnu : ${type}`);
+    const preset = PRESETS[type];
+    if (type !== 'personnalise' && !preset) throw new Error(`type de scanner inconnu : ${type}`);
+    const base = type === 'personnalise' ? baseLibre : preset.analyse;
+    if (!base) throw new Error('commande d\'analyse requise');
+    const dossierP = dossierProjet(this.racine, dossier);
+    const libre = String(testsLibre ?? '').trim();
+    const tests = sansTests ? null : (libre ? verifierCommande(libre, this.jeton) : (preset?.tests ?? null));
     const login = this.login || (await this.appel('/api/users/current'))?.login;
     const branche = nomBrancheLocale(login, this.perimetre.head);
     const commande = commandeScanner(base, branche, this.perimetre.cible);
     const id = crypto.randomBytes(12).toString('hex');
     const lot = {
-      id, projet, branche, commande, cible: this.perimetre.cible, expire: this.horloge() + LOT_DUREE_MS,
+      id, projet, branche, commande, tests, dossier: dossierP, cible: this.perimetre.cible, expire: this.horloge() + LOT_DUREE_MS,
+      testsDuProjet: tests ? `lancés avant l'analyse : ${tests}` : (type === 'maven' && !sansTests ? PRESETS.maven.note : 'non lancés : couverture et résultats de tests absents de l\'analyse'),
       ecritures: [
-        { ordre: 1, action: `analyse du code local de ${projet} sous la branche de travail ${branche}`, appel: commande },
+        { ordre: 1, action: `analyse du code local de ${projet} (dossier ${dossierP}) sous la branche de travail ${branche}`, appel: commande },
         { ordre: 2, action: 'suppression de la branche de travail, après lecture', appel: `POST /api/project_branches/delete project=${projet} branch=${branche}` },
       ],
       ouPartLeCode: 'instance SonarQube',
@@ -2013,10 +2113,19 @@ export class Pilote {
     if (!lot) { const e = new Error('aucun lot validé sous cet identifiant'); e.statut = 409; throw e; }
     this.lots.delete(id);
     if (this.horloge() > lot.expire) { const e = new Error('lot expiré : le proposer à nouveau'); e.statut = 409; throw e; }
-    const rapport = { branche: lot.branche, scanner: null, qualityGate: null, constats: [], horsPerimetre: 0, suppression: null, limites: [] };
+    const rapport = { branche: lot.branche, tests: null, scanner: null, qualityGate: null, mesures: {}, constats: [], horsPerimetre: 0, suppression: null, limites: [] };
     try {
-      rapport.scanner = await this.#scanner(lot.commande);
-      if (rapport.scanner.code !== 0) rapport.limites.push(`scanner en échec (code ${rapport.scanner.code})`);
+      if (lot.tests) {
+        rapport.tests = await this.#executer(lot.tests, lot.dossier);
+        if (rapport.tests.code !== 0) rapport.limites.push(`tests du projet en échec (code ${rapport.tests.code}) : l'analyse continue, leurs rapports sont importés s'ils existent`);
+      }
+      rapport.scanner = await this.#executer(lot.commande, lot.dossier);
+      // Avec sonar.qualitygate.wait=true, un quality gate en échec fait aussi sortir le scanner en erreur :
+      // on lit donc l'instance dès que la branche de travail existe, quel que soit le code de sortie.
+      if (rapport.scanner.code !== 0) rapport.limites.push(`scanner sorti en erreur (code ${rapport.scanner.code}) : quality gate en échec ou analyse interrompue`);
+      const existe = await this.appel(`/api/project_branches/list?project=${encodeURIComponent(lot.projet)}`)
+        .then((r) => (r?.branches ?? []).some((x) => x.name === lot.branche)).catch(() => false);
+      if (!existe) rapport.limites.push('analyse absente de l\'instance : aucun constat lu');
       else {
         const b = encodeURIComponent(lot.branche); const p = encodeURIComponent(lot.projet);
         const gate = await this.appel(`/api/qualitygates/project_status?projectKey=${p}&branch=${b}`).catch((e) => { rapport.limites.push(e.message); return null; });
@@ -2028,14 +2137,22 @@ export class Pilote {
           if (!r?.issues?.length || issues.length >= (r.total ?? r.paging?.total ?? 0)) break;
           if (page * PAGE_ISSUES >= MAX_ISSUES) rapport.limites.push('plus de 10 000 constats : découper la requête');
         }
+        const mesures = await this.appel(`/api/measures/component?component=${p}&branch=${b}&metricKeys=${MESURES_TESTS.join(',')}`)
+          .catch((e) => { rapport.limites.push(`mesures non lues : ${e.message}`); return null; });
+        for (const m of mesures?.component?.measures ?? []) rapport.mesures[m.metric] = valeurMesure(m);
+        if (mesures && rapport.mesures.coverage == null && rapport.mesures.new_coverage == null) {
+          rapport.limites.push('couverture absente : aucun rapport JaCoCo ou LCOV importé (D2.INV-2)');
+        }
+        const enEchec = (rapport.mesures.test_failures ?? 0) + (rapport.mesures.test_errors ?? 0);
+        if (enEchec > 0) rapport.limites.push(`${enEchec} test(s) en échec ou en erreur, lus dans SonarQube`);
         const hotspots = await this.appel(`/api/hotspots/search?project=${p}&branch=${b}&status=TO_REVIEW`)
           .then((r) => r?.hotspots ?? []).catch(() => { rapport.limites.push('revues de sécurité non lues'); return []; });
         for (const i of issues) {
-          if (!dansPerimetre(this.perimetre.plages, i.component, i.line)) { rapport.horsPerimetre++; continue; }
+          if (!dansPerimetre(this.perimetre.plages, i.component, i.line, lot.dossier)) { rapport.horsPerimetre++; continue; }
           rapport.constats.push({ moteur: 'analyse éphémère', cle: i.key, regle: i.rule, composant: i.component, ligne: i.line ?? null, message: i.message, impacts: i.impacts ?? null, severite: i.severity ?? null, type: i.type ?? null });
         }
         for (const h of hotspots) {
-          if (!dansPerimetre(this.perimetre.plages, h.component, h.line)) { rapport.horsPerimetre++; continue; }
+          if (!dansPerimetre(this.perimetre.plages, h.component, h.line, lot.dossier)) { rapport.horsPerimetre++; continue; }
           rapport.constats.push({ moteur: 'analyse éphémère', cle: h.key, regle: h.ruleKey, composant: h.component, ligne: h.line ?? null, message: h.message, revueSecurite: true });
         }
       }
@@ -2061,9 +2178,9 @@ export class Pilote {
     }
   }
 
-  #scanner(commande) {
+  #executer(commande, dossier = '.') {
     return new Promise((resolve) => {
-      const enfant = spawn(commande, { cwd: this.racine, env: environnementScanner(this.env), shell: true });
+      const enfant = spawn(commande, { cwd: path.join(this.racine, dossier), env: environnementScanner(this.env), shell: true });
       let sortie = '';
       const garder = (d) => { sortie = (sortie + d).slice(-20000); };
       enfant.stdout.on('data', garder);
@@ -2128,6 +2245,7 @@ caption{text-align:left;font-weight:600;padding:4px 0}code,pre{font-family:ui-mo
 pre{background:var(--fond);border:1px solid var(--ligne);border-radius:5px;padding:10px;overflow:auto;white-space:pre-wrap}
 .ok{color:var(--ok);font-weight:600}.ko{color:var(--ko);font-weight:600}.etat{min-height:1.4em;margin-top:8px}
 .lot{border:2px solid var(--ko);border-radius:6px;padding:12px;margin-top:10px}
+label.case{font-weight:400;display:flex;gap:8px;align-items:center}input[type=checkbox]{width:auto}
 </style></head><body><main>
 <h1>Pilote SonarQube</h1>
 <p class="sous">Examen local avant GitLab — le jeton reste dans le processus du pilote ; ce navigateur n'en connaît que la présence.</p>
@@ -2143,6 +2261,7 @@ pre{background:var(--fond);border:1px solid var(--ligne);border-radius:5px;paddi
 <section aria-labelledby="t-pe"><h2 id="t-pe">2. Projet et périmètre</h2>
 <label for="projet">Clé du projet SonarQube</label><input id="projet" autocomplete="off" placeholder="acme-api">
 <label for="cible">Branche cible</label><input id="cible" autocomplete="off" value="develop">
+<label for="dossier">Dossier du projet dans le dépôt</label><input id="dossier" autocomplete="off" value="." placeholder=". pour la racine, web pour un front dans web/">
 <button id="bPerimetre">Calculer le diff</button>
 <div class="etat" id="ePerimetre" role="status" aria-live="polite"></div></section>
 
@@ -2154,6 +2273,8 @@ pre{background:var(--fond);border:1px solid var(--ligne);border-radius:5px;paddi
 <label for="scanner">Scanner</label>
 <select id="scanner"><option value="maven">Maven (back)</option><option value="npm">npm, @sonar/scan (front)</option><option value="personnalise">Commande personnalisée</option></select>
 <label for="baseLibre">Commande personnalisée, sans branche ni jeton</label><input id="baseLibre" autocomplete="off" disabled>
+<label for="tests">Tests du projet, lancés avant l'analyse (vide : commande du préréglage)</label><input id="tests" autocomplete="off" placeholder="inclus dans mvn verify">
+<label class="case"><input type="checkbox" id="sansTests"> Ne pas lancer les tests : couverture et résultats absents de l'analyse</label>
 <button id="bProposer">Proposer le lot</button>
 <div id="lot"></div>
 <div class="etat" id="eEphemere" role="status" aria-live="polite"></div></section>
@@ -2188,11 +2309,12 @@ $('bConnexion').onclick = async () => { try { const c = await api('/api/connexio
 $('bPerimetre').onclick = async () => { try { const p = await api('/api/perimetre', { cible: $('cible').value.trim() }); etat('ePerimetre', p.fichiers.length + ' fichier(s), ' + p.lignes + ' ligne(s) modifiée(s) ; base ' + txt(p.base.slice(0, 8)) + ', HEAD ' + txt(p.head.slice(0, 8)) + (p.nonCommite.length ? ' — <span class="ko">' + p.nonCommite.length + ' modification(s) non commitée(s), hors examen</span>' : '') + (p.sonarLocalIgnore ? '' : ' — ajouter .sonar-local/ au .gitignore')); } catch (e) { etat('ePerimetre', txt(e.message), true); } };
 $('bRegles').onclick = async () => { try { const r = await api('/api/regles', { projet: $('projet').value.trim() }); etat('eRegles', r.map((p) => txt(p.name) + ' (' + txt(p.language) + ') : ' + p.regles.length + ' règles' + (p.depuisCache ? ', depuis le cache vérifié' : '')).join(' ; ') || 'aucun profil'); } catch (e) { etat('eRegles', txt(e.message), true); } };
 $('bRelecture').onclick = async () => { try { const r = await api('/api/relecture', { projet: $('projet').value.trim() }); etat('eRegles', 'Dossier écrit : <code>' + txt(r.fichier) + '</code> (' + r.regles + ' règles) — à remettre à l\'expert'); } catch (e) { etat('eRegles', txt(e.message), true); } };
-$('scanner').onchange = () => { $('baseLibre').disabled = $('scanner').value !== 'personnalise'; };
+const TESTS_PRESETS = { maven: 'inclus dans mvn verify', npm: 'npx ng test --watch=false --code-coverage', personnalise: 'commande de tests, facultative' };
+$('scanner').onchange = () => { $('baseLibre').disabled = $('scanner').value !== 'personnalise'; $('tests').placeholder = TESTS_PRESETS[$('scanner').value]; };
 $('bProposer').onclick = async () => {
   try {
-    const l = await api('/api/ephemere/proposer', { projet: $('projet').value.trim(), type: $('scanner').value, base: $('baseLibre').value });
-    $('lot').innerHTML = '<div class="lot" role="group" aria-labelledby="t-lot"><h3 id="t-lot">Écritures proposées (lot de ' + l.ecritures.length + ')</h3><ol>' + l.ecritures.map((x) => '<li>' + txt(x.action) + '<pre>' + txt(x.appel) + '</pre></li>').join('') + '</ol><p>Où part le code : <strong>' + txt(l.ouPartLeCode) + '</strong> — permissions : ' + txt(l.permissions.join(', ')) + ' — valable ' + txt(l.expireDans) + '.</p><button id="bValider">Valider et lancer</button><button id="bAnnuler" class="second">Annuler</button></div>';
+    const l = await api('/api/ephemere/proposer', { projet: $('projet').value.trim(), type: $('scanner').value, base: $('baseLibre').value, tests: $('tests').value, sansTests: $('sansTests').checked, dossier: $('dossier').value.trim() || '.' });
+    $('lot').innerHTML = '<div class="lot" role="group" aria-labelledby="t-lot"><h3 id="t-lot">Écritures proposées (lot de ' + l.ecritures.length + ')</h3><ol>' + l.ecritures.map((x) => '<li>' + txt(x.action) + '<pre>' + txt(x.appel) + '</pre></li>').join('') + '</ol><p>Tests du projet : ' + txt(l.testsDuProjet) + '</p><p>Où part le code : <strong>' + txt(l.ouPartLeCode) + '</strong> — permissions : ' + txt(l.permissions.join(', ')) + ' — valable ' + txt(l.expireDans) + '.</p><button id="bValider">Valider et lancer</button><button id="bAnnuler" class="second">Annuler</button></div>';
     $('bAnnuler').onclick = () => { $('lot').innerHTML = ''; };
     $('bValider').onclick = async () => {
       $('bValider').disabled = true; etat('eEphemere', 'Analyse en cours…');
@@ -2201,14 +2323,16 @@ $('bProposer').onclick = async () => {
         $('lot').innerHTML = '';
         const g = r.qualityGate ? r.qualityGate.status : 'non lu';
         etat('eEphemere', 'Quality gate : ' + txt(g) + ' — ' + r.constats.length + ' constat(s) dans le périmètre, ' + r.horsPerimetre + ' hors périmètre — branche ' + txt(r.branche) + ' : ' + (r.suppression.faite ? 'supprimée' : 'NON supprimée') + (r.suppression.verifiee ? ', vérifié' : ', non vérifié') + (r.limites.length ? ' — limites : ' + txt(r.limites.join(' ; ')) : ''), g !== 'OK' || !r.suppression.faite);
-        afficherConstats(r.constats);
+        afficherConstats(r.constats, r.mesures);
       } catch (e) { etat('eEphemere', txt(e.message), true); }
     };
   } catch (e) { etat('eEphemere', txt(e.message), true); }
 };
-function afficherConstats(c) {
-  if (!c.length) { $('constats').innerHTML = '<p>Aucun constat dans le périmètre.</p>'; return; }
-  $('constats').innerHTML = '<table><caption>Constats par moteur</caption><thead><tr><th scope="col">Moteur</th><th scope="col">Règle</th><th scope="col">Emplacement</th><th scope="col">Constat</th></tr></thead><tbody>' + c.map((x) => '<tr><td>' + txt(x.moteur) + (x.revueSecurite ? '<br><small>revue de sécurité</small>' : '') + '</td><td><code>' + txt(x.regle) + '</code></td><td><code>' + txt(String(x.composant).split(':').slice(1).join(':')) + (x.ligne ? ':' + x.ligne : '') + '</code></td><td>' + txt(x.message) + '</td></tr>').join('') + '</tbody></table>';
+function afficherConstats(c, mesures) {
+  const libelles = { tests: 'tests', test_failures: 'échecs', test_errors: 'erreurs', skipped_tests: 'ignorés', coverage: 'couverture (%)', new_coverage: 'couverture du nouveau code (%)' };
+  const m = mesures && Object.keys(mesures).length ? '<table><caption>Tests et couverture, lus dans SonarQube</caption><tbody>' + Object.entries(mesures).map(([k, v]) => '<tr><th scope="row">' + txt(libelles[k] || k) + '</th><td>' + (v == null ? '—' : txt(v)) + '</td></tr>').join('') + '</tbody></table>' : '';
+  if (!c.length) { $('constats').innerHTML = m + '<p>Aucun constat dans le périmètre.</p>'; return; }
+  $('constats').innerHTML = m + '<table><caption>Constats par moteur</caption><thead><tr><th scope="col">Moteur</th><th scope="col">Règle</th><th scope="col">Emplacement</th><th scope="col">Constat</th></tr></thead><tbody>' + c.map((x) => '<tr><td>' + txt(x.moteur) + (x.revueSecurite ? '<br><small>revue de sécurité</small>' : '') + '</td><td><code>' + txt(x.regle) + '</code></td><td><code>' + txt(String(x.composant).split(':').slice(1).join(':')) + (x.ligne ? ':' + x.ligne : '') + '</code></td><td>' + txt(x.message) + '</td></tr>').join('') + '</tbody></table>';
 }
 $('bJournal').onclick = async () => { const j = await api('/api/journal'); $('journal').innerHTML = j.map((x) => '<tr><td>' + txt(x.date) + '</td><td>' + txt(x.methode) + '</td><td><code>' + txt(x.chemin) + '</code></td><td>' + x.statut + '</td><td>' + (x.ecriture ? '<span class="ko">oui</span>' : 'non') + '</td></tr>').join(''); };
 charger().catch((e) => etat('eConnexion', txt(e.message), true));
@@ -2287,7 +2411,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.ar
 }
 ```
 
-## 10. Recette `tests/pilote-sonar.test.mjs`
+## 10. Recette simulée `tests/pilote-sonar.test.mjs`
 
 <!-- fichier : tests/pilote-sonar.test.mjs -->
 ```javascript
@@ -2304,7 +2428,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import {
   Pilote, creerServeur, nomBrancheLocale, enteteAuth, verifierCommande, commandeScanner,
-  analyserDiff, dansPerimetre, environnementScanner,
+  analyserDiff, dansPerimetre, environnementScanner, PRESETS, valeurMesure, dossierProjet,
 } from '../outils/pilote-sonar.mjs';
 
 const JETON = 'squ_jeton-de-recette-0123456789';
@@ -2312,8 +2436,14 @@ const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'pilote-sonar-'));
 const depot = path.join(tmp, 'depot');
 const trace = path.join(tmp, 'scanner.json');
 const fauxScanner = path.join(tmp, 'faux-scanner.mjs');
+const bin = path.join(tmp, 'bin');
+const traceOutils = path.join(tmp, 'outils.jsonl');
 let sonar; let hote;
-const etat = { branches: new Set(['main', 'develop']), refuserBearer: false, rulesUpdatedAt: '2026-10-28T10:00:00+0000', reglesLues: 0, supprimerEchoue: false };
+const MESURES_DEFAUT = [
+  { metric: 'tests', value: '12' }, { metric: 'test_failures', value: '1' }, { metric: 'test_errors', value: '0' },
+  { metric: 'skipped_tests', value: '2' }, { metric: 'coverage', value: '81.5' }, { metric: 'new_coverage', period: { index: 1, value: '71.4' } },
+];
+const etat = { branches: new Set(['main', 'develop']), refuserBearer: false, rulesUpdatedAt: '2026-10-28T10:00:00+0000', reglesLues: 0, supprimerEchoue: false, mesures: MESURES_DEFAUT };
 
 function g(...args) { return execFileSync('git', args, { cwd: depot, encoding: 'utf8' }); }
 
@@ -2333,7 +2463,24 @@ before(async () => {
   g('commit', '-q', '-am', 'modifie A');
   fs.writeFileSync(path.join(depot, 'src', 'B.java'), 'class B {\n  void f() {}\n}\n');
   g('add', '.'); g('commit', '-q', '-m', 'ajoute B');
+  fs.mkdirSync(path.join(depot, 'web', 'src', 'app'), { recursive: true });
+  fs.writeFileSync(path.join(depot, 'web', 'src', 'app', 'b.service.ts'), 'export class BService {\n  inutile = 1;\n}\n');
+  g('add', '.'); g('commit', '-q', '-m', 'ajoute le service du front');
   fs.writeFileSync(path.join(depot, 'brouillon.txt'), 'non commité\n');
+
+  // Faux mvn et npx en tête du PATH : consignent appel, arguments et dossier ; le scan crée la branche.
+  fs.mkdirSync(bin);
+  fs.writeFileSync(path.join(bin, 'faux-outil.mjs'), `import fs from 'node:fs';
+const [outil, ...args] = process.argv.slice(2);
+fs.appendFileSync(${JSON.stringify(traceOutils)}, JSON.stringify({ outil, args, dossier: process.cwd() }) + '\\n');
+if (outil === 'npx' && args[0] === 'ng') process.exit(Number(process.env.FAUX_TESTS_CODE || 0));
+const b = args.find((a) => a.startsWith('-Dsonar.branch.name='));
+if (b) await fetch(process.env.SONAR_HOST_URL + '/faux/creer-branche?b=' + encodeURIComponent(b.split('=')[1]));
+`);
+  for (const outil of ['npx', 'mvn']) {
+    fs.writeFileSync(path.join(bin, outil), `#!/bin/sh\nexec node "\${0%/*}/faux-outil.mjs" ${outil} "$@"\n`, { mode: 0o755 });
+    fs.writeFileSync(path.join(bin, `${outil}.cmd`), `@echo off\r\nnode "%~dp0faux-outil.mjs" ${outil} %*\r\n`);
+  }
 
   // Faux scanner : consigne ses arguments et son environnement, sort avec le code demandé.
   fs.writeFileSync(fauxScanner, `import fs from 'node:fs';
@@ -2359,10 +2506,14 @@ process.exit(Number(process.env.FAUX_CODE || 0));
     if (p === '/api/server/version') { res.writeHead(200, { 'content-type': 'text/plain' }); return res.end('2026.5.0.12345'); }
     if (p === '/api/navigation/global') return json(200, { edition: 'developer' });
     if (p === '/api/users/current') return json(200, { login: 'F.Garcia', permissions: { global: ['scan'] } });
-    if (p === '/api/qualityprofiles/search') return json(200, { profiles: [{ key: 'AYprof-java', name: 'Acme way', language: 'java', rulesUpdatedAt: etat.rulesUpdatedAt }] });
+    if (p === '/api/qualityprofiles/search') {
+      if (url.searchParams.get('project') === 'acme-web') return json(200, { profiles: [{ key: 'AYprof-ts', name: 'Sonar way', language: 'ts', rulesUpdatedAt: '2026-09-01T08:00:00+0000' }] });
+      return json(200, { profiles: [{ key: 'AYprof-java', name: 'Acme way', language: 'java', rulesUpdatedAt: etat.rulesUpdatedAt }] });
+    }
     if (p === '/api/rules/search') {
       etat.reglesLues++;
       const page = Number(url.searchParams.get('p'));
+      if (url.searchParams.get('qprofile') === 'AYprof-ts') return json(200, { total: 2, rules: page > 1 ? [] : [{ key: 'typescript:S1481', name: 'Variable locale inutilisée', lang: 'ts' }, { key: 'typescript:S1525', name: 'Instruction debugger', lang: 'ts' }] });
       const toutes = [{ key: 'java:S6813', name: 'Injection par champ', lang: 'java' }, { key: 'java:S2077', name: 'Requête SQL formatée', lang: 'java' }, { key: 'java:S1481', name: 'Variable locale inutilisée', lang: 'java' }];
       const ps = 2;
       return json(200, { total: toutes.length, rules: toutes.slice((page - 1) * ps, page * ps) });
@@ -2370,11 +2521,19 @@ process.exit(Number(process.env.FAUX_CODE || 0));
     if (p === '/api/qualitygates/project_status') return json(200, { projectStatus: { status: 'ERROR', conditions: [{ metricKey: 'new_coverage', status: 'ERROR', actualValue: '71.4', errorThreshold: '80' }] } });
     if (p === '/api/issues/search') {
       if (!etat.branches.has(url.searchParams.get('branch'))) return json(404, { errors: [{ msg: 'branche inconnue' }] });
+      if (url.searchParams.get('components') === 'acme-web') return json(200, { total: 2, issues: [
+        { key: 'AW1', rule: 'typescript:S1481', component: 'acme-web:src/app/b.service.ts', line: 2, message: 'propriété inutilisée' },
+        { key: 'AW2', rule: 'typescript:S1525', component: 'acme-web:src/app/ancien.ts', line: 1, message: 'fichier non modifié' },
+      ] });
       return json(200, { total: 3, issues: [
         { key: 'AZ1', rule: 'java:S1481', component: 'acme-api:src/A.java', line: 2, message: 'variable inutilisée', severity: 'MINOR' },
         { key: 'AZ2', rule: 'java:S1481', component: 'acme-api:src/A.java', line: 3, message: 'ligne non modifiée', severity: 'MINOR' },
         { key: 'AZ3', rule: 'java:S6813', component: 'acme-api:src/B.java', line: 2, message: 'injection par champ', severity: 'MAJOR' },
       ] });
+    }
+    if (p === '/api/measures/component') {
+      if (!etat.branches.has(url.searchParams.get('branch'))) return json(404, { errors: [{ msg: 'branche inconnue' }] });
+      return json(200, { component: { key: url.searchParams.get('component'), measures: etat.mesures } });
     }
     if (p === '/api/hotspots/search') return json(404, { errors: [{ msg: 'déprécié' }] });
     if (p === '/api/project_branches/delete' && req.method === 'POST') {
@@ -2395,7 +2554,9 @@ process.exit(Number(process.env.FAUX_CODE || 0));
 
 after(() => { sonar.close(); fs.rmSync(tmp, { recursive: true, force: true }); });
 
-const env = (extra = {}) => ({ ...process.env, SONAR_HOST_URL: hote, SONAR_TOKEN: JETON, CI_MERGE_REQUEST_IID: '412', ...extra });
+const CLE_PATH = Object.keys(process.env).find((k) => k.toUpperCase() === 'PATH') || 'PATH';
+const env = (extra = {}) => ({ ...process.env, [CLE_PATH]: bin + path.delimiter + process.env[CLE_PATH], SONAR_HOST_URL: hote, SONAR_TOKEN: JETON, CI_MERGE_REQUEST_IID: '412', ...extra });
+const appelsOutils = () => (fs.existsSync(traceOutils) ? fs.readFileSync(traceOutils, 'utf8').trim().split('\n').filter(Boolean).map((l) => JSON.parse(l)) : []);
 
 /** Un pilote servi sur un port libre ; renvoie un client qui porte la clé de session. */
 async function demarrer(extra) {
@@ -2502,8 +2663,8 @@ test('P9 : périmètre = diff avec la base de fusion de origin/<cible> ; non com
   try {
     const r = await s.appel('/api/perimetre', { cible: 'develop' });
     assert.equal(r.status, 200, r.texte);
-    assert.deepEqual(r.json.fichiers.sort(), ['src/A.java', 'src/B.java']);
-    assert.equal(r.json.lignes, 4);
+    assert.deepEqual(r.json.fichiers.sort(), ['src/A.java', 'src/B.java', 'web/src/app/b.service.ts']);
+    assert.equal(r.json.lignes, 7);
     assert.deepEqual(r.json.nonCommite, ['?? brouillon.txt']);
     assert.equal(r.json.sonarLocalIgnore, true);
     assert.equal(r.json.head, g('rev-parse', 'HEAD').trim());
@@ -2572,7 +2733,7 @@ test('P12 : analyse éphémère sous local-, constats filtrés et étiquetés, b
   } finally { s.fermer(); }
 });
 
-test('P13 : la branche est supprimée même si le scanner échoue (D9.INV-2)', async () => {
+test('P13 : scanner en erreur (gate en échec) : résultats lus quand même, branche supprimée (D9.INV-2)', async () => {
   const s = await demarrer({ FAUX_CODE: '3' });
   try {
     await s.appel('/api/perimetre', { cible: 'develop' });
@@ -2580,7 +2741,8 @@ test('P13 : la branche est supprimée même si le scanner échoue (D9.INV-2)', a
     const r = await s.appel('/api/ephemere/lancer', { id: lot.id });
     assert.equal(r.status, 200);
     assert.equal(r.json.scanner.code, 3);
-    assert.ok(r.json.limites.some((l) => l.includes('scanner en échec')));
+    assert.ok(r.json.limites.some((l) => l.startsWith('scanner sorti en erreur (code 3)')));
+    assert.ok(r.json.qualityGate, 'branche créée : l\'instance est lue malgré le code de sortie');
     assert.equal(r.json.suppression.faite, true);
     assert.equal(etat.branches.has(lot.branche), false);
   } finally { s.fermer(); }
@@ -2626,6 +2788,271 @@ test('P16 : dossier de relecture avec règles actives et diff, dans .sonar-local
     assert.match(texte, /\+  int a = 10;/);
     assert.equal(g('status', '--porcelain').includes('.sonar-local'), false);
   } finally { s.fermer(); }
+});
+
+test('P17 : préréglage npm, les tests du projet tournent avant l\'analyse, dans le dossier du projet (D9.INV-7)', async () => {
+  const s = await demarrer();
+  try {
+    fs.rmSync(traceOutils, { force: true });
+    await s.appel('/api/perimetre', { cible: 'develop' });
+    const lot = (await s.appel('/api/ephemere/proposer', { projet: 'acme-web', type: 'npm', dossier: 'web' })).json;
+    assert.match(lot.testsDuProjet, /^lancés avant l'analyse : npx ng test --watch=false --code-coverage$/);
+    const r = await s.appel('/api/ephemere/lancer', { id: lot.id });
+    assert.equal(r.status, 200, r.texte);
+    const appels = appelsOutils();
+    assert.deepEqual(appels.map((a) => a.args[0]), ['ng', '@sonar/scan']);
+    assert.ok(appels.every((a) => fs.realpathSync(a.dossier) === fs.realpathSync(path.join(depot, 'web'))));
+    assert.ok(appels[1].args.includes(`-Dsonar.branch.name=${lot.branche}`));
+    assert.ok(appels[1].args.includes('-Dsonar.qualitygate.wait=true'));
+    assert.equal(r.json.tests.code, 0);
+    assert.equal(r.json.suppression.faite, true);
+  } finally { s.fermer(); }
+});
+
+test('P18 : préréglage Maven, tests JUnit et JaCoCo dans verify, échecs de tests importés plutôt que bloquants (D9.INV-7)', async () => {
+  const s = await demarrer();
+  try {
+    fs.rmSync(traceOutils, { force: true });
+    await s.appel('/api/perimetre', { cible: 'develop' });
+    const lot = (await s.appel('/api/ephemere/proposer', { projet: 'acme-api', type: 'maven' })).json;
+    assert.equal(lot.testsDuProjet, PRESETS.maven.note);
+    await s.appel('/api/ephemere/lancer', { id: lot.id });
+    const appels = appelsOutils();
+    assert.equal(appels.length, 1);
+    assert.equal(appels[0].outil, 'mvn');
+    for (const a of ['verify', '-Dmaven.test.failure.ignore=true', `-Dsonar.branch.name=${lot.branche}`, '-Dsonar.newCode.referenceBranch=develop']) assert.ok(appels[0].args.includes(a), a);
+  } finally { s.fermer(); }
+});
+
+test('P19 : tests et couverture lus sur la branche de travail ; échecs signalés (D9.INV-7, D6.INV-2)', async () => {
+  const s = await demarrer();
+  try {
+    await s.appel('/api/perimetre', { cible: 'develop' });
+    const lot = (await s.appel('/api/ephemere/proposer', { projet: 'acme-api', type: 'maven' })).json;
+    const r = (await s.appel('/api/ephemere/lancer', { id: lot.id })).json;
+    assert.deepEqual(r.mesures, { tests: 12, test_failures: 1, test_errors: 0, skipped_tests: 2, coverage: 81.5, new_coverage: 71.4 });
+    assert.ok(r.limites.includes('1 test(s) en échec ou en erreur, lus dans SonarQube'));
+    assert.equal(r.limites.some((l) => l.startsWith('couverture absente')), false);
+  } finally { s.fermer(); }
+});
+
+test('P20 : couverture absente signalée ; tests non lancés annoncés dans le lot (D2.INV-2, D9.INV-7)', async () => {
+  const s = await demarrer();
+  try {
+    etat.mesures = [{ metric: 'tests', value: '0' }];
+    await s.appel('/api/perimetre', { cible: 'develop' });
+    const lot = (await s.appel('/api/ephemere/proposer', { projet: 'acme-web', type: 'npm', dossier: 'web', sansTests: true })).json;
+    assert.match(lot.testsDuProjet, /^non lancés/);
+    fs.rmSync(traceOutils, { force: true });
+    const r = (await s.appel('/api/ephemere/lancer', { id: lot.id })).json;
+    assert.deepEqual(appelsOutils().map((a) => a.args[0]), ['@sonar/scan']);
+    assert.ok(r.limites.some((l) => l.startsWith('couverture absente')));
+  } finally { etat.mesures = MESURES_DEFAUT; s.fermer(); }
+});
+
+test('P21 : front TypeScript dans web/, constats ramenés au dépôt et filtrés, profil TS dans son propre cache (D9.INV-1, D9.INV-3, D9.INV-4)', async () => {
+  const s = await demarrer();
+  try {
+    await s.appel('/api/perimetre', { cible: 'develop' });
+    const regles = (await s.appel('/api/regles', { projet: 'acme-web' })).json;
+    assert.deepEqual(regles.map((p) => [p.language, p.regles.length]), [['ts', 2]]);
+    assert.ok(fs.existsSync(path.join(depot, '.sonar-local', 'regles-AYprof-ts.json')));
+    assert.ok(fs.existsSync(path.join(depot, '.sonar-local', 'regles-AYprof-java.json')));
+    const lot = (await s.appel('/api/ephemere/proposer', { projet: 'acme-web', type: 'npm', dossier: 'web' })).json;
+    const r = (await s.appel('/api/ephemere/lancer', { id: lot.id })).json;
+    assert.deepEqual(r.constats.map((c) => [c.cle, c.regle, c.moteur]), [['AW1', 'typescript:S1481', 'analyse éphémère']]);
+    assert.equal(r.horsPerimetre, 1);
+    assert.equal(dansPerimetre(analyserDiff('+++ b/web/src/a.ts\n@@ -0,0 +1 @@\n'), 'acme-web:src/a.ts', 1, 'web'), true);
+  } finally { s.fermer(); }
+});
+
+test('P22 : tests du projet en échec, l\'analyse continue et la branche est supprimée (D9.INV-2, D9.INV-7)', async () => {
+  const s = await demarrer({ FAUX_TESTS_CODE: '1' });
+  try {
+    fs.rmSync(traceOutils, { force: true });
+    await s.appel('/api/perimetre', { cible: 'develop' });
+    const lot = (await s.appel('/api/ephemere/proposer', { projet: 'acme-web', type: 'npm', dossier: 'web' })).json;
+    const r = (await s.appel('/api/ephemere/lancer', { id: lot.id })).json;
+    assert.equal(r.tests.code, 1);
+    assert.ok(r.limites.some((l) => l.startsWith('tests du projet en échec (code 1)')));
+    assert.deepEqual(appelsOutils().map((a) => a.args[0]), ['ng', '@sonar/scan']);
+    assert.equal(r.suppression.faite, true);
+  } finally { s.fermer(); }
+});
+
+test('P23 : dossier du projet et commande de tests vérifiés avant tout lot (D1.INV-2)', async () => {
+  const s = await demarrer();
+  try {
+    await s.appel('/api/perimetre', { cible: 'develop' });
+    for (const dossier of ['../ailleurs', '/etc', 'C:/Windows', 'absent']) {
+      assert.equal((await s.appel('/api/ephemere/proposer', { projet: 'acme-web', type: 'npm', dossier })).status, 400, dossier);
+    }
+    assert.equal((await s.appel('/api/ephemere/proposer', { projet: 'acme-web', type: 'npm', dossier: 'web', tests: `npm test -- --jeton=${JETON}` })).status, 400);
+    assert.equal(dossierProjet(depot, 'web/'), 'web');
+    assert.equal(dossierProjet(depot, '.'), '.');
+  } finally { s.fermer(); }
+});
+
+test('P24 : valeur d\'une mesure, directe ou de période', () => {
+  assert.equal(valeurMesure({ metric: 'coverage', value: '81.5' }), 81.5);
+  assert.equal(valeurMesure({ metric: 'new_coverage', period: { value: '71.4' } }), 71.4);
+  assert.equal(valeurMesure({ metric: 'new_coverage', periods: [{ index: 1, value: '0.0' }] }), 0);
+  assert.equal(valeurMesure({ metric: 'tests' }), null);
+});
+
+test('P25 : analyse absente de l\'instance, aucun constat inventé, suppression tentée (D9.INV-1, D9.INV-2)', async () => {
+  const s = await demarrer();
+  try {
+    await s.appel('/api/perimetre', { cible: 'develop' });
+    const lot = (await s.appel('/api/ephemere/proposer', { projet: 'acme-api', type: 'personnalise', base: 'node -e "process.exit(4)"' })).json;
+    const r = (await s.appel('/api/ephemere/lancer', { id: lot.id })).json;
+    assert.ok(r.limites.includes('analyse absente de l\'instance : aucun constat lu'));
+    assert.deepEqual(r.constats, []);
+    assert.equal(r.qualityGate, null);
+    assert.equal(s.pilote.journal.filter((x) => x.ecriture).length >= 1, true);
+  } finally { s.fermer(); }
+});
+```
+
+## 11. Recette réelle `tests/pilote-sonar.reel.test.mjs`
+
+<!-- fichier : tests/pilote-sonar.reel.test.mjs -->
+```javascript
+// Recette réelle du pilote SonarQube (skill sonarqube 1.1.0, module pilotage, D10).
+// Elle tourne contre une vraie instance, édition Developer ou supérieure, sur un projet dédié à la recette.
+// Sans les trois variables ci-dessous, chaque scénario est sauté : aucune écriture, aucun réseau.
+//
+//   RECETTE_SONAR_HOST_URL  adresse de l'instance
+//   RECETTE_SONAR_TOKEN     jeton utilisateur : Browse, Execute Analysis et Administer sur le projet de recette
+//   RECETTE_SONAR_PROJET    clé du projet de recette, déjà créé sur l'instance, réservé à cet usage
+//
+// Écritures sur l'instance : une analyse de la branche principale du projet de recette (le décor), puis
+// une analyse éphémère sous local-…, supprimée et vérifiée. Réseau : npm (@sonar/scan) et l'instance.
+// Lancer : node --test tests/pilote-sonar.reel.test.mjs
+
+import { test, before, after } from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { execFileSync, spawnSync } from 'node:child_process';
+import { Pilote, enteteAuth } from '../outils/pilote-sonar.mjs';
+
+const HOTE = (process.env.RECETTE_SONAR_HOST_URL || '').replace(/\/+$/, '');
+const JETON = process.env.RECETTE_SONAR_TOKEN || '';
+const PROJET = process.env.RECETTE_SONAR_PROJET || '';
+const ACTIVE = Boolean(HOTE && JETON && PROJET);
+const sauter = ACTIVE ? false : 'RECETTE_SONAR_HOST_URL, RECETTE_SONAR_TOKEN et RECETTE_SONAR_PROJET absentes';
+const LONG = 15 * 60 * 1000;
+const SCAN = 'npx --yes @sonar/scan';
+const TESTS = 'node --test --experimental-test-coverage --test-reporter=spec --test-reporter-destination=stdout --test-reporter=lcov --test-reporter-destination=coverage/lcov.info';
+
+let tmp; let depot; let pilote; let brancheMain = 'main'; let edition = 'inconnue'; let lot = null;
+const env = { ...process.env, SONAR_HOST_URL: HOTE, SONAR_TOKEN: JETON };
+for (const k of Object.keys(env)) if (/^CI_MERGE_REQUEST_/.test(k)) delete env[k];
+
+function g(...args) { return execFileSync('git', args, { cwd: depot, encoding: 'utf8' }); }
+async function api(chemin, options = {}) {
+  const r = await fetch(HOTE + chemin, { ...options, headers: { authorization: enteteAuth('bearer', JETON), ...(options.headers || {}) } });
+  const texte = await r.text();
+  try { return { statut: r.status, corps: JSON.parse(texte) }; } catch { return { statut: r.status, corps: texte }; }
+}
+
+before(async () => {
+  if (!ACTIVE) return;
+  const branches = await api(`/api/project_branches/list?project=${encodeURIComponent(PROJET)}`);
+  assert.equal(branches.statut, 200, `projet de recette ${PROJET} introuvable ou jeton sans droit : ${JSON.stringify(branches.corps)}`);
+  brancheMain = branches.corps.branches.find((b) => b.isMain)?.name || 'main';
+
+  // Décor : un petit projet JavaScript, testé avec couverture LCOV, analysé sur la branche principale.
+  tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'pilote-reel-'));
+  depot = path.join(tmp, 'depot');
+  execFileSync('git', ['init', '--bare', '-q', path.join(tmp, 'origin.git')]);
+  fs.mkdirSync(path.join(depot, 'src'), { recursive: true });
+  fs.mkdirSync(path.join(depot, 'test'));
+  g('init', '-q', '-b', brancheMain);
+  g('config', 'user.email', 'recette@exemple.org'); g('config', 'user.name', 'Recette'); g('config', 'core.autocrlf', 'false');
+  g('remote', 'add', 'origin', path.join(tmp, 'origin.git'));
+  fs.writeFileSync(path.join(depot, 'sonar-project.properties'), [
+    `sonar.projectKey=${PROJET}`, 'sonar.sources=src', 'sonar.tests=test',
+    'sonar.javascript.lcov.reportPaths=coverage/lcov.info', 'sonar.scm.provider=git', '',
+  ].join('\n'));
+  fs.writeFileSync(path.join(depot, 'package.json'), '{ "name": "recette-pilote", "private": true, "type": "module" }\n');
+  fs.writeFileSync(path.join(depot, '.gitignore'), 'coverage/\n.sonar-local/\n.scannerwork/\n');
+  fs.writeFileSync(path.join(depot, 'src', 'calcul.js'), 'export function somme(a, b) {\n  return a + b;\n}\n');
+  fs.writeFileSync(path.join(depot, 'test', 'calcul.test.js'), "import { test } from 'node:test';\nimport assert from 'node:assert/strict';\nimport { somme } from '../src/calcul.js';\ntest('somme', () => assert.equal(somme(2, 3), 5));\n");
+  g('add', '.'); g('commit', '-q', '-m', 'décor'); g('push', '-q', 'origin', brancheMain);
+  const tests = spawnSync(TESTS, { cwd: depot, shell: true, env, encoding: 'utf8' });
+  assert.equal(tests.status, 0, tests.stderr);
+  const scan = spawnSync(`${SCAN} -Dsonar.qualitygate.wait=false`, { cwd: depot, shell: true, env, encoding: 'utf8', timeout: LONG });
+  assert.equal(scan.status, 0, `analyse du décor : ${(scan.stdout + scan.stderr).split(JETON).join('***').slice(-3000)}`);
+
+  // Modification à examiner : une instruction debugger et une variable inutilisée, sans test.
+  g('checkout', '-q', '-b', 'fonction-locale');
+  fs.writeFileSync(path.join(depot, 'src', 'nouveau.js'), 'export function double(x) {\n  const inutile = 42;\n  debugger;\n  return x * 2;\n}\n');
+  g('add', '.'); g('commit', '-q', '-m', 'ajoute double');
+  pilote = new Pilote({ racine: depot, env });
+}, { timeout: LONG });
+
+after(async () => {
+  if (!ACTIVE) return;
+  if (lot) { // filet de sécurité : la branche de travail ne doit pas survivre à la recette
+    await api('/api/project_branches/delete', { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ project: PROJET, branch: lot.branche }) }).catch(() => {});
+  }
+  if (tmp) fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test('R1 : connexion réelle par en-tête Bearer, relevé de l\'instance (D1.INV-4, D1.INV-5)', { skip: sauter }, async () => {
+  const c = await pilote.connexion('bearer');
+  assert.match(String(c.version), /^\d{4}\.\d+/);
+  assert.ok(c.login);
+  edition = String(c.edition).toLowerCase();
+  assert.ok(['developer', 'enterprise', 'datacenter'].includes(edition), `édition ${edition} : l'analyse de branches exige Developer ou supérieure`);
+});
+
+test('R2 : jeton en nom d\'utilisateur, accepté ou refusé proprement selon l\'instance (D1.INV-5)', { skip: sauter }, async (t) => {
+  try {
+    const c = await pilote.connexion('basic');
+    assert.ok(c.login);
+  } catch (e) {
+    t.diagnostic(`mode refusé par l'instance : ${e.message}`);
+    assert.equal(String(e.message).includes(JETON), false);
+  }
+  await pilote.connexion('bearer');
+});
+
+test('R3 : modes détectés, jeton absent de l\'état (D10.INV-2)', { skip: sauter }, async (t) => {
+  const m = await pilote.modes();
+  assert.equal(m.jetonPresent, true);
+  assert.equal(JSON.stringify(m).includes(JETON), false);
+  t.diagnostic(`serveur MCP hébergé : ${m.modes.find((x) => x.id === 'mcp-heberge').note}`);
+});
+
+test('R4 : périmètre et règles actives du profil réel, puis cache (D9.INV-3, D9.INV-4)', { skip: sauter }, async () => {
+  const p = await pilote.calculerPerimetre(brancheMain);
+  assert.deepEqual(p.fichiers, ['src/nouveau.js']);
+  const r1 = await pilote.regles(PROJET);
+  assert.ok(r1.length >= 1 && r1.every((x) => x.regles.length > 0), 'au moins un profil avec des règles actives');
+  const r2 = await pilote.regles(PROJET);
+  assert.ok(r2.every((x) => x.depuisCache));
+}, { timeout: LONG });
+
+test('R5 : analyse éphémère réelle, tests et couverture remontés, constats au périmètre, branche supprimée (D9.INV-1, D9.INV-2, D9.INV-7)', { skip: sauter, timeout: LONG }, async () => {
+  if (!['developer', 'enterprise', 'datacenter'].includes(edition)) return;
+  lot = await pilote.proposerEphemere({ projet: PROJET, type: 'personnalise', base: `${SCAN} -Dsonar.qualitygate.wait=true`, tests: TESTS });
+  const r = await pilote.lancerEphemere(lot.id);
+  const journal = JSON.stringify(pilote.journal) + JSON.stringify(r);
+  assert.equal(journal.includes(JETON), false, 'jeton absent du rapport et du journal');
+  assert.equal(r.tests.code, 0, r.tests.sortie);
+  // quality gate en échec : le scanner sort avec un code non nul, mais l'analyse a bien eu lieu
+  assert.ok(r.qualityGate, `quality gate lu ; limites : ${r.limites.join(' ; ')}`);
+  assert.ok(r.constats.length >= 1, `au moins un constat sur src/nouveau.js ; hors périmètre : ${r.horsPerimetre}`);
+  assert.ok(r.constats.every((c) => c.moteur === 'analyse éphémère' && c.composant.endsWith(':src/nouveau.js')));
+  assert.ok(r.mesures.coverage != null || r.mesures.new_coverage != null, 'couverture importée depuis lcov.info');
+  assert.deepEqual([r.suppression.faite, r.suppression.verifiee], [true, true], r.suppression.detail);
+  const liste = await api(`/api/project_branches/list?project=${encodeURIComponent(PROJET)}`);
+  assert.equal(liste.corps.branches.some((b) => b.name === lot.branche), false);
+  lot = null;
 });
 ```
 <<<FIN modules/pilotage/SKILL.md>>>
@@ -3182,14 +3609,14 @@ La table de correspondance existe dans le dépôt du projet dès que la mission 
 Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichiers ont été matérialisés.
 
     a7b53e3a6c95263c3b131f00673d0d27fb118e12b7dacebc94e06e52c7d40db7  manifest.json
-    a61615087d50a89e72aff2d9fe4629bb84e2566390080034cacd32da39893073  SKILL.md
+    0ff9627a0fb22270af0cd4557ebcea71bdac7ecf4b08d44e09827918c6f46c3b  SKILL.md
     5ac479aa32da55649f258d9f571fe87c157b86d107ffa80babf731ae3f7ed52c  socle/SKILL.md
     4bb52253c4504f4a804460442b1711a9caab8e364528171f2afb9ba7d5acfccf  references/java.md
     28e0a697773aaf205f024e3fa0a0d99c43bbaf86fb7a56c954c9964e67d22d16  references/angular.md
     982d36c2fa49272d2bc68a2cd5f68be825a3eec14b7f9007158108b0758e4280  modules/cadrage-acces/SKILL.md
     ff232645f0ab3f73b4e9213901782f59e70e438e34fb331783b6ac954459a72c  modules/configuration-analyse/SKILL.md
-    61e84d35458a8a4cfd5b7c280830932757ee1abcf6c64ddbdb3ce2843c5da31d  modules/examen-local/SKILL.md
-    a05db43ad20c507f51dfa6494cc6e381b696bd3269ac0c8677b27e397a70df8f  modules/pilotage/SKILL.md
+    996465b1319a0fe5e1096bd354077af8d3d358a4d75dddb73e6350c5c9c027b7  modules/examen-local/SKILL.md
+    1a7681433a372b83a8ec1b7a6934e04ae1c14bf54351fb635cf7885a10cc63e5  modules/pilotage/SKILL.md
     7c7ca0d0588d779f56c7cbe24dac9595c364c94fe7193ed3ccd226f572127458  modules/triage/SKILL.md
     db10b5f69fc4a372e6cc0333270cc850de5851532684710620233fb8dd483b45  modules/correction/SKILL.md
     795d888ac22d9afba835fc4e4cf99645e266a1af7014d1a3da3312b6c77c2bcf  modules/gouvernance/SKILL.md

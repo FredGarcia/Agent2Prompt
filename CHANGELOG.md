@@ -14,15 +14,17 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
   - Catalogue d'appels (point E1) : règles actives d'un profil, analyse sous une branche de travail, suppression d'une branche, outil MCP admis ; le reste de D7 demeure réservé.
   - Rapport : mission « Examiner en local », constats par moteur.
   - Modes de connexion au choix, retenus au cadrage (module `cadrage-acces`, § 3 bis) : API web par en-tête `Bearer` ou par jeton en nom d'utilisateur, scanner, SonarQube for IDE par le serveur MCP autonome, serveur MCP hébergé par l'instance (relevé, sans usage tant que D7 est réservée), SonarQube CLI ; chacun avec ses usages admis et sa variable de jeton ; invariant D1.INV-5.
-  - Dimension D10 active, l'interface de pilotage : module `pilotage`, script Node sans dépendance `outils/pilote-sonar.mjs` servi sur `127.0.0.1` avec une clé de session (connexion, périmètre, règles, analyse éphémère par lot validé, dossier de relecture, commande MCP, constats, journal sans jeton) et recette de seize scénarios contre un faux SonarQube, tirés du module par une commande à empreintes ; workflow `recette-sonarqube.yml`, Linux et Windows, Node 20 et 22. Invariants D10.INV-1 à D10.INV-4.
-  - Trente-trois invariants. Archive : `archives/SKILL-v1.0.2.md`.
+  - Dimension D10 active, l'interface de pilotage : module `pilotage`, script Node sans dépendance `outils/pilote-sonar.mjs` servi sur `127.0.0.1` avec une clé de session (connexion, périmètre, règles, analyse éphémère par lot validé, dossier de relecture, commande MCP, constats, journal sans jeton) recette simulée de vingt-cinq scénarios contre un faux SonarQube (back Java, front TypeScript dans `web/`, faux `mvn` et `npx`) et recette réelle de cinq scénarios contre l'instance du développeur, sur un projet réservé, tirés du module par une commande à empreintes ; workflow `recette-sonarqube.yml`, Linux et Windows, Node 20 et 22, et travail de recette réelle activé par la variable `RECETTE_SONAR_ACTIVE`. Invariants D10.INV-1 à D10.INV-4.
+  - Tests du projet passés par SonarQube : ils tournent avant chaque analyse éphémère (JUnit et JaCoCo dans `mvn verify`, échecs importés ; `ng test` avec couverture LCOV côté front), et tests, échecs, ignorés et couverture sont lus sur la branche de travail ; l'instance est lue même quand le gate fait sortir le scanner en erreur. Invariant D9.INV-7. Dossier du projet pour un monodépôt back et front.
+  - Trente-quatre invariants. Archive : `archives/SKILL-v1.0.2.md`.
 - Décisions ratifiées :
   - les trois moteurs, au choix du développeur, plutôt qu'un seul ;
   - le périmètre limité au diff avec la branche cible ;
   - un examen lancé à la demande, sans hook `pre-push` ;
   - une livraison par pull request ;
   - les modes de connexion en option, chacun borné à ses usages, le serveur MCP hébergé relevé mais sans usage tant que D7 est réservée ;
-  - une interface de pilotage locale, intégrée à la 1.1.0 encore non publiée plutôt qu'en 1.2.0.
+  - une interface de pilotage locale, intégrée à la 1.1.0 encore non publiée plutôt qu'en 1.2.0 ;
+  - les tests du projet passés par SonarQube avant chaque analyse éphémère, et une recette réelle contre l'instance du développeur, en plus de la recette simulée.
 
 ### 2026-11-01 : orchestrateur-c7e 3.3.0
 

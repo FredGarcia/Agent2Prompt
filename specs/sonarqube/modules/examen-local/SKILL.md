@@ -143,6 +143,8 @@ npx @sonar/scan \
   -Dsonar.qualitygate.wait=true
 ```
 
+- Les tests du projet tournent avant l'analyse, pour que leurs résultats et la couverture remontent dans l'instance (D9.INV-7). Côté Maven, `verify` les lance ; ajouter `-Dmaven.test.failure.ignore=true` pour qu'un test en échec soit importé au lieu d'arrêter l'examen. Côté front, la commande de tests précède le scanner ; le nombre de tests du front n'est connu de SonarQube que si le projet produit un rapport d'exécution au format générique (`sonar.testExecutionReportPaths`).
+- Avec `sonar.qualitygate.wait=true`, un quality gate en échec fait sortir le scanner en erreur : l'expert lit quand même l'instance si la branche de travail existe.
 - `sonar.newCode.referenceBranch` fait du diff avec la branche cible le nouveau code de la branche de travail. L'expert vérifie que l'instance accepte ce paramètre d'analyse (documentation de la version) et que la branche cible y est analysée ; sinon, il le signale et filtre les constats par le périmètre du § 3.
 - Aucune variable `CI_MERGE_REQUEST_*` ni propriété `sonar.pullrequest.*` ne doit être présente : le scanner croirait analyser une MR.
 - Le scanner du front exige Node.js 22 ou plus récent avec l'instance 2026.5 (module `configuration-analyse`).
@@ -153,7 +155,7 @@ npx @sonar/scan \
 sonar_get "/api/qualitygates/project_status?projectKey=acme-api&branch=$BRANCHE_LOCALE"
 sonar_get "/api/issues/search?components=acme-api&branch=$BRANCHE_LOCALE&inNewCodePeriod=true&issueStatuses=OPEN,CONFIRMED&ps=500&p=1"
 sonar_get "/api/hotspots/search?project=acme-api&branch=$BRANCHE_LOCALE&status=TO_REVIEW"
-sonar_get "/api/measures/component?component=acme-api&branch=$BRANCHE_LOCALE&metricKeys=new_coverage,new_duplicated_lines_density"
+sonar_get "/api/measures/component?component=acme-api&branch=$BRANCHE_LOCALE&metricKeys=tests,test_failures,test_errors,skipped_tests,coverage,new_coverage,new_duplicated_lines_density"
 
 # Écriture 2 du lot validé
 sonar_post "/api/project_branches/delete" "project=acme-api" "branch=$BRANCHE_LOCALE"
@@ -236,3 +238,4 @@ Le reste du rapport suit le module `rapport` (mission « Examiner en local »).
 - Les règles citées sont actives dans le profil du projet, lu à l'examen ou depuis un cache vérifié (D9.INV-4).
 - La fiche indiquait, pour chaque moteur, où part le code (D9.INV-5).
 - Aucun push, aucune transition, aucun commentaire n'a été fait par l'examen (D9.INV-6).
+- Les tests du projet ont précédé l'analyse éphémère, ou leur absence a été annoncée ; tests et couverture lus sur la branche figurent au rapport (D9.INV-7).

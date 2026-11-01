@@ -31,7 +31,7 @@ La colonne « Repris dans » cite les modules de la spécification qui reprennen
 | [`orchestrateur-c7e`](#orchestrateur-c7e-330) | 3.3.0 | 10 | 1 | 31 |
 | [`skill4appli`](#skill4appli-110) | 1.1.0 | 9 | 3 | 34 |
 | [`socle-back-front`](#socle-back-front-101) | 1.0.1 | 6 | 1 | 15 |
-| [`sonarqube`](#sonarqube-110) | 1.1.0 | 8 | 2 | 33 |
+| [`sonarqube`](#sonarqube-110) | 1.1.0 | 8 | 2 | 34 |
 | [`tension-dashboard-gitlab-agent`](#tension-dashboard-gitlab-agent-220) | 2.2.0 | 7 | 3 | 17 |
 
 ## agent-tdd-jira 1.3.2
@@ -1200,7 +1200,7 @@ Expert SonarQube Server 2026.x : configurer l'analyse et la CI, examiner le code
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
 | **D2.INV-1** | le code généré, les dépendances et les artefacts de build sont exclus de l'analyse. | `configuration-analyse`, `triage` |
-| **D2.INV-2** | la couverture des tests est importée pour le back (rapport XML JaCoCo) et pour le front (rapport LCOV) ; une analyse sans couverture est signalée. | `configuration-analyse`, `examen-local` |
+| **D2.INV-2** | la couverture des tests est importée pour le back (rapport XML JaCoCo) et pour le front (rapport LCOV) ; une analyse sans couverture est signalée. | `configuration-analyse`, `examen-local`, `pilotage` |
 | **D2.INV-3** | le pipeline analyse les merge requests et la branche principale, avec l'historique Git complet, et attend le résultat du quality gate. | `configuration-analyse` |
 | **D2.INV-4** | les paramètres d'analyse sont versionnés dans le dépôt ; le jeton utilisé par la CI n'est jamais dans le dépôt et n'est fourni que par une variable masquée de la CI. | `configuration-analyse` |
 
@@ -1236,7 +1236,7 @@ Expert SonarQube Server 2026.x : configurer l'analyse et la CI, examiner le code
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
 | **D6.INV-1** | chaque rapport indique l'instance (version, édition), le projet, la branche ou merge request, la date de l'analyse, l'état du quality gate et les appels d'API utilisés. | `pilotage`, `rapport` |
-| **D6.INV-2** | chaque chiffre vient d'une réponse de l'API, jamais d'une estimation. | `examen-local`, `rapport` |
+| **D6.INV-2** | chaque chiffre vient d'une réponse de l'API, jamais d'une estimation. | `examen-local`, `pilotage`, `rapport` |
 
 ### D7 : Serveur MCP et agents Sonar (reserved)
 
@@ -1256,6 +1256,7 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 | **D9.INV-4** | seules les règles actives du ou des profils qualité du projet sur l'instance sont appliquées et citées, lues à l'examen ou depuis un cache dont la date de mise à jour du profil a été vérifiée. | `examen-local`, `pilotage` |
 | **D9.INV-5** | avant le lancement, la fiche indique pour chaque moteur retenu où part le code, et le développeur l'a confirmée. | `examen-local` |
 | **D9.INV-6** | l'examen local ne pousse rien, ne commente aucune issue et ne change aucun statut ; ses constats passent par le triage et la correction. | `examen-local` |
+| **D9.INV-7** | une analyse éphémère est précédée des tests du projet, sauf refus annoncé dans le lot ; un test en échec n'empêche pas l'analyse ; tests et couverture sont lus sur la branche de travail et rapportés, et une couverture absente ou un test en échec est signalé, jamais tu. | `examen-local`, `pilotage` |
 
 ### D10 : Interface de pilotage locale (active)
 
