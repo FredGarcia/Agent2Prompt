@@ -4,6 +4,19 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-11-01 : orchestrateur-c7e 3.2.1
+
+- **orchestrateur-c7e 3.2.1** : correctif de l'installation. Masqué à Git par la seule exclusion `.git/info/exclude` d'un clone ordinaire, comme le prévoyait la 3.2.0, le skill ne livrait que son `SKILL.md` à l'activation : l'outil de lecture de Gemini CLI refuse les fichiers ainsi exclus, et les modules restaient illisibles.
+  - § 11.3 et étape 0 de la consigne : exclusion du dossier du skill et de `/.geminiignore`, et une négation par niveau de dossier dans `.geminiignore` (`!/.gemini/`, `!/.gemini/skills/`, `!/.gemini/skills/orchestrateur-c7e/`, ou `!/.skills/` et `!/.skills/orchestrateur-c7e/` en chargement permanent).
+  - L'installateur du dépôt, `tools/installer.mjs`, fait la matérialisation et le masquage ; l'étape 0 de la consigne le reconnaît et se limite alors à vérifier `integrite.sha256`.
+  - § 11.4 : l'activation livre le `SKILL.md` et la liste des fichiers du skill, que l'IA lit ensuite ; les skills du workspace ne se chargent que dans un dossier de confiance, quand la confiance des dossiers est activée.
+  - Scénario R15 : un skill installé dans un clone ordinaire est absent de `git status`, et ses fichiers se lisent après l'activation. Invariants inchangés.
+- Vérifications : comportement de Gemini CLI lu dans son code et reproduit avec `@google/gemini-cli-core` 0.66.0, en chargement au choix et en chargement permanent, y compris quand `/.gemini/skills/` ou `/.skills/` était déjà exclu ; vérificateur, glossaire et transmission à jour.
+- `docs/orchestrateur-c7e/mode-emploi.md` : version 3.2.1, renvoi au § 11.3 ; la note sur l'écart entre la spécification et le mode d'emploi est retirée.
+- Soumis à ratification :
+  - un correctif (3.2.1) plutôt qu'une version mineure : aucune dimension, aucun point d'extension, aucun invariant ne change ;
+  - la spécification qui renvoie à l'installateur du dépôt Agent2Prompt, à côté de la matérialisation par l'IA.
+
 ### 2026-10-31 : orchestrateur-c7e 3.2.0
 
 - **orchestrateur-c7e 3.2.0** : le référentiel des méso-contrats remis par le développeur, en TOML, intégré à l'orchestrateur comme dimension D10, active.

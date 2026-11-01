@@ -28,7 +28,7 @@ La colonne « Repris dans » cite les modules de la spécification qui reprennen
 | [`angular`](#angular-101) | 1.0.1 | 8 | 2 | 30 |
 | [`capture-sprint-jira`](#capture-sprint-jira-121) | 1.2.1 | 9 | 2 | 39 |
 | [`java`](#java-111) | 1.1.1 | 7 | 1 | 29 |
-| [`orchestrateur-c7e`](#orchestrateur-c7e-320) | 3.2.0 | 9 | 1 | 26 |
+| [`orchestrateur-c7e`](#orchestrateur-c7e-321) | 3.2.1 | 9 | 1 | 26 |
 | [`skill4appli`](#skill4appli-110) | 1.1.0 | 9 | 3 | 34 |
 | [`socle-back-front`](#socle-back-front-101) | 1.0.1 | 6 | 1 | 15 |
 | [`sonarqube`](#sonarqube-102) | 1.0.2 | 6 | 2 | 22 |
@@ -944,7 +944,7 @@ Expert Java 21, Spring Boot 3.5 et PostgreSQL : produire et relire du code confo
 
 Dimension réservée : aucun invariant en vigueur dans cette version.
 
-## orchestrateur-c7e 3.2.0
+## orchestrateur-c7e 3.2.1
 
 Orchestrateur fractal C7E : résolution d'un ticket full-stack comme transformation maîtrisée d'un système vivant, avec le cycle de l'Axiome 7E, quatre profondeurs de déclinaison, des concepts paramétrables, un référentiel des méso-contrats qui classe chaque ticket et en fixe les options par couche, l'analyse des images PNG de l'objectif, une fiche validée avant toute modification, des tests déduits des risques, des conventions Git compatibles avec le kit des agents parallèles, une boucle de second ordre bornée par un registre et un fichier d'invariants du projet ; activé au démarrage de l'IA locale, sur choix du développeur. Point d'entrée : [`specs/orchestrateur-c7e/SKILL.md`](specs/orchestrateur-c7e/SKILL.md).
 

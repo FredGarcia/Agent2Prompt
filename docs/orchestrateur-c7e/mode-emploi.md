@@ -1,6 +1,6 @@
 # Mode d'emploi : lancer l'orchestrateur C7E dans Gemini CLI
 
-Ce mode d'emploi installe la spécification [`orchestrateur-c7e`](../../specs/orchestrateur-c7e/SKILL.md) 3.2.0 dans un projet et la fait appeler au démarrage de l'IA locale, Gemini CLI. Le skill ne s'applique qu'au choix du développeur, selon l'un de deux chargements :
+Ce mode d'emploi installe la spécification [`orchestrateur-c7e`](../../specs/orchestrateur-c7e/SKILL.md) 3.2.1 dans un projet et la fait appeler au démarrage de l'IA locale, Gemini CLI. Le skill ne s'applique qu'au choix du développeur, selon l'un de deux chargements :
 
 | Chargement | Le choix se fait | Au démarrage, le contexte contient |
 |---|---|---|
@@ -17,7 +17,7 @@ Une fois l'orchestrateur choisi, chaque ticket est classé dans le **référenti
 
 - Gemini CLI, lancé à la racine du projet.
 - Pour le chargement au choix, la prise en charge des skills : la commande `/skills list` doit répondre.
-- La transmission [`transmissions/orchestrateur-c7e-3.2.0.md`](../../transmissions/orchestrateur-c7e-3.2.0.md).
+- La transmission [`transmissions/orchestrateur-c7e-3.2.1.md`](../../transmissions/orchestrateur-c7e-3.2.1.md).
 - Node 20 ou plus récent pour extraire le référentiel, et `sha256sum`, fourni par Git Bash sous Windows, pour vérifier les fichiers.
 
 ## 2. Installer le skill
@@ -39,14 +39,12 @@ Une fois l'orchestrateur choisi, chaque ticket est classé dans le **référenti
 
    Il recrée les fichiers de la transmission, vérifie leurs empreintes, garde la consigne dans `CONSIGNE.md` et masque le skill à Git sans le rendre illisible (README du dépôt, « Installer un skill dans Gemini CLI »). Dans Gemini CLI, après `/skills reload` : « Active le skill orchestrateur-c7e. L'étape 0 de sa consigne est faite. Lis `CONSIGNE.md` dans son dossier et suis-la à partir de l'étape 1. » L'IA installe alors les fichiers du projet (§ 3).
 3. Pour un chargement permanent, ou sans clone du dépôt, coller la transmission dans Gemini CLI, en précisant l'emplacement choisi. L'IA crée les fichiers à l'identique, les vérifie avec la table d'intégrité, puis installe les fichiers du projet (§ 3).
-4. Masquer le skill à Git sans le rendre illisible pour Gemini CLI. Dans un clone ordinaire, son outil de lecture refuse les fichiers qu'exclut `.git/info/exclude` : un skill exclu ainsi ne livre que son `SKILL.md` à l'activation, et ses modules restent illisibles. L'installateur s'en charge. À la main, ajouter à `.git/info/exclude` le dossier du skill et `/.geminiignore`, et à `.geminiignore` une négation par niveau :
+4. Masquer le skill à Git sans le rendre illisible pour Gemini CLI (§ 11.3 du skill). Dans un clone ordinaire, son outil de lecture refuse les fichiers qu'exclut `.git/info/exclude` : un skill exclu ainsi ne livre que son `SKILL.md` à l'activation, et ses modules restent illisibles. L'installateur s'en charge. À la main, ajouter à `.git/info/exclude` le dossier du skill et `/.geminiignore`, et à `.geminiignore` une négation par niveau :
    - chargement au choix : `!/.gemini/`, `!/.gemini/skills/` et `!/.gemini/skills/orchestrateur-c7e/` ;
    - chargement permanent : `!/.skills/` et `!/.skills/orchestrateur-c7e/`.
 
    Inutile au niveau utilisateur, hors de tout dépôt.
 5. Pour le chargement au choix, vérifier que le dossier du skill porte le nom de son `name` : `orchestrateur-c7e`.
-
-Le § 11.3 du skill et l'étape 0 de sa transmission ne prévoient que l'exclusion par `.git/info/exclude` : suivre ici le point 4.
 
 ## 3. Préparer les fichiers du projet
 
@@ -88,7 +86,7 @@ Tous ces fichiers sont versionnés avec le projet, images comprises : une comman
    ```
 
 2. Si ce fichier ne s'appelle pas `GEMINI.md`, le déclarer dans `.gemini/settings.json` (voir § 6).
-3. Lancer `gemini`, puis `/memory show` : le texte du skill doit apparaître, en commençant par « Orchestrateur fractal C7E, version 3.2.0 ».
+3. Lancer `gemini`, puis `/memory show` : le texte du skill doit apparaître, en commençant par « Orchestrateur fractal C7E, version 3.2.1 ».
 
 Les lignes `@` ne sont développées que dans un fichier de contexte. Si le fichier est envoyé comme message, l'IA ne voit que le texte des lignes, sans le contenu des fichiers. Le référentiel n'est pas importé : l'IA le lit à l'analyse de chaque ticket.
 
