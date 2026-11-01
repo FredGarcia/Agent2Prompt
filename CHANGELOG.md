@@ -6,19 +6,23 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ### 2026-11-01 : sonarqube 1.1.0
 
-- **sonarqube 1.1.0** : dimension D9 active, l'examen local avant GitLab, à la demande du développeur. Cinquième mission, « Examiner en local » : le code est examiné avant son envoi sur GitLab, selon les règles du profil qualité du projet sur l'instance, en accédant à SonarQube par le jeton du compte Sonar.
+- **sonarqube 1.1.0** : dimensions D9 et D10 actives, l'examen local avant GitLab et son interface de pilotage, à la demande du développeur. Cinquième mission, « Examiner en local » : le code est examiné avant son envoi sur GitLab, selon les règles du profil qualité du projet sur l'instance, en accédant à SonarQube par le jeton du compte Sonar.
   - Module `examen-local` : périmètre réduit au diff entre `HEAD` et la base de fusion avec la branche cible lue sur le dépôt distant ; trois moteurs au choix, que le développeur combine :
     - **analyse éphémère** : scanner Maven ou npm lancé en local sous une branche de travail `local-<login>-<HEAD>`, nouveau code défini par la branche cible, quality gate et constats lus sur cette branche, puis branche supprimée ; analyse et suppression forment un seul lot validé ;
     - **moteur SonarLint** : analyseurs de SonarQube for IDE en mode connecté, avec les règles du profil, pilotés par l'outil `analyze_file_list` du serveur MCP de Sonar, sans envoi du code ; `analyze_code_snippet`, déprécié, seulement en repli signalé ;
     - **relecture par les règles** : relecture du diff contre les règles actives du profil, lues par l'API et gardées en cache tant que le profil n'a pas changé ; constats étiquetés avec un niveau de confiance, jamais comptés comme des issues.
   - Catalogue d'appels (point E1) : règles actives d'un profil, analyse sous une branche de travail, suppression d'une branche, outil MCP admis ; le reste de D7 demeure réservé.
   - Rapport : mission « Examiner en local », constats par moteur.
-  - Invariants D9.INV-1 à D9.INV-6 ; vingt-huit invariants. Archive : `archives/SKILL-v1.0.2.md`.
+  - Modes de connexion au choix, retenus au cadrage (module `cadrage-acces`, § 3 bis) : API web par en-tête `Bearer` ou par jeton en nom d'utilisateur, scanner, SonarQube for IDE par le serveur MCP autonome, serveur MCP hébergé par l'instance (relevé, sans usage tant que D7 est réservée), SonarQube CLI ; chacun avec ses usages admis et sa variable de jeton ; invariant D1.INV-5.
+  - Dimension D10 active, l'interface de pilotage : module `pilotage`, script Node sans dépendance `outils/pilote-sonar.mjs` servi sur `127.0.0.1` avec une clé de session (connexion, périmètre, règles, analyse éphémère par lot validé, dossier de relecture, commande MCP, constats, journal sans jeton) et recette de seize scénarios contre un faux SonarQube, tirés du module par une commande à empreintes ; workflow `recette-sonarqube.yml`, Linux et Windows, Node 20 et 22. Invariants D10.INV-1 à D10.INV-4.
+  - Trente-trois invariants. Archive : `archives/SKILL-v1.0.2.md`.
 - Décisions ratifiées :
   - les trois moteurs, au choix du développeur, plutôt qu'un seul ;
   - le périmètre limité au diff avec la branche cible ;
   - un examen lancé à la demande, sans hook `pre-push` ;
-  - une livraison par pull request.
+  - une livraison par pull request ;
+  - les modes de connexion en option, chacun borné à ses usages, le serveur MCP hébergé relevé mais sans usage tant que D7 est réservée ;
+  - une interface de pilotage locale, intégrée à la 1.1.0 encore non publiée plutôt qu'en 1.2.0.
 
 ### 2026-11-01 : orchestrateur-c7e 3.3.0
 

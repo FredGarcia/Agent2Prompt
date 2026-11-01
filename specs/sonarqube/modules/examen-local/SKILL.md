@@ -9,7 +9,7 @@ status: active
 
 Examiner en local, c'est savoir ce que SonarQube dira du code **avant** qu'il parte sur GitLab, sans attendre le pipeline de merge request. L'examen porte sur ce qui partirait dans la MR : le diff entre le `HEAD` local et la base de fusion avec la branche cible (D9.INV-3). Il applique les règles du ou des profils qualité du projet sur l'instance, et rien d'autre (D9.INV-4).
 
-L'examen se lance à la demande. Il ne pousse rien, ne commente rien, ne change le statut d'aucune issue (D9.INV-6) : il prépare le triage et la correction, qui suivent leurs propres modules et invariants.
+L'examen se lance à la demande, au terminal ou depuis l'interface de pilotage (module `pilotage`), qui applique les mêmes règles par programme. Il ne pousse rien, ne commente rien, ne change le statut d'aucune issue (D9.INV-6) : il prépare le triage et la correction, qui suivent leurs propres modules et invariants.
 
 ## 1. Trois moteurs
 

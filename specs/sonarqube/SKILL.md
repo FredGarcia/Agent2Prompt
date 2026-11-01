@@ -1,6 +1,6 @@
 ---
 name: sonarqube
-description: Expert SonarQube Server 2026.x (édition Developer ou supérieure) pour des projets Java Spring Boot et Angular sur GitLab. Il configure l'analyse et la CI, examine le code local avant son envoi sur GitLab selon les règles du profil du projet, trie et interprète les constats, corrige le code ou prépare des plans pour les experts Java et Angular, et gouverne la qualité (quality gate, profils, nouveau code). À utiliser pour toute question ou action liée à SonarQube sur un projet back et front.
+description: Expert SonarQube Server 2026.x (édition Developer ou supérieure) pour des projets Java Spring Boot et Angular sur GitLab. Il configure l'analyse et la CI, examine le code local avant son envoi sur GitLab selon les règles du profil du projet, au besoin depuis une interface locale de pilotage, avec le mode de connexion choisi, trie et interprète les constats, corrige le code ou prépare des plans pour les experts Java et Angular, et gouverne la qualité (quality gate, profils, nouveau code). À utiliser pour toute question ou action liée à SonarQube sur un projet back et front.
 version: 1.1.0
 ---
 
@@ -20,7 +20,7 @@ Notation : `java:D4.INV-4` désigne un invariant du référentiel `java` ; `java
 1. Ce document, en entier.
 2. `manifest.json`.
 3. `socle/SKILL.md`, puis les sections « Versions cibles » et « Invariants » de `references/java.md` et `references/angular.md`.
-4. Les modules actifs, dans cet ordre : `cadrage-acces`, `configuration-analyse`, `examen-local`, `triage`, `correction`, `gouvernance`, `rapport`.
+4. Les modules actifs, dans cet ordre : `cadrage-acces`, `configuration-analyse`, `examen-local`, `triage`, `correction`, `gouvernance`, `rapport`. Le module `pilotage` se lit quand le développeur veut l'interface de pilotage.
 5. `modules/agents-sonar/SKILL.md` et `modules/conformite/SKILL.md` : seulement pour comprendre les points d'extension. Ne pas les appliquer en 1.x, hormis l'outil MCP admis au catalogue pour l'examen local (module `cadrage-acces`, § 4.4).
 
 ## 2. Cinq missions
@@ -95,6 +95,7 @@ flowchart TD
   end
   CA["cadrage-acces<br/>D1"] --> CO["configuration-analyse<br/>D2"]
   CA --> EL["examen-local<br/>D9"]
+  EL --> PI["pilotage<br/>D10, interface locale"]
   EL --> TR
   EL --> RP
   CA --> TR["triage<br/>D3"]
@@ -140,6 +141,7 @@ Clause de second ordre : un quality gate change le comportement de ceux qu'il me
 | D7 | Serveur MCP et agents Sonar | 1.0 | reserved | D1, D3, D4 | `agents-sonar` |
 | D8 | Rapports de conformité (WCAG, OWASP, CRA) | 1.0 | reserved | D3, D6 | `conformite` |
 | D9 | Examen local avant GitLab | 1.1 | active | D1, D2, D3 | `examen-local` |
+| D10 | Interface de pilotage locale | 1.1 | active | D1, D9 | `pilotage` |
 
 ## 7. Contrat de version et points d'extension
 
@@ -165,7 +167,7 @@ Points d'extension, actifs dès 1.0.0 :
 Par mission :
 
 - **Configurer** : une analyse complète du back et du front aboutit, avec couverture importée ; le pipeline de merge request attend le quality gate ; aucun secret dans le dépôt.
-- **Examiner en local** : chaque constat sur le diff avec la branche cible porte son moteur ; si l'analyse éphémère est retenue, l'état du quality gate est connu avant le push et la branche de travail est supprimée ; rien n'est poussé ni modifié dans les issues.
+- **Examiner en local** : chaque constat sur le diff avec la branche cible porte son moteur ; par l'interface de pilotage, la recette de seize scénarios passe ; si l'analyse éphémère est retenue, l'état du quality gate est connu avant le push et la branche de travail est supprimée ; rien n'est poussé ni modifié dans les issues.
 - **Trier** : chaque constat traité a une décision, une justification et, si une transition est appliquée, un commentaire dans SonarQube.
 - **Corriger ou planifier** : build et tests verts, constat fermé à l'analyse suivante, ou plan conforme au module `correction`.
 - **Gouverner** : chaque changement est validé, appliqué, vérifié par relecture de la configuration, et inscrit au journal.
@@ -180,6 +182,7 @@ Toute intervention se termine par un rapport conforme au module `rapport`.
 - **D1.INV-2** : le jeton n'est jamais affiché, journalisé, versionné, ni placé dans une URL ou un argument de commande visible ; il est lu depuis la variable `SONAR_TOKEN`.
 - **D1.INV-3** : toute écriture vers SonarQube est proposée avec l'appel exact et n'est appliquée qu'après validation explicite.
 - **D1.INV-4** : la version, l'édition et le mode de l'instance sont relevés avant toute interprétation, et aucune fonction absente de l'instance n'est proposée.
+- **D1.INV-5** : les modes de connexion employés sont retenus au cadrage parmi ceux du module `cadrage-acces` ; chacun reçoit le jeton par une variable d'environnement et ne sert qu'aux usages que ce module lui attribue.
 
 **D2 : configuration de l'analyse**
 
@@ -223,6 +226,13 @@ Toute intervention se termine par un rapport conforme au module `rapport`.
 - **D9.INV-5** : avant le lancement, la fiche indique pour chaque moteur retenu où part le code, et le développeur l'a confirmée.
 - **D9.INV-6** : l'examen local ne pousse rien, ne commente aucune issue et ne change aucun statut ; ses constats passent par le triage et la correction.
 
+**D10 : pilotage**
+
+- **D10.INV-1** : l'interface de pilotage n'écoute que sur la boucle locale et ne sert qu'une requête portant la clé de session du lancement et un en-tête `Host` local.
+- **D10.INV-2** : le jeton ne quitte jamais le processus du pilote et celui du scanner qu'il lance : ni réponse au navigateur, ni journal, ni message d'erreur, ni sortie du scanner ne le contient ; le navigateur n'en connaît que la présence.
+- **D10.INV-3** : toute écriture vers SonarQube déclenchée par l'interface vient d'un lot proposé avec les appels exacts, puis validé ; un lot inconnu, expiré ou déjà employé n'écrit rien.
+- **D10.INV-4** : l'interface applique par programme les invariants de l'examen local qu'elle pilote : branche `local-…` imposée et commande de scanner sans branche, MR ni jeton, suppression tentée en toute issue puis vérifiée, constats filtrés au périmètre et étiquetés par moteur.
+
 ## 11. Journal de révision
 
 **1.0.0** (2026-10-16) : première version. Dimensions D1 à D6 actives, D7 et D8 réservées. Points d'extension E1 à E3. Socle back-front 1.0.0, expert-java 1.0.0 et expert-angular 1.0.0 inclus et épinglés. Archive : `archives/SKILL-v1.0.0.md`.
@@ -231,4 +241,4 @@ Toute intervention se termine par un rapport conforme au module `rapport`.
 
 **1.0.2** (2026-10-21) : correctif. Le skill s'appelle désormais `sonarqube` (auparavant `expert-sonarqube`) : le préfixe `expert-` est retiré de tous les skills du dépôt. Référentiels renommés et montés : `references/java.md` (java 1.1.1) et `references/angular.md` (angular 1.0.1), cités sous la forme `java:Dn.INV-k` et `angular:Dn.INV-k` ; le skill se matérialise dans `.skills/sonarqube/`. Notation précisée : `java:Dn.INV-k` désigne un invariant du référentiel `java`, `java:Snnnn` une règle SonarQube. Socle back-front épinglé en 1.0.1. Aucune dimension ni aucun invariant modifié. Motif : une nouvelle notion d'expertise sera définie ensuite.
 
-**1.1.0** (2026-11-01) : dimension D9 active, l'examen local avant GitLab, à la demande du développeur. Cinquième mission, « Examiner en local » : le code est examiné selon les règles du profil qualité du projet sur l'instance, avant son envoi sur GitLab, sur le diff entre `HEAD` et la base de fusion avec la branche cible. Trois moteurs au choix : analyse éphémère sous une branche de travail `local-…` supprimée après lecture, moteur SonarLint de SonarQube for IDE en mode connecté piloté par le serveur MCP de Sonar, relecture du diff par les règles actives du profil. Module `examen-local`. Catalogue d'appels (point E1) complété : règles actives d'un profil, suppression d'une branche, analyse sous une branche de travail, outil MCP `analyze_file_list` ; le reste de D7 demeure réservé. Rapport : mission « Examiner en local ». Invariants D9.INV-1 à D9.INV-6 ; vingt-huit invariants. Archive de la version précédente : `archives/SKILL-v1.0.2.md`.
+**1.1.0** (2026-11-01) : dimensions D9 et D10 actives, l'examen local avant GitLab et son interface de pilotage, à la demande du développeur. Cinquième mission, « Examiner en local » : le code est examiné selon les règles du profil qualité du projet sur l'instance, avant son envoi sur GitLab, sur le diff entre `HEAD` et la base de fusion avec la branche cible. Trois moteurs au choix : analyse éphémère sous une branche de travail `local-…` supprimée après lecture, moteur SonarLint de SonarQube for IDE en mode connecté piloté par le serveur MCP de Sonar, relecture du diff par les règles actives du profil. Module `examen-local`. Catalogue d'appels (point E1) complété : règles actives d'un profil, suppression d'une branche, analyse sous une branche de travail, outil MCP `analyze_file_list` ; le reste de D7 demeure réservé. Rapport : mission « Examiner en local ». Modes de connexion au choix (module `cadrage-acces`, § 3 bis) : API web par en-tête `Bearer` ou par jeton en nom d'utilisateur, scanner, SonarQube for IDE par le serveur MCP autonome, serveur MCP hébergé par l'instance (noté, sans usage en 1.1), SonarQube CLI ; invariant D1.INV-5. Dimension D10 active, l'interface de pilotage locale : module `pilotage`, script Node sans dépendance `outils/pilote-sonar.mjs` et recette de seize scénarios `tests/pilote-sonar.test.mjs`, tirés du module par une commande à empreintes. Invariants D9.INV-1 à D9.INV-6 et D10.INV-1 à D10.INV-4 ; trente-trois invariants. Archive de la version précédente : `archives/SKILL-v1.0.2.md`.

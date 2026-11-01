@@ -24,12 +24,15 @@ Les fichiers de `references/` sont des **référentiels** : tu y lis les invaria
 
 Ne lis `modules/agents-sonar/SKILL.md` et `modules/conformite/SKILL.md` que pour comprendre les points d'extension : ces dimensions sont réservées.
 
+Si le développeur veut l'interface de pilotage, lis le module `pilotage` et tire son script et sa recette par la commande de sa section 5, puis lance la recette avant de lancer le pilote.
+
 ## Étape 2 : cadrage avec le développeur
 
 Applique le module `cadrage-acces`. Obtiens au minimum :
 
 - la ou les **missions** : configurer, examiner en local, trier, corriger ou planifier, gouverner ;
 - le **périmètre** : projets SonarQube, branche ou merge request ; pour l'examen local, la branche cible et les moteurs retenus (module `examen-local`) ;
+- les **modes de connexion** retenus parmi ceux du module `cadrage-acces`, § 3 bis ;
 - les variables `SONAR_HOST_URL` et `SONAR_TOKEN` définies dans l'environnement. **Ne demande jamais au développeur de coller son jeton dans la conversation.** S'il le fait, signale-le et recommande de révoquer ce jeton.
 
 Puis relève la version, l'édition et le mode de l'instance, et les permissions du compte. Reformule le tout dans une fiche de cadrage et attends sa confirmation.

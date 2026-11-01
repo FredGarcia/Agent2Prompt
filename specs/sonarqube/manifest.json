@@ -24,6 +24,7 @@
     { "id": "cadrage-acces", "path": "modules/cadrage-acces/SKILL.md", "dimensions": ["D1"], "status": "active" },
     { "id": "configuration-analyse", "path": "modules/configuration-analyse/SKILL.md", "dimensions": ["D2"], "status": "active" },
     { "id": "examen-local", "path": "modules/examen-local/SKILL.md", "dimensions": ["D9"], "status": "active" },
+    { "id": "pilotage", "path": "modules/pilotage/SKILL.md", "dimensions": ["D10"], "status": "active" },
     { "id": "triage", "path": "modules/triage/SKILL.md", "dimensions": ["D3"], "status": "active" },
     { "id": "correction", "path": "modules/correction/SKILL.md", "dimensions": ["D4"], "status": "active" },
     { "id": "gouvernance", "path": "modules/gouvernance/SKILL.md", "dimensions": ["D5"], "status": "active" },
