@@ -4,6 +4,12 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-11-01 : modes d'emploi de toutes les spécifications
+
+- Un mode d'emploi par spécification transmissible qui n'en avait pas, dans `docs/<nom>/mode-emploi.md` : `java`, `angular`, `analyse-projet`, `sonarqube`, `agent-tdd-jira`, `agent2test`, `agent2dev`, `agents-paralleles-gitlab`, `skill4appli`, `capture-sprint-jira`, `tension-dashboard-gitlab-agent`. Chacun suit le même plan : à quoi sert la spécification, prérequis, installation (installateur, transmission collée, ou construction dans `spec/` pour les systèmes à construire), cadrage ou démarrage, usage et points de validation, règles qui ne se négocient pas, mise à jour, dépannage, avec un schéma Mermaid.
+- `socle-back-front`, qui ne se transmet qu'inclus dans les experts, n'a pas de mode d'emploi propre.
+- Aucune spécification modifiée : versions, transmissions et glossaire inchangés.
+
 ### 2026-11-01 : sonarqube 1.1.0
 
 - **sonarqube 1.1.0** : dimensions D9 et D10 actives, l'examen local avant GitLab et son interface de pilotage, à la demande du développeur. Cinquième mission, « Examiner en local » : le code est examiné avant son envoi sur GitLab, selon les règles du profil qualité du projet sur l'instance, en accédant à SonarQube par le jeton du compte Sonar.

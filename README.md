@@ -60,12 +60,23 @@ flowchart LR
 
 ## Documents
 
-Ces documents ne sont pas des spécifications : le vérificateur ne les contrôle pas.
+Ces documents ne sont pas des spécifications : le vérificateur ne les contrôle pas. Chaque spécification transmissible a son mode d'emploi dans `docs/<nom>/mode-emploi.md` ; le socle `socle-back-front`, qui ne se transmet qu'inclus dans les experts, n'en a pas.
 
 | Document | Formats | Objet |
 |---|---|---|
 | [L'IA, un investissement mesurable](docs/presentation-valeur-ia/presentation-valeur-ia.md) | Markdown avec schémas Mermaid ; [PowerPoint](docs/presentation-valeur-ia/presentation-valeur-ia.pptx) avec notes du présentateur | Montrer à un client ce que son investissement dans l'IA rapporte au développement de ses applications : constats publics sourcés, changement de paradigme, contrepartie par ticket, garde-fous, seuil de rentabilité, protocole de mesure, pilote avec règle d'arrêt |
 | [Mode d'emploi de l'orchestrateur C7E](docs/orchestrateur-c7e/mode-emploi.md) | Markdown avec un schéma Mermaid | Installer `orchestrateur-c7e` 3.3.0 et le faire appeler au démarrage de Gemini CLI, en chargement permanent ou au choix, avec un menu et la commande `/c7e` ; installer le référentiel des méso-contrats, qualifier chaque ticket à son ouverture, choisir ses options et faire analyser les images de l'objectif ; vérifications, usage quotidien, limites et dépannage |
+| [Mode d'emploi de l'expert Java](docs/java/mode-emploi.md) | Markdown avec un schéma Mermaid | Installer `java` 1.1.1, cadrer mode, périmètre et versions, produire avec plan validé et build vert, ou relire avec la grille de revue ; mise à jour, dépannage |
+| [Mode d'emploi de l'expert Angular](docs/angular/mode-emploi.md) | Markdown avec un schéma Mermaid | Installer `angular` 1.0.1, cadrer mode, versions et choix du projet, produire avec `ng lint`, `ng test` et `ng build`, ou relire ; accessibilité RGAA et WCAG ; dépannage |
+| [Mode d'emploi de l'analyse de projet](docs/analyse-projet/mode-emploi.md) | Markdown avec un schéma Mermaid | Installer `analyse-projet` 1.0.2 au niveau utilisateur, choisir le livrable (cartographie, rapport, plans), cadrer périmètre, axes et profondeur ; lecture seule ; dépannage |
+| [Mode d'emploi de l'expert SonarQube](docs/sonarqube/mode-emploi.md) | Markdown avec un schéma Mermaid | Installer `sonarqube` 1.1.0, jeton et modes de connexion, cinq missions, examen local avant le push par trois moteurs, interface de pilotage, recettes ; tableaux des règles Java et JavaScript / TypeScript dans le même dossier |
+| [Mode d'emploi de l'agent TDD](docs/agent-tdd-jira/mode-emploi.md) | Markdown avec un schéma Mermaid | Installer `agent-tdd-jira` 1.3.2, en clone ordinaire ou en mode parallèle, enregistrer la demande en MHTML, franchir les points V1 à V5, binôme avec Agent2Test ; dépannage |
+| [Mode d'emploi d'Agent2Test](docs/agent2test/mode-emploi.md) | Markdown avec un schéma Mermaid | Construire `agent2test` 1.2.0 dans son propre projet en huit lots, puis mener une campagne par les points de contrôle CP-0 à CP-5 ; binôme, faire évoluer, dépannage |
+| [Mode d'emploi d'Agent2Dev](docs/agent2dev/mode-emploi.md) | Markdown avec un schéma Mermaid | Construire `agent2dev` 1.1.0 en neuf lots avec la méthode agent-tdd-jira, puis traiter une demande par les points V0 à V5 et CP-4, patchs par défaut ; binôme, dépannage |
+| [Mode d'emploi des agents parallèles](docs/agents-paralleles-gitlab/mode-emploi.md) | Markdown avec un schéma Mermaid | Installer le kit `agents-paralleles-gitlab` 1.0.1 avec l'IA, disposition autour du dépôt nu, cycle d'une demande par `agt`, garde-fous GitLab, recette de 44 contrôles ; dépannage |
+| [Mode d'emploi de Skill4Appli](docs/skill4appli/mode-emploi.md) | Markdown avec un schéma Mermaid | Installer `skill4appli` 1.1.0 du bon côté du git, recette, agent `memoire-appli`, modes `travail` et `miroir`, commandes, variables et codes de sortie ; dépannage |
+| [Mode d'emploi de la capture de sprint](docs/capture-sprint-jira/mode-emploi.md) | Markdown avec un schéma Mermaid | Installer `capture-sprint-jira` 1.2.1, capturer un sprint ou un ticket en MHTML après connexion SSO à la main, classement par section, réglages ; dépannage |
+| [Mode d'emploi du tableau de bord des fichiers sous tension](docs/tension-dashboard-gitlab-agent/mode-emploi.md) | Markdown avec un schéma Mermaid | Construire `tension-dashboard-gitlab-agent` 2.2.0 dans un projet neuf, en six étapes testées, effecteur GitLab en essai à blanc ; vérifications sur la machine réelle |
 
 ## Structure du dépôt
 
@@ -92,7 +103,9 @@ Agent2Prompt/
 │   └── verifier.mjs             vérification structurelle de toutes les spécifications
 └── docs/
     ├── presentation-valeur-ia/  présentation « L'IA, un investissement mesurable », en Markdown et en PowerPoint
-    └── orchestrateur-c7e/       mode d'emploi du lancement de l'orchestrateur C7E dans Gemini CLI
+    ├── orchestrateur-c7e/       mode d'emploi du lancement de l'orchestrateur C7E dans Gemini CLI
+    ├── sonarqube/               mode d'emploi, règles Java et JavaScript / TypeScript, scénarios du pilote
+    └── <nom>/mode-emploi.md     un mode d'emploi par spécification transmissible
 ```
 
 ## Transmettre une spécification
