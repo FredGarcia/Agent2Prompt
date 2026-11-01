@@ -12,7 +12,9 @@ Ce texte contient à la fois la consigne de travail et le skill complet. Il n'y 
 
 ## Étape 0 : matérialiser le skill
 
-1. Crée le dossier du skill à l'emplacement que le développeur choisit (section 11.3 de `SKILL.md`) : `.skills/orchestrateur-c7e/` à la racine du dépôt du projet pour un chargement permanent, `.gemini/skills/orchestrateur-c7e/` pour un chargement au choix. Dans la disposition du kit `agents-paralleles-gitlab`, c'est `~/dev/<projet>/.skills/orchestrateur-c7e/`, hors des worktrees, ou `~/.gemini/skills/orchestrateur-c7e/`. Dans un clone ordinaire, ajoute ce dossier à `.git/info/exclude` s'il n'y est pas : le skill ne doit pas apparaître dans `git status`.
+Si le développeur a installé le skill avec l'installateur du dépôt Agent2Prompt (`tools/installer.mjs`), cette étape est faite : vérifie seulement les fichiers avec `sha256sum -c integrite.sha256`, depuis le dossier du skill, puis passe à l'étape 1.
+
+1. Crée le dossier du skill à l'emplacement que le développeur choisit (section 11.3 de `SKILL.md`) : `.skills/orchestrateur-c7e/` à la racine du dépôt du projet pour un chargement permanent, `.gemini/skills/orchestrateur-c7e/` pour un chargement au choix. Dans la disposition du kit `agents-paralleles-gitlab`, c'est `~/dev/<projet>/.skills/orchestrateur-c7e/`, hors des worktrees, ou `~/.gemini/skills/orchestrateur-c7e/`. Dans un clone ordinaire, le skill ne doit pas apparaître dans `git status`, mais doit rester lisible : l'outil de lecture de Gemini CLI refuse les fichiers qu'exclut `.git/info/exclude`. Ajoute donc à `.git/info/exclude` le dossier du skill et `/.geminiignore`, et à `.geminiignore` une négation par niveau de dossier : `!/.gemini/`, `!/.gemini/skills/` et `!/.gemini/skills/orchestrateur-c7e/`, ou `!/.skills/` et `!/.skills/orchestrateur-c7e/` (section 11.3).
 2. Pour chaque bloc `<<<FICHIER chemin>>>` … `<<<FIN chemin>>>`, crée le fichier `chemin` dans ce dossier, avec le contenu exact compris entre les deux lignes délimitrices. Ces deux lignes ne font pas partie du fichier. Ne reformule rien, ne traduis rien, ne complète rien.
 3. Si tu disposes d'un shell, vérifie chaque fichier avec `sha256sum -c` contre la table d'intégrité en fin de texte ; sous Windows, Git Bash fournit `sha256sum`. Signale tout écart avant de continuer.
 
@@ -28,7 +30,7 @@ Suis la section 11.3 de `SKILL.md`, avec le développeur :
 2. Écris le modèle du référentiel des méso-contrats dans `docs/c7e/referentiel-meso-contrats.toml`, à l'identique, et vérifie son empreinte (`modules/referentiel/SKILL.md`, § 6). Liste au développeur les catégories et les options permises à adapter ; ne les change pas toi-même.
 3. Crée `docs/c7e/registre-ecarts.md`, `docs/c7e/concepts.json` (registre de départ, § 7.2) et `docs/c7e/connaissances.md`.
 4. Propose-lui le fichier de démarrage de l'IA locale et, pour un chargement au choix, la commande `/c7e` (§ 11.4). Ne les crée qu'avec son accord.
-5. Rejoue avec lui les scénarios R1 à R14 (§ 15) quand il le demande.
+5. Rejoue avec lui les scénarios R1 à R15 (§ 15) quand il le demande.
 
 ## Étape 3 : chaque ticket
 

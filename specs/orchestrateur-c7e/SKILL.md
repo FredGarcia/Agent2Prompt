@@ -1,10 +1,10 @@
 ---
 name: orchestrateur-c7e
 description: Orchestrateur fractal C7E, qui pilote la résolution d'un ticket full-stack comme la transformation maîtrisée d'un système vivant (cycle de l'Axiome 7E, déclinaison récursive imbriquée sur quatre profondeurs, concepts paramétrables, référentiel des méso-contrats qui classe chaque ticket et en fixe les options par couche, analyse des images PNG de l'objectif, fiche de transformation validée avant toute modification, tests déduits des risques, traçabilité Git compatible avec le kit des agents parallèles, boucle de second ordre bornée par un registre, valeur annoncée comme une hypothèse tant qu'elle n'est pas mesurée), avec le fichier des invariants du projet, meso-contrats. Adaptateur par défaut Java, Spring Boot, PostgreSQL, Liquibase et Angular. À activer au démarrage de l'IA locale, sur choix du développeur, pour les tickets qu'il lui confie.
-version: 3.2.0
+version: 3.2.1
 ---
 
-# Orchestrateur fractal C7E, version 3.2.0
+# Orchestrateur fractal C7E, version 3.2.1
 
 Ce document est le point d'entrée du skill et contient la méthode. Il s'active au démarrage de l'IA locale, sur choix du développeur (§ 11.4), avec le fichier des invariants du projet, copie remplie du modèle `meso-contrats.md`. Ces deux fichiers suffisent au démarrage ; le référentiel des méso-contrats se lit à l'analyse de chaque ticket, et les autres fichiers quand un ticket touche leur domaine.
 
@@ -407,7 +407,7 @@ Un ticket : sa capture MHTML, par défaut celle du dossier `IA/` que produit le 
 
 | Fichier | Rôle | Qui l'écrit | Emplacement par défaut |
 |---|---|---|---|
-| le skill | méthode, modèles, socle, référentiels | personne après l'installation : il reste identique à la transmission | `.skills/orchestrateur-c7e/`, ou `.gemini/skills/orchestrateur-c7e/` pour un chargement au choix (§ 11.4) ; hors de l'arbre suivi |
+| le skill | méthode, modèles, socle, référentiels | personne après l'installation : il reste identique à la transmission | `.skills/orchestrateur-c7e/`, ou `.gemini/skills/orchestrateur-c7e/` pour un chargement au choix (§ 11.4) ; hors de l'arbre suivi, masqué à Git et lisible par l'IA locale (§ 11.3) |
 | invariants du projet | copie remplie de `meso-contrats.md` | le développeur seul | `docs/c7e/meso-contrats.md` |
 | registre des écarts | un écart par ligne, avec sa décision | l'IA ajoute des lignes ; le développeur décide | `docs/c7e/registre-ecarts.md` |
 | registre des concepts | bibliothèque de concepts (§ 7.2) | l'IA ajoute des entrées `proposed` ; le développeur promeut | `docs/c7e/concepts.json` |
@@ -422,11 +422,12 @@ Les fichiers de `docs/` sont versionnés avec le projet : ce qu'un ticket capita
 
 ### 11.3 Installation, une fois par projet
 
-1. Matérialiser le skill à l'identique de la transmission, hors de l'arbre suivi : dans `.skills/orchestrateur-c7e/` pour un chargement permanent, dans `.gemini/skills/orchestrateur-c7e/` pour un chargement au choix, ou au niveau utilisateur avec le kit `agents-paralleles-gitlab` (§ 11.4) ; exclusion par `.git/info/exclude` d'un clone ordinaire, ou exclusion commune du kit.
-2. Copier `meso-contrats.md` à `docs/c7e/meso-contrats.md` ; le développeur remplit les valeurs `ADAPTER`, et l'IA lui liste celles qui restent (D8.INV-1).
-3. Écrire le modèle du référentiel des méso-contrats dans `docs/c7e/referentiel-meso-contrats.toml`, à l'identique, et en vérifier l'empreinte (module `referentiel`, § 6) ; le développeur y adapte les catégories et les options permises.
-4. Créer `docs/c7e/registre-ecarts.md` (modèle à la fin de `meso-contrats.md`), `docs/c7e/concepts.json` (registre de départ, § 7.2) et `docs/c7e/connaissances.md`, vide.
-5. Proposer le fichier de démarrage et, pour un chargement au choix, la commande `/c7e` (§ 11.4) ; ne les créer qu'avec l'accord du développeur.
+1. Matérialiser le skill à l'identique de la transmission, hors de l'arbre suivi : dans `.skills/orchestrateur-c7e/` pour un chargement permanent, dans `.gemini/skills/orchestrateur-c7e/` pour un chargement au choix, ou au niveau utilisateur avec le kit `agents-paralleles-gitlab` (§ 11.4). L'installateur du dépôt Agent2Prompt, `tools/installer.mjs`, fait cette étape et la suivante sans IA, et vérifie chaque fichier par son empreinte.
+2. Masquer le skill à Git sans le rendre illisible pour l'IA locale. Dans un clone ordinaire, l'outil de lecture de fichiers de Gemini CLI refuse ce qu'exclut `.git/info/exclude` : un skill exclu ainsi ne livre que ce document à l'activation, et ses autres fichiers sont refusés. Ajouter donc à `.git/info/exclude` le dossier du skill et `/.geminiignore`, et à `.geminiignore` une négation par niveau de dossier : `!/.gemini/`, `!/.gemini/skills/` et `!/.gemini/skills/orchestrateur-c7e/` en chargement au choix ; `!/.skills/` et `!/.skills/orchestrateur-c7e/` en chargement permanent. Au niveau utilisateur, hors de tout dépôt, rien n'est à masquer.
+3. Copier `meso-contrats.md` à `docs/c7e/meso-contrats.md` ; le développeur remplit les valeurs `ADAPTER`, et l'IA lui liste celles qui restent (D8.INV-1).
+4. Écrire le modèle du référentiel des méso-contrats dans `docs/c7e/referentiel-meso-contrats.toml`, à l'identique, et en vérifier l'empreinte (module `referentiel`, § 6) ; le développeur y adapte les catégories et les options permises.
+5. Créer `docs/c7e/registre-ecarts.md` (modèle à la fin de `meso-contrats.md`), `docs/c7e/concepts.json` (registre de départ, § 7.2) et `docs/c7e/connaissances.md`, vide.
+6. Proposer le fichier de démarrage et, pour un chargement au choix, la commande `/c7e` (§ 11.4) ; ne les créer qu'avec l'accord du développeur.
 
 ### 11.4 Démarrage de l'IA locale
 
@@ -483,7 +484,8 @@ Ticket, et méso-contrat imposé s'il est précisé : {{args}}
 ```
 
 - **Gemini CLI** lit `GEMINI.md` au démarrage : le fichier global, celui du projet et ceux de ses dossiers parents ; il y développe les imports `@chemin`. Un autre nom se déclare dans `context.fileName` de `.gemini/settings.json`, qui accepte une liste, avec la casse exacte du fichier : `{ "context": { "fileName": ["GEMINI.md", "README.md"] } }`. Gemini CLI cherche aussi les fichiers de ce nom dans les dossiers que ses outils lisent : nommé `README.md`, le contexte s'enrichirait des autres `README.md` du projet ; un nom propre à l'IA locale l'évite.
-- **Commandes de Gemini CLI** : elles injectent les `@{…}` en respectant `.gitignore`. Le skill, exclu de Git, passe donc par son activation, jamais par une injection ; les fichiers de `docs/c7e/` et les images de l'objectif, versionnés, s'injectent.
+- **Commandes de Gemini CLI** : elles injectent les `@{…}` en respectant les exclusions de Git et `.geminiignore`. Le skill passe par son activation, jamais par une injection : Gemini CLI livre alors ce document et la liste des fichiers du skill, que l'IA lit ensuite, d'où les négations du § 11.3 ; les fichiers de `docs/c7e/` et les images de l'objectif, versionnés, s'injectent.
+- **Confiance des dossiers** : quand elle est activée dans Gemini CLI, les skills du workspace ne se chargent que dans un dossier de confiance ; ceux du niveau utilisateur, toujours.
 - **Vérifications** : `/memory show` affiche le fichier de démarrage, `/skills list` le skill, `/commands list` la commande ; après une modification, `/memory reload`, `/skills reload` ou `/commands reload`.
 - **Claude Code** lit `CLAUDE.md` et y importe de même les fichiers désignés par `@chemin`.
 - **Kit `agents-paralleles-gitlab`** : en chargement permanent, le fichier de démarrage se pose à la racine du kit, dossier parent des worktrees, que Gemini CLI lit aussi ; il importe `@./.skills/orchestrateur-c7e/SKILL.md` et `@./main/docs/c7e/meso-contrats.md`, la copie du worktree de référence, jamais celle d'une demande en cours. En chargement au choix, le skill et la commande vont au niveau utilisateur, `~/.gemini/skills/` et `~/.gemini/commands/` : une installation sert tous les worktrees, et les chemins `docs/c7e/…` se lisent dans le worktree où Gemini CLI est lancé.
@@ -505,7 +507,7 @@ Une contradiction entre deux niveaux se signale et s'inscrit au registre des éc
 
 ## 12. Registre des dimensions
 
-| ID | Dimension | Introduite | Statut 3.2.0 | Dépend de | Où |
+| ID | Dimension | Introduite | Statut 3.2.1 | Dépend de | Où |
 |---|---|---|---|---|---|
 | D1 | Ontologie : cycle 7E, profondeurs du CRI, concepts paramétrables | 3.1 | active | | `SKILL.md`, § 1 |
 | D2 | Configuration : matrice d'activation, modes de modulation, choix du démarrage | 3.1 | active | D1 | § 2, § 7.1, § 11.4 |
@@ -522,7 +524,7 @@ La méthode tient en un seul fichier pour se charger au démarrage : D1 à D7 so
 
 ## 13. Contrat de version et points d'extension
 
-Le skill suit le contrat de version de `EVOLUTION.md` du dépôt Agent2Prompt. La version 3.0.0, remise par le développeur, est archivée telle quelle avec son fichier d'invariants (`archives/`), comme la version 3.1.0 et le modèle de référentiel remis en 2.0.0. Le socle et les deux référentiels sont épinglés dans `manifest.json`.
+Le skill suit le contrat de version de `EVOLUTION.md` du dépôt Agent2Prompt. La version 3.0.0, remise par le développeur, est archivée telle quelle avec son fichier d'invariants (`archives/`), comme les versions 3.1.0 et 3.2.0 et le modèle de référentiel remis en 2.0.0. Le socle et les deux référentiels sont épinglés dans `manifest.json`.
 
 Points d'extension, actifs dès 3.1.0 :
 
@@ -605,10 +607,11 @@ Rejoués avec le développeur à l'installation, puis à chaque version du skill
 | R12 | Une option front désigne `maquettes/ecran-cible.png` et demande `structure`, `composants` et `etats` | `analyse-image.md` rédigée avant la fiche : extractions demandées, chaque élément rattaché à une option ou posé en question, estimations signalées ; validée avec la fiche | D10.INV-4 |
 | R13 | Ticket classé M03 dont l'analyse montre une donnée nouvelle à persister | aucune option de persistance sous M03, à l'impact `aucun` ; l'IA signale que le ticket sort de M03, propose M01 ou une catégorie nouvelle, et ne modifie pas le référentiel | D10.INV-2, D10.INV-5 |
 | R14 | Chargement au choix ; le développeur répond « sans orchestrateur », puis confie un ticket | le skill n'est pas activé ; ni fiche C7E ni règle du skill ; seules les règles du projet s'appliquent | D2.INV-3 |
+| R15 | Skill installé dans `.gemini/skills/` d'un clone ordinaire ; le développeur choisit l'orchestrateur | `git status` ne montre ni le skill ni `.geminiignore` ; après l'activation, l'IA lit `meso-contrats.md` et `modules/referentiel/SKILL.md` du skill sans refus | § 11.3 |
 
 Critères d'acceptation du skill :
 
-- R1 à R14 rejoués avec le développeur, à l'installation et à chaque version ;
+- R1 à R15 rejoués avec le développeur, à l'installation et à chaque version ;
 - le modèle du référentiel se lit en TOML, sa commande d'extraction redonne l'empreinte publiée, et l'exemple d'instance respecte ses règles de validation ;
 - les exemples de branches et de commits de ce skill passent les hooks du kit `agents-paralleles-gitlab` (vérifié à la publication, section 16) ;
 - `docs/c7e/concepts.json` est un JSON valide, de `schemaVersion` 1.
@@ -695,6 +698,17 @@ Vérifications faites à la publication de la 3.2.0 :
 - la commande d'extraction du module, rejouée dans un projet factice, redonne le fichier et son empreinte ;
 - l'exemple d'instance respecte les huit règles de validation du référentiel, et huit écarts introduits volontairement sont tous rejetés.
 
+### Installation lisible par l'IA locale, en 3.2.1
+
+| Dans la 3.2.0 | En 3.2.1 | Section |
+|---|---|---|
+| skill exclu de Git par `.git/info/exclude` d'un clone ordinaire, sans autre précaution : Gemini CLI n'en lit plus que le `SKILL.md` livré à l'activation, et refuse ses autres fichiers | exclusion et négations dans `.geminiignore`, lui-même exclu, une par niveau de dossier | § 11.3, étape 0 de la consigne |
+| « Le skill, exclu de Git, passe donc par son activation » : l'activation ne livre que ce document | l'activation livre ce document et la liste des fichiers, que l'IA lit ensuite | § 11.4 |
+| matérialisation par l'IA seulement | aussi par l'installateur du dépôt Agent2Prompt, sans IA ; l'étape 0 de la consigne le reconnaît | § 11.3, étape 0 de la consigne |
+| confiance des dossiers non mentionnée | skills du workspace chargés dans un dossier de confiance seulement | § 11.4 |
+
+Vérifications faites à la publication de la 3.2.1 : le comportement de Gemini CLI est lu dans son code (découverte des skills, activation, outil de lecture, exclusions de Git) et reproduit avec le paquet `@google/gemini-cli-core` 0.66.0 ; les négations rendent les fichiers du skill lisibles en chargement au choix comme en chargement permanent, y compris quand `/.gemini/skills/` ou `/.skills/` était déjà exclu, et `git status` reste propre. La recette de l'installateur du dépôt rejoue ce contrôle pour `.gemini/skills/` à chaque modification des transmissions.
+
 ## 17. Journal de révision
 
 **3.0.0** : version remise par le développeur le 31 octobre 2026, hors dépôt, avec son fichier `meso-contrats.md`. Archives : `archives/SKILL-v3.0.0.md` et `archives/meso-contrats-v3.0.0.md`.
@@ -702,3 +716,5 @@ Vérifications faites à la publication de la 3.2.0 :
 **3.1.0** (2026-10-31) : première version du dépôt. Méthode corrigée (section 16) et formalisée : dimensions D1 à D8 actives, D9 (campagne de mesure de la valeur) réservée ; points d'extension E1 à E3 ; vingt invariants et dix scénarios de recette. Socle back-front 1.0.1 épinglé ; experts `java` 1.1.1 et `angular` 1.0.1 inclus comme référentiels ; conventions Git alignées sur `agents-paralleles-gitlab` 1.0.1 et `agent-tdd-jira` 1.3.2. Fichier d'invariants aligné sur le socle et sur les référentiels.
 
 **3.2.0** (2026-10-31) : dimension D10 active, le référentiel des méso-contrats : modèle à installer dans le projet, catégories M01 à M03 et transverses T01 à T03, options au choix par couche, analyse des images PNG de l'objectif, `ticket.toml` par ticket ; invariants D10.INV-1 à D10.INV-5. Démarrage au choix du développeur (D2.INV-3) : chargement permanent ou au choix, menu et commande `/c7e`. Scénarios R11 à R14 ; vingt-six invariants. Archives : `archives/SKILL-v3.1.0.md` ; modèle de référentiel remis, `archives/referentiel-meso-contrats-v2.0.0.toml`.
+
+**3.2.1** (2026-11-01) : correctif de l'installation (section 16). Le skill est masqué à Git et reste lisible par l'IA locale : exclusion locale et négations dans `.geminiignore`, une par niveau de dossier, car l'outil de lecture de Gemini CLI refuse les fichiers qu'exclut `.git/info/exclude` d'un clone ordinaire. Installateur du dépôt Agent2Prompt reconnu par la consigne ; confiance des dossiers ; scénario R15. Invariants inchangés. Archive : `archives/SKILL-v3.2.0.md`.
