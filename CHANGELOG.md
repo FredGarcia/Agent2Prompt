@@ -13,7 +13,7 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
   - Scénario R15 : un skill installé dans un clone ordinaire est absent de `git status`, et ses fichiers se lisent après l'activation. Invariants inchangés.
 - Vérifications : comportement de Gemini CLI lu dans son code et reproduit avec `@google/gemini-cli-core` 0.66.0, en chargement au choix et en chargement permanent, y compris quand `/.gemini/skills/` ou `/.skills/` était déjà exclu ; vérificateur, glossaire et transmission à jour.
 - `docs/orchestrateur-c7e/mode-emploi.md` : version 3.2.1, renvoi au § 11.3 ; la note sur l'écart entre la spécification et le mode d'emploi est retirée.
-- Soumis à ratification :
+- Décisions ratifiées (pull request n° 29) :
   - un correctif (3.2.1) plutôt qu'une version mineure : aucune dimension, aucun point d'extension, aucun invariant ne change ;
   - la spécification qui renvoie à l'installateur du dépôt Agent2Prompt, à côté de la matérialisation par l'IA.
 
