@@ -1,0 +1,60 @@
+name: Recette de l'installateur
+
+# tools/installer.mjs installe un skill dans Gemini CLI à partir de sa transmission. Sa recette tourne
+# sous Linux et sous Windows. Le job « contrat » confronte une installation au code de Gemini CLI
+# lui-même, à une version épinglée : découverte des skills et lecture de chacun de leurs fichiers.
+
+on:
+  pull_request:
+    paths:
+      - 'tools/**'
+      - 'transmissions/**'
+      - '.github/scripts/contrat-gemini.mjs'
+      - '.github/workflows/recette-installer.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'tools/**'
+      - 'transmissions/**'
+      - '.github/scripts/contrat-gemini.mjs'
+      - '.github/workflows/recette-installer.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  recette:
+    name: recette (${{ matrix.os }}, Node ${{ matrix.node }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node: [20, 24]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Recette de tools/installer.mjs
+        run: node --test tools/installer.test.mjs
+
+  contrat:
+    name: contrat avec Gemini CLI (@google/gemini-cli-core 0.66.0)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+      - name: Paquet de Gemini CLI, à la version épinglée
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/gemini"
+          cd "$RUNNER_TEMP/gemini"
+          npm init -y > /dev/null
+          npm install --no-audit --no-fund --ignore-scripts @google/gemini-cli-core@0.66.0
+          cp "$GITHUB_WORKSPACE/.github/scripts/contrat-gemini.mjs" .
+      - name: Installer tous les skills, puis les relire avec le code de Gemini CLI
+        shell: bash
+        run: node "$RUNNER_TEMP/gemini/contrat-gemini.mjs" "$GITHUB_WORKSPACE"
