@@ -298,6 +298,16 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Documents
 
+### 2026-11-01 : mode d'emploi de l'orchestrateur C7E, compléments
+
+- `docs/orchestrateur-c7e/mode-emploi.md`, compléments à l'installateur et à la version 3.2.1 :
+  - § 1 : un clone d'Agent2Prompt pour l'installateur ; les deux dépôts en jeu, Agent2Prompt et celui du projet ; le rôle du dossier `transmissions/` ;
+  - § 2 : mettre à jour le skill (`git pull`, puis la même commande, `--liste`, `--forcer`) et le retirer ;
+  - § 3 : ces fichiers appartiennent au dépôt du projet ; colonne du modèle de chaque fichier dans le skill ; ligne de la fiche de transformation ; chemin de la commande d'extraction en chargement au choix ;
+  - § 5.2 : ce que livre l'activation, aligné sur le § 11.4 du skill ;
+  - § 10 : trois lignes de dépannage (skill collé par l'IA, fichiers changés, fichier de `docs/c7e/` introuvable).
+- Motif : un fichier de `docs/c7e/` cherché dans Agent2Prompt, et le rôle de `transmissions/`, qui n'étaient pas expliqués.
+
 ### 2026-10-31 : mode d'emploi de l'orchestrateur C7E
 
 - **`docs/orchestrateur-c7e/mode-emploi.md`** : installer `orchestrateur-c7e` 3.1.0 dans un projet et le faire appeler au lancement de Gemini CLI, selon deux modes :
