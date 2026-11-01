@@ -28,7 +28,7 @@ La colonne « Repris dans » cite les modules de la spécification qui reprennen
 | [`angular`](#angular-101) | 1.0.1 | 8 | 2 | 30 |
 | [`capture-sprint-jira`](#capture-sprint-jira-121) | 1.2.1 | 9 | 2 | 39 |
 | [`java`](#java-111) | 1.1.1 | 7 | 1 | 29 |
-| [`orchestrateur-c7e`](#orchestrateur-c7e-330) | 3.3.0 | 10 | 1 | 31 |
+| [`orchestrateur-c7e`](#orchestrateur-c7e-340) | 3.4.0 | 10 | 1 | 32 |
 | [`skill4appli`](#skill4appli-110) | 1.1.0 | 9 | 3 | 34 |
 | [`socle-back-front`](#socle-back-front-101) | 1.0.1 | 6 | 1 | 15 |
 | [`sonarqube`](#sonarqube-110) | 1.1.0 | 8 | 2 | 34 |
@@ -944,9 +944,9 @@ Expert Java 21, Spring Boot 3.5 et PostgreSQL : produire et relire du code confo
 
 Dimension réservée : aucun invariant en vigueur dans cette version.
 
-## orchestrateur-c7e 3.3.0
+## orchestrateur-c7e 3.4.0
 
-Orchestrateur fractal C7E : résolution d'un ticket full-stack comme transformation maîtrisée d'un système vivant, avec le cycle de l'Axiome 7E, quatre profondeurs de déclinaison, des concepts paramétrables, la qualification de chaque ticket à son ouverture par un modèle générique de la demande et des questions complémentaires, un méso-contrat confirmé avant tout le reste, des options par couche, l'analyse des images PNG de l'objectif, une fiche validée avant toute modification, des tests déduits des risques, des conventions Git compatibles avec le kit des agents parallèles, une boucle de second ordre bornée par un registre et un fichier d'invariants du projet ; activé au démarrage de l'IA locale, sur choix du développeur. Point d'entrée : [`specs/orchestrateur-c7e/SKILL.md`](specs/orchestrateur-c7e/SKILL.md).
+Orchestrateur fractal C7E : résolution d'un ticket full-stack comme transformation maîtrisée d'un système vivant, avec le cycle de l'Axiome 7E, quatre profondeurs de déclinaison, des concepts paramétrables, la qualification de chaque ticket à son ouverture par un modèle générique de la demande et des questions complémentaires, un méso-contrat confirmé avant tout le reste, des options par couche avec leurs paramètres au choix par ticket, des variantes de représentation d'une ressource, l'analyse des images PNG de l'objectif, une fiche validée avant toute modification, des tests déduits des risques, des conventions Git compatibles avec le kit des agents parallèles, une boucle de second ordre bornée par un registre et un fichier d'invariants du projet ; activé au démarrage de l'IA locale, sur choix du développeur. Point d'entrée : [`specs/orchestrateur-c7e/SKILL.md`](specs/orchestrateur-c7e/SKILL.md).
 
 ### D1 : Ontologie : cycle 7E, profondeurs du CRI, concepts paramétrables (active)
 
@@ -1022,6 +1022,7 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 | **D10.INV-3** | chaque option retenue apporte aux tests déduits les preuves que le référentiel lui associe, reliées à un critère ou à un risque. | `referentiel` |
 | **D10.INV-4** | une option front qui désigne une image PNG de l'objectif et en demande l'analyse donne lieu à `analyse-image.md`, rédigée avant la fiche et validée avec elle ; chaque élément de l'image y est rattaché à une option ou posé en question, et les tailles et couleurs lues sur l'image y sont des estimations. | `referentiel` |
 | **D10.INV-5** | `ticket.toml` épingle la version du référentiel qu'il suit ; l'IA ne modifie jamais le référentiel du projet : une catégorie ou une option nouvelle se propose au développeur, qui seul l'ajoute. | `referentiel`, `qualification` |
+| **D10.INV-6** | une variante de représentation laisse la réponse actuelle de l'opération inchangée pour toute requête qui ne la sélectionne pas ; le champ retiré est absent de la variante, et non pas `null` ; la date-heure qui le résume suit le format Instant du socle et se calcule en base sans charger les éléments ; le remplacement de la réponse actuelle n'est retenu que pour une opération dont la version d'API n'est pas publiée, sinon il est refusé avec la règle du socle (SC1.INV-2). | `referentiel` |
 
 ### D11 : Qualification de la demande : modèle générique, questions complémentaires, méso-contrat confirmé à l'ouverture du ticket (active)
 
@@ -1137,7 +1138,7 @@ Socle commun back-front : contrat OpenAPI, erreurs RFC 9457, formats de données
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
 | **SC1.INV-1** | tout endpoint exposé par le back figure dans le contrat, et tout endpoint du contrat est implémenté. Contrôle : test de conformité du contrat côté back. | `java`, `java/api-rest`, `orchestrateur-c7e`, `orchestrateur-c7e/meso-contrats` |
-| **SC1.INV-2** | aucun changement cassant n'est introduit dans une version d'API publiée. Contrôle : comparaison du contrat avec sa version précédente (outil de diff OpenAPI en CI, ou revue). | `agent-tdd-jira`, `agent2dev/conception`, `analyse-projet`, `analyse-projet/plans-action`, `java/api-rest`, `orchestrateur-c7e`, `orchestrateur-c7e/meso-contrats` |
+| **SC1.INV-2** | aucun changement cassant n'est introduit dans une version d'API publiée. Contrôle : comparaison du contrat avec sa version précédente (outil de diff OpenAPI en CI, ou revue). | `agent-tdd-jira`, `agent2dev/conception`, `analyse-projet`, `analyse-projet/plans-action`, `java/api-rest`, `orchestrateur-c7e`, `orchestrateur-c7e/meso-contrats`, `orchestrateur-c7e/referentiel`, `orchestrateur-c7e/qualification` |
 | **SC1.INV-3** | le front n'appelle les endpoints du contrat qu'au travers du client généré. Contrôle : recherche d'URL `/api/` codées en dur dans le front, hors client généré. | `angular`, `angular/architecture`, `angular/donnees-http`, `angular/revue`, `orchestrateur-c7e`, `orchestrateur-c7e/meso-contrats` |
 
 ### SC2 : Erreurs RFC 9457 (active)

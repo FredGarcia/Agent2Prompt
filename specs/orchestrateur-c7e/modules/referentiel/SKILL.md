@@ -7,7 +7,7 @@ status: active
 
 # Module `referentiel` (D10)
 
-Statut : `active`, depuis la version 3.2.0. Modèle du référentiel en 3.1.0 depuis la version 3.3.0 du skill : modèle générique de la demande ajouté.
+Statut : `active`, depuis la version 3.2.0. Modèle du référentiel en 3.1.0 depuis la version 3.3.0 du skill : modèle générique de la demande ajouté. Modèle en 3.2.0 depuis la version 3.4.0 : catégorie M04, variante de représentation d'une ressource, avec l'option `representations` et ses paramètres au choix par ticket.
 
 ## 1. Rôle
 
@@ -39,7 +39,7 @@ Ces étapes prennent place dans l'analyse du § 3 du point d'entrée, après la 
 2. Prendre pour point de départ les options que signale la demande remplie.
 3. Choisir les options, couche par couche, parmi les options permises du méso-contrat (D10.INV-2) :
    - persistance : évolution de schéma (tables, colonnes, index, contraintes) ; contrat CRUD, avec ses opérations et, si `delete` est retenu, le mode de suppression ;
-   - backend : endpoints, règles métier, fonctionnalités ;
+   - backend : endpoints, règles métier, fonctionnalités ; variantes de représentation, avec le repérage depuis l'URI et une valeur pour chaque paramètre (mécanisme de sélection, exposition de la variante sans champ) ; la réponse actuelle reste inchangée sans sélection, et le remplacement d'une réponse publiée se refuse (D10.INV-6) ;
    - frontend : éléments graphiques, fonctionnalités ; pour chacun, s'il y a lieu, l'image de l'objectif (`image_objectif`) et les extractions demandées (`analyse_image`).
 4. Analyser les images demandées dans `analyse-image.md` (D10.INV-4) :
    - les extractions demandées : structure, composants, textes, états, couleurs, accessibilité ;
@@ -55,7 +55,7 @@ Ces étapes prennent place dans l'analyse du § 3 du point d'entrée, après la 
 | Couche | Option | Slot | Étiquette des commits |
 |---|---|---|---|
 | persistance | `schema`, `crud` | É1 | `[É1-DB]` |
-| backend | `endpoints` | É3 | `[É3-API]` |
+| backend | `endpoints`, `representations` | É3 | `[É3-API]` |
 | backend | `regles`, `fonctionnalites` | É4 | `[É4-SVC]` |
 | frontend | `fonctionnalites` | É2, puis É5 | `[É2-UI]`, `[É5-UI]` |
 | frontend | `elements_graphiques` | É5 | `[É5-UI]` |
@@ -71,23 +71,38 @@ Le référentiel ne sert que si le développeur a choisi l'orchestrateur (D2.INV
 
 | Fichier | Empreinte sha256 |
 |---|---|
-| `docs/c7e/referentiel-meso-contrats.toml` | `fa83ac127aa748f71fba06504c5634ff418ec4bfffa5f878eccd691414ca3073` |
+| `docs/c7e/referentiel-meso-contrats.toml` | `28d030f8f3a88e86a3532ab70520ba9281d2ff7ffcd10718b59f9187ad11443d` |
 
 Commande d'extraction et de vérification, depuis la racine du projet (Node 20 ou plus récent, sans dépendance). Elle suppose le skill dans `.skills/orchestrateur-c7e/` ; pour un autre emplacement, comme `.gemini/skills/orchestrateur-c7e/` en chargement au choix, remplacer ce chemin :
 
 ```bash
-node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const texte = fs.readFileSync('.skills/orchestrateur-c7e/modules/referentiel/SKILL.md', 'utf8').replace(/\r\n/g, '\n'); const m = /^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/m.exec(texte); const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === 'fa83ac127aa748f71fba06504c5634ff418ec4bfffa5f878eccd691414ca3073'; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); if (!conforme) process.exitCode = 1;"
+node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const texte = fs.readFileSync('.skills/orchestrateur-c7e/modules/referentiel/SKILL.md', 'utf8').replace(/\r\n/g, '\n'); const m = /^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/m.exec(texte); const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === '28d030f8f3a88e86a3532ab70520ba9281d2ff7ffcd10718b59f9187ad11443d'; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); if (!conforme) process.exitCode = 1;"
 ```
 
-Le développeur adapte ensuite sa copie : possibilités du modèle générique de la demande, confrontées à l'analyse de l'application (module `qualification`, § 2), catégories `M04` et suivantes, technologies, options permises, transverses. Il change `meta.version` à chaque modification ; les tickets déjà instanciés gardent la version qu'ils ont épinglée.
+Le développeur adapte ensuite sa copie : possibilités du modèle générique de la demande, confrontées à l'analyse de l'application (module `qualification`, § 2), catégories `M05` et suivantes, technologies, options permises, transverses. Il change `meta.version` à chaque modification ; les tickets déjà instanciés gardent la version qu'ils ont épinglée.
 
 Un référentiel installé avant la version 3.3.0 du skill n'a pas de section `[modele_demande]` : le développeur l'y ajoute, copiée de ce modèle. D'ici là, la qualification prend celle du modèle et le signale (module `qualification`, § 2).
+
+Un référentiel installé avant la version 3.4.0 n'a ni M04, ni l'option `representations`, ni la possibilité `variante_representation`, ni la règle de choix sur les possibilités requises. Le développeur les copie de ce modèle s'il veut cette catégorie, et change `meta.version`. D'ici là, un ticket de variante de représentation ne trouve pas de catégorie : il se signale, sans catégorie inventée (D10.INV-1).
 
 <!-- fichier : docs/c7e/referentiel-meso-contrats.toml -->
 ```toml
 # ==============================================================================
 # RÉFÉRENTIEL DES MÉSO-CONTRATS ET CATÉGORIES DE TICKETS
 # ==============================================================================
+#
+# 3.2.0 (1er novembre 2026)
+#   - Catégorie M04, variante de représentation d'une ressource : depuis l'URI
+#     d'une opération, son type de réponse et un champ liste ou record, une
+#     variante sans ce champ, et une variante à la même URI où ce champ est
+#     remplacé par la date-heure de son dernier enregistrement.
+#   - Possibilité variante_representation (backend) ; lecture étendue aux
+#     projections et agrégats.
+#   - Option backend « representations », avec des paramètres au choix par
+#     ticket : mécanisme de sélection et exposition de la variante sans champ.
+#   - Possibilités requises d'un méso-contrat (possibilites_requises), prises en
+#     compte par la règle de choix.
+#   - Deux règles de validation de plus (section 4).
 #
 # 3.1.0 (1er novembre 2026)
 #   - Modèle générique de la demande (section 0) : une combinaison de
@@ -114,7 +129,7 @@ Un référentiel installé avant la version 3.3.0 du skill n'a pas de section `[
 # ==============================================================================
 
 [meta]
-version = "3.1.0"
+version = "3.2.0"
 domaine = "Software Factory & Architecture"
 description = "Taxonomie des méso-contrats structurant les évolutions logicielles de la stack (PostgreSQL, Java, Angular), avec les options au choix de chaque couche."
 
@@ -144,6 +159,7 @@ valeurs = ["oui", "non", "inconnu"]
 choix = [
   "toute couche d'une possibilité à oui a, dans l'empreinte du méso-contrat, l'impact requis ou optionnel",
   "toute couche à l'impact requis dans l'empreinte porte au moins une possibilité à oui",
+  "toute possibilité requise par le méso-contrat (possibilites_requises) est à oui",
   "l'option de chaque possibilité à oui figure parmi les options permises de sa couche",
   "un seul méso-contrat convient : il est proposé ; plusieurs : une question les départage ; aucun : le ticket est signalé, sans catégorie inventée",
 ]
@@ -189,9 +205,9 @@ reperes = ["changelog Liquibase"]
 [[modele_demande.possibilites]]
 id = "lecture"
 couche = "persistance"
-modification = "Lire les données d'une entité : filtre, tri, pagination"
+modification = "Lire les données d'une entité : filtre, tri, pagination, projection ou agrégat"
 option = "crud"
-reperes = ["repository Spring Data", "requête"]
+reperes = ["repository Spring Data", "requête", "projection ou requête d'agrégat"]
 
 [[modele_demande.possibilites]]
 id = "ecriture"
@@ -215,6 +231,13 @@ couche = "backend"
 modification = "Modifier le contrat d'un endpoint : paramètres, réponse, erreurs"
 option = "endpoints"
 reperes = ["contrat OpenAPI", "contrôleur REST", "DTO"]
+
+[[modele_demande.possibilites]]
+id = "variante_representation"
+couche = "backend"
+modification = "Ajouter une variante de représentation d'une opération existante : un champ liste ou record retiré, ou remplacé par la date-heure de son dernier enregistrement"
+option = "representations"
+reperes = ["contrat OpenAPI", "contrôleur REST", "DTO ou record de réponse"]
 
 [[modele_demande.possibilites]]
 id = "regle"
@@ -323,6 +346,44 @@ preuves = [
   "erreurs RFC 9457 : 400, 401, 403, 404, 409 ou 422 selon le cas",
 ]
 
+[options.backend.representations]
+nom = "Variantes de représentation"
+slot = "É3"
+description = """
+Variantes du type de réponse d'une opération existante. À l'analyse (d=0),
+l'IA repère depuis l'URI l'opération du contrat OpenAPI et son contrôleur, le
+type de réponse, le champ liste ou record visé, l'entité qui le porte et la
+colonne de date-heure de son enregistrement ; elle l'écrit dans ticket.toml.
+Variante sans champ : le type de réponse sans ce champ. Variante résumée : à
+la même URI, le champ remplacé par la date-heure de son dernier enregistrement,
+le maximum des dates des éléments pour une liste, la date du record pour un
+record, calculée en base sans charger les éléments.
+"""
+variantes = ["sans_champ", "resume"]
+preuves = [
+  "repérage depuis l'URI écrit dans ticket.toml : opération, contrôleur, type de réponse, champ, entité et colonne de date-heure",
+  "contrat OpenAPI : un schéma par variante et le mécanisme de sélection décrit, validés avant le code",
+  "un test de contrat par variante : le champ retiré est absent de la réponse, et non pas null",
+  "sans sélection, la réponse actuelle reste identique, vérifiée par un test de non-régression (sauf remplacement)",
+  "date-heure du dernier enregistrement au format Instant du socle, ISO 8601 avec fuseau ; null documenté au contrat et testé pour une liste vide",
+  "date-heure calculée en base par une seule requête, sans charger les éléments, vérifiée par un compteur de requêtes dans le test",
+  "negociation_contenu : 406 pour un type de média non servi",
+  "remplacement : version d'API non publiée, vérifiée par la comparaison du contrat avec sa version précédente",
+]
+
+[options.backend.representations.parametres]
+# Au choix par ticket, gardés dans ticket.toml.
+selection = ["parametre_vue", "negociation_contenu", "remplacement"]
+exposition_sans_champ = ["base", "meme_uri", "uri_propre"]
+
+[options.backend.representations.notes]
+parametre_vue = "Paramètre de requête facultatif (par exemple ?vue=resume) ; sans lui, la réponse actuelle est inchangée."
+negociation_contenu = "Type de média dédié dans l'en-tête Accept ; sans lui, la réponse actuelle est inchangée ; 406 pour un type non servi."
+remplacement = "La réponse actuelle devient la variante résumée : retrait d'un champ, donc changement cassant (socle, SC1.INV-2), seulement pour une opération dont la version d'API n'est pas publiée."
+base = "La variante sans champ n'a pas d'opération à elle : elle sert de base à la variante résumée."
+meme_uri = "La variante sans champ se sélectionne aussi à la même URI, par le même mécanisme, avec une valeur de plus."
+uri_propre = "La variante sans champ a sa propre opération, ajoutée au contrat (option endpoints)."
+
 [options.frontend.elements_graphiques]
 nom = "Éléments graphiques"
 slot = "É5"
@@ -362,9 +423,10 @@ preuves = [
 
 # ------------------------------------------------------------------------------
 # 2. CATALOGUE DES MÉSO-CONTRATS (LES DIFFÉRENTES CATÉGORIES)
-#    Pour ajouter une catégorie : un bloc [[meso_contrats]] d'identifiant M04,
-#    M05…, dont chaque couche déclare son impact et ses options permises,
-#    choisies dans la section 1.
+#    Pour ajouter une catégorie : un bloc [[meso_contrats]] d'identifiant M05,
+#    M06…, dont chaque couche déclare son impact et ses options permises,
+#    choisies dans la section 1, et, s'il y a lieu, les possibilités de la
+#    section 0 sans lesquelles il ne convient pas (possibilites_requises).
 # ------------------------------------------------------------------------------
 
 [[meso_contrats]]
@@ -404,6 +466,21 @@ complexite_moyenne = "Faible"
 persistance = { impact = "aucun", technologies = [], options = [] }
 backend = { impact = "aucun", technologies = [], options = [] }
 frontend = { impact = "requis", technologies = ["Angular"], style = "Composants et signals", options = ["elements_graphiques", "fonctionnalites"] }
+
+
+
+[[meso_contrats]]
+id = "M04"
+code = "VARIANTE_REPRESENTATION"
+nom = "Variante de représentation d'une ressource"
+description = "Tickets qui, depuis l'URI d'une opération existante, dérivent de son type de réponse une variante sans un champ liste ou record, et, à la même URI, une variante où ce champ est remplacé par la date-heure de son dernier enregistrement. Le front et la base ne sont touchés que si la demande l'exige."
+complexite_moyenne = "Moyenne"
+possibilites_requises = ["variante_representation"]
+
+[meso_contrats.empreinte_technique]
+persistance = { impact = "optionnel", technologies = ["PostgreSQL", "Liquibase"], options = ["crud", "schema"] }
+backend = { impact = "requis", technologies = ["Java", "API REST"], options = ["representations", "endpoints"] }
+frontend = { impact = "optionnel", technologies = ["Angular"], style = "Types et appels d'API", options = ["fonctionnalites", "elements_graphiques"] }
 
 # ------------------------------------------------------------------------------
 # 3. MÉSO-CONTRATS TRANSVERSES DE LA PLATEFORME
@@ -448,6 +525,8 @@ regles = [
   "chaque option choisie figure parmi les options permises de sa couche",
   "les opérations CRUD sont prises parmi create, read, update et delete ; delete impose un mode de suppression",
   "la méthode d'un endpoint est prise parmi les méthodes du catalogue",
+  "chaque paramètre d'une option choisie prend une valeur de son catalogue (parametres)",
+  "le mécanisme de sélection remplacement n'est choisi que pour une opération dont la version d'API n'est pas publiée (version_publiee = false)",
   "analyse_image n'apparaît qu'avec image_objectif, en PNG, et ses extractions sont prises dans le catalogue",
   "les méso-contrats transverses des couches touchées s'appliquent d'office",
 ]
@@ -455,12 +534,14 @@ regles = [
 
 ## 7. Exemple d'instance
 
+### 7.1 Ticket fil rouge, M01
+
 `docs/demandes/ABCDE-3512/ticket.toml`, pour le ticket fil rouge du point d'entrée (§ 15, R3, R11 et R16). La section `[ticket.demande]` vient de la qualification, à l'ouverture du ticket ; les options, de l'analyse :
 
 ```toml
 [ticket]
 reference = "ABCDE-3512"
-referentiel = "3.1.0"
+referentiel = "3.2.0"
 meso_contrat = "M01"
 meso_contrat_confirme = true
 titre = "Charger les données au clic plutôt qu'à l'ouverture de l'écran"
@@ -479,6 +560,7 @@ lecture = { reponse = "oui", precision = "données paginées", source = "ticket 
 ecriture = { reponse = "inconnu" }
 endpoint_nouveau = { reponse = "non", source = "développeur : question 1" }
 endpoint_modifie = { reponse = "oui", precision = "GET /api/v1/donnees, paginé", source = "développeur : question 1" }
+variante_representation = { reponse = "non", precision = "réponse paginée, sans variante", source = "développeur : question 1" }
 regle = { reponse = "oui", precision = "seul un utilisateur habilité obtient les données", source = "ticket : critères d'acceptation" }
 service = { reponse = "oui", precision = "fournir les données à la demande", source = "ticket : description" }
 ecran_nouveau = { reponse = "inconnu" }
@@ -524,8 +606,67 @@ image_actuelle = "docs/demandes/ABCDE-3512/maquettes/ecran-actuel.png"
 analyse_image = ["structure", "etats"]
 ```
 
+### 7.2 Variante de représentation, M04
+
+`docs/demandes/ABCDE-3620/ticket.toml`, pour le scénario R19. Le ticket : « Trouver l'endpoint de l'URI `/api/v1/commandes/{id}` avec son type de donnée ; sa composition contient le champ `lignes`, une liste. Réaliser une variante de ce type sans ce champ. Réaliser une variante à la même URI où ce champ ne sera pas intégré : les informations le concernant seront uniquement la date et l'heure du dernier enregistrement. » Le développeur a répondu aux quatre questions de la qualification : sélection par paramètre de vue, variante sans champ sans opération à elle, date-heure déjà stockée sur les lignes, front non concerné. Le repérage depuis l'URI vient de l'analyse :
+
+```toml
+[ticket]
+reference = "ABCDE-3620"
+referentiel = "3.2.0"
+meso_contrat = "M04"
+meso_contrat_confirme = true
+titre = "Commande : variante sans les lignes, et résumé à la même URI avec la date-heure de la dernière ligne enregistrée"
+
+[ticket.demande]
+intention = { reponse = "Dériver de la réponse de GET /api/v1/commandes/{id} une variante sans les lignes, et, à la même URI, une variante où les lignes sont remplacées par la date-heure de la dernière ligne enregistrée", source = "ticket : description" }
+maquette = { reponse = "non", source = "ticket : pièces jointes" }
+table = { reponse = "inconnu" }
+colonne = { reponse = "non", precision = "ligne_commande.enregistree_le existe déjà", source = "développeur : question 3" }
+index = { reponse = "inconnu" }
+contrainte = { reponse = "inconnu" }
+lecture = { reponse = "oui", precision = "date-heure maximale des lignes d'une commande, sans charger les lignes", source = "ticket : description" }
+ecriture = { reponse = "inconnu" }
+endpoint_nouveau = { reponse = "non", source = "développeur : question 2" }
+endpoint_modifie = { reponse = "oui", precision = "GET /api/v1/commandes/{id}, paramètre vue facultatif", source = "développeur : question 1" }
+variante_representation = { reponse = "oui", precision = "champ lignes, une liste", source = "ticket : description" }
+regle = { reponse = "inconnu" }
+service = { reponse = "inconnu" }
+ecran_nouveau = { reponse = "non", source = "développeur : question 4" }
+ecran_modifie = { reponse = "non", source = "développeur : question 4" }
+formulaire = { reponse = "inconnu" }
+comportement = { reponse = "non", source = "développeur : question 4" }
+navigation = { reponse = "inconnu" }
+
+[[ticket.persistance.crud]]
+entite = "LigneCommande"
+table = "ligne_commande"
+operations = ["read"]
+lecture = "max(enregistree_le) des lignes d'une commande, par une requête d'agrégat"
+
+[[ticket.backend.representations]]
+operation = "GET /api/v1/commandes/{id}"
+version_publiee = true
+controleur = "CommandeController#lire"
+type_reponse = "CommandeDto"
+champ = { nom = "lignes", nature = "liste", type = "List<LigneCommandeDto>" }
+entite = "LigneCommande"
+colonne_date = "ligne_commande.enregistree_le"
+selection = "parametre_vue"
+exposition_sans_champ = "base"
+variante_sans_champ = { type = "CommandeSansLignesDto" }
+variante_resume = { type = "CommandeResumeDto", vue = "resume", champ_date = "lignesDernierEnregistrement", vide = "null" }
+
+[[ticket.backend.endpoints]]
+methode = "GET"
+chemin = "/api/v1/commandes/{id}"
+parametres = ["vue, facultatif : resume"]
+reponse = "CommandeDto sans paramètre, inchangée ; CommandeResumeDto avec vue=resume"
+erreurs = [400, 401, 403, 404]
+```
+
 ## 8. Contrôles
 
 - La section `[validation]` du référentiel énumère les règles d'un ticket, celles de la demande remplie comprises ; l'IA les vérifie avant de présenter `ticket.toml` (D10.INV-2).
-- Scénarios R11 à R14 du point d'entrée ; R16 à R18 pour le modèle générique de la demande.
-- À la publication : le modèle se lit en TOML, et l'exemple d'instance respecte toutes ses règles de validation (point d'entrée, section 16).
+- Scénarios R11 à R14 du point d'entrée ; R16 à R18 pour le modèle générique de la demande ; R19 et R20 pour M04 et l'option `representations`.
+- À la publication : le modèle se lit en TOML, et les deux exemples d'instance respectent toutes ses règles de validation (point d'entrée, section 16).

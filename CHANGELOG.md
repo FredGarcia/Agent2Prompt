@@ -4,6 +4,25 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-11-01 : orchestrateur-c7e 3.4.0
+
+- **orchestrateur-c7e 3.4.0** : catégorie M04, variante de représentation d'une ressource, deuxième exemple de méso-contrat donné par le développeur après le CRUD en base, son endpoint Java et sa lecture depuis le front : « Trouver le endpoint d'une URI avec le type de donnée ; sa composition contient un champ avec une liste ou un record. Réaliser une variante de ce type avec ce champ en moins. Réaliser une variante avec la même URI où ce champ ne sera pas intégré ; les informations le concernant seront uniquement la date et l'heure du dernier enregistrement. »
+  - M04, `VARIANTE_REPRESENTATION` : backend requis, persistance et frontend optionnels ; aucune catégorie existante ne convenait.
+  - Option `representations` (slot É3) : repérage depuis l'URI (opération, contrôleur, type de réponse, champ, entité, colonne de date-heure), variante sans champ, variante résumée à la même URI dont la date-heure se calcule en base sans charger les éléments ; huit preuves.
+  - Point d'extension E4 : paramètres d'option au choix par ticket, ici le mécanisme de sélection (`parametre_vue`, `negociation_contenu`, `remplacement`) et l'exposition de la variante sans champ (`base`, `meme_uri`, `uri_propre`) ; possibilités requises d'un méso-contrat, prises en compte par la règle de choix.
+  - Modèle du référentiel 3.2.0 : possibilité `variante_representation`, `lecture` étendue aux projections et agrégats, seize possibilités ; deux règles de validation de plus, quatorze en tout ; second exemple d'instance, `ABCDE-3620`.
+  - Invariant D10.INV-6 : réponse actuelle inchangée sans sélection, champ absent et non `null`, date-heure au format Instant du socle, remplacement refusé pour une version d'API publiée. Trente-deux invariants. Scénarios R19 et R20.
+- Vérifications :
+  - le modèle se lit en TOML et la commande d'extraction redonne sa nouvelle empreinte ;
+  - les deux exemples d'instance respectent les quatorze règles, et sept écarts volontaires dans l'exemple M04 sont tous rejetés ;
+  - la règle de choix retient les mêmes catégories qu'en 3.3.0 pour les six demandes types de la 3.3.0, et M04 pour cinq variantes de représentation ;
+  - vérificateur, glossaire, transmission et recette de l'installateur à jour.
+- `docs/orchestrateur-c7e/mode-emploi.md` : version 3.4.0, option `representations` et deux cas de dépannage.
+- Décisions ratifiées :
+  - une catégorie nouvelle, M04, plutôt qu'un élargissement de M01 ;
+  - le mécanisme de sélection à la même URI et l'exposition de la variante sans champ au choix par ticket ;
+  - une version mineure, pour le point d'extension E4.
+
 ### 2026-11-01 : sonarqube 1.1.0
 
 - **sonarqube 1.1.0** : dimensions D9 et D10 actives, l'examen local avant GitLab et son interface de pilotage, à la demande du développeur. Cinquième mission, « Examiner en local » : le code est examiné avant son envoi sur GitLab, selon les règles du profil qualité du projet sur l'instance, en accédant à SonarQube par le jeton du compte Sonar.

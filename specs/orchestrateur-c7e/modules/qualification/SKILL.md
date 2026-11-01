@@ -21,7 +21,7 @@ Le développeur confirme ce méso-contrat. L'analyse et la fiche de transformati
 
 ## 2. Le modèle générique de la demande
 
-Le modèle est une **combinaison de possibilités** : les modifications qu'un ticket peut demander à l'application, couche par couche. Il se trouve dans la section 0 du référentiel du projet, `[modele_demande]` (module `referentiel`, § 6). Chaque possibilité nomme sa couche, la modification, l'option du référentiel qu'elle engage, et ses repères dans l'application. Pour une application PostgreSQL, Java et Angular, le modèle en propose quinze :
+Le modèle est une **combinaison de possibilités** : les modifications qu'un ticket peut demander à l'application, couche par couche. Il se trouve dans la section 0 du référentiel du projet, `[modele_demande]` (module `referentiel`, § 6). Chaque possibilité nomme sa couche, la modification, l'option du référentiel qu'elle engage, et ses repères dans l'application. Pour une application PostgreSQL, Java et Angular, le modèle en propose seize :
 
 | Couche | Possibilité | Modification | Option |
 |---|---|---|---|
@@ -29,10 +29,11 @@ Le modèle est une **combinaison de possibilités** : les modifications qu'un ti
 | persistance, PostgreSQL | `colonne` | ajouter ou modifier une colonne | `schema` |
 | persistance, PostgreSQL | `index` | ajouter ou modifier un index, pour la performance d'une requête | `schema` |
 | persistance, PostgreSQL | `contrainte` | ajouter ou modifier une contrainte : clé, unicité, NOT NULL | `schema` |
-| persistance, PostgreSQL | `lecture` | lire les données d'une entité : filtre, tri, pagination | `crud` |
+| persistance, PostgreSQL | `lecture` | lire les données d'une entité : filtre, tri, pagination, projection ou agrégat | `crud` |
 | persistance, PostgreSQL | `ecriture` | créer, modifier ou supprimer les données d'une entité | `crud` |
 | backend, Java | `endpoint_nouveau` | ajouter un endpoint | `endpoints` |
 | backend, Java | `endpoint_modifie` | modifier le contrat d'un endpoint : paramètres, réponse, erreurs | `endpoints` |
+| backend, Java | `variante_representation` | ajouter une variante de représentation d'une opération existante : un champ liste ou record retiré, ou remplacé par la date-heure de son dernier enregistrement | `representations` |
 | backend, Java | `regle` | ajouter ou modifier une règle métier ou une habilitation | `regles` |
 | backend, Java | `service` | ajouter ou modifier un cas d'usage côté serveur | `fonctionnalites` |
 | frontend, Angular | `ecran_nouveau` | créer un écran ou un composant | `elements_graphiques` |
@@ -47,17 +48,20 @@ La demande d'un ticket est la combinaison de ses possibilités à `oui`. La **r�
 
 - toute couche d'une possibilité à `oui` y a l'impact `requis` ou `optionnel` ;
 - toute couche à l'impact `requis` porte au moins une possibilité à `oui` ;
-- l'option de chaque possibilité à `oui` figure parmi les options permises de sa couche.
+- l'option de chaque possibilité à `oui` figure parmi les options permises de sa couche ;
+- toute possibilité que le méso-contrat déclare requise (`possibilites_requises`) est à `oui`. M04 requiert `variante_representation` : sans elle, un ticket qui modifie un endpoint ne lui est pas rattaché, même si son empreinte le permettrait.
 
 Si un seul méso-contrat convient, il est proposé. Si plusieurs conviennent, une question les départage. Si aucun ne convient, le ticket est signalé, sans catégorie inventée (D10.INV-1).
 
-**Des possibilités établies à l'analyse de l'application.** Les quinze possibilités valent pour la pile ; celles du projet se fondent sur l'analyse de son application. À l'installation (§ 11.3 du point d'entrée), l'IA confronte le modèle à cette analyse : la cartographie produite par le skill `analyse-projet`, s'il a été appliqué, ou la lecture de la structure du projet (changelogs Liquibase, entités, contrôleurs, services, composants, routes). Elle propose au développeur :
+**Des possibilités établies à l'analyse de l'application.** Les seize possibilités valent pour la pile ; celles du projet se fondent sur l'analyse de son application. À l'installation (§ 11.3 du point d'entrée), l'IA confronte le modèle à cette analyse : la cartographie produite par le skill `analyse-projet`, s'il a été appliqué, ou la lecture de la structure du projet (changelogs Liquibase, entités, contrôleurs, services, composants, routes). Elle propose au développeur :
 
 - les possibilités qui s'appliquent, avec leurs repères dans l'application (dossiers, conventions de nommage) ;
 - celles qui ne s'appliquent pas, à retirer ;
 - celles qui manquent, propres à l'application : un batch, un message, un export, un rapport. Chacune est rattachée à une couche et à une option du référentiel, ou à une option nouvelle à créer.
 
-Le développeur les écrit dans son référentiel ; l'IA ne le modifie pas (D11.INV-5, D10.INV-5). Si le référentiel du projet n'a pas encore de section `[modele_demande]`, parce qu'il a été installé avant la version 3.3.0, l'IA prend celle du modèle du skill et le signale au développeur dans la qualification.
+Le développeur les écrit dans son référentiel ; l'IA ne le modifie pas (D11.INV-5, D10.INV-5). Si le référentiel du projet n'a pas encore de section `[modele_demande]`, parce qu'il a été installé avant la version 3.3.0, l'IA prend celle du modèle du skill et le signale au développeur dans la qualification. S'il n'a pas M04, parce qu'il a été installé avant la version 3.4.0, un ticket de variante de représentation se signale sans catégorie, et l'IA indique au développeur les blocs à copier du modèle (module `referentiel`, § 6).
+
+**Paramètres d'option au choix par ticket.** Certaines options déclarent des paramètres, chacun avec ses valeurs (`parametres` dans le référentiel). Quand le ticket ne dit pas la valeur d'un paramètre, et qu'elle changerait les possibilités à `oui` ou les preuves, la question se pose à la qualification avec les autres. C'est le cas de l'option `representations` : le mécanisme de sélection à la même URI (`parametre_vue`, `negociation_contenu`, `remplacement`) et l'exposition de la variante sans champ (`base`, `meme_uri`, `uri_propre`, qui fait passer `endpoint_nouveau` à `oui`).
 
 ## 3. À l'ouverture de chaque ticket
 
@@ -106,10 +110,28 @@ Avec la commande `/c7e ABCDE-3512 M01` (§ 11.4 du point d'entrée), le dévelop
 
 **Ticket fil rouge, `ABCDE-3512` (scénario R16).** Le ticket demande de charger les données au clic plutôt qu'à l'ouverture de l'écran. Il implique `colonne`, `lecture`, `regle`, `service`, `ecran_modifie`, `comportement` et une maquette : la combinaison touche les trois couches, et seul M01 convient. Le ticket ne dit pas si l'endpoint est ajouté ou modifié ; c'est la seule question, parce qu'elle décide de l'option `endpoints`. Les possibilités qu'il n'évoque pas, comme `table` ou `navigation`, restent `inconnu` sans question : aucune ne changerait le méso-contrat ni ses options. Le développeur répond « modifier `GET /api/v1/donnees`, pour la pagination », et confirme M01. `ticket.toml` reçoit la demande : module `referentiel`, § 7.
 
-**Ticket ambigu (scénario R17).** « Afficher la date de dernière mise à jour sur l'écran de détail. » `ecran_modifie` est à `oui` ; `colonne`, `lecture` et `endpoint_modifie` restent `inconnu`. Si la date est déjà stockée et renvoyée par l'API, la combinaison ne touche qu'Angular, et M03 convient. Sinon, elle touche aussi PostgreSQL et Java, et M01 convient. L'IA pose donc une question : « La date de dernière mise à jour est-elle déjà stockée et renvoyée par l'API de détail ? » Elle ne propose de méso-contrat qu'après la réponse.
+**Ticket ambigu (scénario R17).** « Afficher la date de dernière mise à jour sur l'écran de détail. » `ecran_modifie` est à `oui` ; `colonne`, `lecture` et `endpoint_modifie` restent `inconnu`. Si la date est déjà stockée et renvoyée par l'API, la combinaison ne touche qu'Angular, et M03 convient. Sinon, elle touche aussi PostgreSQL et Java, et M01 convient. L'IA pose donc une question : « La date de dernière mise à jour est-elle déjà stockée et renvoyée par l'API de détail ? » Elle ne propose de méso-contrat qu'après la réponse. M04 n'est pas en jeu : la demande n'a pas `variante_representation`, qu'il requiert.
+
+**Variante de représentation, `ABCDE-3620` (scénarios R19 et R20).** « Trouver l'endpoint de l'URI `/api/v1/commandes/{id}` avec son type de donnée ; sa composition contient le champ `lignes`, une liste. Réaliser une variante de ce type sans ce champ. Réaliser une variante à la même URI où ce champ ne sera pas intégré : les informations le concernant seront uniquement la date et l'heure du dernier enregistrement. » `variante_representation`, `endpoint_modifie` et `lecture` (un agrégat, la date-heure maximale des lignes) sont à `oui`. Seul M04 convient : M01 ne permet pas l'option `representations` et exige le frontend, M02 et M03 n'ont pas cette option. Le message de qualification pose quatre questions :
+
+```markdown
+**Méso-contrat proposé** : M04, VARIANTE_REPRESENTATION
+- la demande dérive une variante du type de réponse de GET /api/v1/commandes/{id} ; M04 la requiert
+- M01 écarté : il ne permet pas l'option representations et exige le frontend ; M02 et M03 écartés : ni l'un ni l'autre ne la permet
+
+**Questions**
+1. À la même URI, comment le client choisit-il la variante résumée : paramètre de vue (?vue=resume), négociation de contenu (Accept), ou remplacement de la réponse actuelle ? (paramètre selection ; le remplacement retire un champ, il n'est possible que si la version d'API n'est pas publiée)
+2. La variante sans les lignes a-t-elle une opération à elle : non, elle sert de base au résumé ; oui, à la même URI ; oui, à sa propre URI ? (paramètre exposition_sans_champ ; endpoint_nouveau)
+3. Les lignes portent-elles déjà leur date-heure d'enregistrement ? (colonne : décide de l'option schema)
+4. Le front Angular consomme-t-il la variante résumée ? (ecran_modifie, comportement : décide des options frontend)
+
+Confirmez-vous M04 ? Je ne fais rien d'autre avant votre réponse.
+```
+
+Le développeur répond : paramètre de vue, variante sans champ en base du résumé, date-heure déjà stockée, front non concerné ; il confirme M04. À l'analyse, l'IA repère depuis l'URI l'opération, son contrôleur, `CommandeDto`, le champ `lignes` et la colonne `ligne_commande.enregistree_le`. `ticket.toml` : module `referentiel`, § 7.2. Si le développeur avait choisi le remplacement alors que `/api/v1` est publiée, l'IA l'aurait refusé en citant le socle (SC1.INV-2) et proposé le paramètre de vue ou la négociation de contenu (R20).
 
 ## 7. Contrôles
 
-- Scénarios R16 à R18 du point d'entrée, et R13 pour le retour à la qualification.
+- Scénarios R16 à R18 du point d'entrée, R19 et R20 pour M04, et R13 pour le retour à la qualification.
 - Les règles de validation du référentiel vérifient la demande remplie : intention et possibilités répondues et sourcées, méso-contrat conforme à la règle de choix, aucune possibilité `inconnu` qui changerait le méso-contrat, aucune option avant la confirmation.
 - À l'installation, la liste des possibilités du projet est validée par le développeur, à partir de l'analyse de l'application.
