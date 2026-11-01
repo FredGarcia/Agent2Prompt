@@ -1,9 +1,9 @@
 {
   "name": "orchestrateur-c7e",
-  "version": "3.2.1",
+  "version": "3.3.0",
   "specSchema": 1,
   "language": "fr",
-  "description": "Orchestrateur fractal C7E : résolution d'un ticket full-stack comme transformation maîtrisée d'un système vivant, avec le cycle de l'Axiome 7E, quatre profondeurs de déclinaison, des concepts paramétrables, un référentiel des méso-contrats qui classe chaque ticket et en fixe les options par couche, l'analyse des images PNG de l'objectif, une fiche validée avant toute modification, des tests déduits des risques, des conventions Git compatibles avec le kit des agents parallèles, une boucle de second ordre bornée par un registre et un fichier d'invariants du projet ; activé au démarrage de l'IA locale, sur choix du développeur.",
+  "description": "Orchestrateur fractal C7E : résolution d'un ticket full-stack comme transformation maîtrisée d'un système vivant, avec le cycle de l'Axiome 7E, quatre profondeurs de déclinaison, des concepts paramétrables, la qualification de chaque ticket à son ouverture par un modèle générique de la demande et des questions complémentaires, un méso-contrat confirmé avant tout le reste, des options par couche, l'analyse des images PNG de l'objectif, une fiche validée avant toute modification, des tests déduits des risques, des conventions Git compatibles avec le kit des agents parallèles, une boucle de second ordre bornée par un registre et un fichier d'invariants du projet ; activé au démarrage de l'IA locale, sur choix du développeur.",
   "entry": "SKILL.md",
   "modes": ["externe", "autonome", "hybride"],
   "targets": {
@@ -11,7 +11,7 @@
     "entree": "ticket Jira en MHTML (dossier IA de capture-sprint-jira) ou texte",
     "adaptateur": "Java 21, Spring Boot 3.5, PostgreSQL, Liquibase, Angular 20",
     "git": "une branche par ticket, commits préfixés par la clé, compatibles avec les hooks d'agents-paralleles-gitlab",
-    "referentiel": "catégories de tickets du projet, en TOML, options au choix par couche, une instance ticket.toml par ticket"
+    "referentiel": "modèle générique de la demande et catégories de tickets du projet, en TOML, options au choix par couche, une instance ticket.toml par ticket"
   },
   "shared": [
     { "path": "socle/SKILL.md", "from": "specs/socle-back-front/SKILL.md", "version": "1.0.1" },
@@ -27,7 +27,8 @@
   "modules": [
     { "id": "meso-contrats", "path": "meso-contrats.md", "dimensions": ["D8"], "status": "active" },
     { "id": "mesure", "path": "modules/mesure/SKILL.md", "dimensions": ["D9"], "status": "reserved" },
-    { "id": "referentiel", "path": "modules/referentiel/SKILL.md", "dimensions": ["D10"], "status": "active" }
+    { "id": "referentiel", "path": "modules/referentiel/SKILL.md", "dimensions": ["D10"], "status": "active" },
+    { "id": "qualification", "path": "modules/qualification/SKILL.md", "dimensions": ["D11"], "status": "active" }
   ],
   "extensionPoints": ["E1", "E2", "E3"],
   "previousVersions": [
@@ -35,6 +36,7 @@
     { "version": "3.0.0", "file": "archives/meso-contrats-v3.0.0.md" },
     { "version": "3.1.0", "file": "archives/SKILL-v3.1.0.md" },
     { "version": "3.2.0", "file": "archives/SKILL-v3.2.0.md" },
+    { "version": "3.2.1", "file": "archives/SKILL-v3.2.1.md" },
     { "version": "2.0.0", "file": "archives/referentiel-meso-contrats-v2.0.0.toml" }
   ]
 }

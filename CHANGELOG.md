@@ -4,6 +4,32 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-11-01 : orchestrateur-c7e 3.3.0
+
+- **orchestrateur-c7e 3.3.0** : dimension D11 active, la qualification de la demande, à la demande du développeur. À l'ouverture d'un ticket, la première chose à faire est de trouver son méso-contrat, avec un modèle générique de la demande, à partir du contenu du ticket, en posant des questions complémentaires si besoin. Le modèle est une combinaison de possibilités, fondées sur les modifications de l'application construite sur la pile PostgreSQL, Java et Angular, établies à son analyse.
+  - Module `qualification` : la demande du ticket est rangée dans le modèle, chaque réponse avec sa source ; les possibilités inconnues qui changeraient le méso-contrat ou ses options deviennent des questions, posées ensemble ; le méso-contrat retenu par la règle de choix est confirmé par le développeur avant la lecture du code, l'analyse et la fiche ; gabarit de présentation ; méso-contrat imposé par `/c7e` ; deux exemples.
+  - Modèle du référentiel 3.1.0, section 0, `[modele_demande]` : quinze possibilités de modification pour la pile, chacune avec sa couche, son option et ses repères (PostgreSQL : table, colonne, index, contrainte, lecture, écriture ; Java : endpoint nouveau ou modifié, règle, service ; Angular : écran nouveau ou modifié, formulaire, comportement, navigation), l'intention, la maquette et la règle de choix ; quatre règles de validation de plus ; nouvelle empreinte.
+  - À l'installation, l'IA confronte ces possibilités à l'analyse de l'application et propose celles à retenir, avec leurs repères, à retirer et à ajouter ; le développeur les écrit.
+  - `ticket.toml` : section `[ticket.demande]`, qui remplace `[ticket.specifications_metier]` du modèle remis en 2.0.0, et `meso_contrat_confirme`.
+  - § 3 : trois temps, qualification, analyse, transformation, et deux réponses du développeur ; § 10, § 11 et la consigne suivent. Menu de démarrage et commande `/c7e` : qualification d'abord.
+  - Invariants D11.INV-1 à D11.INV-5 ; D10.INV-1 renforcé, le méso-contrat étant confirmé dès la qualification ; trente et un invariants. Scénarios R16 à R18 ; R13 revient à la qualification.
+- Vérifications :
+  - le modèle du référentiel se lit en TOML, ses quinze possibilités n'engagent que des couches et des options du catalogue, et la commande d'extraction redonne sa nouvelle empreinte ;
+  - l'exemple d'instance respecte les douze règles de validation, et quatorze écarts introduits volontairement sont tous rejetés ;
+  - la règle de choix retient M01 pour le ticket fil rouge et pour un écran de saisie nouveau avec sa table et son API, M02 pour un index seul, M03 pour un libellé d'écran, et M03 ou M01 pour une date à afficher, selon qu'elle est déjà exposée ou non ;
+  - installé par `tools/installer.mjs`, le skill est découvert une fois par Gemini CLI, le module `qualification` n'y devient pas un skill, et tous ses fichiers sont lisibles ;
+  - vérificateur, glossaire et transmission à jour.
+- `docs/orchestrateur-c7e/mode-emploi.md` : version 3.3.0, qualification à l'ouverture du ticket dans l'introduction, le schéma, le menu, la commande, l'usage quotidien et le dépannage ; adaptation des possibilités à l'application.
+- Soumis à ratification :
+  - une dimension nouvelle, D11, et donc une version mineure, plutôt qu'un ajout à D10 ;
+  - les quinze possibilités de modification proposées pour la pile, leurs options et leurs repères, et la règle de choix ;
+  - la confrontation des possibilités à l'analyse de l'application à l'installation, l'IA proposant et le développeur écrivant ;
+  - une confirmation du méso-contrat à part, avant toute analyse du code, en plus de la validation de la fiche ;
+  - des questions limitées aux possibilités inconnues qui changeraient le méso-contrat ou ses options ;
+  - `[ticket.demande]` à la place de `[ticket.specifications_metier]` ;
+  - un méso-contrat imposé par `/c7e` qui vaut confirmation s'il couvre la demande remplie ;
+  - le modèle du skill pris par défaut, et signalé, quand le référentiel du projet n'a pas encore de section `[modele_demande]`.
+
 ### 2026-11-01 : orchestrateur-c7e 3.2.1
 
 - **orchestrateur-c7e 3.2.1** : correctif de l'installation. Masqué à Git par la seule exclusion `.git/info/exclude` d'un clone ordinaire, comme le prévoyait la 3.2.0, le skill ne livrait que son `SKILL.md` à l'activation : l'outil de lecture de Gemini CLI refuse les fichiers ainsi exclus, et les modules restaient illisibles.
