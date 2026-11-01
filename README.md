@@ -62,7 +62,7 @@ Ces documents ne sont pas des spécifications : le vérificateur ne les contrôl
 
 | Document | Formats | Objet |
 |---|---|---|
-| [L'IA, un investissement mesurable](docs/presentation-valeur-ia/presentation-valeur-ia.md) | Markdown avec schémas Mermaid ; [PowerPoint](docs/presentation-valeur-ia/presentation-valeur-ia.pptx) avec notes du présentateur | Montrer à un client ce que son investissement dans l'IA rapporte au développement de ses applications : constats publics sourcés, contrepartie par ticket, garde-fous, seuil de rentabilité, protocole de mesure, pilote avec règle d'arrêt |
+| [L'IA, un investissement mesurable](docs/presentation-valeur-ia/presentation-valeur-ia.md) | Markdown avec schémas Mermaid ; [PowerPoint](docs/presentation-valeur-ia/presentation-valeur-ia.pptx) avec notes du présentateur | Montrer à un client ce que son investissement dans l'IA rapporte au développement de ses applications : constats publics sourcés, changement de paradigme, contrepartie par ticket, garde-fous, seuil de rentabilité, protocole de mesure, pilote avec règle d'arrêt |
 | [Mode d'emploi de l'orchestrateur C7E](docs/orchestrateur-c7e/mode-emploi.md) | Markdown avec un schéma Mermaid | Installer `orchestrateur-c7e` 3.3.0 et le faire appeler au démarrage de Gemini CLI, en chargement permanent ou au choix, avec un menu et la commande `/c7e` ; installer le référentiel des méso-contrats, qualifier chaque ticket à son ouverture, choisir ses options et faire analyser les images de l'objectif ; vérifications, usage quotidien, limites et dépannage |
 
 ## Structure du dépôt

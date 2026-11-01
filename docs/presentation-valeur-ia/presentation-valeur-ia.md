@@ -61,7 +61,55 @@ DORA identifie sept capacités qui amplifient l'effet positif de l'IA. Voici ce 
 
 ---
 
-## 5. Ce qui change dans un ticket
+## 5. Un changement de paradigme
+
+Le changement ne tient pas à un outil : il tient à la question que l'on pose à chaque ticket.
+
+Sans méthode, il n'y en a qu'une : **« Quel code ferme ce ticket ? »** L'IA écrit du code, vos équipes relisent après coup, et le ticket se ferme quand les tests passent.
+
+Avec la méthode, on en pose trois, avant d'écrire la moindre ligne :
+
+| Question | Réponse |
+|---|---|
+| Vers quel état l'application doit-elle passer ? | l'objectif, fixé dans une fiche que vos équipes valident |
+| Qu'est-ce qui ne doit pas bouger ? | les invariants de votre projet, que l'IA ne modifie jamais |
+| Comment le prouver ? | chaque critère et chaque risque, par un test |
+
+Les rôles changent avec ces questions : l'IA modélise, transforme et prouve ; vos équipes décident et ratifient.
+
+> Le centre de gravité passe de l'écriture du code à la décision et à la preuve : c'est ce qui rend le résultat vérifiable, donc mesurable.
+
+---
+
+## 6. D'un état validé au suivant
+
+Votre application est dans un état validé : les tests passent, les invariants sont respectés. Un ticket la fait passer à l'état suivant, en quatre pas.
+
+```mermaid
+flowchart LR
+  N(["État validé n<br/>tests au vert,<br/>invariants respectés"])
+  subgraph I["Sous les invariants de votre projet, qui ne bougent pas"]
+    direction LR
+    Q["Qualifier<br/>catégorie du ticket,<br/>confirmée par vos équipes"] --> M["Modéliser<br/>fiche, validée<br/>par vos équipes"] --> T["Transformer<br/>couche par couche,<br/>un contrôle à chaque niveau"] --> P["Prouver<br/>chaque critère et<br/>chaque risque, par un test"]
+  end
+  N --> Q
+  P --> N1(["État validé n + 1<br/>objectif prouvé,<br/>connaissances en plus"])
+```
+
+1. **Qualifier.** L'IA range la demande dans une catégorie de ticket ; vos équipes la confirment.
+2. **Modéliser.** L'IA rédige la fiche, objectif, impacts et décisions ; vos équipes la valident avant toute modification.
+3. **Transformer.** Couche par couche, avec un contrôle à chaque niveau.
+4. **Prouver.** Chaque critère d'acceptation et chaque risque a son test.
+
+**Ce qui change** : ce que le ticket demande, et seulement cela.
+
+**Ce qui ne bouge pas** : les invariants de votre projet, par exemple le contrat d'API et le format des erreurs, la pagination, la sécurité, l'accessibilité et les migrations réversibles. L'IA ne les modifie jamais ; tout écart s'inscrit au registre.
+
+> On ne livre plus seulement du code : on livre un nouvel état de votre application, prouvé, avec ce que le projet a appris en chemin.
+
+---
+
+## 7. Ce qui change dans un ticket
 
 Sans méthode, l'IA reçoit une consigne et rend du code ; le travail s'arrête quand les tests passent, et rien ne revient. Avec la méthode, deux retours referment la boucle : l'un corrige le système, l'autre corrige la méthode, et ce second retour passe par vos équipes.
 
@@ -82,16 +130,11 @@ flowchart TB
 
 > Un ticket n'est plus une modification à exécuter, c'est une transformation à piloter : faire passer le système d'un état validé à un autre sans toucher à ce qui le définit, en prouvant chaque pas.
 
-La question posée change elle aussi :
-
-- sans méthode : « Quel code ferme ce ticket ? »
-- avec la méthode : « Vers quel état le système doit-il passer, qu'est-ce qui ne doit pas bouger, et comment le prouver ? »
-
 **Exemple.** Un ticket demande de charger des données au clic plutôt qu'à l'ouverture de l'écran. Sans méthode, l'IA modifie le composant, les tests passent, le ticket se ferme. Avec la méthode, la fiche fixe l'état visé et ce qui ne bouge pas : contrat d'erreur, pagination, accessibilité. Les mesures révèlent une colonne filtrée sans index. Premier ordre : un commit ajoute l'index. Second ordre : l'IA propose de vérifier l'index de toute colonne filtrée ; si vos équipes ratifient la règle, les tickets suivants l'appliquent.
 
 ---
 
-## 6. La contrepartie, ticket par ticket
+## 8. La contrepartie, ticket par ticket
 
 ```mermaid
 flowchart LR
@@ -118,7 +161,7 @@ Chaque fiche consigne les cinq indices, chacun entre 0 et 1, avec leur calcul. L
 
 ---
 
-## 7. Ce qui reste chez vous
+## 9. Ce qui reste chez vous
 
 ```
 votre dépôt
@@ -138,7 +181,7 @@ Ce qui est générique, la méthode et les outils, ne contient aucune donnée de
 
 ---
 
-## 8. Les garde-fous : l'IA propose, vos équipes décident
+## 10. Les garde-fous : l'IA propose, vos équipes décident
 
 ```mermaid
 flowchart LR
@@ -161,7 +204,7 @@ Le risque reste du côté de vos équipes, là où se trouve la responsabilité.
 
 ---
 
-## 9. Le seuil de rentabilité
+## 11. Le seuil de rentabilité
 
 La question n'est pas « combien l'IA fait-elle gagner ? », mais « combien faut-il gagner pour que l'investissement soit remboursé ? ».
 
@@ -182,7 +225,7 @@ Exemple chiffré, sur des hypothèses à remplacer par les vôtres :
 
 Coût mensuel par développeur : 50 + 2 × 75 + 150 = **350 €**. Seuil : 350 ÷ 75 = **4 h 40 par mois**, soit **2,9 %** du temps de travail. Pour l'équipe de cinq : 1 750 € par mois, 21 000 € par an. L'annexe C reprend la formule, à remplir avec vos chiffres.
 
-## 10. La valeur nette selon le gain mesuré
+## 12. La valeur nette selon le gain mesuré
 
 | Gain de temps mesuré | Heures par mois | Valeur nette par développeur et par mois |
 |---|---|---|
@@ -207,7 +250,7 @@ Ce calcul ne compte que le temps : la qualité, la traçabilité et la capitalis
 
 ---
 
-## 11. Comment nous le mesurons
+## 13. Comment nous le mesurons
 
 Votre sprint distingue déjà des tickets « IA » et des tickets « DEV » : la base de comparaison existe. Pour le pilote, des tickets comparables (même taille, même domaine) sont répartis par tirage au sort entre un groupe traité avec la méthode et un groupe témoin, au moins dix de chaque côté. Le tirage au sort évite de comparer des tickets choisis pour l'IA parce qu'ils semblaient plus simples.
 
@@ -224,7 +267,7 @@ Un évaluateur qui ne participe pas au pilote, par exemple le PO, valide les mes
 
 ---
 
-## 12. Notre proposition : un pilote avec règle d'arrêt
+## 14. Notre proposition : un pilote avec règle d'arrêt
 
 ```mermaid
 flowchart LR
@@ -243,7 +286,7 @@ flowchart LR
 
 ---
 
-## 13. En résumé
+## 15. En résumé
 
 | | |
 |---|---|
