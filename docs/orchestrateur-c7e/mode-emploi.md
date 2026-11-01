@@ -30,9 +30,23 @@ Une fois l'orchestrateur choisi, chaque ticket est classé dans le **référenti
    | au choix, clone ordinaire | `.gemini/skills/orchestrateur-c7e/` |
    | au choix, kit `agents-paralleles-gitlab` | `~/.gemini/skills/orchestrateur-c7e/`, une seule installation pour tous les worktrees |
 
-2. Coller la transmission dans Gemini CLI, en précisant l'emplacement choisi. L'IA crée les fichiers à l'identique, les vérifie avec la table d'intégrité, puis installe les fichiers du projet (§ 3).
-3. Exclure le skill de Git, dans `.git/info/exclude` : `/.skills/` ou `/.gemini/skills/`. Inutile au niveau utilisateur.
-4. Pour le chargement au choix, vérifier que le dossier du skill porte le nom de son `name` : `orchestrateur-c7e`.
+2. Pour un chargement au choix, installer le skill avec l'installateur du dépôt, depuis la racine du projet :
+
+   ```bash
+   node <Agent2Prompt>/tools/installer.mjs orchestrateur-c7e                 # .gemini/skills/orchestrateur-c7e/
+   node <Agent2Prompt>/tools/installer.mjs orchestrateur-c7e --utilisateur   # ~/.gemini/skills/, avec le kit
+   ```
+
+   Il recrée les fichiers de la transmission, vérifie leurs empreintes, garde la consigne dans `CONSIGNE.md` et masque le skill à Git sans le rendre illisible (README du dépôt, « Installer un skill dans Gemini CLI »). Dans Gemini CLI, après `/skills reload` : « Active le skill orchestrateur-c7e. L'étape 0 de sa consigne est faite. Lis `CONSIGNE.md` dans son dossier et suis-la à partir de l'étape 1. » L'IA installe alors les fichiers du projet (§ 3).
+3. Pour un chargement permanent, ou sans clone du dépôt, coller la transmission dans Gemini CLI, en précisant l'emplacement choisi. L'IA crée les fichiers à l'identique, les vérifie avec la table d'intégrité, puis installe les fichiers du projet (§ 3).
+4. Masquer le skill à Git sans le rendre illisible pour Gemini CLI. Dans un clone ordinaire, son outil de lecture refuse les fichiers qu'exclut `.git/info/exclude` : un skill exclu ainsi ne livre que son `SKILL.md` à l'activation, et ses modules restent illisibles. L'installateur s'en charge. À la main, ajouter à `.git/info/exclude` le dossier du skill et `/.geminiignore`, et à `.geminiignore` une négation par niveau :
+   - chargement au choix : `!/.gemini/`, `!/.gemini/skills/` et `!/.gemini/skills/orchestrateur-c7e/` ;
+   - chargement permanent : `!/.skills/` et `!/.skills/orchestrateur-c7e/`.
+
+   Inutile au niveau utilisateur, hors de tout dépôt.
+5. Pour le chargement au choix, vérifier que le dossier du skill porte le nom de son `name` : `orchestrateur-c7e`.
+
+Le § 11.3 du skill et l'étape 0 de sa transmission ne prévoient que l'exclusion par `.git/info/exclude` : suivre ici le point 4.
 
 ## 3. Préparer les fichiers du projet
 
@@ -196,6 +210,8 @@ Si l'IA signale qu'aucune catégorie ne couvre le ticket, choisir la plus proche
 | Symptôme | Cause probable | Remède |
 |---|---|---|
 | `/skills list` ne montre pas le skill | dossier mal placé ou mal nommé | le dossier doit s'appeler `orchestrateur-c7e`, sous `.gemini/skills/` ou `~/.gemini/skills/`, puis `/skills reload` |
+| `/skills list` ne montre aucun skill du workspace | dossier pas de confiance, ou Gemini CLI lancé ailleurs | accorder la confiance au dossier ; lancer Gemini CLI là où se trouve `.gemini/` |
+| le skill s'active, mais ses modules sont refusés (« ignored by configured ignore patterns ») | skill exclu de Git sans négation dans `.geminiignore` | relancer l'installateur, ou ajouter les négations du § 2, point 4 |
 | le menu n'apparaît pas | fichier de démarrage non déclaré, ou casse différente | § 6, puis `/memory show` |
 | `/memory show` montre les lignes `@` sans le contenu | chemin faux, ou fichier envoyé comme message | chemins relatifs au fichier de démarrage ; le charger comme fichier de contexte |
 | la commande ne trouve pas le référentiel ou les invariants | fichier absent ou exclu de Git | les fichiers de `docs/c7e/` doivent exister et être versionnés |

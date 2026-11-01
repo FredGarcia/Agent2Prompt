@@ -334,6 +334,29 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Outils
 
+### 2026-11-01 : installateur des skills dans Gemini CLI
+
+- Ajout de `tools/installer.mjs` : il installe un skill du dépôt dans Gemini CLI à partir de sa transmission et fait l'étape 0 de la consigne sans IA. Node 20 ou plus récent, modules natifs, git pour le masquage.
+  - Cible : `.gemini/skills/<skill>/` du workspace, ou `~/.gemini/skills/` avec `--utilisateur` (`GEMINI_CLI_HOME` respecté). Le skill se désigne par son nom, `<skill>@<version>` ou un fichier de transmission ; `--tous`, `--liste`, `--retirer`, `--essai`.
+  - La transmission est relue par `relire` (CRLF compris), et chaque fichier vérifié contre la table d'intégrité avant toute écriture ; un chemin qui sortirait du dossier est refusé.
+  - Le dossier reçoit les fichiers transmis, `CONSIGNE.md` (l'en-tête de la transmission) et `integrite.sha256`. Une version installée est remplacée d'un bloc ; refus si des fichiers ont changé depuis l'installation, sauf `--forcer` ; un dossier que l'outil n'a pas installé est protégé.
+  - Masquage dans un dépôt Git : exclusion locale (`info/exclude`, commune aux worktrees, gardée tant qu'un autre worktree a le skill) et négations dans `.geminiignore`, lui-même exclu. `--visible` laisse le skill dans `git status`. Si `.geminiignore` est versionné, le skill n'est pas masqué et un avertissement donne les lignes à y ajouter.
+  - Refusés : les systèmes à construire (`agent2dev`, `agent2test`, `tension-dashboard-gitlab-agent`), matérialisés dans `spec/` de leur propre projet. `analyse-projet` ne s'installe qu'au niveau utilisateur.
+- Constats sur Gemini CLI, lus dans son code (`skillLoader.ts`, `skillManager.ts`, `activate-skill.ts`, `read-file.ts`, `gitIgnoreParser.ts`) et reproduits avec `@google/gemini-cli-core` 0.66.0 :
+  - seuls `SKILL.md` et `*/SKILL.md` d'un dossier de skills sont découverts, et seuls `name` et `description` du frontmatter sont lus : les modules d'un skill ne deviennent pas des skills ;
+  - l'activation livre le corps du `SKILL.md` et la liste des fichiers du dossier ; les autres fichiers se lisent ensuite par l'outil de lecture ;
+  - les skills du workspace ne sont chargés que si le dossier est de confiance, quand la confiance des dossiers est activée ;
+  - l'outil de lecture refuse les fichiers qu'excluent `.gitignore` et `.git/info/exclude` d'un clone ordinaire, mais pas ceux de l'exclusion commune d'un worktree ni de l'exclusion globale de Git ; une négation dans `.geminiignore` rend un fichier exclu de nouveau lisible, à condition de nier chaque niveau de dossier exclu.
+- Conséquence : un skill matérialisé dans `.skills/` ou `.gemini/skills/` d'un clone ordinaire et exclu par `.git/info/exclude`, comme le prévoient le § 11.3 et l'étape 0 de l'orchestrateur C7E 3.2.0, ne livre que son `SKILL.md` ; ses modules sont refusés. Le mode d'emploi de C7E passe désormais par l'installateur et donne les négations à poser à la main ; la spécification reste à corriger.
+- Recette : `tools/installer.test.mjs`, 17 tests en boîte noire, dans des dépôts Git temporaires. 10 contre-épreuves sur des copies de l'outil (négations absentes, CRLF, chemins, empreintes, changements locaux, worktrees, systèmes, sous-dossier, dossier non géré, remplacement), toutes détectées.
+- `.github/workflows/recette-installer.yml` : la recette sous Linux et Windows, Node 20 et 24, et un contrat avec le code de Gemini CLI (`.github/scripts/contrat-gemini.mjs`). Le contrat installe les huit skills installables et `analyse-projet` dans un projet où `/.gemini/skills/` était déjà exclu. Chaque skill est découvert une fois, nom et description lus tels quels, et tous ses fichiers sont lisibles. `node_modules` reste ignoré.
+- `README.md` : section « Installer un skill dans Gemini CLI ». `docs/orchestrateur-c7e/mode-emploi.md` : installation par l'outil, masquage lisible, deux lignes de dépannage.
+- Soumis à ratification :
+  - un utilitaire déterministe plutôt qu'un agent : l'IA ne fait que les étapes qui suivent l'étape 0, à partir de `CONSIGNE.md` ;
+  - le workspace par défaut ; `analyse-projet` au niveau utilisateur seulement ; les systèmes à construire refusés ;
+  - le masquage par exclusion locale et négations dans `.geminiignore`, plutôt que l'exclusion globale de Git ou un skill versionné ;
+  - deux fichiers ajoutés au dossier du skill, hors transmission : `CONSIGNE.md` et `integrite.sha256`.
+
 ### 2026-10-21 : citations entre skills vérifiées
 
 - `tools/verifier.mjs` vérifie aussi les identifiants d'un autre skill, cités sous la forme `java:D4.INV-2` : chacun doit être défini dans le point d'entrée du skill qu'il nomme, et ce skill doit exister dans le dépôt. Jusqu'ici, ces identifiants n'étaient pas vérifiés. Les 107 citations de ce type que contient le dépôt sont toutes définies.
