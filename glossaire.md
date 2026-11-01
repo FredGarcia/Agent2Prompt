@@ -30,7 +30,7 @@ La colonne « Repris dans » cite les modules de la spécification qui reprennen
 | [`java`](#java-111) | 1.1.1 | 7 | 1 | 29 |
 | [`orchestrateur-c7e`](#orchestrateur-c7e-340) | 3.4.0 | 10 | 1 | 32 |
 | [`skill4appli`](#skill4appli-110) | 1.1.0 | 9 | 3 | 34 |
-| [`socle-back-front`](#socle-back-front-101) | 1.0.1 | 6 | 1 | 15 |
+| [`socle-back-front`](#socle-back-front-110) | 1.1.0 | 7 | 0 | 21 |
 | [`sonarqube`](#sonarqube-110) | 1.1.0 | 8 | 2 | 34 |
 | [`tension-dashboard-gitlab-agent`](#tension-dashboard-gitlab-agent-220) | 2.2.0 | 7 | 3 | 17 |
 
@@ -946,7 +946,7 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 
 ## orchestrateur-c7e 3.4.0
 
-Orchestrateur fractal C7E : résolution d'un ticket full-stack comme transformation maîtrisée d'un système vivant, avec le cycle de l'Axiome 7E, quatre profondeurs de déclinaison, des concepts paramétrables, la qualification de chaque ticket à son ouverture par un modèle générique de la demande et des questions complémentaires, un méso-contrat confirmé avant tout le reste, des options par couche avec leurs paramètres au choix par ticket, des variantes de représentation d'une ressource, l'analyse des images PNG de l'objectif, une fiche validée avant toute modification, des tests déduits des risques, des conventions Git compatibles avec le kit des agents parallèles, une boucle de second ordre bornée par un registre et un fichier d'invariants du projet ; activé au démarrage de l'IA locale, sur choix du développeur. Point d'entrée : [`specs/orchestrateur-c7e/SKILL.md`](specs/orchestrateur-c7e/SKILL.md).
+Orchestrateur fractal C7E : résolution d'un ticket full-stack comme transformation maîtrisée d'un système vivant, avec le cycle de l'Axiome 7E, quatre profondeurs de déclinaison, des concepts paramétrables, la qualification de chaque ticket à son ouverture par un modèle générique de la demande et des questions complémentaires, un méso-contrat confirmé avant tout le reste, des options par couche avec leurs paramètres au choix par ticket, des variantes de représentation d'une ressource et leur mise à jour en temps réel, l'analyse des images PNG de l'objectif, une fiche validée avant toute modification, des tests déduits des risques, des conventions Git compatibles avec le kit des agents parallèles, une boucle de second ordre bornée par un registre et un fichier d'invariants du projet ; activé au démarrage de l'IA locale, sur choix du développeur. Point d'entrée : [`specs/orchestrateur-c7e/SKILL.md`](specs/orchestrateur-c7e/SKILL.md).
 
 ### D1 : Ontologie : cycle 7E, profondeurs du CRI, concepts paramétrables (active)
 
@@ -1129,9 +1129,9 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 | **D12.INV-4** | les fins de ligne de la plateforme (CRLF de `core.autocrlf`) ne faussent ni le compte et les numéros de ligne, ni les extraits de `search`, ni le verdict de `status`. | `parite`, `ingestion`, `recette` |
 | **D12.INV-5** | lancé dans WSL sur un worktree du système de fichiers Windows, le skill le signale par l'avertissement `depot_windows_depuis_wsl` dans `status` et `config`, sans refuser la commande. | `execution`, `parite`, `fraicheur`, `agent`, `recette` |
 
-## socle-back-front 1.0.1
+## socle-back-front 1.1.0
 
-Socle commun back-front : contrat OpenAPI, erreurs RFC 9457, formats de données, sécurité, traçabilité, accessibilité. Point d'entrée : [`specs/socle-back-front/SKILL.md`](specs/socle-back-front/SKILL.md).
+Socle commun back-front : contrat OpenAPI, erreurs RFC 9457, formats de données, sécurité, traçabilité, accessibilité, événements temps réel par WebSocket STOMP (AsyncAPI, CloudEvents). Point d'entrée : [`specs/socle-back-front/SKILL.md`](specs/socle-back-front/SKILL.md).
 
 ### SC1 : Contrat d'API OpenAPI (active)
 
@@ -1178,9 +1178,16 @@ Socle commun back-front : contrat OpenAPI, erreurs RFC 9457, formats de données
 | **SC6.INV-1** | chaque erreur de validation renvoyée par le back est rattachée au champ correspondant dans le formulaire du front. Contrôle : test de composant avec une réponse 400 simulée. | `angular`, `angular/formulaires`, `angular/tests`, `angular/revue`, `java/tests` |
 | **SC6.INV-2** | aucune information n'est transmise par la couleur seule. Contrôle : revue RGAA (critère 3.1) et tests automatisés d'accessibilité. | `angular/accessibilite`, `angular/revue`, `orchestrateur-c7e/meso-contrats` |
 
-### SC7 : Événements asynchrones (WebSocket, SSE, messages) (reserved)
+### SC7 : Événements temps réel vers le front (WebSocket STOMP) ; SSE et messages entre services réservés (active)
 
-Dimension réservée : aucun invariant en vigueur dans cette version.
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **SC7.INV-1** | tout canal temps réel figure au contrat AsyncAPI du dépôt, avec son instantané REST ; aucun autre canal asynchrone n'est introduit sans être signalé comme écart au socle. Contrôle : test qui compare les destinations publiées par l'application au contrat. | `orchestrateur-c7e`, `orchestrateur-c7e/referentiel` |
+| **SC7.INV-2** | chaque événement suit l'enveloppe CloudEvents du socle : `time` avec fuseau, `sequence` croissante par canal, `traceparent`, `data` conforme au schéma du contrat. Contrôle : test de sérialisation et validation contre le contrat. | `orchestrateur-c7e/referentiel` |
+| **SC7.INV-3** | un événement n'est publié qu'après la validation de la transaction qui l'a produit. Contrôle : test d'intégration où la transaction est annulée et aucun message n'est reçu. | `orchestrateur-c7e`, `orchestrateur-c7e/meso-contrats`, `orchestrateur-c7e/referentiel` |
+| **SC7.INV-4** | le client reste juste après une déconnexion, un doublon ou un trou : abonnement avant l'instantané, événements de séquence inférieure ou égale à l'`ETag` ignorés, instantané relu à chaque trou ou reconnexion. Contrôle : test du service client avec déconnexion, doublon et trou simulés. | `orchestrateur-c7e`, `orchestrateur-c7e/referentiel` |
+| **SC7.INV-5** | aucun jeton dans l'URL de connexion ; chaque abonnement vérifie le droit de lecture de la ressource ; origines explicites. Contrôle : test d'abonnement refusé (`ERROR` avec un Problem Details 403) et test de connexion depuis une origine non autorisée. | `orchestrateur-c7e`, `orchestrateur-c7e/referentiel` |
+| **SC7.INV-6** | toute mise à jour reçue en temps réel est annoncée par une région `aria-live="polite"`, sans déplacer le focus. Contrôle : test de composant et revue RGAA (critère 7.5). | `orchestrateur-c7e/referentiel` |
 
 ## sonarqube 1.1.0
 

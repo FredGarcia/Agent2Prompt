@@ -13,7 +13,7 @@
  * - chaque module existe, et son frontmatter porte le même statut et les mêmes dimensions ;
  * - le registre des dimensions du point d'entrée donne à chaque dimension d'un module
  *   le statut que le manifeste donne à ce module ;
- * - chaque fichier partagé existe et a la version épinglée ; chaque skill référencé
+ * - chaque fichier partagé existe et a la version épinglée, courante ou archivée ; chaque skill référencé
  *   existe à la version citée ;
  * - une spécification transmissible a un `ENTETE-TRANSMISSION.md` contenant `{{VERSION}}`,
  *   et la transmission de sa version courante (`transmissions/<nom>-<version>.md`) existe
@@ -42,7 +42,7 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { assembler, relire } from './bundle.mjs';
+import { assembler, relire, sourcePartagee } from './bundle.mjs';
 import { CHEMIN_GLOSSAIRE, genererGlossaire } from './glossaire.mjs';
 
 const racine = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -205,9 +205,12 @@ function verifierSpec(dossier) {
       erreur(`fichier partagé absent : ${partage.from}`);
       continue;
     }
-    const texte = lire(source);
-    if (frontmatter(texte).version !== partage.version) {
-      erreur(`${partage.from} n'est pas en version ${partage.version}`);
+    let texte;
+    try {
+      texte = lire(sourcePartagee(partage, manifeste.name));
+    } catch (e) {
+      erreur(e.message);
+      continue;
     }
     // Seuls les identifiants hors de l'espace local `Dn` sont importés (ceux du socle, `SCn`) :
     // un référentiel d'expert inclus définit aussi des `Dn`, qui masqueraient une faute de frappe locale.

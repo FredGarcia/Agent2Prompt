@@ -204,6 +204,7 @@ Chaque méso-contrat permet certaines options par couche ; `ticket.toml` les pr�
 | PostgreSQL | contrat CRUD (`crud`) | l'entité, la table, les opérations parmi `create`, `read`, `update`, `delete`, et le mode de suppression si `delete` est retenu |
 | Java | endpoints (`endpoints`) | la méthode, le chemin, la réponse, les erreurs attendues |
 | Java | variantes de représentation (`representations`), sous M04 | le repérage depuis l'URI (opération, contrôleur, type de réponse, champ liste ou record, entité, colonne de date-heure), si la version d'API est publiée, le mécanisme de sélection (`parametre_vue`, `negociation_contenu`, `remplacement`), l'exposition de la variante sans champ (`base`, `meme_uri`, `uri_propre`) et les deux types de variante |
+| Java | événements temps réel (`evenements`), sous M04 | le canal STOMP, les types d'événements, l'instantané REST et le courtier (`simple` ou `relais`) que nomme votre fichier d'invariants, selon le socle 1.1.0 (SC7) |
 | Java | règles métier (`regles`) | un identifiant et l'énoncé de chaque règle |
 | Java | fonctionnalités (`fonctionnalites`) | le cas d'usage |
 | Angular | éléments graphiques (`elements_graphiques`) | le composant et ses états visuels |
@@ -252,7 +253,8 @@ Si l'IA signale qu'aucune catégorie ne couvre le ticket, choisir la plus proche
 | l'IA ne propose aucun méso-contrat | référentiel absent, ou ticket hors de toute catégorie | installer le référentiel ; sinon, choisir une catégorie ou en ajouter une |
 | l'IA lit le code ou prépare la fiche sans avoir qualifié le ticket | qualification sautée | l'arrêter et demander la qualification : le skill l'impose avant tout le reste (D11.INV-1) |
 | la qualification dit prendre le modèle de la demande du skill | référentiel installé avant la 3.3.0, sans section `[modele_demande]` | copier la section 0 du modèle (module `referentiel`, § 6) dans le référentiel du projet, et changer `meta.version` |
-| un ticket de variante de représentation ne trouve pas de catégorie | référentiel installé avant la 3.4.0, sans M04 | copier du modèle (module `referentiel`, § 6) le bloc M04, l'option `representations`, la possibilité `variante_representation` et la règle de choix sur les possibilités requises, et changer `meta.version` |
+| un ticket de variante de représentation ne trouve pas de catégorie | référentiel installé avant la 3.4.0, sans M04 | copier du modèle (module `referentiel`, § 6) le bloc M04, les options `representations` et `evenements`, les possibilités `variante_representation` et `temps_reel` et la règle de choix sur les possibilités requises, et changer `meta.version` ; pour le temps réel, renseigner le courtier dans la section 2 du fichier d'invariants |
+| un ticket temps réel sans variante de représentation ne trouve pas de catégorie | seul M04 permet l'option `evenements` | permettre `evenements` dans une autre catégorie de votre référentiel, ou en créer une |
 | l'IA refuse le remplacement de la réponse actuelle | version d'API publiée : retirer un champ y est cassant (socle, SC1.INV-2) | choisir le paramètre de vue ou la négociation de contenu, ou une version `v2` |
 | l'IA retient une option refusée par la catégorie | règle de validation ignorée | la refuser à la validation ; le skill la rejette (scénario R13) |
 | l'image n'est pas analysée | fichier absent, non versionné, ou pas en PNG | déposer le PNG dans `maquettes/`, le versionner, renseigner `image_objectif` et `analyse_image` |

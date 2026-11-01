@@ -61,7 +61,7 @@ Commence par l'étape 0, puis l'étape 1, puis l'étape 2.
   "version": "3.4.0",
   "specSchema": 1,
   "language": "fr",
-  "description": "Orchestrateur fractal C7E : résolution d'un ticket full-stack comme transformation maîtrisée d'un système vivant, avec le cycle de l'Axiome 7E, quatre profondeurs de déclinaison, des concepts paramétrables, la qualification de chaque ticket à son ouverture par un modèle générique de la demande et des questions complémentaires, un méso-contrat confirmé avant tout le reste, des options par couche avec leurs paramètres au choix par ticket, des variantes de représentation d'une ressource, l'analyse des images PNG de l'objectif, une fiche validée avant toute modification, des tests déduits des risques, des conventions Git compatibles avec le kit des agents parallèles, une boucle de second ordre bornée par un registre et un fichier d'invariants du projet ; activé au démarrage de l'IA locale, sur choix du développeur.",
+  "description": "Orchestrateur fractal C7E : résolution d'un ticket full-stack comme transformation maîtrisée d'un système vivant, avec le cycle de l'Axiome 7E, quatre profondeurs de déclinaison, des concepts paramétrables, la qualification de chaque ticket à son ouverture par un modèle générique de la demande et des questions complémentaires, un méso-contrat confirmé avant tout le reste, des options par couche avec leurs paramètres au choix par ticket, des variantes de représentation d'une ressource et leur mise à jour en temps réel, l'analyse des images PNG de l'objectif, une fiche validée avant toute modification, des tests déduits des risques, des conventions Git compatibles avec le kit des agents parallèles, une boucle de second ordre bornée par un registre et un fichier d'invariants du projet ; activé au démarrage de l'IA locale, sur choix du développeur.",
   "entry": "SKILL.md",
   "modes": ["externe", "autonome", "hybride"],
   "targets": {
@@ -72,7 +72,7 @@ Commence par l'étape 0, puis l'étape 1, puis l'étape 2.
     "referentiel": "modèle générique de la demande et catégories de tickets du projet (M01 à M04), en TOML, options au choix par couche et leurs paramètres, une instance ticket.toml par ticket"
   },
   "shared": [
-    { "path": "socle/SKILL.md", "from": "specs/socle-back-front/SKILL.md", "version": "1.0.1" },
+    { "path": "socle/SKILL.md", "from": "specs/socle-back-front/SKILL.md", "version": "1.1.0" },
     { "path": "references/java.md", "from": "specs/java/SKILL.md", "version": "1.1.1" },
     { "path": "references/angular.md", "from": "specs/angular/SKILL.md", "version": "1.0.1" }
   ],
@@ -104,7 +104,7 @@ Commence par l'étape 0, puis l'étape 1, puis l'étape 2.
 <<<FICHIER SKILL.md>>>
 ---
 name: orchestrateur-c7e
-description: Orchestrateur fractal C7E, qui pilote la résolution d'un ticket full-stack comme la transformation maîtrisée d'un système vivant (cycle de l'Axiome 7E, déclinaison récursive imbriquée sur quatre profondeurs, concepts paramétrables, qualification de chaque ticket à son ouverture par un modèle générique de la demande et des questions, méso-contrat confirmé avant tout le reste, options par couche avec leurs paramètres au choix par ticket, variantes de représentation d'une ressource, analyse des images PNG de l'objectif, fiche de transformation validée avant toute modification, tests déduits des risques, traçabilité Git compatible avec le kit des agents parallèles, boucle de second ordre bornée par un registre, valeur annoncée comme une hypothèse tant qu'elle n'est pas mesurée), avec le fichier des invariants du projet, meso-contrats. Adaptateur par défaut Java, Spring Boot, PostgreSQL, Liquibase et Angular. À activer au démarrage de l'IA locale, sur choix du développeur, pour les tickets qu'il lui confie.
+description: Orchestrateur fractal C7E, qui pilote la résolution d'un ticket full-stack comme la transformation maîtrisée d'un système vivant (cycle de l'Axiome 7E, déclinaison récursive imbriquée sur quatre profondeurs, concepts paramétrables, qualification de chaque ticket à son ouverture par un modèle générique de la demande et des questions, méso-contrat confirmé avant tout le reste, options par couche avec leurs paramètres au choix par ticket, variantes de représentation d'une ressource et leur mise à jour en temps réel, analyse des images PNG de l'objectif, fiche de transformation validée avant toute modification, tests déduits des risques, traçabilité Git compatible avec le kit des agents parallèles, boucle de second ordre bornée par un registre, valeur annoncée comme une hypothèse tant qu'elle n'est pas mesurée), avec le fichier des invariants du projet, meso-contrats. Adaptateur par défaut Java, Spring Boot, PostgreSQL, Liquibase et Angular. À activer au démarrage de l'IA locale, sur choix du développeur, pour les tickets qu'il lui confie.
 version: 3.4.0
 ---
 
@@ -116,7 +116,7 @@ Fichiers du skill :
 
 - `SKILL.md` : la méthode, ce document ;
 - `meso-contrats.md` : modèle des invariants du projet (dimension D8), pré-rempli pour l'adaptateur par défaut, à copier dans le projet et à remplir par le développeur ;
-- `socle/SKILL.md` : socle commun back-front (contrat OpenAPI, erreurs RFC 9457, formats, pagination, sécurité, traçabilité, accessibilité), inclus à une version épinglée ;
+- `socle/SKILL.md` : socle commun back-front (contrat OpenAPI, erreurs RFC 9457, formats, pagination, sécurité, traçabilité, accessibilité, événements temps réel par WebSocket STOMP), inclus à une version épinglée, 1.1.0 ;
 - `references/java.md` et `references/angular.md` : points d'entrée des experts Java et Angular. Ce sont des **référentiels** : l'IA y lit les versions cibles et les invariants que tout code produit doit respecter, sans adopter leur mode de travail ;
 - `modules/qualification/SKILL.md` : dimension D11, la qualification de chaque ticket à son ouverture : modèle générique de la demande, questions complémentaires, méso-contrat confirmé avant tout le reste ;
 - `modules/referentiel/SKILL.md` : dimension D10, le référentiel des méso-contrats : modèle générique de la demande, catégories de tickets (dont M04, variante de représentation d'une ressource), options au choix par couche et leurs paramètres, analyse des images de l'objectif, modèle à installer dans le projet ;
@@ -743,7 +743,7 @@ Rejoués avec le développeur à l'installation, puis à chaque version du skill
 | R16 | Ouverture du ticket fil rouge ; le ticket ne dit pas s'il faut ajouter un endpoint | avant de lire le code, l'IA remplit la demande depuis le ticket, chaque réponse sourcée ; elle propose M01, seul à couvrir persistance, backend et frontend, M02 et M03 écartés par l'empreinte ; une question, sur l'endpoint ; rien d'autre avant la confirmation ; `ticket.toml` reçoit la demande, la réponse du développeur et M01 confirmé | D11.INV-1, D11.INV-2, D11.INV-3, D11.INV-4 |
 | R17 | « Afficher la date de dernière mise à jour sur l'écran de détail », sans dire si la date est stockée et exposée | `ecran_modifie` à `oui` ; `colonne`, `lecture` et `endpoint_modifie` à `inconnu` ; M01 ou M03 selon la réponse ; l'IA pose la question et ne propose de méso-contrat qu'après la réponse | D11.INV-2, D11.INV-3 |
 | R18 | Installation dans une application qui a des traitements par lots et des exports de fichiers | d'après l'analyse de l'application, l'IA propose les possibilités du modèle qui s'appliquent, avec leurs repères, et deux possibilités nouvelles, un traitement par lots et un export, chacune rattachée à une couche et à une option ; elle n'écrit pas le référentiel, le développeur les ajoute | D11.INV-5, D10.INV-5 |
-| R19 | Ticket `ABCDE-3620` : depuis l'URI `/api/v1/commandes/{id}`, une variante de `CommandeDto` sans le champ `lignes`, et à la même URI une variante où `lignes` est remplacé par la date-heure de la dernière ligne enregistrée | qualification : `variante_representation`, `endpoint_modifie` et `lecture` à `oui` ; M04 proposé, M01, M02 et M03 écartés par l'empreinte et les possibilités requises ; quatre questions posées ensemble (sélection, exposition de la variante sans champ, date-heure stockée, front) ; après confirmation, repérage depuis l'URI dans `ticket.toml` ; tests déduits : champ absent, réponse actuelle inchangée sans `vue`, date-heure ISO 8601 avec fuseau, `null` pour une commande sans ligne, une seule requête d'agrégat | D11.INV-2, D11.INV-3, D10.INV-2, D10.INV-3, D10.INV-6 |
+| R19 | Ticket `ABCDE-3620` : depuis l'URI `/api/v1/commandes/{id}`, une variante de `CommandeDto` sans le champ `lignes`, une liste de records, et à la même URI une variante où `lignes` est remplacé par la date-heure de la dernière ligne enregistrée ; la liste, servie par son URI existante, est mise à jour en temps réel | qualification : `variante_representation`, `temps_reel`, `endpoint_modifie` et `lecture` à `oui` ; M04 proposé, M01, M02 et M03 écartés par l'empreinte et les possibilités requises ; quatre questions posées ensemble (sélection, exposition de la variante sans champ, date-heure stockée, front), le courtier pris dans le fichier d'invariants du projet ; après confirmation, repérage depuis l'URI dans `ticket.toml`, URI existante de la liste comprise ; tests déduits : champ absent, réponse actuelle inchangée sans `vue`, date-heure ISO 8601 avec fuseau, `null` pour une commande sans ligne, une seule requête d'agrégat, canal au contrat AsyncAPI, aucun événement pour une transaction annulée, reprise après déconnexion par l'`ETag` de la liste, abonnement refusé sans droit de lecture, annonce `aria-live`, date-heure du résumé recalculée après une suppression | D11.INV-2, D11.INV-3, D10.INV-2, D10.INV-3, D10.INV-6, SC7.INV-1, SC7.INV-3, SC7.INV-4, SC7.INV-5 |
 | R20 | Même ticket ; le développeur choisit le remplacement de la réponse actuelle, alors que `/api/v1` est publiée | refus, avec la règle du socle (SC1.INV-2) : retirer un champ d'une version publiée est cassant ; l'IA propose le paramètre de vue ou la négociation de contenu, ou une version `v2` qui n'est plus la même URI, et attend la décision ; rien n'est écrit dans `ticket.toml` avant | D10.INV-6, D8.INV-2 |
 
 Critères d'acceptation du skill :
@@ -869,7 +869,7 @@ Vérifications faites à la publication de la 3.3.0 :
 
 ### Variante de représentation d'une ressource, en 3.4.0
 
-Demande du développeur, le 1er novembre 2026, un deuxième exemple de méso-contrat après le CRUD en base, son endpoint Java et sa lecture depuis le front : « Trouver le endpoint d'une URI avec le type de donnée ; sa composition contient un champ avec une liste ou un record. Réaliser une variante de ce type avec ce champ en moins. Réaliser une variante avec la même URI où ce champ ne sera pas intégré ; les informations le concernant seront uniquement la date et l'heure du dernier enregistrement. » Le mécanisme de sélection à la même URI et l'exposition de la variante sans champ sont, à sa demande, au choix par ticket.
+Demande du développeur, le 1er novembre 2026, un deuxième exemple de méso-contrat après le CRUD en base, son endpoint Java et sa lecture depuis le front : « Trouver le endpoint d'une URI avec le type de donnée ; sa composition contient un champ avec une liste ou un record. Réaliser une variante de ce type avec ce champ en moins. Réaliser une variante avec la même URI où ce champ ne sera pas intégré ; les informations le concernant seront uniquement la date et l'heure du dernier enregistrement. » Le mécanisme de sélection à la même URI et l'exposition de la variante sans champ sont, à sa demande, au choix par ticket. Il a complété : le champ, une liste de records appelée au travers d'une URI existante, devra être mis à jour en temps réel. Il a retenu la liste et la date-heure du résumé, par WebSocket STOMP, et l'activation de la dimension SC7 du socle, qui réservait les canaux asynchrones.
 
 | En 3.3.0 | En 3.4.0 | Invariant ou section |
 |---|---|---|
@@ -878,15 +878,19 @@ Demande du développeur, le 1er novembre 2026, un deuxième exemple de méso-con
 | la règle de choix ne regarde que l'empreinte : un ticket qui modifie un endpoint et un écran conviendrait aussi à M04 | possibilités requises d'un méso-contrat ; M04 requiert `variante_representation`, et R17 donne toujours M01 ou M03 | E4, module `qualification`, § 2 |
 | aucune valeur d'option au choix par ticket, hors les opérations CRUD | paramètres d'option : mécanisme de sélection (`parametre_vue`, `negociation_contenu`, `remplacement`) et exposition de la variante sans champ (`base`, `meme_uri`, `uri_propre`), demandés à la qualification si le ticket ne les dit pas | E4, D10.INV-6 |
 | rien n'empêchait de retirer un champ d'une réponse publiée | réponse actuelle inchangée sans sélection ; remplacement refusé pour une version publiée, avec la règle du socle | D10.INV-6, R20 |
+| socle 1.0.1 : tout canal asynchrone est un écart | socle 1.1.0 épinglé, SC7 active : WebSocket STOMP, contrat AsyncAPI, CloudEvents, publication après commit, reprise par instantané et `ETag` ; possibilité `temps_reel` et option `evenements`, permise par M04 ; courtier nommé dans le fichier d'invariants du projet | socle, SC7 ; module `referentiel`, § 6 ; `meso-contrats.md`, § 2 |
 
-Le modèle du référentiel passe en 3.2.0, avec deux règles de validation de plus. Un référentiel installé avant reçoit M04, l'option, la possibilité et la règle de choix de la main du développeur ; d'ici là, un ticket de ce type se signale sans catégorie.
+Le modèle du référentiel passe en 3.2.0, avec trois règles de validation de plus. Un référentiel installé avant reçoit M04, les deux options, les deux possibilités et la règle de choix de la main du développeur ; d'ici là, un ticket de ce type se signale sans catégorie. Seul M04 permet l'option `evenements` : un ticket temps réel sans variante de représentation ne trouve pas encore de catégorie, et se signale.
+
+Les autres skills qui incluent le socle gardent la 1.0.1, prise dans ses archives : l'outil d'assemblage prend désormais un fichier partagé à sa version épinglée, courante ou archivée. Chacun montera quand il le décidera.
 
 Vérifications faites à la publication de la 3.4.0 :
 
-- le modèle du référentiel se lit en TOML ; ses seize possibilités et les options de ses quatre méso-contrats n'engagent que des couches et des options du catalogue ;
+- le modèle du référentiel se lit en TOML ; ses dix-sept possibilités et les options de ses quatre méso-contrats n'engagent que des couches et des options du catalogue ;
 - la commande d'extraction redonne le fichier et sa nouvelle empreinte ;
-- les deux exemples d'instance respectent les quatorze règles de validation, et sept écarts introduits volontairement dans l'exemple M04 sont tous rejetés : sélection hors catalogue, exposition absente, remplacement sur une version publiée, `variante_representation` à `non`, M01 à la place de M04, aucune option backend, réponse sans source ; le remplacement sur une version non publiée est accepté ;
-- la règle de choix, appliquée à onze demandes types, retient toujours les mêmes catégories pour les six demandes de la 3.3.0 (M01, M02, M03, et M01 ou M03 pour R17) et M04 pour les cinq variantes de représentation : seule, avec un agrégat, avec un front consommateur, avec une colonne de date à créer, avec une URI propre.
+- les deux exemples d'instance respectent les quinze règles de validation, et dix écarts introduits volontairement dans l'exemple M04 sont tous rejetés : sélection hors catalogue, exposition absente, remplacement sur une version publiée, `variante_representation` à `non`, M01 à la place de M04, aucune option backend, réponse sans source, courtier hors catalogue, événements sans canal, `temps_reel` sans source ; le remplacement sur une version non publiée est accepté ;
+- la règle de choix, appliquée à treize demandes types, retient toujours les mêmes catégories pour les six demandes de la 3.3.0 (M01, M02, M03, et M01 ou M03 pour R17), M04 pour les six variantes de représentation (seule, avec un agrégat, avec un front consommateur, avec une colonne de date à créer, avec une URI propre, en temps réel) et aucune catégorie pour le temps réel sans variante ;
+- les transmissions des autres skills qui incluent le socle restent fidèles, avec la 1.0.1 prise dans ses archives.
 
 ## 17. Journal de révision
 
@@ -900,19 +904,19 @@ Vérifications faites à la publication de la 3.4.0 :
 
 **3.3.0** (2026-11-01) : dimension D11 active, la qualification de la demande (section 16). À l'ouverture de chaque ticket, avant tout le reste, la demande du ticket est rangée dans le modèle générique de la demande du référentiel, une combinaison de possibilités de modification de l'application établies à son analyse ; les questions que le ticket laisse ouvertes sont posées au développeur ; le méso-contrat que retient la règle de choix est confirmé avant l'analyse. Module `qualification` ; modèle du référentiel 3.1.0, avec la section 0, quinze possibilités pour la pile PostgreSQL, Java et Angular, `[ticket.demande]` et quatre règles de validation de plus. Invariants D11.INV-1 à D11.INV-5 ; D10.INV-1 renforcé ; trente et un invariants. Scénarios R16 à R18, R13 revu. Archive : `archives/SKILL-v3.2.1.md`.
 
-**3.4.0** (2026-11-01) : point d'extension E4, les paramètres d'option au choix par ticket et les possibilités requises d'un méso-contrat (section 16). Catégorie M04, variante de représentation d'une ressource : depuis l'URI d'une opération, une variante de son type de réponse sans un champ liste ou record, et une variante à la même URI où ce champ est remplacé par la date-heure de son dernier enregistrement. Option `representations` avec ses paramètres (mécanisme de sélection, exposition de la variante sans champ) et ses preuves ; possibilité `variante_representation` ; modèle du référentiel 3.2.0, seize possibilités, quatorze règles de validation ; second exemple d'instance. Invariant D10.INV-6 ; trente-deux invariants. Scénarios R19 et R20. Archive : `archives/SKILL-v3.3.0.md`.
+**3.4.0** (2026-11-01) : point d'extension E4, les paramètres d'option au choix par ticket et les possibilités requises d'un méso-contrat (section 16). Catégorie M04, variante de représentation d'une ressource : depuis l'URI d'une opération, une variante de son type de réponse sans un champ liste ou record, et une variante à la même URI où ce champ est remplacé par la date-heure de son dernier enregistrement ; le champ, servi par son URI existante, et la date-heure tenus à jour en temps réel. Option `representations` avec ses paramètres (mécanisme de sélection, exposition de la variante sans champ) et ses preuves ; option `evenements` (WebSocket STOMP, courtier simple ou relais) ; possibilités `variante_representation` et `temps_reel` ; modèle du référentiel 3.2.0, dix-sept possibilités, quinze règles de validation ; second exemple d'instance. Socle back-front 1.1.0 épinglé, SC7 active ; fichier d'invariants du projet complété (événements temps réel, courtier). Invariant D10.INV-6 ; trente-deux invariants. Scénarios R19 et R20. Archive : `archives/SKILL-v3.3.0.md`.
 <<<FIN SKILL.md>>>
 
 <<<FICHIER socle/SKILL.md>>>
 ---
 name: socle-back-front
-description: Socle commun aux experts Java, Angular et analyse de projet. Il fixe le contrat entre back et front (OpenAPI, erreurs RFC 9457, formats de données, pagination, sécurité, traçabilité, accessibilité). À lire avant de produire, relire ou analyser du code qui traverse la frontière back-front.
-version: 1.0.1
+description: Socle commun aux experts Java, Angular et analyse de projet. Il fixe le contrat entre back et front (OpenAPI, erreurs RFC 9457, formats de données, pagination, sécurité, traçabilité, accessibilité, événements temps réel par WebSocket STOMP décrits en AsyncAPI). À lire avant de produire, relire ou analyser du code qui traverse la frontière back-front.
+version: 1.1.0
 ---
 
-# Socle commun back-front, version 1.0.1
+# Socle commun back-front, version 1.1.0
 
-Ce socle définit ce que le back et le front doivent respecter **ensemble**. Il est inclus à l'identique dans chaque skill qui en dépend (`java`, `angular`, `analyse-projet`, `sonarqube`, `agent-tdd-jira`), à une version épinglée. Un skill ne redéfinit jamais une règle du socle : il peut seulement la préciser pour sa technologie.
+Ce socle définit ce que le back et le front doivent respecter **ensemble**. Il est inclus à l'identique dans chaque skill qui en dépend (`java`, `angular`, `analyse-projet`, `sonarqube`, `agent-tdd-jira`, `orchestrateur-c7e`), à une version épinglée. Un skill ne redéfinit jamais une règle du socle : il peut seulement la préciser pour sa technologie.
 
 Les identifiants du socle commencent par `SC` (`SC2.INV-1`), pour ne jamais se confondre avec ceux d'un skill, qui commencent par `D` suivi du numéro de dimension.
 
@@ -922,6 +926,7 @@ Les identifiants du socle commencent par `SC` (`SC2.INV-1`), pour ne jamais se c
 flowchart LR
   subgraph CONTRAT["Contrat versionné dans le dépôt"]
     OAS["openapi.yaml<br/>OpenAPI 3.1<br/>source de vérité"]
+    AAS["asyncapi.yaml<br/>AsyncAPI 3.0<br/>canaux temps réel"]
   end
   subgraph BACK["Back : Java, Spring Boot, PostgreSQL"]
     CTRL["Contrôleurs REST"]
@@ -936,6 +941,8 @@ flowchart LR
   OAS -->|"implémenté et vérifié par"| CTRL
   OAS -->|"généré vers"| CLI
   CLI <-->|"HTTPS, JSON, Bearer"| CTRL
+  AAS -->|"implémenté par"| WS["Courtier STOMP<br/>après commit"]
+  WS -->|"WSS, STOMP 1.2,<br/>CloudEvents"| CLI
   CTRL --> DB
   CTRL --> PD
   PD -->|"code, traceId, errors[]"| ERR
@@ -944,7 +951,7 @@ flowchart LR
 
 ## 2. Registre des dimensions du socle
 
-| ID | Dimension | Statut 1.0.0 |
+| ID | Dimension | Statut 1.1.0 |
 |---|---|---|
 | SC1 | Contrat d'API OpenAPI | active |
 | SC2 | Erreurs RFC 9457 | active |
@@ -952,7 +959,7 @@ flowchart LR
 | SC4 | Sécurité de la frontière | active |
 | SC5 | Traçabilité | active |
 | SC6 | Accessibilité et messages | active |
-| SC7 | Événements asynchrones (WebSocket, SSE, messages) | reserved |
+| SC7 | Événements temps réel vers le front (WebSocket STOMP) ; SSE et messages entre services réservés | active |
 
 ## 3. SC1 : contrat d'API
 
@@ -1100,9 +1107,69 @@ Invariants :
 - **SC6.INV-1** : chaque erreur de validation renvoyée par le back est rattachée au champ correspondant dans le formulaire du front. Contrôle : test de composant avec une réponse 400 simulée.
 - **SC6.INV-2** : aucune information n'est transmise par la couleur seule. Contrôle : revue RGAA (critère 3.1) et tests automatisés d'accessibilité.
 
-## 9. SC7 : événements asynchrones (réservé)
+## 9. SC7 : événements temps réel
 
-Réservé à une version ultérieure du socle : contrat AsyncAPI, format d'enveloppe d'événement, reprise après déconnexion. En 1.0.0, aucun skill ne doit introduire de canal asynchrone sans le signaler comme écart au socle.
+Active depuis 1.1.0, pour un seul usage : tenir le front à jour des changements d'une ressource, par WebSocket et STOMP 1.2. Le serveur publie, le client s'abonne. Les autres canaux asynchrones (SSE, messages entre services, commandes envoyées par le client sur le canal) restent réservés : un skill qui en introduit un le signale comme écart au socle.
+
+### 9.1 Contrat
+
+- Les canaux sont décrits dans un fichier **AsyncAPI 3.0** versionné dans le dépôt (par défaut `api/asyncapi.yaml`), à côté du contrat OpenAPI. Les schémas des données y sont des références aux schémas du contrat OpenAPI : le front réutilise les types générés.
+- Point de connexion : `/api/ws`. Destinations : `/topic/v1/<ressources>/{id}/<sous-ressource>`, en kebab-case, versionnées comme l'API REST et soumises aux mêmes règles de compatibilité (§ 3.2).
+- Chaque canal a son **instantané** : l'opération REST qui renvoie l'état courant de la ressource. Sa réponse porte l'en-tête `ETag`, égal à la dernière séquence publiée sur le canal (`"42"`).
+
+### 9.2 Enveloppe d'événement
+
+Chaque message est un événement **CloudEvents 1.0**, au format JSON structuré :
+
+```json
+{
+  "specversion": "1.0",
+  "id": "5f1c0e7a-2b8d-4f0e-9a51-1d2c3b4a5e6f",
+  "source": "/api/v1/commandes/7d0e…/lignes",
+  "type": "ligne-commande.creee.v1",
+  "subject": "7d0e…",
+  "time": "2026-11-01T21:30:12Z",
+  "sequence": "43",
+  "traceparent": "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01",
+  "datacontenttype": "application/json",
+  "data": { }
+}
+```
+
+- `type` : `<ressource>.<évènement>.v<n>`, en minuscules, l'évènement au participe passé (`creee`, `modifiee`, `supprimee`).
+- `time` : instant ISO 8601 avec fuseau (SC3).
+- `sequence` : extension CloudEvents, entier croissant par canal, sérialisé en chaîne.
+- `traceparent` : extension CloudEvents de traçage distribué, contexte W3C de la transaction qui a produit l'événement (SC5).
+- `data` : schéma déclaré au contrat AsyncAPI ; pour une suppression, l'identifiant seul.
+
+### 9.3 Publication
+
+- Un événement n'est publié qu'après la validation de la transaction qui l'a produit (côté Spring : écouteur `@TransactionalEventListener` en phase `AFTER_COMMIT`). Une transaction annulée ne publie rien.
+- Courtier : le courtier simple en mémoire pour une seule instance du back ; au-delà, un relais vers un courtier STOMP externe (RabbitMQ par exemple). Le fichier d'invariants du projet dit lequel.
+
+### 9.4 Côté client : abonnement et reprise
+
+- Le client se connecte, **s'abonne d'abord**, puis lit l'instantané ; il ignore tout événement de séquence inférieure ou égale à l'`ETag` de l'instantané, et applique les autres dans l'ordre des séquences.
+- Un trou dans les séquences (événement manquant) ou une reconnexion déclenche une nouvelle lecture de l'instantané.
+- Battements STOMP à 10 secondes dans les deux sens ; reconnexion avec attente exponentielle de 1 à 30 secondes, avec un aléa.
+- Sur une collection paginée (SC3), le client applique l'événement aux pages chargées si l'élément y tombe selon le tri ; sinon il signale qu'il y a du nouveau, sans recharger de lui-même.
+
+### 9.5 Sécurité, erreurs et accessibilité
+
+- Connexion en `wss://` seulement, depuis une origine de la liste explicite (SC4) ; jamais `*`.
+- Le jeton porteur passe dans l'en-tête `Authorization` de la trame STOMP `CONNECT`, jamais dans l'URL de connexion (SC4.INV-1). À son expiration, le serveur ferme la session ; le client se reconnecte avec un jeton renouvelé.
+- Chaque `SUBSCRIBE` vérifie le droit de lecture de la ressource, avec la même règle que son opération REST de lecture.
+- Un refus ou une erreur se rend par une trame STOMP `ERROR`, dont le corps est un Problem Details (`application/problem+json`, SC2) avec `status`, `code` et `traceId`.
+- Une mise à jour reçue en temps réel est annoncée aux technologies d'assistance par une région `aria-live="polite"`, sans déplacer le focus ; plusieurs mises à jour rapprochées s'annoncent en un seul message (SC6).
+
+### 9.6 Invariants
+
+- **SC7.INV-1** : tout canal temps réel figure au contrat AsyncAPI du dépôt, avec son instantané REST ; aucun autre canal asynchrone n'est introduit sans être signalé comme écart au socle. Contrôle : test qui compare les destinations publiées par l'application au contrat.
+- **SC7.INV-2** : chaque événement suit l'enveloppe CloudEvents du socle : `time` avec fuseau, `sequence` croissante par canal, `traceparent`, `data` conforme au schéma du contrat. Contrôle : test de sérialisation et validation contre le contrat.
+- **SC7.INV-3** : un événement n'est publié qu'après la validation de la transaction qui l'a produit. Contrôle : test d'intégration où la transaction est annulée et aucun message n'est reçu.
+- **SC7.INV-4** : le client reste juste après une déconnexion, un doublon ou un trou : abonnement avant l'instantané, événements de séquence inférieure ou égale à l'`ETag` ignorés, instantané relu à chaque trou ou reconnexion. Contrôle : test du service client avec déconnexion, doublon et trou simulés.
+- **SC7.INV-5** : aucun jeton dans l'URL de connexion ; chaque abonnement vérifie le droit de lecture de la ressource ; origines explicites. Contrôle : test d'abonnement refusé (`ERROR` avec un Problem Details 403) et test de connexion depuis une origine non autorisée.
+- **SC7.INV-6** : toute mise à jour reçue en temps réel est annoncée par une région `aria-live="polite"`, sans déplacer le focus. Contrôle : test de composant et revue RGAA (critère 7.5).
 
 ## 10. Règles d'évolution du socle
 
@@ -1115,6 +1182,8 @@ Réservé à une version ultérieure du socle : contrat AsyncAPI, format d'envel
 **1.0.0** (2026-10-16) : première version. Dimensions SC1 à SC6 actives, SC7 réservée. Archive : `archives/SKILL-v1.0.0.md`.
 
 **1.0.1** (2026-10-21) : correctif. Les skills qui incluent le socle sont désignés sans le préfixe `expert-`, retiré de tous les skills du dépôt : `java`, `angular`, `analyse-projet`, auxquels s'ajoutent `sonarqube` et `agent-tdd-jira`, qui l'incluent aussi et manquaient à la liste. Aucune dimension ni aucun invariant modifié. Motif : une nouvelle notion d'expertise sera définie ensuite.
+
+**1.1.0** (2026-11-01) : dimension SC7 active, les événements temps réel vers le front, à la demande du développeur pour la catégorie M04 de `orchestrateur-c7e` (une liste servie par son URI existante, tenue à jour en temps réel). WebSocket et STOMP 1.2, contrat AsyncAPI 3.0 dont les schémas renvoient au contrat OpenAPI, enveloppe CloudEvents 1.0 avec `sequence` et `traceparent`, publication après commit, reprise par instantané REST et `ETag`, sécurité de la connexion et de chaque abonnement, erreurs en Problem Details, annonce `aria-live`. SSE, messages entre services et commandes du client restent réservés. Invariants SC7.INV-1 à SC7.INV-6 ; aucun invariant de SC1 à SC6 modifié. `orchestrateur-c7e` ajouté à la liste des skills qui incluent le socle. Archive : `archives/SKILL-v1.0.1.md`.
 <<<FIN socle/SKILL.md>>>
 
 <<<FICHIER references/java.md>>>
@@ -1614,7 +1683,7 @@ databaseChangeLog:
 
 ## 2. Contrats d'interface (É3) : REST conformes au socle
 
-Le socle (`socle/SKILL.md`, SC1 à SC6) fait foi pour la frontière ; cette section n'en retient que les valeurs du projet.
+Le socle (`socle/SKILL.md`, SC1 à SC7) fait foi pour la frontière ; cette section n'en retient que les valeurs du projet.
 
 ### Endpoints
 
@@ -1651,9 +1720,16 @@ La RFC 9457 remplace la RFC 7807. Format du socle (SC2), avec ses trois extensio
   - 500 sans détail technique (SC2.INV-3).
 - ⚠️ ADAPTER : `type`, l'URI de la documentation des erreurs du projet. Une extension propre au projet (par exemple `timestamp`) s'ajoute aux trois du socle, sans en retirer aucune.
 
+### Événements temps réel (SC7), si un ticket en touche
+
+- Contrat : `api/asyncapi.yaml`, AsyncAPI 3.0, dont les schémas renvoient à ceux du contrat OpenAPI ⚠️ ADAPTER (chemin).
+- Point de connexion `/api/ws`, STOMP 1.2 ; destinations `/topic/v1/<ressources>/{id}/<sous-ressource>` ; événements CloudEvents 1.0 publiés après commit (SC7.INV-3).
+- Courtier ⚠️ ADAPTER : `simple`, en mémoire, si le back tourne en une seule instance ; sinon `relais`, vers un courtier STOMP externe (lequel).
+- Front : client STOMP enveloppé dans un service de données, état en signals ; jamais d'abonnement dans un composant de présentation (angular:D3.INV-3).
+
 ### Gate É3 (bloquante)
 
-- Contrat écrit et validé avant toute implémentation de niveau d=2 (D3.INV-2).
+- Contrat écrit et validé avant toute implémentation de niveau d=2 (D3.INV-2), contrat AsyncAPI compris quand un canal temps réel est touché.
 - ⚠️ ADAPTER : relecteur du contrat, le tech lead, avant le code de niveau d=2.
 - Le code ne contredit pas le contrat : test de conformité côté back (SC1.INV-1) et comparaison avec la version publiée du contrat (SC1.INV-2), en gate Méso → Macro.
 
@@ -1799,14 +1875,14 @@ Le scénario R9 du point d'entrée : une question sur la valeur de la méthode r
 <<<FICHIER modules/referentiel/SKILL.md>>>
 ---
 name: referentiel
-description: Dimension D10, le référentiel des méso-contrats du projet. Catégories de tickets avec leur empreinte technique par couche, options au choix (évolution de schéma et contrat CRUD pour PostgreSQL, règles, fonctionnalités et endpoints pour Java, éléments graphiques et fonctionnalités pour Angular, analyse d'une image PNG de l'objectif pour toute option front), méso-contrats transverses, modèle générique de la demande dont part la qualification de chaque ticket (D11), et instance de chaque ticket dans ticket.toml. À lire à l'installation, à l'ouverture et à l'analyse de chaque ticket.
+description: Dimension D10, le référentiel des méso-contrats du projet. Catégories de tickets avec leur empreinte technique par couche, options au choix (évolution de schéma et contrat CRUD pour PostgreSQL, règles, fonctionnalités, endpoints, variantes de représentation et événements temps réel pour Java, éléments graphiques et fonctionnalités pour Angular, analyse d'une image PNG de l'objectif pour toute option front), méso-contrats transverses, modèle générique de la demande dont part la qualification de chaque ticket (D11), et instance de chaque ticket dans ticket.toml. À lire à l'installation, à l'ouverture et à l'analyse de chaque ticket.
 dimensions: [D10]
 status: active
 ---
 
 # Module `referentiel` (D10)
 
-Statut : `active`, depuis la version 3.2.0. Modèle du référentiel en 3.1.0 depuis la version 3.3.0 du skill : modèle générique de la demande ajouté. Modèle en 3.2.0 depuis la version 3.4.0 : catégorie M04, variante de représentation d'une ressource, avec l'option `representations` et ses paramètres au choix par ticket.
+Statut : `active`, depuis la version 3.2.0. Modèle du référentiel en 3.1.0 depuis la version 3.3.0 du skill : modèle générique de la demande ajouté. Modèle en 3.2.0 depuis la version 3.4.0 : catégorie M04, variante de représentation d'une ressource, avec l'option `representations` et ses paramètres au choix par ticket, et l'option `evenements`, le temps réel par WebSocket STOMP (socle, SC7).
 
 ## 1. Rôle
 
@@ -1838,7 +1914,7 @@ Ces étapes prennent place dans l'analyse du § 3 du point d'entrée, après la 
 2. Prendre pour point de départ les options que signale la demande remplie.
 3. Choisir les options, couche par couche, parmi les options permises du méso-contrat (D10.INV-2) :
    - persistance : évolution de schéma (tables, colonnes, index, contraintes) ; contrat CRUD, avec ses opérations et, si `delete` est retenu, le mode de suppression ;
-   - backend : endpoints, règles métier, fonctionnalités ; variantes de représentation, avec le repérage depuis l'URI et une valeur pour chaque paramètre (mécanisme de sélection, exposition de la variante sans champ) ; la réponse actuelle reste inchangée sans sélection, et le remplacement d'une réponse publiée se refuse (D10.INV-6) ;
+   - backend : endpoints, règles métier, fonctionnalités ; variantes de représentation, avec le repérage depuis l'URI et une valeur pour chaque paramètre (mécanisme de sélection, exposition de la variante sans champ) ; la réponse actuelle reste inchangée sans sélection, et le remplacement d'une réponse publiée se refuse (D10.INV-6) ; événements temps réel, avec leur canal, leurs types, leur instantané et le courtier que nomme le fichier d'invariants du projet (socle, SC7) ;
    - frontend : éléments graphiques, fonctionnalités ; pour chacun, s'il y a lieu, l'image de l'objectif (`image_objectif`) et les extractions demandées (`analyse_image`).
 4. Analyser les images demandées dans `analyse-image.md` (D10.INV-4) :
    - les extractions demandées : structure, composants, textes, états, couleurs, accessibilité ;
@@ -1854,7 +1930,7 @@ Ces étapes prennent place dans l'analyse du § 3 du point d'entrée, après la 
 | Couche | Option | Slot | Étiquette des commits |
 |---|---|---|---|
 | persistance | `schema`, `crud` | É1 | `[É1-DB]` |
-| backend | `endpoints`, `representations` | É3 | `[É3-API]` |
+| backend | `endpoints`, `representations`, `evenements` | É3 | `[É3-API]` |
 | backend | `regles`, `fonctionnalites` | É4 | `[É4-SVC]` |
 | frontend | `fonctionnalites` | É2, puis É5 | `[É2-UI]`, `[É5-UI]` |
 | frontend | `elements_graphiques` | É5 | `[É5-UI]` |
@@ -1870,19 +1946,19 @@ Le référentiel ne sert que si le développeur a choisi l'orchestrateur (D2.INV
 
 | Fichier | Empreinte sha256 |
 |---|---|
-| `docs/c7e/referentiel-meso-contrats.toml` | `28d030f8f3a88e86a3532ab70520ba9281d2ff7ffcd10718b59f9187ad11443d` |
+| `docs/c7e/referentiel-meso-contrats.toml` | `96b0d891dadd1a2d176c1fda0b1ca845e3bb1d6fa45979734e75bf74c2608100` |
 
 Commande d'extraction et de vérification, depuis la racine du projet (Node 20 ou plus récent, sans dépendance). Elle suppose le skill dans `.skills/orchestrateur-c7e/` ; pour un autre emplacement, comme `.gemini/skills/orchestrateur-c7e/` en chargement au choix, remplacer ce chemin :
 
 ```bash
-node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const texte = fs.readFileSync('.skills/orchestrateur-c7e/modules/referentiel/SKILL.md', 'utf8').replace(/\r\n/g, '\n'); const m = /^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/m.exec(texte); const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === '28d030f8f3a88e86a3532ab70520ba9281d2ff7ffcd10718b59f9187ad11443d'; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); if (!conforme) process.exitCode = 1;"
+node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const texte = fs.readFileSync('.skills/orchestrateur-c7e/modules/referentiel/SKILL.md', 'utf8').replace(/\r\n/g, '\n'); const m = /^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/m.exec(texte); const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === '96b0d891dadd1a2d176c1fda0b1ca845e3bb1d6fa45979734e75bf74c2608100'; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); if (!conforme) process.exitCode = 1;"
 ```
 
 Le développeur adapte ensuite sa copie : possibilités du modèle générique de la demande, confrontées à l'analyse de l'application (module `qualification`, § 2), catégories `M05` et suivantes, technologies, options permises, transverses. Il change `meta.version` à chaque modification ; les tickets déjà instanciés gardent la version qu'ils ont épinglée.
 
 Un référentiel installé avant la version 3.3.0 du skill n'a pas de section `[modele_demande]` : le développeur l'y ajoute, copiée de ce modèle. D'ici là, la qualification prend celle du modèle et le signale (module `qualification`, § 2).
 
-Un référentiel installé avant la version 3.4.0 n'a ni M04, ni l'option `representations`, ni la possibilité `variante_representation`, ni la règle de choix sur les possibilités requises. Le développeur les copie de ce modèle s'il veut cette catégorie, et change `meta.version`. D'ici là, un ticket de variante de représentation ne trouve pas de catégorie : il se signale, sans catégorie inventée (D10.INV-1).
+Un référentiel installé avant la version 3.4.0 n'a ni M04, ni les options `representations` et `evenements`, ni les possibilités `variante_representation` et `temps_reel`, ni la règle de choix sur les possibilités requises. Le développeur les copie de ce modèle s'il veut cette catégorie, et change `meta.version`. D'ici là, un ticket de variante de représentation ne trouve pas de catégorie : il se signale, sans catégorie inventée (D10.INV-1).
 
 <!-- fichier : docs/c7e/referentiel-meso-contrats.toml -->
 ```toml
@@ -1901,7 +1977,10 @@ Un référentiel installé avant la version 3.4.0 n'a ni M04, ni l'option `repre
 #     ticket : mécanisme de sélection et exposition de la variante sans champ.
 #   - Possibilités requises d'un méso-contrat (possibilites_requises), prises en
 #     compte par la règle de choix.
-#   - Deux règles de validation de plus (section 4).
+#   - Possibilité temps_reel et option backend « evenements » : le champ servi
+#     par son URI existante, et la date-heure du résumé, tenus à jour en temps
+#     réel chez le client par WebSocket STOMP (socle 1.1.0, SC7).
+#   - Trois règles de validation de plus (section 4).
 #
 # 3.1.0 (1er novembre 2026)
 #   - Modèle générique de la demande (section 0) : une combinaison de
@@ -2039,6 +2118,13 @@ option = "representations"
 reperes = ["contrat OpenAPI", "contrôleur REST", "DTO ou record de réponse"]
 
 [[modele_demande.possibilites]]
+id = "temps_reel"
+couche = "backend"
+modification = "Tenir le front à jour en temps réel des changements d'une ressource, par un canal WebSocket STOMP (socle, SC7)"
+option = "evenements"
+reperes = ["contrat AsyncAPI", "configuration STOMP", "écouteur après commit"]
+
+[[modele_demande.possibilites]]
 id = "regle"
 couche = "backend"
 modification = "Ajouter ou modifier une règle métier ou une habilitation"
@@ -2151,8 +2237,9 @@ slot = "É3"
 description = """
 Variantes du type de réponse d'une opération existante. À l'analyse (d=0),
 l'IA repère depuis l'URI l'opération du contrat OpenAPI et son contrôleur, le
-type de réponse, le champ liste ou record visé, l'entité qui le porte et la
-colonne de date-heure de son enregistrement ; elle l'écrit dans ticket.toml.
+type de réponse, le champ liste ou record visé, l'URI existante qui sert ce
+champ s'il y en a une, l'entité qui le porte et la colonne de date-heure de
+son enregistrement ; elle l'écrit dans ticket.toml.
 Variante sans champ : le type de réponse sans ce champ. Variante résumée : à
 la même URI, le champ remplacé par la date-heure de son dernier enregistrement,
 le maximum des dates des éléments pour une liste, la date du record pour un
@@ -2160,7 +2247,7 @@ record, calculée en base sans charger les éléments.
 """
 variantes = ["sans_champ", "resume"]
 preuves = [
-  "repérage depuis l'URI écrit dans ticket.toml : opération, contrôleur, type de réponse, champ, entité et colonne de date-heure",
+  "repérage depuis l'URI écrit dans ticket.toml : opération, contrôleur, type de réponse, champ, URI existante du champ, entité et colonne de date-heure",
   "contrat OpenAPI : un schéma par variante et le mécanisme de sélection décrit, validés avant le code",
   "un test de contrat par variante : le champ retiré est absent de la réponse, et non pas null",
   "sans sélection, la réponse actuelle reste identique, vérifiée par un test de non-régression (sauf remplacement)",
@@ -2182,6 +2269,37 @@ remplacement = "La réponse actuelle devient la variante résumée : retrait d'u
 base = "La variante sans champ n'a pas d'opération à elle : elle sert de base à la variante résumée."
 meme_uri = "La variante sans champ se sélectionne aussi à la même URI, par le même mécanisme, avec une valeur de plus."
 uri_propre = "La variante sans champ a sa propre opération, ajoutée au contrat (option endpoints)."
+
+[options.backend.evenements]
+nom = "Événements temps réel"
+slot = "É3"
+description = """
+Changements d'une ressource diffusés au front par WebSocket STOMP, selon le
+socle (SC7) : canal au contrat AsyncAPI, enveloppe CloudEvents avec sa
+séquence, publication après commit, instantané REST dont l'ETag est la
+dernière séquence, reprise après déconnexion, abonnement autorisé comme la
+lecture REST. Pour une variante résumée, chaque événement de la liste porte
+aussi la date-heure de son dernier enregistrement après le changement : le
+résumé se tient à jour sans recharger la liste, suppressions comprises.
+"""
+preuves = [
+  "canal et types d'événements au contrat AsyncAPI, validé avant le code (SC7.INV-1)",
+  "enveloppe CloudEvents validée contre le contrat : time avec fuseau, sequence, traceparent (SC7.INV-2)",
+  "transaction annulée : aucun événement reçu (SC7.INV-3)",
+  "instantané REST avec ETag égal à la dernière séquence ; déconnexion, doublon et trou simulés côté client (SC7.INV-4)",
+  "abonnement refusé sans droit de lecture, par une trame ERROR qui porte un Problem Details 403 ; aucun jeton dans l'URL (SC7.INV-5)",
+  "mise à jour annoncée par une région aria-live polite, sans déplacer le focus (SC7.INV-6)",
+  "relais : deux instances du back, un événement publié par l'une est reçu par un client connecté à l'autre",
+]
+
+[options.backend.evenements.parametres]
+mecanisme = ["websocket_stomp"]
+courtier = ["simple", "relais"]
+
+[options.backend.evenements.notes]
+websocket_stomp = "Seul mécanisme du socle 1.1.0 ; SSE et messages entre services restent réservés (SC7)."
+simple = "Courtier en mémoire du back, pour une seule instance."
+relais = "Relais vers un courtier STOMP externe, dès deux instances ; le fichier d'invariants du projet le nomme."
 
 [options.frontend.elements_graphiques]
 nom = "Éléments graphiques"
@@ -2272,13 +2390,13 @@ frontend = { impact = "requis", technologies = ["Angular"], style = "Composants 
 id = "M04"
 code = "VARIANTE_REPRESENTATION"
 nom = "Variante de représentation d'une ressource"
-description = "Tickets qui, depuis l'URI d'une opération existante, dérivent de son type de réponse une variante sans un champ liste ou record, et, à la même URI, une variante où ce champ est remplacé par la date-heure de son dernier enregistrement. Le front et la base ne sont touchés que si la demande l'exige."
+description = "Tickets qui, depuis l'URI d'une opération existante, dérivent de son type de réponse une variante sans un champ liste ou record, et, à la même URI, une variante où ce champ est remplacé par la date-heure de son dernier enregistrement ; le champ, servi par son URI existante, et la date-heure peuvent être tenus à jour en temps réel. Le front et la base ne sont touchés que si la demande l'exige."
 complexite_moyenne = "Moyenne"
 possibilites_requises = ["variante_representation"]
 
 [meso_contrats.empreinte_technique]
 persistance = { impact = "optionnel", technologies = ["PostgreSQL", "Liquibase"], options = ["crud", "schema"] }
-backend = { impact = "requis", technologies = ["Java", "API REST"], options = ["representations", "endpoints"] }
+backend = { impact = "requis", technologies = ["Java", "API REST", "WebSocket STOMP"], options = ["representations", "endpoints", "evenements"] }
 frontend = { impact = "optionnel", technologies = ["Angular"], style = "Types et appels d'API", options = ["fonctionnalites", "elements_graphiques"] }
 
 # ------------------------------------------------------------------------------
@@ -2292,7 +2410,7 @@ id = "T01"
 code = "SOCLE_BACK_FRONT"
 nom = "Socle back-front"
 s_applique_si = ["backend", "frontend"]
-exigences = "Contrat OpenAPI, erreurs RFC 9457, formats, pagination, sécurité OAuth 2.1 et OIDC, traçabilité W3C."
+exigences = "Contrat OpenAPI, erreurs RFC 9457, formats, pagination, sécurité OAuth 2.1 et OIDC, traçabilité W3C ; événements temps réel (contrat AsyncAPI, WebSocket STOMP, CloudEvents) dès qu'un canal est touché."
 
 [[meso_contrats_transverses]]
 id = "T02"
@@ -2326,6 +2444,7 @@ regles = [
   "la méthode d'un endpoint est prise parmi les méthodes du catalogue",
   "chaque paramètre d'une option choisie prend une valeur de son catalogue (parametres)",
   "le mécanisme de sélection remplacement n'est choisi que pour une opération dont la version d'API n'est pas publiée (version_publiee = false)",
+  "une option evenements nomme son canal, ses types d'événements et son instantané REST",
   "analyse_image n'apparaît qu'avec image_objectif, en PNG, et ses extractions sont prises dans le catalogue",
   "les méso-contrats transverses des couches touchées s'appliquent d'office",
 ]
@@ -2360,6 +2479,7 @@ ecriture = { reponse = "inconnu" }
 endpoint_nouveau = { reponse = "non", source = "développeur : question 1" }
 endpoint_modifie = { reponse = "oui", precision = "GET /api/v1/donnees, paginé", source = "développeur : question 1" }
 variante_representation = { reponse = "non", precision = "réponse paginée, sans variante", source = "développeur : question 1" }
+temps_reel = { reponse = "non", precision = "chargement au clic, sans mise à jour poussée", source = "ticket : titre" }
 regle = { reponse = "oui", precision = "seul un utilisateur habilité obtient les données", source = "ticket : critères d'acceptation" }
 service = { reponse = "oui", precision = "fournir les données à la demande", source = "ticket : description" }
 ecran_nouveau = { reponse = "inconnu" }
@@ -2405,9 +2525,9 @@ image_actuelle = "docs/demandes/ABCDE-3512/maquettes/ecran-actuel.png"
 analyse_image = ["structure", "etats"]
 ```
 
-### 7.2 Variante de représentation, M04
+### 7.2 Variante de représentation en temps réel, M04
 
-`docs/demandes/ABCDE-3620/ticket.toml`, pour le scénario R19. Le ticket : « Trouver l'endpoint de l'URI `/api/v1/commandes/{id}` avec son type de donnée ; sa composition contient le champ `lignes`, une liste. Réaliser une variante de ce type sans ce champ. Réaliser une variante à la même URI où ce champ ne sera pas intégré : les informations le concernant seront uniquement la date et l'heure du dernier enregistrement. » Le développeur a répondu aux quatre questions de la qualification : sélection par paramètre de vue, variante sans champ sans opération à elle, date-heure déjà stockée sur les lignes, front non concerné. Le repérage depuis l'URI vient de l'analyse :
+`docs/demandes/ABCDE-3620/ticket.toml`, pour le scénario R19. Le ticket : « Trouver l'endpoint de l'URI `/api/v1/commandes/{id}` avec son type de donnée ; sa composition contient le champ `lignes`, une liste de records. Réaliser une variante de ce type sans ce champ. Réaliser une variante à la même URI où ce champ ne sera pas intégré : les informations le concernant seront uniquement la date et l'heure du dernier enregistrement. La liste des lignes, appelée par son URI existante, devra être mise à jour en temps réel. » Le développeur a répondu aux quatre questions de la qualification : sélection par paramètre de vue, variante sans champ sans opération à elle, date-heure déjà stockée sur les lignes, front qui affiche la liste et le résumé. Le courtier vient du fichier d'invariants du projet ; le repérage depuis l'URI, de l'analyse :
 
 ```toml
 [ticket]
@@ -2415,10 +2535,10 @@ reference = "ABCDE-3620"
 referentiel = "3.2.0"
 meso_contrat = "M04"
 meso_contrat_confirme = true
-titre = "Commande : variante sans les lignes, et résumé à la même URI avec la date-heure de la dernière ligne enregistrée"
+titre = "Commande : variante sans les lignes, résumé à la même URI avec la date-heure de la dernière ligne enregistrée, lignes en temps réel"
 
 [ticket.demande]
-intention = { reponse = "Dériver de la réponse de GET /api/v1/commandes/{id} une variante sans les lignes, et, à la même URI, une variante où les lignes sont remplacées par la date-heure de la dernière ligne enregistrée", source = "ticket : description" }
+intention = { reponse = "Dériver de la réponse de GET /api/v1/commandes/{id} une variante sans les lignes et, à la même URI, une variante où les lignes sont remplacées par la date-heure de la dernière ligne enregistrée ; tenir à jour en temps réel la liste des lignes, servie par son URI existante", source = "ticket : description" }
 maquette = { reponse = "non", source = "ticket : pièces jointes" }
 table = { reponse = "inconnu" }
 colonne = { reponse = "non", precision = "ligne_commande.enregistree_le existe déjà", source = "développeur : question 3" }
@@ -2427,14 +2547,15 @@ contrainte = { reponse = "inconnu" }
 lecture = { reponse = "oui", precision = "date-heure maximale des lignes d'une commande, sans charger les lignes", source = "ticket : description" }
 ecriture = { reponse = "inconnu" }
 endpoint_nouveau = { reponse = "non", source = "développeur : question 2" }
-endpoint_modifie = { reponse = "oui", precision = "GET /api/v1/commandes/{id}, paramètre vue facultatif", source = "développeur : question 1" }
-variante_representation = { reponse = "oui", precision = "champ lignes, une liste", source = "ticket : description" }
+endpoint_modifie = { reponse = "oui", precision = "GET /api/v1/commandes/{id}, paramètre vue facultatif ; GET /api/v1/commandes/{id}/lignes, en-tête ETag", source = "développeur : question 1 ; ticket : description" }
+variante_representation = { reponse = "oui", precision = "champ lignes, une liste de records", source = "ticket : description" }
+temps_reel = { reponse = "oui", precision = "liste des lignes, et date-heure du résumé", source = "ticket : description" }
 regle = { reponse = "inconnu" }
 service = { reponse = "inconnu" }
 ecran_nouveau = { reponse = "non", source = "développeur : question 4" }
-ecran_modifie = { reponse = "non", source = "développeur : question 4" }
+ecran_modifie = { reponse = "oui", precision = "liste des lignes et date-heure du dernier enregistrement, annoncées à leur mise à jour", source = "développeur : question 4" }
 formulaire = { reponse = "inconnu" }
-comportement = { reponse = "non", source = "développeur : question 4" }
+comportement = { reponse = "oui", precision = "abonnement au canal des lignes, instantané, application des événements", source = "développeur : question 4" }
 navigation = { reponse = "inconnu" }
 
 [[ticket.persistance.crud]]
@@ -2448,7 +2569,7 @@ operation = "GET /api/v1/commandes/{id}"
 version_publiee = true
 controleur = "CommandeController#lire"
 type_reponse = "CommandeDto"
-champ = { nom = "lignes", nature = "liste", type = "List<LigneCommandeDto>" }
+champ = { nom = "lignes", nature = "liste", type = "List<LigneCommandeDto>", uri = "GET /api/v1/commandes/{id}/lignes" }
 entite = "LigneCommande"
 colonne_date = "ligne_commande.enregistree_le"
 selection = "parametre_vue"
@@ -2462,6 +2583,28 @@ chemin = "/api/v1/commandes/{id}"
 parametres = ["vue, facultatif : resume"]
 reponse = "CommandeDto sans paramètre, inchangée ; CommandeResumeDto avec vue=resume"
 erreurs = [400, 401, 403, 404]
+
+[[ticket.backend.endpoints]]
+methode = "GET"
+chemin = "/api/v1/commandes/{id}/lignes"
+reponse = "page de LigneCommandeDto, inchangée, avec l'en-tête ETag égal à la dernière séquence du canal"
+erreurs = [400, 401, 403, 404]
+
+[[ticket.backend.evenements]]
+mecanisme = "websocket_stomp"
+courtier = "relais"
+canal = "/topic/v1/commandes/{id}/lignes"
+types = ["ligne-commande.creee.v1", "ligne-commande.modifiee.v1", "ligne-commande.supprimee.v1"]
+instantane = "GET /api/v1/commandes/{id}/lignes"
+donnees = "la ligne (son identifiant seul pour une suppression), et lignesDernierEnregistrement après le changement"
+
+[[ticket.frontend.fonctionnalites]]
+nom = "Tenir à jour la liste des lignes et le résumé : abonnement, puis instantané, puis événements dans l'ordre des séquences"
+declencheur = "ouverture du détail de la commande"
+
+[[ticket.frontend.elements_graphiques]]
+nom = "Liste des lignes et date-heure du dernier enregistrement"
+etats = ["chargement", "à jour", "reconnexion", "erreur"]
 ```
 
 ## 8. Contrôles
@@ -2495,7 +2638,7 @@ Le développeur confirme ce méso-contrat. L'analyse et la fiche de transformati
 
 ## 2. Le modèle générique de la demande
 
-Le modèle est une **combinaison de possibilités** : les modifications qu'un ticket peut demander à l'application, couche par couche. Il se trouve dans la section 0 du référentiel du projet, `[modele_demande]` (module `referentiel`, § 6). Chaque possibilité nomme sa couche, la modification, l'option du référentiel qu'elle engage, et ses repères dans l'application. Pour une application PostgreSQL, Java et Angular, le modèle en propose seize :
+Le modèle est une **combinaison de possibilités** : les modifications qu'un ticket peut demander à l'application, couche par couche. Il se trouve dans la section 0 du référentiel du projet, `[modele_demande]` (module `referentiel`, § 6). Chaque possibilité nomme sa couche, la modification, l'option du référentiel qu'elle engage, et ses repères dans l'application. Pour une application PostgreSQL, Java et Angular, le modèle en propose dix-sept :
 
 | Couche | Possibilité | Modification | Option |
 |---|---|---|---|
@@ -2508,6 +2651,7 @@ Le modèle est une **combinaison de possibilités** : les modifications qu'un ti
 | backend, Java | `endpoint_nouveau` | ajouter un endpoint | `endpoints` |
 | backend, Java | `endpoint_modifie` | modifier le contrat d'un endpoint : paramètres, réponse, erreurs | `endpoints` |
 | backend, Java | `variante_representation` | ajouter une variante de représentation d'une opération existante : un champ liste ou record retiré, ou remplacé par la date-heure de son dernier enregistrement | `representations` |
+| backend, Java | `temps_reel` | tenir le front à jour en temps réel des changements d'une ressource, par un canal WebSocket STOMP (socle, SC7) | `evenements` |
 | backend, Java | `regle` | ajouter ou modifier une règle métier ou une habilitation | `regles` |
 | backend, Java | `service` | ajouter ou modifier un cas d'usage côté serveur | `fonctionnalites` |
 | frontend, Angular | `ecran_nouveau` | créer un écran ou un composant | `elements_graphiques` |
@@ -2527,7 +2671,7 @@ La demande d'un ticket est la combinaison de ses possibilités à `oui`. La **r�
 
 Si un seul méso-contrat convient, il est proposé. Si plusieurs conviennent, une question les départage. Si aucun ne convient, le ticket est signalé, sans catégorie inventée (D10.INV-1).
 
-**Des possibilités établies à l'analyse de l'application.** Les seize possibilités valent pour la pile ; celles du projet se fondent sur l'analyse de son application. À l'installation (§ 11.3 du point d'entrée), l'IA confronte le modèle à cette analyse : la cartographie produite par le skill `analyse-projet`, s'il a été appliqué, ou la lecture de la structure du projet (changelogs Liquibase, entités, contrôleurs, services, composants, routes). Elle propose au développeur :
+**Des possibilités établies à l'analyse de l'application.** Les dix-sept possibilités valent pour la pile ; celles du projet se fondent sur l'analyse de son application. À l'installation (§ 11.3 du point d'entrée), l'IA confronte le modèle à cette analyse : la cartographie produite par le skill `analyse-projet`, s'il a été appliqué, ou la lecture de la structure du projet (changelogs Liquibase, entités, contrôleurs, services, composants, routes). Elle propose au développeur :
 
 - les possibilités qui s'appliquent, avec leurs repères dans l'application (dossiers, conventions de nommage) ;
 - celles qui ne s'appliquent pas, à retirer ;
@@ -2535,7 +2679,7 @@ Si un seul méso-contrat convient, il est proposé. Si plusieurs conviennent, un
 
 Le développeur les écrit dans son référentiel ; l'IA ne le modifie pas (D11.INV-5, D10.INV-5). Si le référentiel du projet n'a pas encore de section `[modele_demande]`, parce qu'il a été installé avant la version 3.3.0, l'IA prend celle du modèle du skill et le signale au développeur dans la qualification. S'il n'a pas M04, parce qu'il a été installé avant la version 3.4.0, un ticket de variante de représentation se signale sans catégorie, et l'IA indique au développeur les blocs à copier du modèle (module `referentiel`, § 6).
 
-**Paramètres d'option au choix par ticket.** Certaines options déclarent des paramètres, chacun avec ses valeurs (`parametres` dans le référentiel). Quand le ticket ne dit pas la valeur d'un paramètre, et qu'elle changerait les possibilités à `oui` ou les preuves, la question se pose à la qualification avec les autres. C'est le cas de l'option `representations` : le mécanisme de sélection à la même URI (`parametre_vue`, `negociation_contenu`, `remplacement`) et l'exposition de la variante sans champ (`base`, `meme_uri`, `uri_propre`, qui fait passer `endpoint_nouveau` à `oui`).
+**Paramètres d'option au choix par ticket.** Certaines options déclarent des paramètres, chacun avec ses valeurs (`parametres` dans le référentiel). Quand le ticket ne dit pas la valeur d'un paramètre, et qu'elle changerait les possibilités à `oui` ou les preuves, la question se pose à la qualification avec les autres. C'est le cas de l'option `representations` : le mécanisme de sélection à la même URI (`parametre_vue`, `negociation_contenu`, `remplacement`) et l'exposition de la variante sans champ (`base`, `meme_uri`, `uri_propre`, qui fait passer `endpoint_nouveau` à `oui`). Le courtier de l'option `evenements` (`simple` ou `relais`) ne se demande pas : le fichier d'invariants du projet le nomme, et il est cité comme source.
 
 ## 3. À l'ouverture de chaque ticket
 
@@ -2586,23 +2730,23 @@ Avec la commande `/c7e ABCDE-3512 M01` (§ 11.4 du point d'entrée), le dévelop
 
 **Ticket ambigu (scénario R17).** « Afficher la date de dernière mise à jour sur l'écran de détail. » `ecran_modifie` est à `oui` ; `colonne`, `lecture` et `endpoint_modifie` restent `inconnu`. Si la date est déjà stockée et renvoyée par l'API, la combinaison ne touche qu'Angular, et M03 convient. Sinon, elle touche aussi PostgreSQL et Java, et M01 convient. L'IA pose donc une question : « La date de dernière mise à jour est-elle déjà stockée et renvoyée par l'API de détail ? » Elle ne propose de méso-contrat qu'après la réponse. M04 n'est pas en jeu : la demande n'a pas `variante_representation`, qu'il requiert.
 
-**Variante de représentation, `ABCDE-3620` (scénarios R19 et R20).** « Trouver l'endpoint de l'URI `/api/v1/commandes/{id}` avec son type de donnée ; sa composition contient le champ `lignes`, une liste. Réaliser une variante de ce type sans ce champ. Réaliser une variante à la même URI où ce champ ne sera pas intégré : les informations le concernant seront uniquement la date et l'heure du dernier enregistrement. » `variante_representation`, `endpoint_modifie` et `lecture` (un agrégat, la date-heure maximale des lignes) sont à `oui`. Seul M04 convient : M01 ne permet pas l'option `representations` et exige le frontend, M02 et M03 n'ont pas cette option. Le message de qualification pose quatre questions :
+**Variante de représentation en temps réel, `ABCDE-3620` (scénarios R19 et R20).** « Trouver l'endpoint de l'URI `/api/v1/commandes/{id}` avec son type de donnée ; sa composition contient le champ `lignes`, une liste. Réaliser une variante de ce type sans ce champ. Réaliser une variante à la même URI où ce champ ne sera pas intégré : les informations le concernant seront uniquement la date et l'heure du dernier enregistrement. La liste des lignes, appelée par son URI existante, devra être mise à jour en temps réel. » `variante_representation`, `temps_reel`, `endpoint_modifie` et `lecture` (un agrégat, la date-heure maximale des lignes) sont à `oui`. Seul M04 convient : M01 ne permet ni l'option `representations` ni l'option `evenements`, M02 et M03 n'ont pas ces options. Le message de qualification pose quatre questions :
 
 ```markdown
 **Méso-contrat proposé** : M04, VARIANTE_REPRESENTATION
-- la demande dérive une variante du type de réponse de GET /api/v1/commandes/{id} ; M04 la requiert
-- M01 écarté : il ne permet pas l'option representations et exige le frontend ; M02 et M03 écartés : ni l'un ni l'autre ne la permet
+- la demande dérive une variante du type de réponse de GET /api/v1/commandes/{id}, et tient à jour en temps réel la liste servie par GET /api/v1/commandes/{id}/lignes ; M04 requiert la variante et permet le temps réel (socle, SC7)
+- M01 écarté : il ne permet ni l'option representations ni l'option evenements ; M02 et M03 écartés : ni l'un ni l'autre ne les permet
 
 **Questions**
 1. À la même URI, comment le client choisit-il la variante résumée : paramètre de vue (?vue=resume), négociation de contenu (Accept), ou remplacement de la réponse actuelle ? (paramètre selection ; le remplacement retire un champ, il n'est possible que si la version d'API n'est pas publiée)
 2. La variante sans les lignes a-t-elle une opération à elle : non, elle sert de base au résumé ; oui, à la même URI ; oui, à sa propre URI ? (paramètre exposition_sans_champ ; endpoint_nouveau)
 3. Les lignes portent-elles déjà leur date-heure d'enregistrement ? (colonne : décide de l'option schema)
-4. Le front Angular consomme-t-il la variante résumée ? (ecran_modifie, comportement : décide des options frontend)
+4. Le front Angular affiche-t-il la liste des lignes et la date-heure du résumé tenues à jour ? (ecran_modifie, comportement : décide des options frontend)
 
 Confirmez-vous M04 ? Je ne fais rien d'autre avant votre réponse.
 ```
 
-Le développeur répond : paramètre de vue, variante sans champ en base du résumé, date-heure déjà stockée, front non concerné ; il confirme M04. À l'analyse, l'IA repère depuis l'URI l'opération, son contrôleur, `CommandeDto`, le champ `lignes` et la colonne `ligne_commande.enregistree_le`. `ticket.toml` : module `referentiel`, § 7.2. Si le développeur avait choisi le remplacement alors que `/api/v1` est publiée, l'IA l'aurait refusé en citant le socle (SC1.INV-2) et proposé le paramètre de vue ou la négociation de contenu (R20).
+Le développeur répond : paramètre de vue, variante sans champ en base du résumé, date-heure déjà stockée, front qui affiche la liste et le résumé ; il confirme M04. À l'analyse, l'IA repère depuis l'URI l'opération, son contrôleur, `CommandeDto`, le champ `lignes`, son URI existante `GET /api/v1/commandes/{id}/lignes` et la colonne `ligne_commande.enregistree_le` ; le courtier, `relais`, vient du fichier d'invariants du projet. `ticket.toml` : module `referentiel`, § 7.2. Si le développeur avait choisi le remplacement alors que `/api/v1` est publiée, l'IA l'aurait refusé en citant le socle (SC1.INV-2) et proposé le paramètre de vue ou la négociation de contenu (R20).
 
 ## 7. Contrôles
 
@@ -2617,12 +2761,12 @@ Le développeur répond : paramètre de vue, variante sans champ en base du rés
 
 Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichiers ont été matérialisés.
 
-    c39959a852458173758a83444f316b2944e3a5a7b65e1f82531bc054733f7951  manifest.json
-    81ea6bc93916962fdaeea2380591249e6a5ff575f0bb6e87f4307d33905d2bd1  SKILL.md
-    5ac479aa32da55649f258d9f571fe87c157b86d107ffa80babf731ae3f7ed52c  socle/SKILL.md
+    f64c88bd0a6f46548339d797ed4bf51f07d9e315885395fd0529219940eb7e73  manifest.json
+    b99dc7099f6046d98cebc5064ae17db418a3c8c5dd790997d085ada2e9c6e3ad  SKILL.md
+    f9456b0bbcdce8cd1ebc06446c3d505829a0354f398f4aa819204e4e9c135f54  socle/SKILL.md
     4bb52253c4504f4a804460442b1711a9caab8e364528171f2afb9ba7d5acfccf  references/java.md
     28e0a697773aaf205f024e3fa0a0d99c43bbaf86fb7a56c954c9964e67d22d16  references/angular.md
-    a878fc5c4181781e440bfc4de0e8c9f03cd346a37e6e0cd289dc4660c9f022a0  meso-contrats.md
+    971128d2351d7dce8941a57e3b3875b59cb229c9469eef7c20d74d7561b6ac31  meso-contrats.md
     1c8197828deac91e92d64391d86598938210add220f1e025e9ad6a5539dac441  modules/mesure/SKILL.md
-    55a2c86f9ae7523e4673b94d4a0684cc43f8c3ff3a385742f3d5cc085eaa7142  modules/referentiel/SKILL.md
-    b0bb401113b2abbbee92c048748afa2f7da5567963f82f80fb8ec9d81b3d7eb9  modules/qualification/SKILL.md
+    a88f13bf18a899ea8f5788dcc454f3cb89a3b6db568bedff1d3e3a1b08754cae  modules/referentiel/SKILL.md
+    92d4fccd8d7c41869968581438df9f2126699af352968a6920fa3b176c46b4a7  modules/qualification/SKILL.md
