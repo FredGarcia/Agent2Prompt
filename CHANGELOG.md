@@ -4,6 +4,30 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-11-01 : sonarqube 1.1.0
+
+- **sonarqube 1.1.0** : dimensions D9 et D10 actives, l'examen local avant GitLab et son interface de pilotage, à la demande du développeur. Cinquième mission, « Examiner en local » : le code est examiné avant son envoi sur GitLab, selon les règles du profil qualité du projet sur l'instance, en accédant à SonarQube par le jeton du compte Sonar.
+  - Module `examen-local` : périmètre réduit au diff entre `HEAD` et la base de fusion avec la branche cible lue sur le dépôt distant ; trois moteurs au choix, que le développeur combine :
+    - **analyse éphémère** : scanner Maven ou npm lancé en local sous une branche de travail `local-<login>-<HEAD>`, nouveau code défini par la branche cible, quality gate et constats lus sur cette branche, puis branche supprimée ; analyse et suppression forment un seul lot validé ;
+    - **moteur SonarLint** : analyseurs de SonarQube for IDE en mode connecté, avec les règles du profil, pilotés par l'outil `analyze_file_list` du serveur MCP de Sonar, sans envoi du code ; `analyze_code_snippet`, déprécié, seulement en repli signalé ;
+    - **relecture par les règles** : relecture du diff contre les règles actives du profil, lues par l'API et gardées en cache tant que le profil n'a pas changé ; constats étiquetés avec un niveau de confiance, jamais comptés comme des issues.
+  - Catalogue d'appels (point E1) : règles actives d'un profil, analyse sous une branche de travail, suppression d'une branche, outil MCP admis ; le reste de D7 demeure réservé.
+  - Rapport : mission « Examiner en local », constats par moteur.
+  - Modes de connexion au choix, retenus au cadrage (module `cadrage-acces`, § 3 bis) : API web par en-tête `Bearer` ou par jeton en nom d'utilisateur, scanner, SonarQube for IDE par le serveur MCP autonome, serveur MCP hébergé par l'instance (relevé, sans usage tant que D7 est réservée), SonarQube CLI ; chacun avec ses usages admis et sa variable de jeton ; invariant D1.INV-5.
+  - Dimension D10 active, l'interface de pilotage : module `pilotage`, script Node sans dépendance `outils/pilote-sonar.mjs` servi sur `127.0.0.1` avec une clé de session (connexion, périmètre, règles, analyse éphémère par lot validé, dossier de relecture, commande MCP, constats, journal sans jeton) recette simulée de vingt-six scénarios contre un faux SonarQube (back Java, front TypeScript dans `web/`, faux `mvn` et `npx`) et recette réelle de cinq scénarios contre l'instance du développeur, sur un projet réservé, tirés du module par une commande à empreintes ; workflow `recette-sonarqube.yml`, Linux et Windows, Node 20 et 22, et travail de recette réelle activé par la variable `RECETTE_SONAR_ACTIVE`. Invariants D10.INV-1 à D10.INV-4.
+  - Tests du projet passés par SonarQube : ils tournent avant chaque analyse éphémère (JUnit et JaCoCo dans `mvn verify`, échecs importés ; `ng test` avec couverture LCOV côté front), et tests, échecs, ignorés et couverture sont lus sur la branche de travail ; l'instance est lue même quand le gate fait sortir le scanner en erreur. Invariant D9.INV-7. Dossier du projet pour un monodépôt back et front.
+  - Export CSV des règles de l'instance pour les langages du projet, actives ou non dans son profil (écran 3 du pilote, scénario P26). Recette réelle : le fichier soumis enfreint trois règles actives de Sonar way pour JavaScript (`S3504`, `S1481`, `S1186`) au lieu de `S1525`, dépréciée.
+  - `docs/sonarqube/` : tables des règles Java (780) et JavaScript / TypeScript (583), tirées des métadonnées de `sonar-java` et `SonarJS` du 30 octobre 2026, avec type, qualité et gravité, statut, présence dans Sonar way et Sonar agentic AI par langage ; script de régénération `generer-regles.mjs` ; liste des 31 scénarios de recette du pilote par langage.
+  - Trente-quatre invariants. Archive : `archives/SKILL-v1.0.2.md`.
+- Décisions ratifiées :
+  - les trois moteurs, au choix du développeur, plutôt qu'un seul ;
+  - le périmètre limité au diff avec la branche cible ;
+  - un examen lancé à la demande, sans hook `pre-push` ;
+  - une livraison par pull request ;
+  - les modes de connexion en option, chacun borné à ses usages, le serveur MCP hébergé relevé mais sans usage tant que D7 est réservée ;
+  - une interface de pilotage locale, intégrée à la 1.1.0 encore non publiée plutôt qu'en 1.2.0 ;
+  - les tests du projet passés par SonarQube avant chaque analyse éphémère, et une recette réelle contre l'instance du développeur, en plus de la recette simulée.
+
 ### 2026-11-01 : orchestrateur-c7e 3.3.0
 
 - **orchestrateur-c7e 3.3.0** : dimension D11 active, la qualification de la demande, à la demande du développeur. À l'ouverture d'un ticket, la première chose à faire est de trouver son méso-contrat, avec un modèle générique de la demande, à partir du contenu du ticket, en posant des questions complémentaires si besoin. Le modèle est une combinaison de possibilités, fondées sur les modifications de l'application construite sur la pile PostgreSQL, Java et Angular, établies à son analyse.

@@ -31,7 +31,7 @@ La colonne « Repris dans » cite les modules de la spécification qui reprennen
 | [`orchestrateur-c7e`](#orchestrateur-c7e-330) | 3.3.0 | 10 | 1 | 31 |
 | [`skill4appli`](#skill4appli-110) | 1.1.0 | 9 | 3 | 34 |
 | [`socle-back-front`](#socle-back-front-101) | 1.0.1 | 6 | 1 | 15 |
-| [`sonarqube`](#sonarqube-102) | 1.0.2 | 6 | 2 | 22 |
+| [`sonarqube`](#sonarqube-110) | 1.1.0 | 8 | 2 | 34 |
 | [`tension-dashboard-gitlab-agent`](#tension-dashboard-gitlab-agent-220) | 2.2.0 | 7 | 3 | 17 |
 
 ## agent-tdd-jira 1.3.2
@@ -1181,25 +1181,26 @@ Socle commun back-front : contrat OpenAPI, erreurs RFC 9457, formats de données
 
 Dimension réservée : aucun invariant en vigueur dans cette version.
 
-## sonarqube 1.0.2
+## sonarqube 1.1.0
 
-Expert SonarQube Server 2026.x : configurer l'analyse et la CI, trier, corriger ou planifier, gouverner la qualité, pour des projets Java et Angular sur GitLab. Point d'entrée : [`specs/sonarqube/SKILL.md`](specs/sonarqube/SKILL.md).
+Expert SonarQube Server 2026.x : configurer l'analyse et la CI, examiner le code local avant GitLab selon les règles du profil, trier, corriger ou planifier, gouverner la qualité, pour des projets Java et Angular sur GitLab. Point d'entrée : [`specs/sonarqube/SKILL.md`](specs/sonarqube/SKILL.md).
 
 ### D1 : Cadrage, accès et sécurité du jeton (active)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
 | **D1.INV-1** | la mission, le périmètre (projets, branche ou merge request) et les droits attendus sont explicites avant toute action. | `cadrage-acces` |
-| **D1.INV-2** | le jeton n'est jamais affiché, journalisé, versionné, ni placé dans une URL ou un argument de commande visible ; il est lu depuis la variable `SONAR_TOKEN`. | `cadrage-acces` |
-| **D1.INV-3** | toute écriture vers SonarQube est proposée avec l'appel exact et n'est appliquée qu'après validation explicite. | `cadrage-acces`, `triage`, `correction`, `gouvernance` |
-| **D1.INV-4** | la version, l'édition et le mode de l'instance sont relevés avant toute interprétation, et aucune fonction absente de l'instance n'est proposée. | `cadrage-acces`, `triage` |
+| **D1.INV-2** | le jeton n'est jamais affiché, journalisé, versionné, ni placé dans une URL ou un argument de commande visible ; il est lu depuis la variable `SONAR_TOKEN`. | `cadrage-acces`, `examen-local`, `pilotage` |
+| **D1.INV-3** | toute écriture vers SonarQube est proposée avec l'appel exact et n'est appliquée qu'après validation explicite. | `cadrage-acces`, `examen-local`, `pilotage`, `triage`, `correction`, `gouvernance` |
+| **D1.INV-4** | la version, l'édition et le mode de l'instance sont relevés avant toute interprétation, et aucune fonction absente de l'instance n'est proposée. | `cadrage-acces`, `pilotage`, `triage` |
+| **D1.INV-5** | les modes de connexion employés sont retenus au cadrage parmi ceux du module `cadrage-acces` ; chacun reçoit le jeton par une variable d'environnement et ne sert qu'aux usages que ce module lui attribue. | `cadrage-acces`, `pilotage` |
 
 ### D2 : Configuration de l'analyse et de la CI (active)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
 | **D2.INV-1** | le code généré, les dépendances et les artefacts de build sont exclus de l'analyse. | `configuration-analyse`, `triage` |
-| **D2.INV-2** | la couverture des tests est importée pour le back (rapport XML JaCoCo) et pour le front (rapport LCOV) ; une analyse sans couverture est signalée. | `configuration-analyse` |
+| **D2.INV-2** | la couverture des tests est importée pour le back (rapport XML JaCoCo) et pour le front (rapport LCOV) ; une analyse sans couverture est signalée. | `configuration-analyse`, `examen-local`, `pilotage` |
 | **D2.INV-3** | le pipeline analyse les merge requests et la branche principale, avec l'historique Git complet, et attend le résultat du quality gate. | `configuration-analyse` |
 | **D2.INV-4** | les paramètres d'analyse sont versionnés dans le dépôt ; le jeton utilisé par la CI n'est jamais dans le dépôt et n'est fourni que par une variable masquée de la CI. | `configuration-analyse` |
 
@@ -1210,7 +1211,7 @@ Expert SonarQube Server 2026.x : configurer l'analyse et la CI, trier, corriger 
 | **D3.INV-1** | chaque issue marquée faux positif ou acceptée porte un commentaire de justification dans SonarQube. | `triage` |
 | **D3.INV-2** | l'expert ne modifie jamais une gravité ni un statut pour faire passer le quality gate. | `triage` |
 | **D3.INV-3** | une revue de sécurité (Security Hotspot ou Security Issue) n'est jamais close sans décision humaine enregistrée. | `triage` |
-| **D3.INV-4** | le triage suit l'ordre : nouveau code d'abord, puis sécurité, fiabilité, maintenabilité, puis gravité décroissante. | `triage` |
+| **D3.INV-4** | le triage suit l'ordre : nouveau code d'abord, puis sécurité, fiabilité, maintenabilité, puis gravité décroissante. | `examen-local`, `triage` |
 
 ### D4 : Correction directe ou plan pour un expert (active)
 
@@ -1234,8 +1235,8 @@ Expert SonarQube Server 2026.x : configurer l'analyse et la CI, trier, corriger 
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D6.INV-1** | chaque rapport indique l'instance (version, édition), le projet, la branche ou merge request, la date de l'analyse, l'état du quality gate et les appels d'API utilisés. | `rapport` |
-| **D6.INV-2** | chaque chiffre vient d'une réponse de l'API, jamais d'une estimation. | `rapport` |
+| **D6.INV-1** | chaque rapport indique l'instance (version, édition), le projet, la branche ou merge request, la date de l'analyse, l'état du quality gate et les appels d'API utilisés. | `pilotage`, `rapport` |
+| **D6.INV-2** | chaque chiffre vient d'une réponse de l'API, jamais d'une estimation. | `examen-local`, `pilotage`, `rapport` |
 
 ### D7 : Serveur MCP et agents Sonar (reserved)
 
@@ -1244,6 +1245,27 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 ### D8 : Rapports de conformité (WCAG, OWASP, CRA) (reserved)
 
 Dimension réservée : aucun invariant en vigueur dans cette version.
+
+### D9 : Examen local avant GitLab (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D9.INV-1** | chaque constat de l'examen local porte son moteur (analyse éphémère, moteur SonarLint, relecture) ; un constat de relecture n'est jamais présenté ni compté comme une issue SonarQube. | `examen-local`, `pilotage`, `rapport` |
+| **D9.INV-2** | une analyse éphémère s'exécute sous une branche de travail préfixée `local-`, jamais sous la branche principale, la branche cible ni une merge request ; l'analyse et la suppression de cette branche forment un seul lot validé, et la suppression est vérifiée, que l'analyse réussisse ou non. | `cadrage-acces`, `examen-local`, `pilotage` |
+| **D9.INV-3** | le périmètre est le diff entre `HEAD` et la base de fusion avec la branche cible lue sur le dépôt distant ; les modifications non commitées sont déclarées, jamais mêlées en silence. | `examen-local`, `pilotage` |
+| **D9.INV-4** | seules les règles actives du ou des profils qualité du projet sur l'instance sont appliquées et citées, lues à l'examen ou depuis un cache dont la date de mise à jour du profil a été vérifiée. | `examen-local`, `pilotage` |
+| **D9.INV-5** | avant le lancement, la fiche indique pour chaque moteur retenu où part le code, et le développeur l'a confirmée. | `examen-local` |
+| **D9.INV-6** | l'examen local ne pousse rien, ne commente aucune issue et ne change aucun statut ; ses constats passent par le triage et la correction. | `examen-local` |
+| **D9.INV-7** | une analyse éphémère est précédée des tests du projet, sauf refus annoncé dans le lot ; un test en échec n'empêche pas l'analyse ; tests et couverture sont lus sur la branche de travail et rapportés, et une couverture absente ou un test en échec est signalé, jamais tu. | `examen-local`, `pilotage` |
+
+### D10 : Interface de pilotage locale (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D10.INV-1** | l'interface de pilotage n'écoute que sur la boucle locale et ne sert qu'une requête portant la clé de session du lancement et un en-tête `Host` local. | `pilotage` |
+| **D10.INV-2** | le jeton ne quitte jamais le processus du pilote et celui du scanner qu'il lance : ni réponse au navigateur, ni journal, ni message d'erreur, ni sortie du scanner ne le contient ; le navigateur n'en connaît que la présence. | `pilotage` |
+| **D10.INV-3** | toute écriture vers SonarQube déclenchée par l'interface vient d'un lot proposé avec les appels exacts, puis validé ; un lot inconnu, expiré ou déjà employé n'écrit rien. | `pilotage` |
+| **D10.INV-4** | l'interface applique par programme les invariants de l'examen local qu'elle pilote : branche `local-…` imposée et commande de scanner sans branche, MR ni jeton, suppression tentée en toute issue puis vérifiée, constats filtrés au périmètre et étiquetés par moteur. | `pilotage` |
 
 ## tension-dashboard-gitlab-agent 2.2.0
 
