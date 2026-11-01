@@ -324,6 +324,18 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Documents
 
+### 2026-11-01 : présentation « L'IA, un investissement mesurable », changement de paradigme
+
+- **`docs/presentation-valeur-ia/`** : deux diapositives et deux sections pour illustrer le changement de paradigme, à la demande du développeur.
+  - « Un changement de paradigme » : sans méthode, une seule question, « Quel code ferme ce ticket ? » ; avec la méthode, trois questions posées avant d'écrire la moindre ligne (vers quel état l'application doit passer, ce qui ne doit pas bouger, comment le prouver), et les rôles de l'IA et des équipes qui changent avec elles.
+  - « D'un état validé au suivant » : un ticket fait passer l'application d'un état validé au suivant en quatre pas (qualifier, modéliser, transformer, prouver) ; ce qui change, ce que le ticket demande et seulement cela ; ce qui ne bouge pas, les invariants du projet.
+  - PowerPoint : dix-huit diapositives ; une section « Le changement de paradigme » réunit les deux nouvelles et « Ce qui change dans un ticket » ; le renvoi de l'annexe B vise désormais les diapositives 12 et 13.
+  - Markdown : quinze sections ; la liste des questions passe de « Ce qui change dans un ticket » à la section 5.
+- Vérifications : PowerPoint validé, rendu et relu diapositive par diapositive ; schéma Mermaid rendu ; invariants cités en exemple confrontés au socle back-front et au modèle des invariants d'`orchestrateur-c7e` ; aucun nom de client ni de mission.
+- Soumis à ratification :
+  - la section « Le changement de paradigme » du PowerPoint, qui reprend « Ce qui change dans un ticket » ;
+  - les invariants cités en exemple : contrat d'API et format des erreurs, pagination, sécurité, accessibilité, migrations réversibles.
+
 ### 2026-11-01 : mode d'emploi de l'orchestrateur C7E, compléments
 
 - `docs/orchestrateur-c7e/mode-emploi.md`, compléments à l'installateur et à la version 3.2.1 :
