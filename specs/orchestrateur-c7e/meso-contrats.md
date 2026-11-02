@@ -65,7 +65,7 @@ databaseChangeLog:
 
 ## 2. Contrats d'interface (É3) : REST conformes au socle
 
-Le socle (`socle/SKILL.md`, SC1 à SC6) fait foi pour la frontière ; cette section n'en retient que les valeurs du projet.
+Le socle (`socle/SKILL.md`, SC1 à SC7) fait foi pour la frontière ; cette section n'en retient que les valeurs du projet.
 
 ### Endpoints
 
@@ -102,9 +102,16 @@ La RFC 9457 remplace la RFC 7807. Format du socle (SC2), avec ses trois extensio
   - 500 sans détail technique (SC2.INV-3).
 - ⚠️ ADAPTER : `type`, l'URI de la documentation des erreurs du projet. Une extension propre au projet (par exemple `timestamp`) s'ajoute aux trois du socle, sans en retirer aucune.
 
+### Événements temps réel (SC7), si un ticket en touche
+
+- Contrat : `api/asyncapi.yaml`, AsyncAPI 3.0, dont les schémas renvoient à ceux du contrat OpenAPI ⚠️ ADAPTER (chemin).
+- Point de connexion `/api/ws`, STOMP 1.2 ; destinations `/topic/v1/<ressources>/{id}/<sous-ressource>` ; événements CloudEvents 1.0 publiés après commit (SC7.INV-3).
+- Courtier ⚠️ ADAPTER : `simple`, en mémoire, si le back tourne en une seule instance ; sinon `relais`, vers un courtier STOMP externe (lequel).
+- Front : client STOMP enveloppé dans un service de données, état en signals ; jamais d'abonnement dans un composant de présentation (angular:D3.INV-3).
+
 ### Gate É3 (bloquante)
 
-- Contrat écrit et validé avant toute implémentation de niveau d=2 (D3.INV-2).
+- Contrat écrit et validé avant toute implémentation de niveau d=2 (D3.INV-2), contrat AsyncAPI compris quand un canal temps réel est touché.
 - ⚠️ ADAPTER : relecteur du contrat, le tech lead, avant le code de niveau d=2.
 - Le code ne contredit pas le contrat : test de conformité côté back (SC1.INV-1) et comparaison avec la version publiée du contrat (SC1.INV-2), en gate Méso → Macro.
 

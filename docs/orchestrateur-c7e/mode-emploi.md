@@ -1,6 +1,6 @@
 # Mode d'emploi : lancer l'orchestrateur C7E dans Gemini CLI
 
-Ce mode d'emploi installe la spécification [`orchestrateur-c7e`](../../specs/orchestrateur-c7e/SKILL.md) 3.3.0 dans un projet et la fait appeler au démarrage de l'IA locale, Gemini CLI. Le skill ne s'applique qu'au choix du développeur, selon l'un de deux chargements :
+Ce mode d'emploi installe la spécification [`orchestrateur-c7e`](../../specs/orchestrateur-c7e/SKILL.md) 3.4.0 dans un projet et la fait appeler au démarrage de l'IA locale, Gemini CLI. Le skill ne s'applique qu'au choix du développeur, selon l'un de deux chargements :
 
 | Chargement | Le choix se fait | Au démarrage, le contexte contient |
 |---|---|---|
@@ -9,7 +9,7 @@ Ce mode d'emploi installe la spécification [`orchestrateur-c7e`](../../specs/or
 
 Ces deux chargements ne sont pas les modes de modulation A, B et C du skill, qui règlent la méthode une fois le skill choisi.
 
-Une fois l'orchestrateur choisi, chaque ticket est d'abord **qualifié**, à son ouverture. L'IA range sa demande dans le modèle générique de la demande du référentiel des méso-contrats, une combinaison de possibilités de modification de l'application établies à son analyse, pose les questions que le ticket laisse ouvertes, et propose le méso-contrat (M01, M02, M03…), que vous confirmez avant tout le reste. Viennent ensuite les options au choix sur chaque couche, l'analyse des images PNG de l'objectif quand il y en a, et la fiche de transformation.
+Une fois l'orchestrateur choisi, chaque ticket est d'abord **qualifié**, à son ouverture. L'IA range sa demande dans le modèle générique de la demande du référentiel des méso-contrats, une combinaison de possibilités de modification de l'application établies à son analyse, pose les questions que le ticket laisse ouvertes, et propose le méso-contrat (M01 à M04, puis les catégories du projet), que vous confirmez avant tout le reste. Viennent ensuite les options au choix sur chaque couche, l'analyse des images PNG de l'objectif quand il y en a, et la fiche de transformation.
 
 ---
 
@@ -17,7 +17,7 @@ Une fois l'orchestrateur choisi, chaque ticket est d'abord **qualifié**, à son
 
 - Gemini CLI, lancé à la racine du projet.
 - Pour le chargement au choix, la prise en charge des skills : la commande `/skills list` doit répondre.
-- Un clone du dépôt Agent2Prompt, pour l'installateur `tools/installer.mjs`. À défaut, la transmission seule : [`transmissions/orchestrateur-c7e-3.3.0.md`](../../transmissions/orchestrateur-c7e-3.3.0.md).
+- Un clone du dépôt Agent2Prompt, pour l'installateur `tools/installer.mjs`. À défaut, la transmission seule : [`transmissions/orchestrateur-c7e-3.4.0.md`](../../transmissions/orchestrateur-c7e-3.4.0.md).
 - Node 20 ou plus récent, pour l'installateur et pour extraire le référentiel, et `sha256sum`, fourni par Git Bash sous Windows, pour vérifier les fichiers.
 
 Deux dépôts interviennent :
@@ -112,7 +112,7 @@ Tous ces fichiers sont versionnés avec le projet, images comprises : une comman
    ```
 
 2. Si ce fichier ne s'appelle pas `GEMINI.md`, le déclarer dans `.gemini/settings.json` (voir § 6).
-3. Lancer `gemini`, puis `/memory show` : le texte du skill doit apparaître, en commençant par « Orchestrateur fractal C7E, version 3.3.0 ».
+3. Lancer `gemini`, puis `/memory show` : le texte du skill doit apparaître, en commençant par « Orchestrateur fractal C7E, version 3.4.0 ».
 
 Les lignes `@` ne sont développées que dans un fichier de contexte. Si le fichier est envoyé comme message, l'IA ne voit que le texte des lignes, sans le contenu des fichiers. Le référentiel n'est pas importé : l'IA le lit à l'analyse de chaque ticket.
 
@@ -203,13 +203,15 @@ Chaque méso-contrat permet certaines options par couche ; `ticket.toml` les pr�
 | PostgreSQL | évolution de schéma (`schema`) | le changement (table, colonne, index, contrainte), la table, une description |
 | PostgreSQL | contrat CRUD (`crud`) | l'entité, la table, les opérations parmi `create`, `read`, `update`, `delete`, et le mode de suppression si `delete` est retenu |
 | Java | endpoints (`endpoints`) | la méthode, le chemin, la réponse, les erreurs attendues |
+| Java | variantes de représentation (`representations`), sous M04 | le repérage depuis l'URI (opération, contrôleur, type de réponse, champ liste ou record, entité, colonne de date-heure), si la version d'API est publiée, le mécanisme de sélection (`parametre_vue`, `negociation_contenu`, `remplacement`), l'exposition de la variante sans champ (`base`, `meme_uri`, `uri_propre`) et les deux types de variante |
+| Java | événements temps réel (`evenements`), sous M04 | le canal STOMP, les types d'événements, l'instantané REST et le courtier (`simple` ou `relais`) que nomme votre fichier d'invariants, selon le socle 1.1.0 (SC7) |
 | Java | règles métier (`regles`) | un identifiant et l'énoncé de chaque règle |
 | Java | fonctionnalités (`fonctionnalites`) | le cas d'usage |
 | Angular | éléments graphiques (`elements_graphiques`) | le composant et ses états visuels |
 | Angular | fonctionnalités (`fonctionnalites`) | le comportement et son déclencheur |
 | Angular | analyse d'image, sur toute option front | `image_objectif` (PNG), `analyse_image` (structure, composants, textes, états, couleurs, accessibilité), et `image_actuelle` pour relever les écarts |
 
-La demande remplie à la qualification signale déjà des options ; l'analyse les précise. Chaque option retenue apporte ses preuves aux tests déduits de la fiche. Le module `referentiel` du skill donne un exemple complet de `ticket.toml`, demande remplie comprise.
+La demande remplie à la qualification signale déjà des options ; l'analyse les précise. Les paramètres d'une option, comme le mécanisme de sélection d'une variante, se demandent dès la qualification si le ticket ne les dit pas. Chaque option retenue apporte ses preuves aux tests déduits de la fiche. Le module `referentiel` du skill donne deux exemples complets de `ticket.toml`, demande remplie comprise : le ticket fil rouge sous M01, et une variante de représentation sous M04.
 
 ## 8. Au quotidien
 
@@ -251,6 +253,9 @@ Si l'IA signale qu'aucune catégorie ne couvre le ticket, choisir la plus proche
 | l'IA ne propose aucun méso-contrat | référentiel absent, ou ticket hors de toute catégorie | installer le référentiel ; sinon, choisir une catégorie ou en ajouter une |
 | l'IA lit le code ou prépare la fiche sans avoir qualifié le ticket | qualification sautée | l'arrêter et demander la qualification : le skill l'impose avant tout le reste (D11.INV-1) |
 | la qualification dit prendre le modèle de la demande du skill | référentiel installé avant la 3.3.0, sans section `[modele_demande]` | copier la section 0 du modèle (module `referentiel`, § 6) dans le référentiel du projet, et changer `meta.version` |
+| un ticket de variante de représentation ne trouve pas de catégorie | référentiel installé avant la 3.4.0, sans M04 | copier du modèle (module `referentiel`, § 6) le bloc M04, les options `representations` et `evenements`, les possibilités `variante_representation` et `temps_reel` et la règle de choix sur les possibilités requises, et changer `meta.version` ; pour le temps réel, renseigner le courtier dans la section 2 du fichier d'invariants |
+| un ticket temps réel sans variante de représentation ne trouve pas de catégorie | seul M04 permet l'option `evenements` | permettre `evenements` dans une autre catégorie de votre référentiel, ou en créer une |
+| l'IA refuse le remplacement de la réponse actuelle | version d'API publiée : retirer un champ y est cassant (socle, SC1.INV-2) | choisir le paramètre de vue ou la négociation de contenu, ou une version `v2` |
 | l'IA retient une option refusée par la catégorie | règle de validation ignorée | la refuser à la validation ; le skill la rejette (scénario R13) |
 | l'image n'est pas analysée | fichier absent, non versionné, ou pas en PNG | déposer le PNG dans `maquettes/`, le versionner, renseigner `image_objectif` et `analyse_image` |
 | l'IA applique la méthode sans choix | activation acceptée par erreur | relancer la session et refuser la confirmation |

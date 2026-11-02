@@ -10,8 +10,10 @@
  * son point d'entrée, ses fichiers partagés (`shared`, par exemple le socle
  * back-front), les skills qu'elle référence (`references`) et ses modules
  * (actifs et réservés). Il refuse une spécification marquée
- * `"transmissible": false`, un fichier partagé dont la version ne correspond
- * pas à l'épinglage, et une référence à une version absente du dépôt. Il écrit
+ * `"transmissible": false`, un fichier partagé épinglé à une version ni courante
+ * ni archivée, et une référence à une version absente du dépôt. Un fichier
+ * partagé épinglé à une version antérieure est pris dans les archives de sa
+ * source (`previousVersions`). Il écrit
  * `transmissions/<nom>-<version>.md` :
  *
  * 1. l'en-tête `ENTETE-TRANSMISSION.md` de la spécification, où `{{VERSION}}`
@@ -23,14 +25,15 @@
  * Il vérifie ensuite l'aller-retour : le texte, relu comme le ferait l'IA, doit
  * redonner exactement chaque fichier. Les archives ne sont pas transmises.
  *
- * Le module exporte aussi `assembler` (le texte, sans rien écrire) et `relire`
+ * Le module exporte aussi `assembler` (le texte, sans rien écrire), `sourcePartagee`
+ * (le fichier d'un partage à sa version épinglée) et `relire`
  * (en-tête, fichiers et table d'intégrité d'une transmission) : `tools/verifier.mjs`
  * s'en sert pour contrôler que la transmission de chaque version courante reste
  * fidèle aux fichiers de la spécification.
  * Node 20 ou plus récent, modules natifs uniquement.
  */
 import { createHash } from 'node:crypto';
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -48,6 +51,27 @@ function versionDeclaree(texte) {
 }
 
 /**
+ * Fichier d'un partage à sa version épinglée : la source courante si elle a cette
+ * version, sinon l'archive de cette version déclarée dans le manifeste de la source
+ * (`previousVersions`). Un skill garde ainsi l'épinglage qu'il a choisi quand le
+ * fichier partagé évolue, et monte de version quand il le décide.
+ */
+export function sourcePartagee(partage, nom = 'ce skill') {
+  const source = join(RACINE, partage.from);
+  const trouvee = versionDeclaree(lire(source));
+  if (trouvee === partage.version) return source;
+  const dossierSource = dirname(source);
+  const cheminManifeste = join(dossierSource, 'manifest.json');
+  const precedentes = existsSync(cheminManifeste) ? JSON.parse(lire(cheminManifeste)).previousVersions ?? [] : [];
+  const archive = precedentes.find((p) => p.version === partage.version && p.file.endsWith('.md'));
+  if (archive) {
+    const chemin = join(dossierSource, archive.file);
+    if (existsSync(chemin) && versionDeclaree(lire(chemin)) === partage.version) return chemin;
+  }
+  throw new Error(`${partage.from} est en version ${trouvee}, ${nom} épingle ${partage.version}, absente des archives : mettre à jour l'épinglage`);
+}
+
+/**
  * Assemble la transmission de la spécification du dossier `spec`, sans rien écrire.
  * Renvoie le nom, la version, le texte, l'en-tête et les fichiers transmis, dans l'ordre.
  * Lève une erreur si la spécification n'est pas transmissible ou incohérente.
@@ -60,15 +84,10 @@ export function assembler(spec) {
     throw new Error(`${nom} n'est pas transmissible seul : il est inclus dans les skills qui le déclarent dans « shared »`);
   }
 
-  // Fichiers partagés (socle) : source unique dans le dépôt, version épinglée vérifiée.
+  // Fichiers partagés (socle) : la version épinglée, courante ou archivée.
   const sources = new Map();
   for (const partage of manifeste.shared ?? []) {
-    const source = join(RACINE, partage.from);
-    const trouvee = versionDeclaree(lire(source));
-    if (trouvee !== partage.version) {
-      throw new Error(`${partage.from} est en version ${trouvee}, ${nom} épingle ${partage.version} : mettre à jour l'épinglage ou le socle`);
-    }
-    sources.set(partage.path, source);
+    sources.set(partage.path, sourcePartagee(partage, nom));
   }
 
   // Skills référencés : la version citée doit être celle du dépôt.

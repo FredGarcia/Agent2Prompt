@@ -1,10 +1,10 @@
 ---
 name: orchestrateur-c7e
-description: Orchestrateur fractal C7E, qui pilote la résolution d'un ticket full-stack comme la transformation maîtrisée d'un système vivant (cycle de l'Axiome 7E, déclinaison récursive imbriquée sur quatre profondeurs, concepts paramétrables, qualification de chaque ticket à son ouverture par un modèle générique de la demande et des questions, méso-contrat confirmé avant tout le reste, options par couche, analyse des images PNG de l'objectif, fiche de transformation validée avant toute modification, tests déduits des risques, traçabilité Git compatible avec le kit des agents parallèles, boucle de second ordre bornée par un registre, valeur annoncée comme une hypothèse tant qu'elle n'est pas mesurée), avec le fichier des invariants du projet, meso-contrats. Adaptateur par défaut Java, Spring Boot, PostgreSQL, Liquibase et Angular. À activer au démarrage de l'IA locale, sur choix du développeur, pour les tickets qu'il lui confie.
-version: 3.3.0
+description: Orchestrateur fractal C7E, qui pilote la résolution d'un ticket full-stack comme la transformation maîtrisée d'un système vivant (cycle de l'Axiome 7E, déclinaison récursive imbriquée sur quatre profondeurs, concepts paramétrables, qualification de chaque ticket à son ouverture par un modèle générique de la demande et des questions, méso-contrat confirmé avant tout le reste, options par couche avec leurs paramètres au choix par ticket, variantes de représentation d'une ressource et leur mise à jour en temps réel, analyse des images PNG de l'objectif, fiche de transformation validée avant toute modification, tests déduits des risques, traçabilité Git compatible avec le kit des agents parallèles, boucle de second ordre bornée par un registre, valeur annoncée comme une hypothèse tant qu'elle n'est pas mesurée), avec le fichier des invariants du projet, meso-contrats. Adaptateur par défaut Java, Spring Boot, PostgreSQL, Liquibase et Angular. À activer au démarrage de l'IA locale, sur choix du développeur, pour les tickets qu'il lui confie.
+version: 3.4.0
 ---
 
-# Orchestrateur fractal C7E, version 3.3.0
+# Orchestrateur fractal C7E, version 3.4.0
 
 Ce document est le point d'entrée du skill et contient la méthode. Il s'active au démarrage de l'IA locale, sur choix du développeur (§ 11.4), avec le fichier des invariants du projet, copie remplie du modèle `meso-contrats.md`. Ces deux fichiers suffisent au démarrage ; le référentiel des méso-contrats se lit à l'ouverture de chaque ticket, pour le qualifier, puis à son analyse, et les autres fichiers quand un ticket touche leur domaine.
 
@@ -12,10 +12,10 @@ Fichiers du skill :
 
 - `SKILL.md` : la méthode, ce document ;
 - `meso-contrats.md` : modèle des invariants du projet (dimension D8), pré-rempli pour l'adaptateur par défaut, à copier dans le projet et à remplir par le développeur ;
-- `socle/SKILL.md` : socle commun back-front (contrat OpenAPI, erreurs RFC 9457, formats, pagination, sécurité, traçabilité, accessibilité), inclus à une version épinglée ;
+- `socle/SKILL.md` : socle commun back-front (contrat OpenAPI, erreurs RFC 9457, formats, pagination, sécurité, traçabilité, accessibilité, événements temps réel par WebSocket STOMP), inclus à une version épinglée, 1.1.0 ;
 - `references/java.md` et `references/angular.md` : points d'entrée des experts Java et Angular. Ce sont des **référentiels** : l'IA y lit les versions cibles et les invariants que tout code produit doit respecter, sans adopter leur mode de travail ;
 - `modules/qualification/SKILL.md` : dimension D11, la qualification de chaque ticket à son ouverture : modèle générique de la demande, questions complémentaires, méso-contrat confirmé avant tout le reste ;
-- `modules/referentiel/SKILL.md` : dimension D10, le référentiel des méso-contrats : modèle générique de la demande, catégories de tickets, options au choix par couche, analyse des images de l'objectif, modèle à installer dans le projet ;
+- `modules/referentiel/SKILL.md` : dimension D10, le référentiel des méso-contrats : modèle générique de la demande, catégories de tickets (dont M04, variante de représentation d'une ressource), options au choix par couche et leurs paramètres, analyse des images de l'objectif, modèle à installer dans le projet ;
 - `modules/mesure/SKILL.md` : dimension réservée D9, à lire seulement pour comprendre le point d'extension E1.
 
 Ordre de lecture au premier lancement : ce document en entier ; la copie du projet du fichier d'invariants ; `modules/qualification/SKILL.md` ; `modules/referentiel/SKILL.md` ; `socle/SKILL.md` ; les sections « Versions cibles » et « Invariants » des deux référentiels. Aux lancements suivants, ce document et la copie du projet suffisent ; les modules `qualification` et `referentiel`, et le référentiel du projet, se lisent à l'ouverture et à l'analyse de chaque ticket, le socle et les référentiels quand un ticket touche leur domaine.
@@ -521,7 +521,7 @@ Une contradiction entre deux niveaux se signale et s'inscrit au registre des éc
 
 ## 12. Registre des dimensions
 
-| ID | Dimension | Introduite | Statut 3.3.0 | Dépend de | Où |
+| ID | Dimension | Introduite | Statut 3.4.0 | Dépend de | Où |
 |---|---|---|---|---|---|
 | D1 | Ontologie : cycle 7E, profondeurs du CRI, concepts paramétrables | 3.1 | active | | `SKILL.md`, § 1 |
 | D2 | Configuration : matrice d'activation, modes de modulation, choix du démarrage | 3.1 | active | D1 | § 2, § 7.1, § 11.4 |
@@ -539,13 +539,17 @@ La méthode tient en un seul fichier pour se charger au démarrage : D1 à D7 so
 
 ## 13. Contrat de version et points d'extension
 
-Le skill suit le contrat de version de `EVOLUTION.md` du dépôt Agent2Prompt. La version 3.0.0, remise par le développeur, est archivée telle quelle avec son fichier d'invariants (`archives/`), comme les versions 3.1.0, 3.2.0 et 3.2.1 et le modèle de référentiel remis en 2.0.0. Le socle et les deux référentiels sont épinglés dans `manifest.json`.
+Le skill suit le contrat de version de `EVOLUTION.md` du dépôt Agent2Prompt. La version 3.0.0, remise par le développeur, est archivée telle quelle avec son fichier d'invariants (`archives/`), comme les versions 3.1.0, 3.2.0, 3.2.1 et 3.3.0 et le modèle de référentiel remis en 2.0.0. Le socle et les deux référentiels sont épinglés dans `manifest.json`.
 
 Points d'extension, actifs dès 3.1.0 :
 
 - **E1** : chaque fiche consigne la configuration retenue et les indicateurs Q, R, T, C, A avec leur calcul ; la campagne de mesure (D9) les agrégera sans réécrire de fiche.
 - **E2** : un adaptateur de stack est la colonne « Adaptateur par défaut » du § 1.1, le fichier d'invariants du projet, les référentiels de la stack, et les technologies et options du référentiel des méso-contrats ; une autre stack s'ajoute par d'autres fichiers de ce type, sans changer D1 à D7.
 - **E3** : le registre des concepts porte `schemaVersion` ; un registre partagé entre projets pourra le lire sans conversion.
+
+Point d'extension, actif dès 3.4.0 :
+
+- **E4** : une option du référentiel peut déclarer des paramètres au choix par ticket (`parametres`), chacun avec ses valeurs, et un méso-contrat les possibilités sans lesquelles il ne convient pas (`possibilites_requises`). Un mécanisme de plus, comme un en-tête de version pour la sélection d'une variante, s'ajoute en valeur d'un paramètre, sans toucher aux autres options ni aux tickets déjà instanciés.
 
 ## 14. Invariants
 
@@ -601,6 +605,7 @@ Points d'extension, actifs dès 3.1.0 :
 - **D10.INV-3** : chaque option retenue apporte aux tests déduits les preuves que le référentiel lui associe, reliées à un critère ou à un risque.
 - **D10.INV-4** : une option front qui désigne une image PNG de l'objectif et en demande l'analyse donne lieu à `analyse-image.md`, rédigée avant la fiche et validée avec elle ; chaque élément de l'image y est rattaché à une option ou posé en question, et les tailles et couleurs lues sur l'image y sont des estimations.
 - **D10.INV-5** : `ticket.toml` épingle la version du référentiel qu'il suit ; l'IA ne modifie jamais le référentiel du projet : une catégorie ou une option nouvelle se propose au développeur, qui seul l'ajoute.
+- **D10.INV-6** : une variante de représentation laisse la réponse actuelle de l'opération inchangée pour toute requête qui ne la sélectionne pas ; le champ retiré est absent de la variante, et non pas `null` ; la date-heure qui le résume suit le format Instant du socle et se calcule en base sans charger les éléments ; le remplacement de la réponse actuelle n'est retenu que pour une opération dont la version d'API n'est pas publiée, sinon il est refusé avec la règle du socle (SC1.INV-2).
 
 **D11 : qualification de la demande**
 
@@ -634,11 +639,13 @@ Rejoués avec le développeur à l'installation, puis à chaque version du skill
 | R16 | Ouverture du ticket fil rouge ; le ticket ne dit pas s'il faut ajouter un endpoint | avant de lire le code, l'IA remplit la demande depuis le ticket, chaque réponse sourcée ; elle propose M01, seul à couvrir persistance, backend et frontend, M02 et M03 écartés par l'empreinte ; une question, sur l'endpoint ; rien d'autre avant la confirmation ; `ticket.toml` reçoit la demande, la réponse du développeur et M01 confirmé | D11.INV-1, D11.INV-2, D11.INV-3, D11.INV-4 |
 | R17 | « Afficher la date de dernière mise à jour sur l'écran de détail », sans dire si la date est stockée et exposée | `ecran_modifie` à `oui` ; `colonne`, `lecture` et `endpoint_modifie` à `inconnu` ; M01 ou M03 selon la réponse ; l'IA pose la question et ne propose de méso-contrat qu'après la réponse | D11.INV-2, D11.INV-3 |
 | R18 | Installation dans une application qui a des traitements par lots et des exports de fichiers | d'après l'analyse de l'application, l'IA propose les possibilités du modèle qui s'appliquent, avec leurs repères, et deux possibilités nouvelles, un traitement par lots et un export, chacune rattachée à une couche et à une option ; elle n'écrit pas le référentiel, le développeur les ajoute | D11.INV-5, D10.INV-5 |
+| R19 | Ticket `ABCDE-3620` : depuis l'URI `/api/v1/commandes/{id}`, une variante de `CommandeDto` sans le champ `lignes`, une liste de records, et à la même URI une variante où `lignes` est remplacé par la date-heure de la dernière ligne enregistrée ; la liste, servie par son URI existante, est mise à jour en temps réel | qualification : `variante_representation`, `temps_reel`, `endpoint_modifie` et `lecture` à `oui` ; M04 proposé, M01, M02 et M03 écartés par l'empreinte et les possibilités requises ; quatre questions posées ensemble (sélection, exposition de la variante sans champ, date-heure stockée, front), le courtier pris dans le fichier d'invariants du projet ; après confirmation, repérage depuis l'URI dans `ticket.toml`, URI existante de la liste comprise ; tests déduits : champ absent, réponse actuelle inchangée sans `vue`, date-heure ISO 8601 avec fuseau, `null` pour une commande sans ligne, une seule requête d'agrégat, canal au contrat AsyncAPI, aucun événement pour une transaction annulée, reprise après déconnexion par l'`ETag` de la liste, abonnement refusé sans droit de lecture, annonce `aria-live`, date-heure du résumé recalculée après une suppression | D11.INV-2, D11.INV-3, D10.INV-2, D10.INV-3, D10.INV-6, SC7.INV-1, SC7.INV-3, SC7.INV-4, SC7.INV-5 |
+| R20 | Même ticket ; le développeur choisit le remplacement de la réponse actuelle, alors que `/api/v1` est publiée | refus, avec la règle du socle (SC1.INV-2) : retirer un champ d'une version publiée est cassant ; l'IA propose le paramètre de vue ou la négociation de contenu, ou une version `v2` qui n'est plus la même URI, et attend la décision ; rien n'est écrit dans `ticket.toml` avant | D10.INV-6, D8.INV-2 |
 
 Critères d'acceptation du skill :
 
-- R1 à R18 rejoués avec le développeur, à l'installation et à chaque version ;
-- le modèle du référentiel se lit en TOML, sa commande d'extraction redonne l'empreinte publiée, et l'exemple d'instance respecte ses règles de validation ;
+- R1 à R20 rejoués avec le développeur, à l'installation et à chaque version ;
+- le modèle du référentiel se lit en TOML, sa commande d'extraction redonne l'empreinte publiée, et les exemples d'instance respectent ses règles de validation ;
 - les exemples de branches et de commits de ce skill passent les hooks du kit `agents-paralleles-gitlab` (vérifié à la publication, section 16) ;
 - `docs/c7e/concepts.json` est un JSON valide, de `schemaVersion` 1.
 
@@ -756,6 +763,31 @@ Vérifications faites à la publication de la 3.3.0 :
 - l'exemple d'instance respecte les douze règles de validation, et quatorze écarts introduits volontairement sont tous rejetés, dont six sur la qualification ;
 - la règle de choix, appliquée à six demandes types, retient M01 pour le ticket fil rouge et pour un écran de saisie nouveau avec sa table et son API, M02 pour un index seul, M03 pour un libellé d'écran, et M03 ou M01 pour la date de dernière mise à jour, selon qu'elle est déjà exposée ou non.
 
+### Variante de représentation d'une ressource, en 3.4.0
+
+Demande du développeur, le 1er novembre 2026, un deuxième exemple de méso-contrat après le CRUD en base, son endpoint Java et sa lecture depuis le front : « Trouver le endpoint d'une URI avec le type de donnée ; sa composition contient un champ avec une liste ou un record. Réaliser une variante de ce type avec ce champ en moins. Réaliser une variante avec la même URI où ce champ ne sera pas intégré ; les informations le concernant seront uniquement la date et l'heure du dernier enregistrement. » Le mécanisme de sélection à la même URI et l'exposition de la variante sans champ sont, à sa demande, au choix par ticket. Il a complété : le champ, une liste de records appelée au travers d'une URI existante, devra être mis à jour en temps réel. Il a retenu la liste et la date-heure du résumé, par WebSocket STOMP, et l'activation de la dimension SC7 du socle, qui réservait les canaux asynchrones.
+
+| En 3.3.0 | En 3.4.0 | Invariant ou section |
+|---|---|---|
+| aucune catégorie ne convient : la demande touche Java à coup sûr, PostgreSQL et Angular seulement selon le ticket, alors que M01 exige les trois couches, M02 exclut le front et M03 le back | M04, `VARIANTE_REPRESENTATION` : backend requis, persistance et frontend optionnels | module `referentiel`, § 6 |
+| aucune possibilité pour une variante de la réponse | `variante_representation`, couche backend, option `representations` ; `lecture` étendue aux projections et agrégats ; seize possibilités | module `qualification`, § 2 |
+| la règle de choix ne regarde que l'empreinte : un ticket qui modifie un endpoint et un écran conviendrait aussi à M04 | possibilités requises d'un méso-contrat ; M04 requiert `variante_representation`, et R17 donne toujours M01 ou M03 | E4, module `qualification`, § 2 |
+| aucune valeur d'option au choix par ticket, hors les opérations CRUD | paramètres d'option : mécanisme de sélection (`parametre_vue`, `negociation_contenu`, `remplacement`) et exposition de la variante sans champ (`base`, `meme_uri`, `uri_propre`), demandés à la qualification si le ticket ne les dit pas | E4, D10.INV-6 |
+| rien n'empêchait de retirer un champ d'une réponse publiée | réponse actuelle inchangée sans sélection ; remplacement refusé pour une version publiée, avec la règle du socle | D10.INV-6, R20 |
+| socle 1.0.1 : tout canal asynchrone est un écart | socle 1.1.0 épinglé, SC7 active : WebSocket STOMP, contrat AsyncAPI, CloudEvents, publication après commit, reprise par instantané et `ETag` ; possibilité `temps_reel` et option `evenements`, permise par M04 ; courtier nommé dans le fichier d'invariants du projet | socle, SC7 ; module `referentiel`, § 6 ; `meso-contrats.md`, § 2 |
+
+Le modèle du référentiel passe en 3.2.0, avec trois règles de validation de plus. Un référentiel installé avant reçoit M04, les deux options, les deux possibilités et la règle de choix de la main du développeur ; d'ici là, un ticket de ce type se signale sans catégorie. Seul M04 permet l'option `evenements` : un ticket temps réel sans variante de représentation ne trouve pas encore de catégorie, et se signale.
+
+Les autres skills qui incluent le socle gardent la 1.0.1, prise dans ses archives : l'outil d'assemblage prend désormais un fichier partagé à sa version épinglée, courante ou archivée. Chacun montera quand il le décidera.
+
+Vérifications faites à la publication de la 3.4.0 :
+
+- le modèle du référentiel se lit en TOML ; ses dix-sept possibilités et les options de ses quatre méso-contrats n'engagent que des couches et des options du catalogue ;
+- la commande d'extraction redonne le fichier et sa nouvelle empreinte ;
+- les deux exemples d'instance respectent les quinze règles de validation, et dix écarts introduits volontairement dans l'exemple M04 sont tous rejetés : sélection hors catalogue, exposition absente, remplacement sur une version publiée, `variante_representation` à `non`, M01 à la place de M04, aucune option backend, réponse sans source, courtier hors catalogue, événements sans canal, `temps_reel` sans source ; le remplacement sur une version non publiée est accepté ;
+- la règle de choix, appliquée à treize demandes types, retient toujours les mêmes catégories pour les six demandes de la 3.3.0 (M01, M02, M03, et M01 ou M03 pour R17), M04 pour les six variantes de représentation (seule, avec un agrégat, avec un front consommateur, avec une colonne de date à créer, avec une URI propre, en temps réel) et aucune catégorie pour le temps réel sans variante ;
+- les transmissions des autres skills qui incluent le socle restent fidèles, avec la 1.0.1 prise dans ses archives.
+
 ## 17. Journal de révision
 
 **3.0.0** : version remise par le développeur le 31 octobre 2026, hors dépôt, avec son fichier `meso-contrats.md`. Archives : `archives/SKILL-v3.0.0.md` et `archives/meso-contrats-v3.0.0.md`.
@@ -767,3 +799,5 @@ Vérifications faites à la publication de la 3.3.0 :
 **3.2.1** (2026-11-01) : correctif de l'installation (section 16). Le skill est masqué à Git et reste lisible par l'IA locale : exclusion locale et négations dans `.geminiignore`, une par niveau de dossier, car l'outil de lecture de Gemini CLI refuse les fichiers qu'exclut `.git/info/exclude` d'un clone ordinaire. Installateur du dépôt Agent2Prompt reconnu par la consigne ; confiance des dossiers ; scénario R15. Invariants inchangés. Archive : `archives/SKILL-v3.2.0.md`.
 
 **3.3.0** (2026-11-01) : dimension D11 active, la qualification de la demande (section 16). À l'ouverture de chaque ticket, avant tout le reste, la demande du ticket est rangée dans le modèle générique de la demande du référentiel, une combinaison de possibilités de modification de l'application établies à son analyse ; les questions que le ticket laisse ouvertes sont posées au développeur ; le méso-contrat que retient la règle de choix est confirmé avant l'analyse. Module `qualification` ; modèle du référentiel 3.1.0, avec la section 0, quinze possibilités pour la pile PostgreSQL, Java et Angular, `[ticket.demande]` et quatre règles de validation de plus. Invariants D11.INV-1 à D11.INV-5 ; D10.INV-1 renforcé ; trente et un invariants. Scénarios R16 à R18, R13 revu. Archive : `archives/SKILL-v3.2.1.md`.
+
+**3.4.0** (2026-11-01) : point d'extension E4, les paramètres d'option au choix par ticket et les possibilités requises d'un méso-contrat (section 16). Catégorie M04, variante de représentation d'une ressource : depuis l'URI d'une opération, une variante de son type de réponse sans un champ liste ou record, et une variante à la même URI où ce champ est remplacé par la date-heure de son dernier enregistrement ; le champ, servi par son URI existante, et la date-heure tenus à jour en temps réel. Option `representations` avec ses paramètres (mécanisme de sélection, exposition de la variante sans champ) et ses preuves ; option `evenements` (WebSocket STOMP, courtier simple ou relais) ; possibilités `variante_representation` et `temps_reel` ; modèle du référentiel 3.2.0, dix-sept possibilités, quinze règles de validation ; second exemple d'instance. Socle back-front 1.1.0 épinglé, SC7 active ; fichier d'invariants du projet complété (événements temps réel, courtier). Invariant D10.INV-6 ; trente-deux invariants. Scénarios R19 et R20. Archive : `archives/SKILL-v3.3.0.md`.
