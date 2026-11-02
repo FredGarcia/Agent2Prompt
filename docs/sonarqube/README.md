@@ -1,9 +1,10 @@
 # Règles et tests SonarQube : Java, JavaScript et TypeScript
 
-Ce dossier accompagne le skill [`sonarqube`](../../specs/sonarqube/SKILL.md) 1.1.0. Il énumère les règles que SonarQube applique au code Java et au code JavaScript / TypeScript, et les scénarios qui vérifient l'interface de pilotage de l'expert.
+Ce dossier accompagne le skill [`sonarqube`](../../specs/sonarqube/SKILL.md) 1.1.0, dont le [mode d'emploi](mode-emploi.md) explique l'installation et les missions. Il énumère les règles que SonarQube applique au code Java et au code JavaScript / TypeScript, et les scénarios qui vérifient l'interface de pilotage de l'expert.
 
 | Fichier | Contenu | Lignes |
 |---|---|---|
+| [`mode-emploi.md`](mode-emploi.md) | installer et utiliser l'expert SonarQube | |
 | [`regles-java.csv`](regles-java.csv) | toutes les règles de l'analyseur Java | 780 |
 | [`regles-javascript-typescript.csv`](regles-javascript-typescript.csv) | toutes les règles de l'analyseur JavaScript / TypeScript | 583 |
 | [`tests-pilote.csv`](tests-pilote.csv) | scénarios de recette du pilote, simulés et réels, par langage | 31 |
