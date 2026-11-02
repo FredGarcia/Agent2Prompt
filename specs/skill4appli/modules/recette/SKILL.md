@@ -96,7 +96,7 @@ Le dépôt Agent2Prompt rejoue la recette à chaque pull request et à chaque pu
 
 <!-- fichier : tests/app_db.test.mjs -->
 ```js
-// Recette de skill4appli 1.1.0 : un test par scénario, rattaché à son invariant, sous Linux, WSL2 et Windows.
+// Recette de skill4appli 1.1.1 : un test par scénario, rattaché à son invariant, sous Linux, WSL2 et Windows.
 // Usage, depuis le dossier du skill : node --test tests/app_db.test.mjs
 // Node 22.13 ou plus récent, git 2.38 ou plus récent ; chaque test travaille dans un dépôt temporaire.
 

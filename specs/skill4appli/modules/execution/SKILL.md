@@ -107,7 +107,7 @@ appli/                              worktree source, clone ordinaire
 
 - SQLite par `node:sqlite`, en mode WAL (`synchronous = NORMAL`, `busy_timeout` de 5 s) : les lecteurs lisent pendant que le watcher écrit.
 - `PRAGMA user_version` compte les migrations appliquées. La migration 1 crée `app_metadata`, `app_structure` (et son index sur `lang`), l'index plein texte `app_fts` et ses trois déclencheurs, `git_branches` et `branch_files`. Elle ne sera jamais modifiée : une version suivante ajoute la migration 2.
-- La version 1.1.0 n'ajoute aucune migration : une base créée par la 1.0.0 est lue et écrite telle quelle.
+- Les versions 1.1.0 et 1.1.1 n'ajoutent aucune migration : une base créée par la 1.0.0 est lue et écrite telle quelle.
 - Une base sans numéro de schéma qui contient les tables de la version d'origine est reconstruite : la base est un cache, entièrement dérivable du dépôt.
 - Une base dont le numéro dépasse celui du script est refusée (code 2) : elle a été créée par une version plus récente.
 - Les commandes de lecture ouvrent la base en lecture seule et ne migrent jamais : une base au schéma ancien leur rend le code 2, et `ingest` ou `watch --once` la migrent.
@@ -138,14 +138,14 @@ Trois fichiers sont tirés des blocs annotés `<!-- fichier : chemin -->` des mo
 
 | Fichier | Module, section | Empreinte sha256 |
 |---|---|---|
-| `scripts/app_db.mjs` | `execution`, § 10 | `9e975d2e5e4a87848ee616c6646ca1418679cde5359ffa9d23901a0212b7a505` |
-| `tests/app_db.test.mjs` | `recette`, § 5 | `b7e2b40aebbb05307db86d29e304e5414816785bba44ac430afa6a072d7ce763` |
-| `agent/memoire-appli.md` | `agent`, § 7 | `1d0cc2bed235a4ad6357dd1d41d98028953898dc9fcd42d87edf890dd62d5006` |
+| `scripts/app_db.mjs` | `execution`, § 10 | `bf84189afda6482b47950be5dfccd322b5de08428b2b8936901376bd6e89970d` |
+| `tests/app_db.test.mjs` | `recette`, § 5 | `b33d8c577073e02a66ab6994a2a984dbae5cdf68cf77c1d20589a0766e226822` |
+| `agent/memoire-appli.md` | `agent`, § 7 | `560b977e4df599f7c0bfff14b74005ce79ba0dbbc6c133502f425dfd235175e7` |
 
 Depuis le dossier du skill, cette commande d'une ligne écrit les trois fichiers, compare leurs empreintes à celles du tableau et sort avec le code 1 au moindre écart. Elle ne contient ni `$`, ni accent grave, ni `!`, ni `%`, ni guillemet intérieur : elle se colle telle quelle dans bash, zsh, CMD ou PowerShell, et dans un fichier `.cmd`. Elle lit aussi des modules aux fins de ligne CRLF.
 
 ```text
-node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'scripts/app_db.mjs': '9e975d2e5e4a87848ee616c6646ca1418679cde5359ffa9d23901a0212b7a505', 'tests/app_db.test.mjs': 'b7e2b40aebbb05307db86d29e304e5414816785bba44ac430afa6a072d7ce763', 'agent/memoire-appli.md': '1d0cc2bed235a4ad6357dd1d41d98028953898dc9fcd42d87edf890dd62d5006' }; let ecarts = 0; for (const module of ['modules/execution/SKILL.md', 'modules/recette/SKILL.md', 'modules/agent/SKILL.md']) { const texte = fs.readFileSync(module, 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (conforme === false) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } } if (ecarts > 0) process.exitCode = 1;"
+node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'scripts/app_db.mjs': 'bf84189afda6482b47950be5dfccd322b5de08428b2b8936901376bd6e89970d', 'tests/app_db.test.mjs': 'b33d8c577073e02a66ab6994a2a984dbae5cdf68cf77c1d20589a0766e226822', 'agent/memoire-appli.md': '560b977e4df599f7c0bfff14b74005ce79ba0dbbc6c133502f425dfd235175e7' }; let ecarts = 0; for (const module of ['modules/execution/SKILL.md', 'modules/recette/SKILL.md', 'modules/agent/SKILL.md']) { const texte = fs.readFileSync(module, 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (conforme === false) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } } if (ecarts > 0) process.exitCode = 1;"
 ```
 
 Puis la recette, depuis le même dossier :
@@ -159,7 +159,7 @@ node --test tests/app_db.test.mjs
 <!-- fichier : scripts/app_db.mjs -->
 ```js
 #!/usr/bin/env node
-// skill4appli 1.1.0 : mémoire SQLite d'une application locale, de ses branches git,
+// skill4appli 1.1.1 : mémoire SQLite d'une application locale, de ses branches git,
 // et watcher de la branche courante chargée dans un worktree dédié.
 // Usage : node scripts/app_db.mjs <commande> [options]   (aide : --help)
 // Node 22.13 ou plus récent, modules natifs uniquement. Aucune commande externe ne passe par un shell.
@@ -173,7 +173,7 @@ import { basename, dirname, isAbsolute, join, relative, resolve, sep } from 'nod
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 
-export const VERSION = '1.1.0';
+export const VERSION = '1.1.1';
 export const CODES = { OK: 0, USAGE: 1, BASE: 2, GIT: 3, CONFLIT: 4, ENVIRONNEMENT: 5, PAS_A_JOUR: 6, MIROIR_MODIFIE: 7 };
 const TAILLE_MAX = 1024 * 1024;
 const LIMITE_LISTES = 50;

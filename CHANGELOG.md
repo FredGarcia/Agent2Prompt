@@ -4,6 +4,17 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-11-02 : orchestrateur-c7e 3.5.1, agent2dev 1.1.1, skill4appli 1.1.1, capture-sprint-jira 1.2.2
+
+- Correctifs, à la demande du développeur : les mentions d'outils d'IA autres que Gemini sont retirées de tout ce que l'IA locale lit, pour que Gemini CLI ne reçoive que des consignes qui le concernent. Aucune transmission courante n'en contient plus ; les archives et les transmissions publiées restent telles quelles.
+  - **orchestrateur-c7e 3.5.1** : cible du manifeste « Gemini CLI ou équivalent » ; le § 11.4 décrit tout autre outil sans le nommer.
+  - **agent2dev 1.1.1** : dans la filiation, les moteurs d'un fournisseur commercial sont désignés sans leur nom ; exemples du journal à la version 1.1.1.
+  - **skill4appli 1.1.1** : l'agent `memoire-appli` s'installe comme sous-agent d'un outil qui en accepte, ou comme consigne système, Gemini CLI compris ; le script et l'agent portent la version ; nouvelles empreintes.
+  - **capture-sprint-jira 1.2.2** : l'agent `capteur-sprint` s'installe dans Gemini CLI par GeminiBoard, comme sous-agent d'un autre outil, ou comme consigne système ; `package.json`, `package-lock.json` et l'agent portent la version ; nouvelles empreintes.
+- Modes d'emploi : les prérequis disent « Gemini CLI ou équivalent ».
+- Vérifications : recette de skill4appli 1.1.1, 34 tests réussis ; recette de capture-sprint-jira 1.2.2 sous xvfb avec Chrome, 132 contrôles réussis ; extractions conformes aux nouvelles empreintes ; vérificateur, glossaire, transmissions et recette de l'installateur à jour.
+- Constat qui a motivé la demande : les quatre transmissions refusées par l'installateur sur le poste du développeur (« empreinte fausse ») étaient exactement celles dont un fichier mentionnait un autre outil ; le zip publié était intact.
+
 ### 2026-11-01 : orchestrateur-c7e 3.5.0
 
 - **orchestrateur-c7e 3.5.0** : composition de méso-contrats, à la demande du développeur : « Il peut y avoir plusieurs méso-contrats. »

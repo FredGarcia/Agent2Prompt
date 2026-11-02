@@ -27,7 +27,7 @@ flowchart LR
 
 ## 1. Prérequis
 
-- Une IA locale qui lit et écrit les fichiers du projet : Gemini CLI, Claude Code ou équivalent.
+- Une IA locale qui lit et écrit les fichiers du projet : Gemini CLI ou équivalent.
 - Une instance SonarQube Server 2026.x, édition Developer ou supérieure, et un **jeton utilisateur**.
 - Pour l'analyse éphémère : le scanner du projet (Maven pour le back, `@sonar/scan` avec Node.js 22 pour le front) et les permissions Execute Analysis et Administer sur le projet.
 - Pour le moteur SonarLint : SonarQube for IDE en mode connecté, et Docker pour le serveur MCP de Sonar.

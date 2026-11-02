@@ -17,7 +17,7 @@ flowchart LR
 
 ## 1. Prérequis
 
-- Une IA locale qui lit, écrit et exécute dans le projet : Gemini CLI, Claude Code ou équivalent.
+- Une IA locale qui lit, écrit et exécute dans le projet : Gemini CLI ou équivalent.
 - Le code du back (Java 21, Spring Boot 3.5) et du front (Angular 20), avec leurs outils de build et de test.
 - La demande Jira enregistrée en MHTML **après avoir déplié tous les commentaires** : depuis Chrome, « Enregistrer sous », page Web, fichier unique. Pour tout un sprint, [`capture-sprint-jira`](../capture-sprint-jira/mode-emploi.md) le fait pour vous.
 - La transmission : [`transmissions/agent-tdd-jira-1.3.2.md`](../../transmissions/agent-tdd-jira-1.3.2.md), ou un clone d'Agent2Prompt.

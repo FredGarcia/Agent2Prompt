@@ -1,10 +1,10 @@
 ---
 name: orchestrateur-c7e
 description: Orchestrateur fractal C7E, qui pilote la résolution d'un ticket full-stack comme la transformation maîtrisée d'un système vivant (cycle de l'Axiome 7E, déclinaison récursive imbriquée sur quatre profondeurs, concepts paramétrables, qualification de chaque ticket à son ouverture par un modèle générique de la demande et des questions, méso-contrat principal et compléments confirmés avant tout le reste, options par couche rattachées au méso-contrat qui les permet et leurs paramètres au choix par ticket, variantes de représentation d'une ressource et leur mise à jour en temps réel, analyse des images PNG de l'objectif, fiche de transformation validée avant toute modification, tests déduits des risques, traçabilité Git compatible avec le kit des agents parallèles, boucle de second ordre bornée par un registre, valeur annoncée comme une hypothèse tant qu'elle n'est pas mesurée), avec le fichier des invariants du projet, meso-contrats. Adaptateur par défaut Java, Spring Boot, PostgreSQL, Liquibase et Angular. À activer au démarrage de l'IA locale, sur choix du développeur, pour les tickets qu'il lui confie.
-version: 3.5.0
+version: 3.5.1
 ---
 
-# Orchestrateur fractal C7E, version 3.5.0
+# Orchestrateur fractal C7E, version 3.5.1
 
 Ce document est le point d'entrée du skill et contient la méthode. Il s'active au démarrage de l'IA locale, sur choix du développeur (§ 11.4), avec le fichier des invariants du projet, copie remplie du modèle `meso-contrats.md`. Ces deux fichiers suffisent au démarrage ; le référentiel des méso-contrats se lit à l'ouverture de chaque ticket, pour le qualifier, puis à son analyse, et les autres fichiers quand un ticket touche leur domaine.
 
@@ -501,7 +501,7 @@ Ticket, et méso-contrats imposés s'ils sont précisés, le principal d'abord :
 - **Commandes de Gemini CLI** : elles injectent les `@{…}` en respectant les exclusions de Git et `.geminiignore`. Le skill passe par son activation, jamais par une injection : Gemini CLI livre alors ce document et la liste des fichiers du skill, que l'IA lit ensuite, d'où les négations du § 11.3 ; les fichiers de `docs/c7e/` et les images de l'objectif, versionnés, s'injectent.
 - **Confiance des dossiers** : quand elle est activée dans Gemini CLI, les skills du workspace ne se chargent que dans un dossier de confiance ; ceux du niveau utilisateur, toujours.
 - **Vérifications** : `/memory show` affiche le fichier de démarrage, `/skills list` le skill, `/commands list` la commande ; après une modification, `/memory reload`, `/skills reload` ou `/commands reload`.
-- **Claude Code** lit `CLAUDE.md` et y importe de même les fichiers désignés par `@chemin`.
+- **Autre IA locale** : un outil qui lit un fichier de contexte à son démarrage et en développe les imports `@chemin` s'emploie de la même façon, avec le nom de fichier qu'il attend.
 - **Kit `agents-paralleles-gitlab`** : en chargement permanent, le fichier de démarrage se pose à la racine du kit, dossier parent des worktrees, que Gemini CLI lit aussi ; il importe `@./.skills/orchestrateur-c7e/SKILL.md` et `@./main/docs/c7e/meso-contrats.md`, la copie du worktree de référence, jamais celle d'une demande en cours. En chargement au choix, le skill et la commande vont au niveau utilisateur, `~/.gemini/skills/` et `~/.gemini/commands/` : une installation sert tous les worktrees, et les chemins `docs/c7e/…` se lisent dans le worktree où Gemini CLI est lancé.
 - **Lancement sans interface**, par un outil qui relance Gemini CLI à chaque message : l'outil retient le choix et le rejoue à chaque appel, la confirmation d'activation supposant une interface.
 
@@ -521,7 +521,7 @@ Une contradiction entre deux niveaux se signale et s'inscrit au registre des éc
 
 ## 12. Registre des dimensions
 
-| ID | Dimension | Introduite | Statut 3.5.0 | Dépend de | Où |
+| ID | Dimension | Introduite | Statut 3.5.1 | Dépend de | Où |
 |---|---|---|---|---|---|
 | D1 | Ontologie : cycle 7E, profondeurs du CRI, concepts paramétrables | 3.1 | active | | `SKILL.md`, § 1 |
 | D2 | Configuration : matrice d'activation, modes de modulation, choix du démarrage | 3.1 | active | D1 | § 2, § 7.1, § 11.4 |
@@ -539,7 +539,7 @@ La méthode tient en un seul fichier pour se charger au démarrage : D1 à D7 so
 
 ## 13. Contrat de version et points d'extension
 
-Le skill suit le contrat de version de `EVOLUTION.md` du dépôt Agent2Prompt. La version 3.0.0, remise par le développeur, est archivée telle quelle avec son fichier d'invariants (`archives/`), comme les versions 3.1.0, 3.2.0, 3.2.1, 3.3.0 et 3.4.0 et le modèle de référentiel remis en 2.0.0. Le socle et les deux référentiels sont épinglés dans `manifest.json`.
+Le skill suit le contrat de version de `EVOLUTION.md` du dépôt Agent2Prompt. La version 3.0.0, remise par le développeur, est archivée telle quelle avec son fichier d'invariants (`archives/`), comme les versions 3.1.0, 3.2.0, 3.2.1, 3.3.0, 3.4.0 et 3.5.0 et le modèle de référentiel remis en 2.0.0. Le socle et les deux référentiels sont épinglés dans `manifest.json`.
 
 Points d'extension, actifs dès 3.1.0 :
 
@@ -829,3 +829,5 @@ Vérifications faites à la publication de la 3.5.0 :
 **3.4.0** (2026-11-01) : point d'extension E4, les paramètres d'option au choix par ticket et les possibilités requises d'un méso-contrat (section 16). Catégorie M04, variante de représentation d'une ressource : depuis l'URI d'une opération, une variante de son type de réponse sans un champ liste ou record, et une variante à la même URI où ce champ est remplacé par la date-heure de son dernier enregistrement ; le champ, servi par son URI existante, et la date-heure tenus à jour en temps réel. Option `representations` avec ses paramètres (mécanisme de sélection, exposition de la variante sans champ) et ses preuves ; option `evenements` (WebSocket STOMP, courtier simple ou relais) ; possibilités `variante_representation` et `temps_reel` ; modèle du référentiel 3.2.0, dix-sept possibilités, quinze règles de validation ; second exemple d'instance. Socle back-front 1.1.0 épinglé, SC7 active ; fichier d'invariants du projet complété (événements temps réel, courtier). Invariant D10.INV-6 ; trente-deux invariants. Scénarios R19 et R20. Archive : `archives/SKILL-v3.3.0.md`.
 
 **3.5.0** (2026-11-01) : point d'extension E5, la composition de méso-contrats (section 16). Un ticket engage un méso-contrat principal, qui porte le plus de sa demande, et au besoin des compléments, en plus petit nombre, pour les possibilités qu'il ne porte pas ; chaque option est rattachée au méso-contrat qui la permet, et une couche à l'impact `aucun` dans l'un peut être couverte par un autre. Règle de choix et règles de validation réécrites, modèle du référentiel 3.3.0, `complements` dans `ticket.toml`, troisième exemple d'instance ; composition imposée par `/c7e`. D10.INV-1, D10.INV-2, D11.INV-3 et D11.INV-4 remplacés pour la composition ; D11.INV-6 ; trente-trois invariants. Scénarios R21 et R22, R13 revu. Archive : `archives/SKILL-v3.4.0.md`.
+
+**3.5.1** (2026-11-02) : correctif. Les mentions d'IA locales autres que Gemini CLI sont retirées, à la demande du développeur, pour que Gemini CLI ne lise que des consignes qui le concernent : la cible du manifeste devient « Gemini CLI ou équivalent », et le § 11.4 décrit tout autre outil sans le nommer. Aucune dimension ni aucun invariant modifié. Archive : `archives/SKILL-v3.5.0.md`.

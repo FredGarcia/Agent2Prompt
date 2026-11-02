@@ -1,10 +1,10 @@
 ---
 name: capture-sprint-jira
 description: Capture en MHTML des tickets du prochain sprint d'un Jira protégé par un SSO, rangés dans un dossier par catégorie (connexion faite à la main dans le navigateur du poste, profil dédié, relevé des liens de la page du sprint, filtre par préfixe de clé et plage de numéros, une page MHTML par ticket, classement par section de la page du sprint (en-têtes IA et DEV par défaut), dossier « à classer », capture d'un ticket seul par son adresse, rapport JSON, interface locale et ligne de commande, agent capteur-sprint, export par l'API REST quand un mot de passe ou un jeton est accepté). À utiliser pour récupérer les tickets d'un sprint avant de les analyser, sans les enregistrer un à un à la main.
-version: 1.2.1
+version: 1.2.2
 ---
 
-# Capture des tickets d'un sprint Jira, version 1.2.1
+# Capture des tickets d'un sprint Jira, version 1.2.2
 
 Ce document est le point d'entrée du skill. Le skill enregistre en MHTML, comme « Enregistrer sous… » de Chrome, chaque ticket du prochain sprint d'un Jira protégé par un SSO, et le range dans le dossier de sa section sur la page du sprint (par défaut `IA` et `DEV`, les en-têtes des deux parties du sprint). Un ticket se capture aussi seul, par son adresse, dans le dossier que choisit le développeur. Le développeur se connecte lui-même dans une fenêtre du navigateur de son poste ; le skill ne voit aucun identifiant. Les fichiers produits sont ceux qu'attend l'ingestion d'`agent-tdd-jira`. Les règles détaillées sont dans `modules/`.
 
@@ -74,7 +74,7 @@ Clause de second ordre : le classement n'est pas neutre. Ce que le skill range d
 
 ## 5. Registre des dimensions
 
-| ID | Dimension | Introduite | Statut 1.2.1 | Dépend de | Module |
+| ID | Dimension | Introduite | Statut 1.2.2 | Dépend de | Module |
 |---|---|---|---|---|---|
 | D1 | Exécution : installation, dépendance, emplacements, réglages | 1.0 | active | | `execution`, `recette` |
 | D2 | Session SSO : connexion à la main, profil dédié | 1.0 | active | D1 | `session`, `recette` |
@@ -216,3 +216,5 @@ Le préfixe, les numéros et l'adresse du Jira du développeur ne figurent dans 
 **1.2.0** (2026-10-28) : capture d'un ticket seul par son adresse. Dimension D12 active, module `ticket`. L'adresse `…/browse/<CLÉ>` est ramenée à sa clé ; la page est attendue et enregistrée comme dans la capture d'un sprint. Le dossier est choisi par le développeur parmi les catégories et `à classer`, proposé d'après le dernier `rapport.json` du dossier de sortie ; la copie d'un autre dossier est retirée, l'entrée du rapport remplacée ou ajoutée ; rien n'est écrit en cas d'erreur ; le navigateur revient à la page d'avant. Interface : section « Un ticket seul » et `POST /api/ticket`, `GET /api/section` ; ligne de commande : `--ticket` et `--dossier` ; agent : protocole du ticket seul. Point d'extension E2 : `captureSingleTicket()` exportée. Recette : scénario R20, R16 et R17 étendus ; 20 scénarios, 130 contrôles ; dix-sept défauts réintroduits, dont M15 à M17 nouveaux.
 
 **1.2.1** (2026-10-28) : correctif, après la recette en CI de la version 1.2.0 fusionnée : sur `ubuntu-latest` Node 22, la capture est restée en cours sur le deuxième ticket après la fermeture du navigateur (R15), et la suite de la recette en a échoué. La capture d'un ticket échoue désormais aussitôt si la page ou le navigateur se ferment, et au plus tard après le délai d'affichage plus deux minutes (D4.INV-4, module `capture`). Le blocage n'a pas été reproduit hors de la CI, en trente fermetures avec Chromium et Chrome : ce correctif rend tout blocage de ce genre impossible, sans en prouver la cause. Recette : deux contrôles en R15, sur un faux onglet qui ne répond plus ; 132 contrôles ; dix-neuf défauts réintroduits, dont M18 et M19 nouveaux.
+
+**1.2.2** (2026-11-02) : correctif. Les mentions d'outils d'IA autres que Gemini sont retirées, à la demande du développeur, pour que l'IA locale ne lise que des consignes qui la concernent : l'agent `capteur-sprint` s'installe dans Gemini CLI par GeminiBoard, comme sous-agent d'un autre outil qui en accepte, ou comme consigne système (module `agent`, § 2) ; l'en-tête de transmission suit. `package.json`, `package-lock.json` et l'agent portent la version 1.2.2 ; nouvelles empreintes au module `execution`, § 8. Code, dimensions et invariants inchangés. Archive : `archives/SKILL-v1.2.1.md`.

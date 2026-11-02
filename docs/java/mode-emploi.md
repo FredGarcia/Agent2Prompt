@@ -17,7 +17,7 @@ flowchart LR
 
 ## 1. Prérequis
 
-- Une IA locale qui lit et écrit les fichiers du projet : Gemini CLI, Claude Code ou équivalent.
+- Une IA locale qui lit et écrit les fichiers du projet : Gemini CLI ou équivalent.
 - Le dépôt du back, avec son wrapper Maven ou Gradle.
 - Docker sur le poste : les tests d'intégration s'appuient sur Testcontainers et PostgreSQL.
 - Pour l'installation automatique : un clone d'Agent2Prompt et Node 20 ou plus récent. À défaut, la transmission seule : [`transmissions/java-1.1.1.md`](../../transmissions/java-1.1.1.md).

@@ -1,6 +1,6 @@
 ---
 name: agent
-description: Agent mémoire memoire-appli (rôle de localisation sans modification du code, installation comme sous-agent Claude Code ou consigne système, appel du script du côté du git qui possède le worktree, par node.exe depuis WSL pour un worktree Windows, protocole fraîcheur puis localisation puis relecture du disque, avertissements relayés, réponse avec instantané et écarts, service aux autres agents, interdits, scénarios A1 à A6, définition complète de l'agent). À lire avant d'installer l'agent ou de le consulter depuis un autre agent.
+description: Agent mémoire memoire-appli (rôle de localisation sans modification du code, installation comme sous-agent d'un outil qui en accepte ou comme consigne système, appel du script du côté du git qui possède le worktree, par node.exe depuis WSL pour un worktree Windows, protocole fraîcheur puis localisation puis relecture du disque, avertissements relayés, réponse avec instantané et écarts, service aux autres agents, interdits, scénarios A1 à A6, définition complète de l'agent). À lire avant d'installer l'agent ou de le consulter depuis un autre agent.
 dimensions: [D7]
 status: active
 ---
@@ -17,8 +17,8 @@ L'agent `memoire-appli` répond aux questions de localisation : où un symbole e
 
 Le fichier `agent/memoire-appli.md` (§ 7) est tiré du skill comme le script (module `execution`, § 9).
 
-- **Claude Code** : copier le fichier dans `.claude/agents/memoire-appli.md` du projet, ou dans `~/.claude/agents/` pour tous les projets. Son en-tête porte les deux champs exigés, `name` et `description`, et limite ses outils (`tools: Bash, Read, Grep, Glob`) : il n'a ni écriture ni édition de fichiers. Sous Windows, Claude Code passe par Git Bash : les chemins s'écrivent indifféremment `C:/dev/projet` ou `C:\dev\projet` entre guillemets simples.
-- **Autre outil** (Gemini Code Assist, modèle local) : le corps du fichier, sous l'en-tête, sert de consigne système à un agent qui dispose d'un shell et d'une lecture de fichiers.
+- **Outil à sous-agents** : copier le fichier dans le dossier des agents de l'outil, celui du projet ou celui de l'utilisateur pour tous les projets. Son en-tête porte les deux champs exigés, `name` et `description`, et limite ses outils (`tools: Bash, Read, Grep, Glob`) : il n'a ni écriture ni édition de fichiers. Si l'outil nomme autrement ses outils, adapter l'en-tête de la copie installée, jamais le fichier du skill. Sous Windows, un outil qui passe par Git Bash accepte indifféremment `C:/dev/projet` ou `C:\dev\projet` entre guillemets simples.
+- **Autre outil** (Gemini CLI, Gemini Code Assist, modèle local) : le corps du fichier, sous l'en-tête, sert de consigne système à un agent qui dispose d'un shell et d'une lecture de fichiers.
 - Le chemin du script, dans le fichier, suppose le skill matérialisé dans `.skills/skill4appli/` à la racine du dépôt, ou dans `../.skills/skill4appli/` depuis un worktree du kit `agents-paralleles-gitlab`. Pour un autre emplacement, adapter la copie installée, jamais le fichier du skill, ou poser `SKILL4APPLI_REPO` dans l'environnement de l'agent.
 - **Agent dans WSL2, code sous Windows** : l'agent appelle le Node de Windows par l'interopérabilité de WSL (`node.exe`, extension comprise), avec des chemins Windows (module `parite`, § 3). Le script lit alors le dépôt avec le git du développeur.
 
@@ -74,7 +74,7 @@ Rejoués avec le développeur à l'installation, puis à chaque version du skill
 ```markdown
 ---
 name: memoire-appli
-description: Agent mémoire d'application du projet (skill skill4appli 1.1.0). À solliciter pour localiser du code, un fichier, une configuration ou l'état des branches git sans parcourir tout le dépôt. Rend des emplacements chemin:ligne avec l'instantané indexé et signale toute fraîcheur douteuse. Ne modifie jamais le code.
+description: Agent mémoire d'application du projet (skill skill4appli 1.1.1). À solliciter pour localiser du code, un fichier, une configuration ou l'état des branches git sans parcourir tout le dépôt. Rend des emplacements chemin:ligne avec l'instantané indexé et signale toute fraîcheur douteuse. Ne modifie jamais le code.
 tools: Bash, Read, Grep, Glob
 ---
 

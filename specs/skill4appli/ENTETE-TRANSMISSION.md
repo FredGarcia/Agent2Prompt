@@ -28,7 +28,7 @@ Lis `SKILL.md`, `manifest.json`, puis les modules actifs dans l'ordre indiqué p
 
 ## Étape 3 : l'agent
 
-Propose au développeur d'installer l'agent `agent/memoire-appli.md` (module `agent`, § 2) : dans `.claude/agents/` pour Claude Code, ou comme consigne système dans son outil. Rejoue avec lui les scénarios A1 à A6 du module `agent` avant que l'agent serve d'autres agents.
+Propose au développeur d'installer l'agent `agent/memoire-appli.md` (module `agent`, § 2) : comme sous-agent, si son outil en accepte, ou comme consigne système dans son outil. Rejoue avec lui les scénarios A1 à A6 du module `agent` avant que l'agent serve d'autres agents.
 
 ## Étape 4 : réglages et première indexation
 

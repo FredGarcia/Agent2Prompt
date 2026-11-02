@@ -47,7 +47,7 @@ Aucun réglage n'est lu dans un fichier : ni `.env`, ni fichier du skill. Un age
 `config` rend, sans rien écrire ni créer, chaque réglage avec sa valeur, sa source et sa variable, les emplacements qui en découlent, la plateforme et ses avertissements (module `parite`) :
 
 ```json
-{"ok":true,"commande":"config","version":"1.1.0",
+{"ok":true,"commande":"config","version":"1.1.1",
  "reglages":{"repo":{"valeur":"C:\\dev\\acme","source":"environnement","variable":"SKILL4APPLI_REPO"},
              "interval":{"valeur":2000,"source":"defaut","variable":"SKILL4APPLI_INTERVAL"}},
  "emplacements":{"source":"C:\\dev\\acme","commun":"C:\\dev\\acme\\.git",

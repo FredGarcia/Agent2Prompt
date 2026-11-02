@@ -15,7 +15,7 @@ status: active
 {
   "n": 2041,
   "horodatage": "2026-10-21T14:02:11.482Z",
-  "specVersion": "1.1.0",
+  "specVersion": "1.1.1",
   "instance": "principale",
   "demande": "ECR-77",
   "correlation": "5d1e…",
@@ -71,7 +71,7 @@ Une seule source, la projection JSON, de format `agent2dev.livrable/1` ; le Mark
 {
   "format": "agent2dev.livrable/1",
   "demande": { "cle": "ECR-77", "titre": "Export des retours d'expérience en CSV", "source": "<sha256 du MHTML>" },
-  "versions": { "specification": "1.1.0", "skill": "agent-tdd-jira 1.3.2", "transmission": "<sha256>", "referentiel": "R-4", "constitution": "<sha256>" },
+  "versions": { "specification": "1.1.1", "skill": "agent-tdd-jira 1.3.2", "transmission": "<sha256>", "referentiel": "R-4", "constitution": "<sha256>" },
   "autorisations": { "ecritureCode": false, "moteurExterne": true },
   "arbre": { "mode": "normal", "branche": "feature/ECR-77-export-csv", "commitDepart": "<sha1>" },
   "scenarios": [

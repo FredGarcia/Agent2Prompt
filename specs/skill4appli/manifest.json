@@ -1,6 +1,6 @@
 {
   "name": "skill4appli",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "specSchema": 1,
   "language": "fr",
   "description": "Mémoire SQLite d'une application locale et de ses branches git pour un agent : inventaire fidèle à git, recherche chemin:ligne, requêtes en lecture seule, fraîcheur mesurée, watcher de la branche courante chargée dans un worktree dédié, configuration par l'environnement, parité Linux, WSL2 et Windows, agent mémoire.",
@@ -28,6 +28,7 @@
   ],
   "extensionPoints": ["E1", "E2", "E3", "E4"],
   "previousVersions": [
-    { "version": "1.0.0", "file": "archives/SKILL-v1.0.0.md" }
+    { "version": "1.0.0", "file": "archives/SKILL-v1.0.0.md" },
+    { "version": "1.1.0", "file": "archives/SKILL-v1.1.0.md" }
   ]
 }

@@ -1,6 +1,6 @@
 # Mode d'emploi : Skill4Appli, la mémoire SQLite d'une application
 
-Ce mode d'emploi installe [`skill4appli`](../../specs/skill4appli/SKILL.md) 1.1.0 : une base SQLite qui indexe une application locale et ses branches git, pour qu'un agent y localise du code (`chemin:ligne`), l'état des branches ou des fichiers, **sans relire tout le dépôt**. Un script Node sans dépendance, une recette de 34 tests et un agent `memoire-appli` sont fournis dans la spécification.
+Ce mode d'emploi installe [`skill4appli`](../../specs/skill4appli/SKILL.md) 1.1.1 : une base SQLite qui indexe une application locale et ses branches git, pour qu'un agent y localise du code (`chemin:ligne`), l'état des branches ou des fichiers, **sans relire tout le dépôt**. Un script Node sans dépendance, une recette de 34 tests et un agent `memoire-appli` sont fournis dans la spécification.
 
 La base localise, le disque fait foi : avant d'affirmer le contenu d'un fichier, l'agent le relit dans le worktree.
 
@@ -16,8 +16,8 @@ flowchart LR
 
 - Node 22.13 ou plus récent (`node:sqlite`), git 2.38 ou plus récent.
 - Linux, WSL2 ou Windows natif.
-- Une IA locale qui exécute des commandes : Gemini CLI, Claude Code ou équivalent.
-- La transmission : [`transmissions/skill4appli-1.1.0.md`](../../transmissions/skill4appli-1.1.0.md).
+- Une IA locale qui exécute des commandes : Gemini CLI ou équivalent.
+- La transmission : [`transmissions/skill4appli-1.1.1.md`](../../transmissions/skill4appli-1.1.1.md).
 
 **Où l'installer** : du côté du git qui possède le dépôt. Si le code et son git sont sous Windows, le skill tourne sous Windows, même si vous travaillez dans WSL ; depuis WSL, on l'appelle alors par `node.exe` avec des chemins Windows.
 
@@ -27,7 +27,7 @@ Collez la transmission dans l'IA. Elle mène quatre étapes :
 
 1. **Matérialiser** : `.skills/skill4appli/` à la racine du dépôt (ou `~/dev/<projet>/.skills/skill4appli/` dans la disposition du kit des agents parallèles, hors des worktrees). Dans un clone ordinaire, elle ajoute `/.skills/` à `.git/info/exclude`.
 2. **Fichiers exécutables** : `scripts/app_db.mjs`, `tests/app_db.test.mjs` et `agent/memoire-appli.md`, tirés des modules par la commande d'extraction du module `execution`, § 9, qui vérifie leurs empreintes ; un `ECART` arrête l'installation. Puis la recette : `node --test tests/app_db.test.mjs`. Attendu : 34 tests passés sous Linux et WSL2 ; 33 passés et 1 sauté sous Windows.
-3. **L'agent** : elle vous propose d'installer `agent/memoire-appli.md`, dans `.claude/agents/` pour Claude Code ou comme consigne système de votre outil, et rejoue avec vous les scénarios A1 à A6.
+3. **L'agent** : elle vous propose d'installer `agent/memoire-appli.md`, comme sous-agent, si votre outil en accepte, ou comme consigne système de votre outil, et rejoue avec vous les scénarios A1 à A6.
 4. **Réglages et première indexation** : `config` montre les réglages effectifs et leur source ; vous choisissez ensuite le mode.
 
 Dans Gemini CLI, `node <Agent2Prompt>/tools/installer.mjs skill4appli` fait l'étape 1 ; demandez ensuite à l'IA de suivre `CONSIGNE.md` à partir de l'étape 1.

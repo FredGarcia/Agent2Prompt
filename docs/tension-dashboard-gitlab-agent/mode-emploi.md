@@ -14,7 +14,7 @@ flowchart LR
 
 ## 1. Prérequis
 
-- Une IA locale qui écrit et exécute du code : Gemini CLI, Claude Code ou équivalent.
+- Une IA locale qui écrit et exécute du code : Gemini CLI ou équivalent.
 - Node.js, selon la stack de `spec/SKILL.md`, et git 2.38 ou plus récent (`git merge-tree --write-tree`).
 - Un dépôt de projet **vide**, dédié au système.
 - La transmission : [`transmissions/tension-dashboard-gitlab-agent-2.2.0.md`](../../transmissions/tension-dashboard-gitlab-agent-2.2.0.md).

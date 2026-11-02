@@ -18,7 +18,7 @@ flowchart LR
 
 ## 1. Prérequis
 
-- Une IA qui lit les sources : Gemini CLI, Claude Code ou équivalent.
+- Une IA qui lit les sources : Gemini CLI ou équivalent.
 - Les dépôts du back et du front, en lecture.
 - Pour l'installation automatique : un clone d'Agent2Prompt et Node 20 ou plus récent. À défaut, la transmission seule : [`transmissions/analyse-projet-1.0.2.md`](../../transmissions/analyse-projet-1.0.2.md).
 
