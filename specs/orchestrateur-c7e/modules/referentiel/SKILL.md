@@ -1,22 +1,22 @@
 ---
 name: referentiel
-description: Dimension D10, le référentiel des méso-contrats du projet. Catégories de tickets avec leur empreinte technique par couche, options au choix (évolution de schéma et contrat CRUD pour PostgreSQL, règles, fonctionnalités, endpoints, variantes de représentation et événements temps réel pour Java, éléments graphiques et fonctionnalités pour Angular, analyse d'une image PNG de l'objectif pour toute option front), méso-contrats transverses, modèle générique de la demande dont part la qualification de chaque ticket (D11), et instance de chaque ticket dans ticket.toml. À lire à l'installation, à l'ouverture et à l'analyse de chaque ticket.
+description: Dimension D10, le référentiel des méso-contrats du projet. Catégories de tickets avec leur empreinte technique par couche, composées par ticket (un principal et des compléments), options au choix (évolution de schéma et contrat CRUD pour PostgreSQL, règles, fonctionnalités, endpoints, variantes de représentation et événements temps réel pour Java, éléments graphiques et fonctionnalités pour Angular, analyse d'une image PNG de l'objectif pour toute option front), méso-contrats transverses, modèle générique de la demande dont part la qualification de chaque ticket (D11), et instance de chaque ticket dans ticket.toml. À lire à l'installation, à l'ouverture et à l'analyse de chaque ticket.
 dimensions: [D10]
 status: active
 ---
 
 # Module `referentiel` (D10)
 
-Statut : `active`, depuis la version 3.2.0. Modèle du référentiel en 3.1.0 depuis la version 3.3.0 du skill : modèle générique de la demande ajouté. Modèle en 3.2.0 depuis la version 3.4.0 : catégorie M04, variante de représentation d'une ressource, avec l'option `representations` et ses paramètres au choix par ticket, et l'option `evenements`, le temps réel par WebSocket STOMP (socle, SC7).
+Statut : `active`, depuis la version 3.2.0. Modèle du référentiel en 3.1.0 depuis la version 3.3.0 du skill : modèle générique de la demande ajouté. Modèle en 3.2.0 depuis la version 3.4.0 : catégorie M04, variante de représentation d'une ressource, avec l'option `representations` et ses paramètres au choix par ticket, et l'option `evenements`, le temps réel par WebSocket STOMP (socle, SC7). Modèle en 3.3.0 depuis la version 3.5.0 : composition, un méso-contrat principal et des compléments par ticket.
 
 ## 1. Rôle
 
 Deux fichiers du projet encadrent un ticket :
 
 - le **fichier d'invariants**, `docs/c7e/meso-contrats.md` (D8), dit les règles que tout contrat respecte ;
-- le **référentiel des méso-contrats**, `docs/c7e/referentiel-meso-contrats.toml` (D10), dit quels contrats un ticket engage : sa catégorie, les couches qu'elle touche et les options choisies sur chaque couche.
+- le **référentiel des méso-contrats**, `docs/c7e/referentiel-meso-contrats.toml` (D10), dit quels contrats un ticket engage : sa catégorie principale et, au besoin, ses compléments, les couches qu'ils touchent et les options choisies sur chaque couche.
 
-Un méso-contrat est une catégorie de tickets, définie par son empreinte technique : pour chaque couche (persistance, backend, frontend), un impact `requis`, `optionnel` ou `aucun`, et les options permises. Le ticket choisit ses options parmi celles-ci ; chaque option engage un slot et des preuves. Les méso-contrats transverses (socle back-front, accessibilité, migration sûre) ne se choisissent pas : ils s'appliquent d'office aux couches touchées.
+Un méso-contrat est une catégorie de tickets, définie par son empreinte technique : pour chaque couche (persistance, backend, frontend), un impact `requis`, `optionnel` ou `aucun`, et les options permises. Le ticket choisit ses options parmi celles-ci ; chaque option engage un slot et des preuves. Un ticket engage un **méso-contrat principal**, celui qui porte le plus de sa demande, et, si le principal ne la porte pas toute, des **compléments** pour le reste : chaque option se rattache au méso-contrat qui la permet, et une couche à l'impact `aucun` dans l'un peut être couverte par un autre (module `qualification`, § 2). Les méso-contrats transverses (socle back-front, accessibilité, migration sûre) ne se choisissent pas : ils s'appliquent d'office aux couches touchées.
 
 Le référentiel porte aussi le **modèle générique de la demande** (section 0) : une combinaison de possibilités de modification de l'application, couche par couche, chacune avec son option et ses repères, établies à l'analyse de l'application, et la règle de choix du méso-contrat. La qualification de chaque ticket, à son ouverture, part de ce modèle (module `qualification`, D11).
 
@@ -25,7 +25,7 @@ Le référentiel porte aussi le **modèle générique de la demande** (section 0
 | Fichier | Rôle | Qui l'écrit | Emplacement |
 |---|---|---|---|
 | référentiel du projet | modèle générique de la demande, catégories, options, transverses, règles de validation | le développeur, à partir du modèle du § 6 ; jamais l'IA (D10.INV-5) | `docs/c7e/referentiel-meso-contrats.toml` |
-| instance du ticket | demande remplie, méso-contrat confirmé, options choisies, version du référentiel | l'IA propose ; le développeur confirme le méso-contrat à la qualification (D11.INV-3), puis valide les options avec la fiche (D10.INV-1) | `docs/demandes/<CLÉ>/ticket.toml` |
+| instance du ticket | demande remplie, composition confirmée (principal et compléments), options choisies et leur rattachement, version du référentiel | l'IA propose ; le développeur confirme la composition à la qualification (D11.INV-3), puis valide les options avec la fiche (D10.INV-1) | `docs/demandes/<CLÉ>/ticket.toml` |
 | analyse d'image | extractions, correspondances, questions, écarts | l'IA ; validée avec la fiche (D10.INV-4) | `docs/demandes/<CLÉ>/analyse-image.md` |
 | images de l'objectif | maquettes ou captures au format PNG | le développeur ou le PO | `docs/demandes/<CLÉ>/maquettes/` |
 
@@ -33,11 +33,11 @@ Les images sont versionnées avec la demande : les commandes de Gemini CLI n'inj
 
 ## 3. À l'analyse de chaque ticket (d=0)
 
-Ces étapes prennent place dans l'analyse du § 3 du point d'entrée, après la cartographie d'impact et avant la fiche. Le ticket a déjà été qualifié à son ouverture : son méso-contrat est confirmé, et `ticket.toml` porte la demande remplie et la version du référentiel (module `qualification`).
+Ces étapes prennent place dans l'analyse du § 3 du point d'entrée, après la cartographie d'impact et avant la fiche. Le ticket a déjà été qualifié à son ouverture : sa composition est confirmée, et `ticket.toml` porte la demande remplie et la version du référentiel (module `qualification`).
 
-1. Partir du méso-contrat confirmé. Si la cartographie d'impact montre que la demande sort de son empreinte, revenir à la qualification : compléter la demande, proposer un autre méso-contrat et le faire confirmer, sans en changer de soi-même ni écrire de catégorie nouvelle (D11.INV-4, D10.INV-5).
+1. Partir de la composition confirmée. Si la cartographie d'impact montre que la demande sort de ses empreintes, revenir à la qualification : compléter la demande, proposer une autre composition et la faire confirmer, sans en changer de soi-même ni écrire de catégorie nouvelle (D11.INV-4, D10.INV-5).
 2. Prendre pour point de départ les options que signale la demande remplie.
-3. Choisir les options, couche par couche, parmi les options permises du méso-contrat (D10.INV-2) :
+3. Choisir les options, couche par couche, parmi les options permises des méso-contrats de la composition, et rattacher chacune au méso-contrat qui la permet : le principal par défaut, sinon le complément retenu pour sa possibilité, nommé par la clé `meso_contrat` de l'option (D10.INV-2) :
    - persistance : évolution de schéma (tables, colonnes, index, contraintes) ; contrat CRUD, avec ses opérations et, si `delete` est retenu, le mode de suppression ;
    - backend : endpoints, règles métier, fonctionnalités ; variantes de représentation, avec le repérage depuis l'URI et une valeur pour chaque paramètre (mécanisme de sélection, exposition de la variante sans champ) ; la réponse actuelle reste inchangée sans sélection, et le remplacement d'une réponse publiée se refuse (D10.INV-6) ; événements temps réel, avec leur canal, leurs types, leur instantané et le courtier que nomme le fichier d'invariants du projet (socle, SC7) ;
    - frontend : éléments graphiques, fonctionnalités ; pour chacun, s'il y a lieu, l'image de l'objectif (`image_objectif`) et les extractions demandées (`analyse_image`).
@@ -71,12 +71,12 @@ Le référentiel ne sert que si le développeur a choisi l'orchestrateur (D2.INV
 
 | Fichier | Empreinte sha256 |
 |---|---|
-| `docs/c7e/referentiel-meso-contrats.toml` | `96b0d891dadd1a2d176c1fda0b1ca845e3bb1d6fa45979734e75bf74c2608100` |
+| `docs/c7e/referentiel-meso-contrats.toml` | `a19de2f11e341f86b942ed69cba668c47b1aa121f4f6986f0c5f8bdb84c8855e` |
 
 Commande d'extraction et de vérification, depuis la racine du projet (Node 20 ou plus récent, sans dépendance). Elle suppose le skill dans `.skills/orchestrateur-c7e/` ; pour un autre emplacement, comme `.gemini/skills/orchestrateur-c7e/` en chargement au choix, remplacer ce chemin :
 
 ```bash
-node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const texte = fs.readFileSync('.skills/orchestrateur-c7e/modules/referentiel/SKILL.md', 'utf8').replace(/\r\n/g, '\n'); const m = /^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/m.exec(texte); const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === '96b0d891dadd1a2d176c1fda0b1ca845e3bb1d6fa45979734e75bf74c2608100'; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); if (!conforme) process.exitCode = 1;"
+node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const texte = fs.readFileSync('.skills/orchestrateur-c7e/modules/referentiel/SKILL.md', 'utf8').replace(/\r\n/g, '\n'); const m = /^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/m.exec(texte); const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === 'a19de2f11e341f86b942ed69cba668c47b1aa121f4f6986f0c5f8bdb84c8855e'; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); if (!conforme) process.exitCode = 1;"
 ```
 
 Le développeur adapte ensuite sa copie : possibilités du modèle générique de la demande, confrontées à l'analyse de l'application (module `qualification`, § 2), catégories `M05` et suivantes, technologies, options permises, transverses. Il change `meta.version` à chaque modification ; les tickets déjà instanciés gardent la version qu'ils ont épinglée.
@@ -90,6 +90,15 @@ Un référentiel installé avant la version 3.4.0 n'a ni M04, ni les options `re
 # ==============================================================================
 # RÉFÉRENTIEL DES MÉSO-CONTRATS ET CATÉGORIES DE TICKETS
 # ==============================================================================
+#
+# 3.3.0 (1er novembre 2026)
+#   - Composition : un ticket engage un méso-contrat principal et, au besoin,
+#     des compléments, pour les possibilités que le principal ne porte pas.
+#     Une couche à l'impact aucun dans un méso-contrat peut être couverte par
+#     un autre méso-contrat du ticket : chaque option est rattachée au
+#     méso-contrat qui la permet (meso_contrat, le principal par défaut).
+#   - Règle de choix et règles de validation réécrites pour la composition ;
+#     un ticket sans complément suit les mêmes règles qu'avant.
 #
 # 3.2.0 (1er novembre 2026)
 #   - Catégorie M04, variante de représentation d'une ressource : depuis l'URI
@@ -132,7 +141,7 @@ Un référentiel installé avant la version 3.4.0 n'a ni M04, ni les options `re
 # ==============================================================================
 
 [meta]
-version = "3.2.0"
+version = "3.3.0"
 domaine = "Software Factory & Architecture"
 description = "Taxonomie des méso-contrats structurant les évolutions logicielles de la stack (PostgreSQL, Java, Angular), avec les options au choix de chaque couche."
 
@@ -151,20 +160,21 @@ couches = ["persistance", "backend", "frontend"]
 #    export…). Le développeur seul les écrit ici.
 #    À l'ouverture de chaque ticket, chaque possibilité vaut oui, non ou
 #    inconnu d'après le contenu du ticket, avec sa source ; la combinaison des
-#    possibilités à oui désigne le méso-contrat par la règle de choix. Une
-#    possibilité inconnue dont la réponse changerait le méso-contrat ou ses
-#    options devient une question au développeur, qui confirme ensuite le
-#    méso-contrat avant toute autre étape.
+#    possibilités à oui désigne, par la règle de choix, le méso-contrat
+#    principal et, au besoin, ses compléments. Une possibilité inconnue dont la
+#    réponse changerait la composition ou ses options devient une question au
+#    développeur, qui confirme ensuite la composition avant toute autre étape.
 # ------------------------------------------------------------------------------
 
 [modele_demande]
 valeurs = ["oui", "non", "inconnu"]
 choix = [
-  "toute couche d'une possibilité à oui a, dans l'empreinte du méso-contrat, l'impact requis ou optionnel",
-  "toute couche à l'impact requis dans l'empreinte porte au moins une possibilité à oui",
-  "toute possibilité requise par le méso-contrat (possibilites_requises) est à oui",
-  "l'option de chaque possibilité à oui figure parmi les options permises de sa couche",
-  "un seul méso-contrat convient : il est proposé ; plusieurs : une question les départage ; aucun : le ticket est signalé, sans catégorie inventée",
+  "un méso-contrat porte une possibilité à oui si la couche de celle-ci n'y est pas à l'impact aucun et si son option figure parmi les options permises de cette couche",
+  "un méso-contrat peut être principal si chacune de ses couches à l'impact requis a une possibilité à oui qu'il porte, et si toutes ses possibilités requises (possibilites_requises) sont à oui",
+  "le principal est, parmi ceux-là, celui qui porte le plus de possibilités à oui ; à égalité, une question les départage",
+  "les possibilités à oui que le principal ne porte pas reçoivent des compléments : le plus petit nombre de méso-contrats qui les portent toutes, chacun avec ses possibilités requises à oui et au moins une de ces possibilités",
+  "entre deux ensembles de compléments de même taille, on préfère celui dont chaque complément a, pour chacune de ses couches à l'impact requis, une possibilité restante qu'il porte ; à égalité encore, une question les départage",
+  "une possibilité qu'aucun méso-contrat ne porte, ou un ticket sans principal possible, est signalé, sans catégorie inventée",
 ]
 
 [modele_demande.intention]
@@ -465,6 +475,8 @@ preuves = [
 
 # ------------------------------------------------------------------------------
 # 2. CATALOGUE DES MÉSO-CONTRATS (LES DIFFÉRENTES CATÉGORIES)
+#    Un ticket en engage un, son principal, et au besoin des compléments
+#    (section 0, règle de choix).
 #    Pour ajouter une catégorie : un bloc [[meso_contrats]] d'identifiant M05,
 #    M06…, dont chaque couche déclare son impact et ses options permises,
 #    choisies dans la section 1, et, s'il y a lieu, les possibilités de la
@@ -557,14 +569,13 @@ exigences = "Un changeset par fichier, un rollback par changeset, migration jou�
 
 [validation]
 regles = [
-  "le ticket nomme un méso-contrat du catalogue et la version du référentiel qu'il suit",
+  "le ticket nomme son méso-contrat principal (meso_contrat) et, s'il en a, ses compléments (complements), tous du catalogue, et la version du référentiel qu'il suit",
   "la section demande répond à l'intention et à chaque possibilité du modèle générique, et cite la source de chaque réponse autre qu'inconnu",
-  "le méso-contrat respecte la règle de choix du modèle générique, appliquée aux possibilités à oui",
-  "aucune possibilité ne reste inconnue si sa réponse pouvait changer le méso-contrat",
-  "aucune option n'est choisie tant que le méso-contrat n'est pas confirmé (meso_contrat_confirme)",
-  "chaque couche à l'impact requis porte au moins une option choisie",
-  "aucune option n'est choisie sur une couche à l'impact aucun",
-  "chaque option choisie figure parmi les options permises de sa couche",
+  "la composition, principal et compléments, respecte la règle de choix du modèle générique, appliquée aux possibilités à oui",
+  "aucune possibilité ne reste inconnue si sa réponse pouvait changer la composition",
+  "aucune option n'est choisie tant que la composition n'est pas confirmée (meso_contrat_confirme)",
+  "chaque option choisie est rattachée à un méso-contrat de la composition (meso_contrat de l'option, le principal par défaut) et figure parmi les options permises de sa couche dans ce méso-contrat ; aucune n'est rattachée à un méso-contrat sur une couche où il est à l'impact aucun",
+  "chaque couche à l'impact requis du principal porte au moins une option qui lui est rattachée ; chaque complément porte au moins une option qui lui est rattachée",
   "les opérations CRUD sont prises parmi create, read, update et delete ; delete impose un mode de suppression",
   "la méthode d'un endpoint est prise parmi les méthodes du catalogue",
   "chaque paramètre d'une option choisie prend une valeur de son catalogue (parametres)",
@@ -584,7 +595,7 @@ regles = [
 ```toml
 [ticket]
 reference = "ABCDE-3512"
-referentiel = "3.2.0"
+referentiel = "3.3.0"
 meso_contrat = "M01"
 meso_contrat_confirme = true
 titre = "Charger les données au clic plutôt qu'à l'ouverture de l'écran"
@@ -657,7 +668,7 @@ analyse_image = ["structure", "etats"]
 ```toml
 [ticket]
 reference = "ABCDE-3620"
-referentiel = "3.2.0"
+referentiel = "3.3.0"
 meso_contrat = "M04"
 meso_contrat_confirme = true
 titre = "Commande : variante sans les lignes, résumé à la même URI avec la date-heure de la dernière ligne enregistrée, lignes en temps réel"
@@ -732,8 +743,35 @@ nom = "Liste des lignes et date-heure du dernier enregistrement"
 etats = ["chargement", "à jour", "reconnexion", "erreur"]
 ```
 
+### 7.3 Composition, M04 et un complément M01
+
+`docs/demandes/ABCDE-3655/ticket.toml`, pour le scénario R21. Le ticket reprend celui du § 7.2 et ajoute : « Seuls les utilisateurs du rôle COMMERCIAL obtiennent le résumé ; les autres reçoivent 403. » La possibilité `regle` passe à `oui`. M04 reste le principal, il porte six des sept possibilités à `oui` ; il ne permet pas l'option `regles`, que M01 permet : M01 est le seul complément. Le fichier est celui du § 7.2, à ces lignes près :
+
+```toml
+[ticket]
+reference = "ABCDE-3655"
+referentiel = "3.3.0"
+meso_contrat = "M04"
+complements = ["M01"]
+meso_contrat_confirme = true
+titre = "Commande : variante sans les lignes, résumé réservé au rôle COMMERCIAL, lignes en temps réel"
+
+[ticket.demande]
+# … les autres réponses comme au § 7.2 …
+regle = { reponse = "oui", precision = "résumé réservé au rôle COMMERCIAL, sinon 403", source = "ticket : critères d'acceptation" }
+
+# … les options du § 7.2, rattachées au principal M04 …
+
+[[ticket.backend.regles]]
+meso_contrat = "M01"
+id = "ABCDE-3655-R1"
+enonce = "Seul un utilisateur du rôle COMMERCIAL obtient la vue resume de GET /api/v1/commandes/{id} ; sinon 403."
+```
+
+Les méso-contrats transverses s'appliquent selon les couches touchées par toute la composition. Les preuves sont celles de toutes les options retenues, quel que soit leur rattachement.
+
 ## 8. Contrôles
 
 - La section `[validation]` du référentiel énumère les règles d'un ticket, celles de la demande remplie comprises ; l'IA les vérifie avant de présenter `ticket.toml` (D10.INV-2).
-- Scénarios R11 à R14 du point d'entrée ; R16 à R18 pour le modèle générique de la demande ; R19 et R20 pour M04 et l'option `representations`.
-- À la publication : le modèle se lit en TOML, et les deux exemples d'instance respectent toutes ses règles de validation (point d'entrée, section 16).
+- Scénarios R11 à R14 du point d'entrée ; R16 à R18 pour le modèle générique de la demande ; R19 et R20 pour M04 et l'option `representations` ; R21 et R22 pour la composition.
+- À la publication : le modèle se lit en TOML, et les deux exemples d'instance respectent toutes ses règles de validation, et l'exemple de composition aussi (point d'entrée, section 16).

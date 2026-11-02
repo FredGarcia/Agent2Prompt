@@ -28,7 +28,7 @@ La colonne « Repris dans » cite les modules de la spécification qui reprennen
 | [`angular`](#angular-101) | 1.0.1 | 8 | 2 | 30 |
 | [`capture-sprint-jira`](#capture-sprint-jira-121) | 1.2.1 | 9 | 2 | 39 |
 | [`java`](#java-111) | 1.1.1 | 7 | 1 | 29 |
-| [`orchestrateur-c7e`](#orchestrateur-c7e-340) | 3.4.0 | 10 | 1 | 32 |
+| [`orchestrateur-c7e`](#orchestrateur-c7e-350) | 3.5.0 | 10 | 1 | 33 |
 | [`skill4appli`](#skill4appli-110) | 1.1.0 | 9 | 3 | 34 |
 | [`socle-back-front`](#socle-back-front-110) | 1.1.0 | 7 | 0 | 21 |
 | [`sonarqube`](#sonarqube-110) | 1.1.0 | 8 | 2 | 34 |
@@ -944,9 +944,9 @@ Expert Java 21, Spring Boot 3.5 et PostgreSQL : produire et relire du code confo
 
 Dimension réservée : aucun invariant en vigueur dans cette version.
 
-## orchestrateur-c7e 3.4.0
+## orchestrateur-c7e 3.5.0
 
-Orchestrateur fractal C7E : résolution d'un ticket full-stack comme transformation maîtrisée d'un système vivant, avec le cycle de l'Axiome 7E, quatre profondeurs de déclinaison, des concepts paramétrables, la qualification de chaque ticket à son ouverture par un modèle générique de la demande et des questions complémentaires, un méso-contrat confirmé avant tout le reste, des options par couche avec leurs paramètres au choix par ticket, des variantes de représentation d'une ressource et leur mise à jour en temps réel, l'analyse des images PNG de l'objectif, une fiche validée avant toute modification, des tests déduits des risques, des conventions Git compatibles avec le kit des agents parallèles, une boucle de second ordre bornée par un registre et un fichier d'invariants du projet ; activé au démarrage de l'IA locale, sur choix du développeur. Point d'entrée : [`specs/orchestrateur-c7e/SKILL.md`](specs/orchestrateur-c7e/SKILL.md).
+Orchestrateur fractal C7E : résolution d'un ticket full-stack comme transformation maîtrisée d'un système vivant, avec le cycle de l'Axiome 7E, quatre profondeurs de déclinaison, des concepts paramétrables, la qualification de chaque ticket à son ouverture par un modèle générique de la demande et des questions complémentaires, un méso-contrat principal et au besoin des compléments, confirmés avant tout le reste, des options par couche rattachées au méso-contrat qui les permet avec leurs paramètres au choix par ticket, des variantes de représentation d'une ressource et leur mise à jour en temps réel, l'analyse des images PNG de l'objectif, une fiche validée avant toute modification, des tests déduits des risques, des conventions Git compatibles avec le kit des agents parallèles, une boucle de second ordre bornée par un registre et un fichier d'invariants du projet ; activé au démarrage de l'IA locale, sur choix du développeur. Point d'entrée : [`specs/orchestrateur-c7e/SKILL.md`](specs/orchestrateur-c7e/SKILL.md).
 
 ### D1 : Ontologie : cycle 7E, profondeurs du CRI, concepts paramétrables (active)
 
@@ -1017,8 +1017,8 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D10.INV-1** | chaque ticket est classé dans un méso-contrat du référentiel du projet, que le développeur confirme à la qualification (D11) ; l'IA propose ensuite les options dans `ticket.toml`, que le développeur valide avec la fiche ; un ticket qu'aucune catégorie ne couvre se signale, sans catégorie inventée. | `referentiel`, `qualification` |
-| **D10.INV-2** | les options choisies respectent l'empreinte du méso-contrat : chacune figure parmi les options permises de sa couche ; une couche à l'impact `requis` en porte au moins une, une couche à l'impact `aucun` n'en porte aucune ; les méso-contrats transverses des couches touchées s'appliquent d'office. | `referentiel` |
+| **D10.INV-1** | chaque ticket est classé dans un méso-contrat principal du référentiel du projet et, si le principal ne porte pas toute sa demande, dans des compléments, que le développeur confirme ensemble à la qualification (D11) ; l'IA propose ensuite les options dans `ticket.toml`, que le développeur valide avec la fiche ; une possibilité qu'aucune catégorie ne porte, ou un ticket sans principal possible, se signale, sans catégorie inventée. | `referentiel`, `qualification` |
+| **D10.INV-2** | chaque option choisie est rattachée à un méso-contrat de la composition et respecte son empreinte : elle figure parmi les options permises de sa couche dans ce méso-contrat, et aucune n'est rattachée à un méso-contrat sur une couche où il est à l'impact `aucun` ; chaque couche à l'impact `requis` du principal porte au moins une option qui lui est rattachée, et chaque complément au moins une ; les méso-contrats transverses des couches touchées par la composition s'appliquent d'office. | `referentiel` |
 | **D10.INV-3** | chaque option retenue apporte aux tests déduits les preuves que le référentiel lui associe, reliées à un critère ou à un risque. | `referentiel` |
 | **D10.INV-4** | une option front qui désigne une image PNG de l'objectif et en demande l'analyse donne lieu à `analyse-image.md`, rédigée avant la fiche et validée avec elle ; chaque élément de l'image y est rattaché à une option ou posé en question, et les tailles et couleurs lues sur l'image y sont des estimations. | `referentiel` |
 | **D10.INV-5** | `ticket.toml` épingle la version du référentiel qu'il suit ; l'IA ne modifie jamais le référentiel du projet : une catégorie ou une option nouvelle se propose au développeur, qui seul l'ajoute. | `referentiel`, `qualification` |
@@ -1028,11 +1028,12 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D11.INV-1** | à l'ouverture d'un ticket, la qualification précède toute autre étape : l'IA range la demande du ticket dans le modèle générique de la demande du référentiel, combinaison de possibilités de modification de l'application, et en déduit le méso-contrat par la règle de choix, avant de lire le code, de cartographier l'impact ou de rédiger la fiche. | `qualification` |
-| **D11.INV-2** | l'intention et chaque possibilité de la demande remplie portent leur réponse, `oui`, `non` ou `inconnu` pour une possibilité, et la source de toute réponse autre qu'`inconnu`, dans le ticket ou dans une réponse du développeur ; rien n'est rempli par supposition ; une possibilité `inconnu` dont la réponse changerait le méso-contrat ou ses options, ou un choix entre plusieurs méso-contrats, devient une question au développeur, posée avec les autres. | `qualification` |
-| **D11.INV-3** | le méso-contrat proposé, justifié par l'empreinte, est confirmé par le développeur avant toute autre étape ; un méso-contrat imposé par le développeur vaut confirmation s'il couvre la demande remplie. | `referentiel`, `qualification` |
-| **D11.INV-4** | `ticket.toml` garde la demande remplie, avec ses sources, et le méso-contrat confirmé ; si l'analyse montre ensuite que la demande sort de l'empreinte, l'IA revient à la qualification et fait confirmer un autre méso-contrat, sans en changer d'elle-même. | `referentiel`, `qualification` |
+| **D11.INV-1** | à l'ouverture d'un ticket, la qualification précède toute autre étape : l'IA range la demande du ticket dans le modèle générique de la demande du référentiel, combinaison de possibilités de modification de l'application, et en déduit la composition de méso-contrats par la règle de choix, avant de lire le code, de cartographier l'impact ou de rédiger la fiche. | `qualification` |
+| **D11.INV-2** | l'intention et chaque possibilité de la demande remplie portent leur réponse, `oui`, `non` ou `inconnu` pour une possibilité, et la source de toute réponse autre qu'`inconnu`, dans le ticket ou dans une réponse du développeur ; rien n'est rempli par supposition ; une possibilité `inconnu` dont la réponse changerait la composition ou ses options, ou une égalité entre principaux ou entre ensembles de compléments, devient une question au développeur, posée avec les autres. | `qualification` |
+| **D11.INV-3** | la composition proposée, principal et compléments, justifiée par les empreintes, est confirmée par le développeur avant toute autre étape ; une composition imposée par le développeur vaut confirmation si elle porte la demande remplie selon la règle de choix. | `referentiel`, `qualification` |
+| **D11.INV-4** | `ticket.toml` garde la demande remplie, avec ses sources, et la composition confirmée ; si l'analyse montre ensuite que la demande sort des empreintes, l'IA revient à la qualification et fait confirmer une autre composition, sans en changer d'elle-même. | `referentiel`, `qualification` |
 | **D11.INV-5** | les possibilités du modèle se fondent sur l'analyse de l'application : à l'installation, l'IA propose celles qui s'appliquent, avec leurs repères, celles à retirer et celles qui manquent, rattachées à une couche et à une option ; le développeur seul les écrit dans le référentiel. | `qualification` |
+| **D11.INV-6** | chaque complément se justifie par au moins une possibilité à `oui` que le principal ne porte pas ; les compléments sont en plus petit nombre possible, et la qualification nomme pour chacun les possibilités qui le justifient ; un ticket que le principal porte en entier n'a aucun complément. | `qualification` |
 
 ## skill4appli 1.1.0
 

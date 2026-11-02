@@ -1,10 +1,10 @@
 ---
 name: orchestrateur-c7e
-description: Orchestrateur fractal C7E, qui pilote la résolution d'un ticket full-stack comme la transformation maîtrisée d'un système vivant (cycle de l'Axiome 7E, déclinaison récursive imbriquée sur quatre profondeurs, concepts paramétrables, qualification de chaque ticket à son ouverture par un modèle générique de la demande et des questions, méso-contrat confirmé avant tout le reste, options par couche avec leurs paramètres au choix par ticket, variantes de représentation d'une ressource et leur mise à jour en temps réel, analyse des images PNG de l'objectif, fiche de transformation validée avant toute modification, tests déduits des risques, traçabilité Git compatible avec le kit des agents parallèles, boucle de second ordre bornée par un registre, valeur annoncée comme une hypothèse tant qu'elle n'est pas mesurée), avec le fichier des invariants du projet, meso-contrats. Adaptateur par défaut Java, Spring Boot, PostgreSQL, Liquibase et Angular. À activer au démarrage de l'IA locale, sur choix du développeur, pour les tickets qu'il lui confie.
-version: 3.4.0
+description: Orchestrateur fractal C7E, qui pilote la résolution d'un ticket full-stack comme la transformation maîtrisée d'un système vivant (cycle de l'Axiome 7E, déclinaison récursive imbriquée sur quatre profondeurs, concepts paramétrables, qualification de chaque ticket à son ouverture par un modèle générique de la demande et des questions, méso-contrat principal et compléments confirmés avant tout le reste, options par couche rattachées au méso-contrat qui les permet et leurs paramètres au choix par ticket, variantes de représentation d'une ressource et leur mise à jour en temps réel, analyse des images PNG de l'objectif, fiche de transformation validée avant toute modification, tests déduits des risques, traçabilité Git compatible avec le kit des agents parallèles, boucle de second ordre bornée par un registre, valeur annoncée comme une hypothèse tant qu'elle n'est pas mesurée), avec le fichier des invariants du projet, meso-contrats. Adaptateur par défaut Java, Spring Boot, PostgreSQL, Liquibase et Angular. À activer au démarrage de l'IA locale, sur choix du développeur, pour les tickets qu'il lui confie.
+version: 3.5.0
 ---
 
-# Orchestrateur fractal C7E, version 3.4.0
+# Orchestrateur fractal C7E, version 3.5.0
 
 Ce document est le point d'entrée du skill et contient la méthode. Il s'active au démarrage de l'IA locale, sur choix du développeur (§ 11.4), avec le fichier des invariants du projet, copie remplie du modèle `meso-contrats.md`. Ces deux fichiers suffisent au démarrage ; le référentiel des méso-contrats se lit à l'ouverture de chaque ticket, pour le qualifier, puis à son analyse, et les autres fichiers quand un ticket touche leur domaine.
 
@@ -120,24 +120,24 @@ Paramètres sans unité, définis pour être vérifiables :
 
 ## 3. Pipeline d'exécution par slot
 
-Pour chaque ticket, l'orchestrateur qualifie d'abord la demande, puis produit une **fiche de transformation** (§ 10). Trois temps, séparés par deux réponses du développeur : la confirmation du méso-contrat, puis la validation de la fiche.
+Pour chaque ticket, l'orchestrateur qualifie d'abord la demande, puis produit une **fiche de transformation** (§ 10). Trois temps, séparés par deux réponses du développeur : la confirmation des méso-contrats, un principal et au besoin des compléments, puis la validation de la fiche.
 
 **Qualification, à l'ouverture du ticket, avant tout le reste** (module `qualification`)
 
 1. Lire le ticket (§ 11.1).
 2. Ranger sa demande dans le modèle générique de la demande du référentiel du projet, la combinaison des possibilités de modification de l'application, couche par couche : chaque possibilité à `oui`, `non` ou `inconnu`, avec sa source dans le ticket ; rien n'est rempli par supposition (D11.INV-2).
-3. Proposer le méso-contrat dont l'empreinte couvre la demande, par la règle de choix du modèle, avec sa justification ; poser ensemble les questions que le ticket laisse ouvertes et dont la réponse changerait le méso-contrat ou ses options (D11.INV-1, D11.INV-2).
-4. **Point de confirmation** : rien d'autre n'est fait, ni lecture du code ni fiche, avant que le développeur ait répondu et confirmé le méso-contrat ; ses réponses complètent `ticket.toml` (D11.INV-3, D11.INV-4).
+3. Proposer, par la règle de choix du modèle, le méso-contrat principal, qui porte le plus de la demande, et au besoin des compléments pour ce qu'il ne porte pas, avec leur justification ; poser ensemble les questions que le ticket laisse ouvertes et dont la réponse changerait cette composition ou ses options (D11.INV-1, D11.INV-2, D11.INV-6).
+4. **Point de confirmation** : rien d'autre n'est fait, ni lecture du code ni fiche, avant que le développeur ait répondu et confirmé la composition ; ses réponses complètent `ticket.toml` (D11.INV-3, D11.INV-4).
 
 **Analyse (d=0), avant toute modification**
 
 1. Numéroter les critères d'acceptation du ticket `<CLÉ>-CAnn` s'ils ne le sont pas déjà, au format d'`agent-tdd-jira` (agent-tdd-jira:D10.INV-1).
 2. Lire l'architecture réelle : code, contrat, migrations, tests existants, conventions du projet. Si le skill `skill4appli` est installé, ses emplacements `chemin:ligne` accélèrent la lecture ; le disque fait foi.
 3. Cartographier l'impact : dépendances explicites et détectées, autres consommateurs (écrans, batchs, autres services).
-4. Choisir les options par couche dans le méso-contrat confirmé, en partant de celles que signale la demande, et analyser les images de l'objectif demandées ; le tout s'écrit dans `ticket.toml` et `analyse-image.md` (module `referentiel`, D10.INV-2, D10.INV-4). Si la demande sort de l'empreinte du méso-contrat, revenir à la qualification (D11.INV-4).
+4. Choisir les options par couche dans les méso-contrats confirmés, chacune rattachée au méso-contrat qui la permet, en partant de celles que signale la demande, et analyser les images de l'objectif demandées ; le tout s'écrit dans `ticket.toml` et `analyse-image.md` (module `referentiel`, D10.INV-2, D10.INV-4). Si la demande sort des empreintes de la composition, revenir à la qualification (D11.INV-4).
 5. Choisir la configuration (§ 2, § 7.1).
 6. Déduire les tests des critères et des risques, y compris les preuves des options retenues (§ 5.2, D10.INV-3).
-7. Présenter la fiche au développeur : objectif, critères, méso-contrat confirmé et options, invariants, configuration, cartographie, stratégie et tests déduits, avec `ticket.toml` et l'analyse d'image s'il y en a une. **Point de validation** : rien n'est modifié avant sa réponse (D3.INV-1).
+7. Présenter la fiche au développeur : objectif, critères, méso-contrats confirmés et options, invariants, configuration, cartographie, stratégie et tests déduits, avec `ticket.toml` et l'analyse d'image s'il y en a une. **Point de validation** : rien n'est modifié avant sa réponse (D3.INV-1).
 
 **Transformation, après la validation**
 
@@ -385,8 +385,8 @@ Rangée à `docs/demandes/<CLÉ>/fiche-transformation.md` (§ 11.2). La premièr
 **Synthèse** : une page au plus
 **Objectif Macro (d=0, É7)** : ...
 **Critères d'acceptation** : <CLÉ>-CA01, <CLÉ>-CA02 ... (provenance de chacun)
-**Qualification** : demande remplie et sources (`ticket.toml`, `[ticket.demande]`) ; questions posées et réponses ; confirmation du méso-contrat : nom, date
-**Méso-contrat** : identifiant, code, version du référentiel ; options retenues par couche (`ticket.toml`) ; méso-contrats transverses appliqués
+**Qualification** : demande remplie et sources (`ticket.toml`, `[ticket.demande]`) ; questions posées et réponses ; confirmation de la composition : nom, date
+**Méso-contrats** : principal et compléments, chacun avec son identifiant, son code et ce qu'il porte ; version du référentiel ; options retenues par couche, avec leur rattachement (`ticket.toml`) ; méso-contrats transverses appliqués
 **Analyse d'image** : `analyse-image.md`, s'il y a lieu ; questions posées au développeur
 **Invariants** : SLA, normes, sécurité ; version lue du fichier d'invariants du projet
 **Configuration retenue** : mode ; concepts × poids × paramètres ; profondeur ; niveau de preuve ; justification par la criticité
@@ -423,7 +423,7 @@ Un ticket : sa capture MHTML, par défaut celle du dossier `IA/` que produit le 
 | base de connaissances | conventions, dépendances, échecs récurrents, stratégies efficaces | l'IA ajoute ; le développeur relit | `docs/c7e/connaissances.md` |
 | fiche de transformation | une par ticket (§ 10) | l'IA | `docs/demandes/<CLÉ>/fiche-transformation.md` |
 | référentiel des méso-contrats | modèle générique de la demande (D11), catégories de tickets, options par couche, transverses (D10) | le développeur, à partir du modèle du module `referentiel` | `docs/c7e/referentiel-meso-contrats.toml` |
-| instance du ticket | demande remplie, méso-contrat confirmé, options retenues | l'IA propose ; le développeur confirme le méso-contrat à la qualification, puis valide les options avec la fiche | `docs/demandes/<CLÉ>/ticket.toml` |
+| instance du ticket | demande remplie, méso-contrats confirmés, options retenues | l'IA propose ; le développeur confirme la composition à la qualification, puis valide les options avec la fiche | `docs/demandes/<CLÉ>/ticket.toml` |
 | analyse d'image | une par ticket qui la demande | l'IA ; validée avec la fiche | `docs/demandes/<CLÉ>/analyse-image.md` |
 | images de l'objectif | maquettes ou captures PNG | le développeur ou le PO | `docs/demandes/<CLÉ>/maquettes/` |
 
@@ -481,7 +481,7 @@ transformation par slot.
 - Sans orchestrateur : n'applique aucune règle du skill.
 ```
 
-La commande `/c7e` fait le même choix sans passer par le menu, et confie le ticket d'un même geste : `/c7e ABCDE-3512`, ou `/c7e ABCDE-3512 M01` pour imposer le méso-contrat, ce qui vaut confirmation s'il couvre la demande (module `qualification`, § 5). Fichier `.gemini/commands/c7e.toml` :
+La commande `/c7e` fait le même choix sans passer par le menu, et confie le ticket d'un même geste : `/c7e ABCDE-3512`, ou `/c7e ABCDE-3512 M01` pour imposer le méso-contrat, et `/c7e ABCDE-3655 M04 M01` pour imposer une composition, le principal d'abord ; l'imposition vaut confirmation si elle porte la demande (module `qualification`, § 5). Fichier `.gemini/commands/c7e.toml` :
 
 ```toml
 description = "Orchestrateur C7E : activer le skill et traiter le ticket donné"
@@ -493,7 +493,7 @@ Référentiel des méso-contrats du projet :
 @{docs/c7e/referentiel-meso-contrats.toml}
 Commence par qualifier le ticket : modèle générique de la demande, questions,
 méso-contrat à confirmer avant tout le reste.
-Ticket, et méso-contrat imposé s'il est précisé : {{args}}
+Ticket, et méso-contrats imposés s'ils sont précisés, le principal d'abord : {{args}}
 """
 ```
 
@@ -521,7 +521,7 @@ Une contradiction entre deux niveaux se signale et s'inscrit au registre des éc
 
 ## 12. Registre des dimensions
 
-| ID | Dimension | Introduite | Statut 3.4.0 | Dépend de | Où |
+| ID | Dimension | Introduite | Statut 3.5.0 | Dépend de | Où |
 |---|---|---|---|---|---|
 | D1 | Ontologie : cycle 7E, profondeurs du CRI, concepts paramétrables | 3.1 | active | | `SKILL.md`, § 1 |
 | D2 | Configuration : matrice d'activation, modes de modulation, choix du démarrage | 3.1 | active | D1 | § 2, § 7.1, § 11.4 |
@@ -539,7 +539,7 @@ La méthode tient en un seul fichier pour se charger au démarrage : D1 à D7 so
 
 ## 13. Contrat de version et points d'extension
 
-Le skill suit le contrat de version de `EVOLUTION.md` du dépôt Agent2Prompt. La version 3.0.0, remise par le développeur, est archivée telle quelle avec son fichier d'invariants (`archives/`), comme les versions 3.1.0, 3.2.0, 3.2.1 et 3.3.0 et le modèle de référentiel remis en 2.0.0. Le socle et les deux référentiels sont épinglés dans `manifest.json`.
+Le skill suit le contrat de version de `EVOLUTION.md` du dépôt Agent2Prompt. La version 3.0.0, remise par le développeur, est archivée telle quelle avec son fichier d'invariants (`archives/`), comme les versions 3.1.0, 3.2.0, 3.2.1, 3.3.0 et 3.4.0 et le modèle de référentiel remis en 2.0.0. Le socle et les deux référentiels sont épinglés dans `manifest.json`.
 
 Points d'extension, actifs dès 3.1.0 :
 
@@ -550,6 +550,10 @@ Points d'extension, actifs dès 3.1.0 :
 Point d'extension, actif dès 3.4.0 :
 
 - **E4** : une option du référentiel peut déclarer des paramètres au choix par ticket (`parametres`), chacun avec ses valeurs, et un méso-contrat les possibilités sans lesquelles il ne convient pas (`possibilites_requises`). Un mécanisme de plus, comme un en-tête de version pour la sélection d'une variante, s'ajoute en valeur d'un paramètre, sans toucher aux autres options ni aux tickets déjà instanciés.
+
+Point d'extension, actif dès 3.5.0 :
+
+- **E5** : un ticket engage une composition de méso-contrats, un principal et des compléments, et chaque option nomme le méso-contrat qui la permet (`meso_contrat`). Un ordre de livraison par méso-contrat, ou une composition propre à un sous-ticket, s'y ajoutera sans changer la règle de choix d'un ticket à un seul méso-contrat.
 
 ## 14. Invariants
 
@@ -600,8 +604,8 @@ Point d'extension, actif dès 3.4.0 :
 
 **D10 : référentiel des méso-contrats**
 
-- **D10.INV-1** : chaque ticket est classé dans un méso-contrat du référentiel du projet, que le développeur confirme à la qualification (D11) ; l'IA propose ensuite les options dans `ticket.toml`, que le développeur valide avec la fiche ; un ticket qu'aucune catégorie ne couvre se signale, sans catégorie inventée.
-- **D10.INV-2** : les options choisies respectent l'empreinte du méso-contrat : chacune figure parmi les options permises de sa couche ; une couche à l'impact `requis` en porte au moins une, une couche à l'impact `aucun` n'en porte aucune ; les méso-contrats transverses des couches touchées s'appliquent d'office.
+- **D10.INV-1** : chaque ticket est classé dans un méso-contrat principal du référentiel du projet et, si le principal ne porte pas toute sa demande, dans des compléments, que le développeur confirme ensemble à la qualification (D11) ; l'IA propose ensuite les options dans `ticket.toml`, que le développeur valide avec la fiche ; une possibilité qu'aucune catégorie ne porte, ou un ticket sans principal possible, se signale, sans catégorie inventée.
+- **D10.INV-2** : chaque option choisie est rattachée à un méso-contrat de la composition et respecte son empreinte : elle figure parmi les options permises de sa couche dans ce méso-contrat, et aucune n'est rattachée à un méso-contrat sur une couche où il est à l'impact `aucun` ; chaque couche à l'impact `requis` du principal porte au moins une option qui lui est rattachée, et chaque complément au moins une ; les méso-contrats transverses des couches touchées par la composition s'appliquent d'office.
 - **D10.INV-3** : chaque option retenue apporte aux tests déduits les preuves que le référentiel lui associe, reliées à un critère ou à un risque.
 - **D10.INV-4** : une option front qui désigne une image PNG de l'objectif et en demande l'analyse donne lieu à `analyse-image.md`, rédigée avant la fiche et validée avec elle ; chaque élément de l'image y est rattaché à une option ou posé en question, et les tailles et couleurs lues sur l'image y sont des estimations.
 - **D10.INV-5** : `ticket.toml` épingle la version du référentiel qu'il suit ; l'IA ne modifie jamais le référentiel du projet : une catégorie ou une option nouvelle se propose au développeur, qui seul l'ajoute.
@@ -609,11 +613,12 @@ Point d'extension, actif dès 3.4.0 :
 
 **D11 : qualification de la demande**
 
-- **D11.INV-1** : à l'ouverture d'un ticket, la qualification précède toute autre étape : l'IA range la demande du ticket dans le modèle générique de la demande du référentiel, combinaison de possibilités de modification de l'application, et en déduit le méso-contrat par la règle de choix, avant de lire le code, de cartographier l'impact ou de rédiger la fiche.
-- **D11.INV-2** : l'intention et chaque possibilité de la demande remplie portent leur réponse, `oui`, `non` ou `inconnu` pour une possibilité, et la source de toute réponse autre qu'`inconnu`, dans le ticket ou dans une réponse du développeur ; rien n'est rempli par supposition ; une possibilité `inconnu` dont la réponse changerait le méso-contrat ou ses options, ou un choix entre plusieurs méso-contrats, devient une question au développeur, posée avec les autres.
-- **D11.INV-3** : le méso-contrat proposé, justifié par l'empreinte, est confirmé par le développeur avant toute autre étape ; un méso-contrat imposé par le développeur vaut confirmation s'il couvre la demande remplie.
-- **D11.INV-4** : `ticket.toml` garde la demande remplie, avec ses sources, et le méso-contrat confirmé ; si l'analyse montre ensuite que la demande sort de l'empreinte, l'IA revient à la qualification et fait confirmer un autre méso-contrat, sans en changer d'elle-même.
+- **D11.INV-1** : à l'ouverture d'un ticket, la qualification précède toute autre étape : l'IA range la demande du ticket dans le modèle générique de la demande du référentiel, combinaison de possibilités de modification de l'application, et en déduit la composition de méso-contrats par la règle de choix, avant de lire le code, de cartographier l'impact ou de rédiger la fiche.
+- **D11.INV-2** : l'intention et chaque possibilité de la demande remplie portent leur réponse, `oui`, `non` ou `inconnu` pour une possibilité, et la source de toute réponse autre qu'`inconnu`, dans le ticket ou dans une réponse du développeur ; rien n'est rempli par supposition ; une possibilité `inconnu` dont la réponse changerait la composition ou ses options, ou une égalité entre principaux ou entre ensembles de compléments, devient une question au développeur, posée avec les autres.
+- **D11.INV-3** : la composition proposée, principal et compléments, justifiée par les empreintes, est confirmée par le développeur avant toute autre étape ; une composition imposée par le développeur vaut confirmation si elle porte la demande remplie selon la règle de choix.
+- **D11.INV-4** : `ticket.toml` garde la demande remplie, avec ses sources, et la composition confirmée ; si l'analyse montre ensuite que la demande sort des empreintes, l'IA revient à la qualification et fait confirmer une autre composition, sans en changer d'elle-même.
 - **D11.INV-5** : les possibilités du modèle se fondent sur l'analyse de l'application : à l'installation, l'IA propose celles qui s'appliquent, avec leurs repères, celles à retirer et celles qui manquent, rattachées à une couche et à une option ; le développeur seul les écrit dans le référentiel.
+- **D11.INV-6** : chaque complément se justifie par au moins une possibilité à `oui` que le principal ne porte pas ; les compléments sont en plus petit nombre possible, et la qualification nomme pour chacun les possibilités qui le justifient ; un ticket que le principal porte en entier n'a aucun complément.
 
 ## 15. Scénarios de recette
 
@@ -633,7 +638,7 @@ Rejoués avec le développeur à l'installation, puis à chaque version du skill
 | R10 | Le fichier d'invariants du projet exige `422` pour une entrée invalide | contradiction avec le socle (`400`) signalée et inscrite au registre ; le socle s'applique jusqu'à la décision du développeur | D8.INV-2 |
 | R11 | Ticket fil rouge, référentiel installé, M01 confirmé à la qualification (R16) | options : schéma (colonne), CRUD `read`, endpoint `GET`, fonctionnalité et règle d'habilitation, bouton et chargement au clic ; preuves des options et exigences des transverses (socle, accessibilité, migration sûre) dans les tests déduits ; `ticket.toml` épinglé à la version du référentiel, validé avec la fiche | D10.INV-1, D10.INV-2, D10.INV-3, D10.INV-5 |
 | R12 | Une option front désigne `maquettes/ecran-cible.png` et demande `structure`, `composants` et `etats` | `analyse-image.md` rédigée avant la fiche : extractions demandées, chaque élément rattaché à une option ou posé en question, estimations signalées ; validée avec la fiche | D10.INV-4 |
-| R13 | Ticket confirmé M03 dont l'analyse montre une donnée nouvelle à persister | aucune option de persistance sous M03, à l'impact `aucun` ; l'IA revient à la qualification : elle complète la demande, propose M01 ou une catégorie nouvelle, fait confirmer, et ne modifie pas le référentiel | D10.INV-2, D10.INV-5, D11.INV-4 |
+| R13 | Ticket confirmé M03 dont l'analyse montre une donnée nouvelle à persister | aucune option de persistance rattachée à M03, à l'impact `aucun` ; l'IA revient à la qualification : elle complète la demande, propose la composition que donne la règle de choix (M01 seul dès que l'API change aussi, sinon M03 avec le complément M02), fait confirmer, et ne modifie pas le référentiel | D10.INV-2, D10.INV-5, D11.INV-4 |
 | R14 | Chargement au choix ; le développeur répond « sans orchestrateur », puis confie un ticket | le skill n'est pas activé ; ni fiche C7E ni règle du skill ; seules les règles du projet s'appliquent | D2.INV-3 |
 | R15 | Skill installé dans `.gemini/skills/` d'un clone ordinaire ; le développeur choisit l'orchestrateur | `git status` ne montre ni le skill ni `.geminiignore` ; après l'activation, l'IA lit `meso-contrats.md` et `modules/referentiel/SKILL.md` du skill sans refus | § 11.3 |
 | R16 | Ouverture du ticket fil rouge ; le ticket ne dit pas s'il faut ajouter un endpoint | avant de lire le code, l'IA remplit la demande depuis le ticket, chaque réponse sourcée ; elle propose M01, seul à couvrir persistance, backend et frontend, M02 et M03 écartés par l'empreinte ; une question, sur l'endpoint ; rien d'autre avant la confirmation ; `ticket.toml` reçoit la demande, la réponse du développeur et M01 confirmé | D11.INV-1, D11.INV-2, D11.INV-3, D11.INV-4 |
@@ -641,10 +646,12 @@ Rejoués avec le développeur à l'installation, puis à chaque version du skill
 | R18 | Installation dans une application qui a des traitements par lots et des exports de fichiers | d'après l'analyse de l'application, l'IA propose les possibilités du modèle qui s'appliquent, avec leurs repères, et deux possibilités nouvelles, un traitement par lots et un export, chacune rattachée à une couche et à une option ; elle n'écrit pas le référentiel, le développeur les ajoute | D11.INV-5, D10.INV-5 |
 | R19 | Ticket `ABCDE-3620` : depuis l'URI `/api/v1/commandes/{id}`, une variante de `CommandeDto` sans le champ `lignes`, une liste de records, et à la même URI une variante où `lignes` est remplacé par la date-heure de la dernière ligne enregistrée ; la liste, servie par son URI existante, est mise à jour en temps réel | qualification : `variante_representation`, `temps_reel`, `endpoint_modifie` et `lecture` à `oui` ; M04 proposé, M01, M02 et M03 écartés par l'empreinte et les possibilités requises ; quatre questions posées ensemble (sélection, exposition de la variante sans champ, date-heure stockée, front), le courtier pris dans le fichier d'invariants du projet ; après confirmation, repérage depuis l'URI dans `ticket.toml`, URI existante de la liste comprise ; tests déduits : champ absent, réponse actuelle inchangée sans `vue`, date-heure ISO 8601 avec fuseau, `null` pour une commande sans ligne, une seule requête d'agrégat, canal au contrat AsyncAPI, aucun événement pour une transaction annulée, reprise après déconnexion par l'`ETag` de la liste, abonnement refusé sans droit de lecture, annonce `aria-live`, date-heure du résumé recalculée après une suppression | D11.INV-2, D11.INV-3, D10.INV-2, D10.INV-3, D10.INV-6, SC7.INV-1, SC7.INV-3, SC7.INV-4, SC7.INV-5 |
 | R20 | Même ticket ; le développeur choisit le remplacement de la réponse actuelle, alors que `/api/v1` est publiée | refus, avec la règle du socle (SC1.INV-2) : retirer un champ d'une version publiée est cassant ; l'IA propose le paramètre de vue ou la négociation de contenu, ou une version `v2` qui n'est plus la même URI, et attend la décision ; rien n'est écrit dans `ticket.toml` avant | D10.INV-6, D8.INV-2 |
+| R21 | Ticket `ABCDE-3655` : celui de R19, avec un critère de plus, le résumé réservé au rôle COMMERCIAL | M04 principal, il porte six des sept possibilités à `oui` ; M01, qui en porte cinq, écarté comme principal ; M01 seul complément, pour `regle`, que M04 ne permet pas ; la qualification présente la composition et ce qui justifie le complément ; après confirmation, `ticket.toml` nomme M04 et `complements = ["M01"]`, et la règle d'habilitation est rattachée à M01 ; preuves de toutes les options, transverses des couches de toute la composition | D10.INV-1, D10.INV-2, D11.INV-3, D11.INV-6 |
+| R22 | « Afficher en temps réel, sur l'écran de suivi, les commandes qui arrivent », sans variante de représentation | `temps_reel` n'est porté par aucun méso-contrat : M04, seul à permettre `evenements`, requiert `variante_representation` ; l'IA le signale, propose M03 pour le reste, suggère de permettre `evenements` dans une catégorie du référentiel ou d'en créer une, n'écrit pas le référentiel et ne commence pas l'analyse | D10.INV-1, D10.INV-5, D11.INV-6 |
 
 Critères d'acceptation du skill :
 
-- R1 à R20 rejoués avec le développeur, à l'installation et à chaque version ;
+- R1 à R22 rejoués avec le développeur, à l'installation et à chaque version ;
 - le modèle du référentiel se lit en TOML, sa commande d'extraction redonne l'empreinte publiée, et les exemples d'instance respectent ses règles de validation ;
 - les exemples de branches et de commits de ce skill passent les hooks du kit `agents-paralleles-gitlab` (vérifié à la publication, section 16) ;
 - `docs/c7e/concepts.json` est un JSON valide, de `schemaVersion` 1.
@@ -788,6 +795,25 @@ Vérifications faites à la publication de la 3.4.0 :
 - la règle de choix, appliquée à treize demandes types, retient toujours les mêmes catégories pour les six demandes de la 3.3.0 (M01, M02, M03, et M01 ou M03 pour R17), M04 pour les six variantes de représentation (seule, avec un agrégat, avec un front consommateur, avec une colonne de date à créer, avec une URI propre, en temps réel) et aucune catégorie pour le temps réel sans variante ;
 - les transmissions des autres skills qui incluent le socle restent fidèles, avec la 1.0.1 prise dans ses archives.
 
+### Composition de méso-contrats, en 3.5.0
+
+Demande du développeur, le 1er novembre 2026 : « Il peut y avoir plusieurs méso-contrats. » Il a précisé : un ticket engage plusieurs méso-contrats à la fois, chacun couvrant une partie de sa demande ; un principal porte le ticket, des compléments s'ajoutent pour les possibilités qu'il ne porte pas ; une couche à l'impact `aucun` dans un méso-contrat peut être couverte par un autre du même ticket, l'union l'emportant.
+
+| En 3.4.0 | En 3.5.0 | Invariant ou section |
+|---|---|---|
+| un seul méso-contrat par ticket ; plusieurs qui conviennent : une question les départage ; aucun : le ticket est signalé | un principal, qui porte le plus de la demande, et au besoin des compléments, en plus petit nombre, chacun justifié par une possibilité que le principal ne porte pas ; une possibilité que rien ne porte est signalée | D10.INV-1, D11.INV-6 ; module `qualification`, § 2 |
+| une couche à l'impact `aucun` interdisait toute option sur cette couche | l'impact `aucun` vaut pour le méso-contrat qui le déclare : chaque option est rattachée au méso-contrat qui la permet (`meso_contrat`, le principal par défaut) | D10.INV-2, E5 |
+| `ticket.toml` : `meso_contrat` | `meso_contrat`, le principal, et `complements` ; `meso_contrat_confirme` vaut pour toute la composition | module `referentiel`, § 7.3 |
+| `/c7e ABCDE-3512 M01` | aussi `/c7e ABCDE-3655 M04 M01`, le principal d'abord | § 11.4, module `qualification`, § 5 |
+
+D10.INV-1, D10.INV-2, D11.INV-3 et D11.INV-4 sont remplacés pour la composition. Pour un ticket que le principal porte en entier, ils disent la même chose qu'en 3.4.0 : la règle de choix redonne le méso-contrat unique, et un rattachement par défaut au principal redonne l'empreinte d'un seul méso-contrat. Ce qu'ils ne garantissent plus, une option interdite sur une couche à l'impact `aucun` du seul méso-contrat du ticket, l'est désormais méso-contrat par méso-contrat : une option ne se rattache jamais à un méso-contrat sur une couche où il est à l'impact `aucun`, et chaque complément est justifié et confirmé (D11.INV-6). Ce changement a été ratifié par le développeur. Le modèle du référentiel passe en 3.3.0 ; un référentiel installé avant reçoit la règle de choix et les règles de validation de la main du développeur, et d'ici là la qualification ne propose qu'un méso-contrat, comme avant, en le signalant.
+
+Vérifications faites à la publication de la 3.5.0 :
+
+- le modèle du référentiel se lit en TOML, et la commande d'extraction redonne sa nouvelle empreinte ;
+- les trois exemples d'instance, dont la composition `ABCDE-3655`, respectent les quatorze règles de validation, et sept écarts introduits volontairement dans la composition sont tous rejetés : complément absent, complément superflu, principal et complément inversés, règle rattachée au principal, rattachement hors de la composition, complément sans option, option rattachée à un méso-contrat sur une couche à l'impact `aucun` ;
+- la règle de choix, appliquée à dix-sept demandes types, redonne pour les douze demandes à un seul méso-contrat de la 3.4.0 le même méso-contrat, sans complément, et M04 seul pour une variante avec un index ; elle retient M04 avec le complément M01 pour `ABCDE-3655`, M03 avec le complément M02 pour un écran qui affiche une donnée nouvelle sans changer l'API, pose une question entre M02 et M03 pour un libellé et un index, et signale `temps_reel` sans variante de représentation.
+
 ## 17. Journal de révision
 
 **3.0.0** : version remise par le développeur le 31 octobre 2026, hors dépôt, avec son fichier `meso-contrats.md`. Archives : `archives/SKILL-v3.0.0.md` et `archives/meso-contrats-v3.0.0.md`.
@@ -801,3 +827,5 @@ Vérifications faites à la publication de la 3.4.0 :
 **3.3.0** (2026-11-01) : dimension D11 active, la qualification de la demande (section 16). À l'ouverture de chaque ticket, avant tout le reste, la demande du ticket est rangée dans le modèle générique de la demande du référentiel, une combinaison de possibilités de modification de l'application établies à son analyse ; les questions que le ticket laisse ouvertes sont posées au développeur ; le méso-contrat que retient la règle de choix est confirmé avant l'analyse. Module `qualification` ; modèle du référentiel 3.1.0, avec la section 0, quinze possibilités pour la pile PostgreSQL, Java et Angular, `[ticket.demande]` et quatre règles de validation de plus. Invariants D11.INV-1 à D11.INV-5 ; D10.INV-1 renforcé ; trente et un invariants. Scénarios R16 à R18, R13 revu. Archive : `archives/SKILL-v3.2.1.md`.
 
 **3.4.0** (2026-11-01) : point d'extension E4, les paramètres d'option au choix par ticket et les possibilités requises d'un méso-contrat (section 16). Catégorie M04, variante de représentation d'une ressource : depuis l'URI d'une opération, une variante de son type de réponse sans un champ liste ou record, et une variante à la même URI où ce champ est remplacé par la date-heure de son dernier enregistrement ; le champ, servi par son URI existante, et la date-heure tenus à jour en temps réel. Option `representations` avec ses paramètres (mécanisme de sélection, exposition de la variante sans champ) et ses preuves ; option `evenements` (WebSocket STOMP, courtier simple ou relais) ; possibilités `variante_representation` et `temps_reel` ; modèle du référentiel 3.2.0, dix-sept possibilités, quinze règles de validation ; second exemple d'instance. Socle back-front 1.1.0 épinglé, SC7 active ; fichier d'invariants du projet complété (événements temps réel, courtier). Invariant D10.INV-6 ; trente-deux invariants. Scénarios R19 et R20. Archive : `archives/SKILL-v3.3.0.md`.
+
+**3.5.0** (2026-11-01) : point d'extension E5, la composition de méso-contrats (section 16). Un ticket engage un méso-contrat principal, qui porte le plus de sa demande, et au besoin des compléments, en plus petit nombre, pour les possibilités qu'il ne porte pas ; chaque option est rattachée au méso-contrat qui la permet, et une couche à l'impact `aucun` dans l'un peut être couverte par un autre. Règle de choix et règles de validation réécrites, modèle du référentiel 3.3.0, `complements` dans `ticket.toml`, troisième exemple d'instance ; composition imposée par `/c7e`. D10.INV-1, D10.INV-2, D11.INV-3 et D11.INV-4 remplacés pour la composition ; D11.INV-6 ; trente-trois invariants. Scénarios R21 et R22, R13 revu. Archive : `archives/SKILL-v3.4.0.md`.
