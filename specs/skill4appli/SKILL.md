@@ -1,10 +1,10 @@
 ---
 name: skill4appli
 description: Mémoire SQLite d'une application locale et de ses branches git, interrogée par un agent sans relire tout le dépôt (inventaire fidèle à git, recherche plein texte chemin:ligne, requêtes SQL en lecture seule, fraîcheur mesurée, watcher de la branche courante chargée dans un worktree dédié, configuration par l'environnement, parité Linux, WSL2 et Windows, agent mémoire). À utiliser pour indexer un projet, y localiser du code ou l'état des branches, et garder cet index à jour pendant le travail.
-version: 1.1.0
+version: 1.1.1
 ---
 
-# Skill4Appli, mémoire d'application et watcher de branche, version 1.1.0
+# Skill4Appli, mémoire d'application et watcher de branche, version 1.1.1
 
 Ce document est le point d'entrée du skill. Le skill tient, dans un fichier SQLite, la structure et le contenu d'une application locale et l'état de ses branches git, pour qu'un agent localise du code par requête au lieu de parcourir le disque à chaque question. Un script Node sans dépendance, `scripts/app_db.mjs`, est le seul à écrire dans la base ; l'agent `memoire-appli` en est le premier lecteur. Les règles détaillées sont dans `modules/`.
 
@@ -116,7 +116,7 @@ Poste type visé : back Java sur Tomcat et front Angular sous Windows, avec Git 
 
 ## 6. Registre des dimensions
 
-| ID | Dimension | Introduite | Statut 1.1.0 | Dépend de | Module |
+| ID | Dimension | Introduite | Statut 1.1.1 | Dépend de | Module |
 |---|---|---|---|---|---|
 | D1 | Exécution : commandes, emplacement de la base, sorties et codes, migrations | 1.0 | active | | `execution`, `recette` |
 | D2 | Inventaire et ingestion | 1.0 | active | D1 | `ingestion`, `recette` |
@@ -251,3 +251,5 @@ Ajouts demandés par le développeur : en 1.0.0, le watcher de la branche couran
 **1.0.0** (2026-10-23) : première version. Dimensions D1 à D7 actives, D8 et D9 réservées. Points d'extension E1 à E3. Script `scripts/app_db.mjs` (Node 22.13, sans dépendance), recette de 25 tests et agent `memoire-appli`, écrits en entier dans les modules `execution`, `recette` et `agent`. Tirée de `skill4appli-fr` (section 10). Archive : `archives/SKILL-v1.0.0.md`.
 
 **1.1.0** (2026-10-24) : lecture 12 facteurs × 7E (section 5). Dimensions D10 (configuration par l'environnement : variables `SKILL4APPLI_*`, commande `config`) et D12 (parité Linux, WSL2 et Windows : identité canonique du worktree, chemins natifs, arrêt commun par `watch-stop`, fins de ligne CRLF, avertissement d'un worktree Windows lu depuis WSL) actives ; D11 (service MCP en stdio) réservée. Point d'extension E4 : un objet par commande de lecture, `executer()` exporté. Schéma PostgreSQL suivi par les changelogs Liquibase du dépôt, avec leurs requêtes types. Recette de 34 tests, rejouée en CI sous Linux et Windows ; commande d'extraction valable sous bash, CMD et PowerShell ; agent `memoire-appli` qui relaie les avertissements et appelle `node.exe` depuis WSL. Aucune migration, aucun invariant de 1.0.0 modifié ; une base 1.0.0 est lue telle quelle.
+
+**1.1.1** (2026-11-02) : correctif. Les mentions d'outils d'IA autres que Gemini sont retirées, à la demande du développeur, pour que l'IA locale ne lise que des consignes qui la concernent : l'agent `memoire-appli` s'installe comme sous-agent d'un outil qui en accepte, ou comme consigne système, Gemini CLI compris (module `agent`, § 2) ; l'en-tête de transmission suit. Le script et l'agent portent la version 1.1.1 ; nouvelles empreintes au module `execution`, § 9. Aucune migration, aucune dimension ni aucun invariant modifié. Archive : `archives/SKILL-v1.1.0.md`.

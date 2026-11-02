@@ -1,10 +1,10 @@
 ---
 name: agent2dev
 description: Construire Agent2Dev, système multi-agents de développement qui applique le skill agent-tdd-jira comme méthode. D'une demande Jira exportée en MHTML, il tire les US et leurs critères d'acceptation, les scénarios Gherkin, les variantes, puis réalise chaque scénario en cycle TDD et trace la demande jusqu'aux commits, en binôme avec Agent2Test. Le moteur rédige, des agents déterministes écrivent et exécutent, le développeur valide à chaque point ; un journal chaîné et un apprentissage sous gouvernance en font un système de second ordre. Exécution locale, données dans un fichier SQLite unique, ouvert par un agent médiateur ; la remise et le journal de tests circulent à la main, ou par un échange par dossiers facultatif.
-version: 1.1.0
+version: 1.1.1
 ---
 
-# Agent2Dev, spécification 1.1.0
+# Agent2Dev, spécification 1.1.1
 
 Ce document est le point d'entrée du package. Il donne le principe, la carte du système, les points de validation, le registre des dimensions, les règles communes et les invariants. Les détails techniques sont dans `modules/`. Le fichier `manifest.json` déclare quels modules sont actifs.
 
@@ -182,7 +182,7 @@ Entre V4 et V5, l'acceptation en binôme n'est pas un point de validation : le d
 
 ## 6. Registre des dimensions
 
-| ID | Dimension | Introduite | Statut 1.1.0 | Dépend de | Module |
+| ID | Dimension | Introduite | Statut 1.1.1 | Dépend de | Module |
 |---|---|---|---|---|---|
 | D1 | Noyau 7E, bus et constitution | 1.0 | active | | `noyau` |
 | D2 | Données par agent, en SQLite | 1.0 | superseded | D1 | remplacée en 1.1.0 par D24 (`donnees`) |
@@ -474,7 +474,7 @@ Ce qui change par rapport à l'étape 1 :
 | contestation argumentée par Agent2Dev, tranchée en CP-5 | désaccord remonté au développeur | D10.INV-4 |
 | arbre de travail et branche `a2d/<demande>` créés par Agent2Dev, poussée vers un Gitea local | GitLab de la mission ; seule la partie locale est concernée ; écriture du code en option, à autoriser | par défaut, copie de travail et branche `a2d/<CLÉ>` dans les données d'Agent2Dev, un patch par scénario accepté (D5.INV-7) ; sur autorisation, écriture dans l'arbre de la demande, commit après V4 ; aucune poussée (D5.INV-4) |
 | CP-0 à CP-6, autonomie par défaut (`differe`) | points de validation toujours présentés | V0 à V5 et CP-4 (section 5), décidés dans le tableau de bord ou par MCP, jamais par l'échange ; autonomie réservée à D22 |
-| adaptateurs `gemini-cli` (défaut), `externe`, `compatible-openai`, `anthropic`, `simulation` | même moteur que pour Agent2Test | `externe` (défaut), `compatible-openai`, `simulation` (point E1) |
+| adaptateurs `gemini-cli` (défaut), `externe`, `compatible-openai`, un adaptateur propre à un fournisseur commercial, `simulation` | même moteur que pour Agent2Test | `externe` (défaut), `compatible-openai`, `simulation` (point E1) |
 | stockage JSON, puis SQLite au-delà de 250 Ko | SQLite dès le départ, pour les deux têtes ; un fichier unique par tête, dont un agent médiateur gère l'accès (22 octobre 2026) | un fichier SQLite par agent dès le premier enregistrement, sans phase JSON (D2.INV-2), puis en 1.1.0 un fichier unique dont l'agent médiateur `donnees` tient la seule connexion (D24.INV-1, D24.INV-3) |
 | mémoire et recherche hybride sur le code | — | réservée à D21 (point E3) |
 | plusieurs demandes actives, verrou d'instance | une demande à la fois ; parallélisme par le kit | une instance par demande, une instance par worktree en mode parallèle (D12.INV-2) |
@@ -492,7 +492,7 @@ Ce qui change par rapport à l'étape 1 :
 | `apprenant` | `apprenant`, leçons par moteur, ratification en CP-4 |
 | `journal`, une ligne JSON par trace | `journal` chaîné, échelle et phase sur chaque ligne |
 | `tableau-de-bord` | `tableau-de-bord` par rôle |
-| moteurs `simulation` et `claude` | adaptateurs `simulation`, `externe`, `compatible-openai` |
+| moteurs `simulation` et celui d'un fournisseur commercial | adaptateurs `simulation`, `externe`, `compatible-openai` |
 | `AUTO=1` | supprimé : aucun point n'est validé par le système |
 
 `agents-modif/` reste en place jusqu'à la recette de la première version d'Agent2Dev construite, puis est retiré.
@@ -502,3 +502,5 @@ Ce qui change par rapport à l'étape 1 :
 **1.0.0** (2026-10-22) : première version, tirée de la conception de l'étape 1 (version 0.3.0 du 4 octobre 2026) et des décisions du 21 octobre 2026. Méthode : skill agent-tdd-jira 1.3.1, lu depuis sa transmission vérifiée. Binôme : journal de tests d'agent2test 1.1.0, lu par le script du skill. Dimensions D1 à D20 et D23 actives, D21 (mémoire) et D22 (autonomie) réservées. Points d'extension E1 à E4. Moteur : Gemini Code Assist par MCP, modèle local compatible OpenAI ou simulation. Stockage : un fichier SQLite par agent, dès le départ. Écriture du code en option : sans autorisation, copie de travail et un patch par scénario accepté ; avec, écriture dans l'arbre de la demande. Relais n8n facultatif (D23), qui ne porte que la remise et le journal de tests. Amendements du développeur à la ratification du 21 octobre 2026 : SQLite dès le départ, pour Agent2Dev comme pour Agent2Test (agent2test 1.1.0) ; n8n facultatif, en relais de transport seulement, sur sa base SQLite.
 
 **1.1.0** (2026-10-24) : dimensions D24 et D25 actives ; D2 et D23 passent à `superseded`, remplacées par D24 et D25. Données : un fichier SQLite unique, `agent2dev.sqlite`, dont l'agent médiateur `donnees` tient la seule connexion, au lieu d'un fichier par agent ; les agents n'y accèdent que par ses actions, `lire`, `ecrire`, `ajouter`, `lister` et `compter`, sur les collections qu'ils déclarent ; le médiateur tire la table de l'appelant que le bus atteste et de la collection, sans SQL ni nom de table venu d'un agent ; il numérote et chaîne les collections du journal et du grand livre dans la transaction d'ajout ; une migration qui crée un objet hors des tables de son agent est annulée, et chaque requête du médiateur est vérifiée au démarrage sur le plan d'exécution de SQLite (`EXPLAIN`), déclencheurs, vues et clés étrangères compris ; reprise d'une instance 1.0.0 par la commande `npm run donnees:reprendre` (module `donnees`, section 5). Échange : n8n n'est plus le relais du binôme ; en mode `manuel`, le défaut, la remise se télécharge depuis le tableau de bord et le développeur donne le chemin du journal de tests ; en mode `dossiers`, le `depot` publie la remise dans la boîte de sortie de l'instance, par un fichier provisoire renommé ensuite, et l'échange relève, en lecture seule, le journal de tests dans la boîte de sortie d'Agent2Test, sans aucune connexion ; le rôle `relais` et les outils `a2d_remise` et `a2d_remise_relayee` sont retirés (module `echange`, section 7). D24.INV-1 et D24.INV-2 remplacent D2.INV-1 ; D24.INV-3 reprend D2.INV-2 pour le fichier unique et y ajoute le contrôle d'intégrité ; D24.INV-4 reprend mot pour mot D2.INV-3, et I7 le cite désormais ; D25.INV-1 et D25.INV-3 reprennent D23.INV-1 et D23.INV-3 pour l'échange par dossiers, D23.INV-2 et D23.INV-4 n'ayant plus d'objet, et D25.INV-2 et D25.INV-4 s'ajoutent. Méthode : skill agent-tdd-jira 1.3.2. Binôme : journal de tests et remise d'agent2test 1.2.0. Décisions du développeur (22 et 23 octobre 2026) : un fichier SQLite unique par tête, dont un agent médiateur gère l'accès ; n8n remplacé par l'échange par dossiers, facultatif. Archive : `archives/SKILL-v1.0.0.md`.
+
+**1.1.1** (2026-11-02) : correctif. Les noms des moteurs d'un fournisseur commercial, cités dans la filiation (section 11), sont remplacés par une désignation générique, à la demande du développeur, pour que l'IA qui construit Agent2Dev ne lise que des consignes qui la concernent. Les adaptateurs de la version restent `externe`, `compatible-openai` et `simulation`. Exemples du journal à la version 1.1.1. Aucune dimension ni aucun invariant modifié. Archive : `archives/SKILL-v1.1.0.md`.

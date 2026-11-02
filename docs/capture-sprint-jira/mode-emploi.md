@@ -1,6 +1,6 @@
 # Mode d'emploi : capturer les tickets d'un sprint Jira
 
-Ce mode d'emploi installe [`capture-sprint-jira`](../../specs/capture-sprint-jira/SKILL.md) 1.2.1 : enregistrer en MHTML les tickets du prochain sprint d'un Jira protégé par un SSO, **rangés dans un dossier par section de la page du sprint** (`IA`, `DEV`…), sans les ouvrir un à un. Vous vous connectez vous-même dans la fenêtre du navigateur : aucun identifiant ne passe par le skill.
+Ce mode d'emploi installe [`capture-sprint-jira`](../../specs/capture-sprint-jira/SKILL.md) 1.2.2 : enregistrer en MHTML les tickets du prochain sprint d'un Jira protégé par un SSO, **rangés dans un dossier par section de la page du sprint** (`IA`, `DEV`…), sans les ouvrir un à un. Vous vous connectez vous-même dans la fenêtre du navigateur : aucun identifiant ne passe par le skill.
 
 ```mermaid
 flowchart LR
@@ -17,7 +17,7 @@ flowchart LR
 - Chrome installé sur le poste ; Edge ou le Chromium de Playwright à défaut.
 - Un écran : la capture ouvre une fenêtre visible, pour la connexion SSO. Sous Windows avec WSL2, installez et lancez le skill **du côté où Chrome est installé**, en général Windows.
 - Python 3, seulement pour le script d'export par l'API, facultatif.
-- La transmission : [`transmissions/capture-sprint-jira-1.2.1.md`](../../transmissions/capture-sprint-jira-1.2.1.md).
+- La transmission : [`transmissions/capture-sprint-jira-1.2.2.md`](../../transmissions/capture-sprint-jira-1.2.2.md).
 
 ## 2. Installer, avec l'IA
 
@@ -25,7 +25,7 @@ Collez la transmission dans l'IA. Elle mène quatre étapes :
 
 1. **Matérialiser** : `.skills/capture-sprint-jira/` à l'emplacement que vous indiquez, sinon dans votre dossier personnel. Le skill ne dépend d'aucun projet.
 2. **Fichiers exécutables et recette** : les scripts sont tirés des modules par la commande d'extraction du module `execution`, § 8, qui vérifie leurs empreintes. Puis `npm ci`, qui installe la seule dépendance, `playwright-core`, sans télécharger de navigateur. Puis `npm test` (sous Linux sans écran, `xvfb-run -a npm test`) : 20 scénarios contre un faux Jira local, 132 contrôles, aucun échec ; sans Python, un scénario est sauté.
-3. **L'agent** : elle vous propose d'installer `agent/capteur-sprint.md`, dans `.claude/agents/` pour Claude Code ou comme consigne système, et rejoue avec vous les scénarios A1 à A5.
+3. **L'agent** : elle vous propose d'installer `agent/capteur-sprint.md`, dans Gemini CLI par GeminiBoard, comme sous-agent d'un autre outil qui en accepte, ou comme consigne système, et rejoue avec vous les scénarios A1 à A5.
 4. **Première capture**, avec vous (§ 3).
 
 Dans Gemini CLI, `node <Agent2Prompt>/tools/installer.mjs capture-sprint-jira` fait l'étape 1 ; demandez ensuite à l'IA de suivre `CONSIGNE.md` à partir de l'étape 1.

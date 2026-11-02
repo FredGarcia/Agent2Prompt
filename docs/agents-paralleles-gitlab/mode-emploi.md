@@ -18,7 +18,7 @@ flowchart LR
 ## 1. Prérequis
 
 - Git 2.38 ou plus récent, bash 4 ou plus récent (Git Bash sous Windows), un accès SSH au dépôt GitLab.
-- Une IA locale qui exécute des commandes : Gemini CLI, Claude Code ou équivalent.
+- Une IA locale qui exécute des commandes : Gemini CLI ou équivalent.
 - La transmission : [`transmissions/agents-paralleles-gitlab-1.0.1.md`](../../transmissions/agents-paralleles-gitlab-1.0.1.md).
 
 ## 2. Installer, avec l'IA

@@ -77,14 +77,14 @@ Treize fichiers sont tirés des blocs annotés `<!-- fichier : chemin -->` des m
 
 | Fichier | Module, section | Empreinte sha256 |
 |---|---|---|
-| `package.json` | `execution`, § 9 | `d3784c1e36eb0ca8724d6643b20ac9570e2af3c0019033d460b6cb12abfe2927` |
-| `package-lock.json` | `execution`, § 9 | `b3f53e6ed11bb366196541eb86f28bdf103637536177706072f902e989a2a7f8` |
+| `package.json` | `execution`, § 9 | `04a42f32f55919cc9a9e3d7568e942e6fb2300d310bd489b62ff64870706cf7c` |
+| `package-lock.json` | `execution`, § 9 | `017608a5b06f2491cee4440ed0f986e56ad4a3bae3191d21470dd5e109ac281c` |
 | `.gitignore` | `execution`, § 9 | `b163b109241838c4ff48e7cc27de427a4fb4e7f9aebdb16c8a5ad3fbb7a02613` |
 | `scripts/jira-capture-core.mjs` | `execution`, § 10 | `0cc8e50d0a11bd85a6e2c4fc8aaf82df3426720a753bd0ebd96d915cacf82007` |
 | `scripts/jira-capture-app.mjs` | `interface`, § 8 | `02ffc1ae5d4cffc2c45e7f0112701564c5f36e00435e53194e49712e5e57c439` |
 | `scripts/public/capture.html` | `interface`, § 8 | `0a42f8ad4f4c21bb4d8e9f3f15d437e9622e63fab1d23971d3fdf38a3b98c25a` |
 | `scripts/jira-capture-mhtml.mjs` | `interface`, § 8 | `1aa5f7399a3e19d7a52bb10bec6ce3e3c66162521ff3941a6d32837176763d5c` |
-| `agent/capteur-sprint.md` | `agent`, § 7 | `9843d0625310719470f4bb352de2d9c9d7ee1e64417582aac3bbd640267a7a76` |
+| `agent/capteur-sprint.md` | `agent`, § 7 | `0a4ceb3ca863bd5b8c57a2d4754315436553b29d0b94b8dd7a04a395d9e4db76` |
 | `scripts/jira-sprint-app.mjs` | `export-api`, § 6 | `14005092304d4d368c869d7ee801ca922529848325255054768e86f37c418ea8` |
 | `scripts/public/index.html` | `export-api`, § 6 | `f69c6d601212d9a7e746181957a8c281f00a3d42decd488de25c54fdbb8abd91` |
 | `scripts/jira_sprint_export.py` | `export-api`, § 6 | `60b6953199cbc21443572212fee36de21adc4522e86feb2215f38ba474b91782` |
@@ -94,7 +94,7 @@ Treize fichiers sont tirés des blocs annotés `<!-- fichier : chemin -->` des m
 Depuis le dossier du skill, cette commande d'une ligne écrit les treize fichiers, compare leurs empreintes à celles du tableau et sort avec le code 1 au moindre écart ou à la moindre absence. Elle ne contient ni `$`, ni accent grave, ni `!`, ni `%`, ni guillemet intérieur : elle se colle telle quelle dans bash, zsh, CMD ou PowerShell, et dans un fichier `.cmd`. Elle lit aussi des modules aux fins de ligne CRLF.
 
 ```text
-node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'package.json': 'd3784c1e36eb0ca8724d6643b20ac9570e2af3c0019033d460b6cb12abfe2927', 'package-lock.json': 'b3f53e6ed11bb366196541eb86f28bdf103637536177706072f902e989a2a7f8', '.gitignore': 'b163b109241838c4ff48e7cc27de427a4fb4e7f9aebdb16c8a5ad3fbb7a02613', 'scripts/jira-capture-core.mjs': '0cc8e50d0a11bd85a6e2c4fc8aaf82df3426720a753bd0ebd96d915cacf82007', 'scripts/jira-capture-app.mjs': '02ffc1ae5d4cffc2c45e7f0112701564c5f36e00435e53194e49712e5e57c439', 'scripts/public/capture.html': '0a42f8ad4f4c21bb4d8e9f3f15d437e9622e63fab1d23971d3fdf38a3b98c25a', 'scripts/jira-capture-mhtml.mjs': '1aa5f7399a3e19d7a52bb10bec6ce3e3c66162521ff3941a6d32837176763d5c', 'agent/capteur-sprint.md': '9843d0625310719470f4bb352de2d9c9d7ee1e64417582aac3bbd640267a7a76', 'scripts/jira-sprint-app.mjs': '14005092304d4d368c869d7ee801ca922529848325255054768e86f37c418ea8', 'scripts/public/index.html': 'f69c6d601212d9a7e746181957a8c281f00a3d42decd488de25c54fdbb8abd91', 'scripts/jira_sprint_export.py': '60b6953199cbc21443572212fee36de21adc4522e86feb2215f38ba474b91782', 'tests/fake-jira.mjs': 'eb8de8e8bb1b46ad5a4c6e83cd6f8acdd812a494b8559d017d87b93907d4f83d', 'tests/run-tests.mjs': 'ba49ae2373b8e1ae2049ff7e4ec88ff405adb53136d6fd6227e0ac0e57149273' }; const vus = new Set(); let ecarts = 0; for (const module of ['modules/execution/SKILL.md', 'modules/interface/SKILL.md', 'modules/agent/SKILL.md', 'modules/export-api/SKILL.md', 'modules/recette/SKILL.md']) { const texte = fs.readFileSync(module, 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); vus.add(m[1]); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (conforme === false) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } } for (const f of Object.keys(attendu)) { if (vus.has(f) === false) { ecarts++; console.log('ABSENT    ' + f); } } if (ecarts > 0) process.exitCode = 1;"
+node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'package.json': '04a42f32f55919cc9a9e3d7568e942e6fb2300d310bd489b62ff64870706cf7c', 'package-lock.json': '017608a5b06f2491cee4440ed0f986e56ad4a3bae3191d21470dd5e109ac281c', '.gitignore': 'b163b109241838c4ff48e7cc27de427a4fb4e7f9aebdb16c8a5ad3fbb7a02613', 'scripts/jira-capture-core.mjs': '0cc8e50d0a11bd85a6e2c4fc8aaf82df3426720a753bd0ebd96d915cacf82007', 'scripts/jira-capture-app.mjs': '02ffc1ae5d4cffc2c45e7f0112701564c5f36e00435e53194e49712e5e57c439', 'scripts/public/capture.html': '0a42f8ad4f4c21bb4d8e9f3f15d437e9622e63fab1d23971d3fdf38a3b98c25a', 'scripts/jira-capture-mhtml.mjs': '1aa5f7399a3e19d7a52bb10bec6ce3e3c66162521ff3941a6d32837176763d5c', 'agent/capteur-sprint.md': '0a4ceb3ca863bd5b8c57a2d4754315436553b29d0b94b8dd7a04a395d9e4db76', 'scripts/jira-sprint-app.mjs': '14005092304d4d368c869d7ee801ca922529848325255054768e86f37c418ea8', 'scripts/public/index.html': 'f69c6d601212d9a7e746181957a8c281f00a3d42decd488de25c54fdbb8abd91', 'scripts/jira_sprint_export.py': '60b6953199cbc21443572212fee36de21adc4522e86feb2215f38ba474b91782', 'tests/fake-jira.mjs': 'eb8de8e8bb1b46ad5a4c6e83cd6f8acdd812a494b8559d017d87b93907d4f83d', 'tests/run-tests.mjs': 'ba49ae2373b8e1ae2049ff7e4ec88ff405adb53136d6fd6227e0ac0e57149273' }; const vus = new Set(); let ecarts = 0; for (const module of ['modules/execution/SKILL.md', 'modules/interface/SKILL.md', 'modules/agent/SKILL.md', 'modules/export-api/SKILL.md', 'modules/recette/SKILL.md']) { const texte = fs.readFileSync(module, 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); vus.add(m[1]); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (conforme === false) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } } for (const f of Object.keys(attendu)) { if (vus.has(f) === false) { ecarts++; console.log('ABSENT    ' + f); } } if (ecarts > 0) process.exitCode = 1;"
 ```
 
 Puis, depuis le même dossier :
@@ -112,7 +112,7 @@ npm test
 ```json
 {
   "name": "capture-sprint-jira",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "private": true,
   "description": "Capture en MHTML des tickets d'un sprint Jira derrière un SSO, rangés par catégorie (skill capture-sprint-jira)",
   "engines": {
@@ -134,13 +134,13 @@ npm test
 ```json
 {
   "name": "capture-sprint-jira",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "lockfileVersion": 3,
   "requires": true,
   "packages": {
     "": {
       "name": "capture-sprint-jira",
-      "version": "1.2.1",
+      "version": "1.2.2",
       "dependencies": {
         "playwright-core": "1.63.0"
       },

@@ -16,7 +16,7 @@ flowchart LR
 
 ## 1. Prérequis
 
-- Une IA locale qui écrit et exécute du code : Gemini CLI, Claude Code ou équivalent.
+- Une IA locale qui écrit et exécute du code : Gemini CLI ou équivalent.
 - Node 22.13 ou plus récent (24 recommandé), Playwright 1.63 ou plus récent ; les données tiennent dans un fichier SQLite, par `node:sqlite` : aucun serveur de base de données.
 - L'application Angular lancée par vous sur votre poste, et un navigateur du côté de la session SSO.
 - Docker Compose seulement pour un moteur local souverain (Ollama).

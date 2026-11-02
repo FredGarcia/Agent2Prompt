@@ -29,7 +29,7 @@ Lis `SKILL.md`, `manifest.json`, puis les modules actifs dans l'ordre indiqué p
 
 ## Étape 3 : l'agent
 
-Propose au développeur d'installer l'agent `agent/capteur-sprint.md` (module `agent`, § 2) : dans `.claude/agents/` pour Claude Code, ou comme consigne système dans son outil. Rejoue avec lui les scénarios A1 à A5 du module `agent` avant la première capture d'un sprint réel.
+Propose au développeur d'installer l'agent `agent/capteur-sprint.md` (module `agent`, § 2) : dans Gemini CLI par GeminiBoard, comme sous-agent d'un autre outil qui en accepte, ou comme consigne système dans son outil. Rejoue avec lui les scénarios A1 à A5 du module `agent` avant la première capture d'un sprint réel.
 
 ## Étape 4 : première capture, avec le développeur
 

@@ -1,6 +1,6 @@
 ---
 name: agent
-description: Agent capteur-sprint (rôle de capture sans identifiant, installation comme sous-agent Claude Code, dans Gemini CLI par GeminiBoard ou comme consigne système, pilotage de l'interface par son API HTTP, protocole valeurs puis ouverture puis connexion du développeur puis capture puis bilan, bilan tiré de rapport.json, tickets à classer laissés au développeur, ticket seul capturé dans le dossier confirmé par le développeur, valeurs du Jira jamais écrites dans un fichier, interdits, scénarios A1 à A6, définition complète de l'agent). À lire avant d'installer l'agent ou de lui confier une capture.
+description: Agent capteur-sprint (rôle de capture sans identifiant, installation dans Gemini CLI par GeminiBoard, comme sous-agent d'un autre outil qui en accepte ou comme consigne système, pilotage de l'interface par son API HTTP, protocole valeurs puis ouverture puis connexion du développeur puis capture puis bilan, bilan tiré de rapport.json, tickets à classer laissés au développeur, ticket seul capturé dans le dossier confirmé par le développeur, valeurs du Jira jamais écrites dans un fichier, interdits, scénarios A1 à A6, définition complète de l'agent). À lire avant d'installer l'agent ou de lui confier une capture.
 dimensions: [D7]
 status: active
 ---
@@ -17,8 +17,8 @@ L'agent `capteur-sprint` fait, pour le développeur, ce que celui-ci ferait dans
 
 Le fichier `agent/capteur-sprint.md` (§ 7) est tiré du skill comme les scripts (module `execution`, § 8).
 
-- **Claude Code** : copier le fichier dans `.claude/agents/capteur-sprint.md` du projet, ou dans `~/.claude/agents/` pour tous les projets. Son en-tête porte les champs `name` et `description`, et limite ses outils (`tools: Bash, Read, Glob`) : il n'a ni écriture ni édition de fichiers.
 - **Gemini CLI, par GeminiBoard** : le catalogue de GeminiBoard adopte l'agent dans l'extension d'un projet. Pour Gemini CLI, l'en-tête devient `tools: [run_shell_command, read_file, glob]` ; le corps reste le même.
+- **Autre outil à sous-agents** : copier le fichier dans le dossier des agents de l'outil, celui du projet ou celui de l'utilisateur pour tous les projets. Son en-tête porte les champs `name` et `description`, et limite ses outils (`tools: Bash, Read, Glob`) : il n'a ni écriture ni édition de fichiers. Si l'outil nomme autrement ses outils, adapter l'en-tête de la copie installée, jamais le fichier du skill.
 - **Autre outil** : le corps du fichier, sous l'en-tête, sert de consigne système à un agent qui dispose d'un shell et d'une lecture de fichiers.
 - Le chemin du skill, dans le fichier, suppose `.skills/capture-sprint-jira/`. Pour un autre emplacement, adapter la copie installée, jamais le fichier du skill.
 
@@ -76,7 +76,7 @@ Rejoués avec le développeur à l'installation, puis à chaque version du skill
 ```markdown
 ---
 name: capteur-sprint
-description: Agent de capture des tickets d'un sprint Jira derrière un SSO (skill capture-sprint-jira 1.2.1). À solliciter pour enregistrer en MHTML les tickets du prochain sprint, rangés dans un dossier par section de la page du sprint (par défaut « IA » et « DEV »), ou un ticket seul par son adresse, puis en rendre le bilan. Ne saisit jamais d'identifiant : le développeur se connecte lui-même.
+description: Agent de capture des tickets d'un sprint Jira derrière un SSO (skill capture-sprint-jira 1.2.2). À solliciter pour enregistrer en MHTML les tickets du prochain sprint, rangés dans un dossier par section de la page du sprint (par défaut « IA » et « DEV »), ou un ticket seul par son adresse, puis en rendre le bilan. Ne saisit jamais d'identifiant : le développeur se connecte lui-même.
 tools: Bash, Read, Glob
 ---
 

@@ -17,7 +17,7 @@ flowchart LR
 
 ## 1. Prérequis
 
-- Une IA locale qui lit et écrit les fichiers du projet : Gemini CLI, Claude Code ou équivalent.
+- Une IA locale qui lit et écrit les fichiers du projet : Gemini CLI ou équivalent.
 - Le dépôt du front, avec Node.js 20.19, 22.12 ou 24, et l'Angular CLI du projet.
 - Un navigateur sans interface pour `ng test` ; Playwright et `@axe-core/playwright` si le projet a des tests de bout en bout.
 - Pour l'installation automatique : un clone d'Agent2Prompt et Node 20 ou plus récent. À défaut, la transmission seule : [`transmissions/angular-1.0.1.md`](../../transmissions/angular-1.0.1.md).
