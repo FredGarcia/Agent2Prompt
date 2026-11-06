@@ -1,6 +1,6 @@
 # Mode d'emploi : construire et utiliser Agent2Test
 
-[`agent2test`](../../specs/agent2test/SKILL.md) 1.2.0 est la **spécification d'un système à construire**, pas un skill qu'on installe. Une IA la reçoit dans un projet séparé de l'application et l'implémente par lots, sous votre validation.
+[`agent2test`](../../specs/agent2test/SKILL.md) 1.3.0 est la **spécification d'un système à construire**, pas un skill qu'on installe. Une IA la reçoit dans un projet séparé de l'application et l'implémente par lots, sous votre validation.
 
 Agent2Test choisit, prépare et joue avec Playwright les tests essentiels d'une demande sur l'application Angular **que vous avez lancée**, et rend **un verdict prouvé par critère d'acceptation**. Son plan vient d'[`agent-tdd-jira`](../agent-tdd-jira/mode-emploi.md) : US, critères numérotés, scénarios Gherkin. Il travaille en binôme avec [Agent2Dev](../agent2dev/mode-emploi.md) ou avec l'agent TDD.
 
@@ -20,7 +20,7 @@ flowchart LR
 - Node 22.13 ou plus récent (24 recommandé), Playwright 1.63 ou plus récent ; les données tiennent dans un fichier SQLite, par `node:sqlite` : aucun serveur de base de données.
 - L'application Angular lancée par vous sur votre poste, et un navigateur du côté de la session SSO.
 - Docker Compose seulement pour un moteur local souverain (Ollama).
-- La transmission : [`transmissions/agent2test-1.2.0.md`](../../transmissions/agent2test-1.2.0.md).
+- La transmission : [`transmissions/agent2test-1.3.0.md`](../../transmissions/agent2test-1.3.0.md).
 
 L'installateur d'Agent2Prompt refuse cette spécification : elle se matérialise dans `spec/` de son propre projet.
 
@@ -53,12 +53,18 @@ Entre deux points, les agents avancent seuls ; à chaque point, un humain décid
 |---|---|---|
 | **CP-0** Session | connexion silencieuse en échec, ou session expirée | l'opérateur, qui se connecte dans la fenêtre ouverte |
 | **CP-1** Sélection | tests essentiels retenus pour la demande | le testeur : valider, corriger avec commentaire, rejeter |
-| **CP-2** Mise en place | profil d'environnement, parcours nouveaux ou modifiés | le testeur ou le développeur |
-| **CP-3** Verdicts | échecs, indéterminés, scénarios bloqués | le testeur : confirmer, contester (le désaccord est consigné), demander une réparation |
+| **CP-2** Mise en place | profil d'environnement, références de pictogrammes, parcours nouveaux ou modifiés | le testeur ou le développeur |
+| **CP-3** Verdicts | échecs, indéterminés, scénarios bloqués, avec le témoignage de chaque vérification | le testeur : confirmer, contester (le désaccord est consigné), demander une réparation |
 | **CP-4** Gouvernance | leçon, recalibrage, quarantaine proposés par le système | le référent qualité, depuis le tableau de bord seulement ; effet à la campagne suivante |
 | **CP-5** Préalable | scénario qui exige un batch Java | le développeur, qui lance le batch lui-même, ou déclare le scénario non joué |
 
 Le niveau d'autonomie de chaque point se fixe dans `configuration/humaine.json`, que le système lit et n'écrit jamais.
+
+**Ce que le navigateur constate.** Il joue une personne devant l'écran : il va sur la page, attend la fin du chargement, regarde, puis rend compte de ce qu'il a vu et de ce qu'il n'a pas vu. Il perçoit par trois canaux : la **vue** (où les éléments s'affichent, et le dessin d'un pictogramme), le **lecteur d'écran** (rôles et noms accessibles) et le **clavier** (ce qu'atteint la touche Tab). Chaque vérification déclare ses canaux et sa règle de comparaison ; « seulement » se compare au texte exact.
+
+- **En CP-2**, ratifiez les références de pictogrammes : le système propose la capture d'un élément que vous désignez, par exemple l'icône « œil » de la colonne Checklist. Sans référence ratifiée, un parcours qui demande ce pictogramme est refusé.
+- **En CP-3**, lisez le témoignage sous chaque critère : « Vu », « Non vu », remarques. Exemple : « au bord gauche : « Statut » ; « Checklist » en position 5 sur 5 », avec la remarque que le lecteur d'écran lit pourtant « Checklist » en premier.
+- Une absence n'est jamais constatée sur une zone que le navigateur n'a pas vue, et « chaque cellule » sur un tableau vide reste « non vérifié ».
 
 **Le binôme** : la remise d'Agent2Dev ou de l'agent TDD arrive en fichier, ou par un échange par dossiers facultatif. Elle n'ouvre aucune campagne : vous redémarrez l'application sur le commit remis, puis ouvrez la campagne. Le journal de tests repart par le même chemin.
 
@@ -83,5 +89,8 @@ Une nouvelle version arrive par une nouvelle transmission : remplacez `spec/` à
 | Campagne bloquée en CP-5 | scénario qui exige un batch | lancer le batch vous-même, ou déclarer le scénario non joué |
 | Verdict « indéterminé » | preuve insuffisante | examiner en CP-3 ; demander une réparation du parcours |
 | La remise n'ouvre rien | comportement voulu | redémarrer l'application sur le commit remis, puis ouvrir la campagne |
+| Parcours refusé : « référence de pictogramme » | pictogramme demandé sans référence ratifiée, ou référence modifiée depuis | désigner l'élément, faire capturer la référence et la ratifier en CP-2 |
+| Constat « non constatable » | zone non vue (page d'erreur, chargement non terminé), ou tableau sans ligne | lire ce que le témoignage dit avoir vu à la place ; faire attendre la fin du chargement au parcours, ou fournir des données |
+| Étape `INSTABILITE`, regards discordants | la page bouge pendant qu'il la regarde | faire attendre au parcours l'état final de l'écran |
 
-L'accessibilité automatisée et le profil de recette partagé sont des dimensions réservées, non appliquées en 1.2.
+L'accessibilité automatisée et le profil de recette partagé sont des dimensions réservées, non appliquées en 1.3 : le navigateur rend compte de ce que perçoit une personne, il ne rend pas de verdict de conformité RGAA ou WCAG.

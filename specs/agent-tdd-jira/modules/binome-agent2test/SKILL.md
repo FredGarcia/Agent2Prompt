@@ -7,7 +7,7 @@ status: active
 
 # Module `binome-agent2test` (D7)
 
-Agent2Test (spécification `agent2test` 1.2.0) est la tête de test du binôme. Dans un projet séparé de l'application, il choisit les scénarios essentiels de la demande, les joue avec Playwright sur l'application lancée, et rend un verdict prouvé par critère d'acceptation. La tête de développement est cet agent, ou Agent2Dev quand il applique ce skill. Le développeur fait le lien : il lance l'application, conduit Agent2Test et transmet son journal. Tout se fait en local et à la main : aucune des deux têtes n'appelle l'autre.
+Agent2Test (spécification `agent2test` 1.3.0) est la tête de test du binôme. Dans un projet séparé de l'application, il choisit les scénarios essentiels de la demande, les joue avec Playwright sur l'application lancée, et rend un verdict prouvé par critère d'acceptation. La tête de développement est cet agent, ou Agent2Dev quand il applique ce skill. Le développeur fait le lien : il lance l'application, conduit Agent2Test et transmet son journal. Tout se fait en local et à la main : aucune des deux têtes n'appelle l'autre.
 
 ## 1. Rôles
 
@@ -305,7 +305,7 @@ Code de sortie : 0 quand les verdicts valent pour le plan et le code courants ; 
 ## 7. Corriger un défaut confirmé (D7.INV-2)
 
 - Un défaut applicatif confirmé rouvre le scénario qu'il vise : rouge, vert, remanié, puis V4, comme au premier passage (module `cycle-tdd`). Le fichier Gherkin ne change pas : le scénario décrivait déjà le comportement attendu, c'est le code qui s'en écarte.
-- Le test rouge reproduit le défaut à la couche où il se trouve, d'après les preuves du journal : étape échouée, attendu, signaux, et la capture ou la trace si le développeur les fournit. Il porte l'étiquette du scénario, comme tout test de l'agent (point E3).
+- Le test rouge reproduit le défaut à la couche où il se trouve, d'après les preuves du journal : étape échouée, attendu, signaux, témoignage de l'étape (ce qu'Agent2Test a vu et n'a pas vu, canal par canal : vue, lecteur d'écran, clavier, `agent2test:D25.INV-7`), et la capture ou la trace si le développeur les fournit. Il porte l'étiquette du scénario, comme tout test de l'agent (point E3).
 - Si aucun test de couche ne reproduit le défaut, parce qu'il naît de l'assemblage (configuration, proxy, contrat divergent entre back et front), l'agent le dit au développeur et propose un test de contrat ou de tranche qui le reproduit. Il n'écrit pas de test de bout en bout.
 - Le commit cite la campagne. Après V4, nouvelle remise (section 4) : le verdict de la campagne précédente ne vaut plus pour le code corrigé, et le script le dit.
 

@@ -1,9 +1,9 @@
 {
   "name": "agent2test",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "specSchema": 1,
   "language": "fr",
-  "description": "Agent2Test : système multi-agents qui choisit, prépare, exécute et journalise les tests essentiels d'une application Angular pour une demande, en pilotant Playwright comme une bibliothèque depuis Node, dans un projet séparé de l'application ; plan importé d'agent-tdd-jira, verdict par critère d'acceptation, points de contrôle humains, cybernétique de premier et de second ordre, un fichier SQLite unique ouvert par un agent médiateur, remise d'Agent2Dev en fichier ou par un échange par dossiers facultatif, exécution locale.",
+  "description": "Agent2Test : système multi-agents qui choisit, prépare, exécute et journalise les tests essentiels d'une application Angular pour une demande, en pilotant Playwright comme une bibliothèque depuis Node, dans un projet séparé de l'application ; plan importé d'agent-tdd-jira, verdict par critère d'acceptation, navigateur qui regarde comme une personne et rend compte de ce qu'il voit et ne voit pas, points de contrôle humains, cybernétique de premier et de second ordre, un fichier SQLite unique ouvert par un agent médiateur, remise d'Agent2Dev en fichier ou par un échange par dossiers facultatif, exécution locale.",
   "entry": "SKILL.md",
   "runtime": {
     "node": ">=22.13, 24 recommandé",
@@ -19,13 +19,13 @@
     "echange": "manuel par défaut ; par dossiers, facultatif, sans aucune connexion"
   },
   "references": [
-    { "name": "agent-tdd-jira", "version": "1.3.2" }
+    { "name": "agent-tdd-jira", "version": "1.3.3" }
   ],
   "modules": [
     { "id": "noyau", "path": "modules/noyau/SKILL.md", "dimensions": ["D1"], "status": "active" },
     { "id": "donnees", "path": "modules/donnees/SKILL.md", "dimensions": ["D23"], "status": "active" },
     { "id": "plan", "path": "modules/plan/SKILL.md", "dimensions": ["D3"], "status": "active" },
-    { "id": "navigateur", "path": "modules/navigateur/SKILL.md", "dimensions": ["D4"], "status": "active" },
+    { "id": "navigateur", "path": "modules/navigateur/SKILL.md", "dimensions": ["D4", "D25"], "status": "active" },
     { "id": "scanner", "path": "modules/scanner/SKILL.md", "dimensions": ["D5"], "status": "active" },
     { "id": "stratege", "path": "modules/stratege/SKILL.md", "dimensions": ["D6"], "status": "active" },
     { "id": "preparateur", "path": "modules/preparateur/SKILL.md", "dimensions": ["D7"], "status": "active" },
@@ -47,6 +47,7 @@
   "extensionPoints": ["E1", "E2", "E3", "E4", "E5"],
   "previousVersions": [
     { "version": "1.0.0", "file": "archives/SKILL-v1.0.0.md" },
-    { "version": "1.1.0", "file": "archives/SKILL-v1.1.0.md" }
+    { "version": "1.1.0", "file": "archives/SKILL-v1.1.0.md" },
+    { "version": "1.2.0", "file": "archives/SKILL-v1.2.0.md" }
   ]
 }

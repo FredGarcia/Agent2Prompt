@@ -15,7 +15,7 @@ status: active
 
 ### 1.1 `agent-tdd-jira`
 
-Source : le dossier `docs/demandes/<CLÉ>/` du projet de l'application, produit par agent-tdd-jira 1.3.2 (`agent-tdd-jira:D10.INV-5`, `agent-tdd-jira:D7.INV-1`).
+Source : le dossier `docs/demandes/<CLÉ>/` du projet de l'application, produit par agent-tdd-jira 1.3.3 (`agent-tdd-jira:D10.INV-5`, `agent-tdd-jira:D7.INV-1`).
 
 `us.md` :
 

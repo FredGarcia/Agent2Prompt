@@ -20,21 +20,21 @@ La colonne « Repris dans » cite les modules de la spécification qui reprennen
 
 | Spécification | Version | Dimensions actives | Dimensions réservées | Invariants |
 |---|---|---|---|---|
-| [`agent-tdd-jira`](#agent-tdd-jira-132) | 1.3.2 | 9 | 1 | 43 |
-| [`agent2dev`](#agent2dev-111) | 1.1.1 | 21 | 2 | 96 |
-| [`agent2test`](#agent2test-120) | 1.2.0 | 19 | 2 | 108 |
+| [`agent-tdd-jira`](#agent-tdd-jira-133) | 1.3.3 | 9 | 1 | 43 |
+| [`agent2dev`](#agent2dev-112) | 1.1.2 | 21 | 2 | 96 |
+| [`agent2test`](#agent2test-130) | 1.3.0 | 20 | 2 | 116 |
 | [`agents-paralleles-gitlab`](#agents-paralleles-gitlab-101) | 1.0.1 | 5 | 2 | 20 |
 | [`analyse-projet`](#analyse-projet-102) | 1.0.2 | 5 | 1 | 16 |
 | [`angular`](#angular-101) | 1.0.1 | 8 | 2 | 30 |
 | [`capture-sprint-jira`](#capture-sprint-jira-122) | 1.2.2 | 9 | 2 | 39 |
 | [`java`](#java-111) | 1.1.1 | 7 | 1 | 29 |
-| [`orchestrateur-c7e`](#orchestrateur-c7e-351) | 3.5.1 | 10 | 1 | 33 |
+| [`orchestrateur-c7e`](#orchestrateur-c7e-352) | 3.5.2 | 10 | 1 | 33 |
 | [`skill4appli`](#skill4appli-111) | 1.1.1 | 9 | 3 | 34 |
 | [`socle-back-front`](#socle-back-front-110) | 1.1.0 | 7 | 0 | 21 |
 | [`sonarqube`](#sonarqube-110) | 1.1.0 | 8 | 2 | 34 |
 | [`tension-dashboard-gitlab-agent`](#tension-dashboard-gitlab-agent-220) | 2.2.0 | 7 | 3 | 17 |
 
-## agent-tdd-jira 1.3.2
+## agent-tdd-jira 1.3.3
 
 Agent de développement TDD : demande Jira en MHTML, analyse avec commentaires, US et critères d'acceptation numérotés, scénarios Gherkin par critère, variantes back Java et front Angular, cycle rouge, vert, remanié scénario par scénario, traçabilité ; binôme avec Agent2Test, verdict d'acceptation par critère ; mode parallèle dans un worktree géré par agents-paralleles-gitlab. Point d'entrée : [`specs/agent-tdd-jira/SKILL.md`](specs/agent-tdd-jira/SKILL.md).
 
@@ -130,7 +130,7 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 | **D10.INV-6** | un critère d'acceptation n'entre en réalisation (choix des variantes V3, cycle TDD V4) que s'il est validé, décliné en scénarios validés, et qu'aucune question ouverte ne le concerne. | `us-criteres`, `variantes`, `agent2dev/cadrage` |
 | **D10.INV-7** | la matrice de traçabilité relie chaque US à ses critères d'acceptation, et chaque critère à ses scénarios, tests et commits, ou à un statut « non réalisé » avec sa raison ; le rapport final donne l'état de chaque critère. | `us-criteres`, `tracabilite`, `agent2dev`, `agent2dev/tracabilite` |
 
-## agent2dev 1.1.1
+## agent2dev 1.1.2
 
 Agent2Dev : système multi-agents de développement qui applique le skill agent-tdd-jira comme méthode, de la demande Jira en MHTML jusqu'au rapport, en cycle TDD scénario par scénario et en binôme avec Agent2Test ; le moteur rédige, des agents déterministes écrivent et exécutent, le développeur valide à chaque point ; journal chaîné, apprentissage sous gouvernance, un fichier SQLite unique ouvert par un agent médiateur, binôme à la main ou par un échange par dossiers facultatif, exécution locale. Point d'entrée : [`specs/agent2dev/SKILL.md`](specs/agent2dev/SKILL.md).
 
@@ -353,9 +353,9 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 | **D25.INV-3** | un journal relevé par l'échange est copié par le `depot` dans le dossier de travail de la demande, et `lire-acceptation.mjs` le lit comme un journal déposé à la main. | `echange` |
 | **D25.INV-4** | une remise publiée porte le format `agent2test.remise/1`, sans contenu de fichier ni secret ; elle s'écrit par un fichier provisoire renommé ensuite, et n'est jamais réécrite ; l'échange ne décide rien et n'ouvre aucune campagne. | `echange` |
 
-## agent2test 1.2.0
+## agent2test 1.3.0
 
-Agent2Test : système multi-agents qui choisit, prépare, exécute et journalise les tests essentiels d'une application Angular pour une demande, en pilotant Playwright comme une bibliothèque depuis Node, dans un projet séparé de l'application ; plan importé d'agent-tdd-jira, verdict par critère d'acceptation, points de contrôle humains, cybernétique de premier et de second ordre, un fichier SQLite unique ouvert par un agent médiateur, remise d'Agent2Dev en fichier ou par un échange par dossiers facultatif, exécution locale. Point d'entrée : [`specs/agent2test/SKILL.md`](specs/agent2test/SKILL.md).
+Agent2Test : système multi-agents qui choisit, prépare, exécute et journalise les tests essentiels d'une application Angular pour une demande, en pilotant Playwright comme une bibliothèque depuis Node, dans un projet séparé de l'application ; plan importé d'agent-tdd-jira, verdict par critère d'acceptation, navigateur qui regarde comme une personne et rend compte de ce qu'il voit et ne voit pas, points de contrôle humains, cybernétique de premier et de second ordre, un fichier SQLite unique ouvert par un agent médiateur, remise d'Agent2Dev en fichier ou par un échange par dossiers facultatif, exécution locale. Point d'entrée : [`specs/agent2test/SKILL.md`](specs/agent2test/SKILL.md).
 
 ### D1 : Noyau 7E, bus et constitution (active)
 
@@ -582,6 +582,19 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 | **D24.INV-2** | une remise reçue, déposée par l'opérateur ou lue dans une boîte, n'ouvre aucune campagne : un testeur ou le développeur l'ouvre, depuis le tableau de bord ou par MCP ; à l'ouverture, un fichier suivi modifié ou une empreinte de source qui diffère de la remise la rend périmée, et aucune campagne ne s'ouvre. | `plan`, `orchestrateur`, `echange` |
 | **D24.INV-3** | une remise n'est reçue que conforme au schéma fermé `agent2test.remise/1`, sans contenu de fichier ni secret ; elle s'ouvre sur la racine admise, celle du profil ou de `remises.racines`, dont `HEAD` est le commit remis, et jamais sur le chemin qu'elle cite ; sans racine admise à ce commit, elle est périmée. | `plan`, `echange` |
 | **D24.INV-4** | en mode `dossiers`, Agent2Test ne dépose dans sa boîte de sortie que le journal de tests JSON clos d'une campagne issue d'une remise, octet pour octet, sous le nom de la remise et de la campagne, par un fichier provisoire renommé ensuite. | `echange` |
+
+### D25 : Constat perceptif et témoignage (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D25.INV-1** | un constat ne se fonde que sur ce qu'une personne perçoit, par trois canaux : la vue (boîtes de l'arbre d'accessibilité et capture de la zone), le lecteur d'écran (rôles, noms accessibles, ordre de lecture) et le clavier (arrêts de la touche Tab) ; ni sélecteur sur la structure, ni attribut, ni texte du DOM, ni code exécuté dans la page n'établit un constat, et un élément sans surface n'est pas vu. | `navigateur` |
+| **D25.INV-2** | chaque constat est une fonction pure de sa perception et des références ratifiées ; il se recalcule à l'identique, sans navigateur, depuis ses preuves scellées, et une preuve dont l'empreinte ne correspond plus rend le critère « non vérifié : preuve manquante ». | `navigateur`, `verdict` |
+| **D25.INV-3** | une absence n'est constatée que dans une portée dont la présence a d'abord été constatée, une zone visible contenant au moins un élément du rôle observé ; sans cette ancre, le constat est « non constatable », jamais « absent », et le témoignage dit ce qui est vu à la place. | `navigateur` |
+| **D25.INV-4** | un attendu qui porte sur chaque élément d'un ensemble exige au moins `auMoins` éléments perçus, 1 par défaut ; un ensemble plus petit rend le constat « non constatable » et le critère « non vérifié », jamais « conforme ». | `navigateur`, `verdict` |
+| **D25.INV-5** | toute comparaison de texte déclare son mode, `exacte` ou `contient`, et sa casse, `exacte` ou `ignoree`, et normalise les espaces ; « seulement » et « exactement » s'écrivent `exacte` ; un attendu sans comparaison déclarée est rejeté avant toute exécution. | `navigateur`, `preparateur` |
+| **D25.INV-6** | un pictogramme n'est reconnu que par ressemblance à une image de référence ratifiée en CP-2 et intacte, au seuil `vision.seuil` de la constitution ou au-dessus ; un parcours qui demande un pictogramme sans référence ratifiée est rejeté, et à l'exécution le constat est « non constatable », sans réessai. | `navigateur`, `preparateur`, `referentiel` |
+| **D25.INV-7** | chaque étape `verifier` à attendu perceptif rend un témoignage, réussie ou non : portée regardée, canaux, règle de comparaison, ce qui a été vu, ce qui ne l'a pas été, et les preuves ; un canal déclaré mais non perçu rend le constat « non constatable » ; ce qu'un canal non déclaré voit autrement est rapporté en remarque, sans décider ; une étape `verifier` échouée n'empêche pas les `verifier` suivantes d'être jouées. | `navigateur`, `preparateur`, `journal`, `agent-tdd-jira`, `agent-tdd-jira/binome-agent2test`, `agent2dev` |
+| **D25.INV-8** | un constat « vu » n'est retenu qu'après un second regard qui rend le même constat ; un regard pendant lequel la géométrie de la zone change ne vaut rien ; des regards discordants classent l'étape `INSTABILITE`, jamais « réussie ». | `navigateur`, `verdict` |
 
 ## agents-paralleles-gitlab 1.0.1
 
@@ -944,7 +957,7 @@ Expert Java 21, Spring Boot 3.5 et PostgreSQL : produire et relire du code confo
 
 Dimension réservée : aucun invariant en vigueur dans cette version.
 
-## orchestrateur-c7e 3.5.1
+## orchestrateur-c7e 3.5.2
 
 Orchestrateur fractal C7E : résolution d'un ticket full-stack comme transformation maîtrisée d'un système vivant, avec le cycle de l'Axiome 7E, quatre profondeurs de déclinaison, des concepts paramétrables, la qualification de chaque ticket à son ouverture par un modèle générique de la demande et des questions complémentaires, un méso-contrat principal et au besoin des compléments, confirmés avant tout le reste, des options par couche rattachées au méso-contrat qui les permet avec leurs paramètres au choix par ticket, des variantes de représentation d'une ressource et leur mise à jour en temps réel, l'analyse des images PNG de l'objectif, une fiche validée avant toute modification, des tests déduits des risques, des conventions Git compatibles avec le kit des agents parallèles, une boucle de second ordre bornée par un registre et un fichier d'invariants du projet ; activé au démarrage de l'IA locale, sur choix du développeur. Point d'entrée : [`specs/orchestrateur-c7e/SKILL.md`](specs/orchestrateur-c7e/SKILL.md).
 

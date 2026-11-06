@@ -98,7 +98,7 @@ Le résultat est une liste d'écarts `{ chemin, regle, message }`. Une liste non
 ```json
 {
   "version": "1.0.0",
-  "methode": { "skill": "agent-tdd-jira", "version": "1.3.2" },
+  "methode": { "skill": "agent-tdd-jira", "version": "1.3.3" },
   "invariants": ["D1.INV-1", "D1.INV-2"],
   "points": ["V0", "V1", "V2", "V3", "V4", "V5", "CP-4"],
   "reglesModifiables": [

@@ -4,6 +4,34 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-11-06 : agent2test 1.3.0, agent-tdd-jira 1.3.3, agent2dev 1.1.2, orchestrateur-c7e 3.5.2
+
+- **agent2test 1.3.0** : dimension D25 active, le constat perceptif, dans le module `navigateur`, à la demande du développeur : « démontrer que Playwright prend bien le rôle d'une personne qui navigue vers une page, l'observe et rend compte de ce qu'elle voit ou ne voit pas ».
+  - Trois canaux : la vue (boîtes de `ariaSnapshotJSON({ boxes: true })` et capture de la zone), le lecteur d'écran (rôles, noms accessibles, ordre de lecture), le clavier (arrêts de la touche Tab). Ni sélecteur sur la structure, ni attribut, ni texte du DOM, ni code exécuté dans la page n'établit un constat.
+  - Attendus perceptifs de l'étape `verifier` : `position` et `absence` d'un élément à un bord d'une zone, `chaqueCellule` d'une colonne (lien, nom accessible, atteinte au clavier, pictogramme), `titre` d'un tableau ; canaux et comparaison déclarés.
+  - Absence constatée seulement dans une portée vue ; « chaque » refusé sur un ensemble vide ; comparaison de texte déclarée, exacte pour « seulement » ; pictogramme reconnu par ressemblance à une référence ratifiée en CP-2 avec le profil, seuil `vision.seuil` (0,80, entre 0,70 et 0,95) ; constat « vu » confirmé par un second regard ; une étape `verifier` échouée n'arrête plus les `verifier` suivantes.
+  - Témoignage de chaque étape `verifier`, réussie ou non : portée, canaux, règle de comparaison, vu, non vu, remarques, preuves. Il est versé au résultat d'étape et au journal de tests, qui garde son format `agent2test.journal-de-tests/1` avec le champ ajouté `scenarios[].etapes[].temoignage`. Chaque constat se recalcule depuis ses preuves, perception JSON scellée comprise.
+  - Modules : `navigateur` ; `preparateur` (champ `references.pictogrammes` du profil, contrôles `parcours.comparaison-declaree`, `parcours.reference-ratifiee` et `parcours.canaux`) ; `verdict` (signaux du constat dans les causes) ; `journal` (témoignage) ; `referentiel` (règle `vision.seuil`) ; `tableau-de-bord` (CP-2 et CP-3). Aucune dépendance nouvelle : la ressemblance lit les PNG avec `node:zlib`.
+  - D25.INV-1 à D25.INV-8 ; scénarios NA15 à NA23, PR14 à PR16, VE10 à VE12, JO12 et RF9. Exemple TAB-1 et treize contre-épreuves dans l'application de démonstration. 21 modules, 116 invariants définis, dont 103 en vigueur, 198 scénarios de test. Entrée : agent-tdd-jira 1.3.3. Archive 1.2.0.
+- **agent-tdd-jira 1.3.3** : correctif. Référence à agent2test 1.3.0 ; le module `binome-agent2test` reproduit un défaut confirmé aussi d'après le témoignage de l'étape (`agent2test:D25.INV-7`). Aucune dimension ni aucun invariant modifié ; `lire-acceptation.mjs` inchangé. Archive 1.3.2.
+- **agent2dev 1.1.2** : correctif. Méthode : agent-tdd-jira 1.3.3, seule version prise en charge ; binôme : agent2test 1.3.0 ; exemples du journal à la version 1.1.2. Aucune dimension ni aucun invariant modifié. Archive 1.1.1.
+- **orchestrateur-c7e 3.5.2** : correctif. Référence à agent-tdd-jira 1.3.3 ; conventions Git et numérotation des critères inchangées. Archive 3.5.1.
+- Les quatre spécifications se référencent et se publient dans un même commit (`EVOLUTION.md`, section 7). Les transmissions agent2test 1.2.0, agent-tdd-jira 1.3.2, agent2dev 1.1.1 et orchestrateur-c7e 3.5.1, publiées, restent telles quelles.
+- `docs/agent2test/mode-emploi.md` : version 1.3.0, ce que le navigateur constate, références de pictogrammes en CP-2, témoignage en CP-3, trois cas de dépannage. Modes d'emploi d'agent-tdd-jira, d'Agent2Dev et de l'orchestrateur à leur nouvelle version.
+- Vérifications :
+  - implémentation de référence du constat, hors dépôt (Node 22, Playwright 1.63, Chrome) : la page de l'exemple TAB-1 et treize contre-épreuves, 136 contrôles, aucun écart ; 18 tests en monde simulé ; chaque constat recalculé à l'identique depuis ses preuves, et une capture altérée refusée ;
+  - dix défauts réintroduits un à un (absence sans ancre, ordre de l'arbre pris pour l'ordre vu, sous-chaîne, constat sans second regard, « chaque » sur un ensemble vide, liens homonymes confondus, arrêts du clavier repérés sans position, seuil de ressemblance à 0,40, lien sans nom accepté, stabilité sensible au texte) : chacun fait échouer un test ou la recette. Retirer tout le contrôle de stabilité d'un regard n'est pas détecté : le second regard rattrape les pages qui bougent ;
+  - des contrôles naïfs sur le DOM se trompent sur quatre contre-épreuves (`dir="rtl"`, page sans tableau, « REE 2026 », titre affiché mais non associé), que le navigateur juge correctement ;
+  - ressemblance de l'œil dessiné de 16 à 64 px, en bleu, noir ou rouge, à sa référence de 48 px : de 0,88 à 0,95 ; œil barré : de 0,46 à 0,54 ;
+  - vérificateur, glossaire, quatre transmissions (aller-retour identique) et README à jour.
+- Soumis à ratification :
+  - les trois canaux et leur source, et la règle « rien d'autre n'établit un constat » ;
+  - « gauche » et « droite » pris comme bords à l'écran, l'ordre de lecture rapporté en remarque sans décider ;
+  - la reconnaissance d'un pictogramme par ressemblance à une référence ratifiée avec le profil, au seuil de 0,80 ;
+  - « non constatable » plutôt qu'« absent » quand l'ancre n'est pas vue, et « non vérifié » pour « chaque » sur un ensemble vide ;
+  - une étape `verifier` échouée qui n'arrête plus les suivantes ;
+  - le champ `temoignage` ajouté sans changer le nom du format du journal de tests.
+
 ### 2026-11-02 : orchestrateur-c7e 3.5.1, agent2dev 1.1.1, skill4appli 1.1.1, capture-sprint-jira 1.2.2
 
 - Correctifs, à la demande du développeur : les mentions d'outils d'IA autres que Gemini sont retirées de tout ce que l'IA locale lit, pour que Gemini CLI ne reçoive que des consignes qui le concernent. Aucune transmission courante n'en contient plus ; les archives et les transmissions publiées restent telles quelles.
