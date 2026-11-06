@@ -1,14 +1,14 @@
 ---
 name: agent2test
-description: Construire Agent2Test, système multi-agents qui choisit, prépare, exécute et journalise les tests essentiels d'une application Angular pour une demande donnée. Playwright y est piloté comme une bibliothèque depuis Node, dans un projet séparé de l'application ; le plan vient d'agent-tdd-jira (US, critères d'acceptation numérotés, scénarios Gherkin), chaque critère reçoit un verdict prouvé, l'humain ratifie aux points de contrôle, et le système observe et fait évoluer ses propres règles sous gouvernance. Exécution locale, données dans un fichier SQLite unique, ouvert par un agent médiateur ; la remise d'Agent2Dev arrive en fichier, ou par un échange par dossiers facultatif.
-version: 1.2.0
+description: Construire Agent2Test, système multi-agents qui choisit, prépare, exécute et journalise les tests essentiels d'une application Angular pour une demande donnée. Playwright y est piloté comme une bibliothèque depuis Node, dans un projet séparé de l'application ; le plan vient d'agent-tdd-jira (US, critères d'acceptation numérotés, scénarios Gherkin), chaque critère reçoit un verdict prouvé, l'humain ratifie aux points de contrôle, et le système observe et fait évoluer ses propres règles sous gouvernance. Le navigateur joue une personne : il regarde la page par la vue, le lecteur d'écran et le clavier, et rend compte de ce qu'il voit et de ce qu'il ne voit pas. Exécution locale, données dans un fichier SQLite unique, ouvert par un agent médiateur ; la remise d'Agent2Dev arrive en fichier, ou par un échange par dossiers facultatif.
+version: 1.3.0
 ---
 
-# Agent2Test, spécification 1.2.0
+# Agent2Test, spécification 1.3.0
 
 Ce document est le point d'entrée du package. Il donne le principe, la carte du système, les points de contrôle, le registre des dimensions, les règles communes et les invariants. Les détails techniques sont dans `modules/`. Le fichier `manifest.json` déclare quels modules sont actifs.
 
-La spécification reprend le dossier de conception d'Agent2Test (cadrage, architecture globale et cahier des charges du 25 septembre 2026), adapté aux décisions du 21 octobre 2026 : exécution locale, plan produit par agent-tdd-jira, connexion SSO silencieuse, batchs lancés par le développeur. La section 11 en donne la filiation. Depuis la version 1.2.0, les données tiennent dans un fichier SQLite unique, dont l'agent médiateur `donnees` tient la seule connexion, et la remise d'Agent2Dev arrive en fichier, ou par un échange par dossiers facultatif (section 12).
+La spécification reprend le dossier de conception d'Agent2Test (cadrage, architecture globale et cahier des charges du 25 septembre 2026), adapté aux décisions du 21 octobre 2026 : exécution locale, plan produit par agent-tdd-jira, connexion SSO silencieuse, batchs lancés par le développeur. La section 11 en donne la filiation. Depuis la version 1.2.0, les données tiennent dans un fichier SQLite unique, dont l'agent médiateur `donnees` tient la seule connexion, et la remise d'Agent2Dev arrive en fichier, ou par un échange par dossiers facultatif (section 12). Depuis la version 1.3.0, le navigateur constate comme une personne : il ne lit de la page que ce qu'elle perçoit, ne conclut à une absence que dans une portée qu'il a vue, et rend un témoignage pour chaque vérification (dimension D25).
 
 ## 1. Ordre de lecture
 
@@ -21,7 +21,7 @@ La spécification reprend le dossier de conception d'Agent2Test (cadrage, archit
    4. `referentiel` : fiches, règles, épinglage, grand livre.
    5. `plan` : import du plan, demande, campagne.
    6. `memoire` : recherche hybride.
-   7. `navigateur` : Playwright, session, origines, preuves.
+   7. `navigateur` : Playwright, session, origines, preuves, constat perceptif et témoignage.
    8. `scanner` : cartographie des sources et des écrans.
    9. `stratege` : sélection des tests essentiels.
    10. `preparateur` : profil d'environnement, parcours, exécution probatoire, réparation.
@@ -142,9 +142,9 @@ L'énoncé de l'Axiome 7E : « Les Éléments dans l'Espace Engendrent un État 
 | E1 Éléments | recenser | action, cible, valeur | étapes, données, critères couverts | demande, US, critères, scénarios | fiches, règles, seuils, constitution |
 | E2 Espace | situer | page courante, résolution de la cible | session, URL d'entrée, données préfixées | carte, mémoire, référentiel épinglé | file des campagnes, verrous |
 | E3 Engendrent | produire | acte Playwright | cycles d'étapes | sélection, parcours, cycles de scénarios | cycles de campagnes |
-| E4 État | constater | observation contre assertion | verdict par critère | matrice critères × verdicts | métriques de fonctionnement (O1) |
-| E5 Expression | exprimer | ligne de journal, preuve | compte rendu de scénario | journal de tests | tableaux de bord |
-| E6 Évolutif | ajuster | attente, alternative déclarée | nouvel essai, soupçon d'instabilité | réparation, leçons candidates | réflexivité (O2) |
+| E4 État | constater | observation contre assertion ; constat perceptif, fonction pure de la perception (D25) | verdict par critère | matrice critères × verdicts | métriques de fonctionnement (O1) |
+| E5 Expression | exprimer | ligne de journal, preuve, témoignage : vu, non vu | compte rendu de scénario | journal de tests | tableaux de bord |
+| E6 Évolutif | ajuster | attente, alternative déclarée, second regard | nouvel essai, soupçon d'instabilité | réparation, leçons candidates | réflexivité (O2) |
 | E7 Environnement | coupler | résultat remonté au scénario | résultat remonté à la campagne | rapport aux équipes, mémoire | gouvernance humaine |
 
 Règle de récursion : l'E3 d'une échelle est la suite des cycles complets de l'échelle inférieure, et l'E7 de chaque cycle inférieur alimente l'E4 de l'échelle supérieure.
@@ -170,7 +170,7 @@ Une remise reçue, déposée par l'opérateur ou lue dans une boîte d'Agent2Dev
 
 ## 6. Registre des dimensions
 
-| ID | Dimension | Introduite | Statut 1.2.0 | Dépend de | Module |
+| ID | Dimension | Introduite | Statut 1.3.0 | Dépend de | Module |
 |---|---|---|---|---|---|
 | D1 | Noyau 7E, bus et constitution | 1.0 | active | | `noyau` |
 | D2 | Données isolées par agent, sur PostgreSQL | 1.0 | superseded | D1 | remplacée en 1.1.0 par D21, elle-même remplacée en 1.2.0 par D23 (`donnees`) |
@@ -196,6 +196,7 @@ Une remise reçue, déposée par l'opérateur ou lue dans une boîte d'Agent2Dev
 | D22 | Relais du binôme par n8n, facultatif | 1.1 | superseded | D3, D9, D16, D17 | remplacée en 1.2.0 par D24 (`echange`) |
 | D23 | Données en un fichier unique, par l'agent médiateur | 1.2 | active | D1 | `donnees` |
 | D24 | Remises d'Agent2Dev, en fichier ou par dossier d'échange | 1.2 | active | D3, D9, D16, D17 | `echange` |
+| D25 | Constat perceptif et témoignage | 1.3 | active | D4, D7, D8, D10 | `navigateur` |
 
 Statuts : `active` (implémentée et testée), `reserved` (points d'extension posés, fonctionnalité absente), `superseded` (remplacée ; la version de remplacement est indiquée).
 
@@ -246,7 +247,8 @@ Un point d'extension n'est pas une fonctionnalité. En 1.x, il n'a qu'un test qu
 - En mode `manuel` comme en mode `dossiers`, une remise reçue n'ouvre aucune campagne d'elle-même, et une remise périmée est refusée à l'ouverture ; en mode `dossiers`, Agent2Test n'ouvre aucune connexion vers Agent2Dev.
 - Aucun module `reserved` n'est chargé ; chaque point d'extension a son test d'inertie.
 - Le guide de démarrage suffit, seul, à installer et lancer le kit sur le poste du développeur.
-- Le journal de tests JSON de l'exemple ECR-77 respecte le contrat de lecture d'agent-tdd-jira 1.3.2 (module `journal`, section 3) : sources du plan et leurs empreintes, état git à l'ouverture, verdicts de la liste fermée, cible de chaque décision.
+- Sur l'application de démonstration, la page de l'exemple TAB-1 et ses treize contre-épreuves reçoivent chacune les verdicts attendus et les fragments attendus de leur témoignage, et chaque constat se recalcule à l'identique depuis ses preuves (module `navigateur`, section 11).
+- Le journal de tests JSON de l'exemple ECR-77 respecte le contrat de lecture d'agent-tdd-jira 1.3.3 (module `journal`, section 3) : sources du plan et leurs empreintes, état git à l'ouverture, verdicts de la liste fermée, cible de chaque décision.
 
 ## 10. Invariants
 
@@ -432,6 +434,17 @@ Ces invariants ne sont plus en vigueur : n8n n'est plus le relais du binôme. Il
 - **D24.INV-3** : une remise n'est reçue que conforme au schéma fermé `agent2test.remise/1`, sans contenu de fichier ni secret ; elle s'ouvre sur la racine admise, celle du profil ou de `remises.racines`, dont `HEAD` est le commit remis, et jamais sur le chemin qu'elle cite ; sans racine admise à ce commit, elle est périmée.
 - **D24.INV-4** : en mode `dossiers`, Agent2Test ne dépose dans sa boîte de sortie que le journal de tests JSON clos d'une campagne issue d'une remise, octet pour octet, sous le nom de la remise et de la campagne, par un fichier provisoire renommé ensuite.
 
+**D25 : constat perceptif**
+
+- **D25.INV-1** : un constat ne se fonde que sur ce qu'une personne perçoit, par trois canaux : la vue (boîtes de l'arbre d'accessibilité et capture de la zone), le lecteur d'écran (rôles, noms accessibles, ordre de lecture) et le clavier (arrêts de la touche Tab) ; ni sélecteur sur la structure, ni attribut, ni texte du DOM, ni code exécuté dans la page n'établit un constat, et un élément sans surface n'est pas vu.
+- **D25.INV-2** : chaque constat est une fonction pure de sa perception et des références ratifiées ; il se recalcule à l'identique, sans navigateur, depuis ses preuves scellées, et une preuve dont l'empreinte ne correspond plus rend le critère « non vérifié : preuve manquante ».
+- **D25.INV-3** : une absence n'est constatée que dans une portée dont la présence a d'abord été constatée, une zone visible contenant au moins un élément du rôle observé ; sans cette ancre, le constat est « non constatable », jamais « absent », et le témoignage dit ce qui est vu à la place.
+- **D25.INV-4** : un attendu qui porte sur chaque élément d'un ensemble exige au moins `auMoins` éléments perçus, 1 par défaut ; un ensemble plus petit rend le constat « non constatable » et le critère « non vérifié », jamais « conforme ».
+- **D25.INV-5** : toute comparaison de texte déclare son mode, `exacte` ou `contient`, et sa casse, `exacte` ou `ignoree`, et normalise les espaces ; « seulement » et « exactement » s'écrivent `exacte` ; un attendu sans comparaison déclarée est rejeté avant toute exécution.
+- **D25.INV-6** : un pictogramme n'est reconnu que par ressemblance à une image de référence ratifiée en CP-2 et intacte, au seuil `vision.seuil` de la constitution ou au-dessus ; un parcours qui demande un pictogramme sans référence ratifiée est rejeté, et à l'exécution le constat est « non constatable », sans réessai.
+- **D25.INV-7** : chaque étape `verifier` à attendu perceptif rend un témoignage, réussie ou non : portée regardée, canaux, règle de comparaison, ce qui a été vu, ce qui ne l'a pas été, et les preuves ; un canal déclaré mais non perçu rend le constat « non constatable » ; ce qu'un canal non déclaré voit autrement est rapporté en remarque, sans décider ; une étape `verifier` échouée n'empêche pas les `verifier` suivantes d'être jouées.
+- **D25.INV-8** : un constat « vu » n'est retenu qu'après un second regard qui rend le même constat ; un regard pendant lequel la géométrie de la zone change ne vaut rien ; des regards discordants classent l'étape `INSTABILITE`, jamais « réussie ».
+
 ## 11. Filiation avec le dossier de conception
 
 Le dossier du dépôt Agent2Test (`00-cadrage.md`, `01-architecture.md`, `02-cahier-des-charges.md`) reste la source des choix. Ses invariants I1 à I15 deviennent des invariants de dimension ; ses décisions d'architecture, notées ici DA1 à DA20 pour ne pas les confondre avec les dimensions, sont reprises dans les modules.
@@ -470,6 +483,7 @@ Ce qui change par rapport au dossier :
 | absent du dossier : rôle de l'application exigé par un scénario | ratifié pour le binôme (pull request n° 5) : la session SSO du poste porte des rôles déclarés par un humain | étiquette `@role-<nom>`, configuration `session.roles`, scénario non jouable si le rôle manque (D3.INV-5) |
 | absent du dossier : lecture du journal par l'agent de développement | ratifié pour le binôme (pull request n° 5) | contrat de lecture du journal JSON : sources du plan et leurs empreintes, état git relevé à l'ouverture, cible de chaque décision (module `journal`) |
 | stockage en 1.0.0 : PostgreSQL et pgvector, un schéma et un rôle par agent | SQLite dès le départ, pour Agent2Test comme pour Agent2Dev ; un fichier unique par tête, dont un agent médiateur gère l'accès (22 octobre 2026) | D2 remplacée en 1.1.0 par D21, un fichier par agent, puis en 1.2.0 par D23 : fichier unique, agent médiateur `donnees`, contrats vérifiés sur le plan d'exécution de SQLite, plein texte FTS5, aucun serveur (D18.INV-3) ; reprise d'une instance 1.0.0 ou 1.1.0 (module `donnees`, section 9) |
+| absent du dossier : comment le navigateur constate | demande du développeur, 6 novembre 2026 : Playwright prend le rôle d'une personne qui navigue vers une page, l'observe et rend compte de ce qu'elle voit ou ne voit pas ; exemple TAB-1 | dimension D25 : attendus perceptifs `position`, `absence`, `chaqueCellule`, `titre` ; trois canaux ; absence ancrée ; comparaison déclarée ; pictogramme par référence ratifiée ; second regard ; témoignage (module `navigateur`, section 6) |
 | absent du dossier : enchaînement avec Agent2Dev | à la main ; n8n facultatif en relais, puis remplacé par un échange par dossiers facultatif (23 octobre 2026) | D22 remplacée en 1.2.0 par D24 : remise en fichier, ou lue dans la boîte de sortie d'Agent2Dev ; journal de tests déposé dans celle d'Agent2Test ; aucune connexion ; campagne ouverte par un humain (module `echange`) |
 
 Les valeurs par défaut H14 à H19 du cahier (budgets, conservation, langue, méta-critères, réparations) sont reprises dans la constitution, au module `referentiel`.
@@ -481,3 +495,5 @@ Les valeurs par défaut H14 à H19 du cahier (budgets, conservation, langue, mé
 **1.1.0** (2026-10-22) : dimensions D21 et D22 actives ; D2 passe à `superseded`, remplacée par D21. Données : un fichier SQLite par agent propriétaire, ouvert par le module intégré `node:sqlite`, au lieu des schémas PostgreSQL ; contrats nommés exécutés sur la seule connexion de leur propriétaire, sans `ATTACH` ni extension ; chaque écriture en transaction ; plein texte FTS5 et vecteurs rangés avec les fragments pour la mémoire ; aucun serveur de base de données ni conteneur de données, `pg` gardé pour l'oracle seul ; migration d'une instance 1.0.0 (module `donnees`, section 9). Relais n8n facultatif et désactivé par défaut (module `relais`) : au rôle `relais`, n8n dépose une remise au format `agent2test.remise/1` et relève le journal de tests d'une campagne close ; une remise déposée n'ouvre aucune campagne, un humain l'ouvre, et une remise périmée est refusée à l'ouverture. Invariants remplacés par des invariants plus forts : D10.INV-1 (ajout seul imposé par des déclencheurs, dont la présence et la chaîne sont vérifiées à chaque démarrage), D18.INV-1 (Node 22.13 au minimum), D18.INV-3 (données sans serveur ni port, hors du dépôt et du projet). D21.INV-1 remplace D2.INV-1 ; D21.INV-2 à D21.INV-4 reprennent D2.INV-2 à D2.INV-4 ; D21.INV-5 et D22.INV-1 à D22.INV-4 s'ajoutent. Entrée : agent-tdd-jira 1.3.1. Décisions du développeur (21 octobre 2026) : SQLite dès le départ, pour Agent2Test comme pour Agent2Dev ; n8n facultatif, en relais de transport seulement, sur sa base SQLite. Archive : `archives/SKILL-v1.0.0.md`.
 
 **1.2.0** (2026-10-24) : dimensions D23 et D24 actives ; D21 et D22 passent à `superseded`, remplacées par D23 et D24. Données : un fichier SQLite unique, `agent2test.sqlite`, dont l'agent médiateur `donnees` tient la seule connexion, au lieu d'un fichier par agent ; chaque agent y a son espace de tables, préfixées par son nom ; au démarrage, chaque contrat est vérifié sur le plan d'exécution de SQLite (`EXPLAIN`), déclencheurs compris, et ne doit toucher que les tables de son propriétaire ; une migration qui crée un objet hors de son espace est annulée ; reprise d'une instance 1.1.0 ou 1.0.0 (module `donnees`, section 9). Échange : n8n n'est plus le relais du binôme ; en mode `manuel`, le défaut, l'opérateur dépose la remise dans le tableau de bord ; en mode `dossiers`, Agent2Test lit les remises dans la boîte de sortie de chaque instance d'Agent2Dev et dépose dans la sienne le journal de tests d'une campagne close, sans aucune connexion ; le rôle `relais` et l'outil `a2t_deposer_remise` sont retirés ; une remise s'ouvre sur la racine admise dont `HEAD` est le commit remis, et non plus sur le chemin qu'elle cite. D23.INV-1 remplace D21.INV-1 ; D23.INV-2 à D23.INV-5 reprennent D21.INV-2 à D21.INV-5 ; D24.INV-1 à D24.INV-3 reprennent D22.INV-1, D22.INV-3 et D22.INV-4 pour l'échange par dossiers, D22.INV-2 n'ayant plus d'objet, et D24.INV-4 s'ajoute. D18.INV-3 cite désormais D23.INV-3, qui reprend mot pour mot D21.INV-3. Entrée : agent-tdd-jira 1.3.2. Décisions du développeur (22 et 23 octobre 2026) : un fichier SQLite unique par tête, dont un agent médiateur gère l'accès ; n8n remplacé par l'échange par dossiers, facultatif. Archive : `archives/SKILL-v1.1.0.md`.
+
+**1.3.0** (2026-11-06) : dimension D25 active, dans le module `navigateur`. Le navigateur joue une personne qui va sur une page, la regarde et rend compte de ce qu'elle voit et de ce qu'elle ne voit pas. Attendus perceptifs de l'étape `verifier` : `position` et `absence` d'un élément à un bord d'une zone, `chaqueCellule` d'une colonne (lien, nom accessible, atteinte au clavier, pictogramme), `titre` d'un tableau ; trois canaux, la vue par les boîtes de `ariaSnapshotJSON({ boxes: true })` et la capture, le lecteur d'écran par les rôles et les noms, le clavier par les arrêts de la touche Tab ; absence seulement dans une portée vue ; « chaque » refusé sur un ensemble vide ; comparaison de texte déclarée ; pictogramme reconnu par ressemblance à une référence ratifiée en CP-2, seuil `vision.seuil` ; second regard concordant ; témoignage versé au résultat d'étape et au journal de tests ; constat recalculable depuis ses preuves. Une étape `verifier` échouée n'arrête plus les `verifier` suivantes. Aucune dépendance nouvelle : la ressemblance lit les PNG avec `node:zlib` (D18.INV-2 inchangé). Le journal de tests garde son format `agent2test.journal-de-tests/1` : il gagne le champ `scenarios[].etapes[].temoignage`, sans changer le sens ni la forme des champs que lit agent-tdd-jira. Exemple TAB-1 et treize contre-épreuves dans l'application de démonstration (module `navigateur`, section 11). Invariants D25.INV-1 à D25.INV-8. Demande du développeur (6 novembre 2026) : « démontrer que Playwright prend bien le rôle d'une personne qui navigue vers une page, l'observe et rend compte de ce qu'elle voit ou ne voit pas ». Entrée : agent-tdd-jira 1.3.3. Archive : `archives/SKILL-v1.2.0.md`.

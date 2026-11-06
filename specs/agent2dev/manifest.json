@@ -1,6 +1,6 @@
 {
   "name": "agent2dev",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "specSchema": 1,
   "language": "fr",
   "description": "Agent2Dev : système multi-agents de développement qui applique le skill agent-tdd-jira comme méthode, de la demande Jira en MHTML jusqu'au rapport, en cycle TDD scénario par scénario et en binôme avec Agent2Test ; le moteur rédige, des agents déterministes écrivent et exécutent, le développeur valide à chaque point ; journal chaîné, apprentissage sous gouvernance, un fichier SQLite unique ouvert par un agent médiateur, binôme à la main ou par un échange par dossiers facultatif, exécution locale.",
@@ -11,15 +11,15 @@
   },
   "targets": {
     "application": "back Java 21 et Spring Boot 3.5 construit par Maven, front Angular 20, PostgreSQL en Docker, Liquibase au démarrage ; application lancée par le développeur sur Tomcat en local",
-    "methode": "skill agent-tdd-jira 1.3.2, lu depuis sa transmission vérifiée",
+    "methode": "skill agent-tdd-jira 1.3.3, lu depuis sa transmission vérifiée",
     "moteur": "Gemini Code Assist par MCP, modèle local compatible OpenAI, ou simulation",
     "stockage": "un fichier SQLite unique, agent2dev.sqlite, ouvert par le seul agent médiateur donnees, par node:sqlite ; aucun serveur de base de données",
     "profil": "local",
     "echange": "manuel par défaut ; par dossiers, facultatif, sans aucune connexion"
   },
   "references": [
-    { "name": "agent-tdd-jira", "version": "1.3.2" },
-    { "name": "agent2test", "version": "1.2.0" }
+    { "name": "agent-tdd-jira", "version": "1.3.3" },
+    { "name": "agent2test", "version": "1.3.0" }
   ],
   "modules": [
     { "id": "noyau", "path": "modules/noyau/SKILL.md", "dimensions": ["D1"], "status": "active" },
@@ -49,6 +49,7 @@
   "extensionPoints": ["E1", "E2", "E3", "E4"],
   "previousVersions": [
     { "version": "1.0.0", "file": "archives/SKILL-v1.0.0.md" },
-    { "version": "1.1.0", "file": "archives/SKILL-v1.1.0.md" }
+    { "version": "1.1.0", "file": "archives/SKILL-v1.1.0.md" },
+    { "version": "1.1.1", "file": "archives/SKILL-v1.1.1.md" }
   ]
 }

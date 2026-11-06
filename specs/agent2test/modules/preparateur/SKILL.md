@@ -27,6 +27,7 @@ Le `preparateur` rend jouables les scénarios retenus. Il fait rédiger les parc
 | `fichiersTraduction` | `src/assets/i18n/fr.json` | `angular.json` |
 | `masques` | par écran, liste de cibles à masquer | « à renseigner » |
 | `racineProjet` | chemin du projet de l'application | configuration humaine |
+| `references.pictogrammes` | `oeil` : fichier PNG, empreinte, origine | captures proposées par `navigateur.capturerReference`, à partir d'un élément désigné par l'opérateur ou d'une page du système de design ; ratifiées avec le profil (D25.INV-6) |
 
 Chaque valeur cite le fichier du projet dont elle vient, ou porte la marque « à renseigner ». Aucune campagne ne s'exécute tant que le profil n'est pas ratifié en CP-2 ; toute modification du profil crée une version nouvelle, à ratifier.
 
@@ -51,6 +52,8 @@ Chaque valeur cite le fichier du projet dont elle vient, ou porte la marque « �
 }
 ```
 
+Depuis 1.3.0, une étape `verifier` peut porter un attendu perceptif : `position`, `absence`, `chaqueCellule` ou `titre`, avec ses `canaux` et sa `comparaison` (module `navigateur`, sections 6.3 et 11).
+
 Schéma fermé `schemas/parcours.json` et contrôles nommés :
 
 | Contrôle | Règle |
@@ -61,6 +64,9 @@ Schéma fermé `schemas/parcours.json` et contrôles nommés :
 | `parcours.cibles-ordonnees` | chaque cible emploie la première stratégie disponible dans l'ordre du profil ; une cible `css` porte un `motif` et entre dans les fragilités (D7.INV-7) |
 | `parcours.origine` | `origine` est complet : moteur, fiche et version composée, empreinte du prompt ; `ratifiePar` et `ratifieLe` sont remplis à la ratification (D7.INV-4) |
 | `parcours.urls` | chaque `naviguer` vise une URL relative à l'URL de base |
+| `parcours.comparaison-declaree` | chaque attendu perceptif déclare sa `comparaison`, `mode` et `casse` (D25.INV-5) |
+| `parcours.reference-ratifiee` | chaque pictogramme demandé (`contient.lien.icone`) a une référence ratifiée et intacte dans le profil (D25.INV-6) |
+| `parcours.canaux` | chaque canal déclaré est possible pour son attendu ; un attendu perceptif sans `canaux` prend ceux par défaut, que le parcours ratifié inscrit (D25.INV-7) |
 
 ## 3. Préparer (D7.INV-6)
 
@@ -100,6 +106,7 @@ Un parcours ratifié qu'on modifie devient une version nouvelle, soumise à CP-2
 - **Parcours écrit en code** : un parcours est une donnée ; un champ `script` est un écart.
 - **Préfixe oublié dans une donnée de recherche** : sans mutation, la saisie n'a pas besoin de préfixe ; avec mutation, toute valeur textuelle en porte un.
 - **Ratification implicite** : un parcours non ratifié n'est jamais joué en campagne, même s'il a réussi à l'essai.
+- **« Seulement » traduit par `contient`** : un critère qui dit « seulement », « exactement » ou « le seul mot » se traduit par une comparaison `exacte`.
 
 ## 7. Tests (scénarios)
 
@@ -118,6 +125,9 @@ Un parcours ratifié qu'on modifie devient une version nouvelle, soumise à CP-2
 | PR11 | D7.INV-5 | le profil proposé cite la provenance de chaque valeur ou porte « à renseigner » ; une campagne attend sa ratification |
 | PR12 | D7.INV-6 | une réparation part d'un relevé neuf de l'écran et du diagnostic, et peut reprendre la cible désignée par l'opérateur |
 | PR13 | point E2 | un parcours qui contient une étape `auditer` est rejeté « action réservée » |
+| PR14 | D25.INV-5 | un attendu `titre` sans `comparaison` est rejeté avant toute exécution |
+| PR15 | D25.INV-6 | un attendu qui demande le pictogramme `oeil` est rejeté tant que sa référence n'est pas ratifiée, ou si son empreinte a changé |
+| PR16 | D25.INV-7 | un attendu `titre` qui déclare le canal `clavier` est rejeté ; un attendu sans `canaux` reçoit ceux par défaut |
 
 ## 8. Fichiers à produire
 

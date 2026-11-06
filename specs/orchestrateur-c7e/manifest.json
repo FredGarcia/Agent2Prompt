@@ -1,6 +1,6 @@
 {
   "name": "orchestrateur-c7e",
-  "version": "3.5.1",
+  "version": "3.5.2",
   "specSchema": 1,
   "language": "fr",
   "description": "Orchestrateur fractal C7E : résolution d'un ticket full-stack comme transformation maîtrisée d'un système vivant, avec le cycle de l'Axiome 7E, quatre profondeurs de déclinaison, des concepts paramétrables, la qualification de chaque ticket à son ouverture par un modèle générique de la demande et des questions complémentaires, un méso-contrat principal et au besoin des compléments, confirmés avant tout le reste, des options par couche rattachées au méso-contrat qui les permet avec leurs paramètres au choix par ticket, des variantes de représentation d'une ressource et leur mise à jour en temps réel, l'analyse des images PNG de l'objectif, une fiche validée avant toute modification, des tests déduits des risques, des conventions Git compatibles avec le kit des agents parallèles, une boucle de second ordre bornée par un registre et un fichier d'invariants du projet ; activé au démarrage de l'IA locale, sur choix du développeur.",
@@ -22,7 +22,7 @@
     { "name": "java", "version": "1.1.1" },
     { "name": "angular", "version": "1.0.1" },
     { "name": "agents-paralleles-gitlab", "version": "1.0.1" },
-    { "name": "agent-tdd-jira", "version": "1.3.2" }
+    { "name": "agent-tdd-jira", "version": "1.3.3" }
   ],
   "modules": [
     { "id": "meso-contrats", "path": "meso-contrats.md", "dimensions": ["D8"], "status": "active" },
@@ -40,6 +40,7 @@
     { "version": "3.3.0", "file": "archives/SKILL-v3.3.0.md" },
     { "version": "3.4.0", "file": "archives/SKILL-v3.4.0.md" },
     { "version": "2.0.0", "file": "archives/referentiel-meso-contrats-v2.0.0.toml" },
-    { "version": "3.5.0", "file": "archives/SKILL-v3.5.0.md" }
+    { "version": "3.5.0", "file": "archives/SKILL-v3.5.0.md" },
+    { "version": "3.5.1", "file": "archives/SKILL-v3.5.1.md" }
   ]
 }

@@ -1,6 +1,6 @@
 # Mode d'emploi : l'agent TDD à partir d'une demande Jira
 
-Ce mode d'emploi fait travailler l'IA du développeur comme [`agent-tdd-jira`](../../specs/agent-tdd-jira/SKILL.md) 1.3.2 : partir d'une demande Jira enregistrée en MHTML, en tirer les US et leurs critères d'acceptation numérotés, décliner chaque critère en scénarios Gherkin, proposer des variantes de réalisation back Java et front Angular, puis réaliser les scénarios un par un en cycle **rouge, vert, remanié**, avec une traçabilité jusqu'aux commits.
+Ce mode d'emploi fait travailler l'IA du développeur comme [`agent-tdd-jira`](../../specs/agent-tdd-jira/SKILL.md) 1.3.3 : partir d'une demande Jira enregistrée en MHTML, en tirer les US et leurs critères d'acceptation numérotés, décliner chaque critère en scénarios Gherkin, proposer des variantes de réalisation back Java et front Angular, puis réaliser les scénarios un par un en cycle **rouge, vert, remanié**, avec une traçabilité jusqu'aux commits.
 
 L'agent avance par points de validation : sans votre réponse explicite, il ne passe pas à l'étape suivante.
 
@@ -20,7 +20,7 @@ flowchart LR
 - Une IA locale qui lit, écrit et exécute dans le projet : Gemini CLI ou équivalent.
 - Le code du back (Java 21, Spring Boot 3.5) et du front (Angular 20), avec leurs outils de build et de test.
 - La demande Jira enregistrée en MHTML **après avoir déplié tous les commentaires** : depuis Chrome, « Enregistrer sous », page Web, fichier unique. Pour tout un sprint, [`capture-sprint-jira`](../capture-sprint-jira/mode-emploi.md) le fait pour vous.
-- La transmission : [`transmissions/agent-tdd-jira-1.3.2.md`](../../transmissions/agent-tdd-jira-1.3.2.md), ou un clone d'Agent2Prompt.
+- La transmission : [`transmissions/agent-tdd-jira-1.3.3.md`](../../transmissions/agent-tdd-jira-1.3.3.md), ou un clone d'Agent2Prompt.
 
 ## 2. Installer
 

@@ -19,7 +19,7 @@ Le `verdict` juge, nomme la cause présumée et scelle la preuve. Il est déterm
 
 Règles du critère :
 
-- **conforme** : chaque étape `verifier` qui le porte, dans les scénarios joués, est réussie, avec sa capture et son résultat d'étape scellés ;
+- **conforme** : chaque étape `verifier` qui le porte, dans les scénarios joués, est réussie, avec sa capture et son résultat d'étape scellés, et, pour un attendu perceptif, sa perception (D25.INV-2) ;
 - **non conforme** : au moins une étape `verifier` qui le porte a échoué avec la cause `DEFAUT_APPLICATIF` ;
 - **non vérifié** : dans tous les autres cas, avec le motif : preuve manquante, cause autre qu'applicative, instabilité, scénario non jouable ou non sélectionné, trou de couverture.
 
@@ -33,10 +33,10 @@ Règles appliquées dans cet ordre ; la première qui s'applique l'emporte.
 |---|---|---|---|
 | 1 | `SESSION_EXPIREE` | redirection vers l'origine du fournisseur SSO pendant le scénario | CP-0, puis rejeu du scénario depuis son début ; aucun échec imputé |
 | 2 | `ENVIRONNEMENT` | application injoignable, réponse 5xx hors mutation, délai réseau dépassé, origine bloquée que le parcours ne visait pas | campagne suspendue si la cause revient sur 3 scénarios de suite |
-| 3 | `DEFAUT_PARCOURS` | cible introuvable ou ambiguë, donnée refusée par un message de validation du formulaire | réparation (module `preparateur`), puis CP-2 |
-| 4 | `INSTABILITE` | échec puis succès au réessai, à l'identique | au-delà du seuil `instabilite.seuil`, quarantaine proposée en CP-4 |
-| 5 | `DEFAUT_APPLICATIF` | cible résolue, action jouée, assertion contredite | vue développeur ; confirmation en CP-3 |
-| 6 | `INDETERMINE` | aucun signal discriminant | CP-3 |
+| 3 | `DEFAUT_PARCOURS` | cible introuvable ou ambiguë, donnée refusée par un message de validation du formulaire ; pour un constat : ancre non vue, colonne non vue, référence de pictogramme absente | réparation (module `preparateur`), puis CP-2 |
+| 4 | `INSTABILITE` | échec puis succès au réessai, à l'identique ; regards discordants, ou zone instable à chaque regard (D25.INV-8) | au-delà du seuil `instabilite.seuil`, quarantaine proposée en CP-4 |
+| 5 | `DEFAUT_APPLICATIF` | cible résolue, action jouée, assertion contredite ; pour un constat : ancre vue, regard porté, attendu contredit | vue développeur ; confirmation en CP-3 |
+| 6 | `INDETERMINE` | aucun signal discriminant ; ensemble vide (D25.INV-4) ; preuve manquante d'un canal | CP-3 |
 
 Chaque échec cite les signaux qui fondent sa cause. Les règles de classement sont modifiables sous gouvernance (règle `causes.regles`) ; les définitions de « réussi » et d'« échoué » ne le sont pas.
 
@@ -86,6 +86,9 @@ Le monde simulé du `navigateur` injecte cinq défauts ; chacun doit recevoir sa
 | VE7 | D8.INV-4 | chaque verdict porte l'empreinte de chacune de ses preuves ; une preuve altérée rend le critère « non vérifié » |
 | VE8 | D8.INV-5 | un scénario interrompu par la session ne reçoit pas d'échec ; après CP-0, le passage complet est jugé |
 | VE9 | D8.INV-3 | un échec sans signal discriminant est `INDETERMINE` et présenté en CP-3 |
+| VE10 | D25.INV-4 | une étape `chaqueCellule` sur un ensemble vide est `INDETERMINE` ; son critère est « non vérifié », jamais « conforme » |
+| VE11 | D25.INV-8 | une étape aux regards discordants est `INSTABILITE` ; son critère est « non vérifié : instabilité » |
+| VE12 | D25.INV-2 | un critère dont la perception scellée ne correspond plus à son empreinte est « non vérifié : preuve manquante » |
 
 ## 10. Fichiers à produire
 

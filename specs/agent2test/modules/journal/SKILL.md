@@ -15,7 +15,7 @@ status: active
 {
   "n": 1234,
   "horodatage": "2026-10-21T10:15:02.123Z",
-  "specVersion": "1.2.0",
+  "specVersion": "1.3.0",
   "campagne": "C-20261021-001",
   "correlation": "8f2c…",
   "parent": "77a1…",
@@ -55,7 +55,7 @@ Une seule source, la projection JSON ; les trois autres formats en dérivent. Ru
 1. en-tête : demande, versions épinglées (spécification, plan, référentiel, empreinte de la constitution), moteur, opérateurs ;
 2. sélection : paliers, motifs, scénarios écartés, trous de couverture ;
 3. matrice critères × verdicts, pour tous les critères de la demande, trous compris ;
-4. détail par scénario et par étape : action, cible, résultat, durée, preuve ;
+4. détail par scénario et par étape : action, cible, résultat, durée, preuve, et, pour une étape `verifier` à attendu perceptif, son témoignage : ce qui a été vu, ce qui ne l'a pas été (D25.INV-7) ;
 5. causes présumées, décisions et désaccords humains ;
 6. mesures du premier ordre de la campagne ;
 7. mentions d'origine des productions du moteur ;
@@ -69,7 +69,7 @@ Format JSON, `agent2test.journal-de-tests/1`, celui que lit agent-tdd-jira (`age
   "campagne": "C-20261021-001",
   "demande": { "cle": "ECR-77", "texte": "Export des retours d'expérience en CSV" },
   "versions": {
-    "specification": "1.2.0", "plan": "P-14", "referentiel": "R-9", "constitution": "<sha256>",
+    "specification": "1.3.0", "plan": "P-14", "referentiel": "R-9", "constitution": "<sha256>",
     "sources": [{ "chemin": "docs/demandes/ECR-77/us.md", "empreinte": "<sha256>" }, { "chemin": "docs/demandes/ECR-77/ECR-77.feature", "empreinte": "<sha256>" }],
     "application": { "commit": "<sha1 de HEAD>", "fichiersModifies": [] }
   },
@@ -107,10 +107,11 @@ Règles :
 - Chaque décision et chaque désaccord nomment leur `cible` : scénario, critère ou parcours. Un désaccord porte aussi son auteur, la cause ou le statut proposé (`proposition`), son commentaire et sa date (module `verdict`, section 4).
 - JUnit XML : une suite par campagne, un cas par scénario joué (`name` : identifiant et titre), un `<failure>` par scénario échoué avec sa cause et le critère contredit, un `<skipped>` par scénario non joué avec son motif. GitLab CI le lit tel quel dans son rapport de tests.
 - Markdown : les rubriques dans l'ordre, la matrice en tableau. HTML : la même chose, conforme aux règles d'accessibilité du module `tableau-de-bord`.
+- `scenarios[].etapes[].temoignage` est un champ ajouté en 1.3.0, présent sur chaque étape `verifier` à attendu perceptif, sous la forme du module `navigateur` (section 6.9) ; les étapes de l'exemple ECR-77 n'en ont pas. Il ne change ni le sens ni la forme des champs du contrat de lecture, et le format garde son nom. Le Markdown et le HTML le présentent sous chaque critère : « Vu », « Non vu », « Remarque », règle de comparaison, preuves ; le JUnit XML cite le premier « non vu » dans le `<failure>`.
 - Tout contenu produit par le moteur (motif de sélection, parcours, réparation, leçon) est marqué « produit par <moteur>, fiche <fiche> » et figure dans `origineIA` (D10.INV-3).
 - `empreinteFin` est l'empreinte de la ligne `campagne.close` ; un journal de tests produit avant la clôture porte la mention « provisoire » et aucune empreinte de fin (D10.INV-4).
 - Les fichiers produits vont dans `rapports/<campagne>/journal-de-tests.{md,json,xml,html}`.
-- **Contrat de lecture** : agent-tdd-jira 1.3.2 lit ce JSON pour reporter un verdict par critère et corriger les défauts confirmés (`agent-tdd-jira:D7.INV-3`). Il s'appuie sur `format`, `campagne`, `demande.cle`, `versions.plan`, `versions.sources`, `versions.application`, `matrice` (critère, verdict de la liste fermée, motif, scénarios), `scenarios` (identifiant, cause, étapes), `decisions` et `desaccords` avec leur cible, et `empreinteFin`. Changer le sens ou la forme de l'un de ces champs change le format, donc son nom (`agent2test.journal-de-tests/2`).
+- **Contrat de lecture** : agent-tdd-jira 1.3.3 lit ce JSON pour reporter un verdict par critère et corriger les défauts confirmés (`agent-tdd-jira:D7.INV-3`). Il s'appuie sur `format`, `campagne`, `demande.cle`, `versions.plan`, `versions.sources`, `versions.application`, `matrice` (critère, verdict de la liste fermée, motif, scénarios), `scenarios` (identifiant, cause, étapes), `decisions` et `desaccords` avec leur cible, et `empreinteFin`. Changer le sens ou la forme de l'un de ces champs change le format, donc son nom (`agent2test.journal-de-tests/2`).
 
 ## 4. Pièges connus
 
@@ -134,6 +135,7 @@ Règles :
 | JO9 | D10.INV-2 | le JSON de l'exemple ECR-77 porte les sources du plan et leurs empreintes, l'état git relevé à l'ouverture, et la cible de chaque décision et de chaque désaccord ; il se valide contre `schemas/journal-de-tests.json` |
 | JO10 | D10.INV-1 | un `UPDATE` ou un `DELETE`, sans condition compris, sur `lignes` lève « ajout seul », par la connexion du journal comme par un outil SQLite ; un déclencheur retiré empêche le démarrage |
 | JO11 | D10.INV-1 | après une chaîne rompue, `npm run journal:mettre-de-cote` permet le démarrage ; la copie garde le journal rompu entier, la table neuve a ses deux déclencheurs, et la première ligne du journal neuf cite la copie, sa première ligne rompue et l'empreinte de sa dernière ligne |
+| JO12 | D25.INV-7 | une étape `verifier` réussie et une étape échouée portent chacune leur témoignage dans le JSON, et le Markdown les présente sous leur critère, « Vu » et « Non vu » |
 
 ## 6. Fichiers à produire
 

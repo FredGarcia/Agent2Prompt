@@ -48,6 +48,7 @@ Liste fermée, recopiée dans la constitution. Une valeur hors de ses bornes est
 | `ciblage.ordre` | rôle et nom, libellé, identifiant de test, texte, texte indicatif, CSS | permutation des cinq premières stratégies ; CSS toujours dernière |
 | `memoire.k` | 6 | entre 1 et 12 |
 | `memoire.seuilSimilarite` | 0,75 | entre 0,5 et 0,95 |
+| `vision.seuil` | 0,80 | entre 0,70 et 0,95 ; ressemblance minimale d'un pictogramme à sa référence ratifiée (D25.INV-6) |
 | `quarantaine.scenarios` | aucun | jamais un scénario du palier P1 ; un scénario en quarantaine reste joué et rapporté à part |
 | `causes.regles` | table du module `verdict` | les définitions de « réussi » et d'« échoué » restent hors de portée |
 | `fiches.lecons` | aucune | une leçon ne contredit pas la constitution ; elle vaut pour un moteur |
@@ -82,6 +83,7 @@ Valeurs fixées par la configuration humaine, que le système lit sans les modif
 | RF6 | D15.INV-4 | une décision CP-4 venue du canal MCP, ou d'un rôle testeur, est refusée `DECISION_IRRECEVABLE` |
 | RF7 | D15.INV-5 | `instabilite.seuil` à 40 % est refusé ; `ciblage.ordre` qui ne met pas CSS en dernier est refusé |
 | RF8 | D15.INV-5 | une proposition qui touche une règle absente de la liste fermée est refusée |
+| RF9 | D25.INV-6 | `vision.seuil` à 0,50 est refusé ; à 0,85, ratifié, il s'applique à la campagne suivante |
 
 ## 8. Fichiers à produire
 
