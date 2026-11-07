@@ -84,7 +84,7 @@ Oui. Le modèle produit le texte le plus plausible à partir de ce qu'il a reçu
 
 ## Partie 2. Essayer sans risque
 
-L'agent [`explication-hote-ia`](../../specs/explication-hote-ia/SKILL.md) 1.0.1 explique Gemini CLI en vous le montrant sur votre poste. Pendant qu'il explique, il ne modifie rien : c'est une première utilisation sans risque.
+L'agent [`explication-hote-ia`](../../specs/explication-hote-ia/SKILL.md) 1.0.2 explique Gemini CLI en vous le montrant sur votre poste. Pendant qu'il explique, il ne modifie rien : c'est une première utilisation sans risque.
 
 ### Ce qu'il faut
 
@@ -149,7 +149,7 @@ Avec votre accord :
 
 Le sous-agent a son propre contexte : il voit votre installation, pas la conversation qui l'appelle. Il sert à la carte et au diagnostic. Les questions sur la session en cours se posent dans la session principale.
 
-Dans un autre outil, collez la transmission [`transmissions/explication-hote-ia-1.0.1.md`](../../transmissions/explication-hote-ia-1.0.1.md) : l'IA matérialise le skill dans `.skills/explication-hote-ia/`.
+Dans un autre outil, collez la transmission [`transmissions/explication-hote-ia-1.0.2.md`](../../transmissions/explication-hote-ia-1.0.2.md) : l'IA matérialise le skill dans `.skills/explication-hote-ia/`.
 
 ### Voir l'envoi exact
 

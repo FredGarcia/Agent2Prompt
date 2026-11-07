@@ -1,6 +1,6 @@
 {
   "name": "explication-hote-ia",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "specSchema": 1,
   "language": "fr",
   "description": "Agent qui explique le fonctionnement de l'outil d'IA qui l'exécute, Gemini CLI ou un hôte non reconnu décrit sans être nommé, d'abord pour les développeurs qui hésitent à s'en servir faute d'en voir le fonctionnement : parcours découverte qui ouvre la boîte noire, en langage simple ; boucle d'un tour, assemblage du contexte, outils et politique, confiance, composants, mémoire, modèle, ce qui sort du poste, angles morts ; carte de l'installation et diagnostic ; chaque affirmation étiquetée par sa provenance ; script Node en lecture seule qui ne rend aucun secret.",
@@ -28,6 +28,7 @@
   ],
   "extensionPoints": ["E1", "E2"],
   "previousVersions": [
-    { "version": "1.0.0", "file": "archives/SKILL-v1.0.0.md" }
+    { "version": "1.0.0", "file": "archives/SKILL-v1.0.0.md" },
+    { "version": "1.0.1", "file": "archives/SKILL-v1.0.1.md" }
   ]
 }

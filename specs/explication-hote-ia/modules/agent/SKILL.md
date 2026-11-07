@@ -102,7 +102,7 @@ Rejoués avec le développeur à l'installation, puis à chaque version du skill
 ```markdown
 ---
 name: explicateur-hote
-description: Explicateur de l'outil d'IA hôte (skill explication-hote-ia 1.0.1). À solliciter pour une carte de cette installation (réglages et leur couche, confiance du dossier, fichiers de contexte, skills, sous-agents, commandes, extensions, serveurs MCP, hooks, politiques) ou pour diagnostiquer un comportement de l'hôte (« pourquoi ce skill n'apparaît pas », « pourquoi ce GEMINI.md n'est pas suivi »). Lecture seule ; chaque affirmation porte sa provenance. Ne voit pas le contexte de la session qui l'appelle.
+description: Explicateur de l'outil d'IA hôte (skill explication-hote-ia 1.0.2). À solliciter pour une carte de cette installation (réglages et leur couche, confiance du dossier, fichiers de contexte, skills, sous-agents, commandes, extensions, serveurs MCP, hooks, politiques) ou pour diagnostiquer un comportement de l'hôte (« pourquoi ce skill n'apparaît pas », « pourquoi ce GEMINI.md n'est pas suivi »). Lecture seule ; chaque affirmation porte sa provenance. Ne voit pas le contexte de la session qui l'appelle.
 kind: local
 tools:
   - run_shell_command
@@ -182,7 +182,7 @@ Entre deux sources contradictoires, l'observation l'emporte sur la documentation
 
 <!-- fichier : commandes/hote/explique.toml -->
 ```toml
-description = "Explique le fonctionnement de l'hôte d'IA, appliqué à cette installation ; sans question, le parcours découverte (skill explication-hote-ia 1.0.1)"
+description = "Explique le fonctionnement de l'hôte d'IA, appliqué à cette installation ; sans question, le parcours découverte (skill explication-hote-ia 1.0.2)"
 prompt = """
 Active le skill explication-hote-ia, puis applique son mode « expliquer ».
 Question du développeur : {{args}}
@@ -193,7 +193,7 @@ Chaque affirmation sur l'hôte porte son étiquette de provenance et sa source.
 
 <!-- fichier : commandes/hote/carte.toml -->
 ```toml
-description = "Carte de cette installation de l'hôte d'IA : réglages, confiance, contextes, composants (skill explication-hote-ia 1.0.1)"
+description = "Carte de cette installation de l'hôte d'IA : réglages, confiance, contextes, composants (skill explication-hote-ia 1.0.2)"
 prompt = """
 Active le skill explication-hote-ia, puis applique son mode « carte » : lance l'instantané, en commençant par hote, puis présente la carte de cette installation, chaque point avec son étiquette de provenance et sa source.
 Précision du développeur, s'il y en a une : {{args}}
@@ -202,7 +202,7 @@ Précision du développeur, s'il y en a une : {{args}}
 
 <!-- fichier : commandes/hote/pourquoi.toml -->
 ```toml
-description = "Diagnostique un comportement de l'hôte d'IA à partir de ce qui s'observe (skill explication-hote-ia 1.0.1)"
+description = "Diagnostique un comportement de l'hôte d'IA à partir de ce qui s'observe (skill explication-hote-ia 1.0.2)"
 prompt = """
 Active le skill explication-hote-ia, puis applique son mode « pourquoi » au comportement suivant : {{args}}
 Suis la méthode du module diagnostic : chaque hypothèse confirmée ou écartée par une observation nommée, la cause retenue étiquetée, la correction décrite sans être appliquée.

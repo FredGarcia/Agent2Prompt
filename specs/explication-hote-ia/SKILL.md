@@ -1,10 +1,10 @@
 ---
 name: explication-hote-ia
 description: Explique le fonctionnement de l'outil d'IA qui exécute l'agent (Gemini CLI, ou un hôte non reconnu décrit sans lui prêter de nom), à partir de ce qui s'observe dans cette installation et de la documentation de sa version exacte. Pour les développeurs qui découvrent l'IA ou hésitent à s'en servir faute d'en voir le fonctionnement, un parcours découverte ouvre la boîte noire en langage simple, chaque étape montrée sur le poste. Boucle d'un tour, ce que reçoit le modèle, outils et confirmations, confiance du dossier, composants, mémoire, modèle, ce qui sort du poste, angles morts ; carte de l'installation et diagnostic d'un comportement. Chaque affirmation porte sa provenance. Script Node en lecture seule, sans dépendance, qui ne rend aucun secret.
-version: 1.0.1
+version: 1.0.2
 ---
 
-# Explication de l'hôte d'IA, version 1.0.1
+# Explication de l'hôte d'IA, version 1.0.2
 
 Ce document est le point d'entrée du skill. Le skill fait d'un agent l'explicateur de l'outil d'IA qui l'exécute : il dit comment cet hôte fonctionne, en général et dans cette installation, sans rien affirmer qu'il ne puisse rattacher à une source. Il s'adresse d'abord aux développeurs qui hésitent à se servir de l'IA faute d'en connaître le fonctionnement : son parcours découverte ouvre la boîte noire, en langage simple, chaque étape montrée sur leur poste, sans chercher à les convaincre. Gemini CLI est l'hôte reconnu : ses mécanismes sont décrits par des repères vérifiés sur sa version 0.67.0, à confronter à la documentation de la version installée. Tout autre hôte est décrit par ce qui s'en observe, sans lui prêter de nom ni de configuration. Un script Node en lecture seule, `scripts/instantane-hote.mjs`, fait les observations sur le disque ; l'agent `explicateur-hote` et trois commandes de Gemini CLI le mettent en œuvre. Les règles détaillées sont dans `modules/`.
 
@@ -99,7 +99,7 @@ Clause de second ordre : l'explicateur fait partie du système qu'il explique. S
 
 ## 6. Registre des dimensions
 
-| ID | Dimension | Introduite | Statut 1.0.0 | Dépend de | Module |
+| ID | Dimension | Introduite | Statut 1.0.2 | Dépend de | Module |
 |---|---|---|---|---|---|
 | D1 | Exécution du script : lecture seule, sorties, codes, bornes | 1.0 | active | | `execution`, `recette` |
 | D2 | Identification de l'hôte : famille, preuve, paquet, version, documentation, hôte non reconnu | 1.0 | active | D1 | `hote`, `recette` |
@@ -216,6 +216,8 @@ Les repères sont tirés du paquet `@google/gemini-cli` 0.67.0, publié sur npm,
 Ces lectures ont relevé des écarts entre la documentation et le code de la même version, que l'agent sait dire (module `modele-hote`, § 10). Elles ont aussi montré que, réglé par défaut, Gemini CLI envoie des statistiques d'usage et cherche des mises à jour même quand l'API du modèle est locale (repère H1).
 
 ## 12. Journal de révision
+
+**1.0.2** (2026-11-07) : correctif. L'en-tête de transmission et le module `recette` citaient encore les scénarios A1 à A10 : à l'installation, l'IA rejouait les scénarios sans A11 ni A12, ceux du parcours découverte. Ils citent A1 à A12, comme ce point d'entrée et le module `agent`. Le tableau des dimensions porte la version courante. Version du script, du sous-agent et des commandes portée à 1.0.2 ; aucun comportement ni aucun invariant modifié.
 
 **1.0.1** (2026-11-07) : correctif, pour la diffusion aux développeurs qui hésitent à se servir de l'IA faute d'en voir le fonctionnement. Parcours découverte en sept étapes, à la place du parcours guidé (module `modele-hote`, § 11) ; forme en clair des étiquettes (module `provenance`, § 3) ; invariants D7.INV-4 (pédagogie) et D7.INV-5 (expliquer sans chercher à convaincre) ; scénarios A11 et A12. Repère H1 corrigé : sous Node 26, une partie des sorties de Gemini CLI ne suit plus `HTTPS_PROXY`. Recette vérifiée sous Node 26.13.0, repères confrontés sous Node 26.13.0 ; en-têtes YAML des modules `agent`, `contexte` et `diagnostic` rendus lisibles par un lecteur YAML strict.
 
