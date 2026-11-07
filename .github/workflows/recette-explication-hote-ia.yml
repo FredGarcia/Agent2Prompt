@@ -4,8 +4,9 @@ name: Recette de explication-hote-ia
 # Le travail « recette » suit le chemin de l'IA du développeur, sous Linux et sous Windows : matérialiser
 # la transmission courante, extraire les six fichiers par la commande du module execution, § 8, puis
 # lancer la recette. Le travail « repères » confronte les repères du module modele-hote au Gemini CLI
-# réel, à une version épinglée, contre une fausse API locale et un proxy témoin qui refuse toute autre
-# sortie ; strace relève chaque connexion, et le travail échoue si l'une quitte la boucle locale.
+# réel, à une version épinglée et sous Node 26.13.0, celui du poste de la mission, contre une fausse API
+# locale et un proxy témoin qui refuse toute autre sortie ; strace relève chaque connexion, et le travail
+# échoue si l'une quitte la boucle locale.
 
 on:
   pull_request:
@@ -137,13 +138,13 @@ jobs:
           exit /b %statut%
 
   reperes:
-    name: repères contre Gemini CLI (@google/gemini-cli 0.67.0)
+    name: repères contre Gemini CLI (@google/gemini-cli 0.67.0, Node 26.13.0)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
         with:
-          node-version: 24
+          node-version: '26.13.0'
 
       - name: Paquet de Gemini CLI, à la version épinglée, et strace
         shell: bash

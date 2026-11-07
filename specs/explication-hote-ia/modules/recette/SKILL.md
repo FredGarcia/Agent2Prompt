@@ -1,6 +1,6 @@
 ---
 name: recette
-description: Recette du skill (lancement et bilan attendu par plateforme, tests T1 à T28 et leurs invariants, contre-épreuves où chaque défaut réintroduit est attrapé par son test, recette des repères contre le Gemini CLI réel sans réseau, intégration continue sous Linux et Windows avec Node 20 et 24, texte complet de tests/instantane-hote.test.mjs). À lire avant de déclarer le skill installé ou de modifier son script.
+description: Recette du skill (lancement et bilan attendu par plateforme, tests T1 à T28 et leurs invariants, contre-épreuves où chaque défaut réintroduit est attrapé par son test, recette des repères contre le Gemini CLI réel sans réseau, intégration continue sous Linux et Windows avec Node 20, 24 et 26.13.0, texte complet de tests/instantane-hote.test.mjs). À lire avant de déclarer le skill installé ou de modifier son script.
 dimensions: [D1, D2, D3, D4, D5, D8]
 status: active
 ---
@@ -17,7 +17,7 @@ Depuis le dossier du skill, après l'extraction du module `execution`, § 8 :
 node --test tests/instantane-hote.test.mjs
 ```
 
-Attendu : 28 tests réussis sous Linux et WSL2 ; 27 réussis et 1 sauté (T9, qui lit les processus parents dans `/proc`) sous Windows et macOS ; Node 20 ou plus récent. Chaque test bâtit son propre monde dans un dossier temporaire, puis le supprime : un accueil, un dossier système, un faux paquet de Gemini CLI avec sa documentation, et un dépôt dont la racine est un sous-dossier. Le monde contient quinze secrets témoins, dans les réglages, les serveurs MCP, un hook, un `.env`, une extension, une session, un fichier de contexte et la mémoire privée : aucun ne doit ressortir.
+Attendu : 28 tests réussis sous Linux et WSL2 ; 27 réussis et 1 sauté (T9, qui lit les processus parents dans `/proc`) sous Windows et macOS ; Node 20 ou plus récent, vérifié sous Node 20, 22, 24 et 26.13.0. Chaque test bâtit son propre monde dans un dossier temporaire, puis le supprime : un accueil, un dossier système, un faux paquet de Gemini CLI avec sa documentation, et un dépôt dont la racine est un sous-dossier. Le monde contient quinze secrets témoins, dans les réglages, les serveurs MCP, un hook, un `.env`, une extension, une session, un fichier de contexte et la mémoire privée : aucun ne doit ressortir.
 
 La recette ne lance jamais Gemini CLI et n'a besoin d'aucun réseau. Lancée par Gemini CLI lui-même, elle donne le même bilan : les appels faits en processus ignorent les processus parents, et T9 désigne son propre faux hôte.
 
@@ -88,7 +88,7 @@ Chaque défaut ci-dessous a été réintroduit, un à la fois, dans une copie du
 
 ## 4. Recette des repères
 
-Les repères du module `modele-hote` sont confrontés au Gemini CLI réel par `.github/scripts/reperes-hote.mjs`, dans le dépôt Agent2Prompt, hors du skill, à côté du paquet `@google/gemini-cli` installé à la version épinglée : elle installe le skill par `tools/installer.mjs`, le sous-agent et les commandes, dans un accueil isolé. Elle lance cinq sessions de Gemini CLI avec une clé factice, contre une fausse API locale qui garde chaque requête et répond « clé invalide » : deux non interactives, A avec les réglages par défaut et B avec les réglages de retrait des statistiques d'usage et de la mise à jour ; deux interactives sous un terminal, C avec les réglages de retrait et D avec les réglages par défaut ; enfin E, deux lancements sous un terminal, sans puis avec `CI=true`. Les variables `CI` et `GITHUB_ACTIONS`, que pose l'intégration continue, sont retirées de l'environnement de l'hôte, sauf pour le second lancement de E : les sessions observent ainsi le poste d'un développeur. L'hôte compose chaque session, exporte son prompt système et enregistre sa transcription, puis échoue à joindre l'API. Toute autre sortie passe par un proxy témoin local, qui note l'hôte visé et refuse la connexion : aucun appel ne quitte le poste. En intégration continue, le travail des repères relève en plus chaque connexion ouverte (`strace`), et échoue si l'une vise une autre adresse que la boucle locale. Elle vérifie :
+Les repères du module `modele-hote` sont confrontés au Gemini CLI réel par `.github/scripts/reperes-hote.mjs`, dans le dépôt Agent2Prompt, hors du skill, à côté du paquet `@google/gemini-cli` installé à la version épinglée : elle installe le skill par `tools/installer.mjs`, le sous-agent et les commandes, dans un accueil isolé. Elle lance cinq sessions de Gemini CLI avec une clé factice, contre une fausse API locale qui garde chaque requête et répond « clé invalide » : deux non interactives, A avec les réglages par défaut et B avec les réglages de retrait des statistiques d'usage et de la mise à jour ; deux interactives sous un terminal, C avec les réglages de retrait et D avec les réglages par défaut ; enfin E, deux lancements sous un terminal, sans puis avec `CI=true`. Les variables `CI` et `GITHUB_ACTIONS`, que pose l'intégration continue, sont retirées de l'environnement de l'hôte, sauf pour le second lancement de E : les sessions observent ainsi le poste d'un développeur. L'hôte compose chaque session, exporte son prompt système et enregistre sa transcription, puis échoue à joindre l'API. Toute autre sortie passe par un proxy témoin local, qui note l'hôte visé et refuse la connexion : aucun appel ne quitte le poste. L'hôte reçoit `NODE_USE_ENV_PROXY=1` : sous Node 26, sans elle, une partie de ses sorties ignorerait le proxy témoin et partirait en direct (repère H1). En intégration continue, le travail des repères relève en plus chaque connexion ouverte (`strace`), et échoue si l'une vise une autre adresse que la boucle locale. Elle vérifie :
 
 - le skill s'installe par `tools/installer.mjs`, et ses six fichiers s'extraient par la commande du module `execution`, § 8 ;
 - H13 : une commande `/hote:carte` est développée par l'hôte, `{{args}}` compris, avant l'envoi ;
@@ -109,13 +109,13 @@ Une nouvelle version de Gemini CLI se confronte en changeant la version épingl�
 
 ## 5. Intégration continue
 
-Le workflow `.github/workflows/recette-explication-hote-ia.yml` du dépôt Agent2Prompt suit le chemin de l'IA du développeur : il matérialise la transmission courante, extrait les six fichiers par la commande du module `execution`, § 8, sous bash et sous CMD, puis lance la recette, sur `ubuntu-latest` et `windows-latest`, avec Node 20 et Node 24. Un second travail, sous Linux, lance la recette des repères. Il tourne à chaque pull request et à chaque push sur `main` qui touchent la spécification, sa transmission, l'outil d'assemblage, l'installateur, le script des repères ou le workflow.
+Le workflow `.github/workflows/recette-explication-hote-ia.yml` du dépôt Agent2Prompt suit le chemin de l'IA du développeur : il matérialise la transmission courante, extrait les six fichiers par la commande du module `execution`, § 8, sous bash et sous CMD, puis lance la recette, sur `ubuntu-latest` et `windows-latest`, avec Node 20, version minimale, Node 24 et Node 26.13.0, celle du poste de la mission. Un second travail, sous Linux et Node 26.13.0, lance la recette des repères. Il tourne à chaque pull request et à chaque push sur `main` qui touchent la spécification, sa transmission, l'outil d'assemblage, l'installateur, le script des repères ou le workflow.
 
 ## 6. Recette `tests/instantane-hote.test.mjs`
 
 <!-- fichier : tests/instantane-hote.test.mjs -->
 ```js
-// Recette de explication-hote-ia 1.0.0 : node --test tests/instantane-hote.test.mjs
+// Recette de explication-hote-ia 1.0.1 : node --test tests/instantane-hote.test.mjs
 // Node 20 ou plus récent, modules natifs. Chaque test bâtit son propre monde dans un dossier temporaire :
 // un accueil, un dossier système, un faux paquet de Gemini CLI et un dépôt, puis interroge le script,
 // importé ou lancé comme le ferait l'agent. Le monde contient des secrets témoins qui ne doivent jamais
