@@ -13,7 +13,7 @@ Depuis 1.3.0, il joue le rôle d'une personne devant l'écran : il va sur une pa
 
 ## 1. Session (D4.INV-3, D4.INV-7)
 
-| Stratégie | Principe | Statut 1.3.0 |
+| Stratégie | Principe | Statut 1.3.1 |
 |---|---|---|
 | `integree` (défaut) | contexte persistant dans un profil dédié ; Chromium lancé avec `--auth-server-allowlist` et `--auth-negotiate-delegate-allowlist` sur les domaines SSO de la configuration humaine : l'authentification intégrée du poste, ou la session déjà ouverte chez le fournisseur, connecte sans action humaine | active |
 | `profil` | contexte persistant ; l'opérateur se connecte une fois en CP-0, puis le cookie du fournisseur rend les reconnexions silencieuses | active |

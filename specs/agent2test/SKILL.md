@@ -1,10 +1,10 @@
 ---
 name: agent2test
 description: Construire Agent2Test, système multi-agents qui choisit, prépare, exécute et journalise les tests essentiels d'une application Angular pour une demande donnée. Playwright y est piloté comme une bibliothèque depuis Node, dans un projet séparé de l'application ; le plan vient d'agent-tdd-jira (US, critères d'acceptation numérotés, scénarios Gherkin), chaque critère reçoit un verdict prouvé, l'humain ratifie aux points de contrôle, et le système observe et fait évoluer ses propres règles sous gouvernance. Le navigateur joue une personne : il regarde la page par la vue, le lecteur d'écran et le clavier, et rend compte de ce qu'il voit et de ce qu'il ne voit pas. Exécution locale, données dans un fichier SQLite unique, ouvert par un agent médiateur ; la remise d'Agent2Dev arrive en fichier, ou par un échange par dossiers facultatif.
-version: 1.3.0
+version: 1.3.1
 ---
 
-# Agent2Test, spécification 1.3.0
+# Agent2Test, spécification 1.3.1
 
 Ce document est le point d'entrée du package. Il donne le principe, la carte du système, les points de contrôle, le registre des dimensions, les règles communes et les invariants. Les détails techniques sont dans `modules/`. Le fichier `manifest.json` déclare quels modules sont actifs.
 
@@ -170,7 +170,7 @@ Une remise reçue, déposée par l'opérateur ou lue dans une boîte d'Agent2Dev
 
 ## 6. Registre des dimensions
 
-| ID | Dimension | Introduite | Statut 1.3.0 | Dépend de | Module |
+| ID | Dimension | Introduite | Statut 1.3.1 | Dépend de | Module |
 |---|---|---|---|---|---|
 | D1 | Noyau 7E, bus et constitution | 1.0 | active | | `noyau` |
 | D2 | Données isolées par agent, sur PostgreSQL | 1.0 | superseded | D1 | remplacée en 1.1.0 par D21, elle-même remplacée en 1.2.0 par D23 (`donnees`) |
@@ -233,7 +233,7 @@ Un point d'extension n'est pas une fonctionnalité. En 1.x, il n'a qu'un test qu
 - **Données d'Agent2Test** : un fichier SQLite unique, `agent2test.sqlite`, que seul l'agent médiateur `donnees` ouvre, par le module intégré `node:sqlite`, dans le dossier de données de la configuration (`~/.agent2test/donnees/` par défaut), hors du dépôt d'Agent2Test et du projet de l'application. Chaque agent y a son espace de tables. Aucun serveur de base de données, aucun port.
 - **Configuration humaine** : un fichier `configuration/humaine.json`, lu au démarrage et jamais écrit par le système, fixe l'autonomie des points de contrôle, les origines autorisées, l'autorisation du moteur externe, l'oracle SQL, les rôles des utilisateurs d'Agent2Test, les rôles de l'application que porte la session, le mode d'échange du binôme et ses dossiers, et les racines admises pour une remise.
 - **Langue** : identifiants de code sans accents ; textes de l'IHM, messages, journal et journal de tests en français.
-- **Node** : Node 24 recommandé, Node 22.13 au minimum, première version où `node:sqlite` se passe d'option ; deux dépendances d'exécution seulement, `playwright`, et `pg` pour l'oracle.
+- **Node** : Node 26.13.0 recommandé, Node 22.13 au minimum, première version où `node:sqlite` se passe d'option ; deux dépendances d'exécution seulement, `playwright`, et `pg` pour l'oracle.
 - **Échange par dossiers** : facultatif ; le mode `manuel` est le défaut. En mode `dossiers`, Agent2Test lit les remises dans la boîte de sortie d'Agent2Dev et dépose dans la sienne le journal de tests d'une campagne close issue d'une remise ; il n'ouvre aucune connexion, ne décide rien et n'ouvre aucune campagne. Agent2Test n'en dépend jamais.
 
 ## 9. Critères d'acceptation globaux
@@ -248,7 +248,7 @@ Un point d'extension n'est pas une fonctionnalité. En 1.x, il n'a qu'un test qu
 - Aucun module `reserved` n'est chargé ; chaque point d'extension a son test d'inertie.
 - Le guide de démarrage suffit, seul, à installer et lancer le kit sur le poste du développeur.
 - Sur l'application de démonstration, la page de l'exemple TAB-1 et ses treize contre-épreuves reçoivent chacune les verdicts attendus et les fragments attendus de leur témoignage, et chaque constat se recalcule à l'identique depuis ses preuves (module `navigateur`, section 11).
-- Le journal de tests JSON de l'exemple ECR-77 respecte le contrat de lecture d'agent-tdd-jira 1.3.3 (module `journal`, section 3) : sources du plan et leurs empreintes, état git à l'ouverture, verdicts de la liste fermée, cible de chaque décision.
+- Le journal de tests JSON de l'exemple ECR-77 respecte le contrat de lecture d'agent-tdd-jira 1.3.4 (module `journal`, section 3) : sources du plan et leurs empreintes, état git à l'ouverture, verdicts de la liste fermée, cible de chaque décision.
 
 ## 10. Invariants
 
@@ -497,3 +497,5 @@ Les valeurs par défaut H14 à H19 du cahier (budgets, conservation, langue, mé
 **1.2.0** (2026-10-24) : dimensions D23 et D24 actives ; D21 et D22 passent à `superseded`, remplacées par D23 et D24. Données : un fichier SQLite unique, `agent2test.sqlite`, dont l'agent médiateur `donnees` tient la seule connexion, au lieu d'un fichier par agent ; chaque agent y a son espace de tables, préfixées par son nom ; au démarrage, chaque contrat est vérifié sur le plan d'exécution de SQLite (`EXPLAIN`), déclencheurs compris, et ne doit toucher que les tables de son propriétaire ; une migration qui crée un objet hors de son espace est annulée ; reprise d'une instance 1.1.0 ou 1.0.0 (module `donnees`, section 9). Échange : n8n n'est plus le relais du binôme ; en mode `manuel`, le défaut, l'opérateur dépose la remise dans le tableau de bord ; en mode `dossiers`, Agent2Test lit les remises dans la boîte de sortie de chaque instance d'Agent2Dev et dépose dans la sienne le journal de tests d'une campagne close, sans aucune connexion ; le rôle `relais` et l'outil `a2t_deposer_remise` sont retirés ; une remise s'ouvre sur la racine admise dont `HEAD` est le commit remis, et non plus sur le chemin qu'elle cite. D23.INV-1 remplace D21.INV-1 ; D23.INV-2 à D23.INV-5 reprennent D21.INV-2 à D21.INV-5 ; D24.INV-1 à D24.INV-3 reprennent D22.INV-1, D22.INV-3 et D22.INV-4 pour l'échange par dossiers, D22.INV-2 n'ayant plus d'objet, et D24.INV-4 s'ajoute. D18.INV-3 cite désormais D23.INV-3, qui reprend mot pour mot D21.INV-3. Entrée : agent-tdd-jira 1.3.2. Décisions du développeur (22 et 23 octobre 2026) : un fichier SQLite unique par tête, dont un agent médiateur gère l'accès ; n8n remplacé par l'échange par dossiers, facultatif. Archive : `archives/SKILL-v1.1.0.md`.
 
 **1.3.0** (2026-11-06) : dimension D25 active, dans le module `navigateur`. Le navigateur joue une personne qui va sur une page, la regarde et rend compte de ce qu'elle voit et de ce qu'elle ne voit pas. Attendus perceptifs de l'étape `verifier` : `position` et `absence` d'un élément à un bord d'une zone, `chaqueCellule` d'une colonne (lien, nom accessible, atteinte au clavier, pictogramme), `titre` d'un tableau ; trois canaux, la vue par les boîtes de `ariaSnapshotJSON({ boxes: true })` et la capture, le lecteur d'écran par les rôles et les noms, le clavier par les arrêts de la touche Tab ; absence seulement dans une portée vue ; « chaque » refusé sur un ensemble vide ; comparaison de texte déclarée ; pictogramme reconnu par ressemblance à une référence ratifiée en CP-2, seuil `vision.seuil` ; second regard concordant ; témoignage versé au résultat d'étape et au journal de tests ; constat recalculable depuis ses preuves. Une étape `verifier` échouée n'arrête plus les `verifier` suivantes. Aucune dépendance nouvelle : la ressemblance lit les PNG avec `node:zlib` (D18.INV-2 inchangé). Le journal de tests garde son format `agent2test.journal-de-tests/1` : il gagne le champ `scenarios[].etapes[].temoignage`, sans changer le sens ni la forme des champs que lit agent-tdd-jira. Exemple TAB-1 et treize contre-épreuves dans l'application de démonstration (module `navigateur`, section 11). Invariants D25.INV-1 à D25.INV-8. Demande du développeur (6 novembre 2026) : « démontrer que Playwright prend bien le rôle d'une personne qui navigue vers une page, l'observe et rend compte de ce qu'elle voit ou ne voit pas ». Entrée : agent-tdd-jira 1.3.3. Archive : `archives/SKILL-v1.2.0.md`.
+
+**1.3.1** (2026-11-07) : correctif. Node 26.13.0, version du poste de la mission depuis le 6 novembre 2026, devient la version recommandée, à la place de Node 24 : manifeste, règles globales (section 8), module `exploitation` (schéma de la topologie, message de démarrage). Le minimum reste Node 22.13, première version où `node:sqlite` se passe d'option (D18.INV-1 inchangé). Sous Node 26.13.0, `setAuthorizer` est présent : l'autorisateur du médiateur s'applique et le scénario BD12 s'exécute (module `donnees`). Entrée : agent-tdd-jira 1.3.4. Aucune dimension ni aucun invariant modifié. Archive : `archives/SKILL-v1.3.0.md`.

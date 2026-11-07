@@ -1,6 +1,6 @@
 # Mode d'emploi : construire et utiliser Agent2Dev
 
-[`agent2dev`](../../specs/agent2dev/SKILL.md) 1.1.2 est la **spécification d'un système à construire**, pas un skill qu'on installe. Une IA la reçoit dans le dépôt d'Agent2Dev et l'implémente par lots, sous votre validation.
+[`agent2dev`](../../specs/agent2dev/SKILL.md) 1.1.3 est la **spécification d'un système à construire**, pas un skill qu'on installe. Une IA la reçoit dans le dépôt d'Agent2Dev et l'implémente par lots, sous votre validation.
 
 Agent2Dev applique le skill [`agent-tdd-jira`](../agent-tdd-jira/mode-emploi.md) **comme méthode** : d'une demande Jira exportée en MHTML, il tire les US, les critères d'acceptation, les scénarios Gherkin et les variantes, puis réalise chaque scénario en cycle TDD, jusqu'à la traçabilité, en binôme avec [Agent2Test](../agent2test/mode-emploi.md). Le moteur rédige ; des agents déterministes écrivent et exécutent ; vous validez à chaque point.
 
@@ -16,16 +16,16 @@ flowchart LR
 ## 1. Prérequis
 
 - Une IA locale qui écrit et exécute du code : Gemini CLI ou équivalent.
-- Node 22.13 ou plus récent (24 recommandé), git 2.30 ou plus récent ; les données tiennent dans un fichier SQLite, par `node:sqlite`.
+- Node 22.13 ou plus récent (26.13.0 recommandé), git 2.30 ou plus récent ; les données tiennent dans un fichier SQLite, par `node:sqlite`.
 - Le projet à faire évoluer (back Java, front Angular), avec ses outils de build et de test.
-- La transmission : [`transmissions/agent2dev-1.1.2.md`](../../transmissions/agent2dev-1.1.2.md), et celle de la méthode : [`transmissions/agent-tdd-jira-1.3.3.md`](../../transmissions/agent-tdd-jira-1.3.3.md).
+- La transmission : [`transmissions/agent2dev-1.1.3.md`](../../transmissions/agent2dev-1.1.3.md), et celle de la méthode : [`transmissions/agent-tdd-jira-1.3.4.md`](../../transmissions/agent-tdd-jira-1.3.4.md).
 
 L'installateur d'Agent2Prompt refuse cette spécification : elle se matérialise dans `spec/` de son propre projet.
 
 ## 2. Construire
 
 1. Ouvrir l'IA à la racine du dépôt d'Agent2Dev et coller la transmission.
-2. **Étape 0** : l'IA crée `agent2dev/spec/` et vérifie chaque fichier. Elle vous demande ensuite **la transmission d'agent-tdd-jira 1.3.3**, qu'elle place telle quelle dans `test/fixtures/methode/` : c'est la méthode qu'Agent2Dev charge, vérifiée par ses empreintes, et jamais recopiée dans son code.
+2. **Étape 0** : l'IA crée `agent2dev/spec/` et vérifie chaque fichier. Elle vous demande ensuite **la transmission d'agent-tdd-jira 1.3.4**, qu'elle place telle quelle dans `test/fixtures/methode/` : c'est la méthode qu'Agent2Dev charge, vérifiée par ses empreintes, et jamais recopiée dans son code.
 3. **Étape 1** : lecture, sans code.
 4. **Étape 2** : plan soumis à votre validation. Rien ne s'écrit avant.
 5. **Étape 3** : implémentation en neuf lots, chacun testé en simulation et sans réseau, chacun clos par votre validation :
@@ -62,7 +62,7 @@ L'installateur d'Agent2Prompt refuse cette spécification : elle se matérialise
 
 ## 4. Ce qui ne se négocie pas
 
-- La méthode est agent-tdd-jira 1.3.3, lue depuis sa transmission vérifiée : rien n'en est réécrit.
+- La méthode est agent-tdd-jira 1.3.4, lue depuis sa transmission vérifiée : rien n'en est réécrit.
 - Seul l'agent `depot` écrit dans un arbre du projet ; il ne pousse jamais, et dans votre arbre ne fusionne pas, ne rebase pas, ne change pas de branche.
 - Seules s'exécutent les commandes du profil ratifié et les scripts du skill, sans shell ; l'application n'est ni démarrée, ni arrêtée, ni déployée ; aucun batch.
 - Aucun code de production avant un test étiqueté qui échoue pour la bonne raison.
@@ -78,7 +78,7 @@ Une nouvelle version arrive par une nouvelle transmission : remplacez `spec/` à
 | Symptôme | Cause probable | Remède |
 |---|---|---|
 | Aucune commande ne s'exécute | profil V0 non ratifié, ou fichier de construction modifié | ratifier le profil en V0 |
-| Méthode refusée au chargement | transmission d'agent-tdd-jira absente ou altérée | replacer la transmission 1.3.3 telle quelle dans `test/fixtures/methode/` |
+| Méthode refusée au chargement | transmission d'agent-tdd-jira absente ou altérée | replacer la transmission 1.3.4 telle quelle dans `test/fixtures/methode/` |
 | Rien n'apparaît dans votre arbre | écriture non autorisée, comportement par défaut | appliquer le patch remis en V4, ou autoriser l'écriture |
 | V5 attend | journal de tests d'Agent2Test non fourni | donner son chemin, ou déclarer la demande sans binôme |
 
