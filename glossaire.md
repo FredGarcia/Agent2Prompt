@@ -27,6 +27,7 @@ La colonne « Repris dans » cite les modules de la spécification qui reprennen
 | [`analyse-projet`](#analyse-projet-102) | 1.0.2 | 5 | 1 | 16 |
 | [`angular`](#angular-101) | 1.0.1 | 8 | 2 | 30 |
 | [`capture-sprint-jira`](#capture-sprint-jira-122) | 1.2.2 | 9 | 2 | 39 |
+| [`explication-hote-ia`](#explication-hote-ia-100) | 1.0.0 | 9 | 2 | 30 |
 | [`java`](#java-111) | 1.1.1 | 7 | 1 | 29 |
 | [`orchestrateur-c7e`](#orchestrateur-c7e-353) | 3.5.3 | 10 | 1 | 33 |
 | [`skill4appli`](#skill4appli-111) | 1.1.1 | 9 | 3 | 34 |
@@ -884,6 +885,93 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 | **D12.INV-2** | le dossier d'un ticket capturé seul est choisi par le développeur parmi les catégories et `à classer`, tout autre nom refusé ; il est proposé d'après le dossier du ticket dans le dernier `rapport.json` du dossier de sortie, sinon `à classer` ; la section n'est jamais devinée. | `ticket`, `agent`, `recette` |
 | **D12.INV-3** | la capture d'un ticket seul remplace son fichier, retire sa copie d'un autre dossier de catégorie, et remplace ou ajoute son entrée dans `rapport.json`, avec le choix noté et les décomptes recalculés, ou crée ce rapport ; en cas d'erreur, rien n'est écrit. | `ticket`, `recette` |
 | **D12.INV-4** | après la capture d'un ticket seul, réussie ou non, le navigateur revient à la page où il était. | `ticket`, `recette` |
+
+## explication-hote-ia 1.0.0
+
+Agent qui explique le fonctionnement de l'outil d'IA qui l'exécute, Gemini CLI ou un hôte non reconnu décrit sans être nommé : boucle d'un tour, assemblage du contexte, outils et politique, confiance, composants, mémoire, modèle, ce qui sort du poste, angles morts ; carte de l'installation et diagnostic ; chaque affirmation étiquetée par sa provenance ; script Node en lecture seule qui ne rend aucun secret. Point d'entrée : [`specs/explication-hote-ia/SKILL.md`](specs/explication-hote-ia/SKILL.md).
+
+### D1 : Exécution du script : lecture seule, sorties, codes, bornes (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D1.INV-1** | le script ne fait que lire : il ne crée, ne modifie ni ne supprime aucun fichier, ne lance aucun processus et n'ouvre aucune connexion ; il n'importe aucun module de processus ni de réseau. | `execution`, `recette`, `comparaison` |
+| **D1.INV-2** | une réussite sort avec le code 0 et un objet sur une ligne, qui porte la commande, la version du skill, le numéro de schéma et la date ; un échec sort avec un code documenté (1 usage, 2 introuvable, 3 chemin refusé, 4 erreur interne) et un JSON `{"ok": false, ...}` sur la sortie d'erreur ; une commande réservée sort avec le code 1. | `execution`, `recette`, `comparaison` |
+| **D1.INV-3** | toute liste est bornée par `--max` et tout document par `--max-caracteres` ; chaque troncature est signalée dans la sortie. | `execution`, `recette` |
+| **D1.INV-4** | le script et sa recette n'utilisent que les modules natifs de Node 20 ou plus récent ; aucune installation de paquet n'est nécessaire. | `execution` |
+
+### D2 : Identification de l'hôte : famille, preuve, paquet, version, documentation, hôte non reconnu (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D2.INV-1** | la famille de l'hôte et son paquet portent la nature de leur preuve : observé (variable `GEMINI_CLI=1` que l'hôte pose dans ses commandes, processus parent), déclaré (option `--paquet`), déduit (première commande `gemini` du PATH) ; une preuve déduite ou déclarée n'est jamais rendue comme observée. | `hote`, `recette` |
+| **D2.INV-2** | la version et la documentation sont celles du paquet trouvé ; `doc` ne rend que des documents Markdown de son dossier de documentation, et refuse tout chemin absolu ou qui en sort. | `hote`, `recette` |
+| **D2.INV-3** | un hôte non reconnu est décrit par des candidats déduits de ce qui s'observe (dossiers cachés de configuration d'agents, fichiers de consignes), sans configuration ni nom prêtés ; sans configuration de Gemini CLI, `config`, `contexte` et `composants` le disent au lieu d'en inventer une. | `hote`, `agent`, `recette`, `autres-hotes` |
+
+### D3 : Configuration observée : couches, valeurs effectives, confiance, `.env`, variables (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D3.INV-1** | chaque valeur effective d'un réglage observé porte la couche qui la donne, dans l'ordre de l'hôte (défauts système, utilisateur, workspace, système) ; la couche du workspace est écartée, avec sa raison, si le dossier n'est pas fiable ou si la racine est le dossier d'accueil ; un réglage hors de la liste observée n'est jamais rendu. | `configuration`, `recette` |
+| **D3.INV-2** | un fichier de réglages est lu comme l'hôte le lit, commentaires compris ; un fichier illisible est signalé avec sa ligne, sans aucun extrait de son contenu, et les autres couches restent lues. | `configuration`, `secrets`, `recette` |
+| **D3.INV-3** | la confiance du dossier s'évalue dans l'ordre de l'hôte : variables d'environnement, réglage `security.folderTrust.enabled`, fichier des dossiers de confiance, où la règle la plus longue l'emporte et `TRUST_PARENT` vaut pour le dossier parent ; ce que le script ne peut pas observer, un IDE compagnon connecté, est dit. | `configuration`, `recette` |
+| **D3.INV-4** | le fichier `.env` que l'hôte chargerait est désigné avec les noms de ses variables ; les variables d'environnement observées forment une liste fermée, et les surcharges de réglages par l'environnement sont nommées. | `configuration`, `recette` |
+
+### D4 : Composants : skills, sous-agents, commandes, extensions, serveurs MCP, hooks, politiques (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D4.INV-1** | skills, sous-agents, commandes, extensions, serveurs MCP, hooks et politiques sont rendus avec leur portée ; entre homonymes, celui qui l'emporte est désigné et chacun des autres marqué masqué ; les écarts d'en-tête sont signalés. | `composants`, `recette` |
+| **D4.INV-2** | un composant que l'hôte ignorerait (dossier non fiable, désactivation, exclusion) est rendu marqué ignoré, avec sa raison, jamais omis. | `composants`, `recette` |
+
+### D5 : Contexte : fichiers par palier, imports, mémoire privée, trace de session, prompt exporté (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D5.INV-1** | les fichiers de contexte sont désignés par palier, comme l'hôte les cherche : global, projet de la racine jusqu'au dépôt (marqueurs réglés) dans l'ordre des chemins triés, extensions, et à la demande dans les sous-dossiers, ces derniers en déduits ; sans confiance, aucun fichier du projet n'est annoncé comme chargé. | `contexte`, `recette` |
+| **D5.INV-2** | les imports `@chemin` d'un fichier de contexte sont listés avec leur existence, hors blocs de code. | `contexte`, `recette` |
+| **D5.INV-3** | la trace de la dernière session ne rend que des chemins, des dates et les balises posées par l'hôte, jamais le texte d'un message ; elle dit qu'elle n'est pas forcément celle de la conversation en cours. | `contexte`, `recette` |
+| **D5.INV-4** | un prompt système exporté par le développeur se lit en titres, skills et leurs emplacements, sous-agents, fichiers de contexte chargés et balises ; un fichier absent sort avec le code 2. | `contexte`, `agent`, `recette` |
+
+### D6 : Provenance des affirmations et angles morts (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D6.INV-1** | toute affirmation de l'agent sur l'hôte porte une étiquette, `[observé]`, `[déclaré]`, `[documenté]`, `[déduit]` ou `[inconnu]`, et sa source. | `provenance`, `agent` |
+| **D6.INV-2** | l'agent ne tire jamais de sa propre impression son identité de modèle, sa version, la version de l'hôte, ses réglages ni les limites de son contexte : seulement d'une observation ; quand il parle du modèle, il signale que le routage automatique et les sous-agents peuvent en employer d'autres. | `provenance`, `diagnostic`, `agent` |
+| **D6.INV-3** | entre deux sources contradictoires, l'observation de la session l'emporte sur la documentation, qui l'emporte sur la déduction ; la contradiction est dite avec ses deux sources, jamais tranchée en silence. | `provenance`, `modele-hote`, `agent` |
+| **D6.INV-4** | les angles morts sont nommés : ce qui ne s'observe pas d'ici est rendu `[inconnu]`, avec le moyen de l'observer quand il en existe un. | `provenance`, `agent` |
+| **D6.INV-5** | un repère daté d'une autre version de l'hôte que celle observée se signale « à revérifier », et la documentation de la version installée fait foi pour elle. | `provenance`, `hote`, `modele-hote`, `agent` |
+
+### D7 : Agent explicateur : niveaux d'observation, modes, protocole, commandes (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D7.INV-1** | l'explication d'une session, de son contexte et de ses outils, se fait dans cette session, skill activé ; un sous-agent dit qu'il ne voit pas le contexte de la session qui l'appelle et rend ce qu'il peut observer. | `provenance`, `diagnostic`, `agent` |
+| **D7.INV-2** | l'agent ne modifie aucun fichier pendant qu'il explique ; une modification de configuration se décrit (fichier, clé, valeur, effet attendu) et ne s'applique que sur demande explicite du développeur, hors du rôle d'explicateur. | `diagnostic`, `agent` |
+| **D7.INV-3** | avant toute affirmation sur cette installation, l'agent lance l'instantané, en commençant par `hote`, et cite la version observée de l'hôte. | `diagnostic`, `agent` |
+
+### D8 : Secrets et vie privée (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D8.INV-1** | aucune valeur secrète ne sort du script : des noms seulement pour les variables, les en-têtes et les clés sensibles ; toute valeur rendue passe par un masquage par motifs, puis toute la sortie une seconde fois. | `execution`, `configuration`, `composants`, `secrets`, `recette`, `comparaison` |
+| **D8.INV-2** | aucun texte de conversation, de prompt de lancement ni de fichier de contexte ne sort du script : des chemins, des tailles, des dates et des balises. | `hote`, `contexte`, `secrets`, `recette` |
+| **D8.INV-3** | l'agent ne recopie jamais une valeur secrète qu'il a vue, dans un fichier ou une sortie ; il dit seulement qu'elle existe et où. | `secrets`, `agent` |
+
+### D9 : Modèle de fonctionnement de l'hôte : repères vérifiés, parcours, diagnostics (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D9.INV-1** | chaque repère du module `modele-hote` porte la version de l'hôte, la date et la source de sa vérification (document de la version, code relu, essai réel) ; la recette des repères les confronte au Gemini CLI réel de cette version, sans réseau, à chaque modification de la spécification. | `modele-hote`, `recette` |
+| **D9.INV-2** | un diagnostic suit la table du module `diagnostic` : chaque hypothèse se confirme ou s'écarte par une observation nommée, et la cause retenue est étiquetée ; faute d'observation décisive, le diagnostic le dit et propose l'observation qui manque. | `diagnostic`, `agent` |
+
+### D10 : Autres hôtes reconnus, chacun par un adaptateur (reserved)
+
+Dimension réservée : aucun invariant en vigueur dans cette version.
+
+### D11 : Comparaison de deux instantanés dans le temps (reserved)
+
+Dimension réservée : aucun invariant en vigueur dans cette version.
 
 ## java 1.1.1
 

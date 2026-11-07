@@ -27,6 +27,34 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
   - la version exacte 26.13.0 dans les workflows, plutôt que la dernière version 26 ;
   - l'ajout de 26.13.0 aux matrices, sans en retirer de version.
 
+### 2026-11-06 : explication-hote-ia 1.0.0
+
+- **explication-hote-ia 1.0.0**, nouvelle spécification, à la demande du développeur : « un skill pour un agent qui explique le fonctionnement de l'IA dans laquelle on l'exécute, comme par exemple Gemini CLI ».
+  - L'agent explique l'outil d'IA qui l'exécute : Gemini CLI, ou un hôte non reconnu décrit par ce qui s'en observe, sans être nommé. Trois modes : expliquer, carte et pourquoi. Sous-agent `explicateur-hote` ; commandes `/hote:explique`, `/hote:carte` et `/hote:pourquoi`.
+  - Chaque affirmation sur l'hôte porte sa provenance : `[observé]`, `[déclaré]`, `[documenté]`, `[déduit]` ou `[inconnu]`. L'agent ne tire de sa propre impression ni son modèle, ni sa version, ni ses limites. Il nomme ses angles morts. La documentation embarquée de la version installée fait foi.
+  - Script `instantane-hote.mjs` : Node 20, sans dépendance, lecture seule ; il ne rend ni valeur secrète ni texte de conversation. Commandes `hote`, `config`, `contexte`, `composants`, `doc` et `tout`.
+  - Repères H1 à H17 vérifiés sur Gemini CLI 0.67.0, et dix écarts entre sa documentation et son code.
+  - Dimensions D1 à D9 actives ; D10 (autres hôtes reconnus) et D11 (comparaison de deux instantanés) réservées. Points d'extension E1 et E2 ; trente invariants.
+- Constats sur Gemini CLI 0.67.0, utiles pour le poste :
+  - réglé par défaut, Gemini CLI envoie des statistiques d'usage à `play.googleapis.com`, même en mode non interactif, et cherche une mise à jour sur `registry.npmjs.org` en mode interactif, même quand l'API du modèle est locale. `privacy.usageStatisticsEnabled`, `general.enableAutoUpdate` et `general.enableAutoUpdateNotification` à `false` coupent ces deux sorties ;
+  - `CI` ou `GITHUB_ACTIONS` à `true` mettent Gemini CLI en mode non interactif, même sous un terminal ;
+  - au lancement suivant, une session dont aucun tour n'a abouti est supprimée, malgré `minRetention`.
+- Vérifications :
+  - recette de 28 tests réussie sous Node 20 et Node 22, sous Linux, avec et sans les variables de l'intégration continue ;
+  - 23 défauts réintroduits un à un, tous attrapés par la recette ;
+  - recette des repères : 29 constats tenus contre `@google/gemini-cli` 0.67.0. Les sorties de l'hôte passent par un proxy témoin qui les refuse, et `strace` ne relève aucune connexion hors de la boucle locale ;
+  - installation par `tools/installer.mjs`, dans le workspace et au niveau utilisateur, et retrait ; extraction des six fichiers conforme aux empreintes ;
+  - vérificateur, glossaire, transmission, recette de l'installateur (17 tests) et contrat avec Gemini CLI à jour.
+- Outillage : le workflow `recette-explication-hote-ia.yml` lance la recette sous Linux et Windows, avec Node 20 et 24, et les repères contre Gemini CLI 0.67.0 ; script `.github/scripts/reperes-hote.mjs`.
+- `docs/explication-hote-ia/mode-emploi.md` : installation, trois modes, lecture des étiquettes, ce qui sort du poste, dépannage.
+- Soumis à ratification :
+  - Gemini CLI comme seul hôte nommé ; tout autre hôte est décrit par ce qui s'en observe ;
+  - une installation au niveau utilisateur par défaut ;
+  - un explicateur en lecture seule : une modification se décrit, et ne s'applique que sur demande explicite, hors du rôle d'explicateur ;
+  - des listes fermées de réglages et de variables observés ;
+  - les repères confrontés en CI au Gemini CLI réel, à une version épinglée.
+
+
 ### 2026-11-06 : agent2test 1.3.0, agent-tdd-jira 1.3.3, agent2dev 1.1.2, orchestrateur-c7e 3.5.2
 
 - **agent2test 1.3.0** : dimension D25 active, le constat perceptif, dans le module `navigateur`, à la demande du développeur : « démontrer que Playwright prend bien le rôle d'une personne qui navigue vers une page, l'observe et rend compte de ce qu'elle voit ou ne voit pas ».
