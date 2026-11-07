@@ -12,12 +12,12 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
   - **agent-tdd-jira 1.3.4** : correctif. Référence à agent2test 1.3.1 ; `lire-acceptation.mjs` inchangé. Archive 1.3.3.
   - **orchestrateur-c7e 3.5.3** : correctif. Référence à agent-tdd-jira 1.3.4. Archive 3.5.2.
   - Aucune dimension ni aucun invariant modifié. Les quatre spécifications se référencent et se publient dans un même commit (`EVOLUTION.md`, section 7) ; les transmissions agent2test 1.3.0, agent-tdd-jira 1.3.3, agent2dev 1.1.2 et orchestrateur-c7e 3.5.2, publiées, restent telles quelles.
-- Intégration continue : chaque matrice de Node garde ses versions et ajoute 26.13.0, sous Linux et sous Windows (vérificateur, installateur, recettes de skill4appli, de sonarqube et de capture-sprint-jira) ; le contrat de Gemini CLI se vérifie sous Node 26.13.0, à la place de Node 24. skill4appli (Node 22 et 24) et capture-sprint-jira (Node 20 et 22) énoncent des versions qui restent vérifiées : leurs spécifications ne changent pas.
+- Intégration continue : chaque matrice de Node garde ses versions et ajoute 26.13.0, sous Linux et sous Windows (vérificateur, installateur, recettes de skill4appli, de sonarqube, de capture-sprint-jira et d'explication-hote-ia) ; le contrat de Gemini CLI se vérifie sous Node 26.13.0, à la place de Node 24. skill4appli (Node 22 et 24) et capture-sprint-jira (Node 20 et 22) énoncent des versions qui restent vérifiées : leurs spécifications ne changent pas.
 - Modes d'emploi d'Agent2Test et d'Agent2Dev : Node 26.13.0 recommandé ; modes d'emploi de l'agent TDD et de l'orchestrateur à leur nouvelle version.
-- Entrée du 2026-11-06 : décisions ratifiées par la pull request n° 40.
+- Entrées du 2026-11-06 : décisions ratifiées par les pull requests n° 40 (agent2test 1.3.0) et n° 41 (explication-hote-ia 1.0.0).
 - Vérifications sous Node 26.13.0 (SQLite 3.54.0 intégré), avant les montées :
   - vérificateur : 13 spécifications, transmissions fidèles ; recette de l'installateur : 17 tests ; contrat de Gemini CLI 0.66.0 tenu ;
-  - recettes rejouées comme dans les workflows, transmission matérialisée puis extraite : skill4appli 1.1.1, 34 tests ; sonarqube 1.1.0, 26 tests, et 5 sautés dans la recette réelle, sans serveur SonarQube ; capture-sprint-jira 1.2.2 sous xvfb avec Chrome, 20 scénarios, 132 contrôles ;
+  - recettes rejouées comme dans les workflows, transmission matérialisée puis extraite : skill4appli 1.1.1, 34 tests ; sonarqube 1.1.0, 26 tests, et 5 sautés dans la recette réelle, sans serveur SonarQube ; capture-sprint-jira 1.2.2 sous xvfb avec Chrome, 20 scénarios, 132 contrôles ; explication-hote-ia 1.0.0, 28 tests ;
   - implémentation de référence du constat d'agent2test, hors dépôt : 18 tests en monde simulé ; exemple TAB-1 et treize contre-épreuves, 136 contrôles, aucun écart ;
   - `node:sqlite` : FTS5 et le tokeniseur `trigram` avec `remove_diacritics` disponibles ; `setAuthorizer` présent, il refuse à la préparation une instruction qui touche la table d'un autre espace : le scénario BD12 d'agent2test s'exécute ;
   - seul changement de comportement relevé : depuis Node 23, `node --test` écrit au format spec même quand sa sortie est redirigée ; les recettes du dépôt demandent le format TAP ou ont leur propre lanceur, et n'en dépendent pas ;
@@ -47,7 +47,7 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
   - vérificateur, glossaire, transmission, recette de l'installateur (17 tests) et contrat avec Gemini CLI à jour.
 - Outillage : le workflow `recette-explication-hote-ia.yml` lance la recette sous Linux et Windows, avec Node 20 et 24, et les repères contre Gemini CLI 0.67.0 ; script `.github/scripts/reperes-hote.mjs`.
 - `docs/explication-hote-ia/mode-emploi.md` : installation, trois modes, lecture des étiquettes, ce qui sort du poste, dépannage.
-- Soumis à ratification :
+- Décisions ratifiées (pull request n° 41) :
   - Gemini CLI comme seul hôte nommé ; tout autre hôte est décrit par ce qui s'en observe ;
   - une installation au niveau utilisateur par défaut ;
   - un explicateur en lecture seule : une modification se décrit, et ne s'applique que sur demande explicite, hors du rôle d'explicateur ;
