@@ -22,7 +22,7 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
   - `node:sqlite` : FTS5 et le tokeniseur `trigram` avec `remove_diacritics` disponibles ; `setAuthorizer` présent, il refuse à la préparation une instruction qui touche la table d'un autre espace : le scénario BD12 d'agent2test s'exécute ;
   - seul changement de comportement relevé : depuis Node 23, `node --test` écrit au format spec même quand sa sortie est redirigée ; les recettes du dépôt demandent le format TAP ou ont leur propre lanceur, et n'en dépendent pas ;
   - après les montées : vérificateur, glossaire, quatre transmissions (aller-retour identique) et README à jour.
-- Soumis à ratification :
+- Décisions ratifiées (pull request n° 42) :
   - Node 26.13.0 recommandé pour Agent2Test et Agent2Dev, le minimum restant Node 22.13 ;
   - la version exacte 26.13.0 dans les workflows, plutôt que la dernière version 26 ;
   - l'ajout de 26.13.0 aux matrices, sans en retirer de version.
