@@ -1,6 +1,6 @@
 ---
 name: modele-hote
-description: Modèle de fonctionnement de Gemini CLI, repères H1 à H17 vérifiés sur la version 0.67.0 le 6 novembre 2026 avec leur source (harnais et modèle, ce qui sort du poste, tour de boucle, contexte de chaque requête, gabarit du prompt système, compression, outils intégrés, politique, confiance, bac à sable, environnement des commandes, skills, sous-agents, autres composants, mémoire, modèle et routage, configuration, mode non interactif), écarts entre la documentation et le code de cette version, parcours guidé en huit étapes. À lire avant d'expliquer un mécanisme de l'hôte.
+description: Modèle de fonctionnement de Gemini CLI, repères H1 à H17 vérifiés sur la version 0.67.0 le 6 novembre 2026 avec leur source (harnais et modèle, ce qui sort du poste, tour de boucle, contexte de chaque requête, gabarit du prompt système, compression, outils intégrés, politique, confiance, bac à sable, environnement des commandes, skills, sous-agents, autres composants, mémoire, modèle et routage, configuration, mode non interactif), écarts entre la documentation et le code de cette version, parcours découverte en sept étapes qui ouvre la boîte noire pour un développeur qui découvre l'outil. À lire avant d'expliquer un mécanisme de l'hôte.
 dimensions: [D9]
 status: active
 ---
@@ -19,7 +19,7 @@ Ils servent à expliquer, pas à remplacer l'observation : pour une autre versio
 
 **H1 : le harnais et le modèle.** Gemini CLI est un programme Node, le paquet `@google/gemini-cli`, qui tourne sur le poste ; le modèle tourne chez le fournisseur, joint selon le mode d'authentification (`security.auth.selectedType` : compte Google, clé d'API Gemini, Vertex AI). À chaque requête, l'hôte renvoie les instructions système, tout l'historique utile et les déclarations d'outils : le modèle ne garde rien d'une requête à l'autre. Ce qu'une session « sait » est ce que l'hôte lui renvoie ; ce qui survit à la session est ce qui est écrit sur le disque. Chaque requête porte aussi ses réglages de génération (observés par défaut : `temperature` 1, `topP` 0,95, `topK` 64, réflexion du modèle au niveau `HIGH`), que `modelConfigs` peut changer. Source : requêtes capturées, code, `reference/configuration.md`.
 
-Ce qui sort du poste : les requêtes au modèle, et, avec les réglages par défaut, des statistiques d'usage envoyées à `play.googleapis.com`, même en mode non interactif, et, en mode interactif, la recherche d'une mise à jour sur `registry.npmjs.org`. `privacy.usageStatisticsEnabled`, `general.enableAutoUpdate` et `general.enableAutoUpdateNotification` à `false` les coupent ; la télémétrie OpenTelemetry est coupée par défaut (`telemetry.enabled`) ; les sorties de l'hôte suivent le proxy de `HTTPS_PROXY`. Source : essais réels avec un proxy témoin, `reference/configuration.md` (« Usage statistics »), `cli/enterprise.md`.
+Ce qui sort du poste : les requêtes au modèle, et, avec les réglages par défaut, des statistiques d'usage envoyées à `play.googleapis.com`, même en mode non interactif, et, en mode interactif, la recherche d'une mise à jour sur `registry.npmjs.org`. `privacy.usageStatisticsEnabled`, `general.enableAutoUpdate` et `general.enableAutoUpdateNotification` à `false` les coupent ; la télémétrie OpenTelemetry est coupée par défaut (`telemetry.enabled`). Sous Node 22 et 24, toutes ces sorties suivent le proxy de `HTTPS_PROXY`. Sous Node 26 (observé le 7 novembre 2026 avec Node 26.13.0), la connexion par compte Google le suit encore, mais les requêtes au modèle par clé d'API Gemini, les statistiques d'usage et la recherche de mise à jour partent en direct : l'hôte règle son proxy pour une version de la bibliothèque HTTP de Node que le `fetch` intégré de Node 26 n'écoute plus ; `NODE_USE_ENV_PROXY=1`, posée dans l'environnement de l'hôte, les ramène au proxy. Source : essais réels avec un proxy témoin, sous Node 22, 24 et 26.13.0, code, `reference/configuration.md` (« Usage statistics »), `cli/enterprise.md`.
 
 **H2 : le tour de boucle.** Un prompt du développeur est d'abord développé par l'hôte (commande `/…`, fichiers `@…`, shell `!…`), puis envoyé. Le modèle répond par du texte ou par des appels d'outils. Chaque appel passe par la politique : `allow` l'exécute, `deny` le refuse et le refus est rendu au modèle, `ask_user` le soumet au développeur. Le résultat s'ajoute à l'historique, et l'hôte relance le modèle, jusqu'à une réponse sans appel d'outil. La détection de boucles (`model.disableLoopDetection`) et `model.maxSessionTurns` bornent le tour. Source : `reference/tools.md`, `reference/policy-engine.md`, `reference/configuration.md`.
 
@@ -108,23 +108,35 @@ Relevés le 6 novembre 2026, en relisant le code là où la documentation de la 
 | nettoyage des sessions | `minRetention` (1 jour par défaut) protège toute session plus récente (`cli/session-management.md`) | une session sans contenu à reprendre est supprimée dès le lancement suivant, quel que soit son âge (code ; essai réel) |
 | modèles du mode Auto | `gemini-3-pro-preview` et `gemini-3-flash-preview` pour « Auto (Gemini 3) » (`cli/model.md`) | requête principale sur `gemini-3.1-pro-preview`, routeur sur `gemini-3.5-flash-lite` (requêtes capturées) ; seul `/stats model` dit les modèles réellement employés |
 
-## 11. Parcours guidé
+## 11. Parcours découverte : ouvrir la boîte noire
 
-Pour `/hote:explique` sans question, ou « explique-moi comment tu fonctionnes », huit étapes, chacune en deux paragraphes au plus : le mécanisme (repère), puis ce qui en est en place ici (instantané). L'agent demande après chaque étape s'il continue, approfondit ou s'arrête.
+Pour `/hote:explique` sans question, « explique-moi comment tu fonctionnes », ou un développeur qui dit ne pas voir ce que fait l'outil. Le parcours s'adresse à qui hésite à se servir de l'IA faute d'en connaître le fonctionnement : il ouvre la boîte, sans chercher à convaincre (D7.INV-5). Pendant le parcours, l'agent ne modifie rien (D7.INV-2) : c'est une première utilisation sans risque.
 
-| Étape | Mécanisme | Ce qui en est en place ici |
-|---|---|---|
-| 1. Ce qui s'exécute ici | H1 | `hote` : famille, version, paquet, plateforme, options de lancement ; `config` : statistiques d'usage, mise à jour, télémétrie |
-| 2. Un tour de boucle | H2, H5 | le schéma du § 2 ; `config` : seuil de compression, longueur de session |
-| 3. Ce que le modèle reçoit | H3, H4 | `contexte` : fichiers par palier, trace de session ; le prompt exporté, si le développeur l'a fait |
-| 4. Les outils et qui décide | H6, H7, H8, H9, H10 | outils déclarés [déclaré] ; `config` : confiance, mode d'approbation, bac à sable ; `composants` : politiques |
-| 5. Ce qui étend l'hôte | H11, H12, H13 | `composants` : skills, sous-agents, commandes, extensions, serveurs MCP, hooks |
-| 6. Ce qui reste d'une session à l'autre | H14 | `contexte` : mémoire globale et privée, sessions |
-| 7. Quel modèle répond | H15 | `config` et surcharges ; `/stats model`, à demander au développeur |
-| 8. Ce que je ne peux pas savoir | provenance § 6 | les angles morts qui touchent cette installation |
+Sept étapes, une à la fois, chacune en trois temps (D7.INV-4) :
+
+1. **la réponse simple** : quelques phrases, sans jargon ; un terme technique s'explique à sa première apparition ;
+2. **montré ici** : sur cette installation, l'observation qui le prouve ;
+3. **ce que vous gardez en main** : le geste qui donne la maîtrise.
+
+Les étiquettes s'écrivent en clair (module `provenance`, § 3). Après chaque étape, l'agent demande s'il continue, approfondit ou s'arrête ; approfondir, c'est passer aux repères de l'étape.
+
+| Étape | Question du développeur | La réponse simple | Montré ici | Ce que vous gardez en main | Repères |
+|---|---|---|---|---|---|
+| 1 | « Qu'est-ce que c'est, au juste ? » | deux pièces : un programme sur votre poste, Gemini CLI, et un modèle de langage chez Google ; le modèle ne fait que produire du texte à partir de ce que le programme lui envoie, et ne garde rien d'une requête à l'autre ; c'est le programme qui lit, cherche, écrit et lance des commandes | `hote` : version, paquet, plateforme | le programme tourne chez vous : vous le lancez, l'arrêtez (`/quit`) et le réglez | H1 |
+| 2 | « Que reçoit le modèle quand je tape une demande ? » | à chaque requête, le programme assemble un envoi : des instructions système, vos fichiers `GEMINI.md`, la conversation et la liste des outils ; le modèle ne voit rien d'autre, ni votre écran ni votre disque | `contexte` : fichiers de contexte chargés ; le prompt système exporté par le développeur, lu avec lui section par section (module `contexte`, § 6) | le contenu de vos `GEMINI.md` ; `/memory show` montre ce qui est chargé | H3, H4 |
+| 3 | « Que voit-il de mon code ? » | au premier message, les noms des dossiers et des fichiers du workspace, 200 au plus, pas leur contenu ; un fichier n'est lu que par un outil de lecture, ou quand vous le citez (`@fichier`) ; les outils de recherche ignorent ce qu'excluent `.gitignore` et `.geminiignore` | les outils de lecture vus dans son propre contexte ; `contexte` : racine du workspace ; `composants` : fichiers d'exclusion | lancer l'outil depuis le bon dossier ; `.geminiignore` ; citer les fichiers utiles | H3, H6 |
+| 4 | « Comment décide-t-il d'agir ? » | une boucle : le modèle propose une action (lire, chercher, écrire, lancer une commande) ; le programme la confronte à ses règles, l'exécute ou vous la demande, puis renvoie le résultat au modèle, qui recommence jusqu'à sa réponse | le schéma du § 2 ; `config` : mode d'approbation ; `composants` : politiques | refuser une action proposée ; interrompre la requête (`Ctrl+C`) ; `/tools desc` liste les outils | H2, H6, H7 |
+| 5 | « Peut-il modifier ou casser quelque chose ? » | par défaut, chaque modification de fichier et chaque commande vous est demandée avant de s'exécuter, sauf celles que vous avez approuvées pour la suite ; le mode plan ne fait que lire ; dans un dossier non fiable, ni les réglages, ni les consignes, ni les commandes du projet ne sont chargés, et rien n'est approuvé d'avance ; les points de reprise, s'ils sont activés, permettent de revenir en arrière (`/restore`) | `config` : mode d'approbation, confiance du dossier, points de reprise, bac à sable | lire chaque proposition avant d'accepter ; travailler sous git ; le mode plan ; ne pas tout approuver d'avance | H7, H8, H9, H14 |
+| 6 | « Où partent mes données, et que retient-il ? » | ce que contient l'envoi part chez Google à chaque requête ; par défaut s'y ajoutent des statistiques d'usage et, en mode interactif, une recherche de mise à jour ; le modèle ne retient rien : ce qui reste est écrit sur votre poste (`GEMINI.md`, sessions enregistrées) | `config` : mode d'authentification, statistiques d'usage, mise à jour, télémétrie ; `contexte` : mémoire, sessions | ce que vous mettez dans la conversation ; les réglages qui coupent statistiques et mise à jour ; supprimer une session depuis `/resume` | H1, H14 |
+| 7 | « Peut-il se tromper, et comment le vérifier ? » | oui : il produit un texte plausible à partir de ce qu'il a reçu, et ne sait de votre projet que ce qu'il a lu ; ce qu'il affirme se vérifie, par les tests, la relecture de ses modifications et la question « d'où tiens-tu ça ? » | les étiquettes de cette explication même ; un angle mort de cette installation (module `provenance`, § 6) | relire et tester ; demander la source ; ne pas lui confier ce que vous ne pouvez pas vérifier | H1, H3 |
+
+Sources des réponses simples, outre les repères : l'arrêt d'une requête par `Ctrl+C` (`reference/keyboard-shortcuts.md`), le mode plan en lecture seule (`cli/plan-mode.md`), les exclusions (`cli/gemini-ignore.md`), et, pour l'étape 7, la documentation elle-même, qui présente la recherche web comme un moyen d'éviter que l'agent n'invente (`cli/tutorials/web-tools.md`). La démonstration de l'étape 7 est l'explication : chacune de ses affirmations porte sa source.
+
+Après le parcours, pour qui veut aller plus loin : ce qui étend l'hôte (H11, H12, H13), quel modèle répond (H15, `/stats model`), le mode non interactif (H17), la carte de l'installation (`/hote:carte`).
 
 ## 12. Contrôle de sortie
 
 - Chaque repère cité porte son numéro, sa version et sa source (D9.INV-1).
 - Pour une autre version, le repère est signalé « à revérifier » et le document installé relu (D6.INV-5).
 - Un écart du § 10 se dit avec ses deux sources (D6.INV-3).
+- Chaque étape du parcours découverte donne sa réponse simple, sa démonstration sur cette installation et ce que le développeur garde en main (D7.INV-4).

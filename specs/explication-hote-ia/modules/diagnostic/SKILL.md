@@ -1,6 +1,6 @@
 ---
 name: diagnostic
-description: Diagnostic d'un comportement de l'hôte en mode pourquoi (méthode : symptôme, hypothèses ordonnées, observation qui confirme ou écarte chacune, cause étiquetée ou observation manquante ; tables pour une consigne de GEMINI.md non suivie, un skill absent ou non activé, un fichier invisible, des confirmations trop ou pas assez fréquentes, un outil MCP ou une commande absente, un oubli, une session disparue de /resume, une question de modèle, une variable vide, un comportement différent en mode non interactif, un sous-agent qui ne voit pas). À lire avant de répondre à un « pourquoi ».
+description: Diagnostic d'un comportement de l'hôte en mode pourquoi (méthode, du symptôme aux hypothèses ordonnées, observation qui confirme ou écarte chacune, cause étiquetée ou observation manquante ; tables pour une consigne de GEMINI.md non suivie, un skill absent ou non activé, un fichier invisible, des confirmations trop ou pas assez fréquentes, un outil MCP ou une commande absente, un oubli, une session disparue de /resume, une question de modèle, une variable vide, un comportement différent en mode non interactif, un sous-agent qui ne voit pas). À lire avant de répondre à un « pourquoi ».
 dimensions: [D9]
 status: active
 ---

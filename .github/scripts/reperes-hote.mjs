@@ -99,6 +99,9 @@ const env = {
   http_proxy: proxy,
   NO_PROXY: '127.0.0.1,localhost',
   no_proxy: '127.0.0.1,localhost',
+  // Sous Node 26, Gemini CLI règle son proxy pour une version de la bibliothèque HTTP de Node que le fetch
+  // intégré n'écoute plus : sans cette variable, une partie de ses sorties partirait en direct (H1).
+  NODE_USE_ENV_PROXY: '1',
 };
 const avecExport = (exportation) => (exportation ? { GEMINI_WRITE_SYSTEM_MD: exportation } : {});
 
@@ -223,7 +226,7 @@ constat(sansCi.interface && !avecCi.interface && avecCi.sansEntree, `H17 : sous 
 const hote = lancer('hote', '--paquet', paquet).hote;
 constat(hote.paquet?.version === version && hote.paquet.documentation.fichiers > 0 && hote.paquet.skills_integres.includes('skill-creator'), `script : paquet ${version}, sa documentation (${hote.paquet?.documentation.fichiers} documents) et ses skills intégrés`);
 const doc = lancer('doc', '--paquet', paquet).doc.fichiers;
-const cites = ['cli/gemini-md.md', 'cli/skills.md', 'core/subagents.md', 'reference/tools.md', 'reference/policy-engine.md', 'reference/configuration.md', 'cli/system-prompt.md', 'cli/trusted-folders.md', 'cli/custom-commands.md', 'extensions/reference.md', 'hooks/reference.md', 'tools/mcp-server.md', 'tools/memory.md', 'tools/shell.md', 'cli/model.md', 'cli/model-routing.md', 'cli/headless.md', 'cli/sandbox.md', 'cli/auto-memory.md', 'cli/session-management.md', 'cli/checkpointing.md', 'reference/memport.md', 'reference/commands.md', 'cli/token-caching.md', 'resources/tos-privacy.md', 'cli/enterprise.md'];
+const cites = ['cli/gemini-md.md', 'cli/skills.md', 'core/subagents.md', 'reference/tools.md', 'reference/policy-engine.md', 'reference/configuration.md', 'cli/system-prompt.md', 'cli/trusted-folders.md', 'cli/custom-commands.md', 'extensions/reference.md', 'hooks/reference.md', 'tools/mcp-server.md', 'tools/memory.md', 'tools/shell.md', 'cli/model.md', 'cli/model-routing.md', 'cli/headless.md', 'cli/sandbox.md', 'cli/auto-memory.md', 'cli/session-management.md', 'cli/checkpointing.md', 'reference/memport.md', 'reference/commands.md', 'cli/token-caching.md', 'resources/tos-privacy.md', 'cli/enterprise.md', 'reference/keyboard-shortcuts.md', 'cli/plan-mode.md', 'cli/gemini-ignore.md', 'cli/tutorials/web-tools.md'];
 const absents = cites.filter((x) => !doc.includes(x));
 constat(absents.length === 0, `script : les documents cités par les modules sont dans la documentation embarquée${absents.length ? ` (absents : ${absents.join(', ')})` : ''}`);
 const comp = lancer('composants', '--paquet', paquet).composants;

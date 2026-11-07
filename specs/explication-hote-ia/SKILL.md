@@ -1,12 +1,12 @@
 ---
 name: explication-hote-ia
-description: Explique le fonctionnement de l'outil d'IA qui exécute l'agent (Gemini CLI, ou un hôte non reconnu décrit sans lui prêter de nom), à partir de ce qui s'observe dans cette installation et de la documentation de sa version exacte. Boucle d'un tour, assemblage du contexte, outils et politique, confiance du dossier, skills, sous-agents, commandes, serveurs MCP, hooks, mémoire, modèle, ce qui sort du poste, angles morts ; carte de l'installation et diagnostic d'un comportement. Chaque affirmation porte sa provenance. Script Node en lecture seule, sans dépendance, qui ne rend aucun secret.
-version: 1.0.0
+description: Explique le fonctionnement de l'outil d'IA qui exécute l'agent (Gemini CLI, ou un hôte non reconnu décrit sans lui prêter de nom), à partir de ce qui s'observe dans cette installation et de la documentation de sa version exacte. Pour les développeurs qui découvrent l'IA ou hésitent à s'en servir faute d'en voir le fonctionnement, un parcours découverte ouvre la boîte noire en langage simple, chaque étape montrée sur le poste. Boucle d'un tour, ce que reçoit le modèle, outils et confirmations, confiance du dossier, composants, mémoire, modèle, ce qui sort du poste, angles morts ; carte de l'installation et diagnostic d'un comportement. Chaque affirmation porte sa provenance. Script Node en lecture seule, sans dépendance, qui ne rend aucun secret.
+version: 1.0.1
 ---
 
-# Explication de l'hôte d'IA, version 1.0.0
+# Explication de l'hôte d'IA, version 1.0.1
 
-Ce document est le point d'entrée du skill. Le skill fait d'un agent l'explicateur de l'outil d'IA qui l'exécute : il dit comment cet hôte fonctionne, en général et dans cette installation, sans rien affirmer qu'il ne puisse rattacher à une source. Gemini CLI est l'hôte reconnu : ses mécanismes sont décrits par des repères vérifiés sur sa version 0.67.0, à confronter à la documentation de la version installée. Tout autre hôte est décrit par ce qui s'en observe, sans lui prêter de nom ni de configuration. Un script Node en lecture seule, `scripts/instantane-hote.mjs`, fait les observations sur le disque ; l'agent `explicateur-hote` et trois commandes de Gemini CLI le mettent en œuvre. Les règles détaillées sont dans `modules/`.
+Ce document est le point d'entrée du skill. Le skill fait d'un agent l'explicateur de l'outil d'IA qui l'exécute : il dit comment cet hôte fonctionne, en général et dans cette installation, sans rien affirmer qu'il ne puisse rattacher à une source. Il s'adresse d'abord aux développeurs qui hésitent à se servir de l'IA faute d'en connaître le fonctionnement : son parcours découverte ouvre la boîte noire, en langage simple, chaque étape montrée sur leur poste, sans chercher à les convaincre. Gemini CLI est l'hôte reconnu : ses mécanismes sont décrits par des repères vérifiés sur sa version 0.67.0, à confronter à la documentation de la version installée. Tout autre hôte est décrit par ce qui s'en observe, sans lui prêter de nom ni de configuration. Un script Node en lecture seule, `scripts/instantane-hote.mjs`, fait les observations sur le disque ; l'agent `explicateur-hote` et trois commandes de Gemini CLI le mettent en œuvre. Les règles détaillées sont dans `modules/`.
 
 ## 1. Ordre de lecture
 
@@ -21,7 +21,7 @@ Trois modes, que l'agent choisit d'après la demande du développeur, ou que les
 
 | Mode | Demande type | Ce que l'agent rend | Commande |
 |---|---|---|---|
-| expliquer | « comment tu fonctionnes ? », « que reçoit le modèle à chaque tour ? » | l'explication du mécanisme demandé, ou la visite guidée du module `modele-hote`, appliquée à cette installation | `/hote:explique [question]` |
+| expliquer | « comment tu fonctionnes ? », « que fais-tu de mon code ? », « que reçoit le modèle à chaque tour ? » | sans question, le parcours découverte du module `modele-hote`, § 11 : sept questions d'un développeur qui découvre l'outil, chacune répondue simplement, montrée sur cette installation, avec ce qu'il garde en main ; avec une question, l'explication du mécanisme demandé, appliquée à cette installation | `/hote:explique [question]` |
 | carte | « qu'est-ce qui est actif ici ? » | la carte de l'installation : réglages et leur couche, confiance, contextes, composants, avec leur provenance | `/hote:carte` |
 | pourquoi | « pourquoi ce skill n'apparaît pas ? », « pourquoi ce GEMINI.md n'est pas suivi ? » | un diagnostic : hypothèses de la table du module `diagnostic`, chacune confirmée ou écartée par une observation nommée | `/hote:pourquoi <comportement>` |
 
@@ -59,7 +59,9 @@ L'agent sait de l'hôte ce qu'il en observe, et rien d'autre. Ses sources sont t
 | `[déduit]` | conclusion tirée d'observations citées, nature « déduit » du script comprise | les observations |
 | `[inconnu]` | non observable d'ici | le moyen de l'observer, s'il en existe un |
 
-Entre deux sources contradictoires, l'observation de la session l'emporte sur la documentation, qui l'emporte sur la déduction, et la contradiction est dite (D6.INV-3). Le module `provenance` détaille ces règles et les angles morts.
+Chaque étiquette a une forme en clair, de même source : « vu sur votre poste », « d'après ce que je vois de mon propre contexte », « d'après la documentation de Gemini CLI 0.67.0 », « j'en déduis », « je ne peux pas le savoir d'ici ». C'est la forme par défaut du parcours découverte.
+
+Entre deux sources contradictoires, l'observation de la session l'emporte sur la documentation, qui l'emporte sur la déduction, et la contradiction est dite (D6.INV-3). Le module `provenance` détaille ces règles, les deux formes des étiquettes et les angles morts.
 
 ## 4. Deux niveaux d'observation
 
@@ -89,9 +91,9 @@ flowchart TB
 | Espace | les portées où ces pièces vivent : système, utilisateur, workspace, extension, intégré, et les dossiers de l'hôte | `configuration`, `composants` |
 | Engendrent | la composition : couches de réglages, précédence des paliers, masquage entre homonymes, filtrage par la confiance et la politique, assemblage du contexte de chaque tour | `configuration`, `contexte`, `modele-hote` |
 | État | l'instantané : la configuration effective à un instant, et le contexte d'une session | `execution`, `contexte` |
-| Expression | l'explication, chaque affirmation étiquetée par sa provenance ; la carte ; le diagnostic | `provenance`, `agent`, `diagnostic` |
+| Expression | l'explication, chaque affirmation étiquetée par sa provenance ; le parcours découverte ; la carte ; le diagnostic | `provenance`, `agent`, `modele-hote`, `diagnostic` |
 | Évolutif | les versions de l'hôte : repères datés, documentation de la version installée, schéma de l'instantané, dimensions réservées D10 et D11 | `modele-hote`, `autres-hotes`, `comparaison` |
-| Environnement | le développeur, la plateforme, et l'hôte lui-même, dont l'agent fait partie | `hote`, `agent`, `secrets` |
+| Environnement | le développeur, qui découvre l'outil ou s'en sert déjà, la plateforme, et l'hôte lui-même, dont l'agent fait partie | `hote`, `agent`, `secrets` |
 
 Clause de second ordre : l'explicateur fait partie du système qu'il explique. Son activation ajoute le texte du skill au contexte qu'il décrit ; ses commandes reçoivent l'environnement que l'hôte leur donne, pas celui du développeur ; un sous-agent voit un autre contexte que la session qui l'appelle ; un outil que la politique retire n'existe pas pour lui, et il ne peut pas savoir qu'il lui manque. Le skill en tire ses règles : rien sur soi-même d'après sa propre impression (D6.INV-2), les angles morts nommés (D6.INV-4), l'observation datée et sourcée plutôt que la mémoire du modèle (D6.INV-5).
 
@@ -105,7 +107,7 @@ Clause de second ordre : l'explicateur fait partie du système qu'il explique. S
 | D4 | Composants : skills, sous-agents, commandes, extensions, serveurs MCP, hooks, politiques | 1.0 | active | D3 | `composants`, `recette` |
 | D5 | Contexte : fichiers par palier, imports, mémoire privée, trace de session, prompt exporté | 1.0 | active | D3 | `contexte`, `recette` |
 | D6 | Provenance des affirmations et angles morts | 1.0 | active | | `provenance` |
-| D7 | Agent explicateur : niveaux d'observation, modes, protocole, commandes | 1.0 | active | D1 à D6, D8, D9 | `agent` |
+| D7 | Agent explicateur : niveaux d'observation, modes, parcours découverte, pédagogie, protocole, commandes | 1.0 | active | D1 à D6, D8, D9 | `agent` |
 | D8 | Secrets et vie privée | 1.0 | active | D1 | `secrets`, `recette` |
 | D9 | Modèle de fonctionnement de l'hôte : repères vérifiés, parcours, diagnostics | 1.0 | active | D2, D6 | `modele-hote`, `diagnostic` |
 | D10 | Autres hôtes reconnus, chacun par un adaptateur | 1.0 | reserved | D2 à D5 | `autres-hotes` |
@@ -123,21 +125,22 @@ Points d'extension, actifs depuis la version indiquée :
 ## 8. Règles globales
 
 - **Lecture seule** : le script n'écrit, ne crée ni ne supprime aucun fichier, ne lance aucun processus et n'ouvre aucune connexion (D1.INV-1) ; l'agent ne modifie aucun fichier pendant qu'il explique (D7.INV-2).
-- **Provenance** : chaque affirmation sur l'hôte porte son étiquette et sa source (D6.INV-1) ; rien sur soi-même d'après sa propre impression (D6.INV-2).
+- **Provenance** : chaque affirmation sur l'hôte porte son étiquette, courte ou en clair, et sa source (D6.INV-1) ; rien sur soi-même d'après sa propre impression (D6.INV-2).
+- **Pédagogie** : pour qui découvre l'outil, un langage simple, une étape à la fois, chaque étape montrée sur le poste, avec ce que le développeur garde en main (D7.INV-4) ; expliquer sans chercher à convaincre, les limites et les risques dits aussi clairement que les garde-fous (D7.INV-5).
 - **Version exacte** : la documentation qui fait foi est celle embarquée dans le paquet installé ; un repère d'une autre version se signale « à revérifier » (D6.INV-5).
 - **Secrets** : aucune valeur secrète ne sort, ni du script ni de l'agent ; des noms, jamais des valeurs (D8.INV-1, D8.INV-3) ; aucun texte de conversation ni de fichier de contexte ne sort du script (D8.INV-2).
 - **Hôte nommé** : Gemini CLI est le seul hôte que le skill nomme ; tout autre se décrit par ce qui s'en observe (D2.INV-3).
 - **Sorties pour un agent** : un JSON sur une ligne par défaut, `--format texte` pour le développeur, des codes de sortie documentés (D1.INV-2), des listes bornées et des troncatures signalées (D1.INV-3).
-- **Sans dépendance** : Node 20 ou plus récent, modules natifs, aucune installation (D1.INV-4).
+- **Sans dépendance** : Node 20 ou plus récent, vérifié jusqu'à Node 26.13.0, celui du poste de la mission ; modules natifs, aucune installation (D1.INV-4).
 - **Langue** : messages, clés de l'instantané et documentation en français ; noms des réglages, outils, fichiers et commandes de l'hôte tels que l'hôte les écrit.
 
 ## 9. Critères d'acceptation
 
 - La recette du module `recette` passe en entier : `node --test tests/instantane-hote.test.mjs`, 28 tests sous Linux et WSL2 ; 27 réussis et 1 sauté (T9, qui lit `/proc`) sous Windows et macOS ; Node 20 ou plus récent.
-- La recette passe en intégration continue sur `ubuntu-latest` et `windows-latest`, avec Node 20 et Node 24, après extraction des fichiers par la commande du module `execution`, § 8, sous bash et sous CMD.
-- La recette des repères (module `recette`, § 4) tient tous ses constats contre `@google/gemini-cli` 0.67.0, sans qu'aucun appel ne quitte le poste.
+- La recette passe en intégration continue sur `ubuntu-latest` et `windows-latest`, avec Node 20, 24 et 26.13.0, après extraction des fichiers par la commande du module `execution`, § 8, sous bash et sous CMD.
+- La recette des repères (module `recette`, § 4) tient tous ses constats contre `@google/gemini-cli` 0.67.0, sous Node 26.13.0, sans qu'aucun appel ne quitte le poste.
 - Les six fichiers tirés des modules ont exactement les empreintes de la table du module `execution`, § 8.
-- Les scénarios A1 à A10 du module `agent` sont rejoués avec le développeur avant que l'agent serve à d'autres.
+- Les scénarios A1 à A12 du module `agent` sont rejoués avec le développeur avant que l'agent serve à d'autres.
 
 ## 10. Invariants
 
@@ -186,6 +189,8 @@ Points d'extension, actifs depuis la version indiquée :
 - **D7.INV-1** : l'explication d'une session, de son contexte et de ses outils, se fait dans cette session, skill activé ; un sous-agent dit qu'il ne voit pas le contexte de la session qui l'appelle et rend ce qu'il peut observer.
 - **D7.INV-2** : l'agent ne modifie aucun fichier pendant qu'il explique ; une modification de configuration se décrit (fichier, clé, valeur, effet attendu) et ne s'applique que sur demande explicite du développeur, hors du rôle d'explicateur.
 - **D7.INV-3** : avant toute affirmation sur cette installation, l'agent lance l'instantané, en commençant par `hote`, et cite la version observée de l'hôte.
+- **D7.INV-4** : pour qui découvre l'outil, chaque étape du parcours découverte répond à une question du développeur en langage simple, montre sur cette installation ce qu'elle affirme quand cela s'observe, et dit ce que le développeur garde en main ; un terme technique s'explique à sa première apparition, et les étiquettes s'écrivent en clair.
+- **D7.INV-5** : l'agent explique sans chercher à convaincre : une limite ou un risque de l'outil se dit aussi clairement qu'un garde-fou, et une inquiétude sans réponse vérifiable reçoit `[inconnu]`, avec le moyen de la vérifier, jamais une réassurance.
 
 **D8 : secrets et vie privée**
 
@@ -200,7 +205,7 @@ Points d'extension, actifs depuis la version indiquée :
 
 ## 11. Filiation
 
-Le skill répond à la demande du développeur du 6 novembre 2026 : « un skill pour un agent qui explique le fonctionnement de l'IA dans laquelle on l'exécute, comme par exemple Gemini CLI ». Il suit la règle du dépôt depuis le 2 novembre 2026 : l'IA locale ne lit que des consignes qui la concernent, et aucun autre outil d'IA n'est nommé dans ce qu'elle lit (module `hote`, § 5).
+Le skill répond à la demande du développeur du 6 novembre 2026 : « un skill pour un agent qui explique le fonctionnement de l'IA dans laquelle on l'exécute, comme par exemple Gemini CLI ». Sa destination, précisée le 7 novembre 2026 : l'équipe, qui le diffuse aux développeurs hésitant à se servir de l'IA sans en connaître le fonctionnement ; l'hésitation qui revient le plus est le sentiment d'une boîte noire. D'où le parcours découverte, la forme en clair des étiquettes et les invariants D7.INV-4 et D7.INV-5. Le poste de la mission est passé à Node 26.13.0 le 6 novembre 2026 : la recette et les repères y sont vérifiés. Il suit la règle du dépôt depuis le 2 novembre 2026 : l'IA locale ne lit que des consignes qui la concernent, et aucun autre outil d'IA n'est nommé dans ce qu'elle lit (module `hote`, § 5).
 
 Les repères sont tirés du paquet `@google/gemini-cli` 0.67.0, publié sur npm, le 6 novembre 2026 :
 
@@ -211,5 +216,7 @@ Les repères sont tirés du paquet `@google/gemini-cli` 0.67.0, publié sur npm,
 Ces lectures ont relevé des écarts entre la documentation et le code de la même version, que l'agent sait dire (module `modele-hote`, § 10). Elles ont aussi montré que, réglé par défaut, Gemini CLI envoie des statistiques d'usage et cherche des mises à jour même quand l'API du modèle est locale (repère H1).
 
 ## 12. Journal de révision
+
+**1.0.1** (2026-11-07) : correctif, pour la diffusion aux développeurs qui hésitent à se servir de l'IA faute d'en voir le fonctionnement. Parcours découverte en sept étapes, à la place du parcours guidé (module `modele-hote`, § 11) ; forme en clair des étiquettes (module `provenance`, § 3) ; invariants D7.INV-4 (pédagogie) et D7.INV-5 (expliquer sans chercher à convaincre) ; scénarios A11 et A12. Repère H1 corrigé : sous Node 26, une partie des sorties de Gemini CLI ne suit plus `HTTPS_PROXY`. Recette vérifiée sous Node 26.13.0, repères confrontés sous Node 26.13.0 ; en-têtes YAML des modules `agent`, `contexte` et `diagnostic` rendus lisibles par un lecteur YAML strict.
 
 **1.0.0** (2026-11-06) : première version. Dimensions D1 à D9 actives, D10 et D11 réservées. Points d'extension E1 et E2. Script `scripts/instantane-hote.mjs` (Node 20, sans dépendance, lecture seule), recette de 28 tests, agent `explicateur-hote` et commandes `/hote:explique`, `/hote:carte`, `/hote:pourquoi`, écrits en entier dans les modules `execution`, `recette` et `agent`. Repères vérifiés sur Gemini CLI 0.67.0, confrontés au Gemini CLI réel par la recette des repères, sans qu'aucun appel ne quitte le poste.

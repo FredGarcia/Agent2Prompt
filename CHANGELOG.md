@@ -4,6 +4,27 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-11-07 : explication-hote-ia 1.0.1
+
+- **explication-hote-ia 1.0.1** : correctif. Le développeur a précisé la destination du skill : l'équipe, qui le diffuse aux développeurs hésitant à se servir de l'IA sans en connaître le fonctionnement. L'hésitation qui revient le plus est le sentiment d'une boîte noire.
+  - Parcours découverte, à la place du parcours guidé : sept questions d'un développeur qui découvre l'outil, de « qu'est-ce que c'est, au juste ? » à « peut-il se tromper, et comment le vérifier ? ». Chacune se traite en trois temps : la réponse simple, sa démonstration sur le poste, ce que le développeur garde en main. Pendant le parcours, l'agent ne modifie rien.
+  - Étiquettes en clair pour qui découvre l'outil, comme « vu sur votre poste » ou « je ne peux pas le savoir d'ici » ; elles gardent la catégorie et la source des étiquettes courtes.
+  - Invariants D7.INV-4 (pédagogie) et D7.INV-5 : expliquer sans chercher à convaincre ; les limites et les risques se disent aussi clairement que les garde-fous, et aucune réassurance ne se donne sans source. Scénarios A11 et A12.
+  - Repère H1 corrigé : sous Node 26.13.0, la connexion par compte Google suit le proxy de `HTTPS_PROXY`, mais pas les requêtes au modèle par clé d'API, les statistiques d'usage ni la recherche de mise à jour, qui partent en direct. `NODE_USE_ENV_PROXY=1` les ramène au proxy. Sous Node 22 et 24, tout suit le proxy.
+  - En-têtes YAML des modules `agent`, `contexte` et `diagnostic` rendus lisibles par un lecteur YAML strict.
+- `docs/explication-hote-ia/mode-emploi.md` refait pour la diffusion : « Comprendre avant de s'en servir », sept questions lisibles sans rien installer ; « Essayer sans risque », l'installation et le parcours découverte ; « Aller plus loin ».
+- Outillage : les repères tournent sous Node 26.13.0, avec `NODE_USE_ENV_PROXY=1`, pour que toute sortie de l'hôte reste dans le proxy témoin.
+- Vérifications :
+  - recette de 28 tests réussie sous Node 20, 22 et 26.13.0, sous Linux ; 23 défauts réintroduits un à un, tous attrapés sous Node 26.13.0 ;
+  - repères : 29 constats tenus contre `@google/gemini-cli` 0.67.0, sous Node 26.13.0, dans un espace réseau isolé ; `strace` ne relève aucune connexion hors de la boucle locale ;
+  - en-têtes YAML du skill, de ses modules et du sous-agent lus sans erreur par js-yaml, le lecteur de Gemini CLI ; contrat avec Gemini CLI sans erreur ;
+  - vérificateur, glossaire, transmission et recette de l'installateur (17 tests) à jour.
+- Soumis à ratification :
+  - le parcours découverte comme réponse par défaut de `/hote:explique` sans question ;
+  - les étiquettes en clair pour qui découvre l'outil ;
+  - les invariants D7.INV-4 et D7.INV-5 ;
+  - les repères confrontés sous Node 26.13.0, avec `NODE_USE_ENV_PROXY=1`.
+
 ### 2026-11-07 : agent2test 1.3.1, agent-tdd-jira 1.3.4, agent2dev 1.1.3, orchestrateur-c7e 3.5.3
 
 - Le poste de la mission est passé à Node 26.13.0 le 6 novembre 2026 ; à la demande du développeur, les spécifications et l'intégration continue en tiennent compte.

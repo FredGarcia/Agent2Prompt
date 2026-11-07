@@ -1,6 +1,6 @@
 ---
 name: provenance
-description: Provenance des affirmations sur l'hôte (quatre sources, cinq étiquettes et leur forme de citation, ordre de foi entre sources contradictoires, ce que l'agent ne tire jamais de sa propre impression, angles morts et moyens de les observer, repères d'une autre version à revérifier). À lire avant toute explication.
+description: Provenance des affirmations sur l'hôte (quatre sources, cinq étiquettes, leur forme courte et leur forme en clair pour qui découvre l'outil, ordre de foi entre sources contradictoires, ce que l'agent ne tire jamais de sa propre impression, angles morts et moyens de les observer, repères d'une autre version à revérifier). À lire avant toute explication.
 dimensions: [D6]
 status: active
 ---
@@ -37,6 +37,16 @@ Une étiquette par affirmation, entre crochets, avec sa source après deux-point
 | `[inconnu]` | « Je ne sais pas quel modèle a produit cette réponse [inconnu : `/stats model` le montre]. » |
 
 Les natures du script se traduisent telles quelles : `observé` en `[observé]`, `déduit` en `[déduit]`, `déclaré` en `[déclaré]`, `documenté` en `[documenté]`. Une valeur sans nature dans un objet observé hérite de celle de sa section ; les valeurs effectives de `config` sont `[observé]`, avec leur couche.
+
+Chaque étiquette a une forme en clair : la même étiquette, traduite pour qui découvre l'outil, qui garde sa catégorie et sa source entre parenthèses, et satisfait donc D6.INV-1. C'est la forme par défaut du parcours découverte, et celle de toute réponse à un développeur qui découvre l'outil ou la préfère (D7.INV-4) ; la forme courte sert à la carte, au diagnostic et au sous-agent.
+
+| Étiquette | Forme en clair | Exemple |
+|---|---|---|
+| `[observé]` | « vu sur votre poste » | « Gemini CLI 0.67.0 tourne ici (vu sur votre poste : `hote`). » |
+| `[déclaré]` | « d'après ce que je vois de mon propre contexte », ou « d'après ce que vous m'avez dit » | « Je dispose d'un outil qui lance des commandes (d'après ce que je vois de mon propre contexte : mes outils déclarés). » |
+| `[documenté]` | « d'après la documentation de Gemini CLI <version> » | « Tant qu'un skill n'est pas activé, le modèle n'en voit que le nom et la description (d'après la documentation de Gemini CLI 0.67.0 : `cli/skills.md`). » |
+| `[déduit]` | « j'en déduis, à partir de … » | « Ce fichier n'est pas chargé au démarrage (j'en déduis, à partir de `contexte` : il est dans un sous-dossier). » |
+| `[inconnu]` | « je ne peux pas le savoir d'ici » | « Je ne sais pas quel modèle a produit cette réponse (je ne peux pas le savoir d'ici ; `/stats model` le montre). » |
 
 ## 4. Ordre de foi (D6.INV-3)
 
@@ -80,7 +90,7 @@ Les repères du module `modele-hote` sont vérifiés sur Gemini CLI 0.67.0. Si `
 
 ## 8. Contrôle de sortie
 
-- Chaque affirmation sur l'hôte porte une étiquette et une source (D6.INV-1).
+- Chaque affirmation sur l'hôte porte une étiquette, courte ou en clair, et une source (D6.INV-1).
 - Aucune affirmation sur soi-même ne vient de la propre impression de l'agent (D6.INV-2).
 - Toute contradiction entre sources est dite, avec ses deux sources et l'observation qui la tranche (D6.INV-3).
 - Les angles morts touchés par la question sont nommés, avec leur moyen d'observation (D6.INV-4).

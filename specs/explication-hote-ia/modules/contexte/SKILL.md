@@ -1,6 +1,6 @@
 ---
 name: contexte
-description: Contexte du modèle et commande contexte (ce que l'hôte envoie au modèle à chaque requête, vérifié sur Gemini CLI 0.67.0 : instructions système, premier message de session, historique, contexte découvert à la demande, skill activé, déclarations d'outils ; fichiers de contexte par palier et leur ordre, imports, mémoire privée du projet et registre des projets, trace de la dernière session, export du prompt système par le développeur et son analyse). À lire avant d'expliquer ce que le modèle reçoit ou pourquoi une consigne n'est pas suivie.
+description: Contexte du modèle et commande contexte (ce que l'hôte envoie au modèle à chaque requête, vérifié sur Gemini CLI 0.67.0, avec ses instructions système, premier message de session, historique, contexte découvert à la demande, skill activé, déclarations d'outils ; fichiers de contexte par palier et leur ordre, imports, mémoire privée du projet et registre des projets, trace de la dernière session, export du prompt système par le développeur et son analyse). À lire avant d'expliquer ce que le modèle reçoit ou pourquoi une consigne n'est pas suivie.
 dimensions: [D5]
 status: active
 ---
