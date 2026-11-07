@@ -69,7 +69,7 @@ Repère vérifié sur 0.67.0 [documenté : `reference/policy-engine.md`] : des r
 
 ## 8. Fichiers d'exclusion
 
-`.geminiignore` et `.gitignore` de la racine, et `.git/info/exclude` du dépôt : ce qu'ils excluent, les outils de fichiers de l'hôte ne le voient pas. Un skill exclu par `.git/info/exclude` sans négation dans `.geminiignore` ne livre que son `SKILL.md` (constat du dépôt Agent2Prompt, vérifié contre le code de Gemini CLI par sa recette de l'installateur).
+`.geminiignore` et `.gitignore` de la racine, et `.git/info/exclude` du dépôt : ce qu'ils excluent, les outils de fichiers de l'hôte ne le voient pas. Un skill exclu par `.git/info/exclude` sans négation dans `.geminiignore` ne livre que son `SKILL.md` (constat vérifié contre le code de Gemini CLI 0.67.0 par la recette de l'installateur du dépôt où le skill est maintenu). Le module `diffusion`, § 3, en tire les négations d'une installation au niveau du projet.
 
 ## 9. Contrôle de sortie
 

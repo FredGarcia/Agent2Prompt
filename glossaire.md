@@ -27,7 +27,7 @@ La colonne « Repris dans » cite les modules de la spécification qui reprennen
 | [`analyse-projet`](#analyse-projet-102) | 1.0.2 | 5 | 1 | 16 |
 | [`angular`](#angular-101) | 1.0.1 | 8 | 2 | 30 |
 | [`capture-sprint-jira`](#capture-sprint-jira-122) | 1.2.2 | 9 | 2 | 39 |
-| [`explication-hote-ia`](#explication-hote-ia-102) | 1.0.2 | 9 | 2 | 32 |
+| [`explication-hote-ia`](#explication-hote-ia-110) | 1.1.0 | 10 | 2 | 37 |
 | [`java`](#java-111) | 1.1.1 | 7 | 1 | 29 |
 | [`orchestrateur-c7e`](#orchestrateur-c7e-353) | 3.5.3 | 10 | 1 | 33 |
 | [`skill4appli`](#skill4appli-111) | 1.1.1 | 9 | 3 | 34 |
@@ -886,9 +886,9 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 | **D12.INV-3** | la capture d'un ticket seul remplace son fichier, retire sa copie d'un autre dossier de catégorie, et remplace ou ajoute son entrée dans `rapport.json`, avec le choix noté et les décomptes recalculés, ou crée ce rapport ; en cas d'erreur, rien n'est écrit. | `ticket`, `recette` |
 | **D12.INV-4** | après la capture d'un ticket seul, réussie ou non, le navigateur revient à la page où il était. | `ticket`, `recette` |
 
-## explication-hote-ia 1.0.2
+## explication-hote-ia 1.1.0
 
-Agent qui explique le fonctionnement de l'outil d'IA qui l'exécute, Gemini CLI ou un hôte non reconnu décrit sans être nommé, d'abord pour les développeurs qui hésitent à s'en servir faute d'en voir le fonctionnement : parcours découverte qui ouvre la boîte noire, en langage simple ; boucle d'un tour, assemblage du contexte, outils et politique, confiance, composants, mémoire, modèle, ce qui sort du poste, angles morts ; carte de l'installation et diagnostic ; chaque affirmation étiquetée par sa provenance ; script Node en lecture seule qui ne rend aucun secret. Point d'entrée : [`specs/explication-hote-ia/SKILL.md`](specs/explication-hote-ia/SKILL.md).
+Agent qui explique le fonctionnement de l'outil d'IA qui l'exécute, Gemini CLI ou un hôte non reconnu décrit sans être nommé, d'abord pour les développeurs qui hésitent à s'en servir faute d'en voir le fonctionnement : parcours découverte qui ouvre la boîte noire, en langage simple ; boucle d'un tour, assemblage du contexte, outils et politique, confiance, composants, mémoire, modèle, ce qui sort du poste, angles morts ; carte de l'installation et diagnostic ; chaque affirmation étiquetée par sa provenance ; script Node en lecture seule qui ne rend aucun secret ; se diffuse seul, avec son mode d'emploi, installé par Gemini CLI depuis son dossier ou un fichier .skill. Point d'entrée : [`specs/explication-hote-ia/SKILL.md`](specs/explication-hote-ia/SKILL.md).
 
 ### D1 : Exécution du script : lecture seule, sorties, codes, bornes (active)
 
@@ -940,14 +940,14 @@ Agent qui explique le fonctionnement de l'outil d'IA qui l'exécute, Gemini CLI 
 | **D6.INV-2** | l'agent ne tire jamais de sa propre impression son identité de modèle, sa version, la version de l'hôte, ses réglages ni les limites de son contexte : seulement d'une observation ; quand il parle du modèle, il signale que le routage automatique et les sous-agents peuvent en employer d'autres. | `provenance`, `diagnostic`, `agent` |
 | **D6.INV-3** | entre deux sources contradictoires, l'observation de la session l'emporte sur la documentation, qui l'emporte sur la déduction ; la contradiction est dite avec ses deux sources, jamais tranchée en silence. | `provenance`, `modele-hote`, `agent` |
 | **D6.INV-4** | les angles morts sont nommés : ce qui ne s'observe pas d'ici est rendu `[inconnu]`, avec le moyen de l'observer quand il en existe un. | `provenance`, `agent` |
-| **D6.INV-5** | un repère daté d'une autre version de l'hôte que celle observée se signale « à revérifier », et la documentation de la version installée fait foi pour elle. | `provenance`, `hote`, `modele-hote`, `agent` |
+| **D6.INV-5** | un repère daté d'une autre version de l'hôte que celle observée se signale « à revérifier », et la documentation de la version installée fait foi pour elle. | `provenance`, `hote`, `modele-hote`, `agent`, `diffusion` |
 
 ### D7 : Agent explicateur : niveaux d'observation, modes, parcours découverte, pédagogie, protocole, commandes (active)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
 | **D7.INV-1** | l'explication d'une session, de son contexte et de ses outils, se fait dans cette session, skill activé ; un sous-agent dit qu'il ne voit pas le contexte de la session qui l'appelle et rend ce qu'il peut observer. | `provenance`, `diagnostic`, `agent` |
-| **D7.INV-2** | l'agent ne modifie aucun fichier pendant qu'il explique ; une modification de configuration se décrit (fichier, clé, valeur, effet attendu) et ne s'applique que sur demande explicite du développeur, hors du rôle d'explicateur. | `modele-hote`, `diagnostic`, `agent` |
+| **D7.INV-2** | l'agent ne modifie aucun fichier pendant qu'il explique ; une modification de configuration se décrit (fichier, clé, valeur, effet attendu) et ne s'applique que sur demande explicite du développeur, hors du rôle d'explicateur. | `modele-hote`, `diagnostic`, `agent`, `diffusion` |
 | **D7.INV-3** | avant toute affirmation sur cette installation, l'agent lance l'instantané, en commençant par `hote`, et cite la version observée de l'hôte. | `diagnostic`, `agent` |
 | **D7.INV-4** | pour qui découvre l'outil, chaque étape du parcours découverte répond à une question du développeur en langage simple, montre sur cette installation ce qu'elle affirme quand cela s'observe, et dit ce que le développeur garde en main ; un terme technique s'explique à sa première apparition, et les étiquettes s'écrivent en clair. | `provenance`, `modele-hote`, `agent` |
 | **D7.INV-5** | l'agent explique sans chercher à convaincre : une limite ou un risque de l'outil se dit aussi clairement qu'un garde-fou, et une inquiétude sans réponse vérifiable reçoit `[inconnu]`, avec le moyen de la vérifier, jamais une réassurance. | `modele-hote`, `agent` |
@@ -974,6 +974,16 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 ### D11 : Comparaison de deux instantanés dans le temps (reserved)
 
 Dimension réservée : aucun invariant en vigueur dans cette version.
+
+### D12 : Diffusion autonome : un dossier qui se suffit, installation par l'hôte, mode d'emploi joint, retrait complet (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D12.INV-1** | le dossier du skill se suffit : l'installer, le vérifier et s'en servir ne demandent que ce dossier, Node 20 ou plus récent et l'hôte ; aucune étape du skill ne passe par un dépôt, un outil ou un fichier extérieur au dossier, ni par le réseau, et seul l'hôte parle à son modèle, comme il le fait sans le skill. | `agent`, `diffusion` |
+| **D12.INV-2** | dans Gemini CLI, le skill s'installe par la commande de l'hôte, `gemini skills install`, depuis son dossier ou un fichier `.skill`, et n'y devient qu'un seul skill, ses modules n'étant jamais pris pour des skills ; ses six fichiers exécutables s'en tirent ensuite par la commande d'extraction, puis la recette passe ; un écart ou un échec arrête l'installation. | `diffusion` |
+| **D12.INV-3** | le mode d'emploi `MODE-EMPLOI.md` fait partie du dossier et de la transmission, et porte la version du skill ; ses commandes sont, à l'identique, celles des modules `execution` et `diffusion`, et ses renvois ne sortent pas du dossier. | `diffusion` |
+| **D12.INV-4** | hors du dossier du skill, rien ne s'écrit sans la demande du développeur : le sous-agent et les commandes s'installent par une commande qu'il lance ou qu'il approuve, une commande de retrait les supprime, et, avec `gemini skills uninstall`, rien ne reste. | `agent`, `diffusion` |
+| **D12.INV-5** | le dépôt où le skill est maintenu se nomme comme son origine et le lieu de sa vérification, jamais comme une étape ; le contrat de version, les règles et la recette du skill sont écrits dans le skill. | `recette`, `diffusion` |
 
 ## java 1.1.1
 

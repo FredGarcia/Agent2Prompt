@@ -1,9 +1,9 @@
 {
   "name": "explication-hote-ia",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "specSchema": 1,
   "language": "fr",
-  "description": "Agent qui explique le fonctionnement de l'outil d'IA qui l'exécute, Gemini CLI ou un hôte non reconnu décrit sans être nommé, d'abord pour les développeurs qui hésitent à s'en servir faute d'en voir le fonctionnement : parcours découverte qui ouvre la boîte noire, en langage simple ; boucle d'un tour, assemblage du contexte, outils et politique, confiance, composants, mémoire, modèle, ce qui sort du poste, angles morts ; carte de l'installation et diagnostic ; chaque affirmation étiquetée par sa provenance ; script Node en lecture seule qui ne rend aucun secret.",
+  "description": "Agent qui explique le fonctionnement de l'outil d'IA qui l'exécute, Gemini CLI ou un hôte non reconnu décrit sans être nommé, d'abord pour les développeurs qui hésitent à s'en servir faute d'en voir le fonctionnement : parcours découverte qui ouvre la boîte noire, en langage simple ; boucle d'un tour, assemblage du contexte, outils et politique, confiance, composants, mémoire, modèle, ce qui sort du poste, angles morts ; carte de l'installation et diagnostic ; chaque affirmation étiquetée par sa provenance ; script Node en lecture seule qui ne rend aucun secret ; se diffuse seul, avec son mode d'emploi, installé par Gemini CLI depuis son dossier ou un fichier .skill.",
   "entry": "SKILL.md",
   "modes": ["expliquer", "carte", "pourquoi"],
   "targets": {
@@ -23,12 +23,15 @@
     { "id": "diagnostic", "path": "modules/diagnostic/SKILL.md", "dimensions": ["D9"], "status": "active" },
     { "id": "agent", "path": "modules/agent/SKILL.md", "dimensions": ["D7"], "status": "active" },
     { "id": "recette", "path": "modules/recette/SKILL.md", "dimensions": ["D1", "D2", "D3", "D4", "D5", "D8"], "status": "active" },
+    { "id": "diffusion", "path": "modules/diffusion/SKILL.md", "dimensions": ["D12"], "status": "active" },
+    { "id": "mode-emploi", "path": "MODE-EMPLOI.md", "dimensions": ["D12"], "status": "active" },
     { "id": "autres-hotes", "path": "modules/autres-hotes/SKILL.md", "dimensions": ["D10"], "status": "reserved" },
     { "id": "comparaison", "path": "modules/comparaison/SKILL.md", "dimensions": ["D11"], "status": "reserved" }
   ],
   "extensionPoints": ["E1", "E2"],
   "previousVersions": [
     { "version": "1.0.0", "file": "archives/SKILL-v1.0.0.md" },
-    { "version": "1.0.1", "file": "archives/SKILL-v1.0.1.md" }
+    { "version": "1.0.1", "file": "archives/SKILL-v1.0.1.md" },
+    { "version": "1.0.2", "file": "archives/SKILL-v1.0.2.md" }
   ]
 }

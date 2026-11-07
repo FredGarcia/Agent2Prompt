@@ -20,11 +20,10 @@ Une question sur le contexte de la session posée au sous-agent reçoit cette r�
 
 ## 2. Installation
 
-Tous les fichiers sont tirés du skill par la commande d'extraction du module `execution`, § 8.
+Le skill s'installe à partir de son seul dossier (D12.INV-1) ; le module `diffusion` décrit chaque étape, et `MODE-EMPLOI.md` la donne au développeur, commande par commande. Tous les fichiers exécutables sont tirés du skill par la commande d'extraction du module `execution`, § 8.
 
-- **Le skill**, dans Gemini CLI : `node <Agent2Prompt>/tools/installer.mjs explication-hote-ia --utilisateur` l'installe dans `~/.gemini/skills/explication-hote-ia/`, pour tous les projets ; sans `--utilisateur`, dans `.gemini/skills/` du workspace. Puis, dans ce dossier, l'extraction et la recette (consigne, étape 2), et `/skills reload` dans Gemini CLI. Dans une autre IA, la transmission collée le matérialise dans `.skills/explication-hote-ia/`.
-- **Le sous-agent**, avec l'accord du développeur : copier `agent/explicateur-hote.md` dans `~/.gemini/agents/`, ou `.gemini/agents/` du workspace, en remplaçant, dans la copie, `<DOSSIER_DU_SKILL>` par le chemin absolu du dossier du skill (`/home/<nom>/.gemini/skills/explication-hote-ia`, `C:\Users\<nom>\.gemini\skills\explication-hote-ia`). Puis `/agents reload` et `/agents list`. Le fichier du skill ne change jamais : seule la copie installée s'adapte.
-- **Les commandes**, avec l'accord du développeur : copier `commandes/hote/explique.toml`, `carte.toml` et `pourquoi.toml` dans `~/.gemini/commands/hote/` ; elles deviennent `/hote:explique`, `/hote:carte` et `/hote:pourquoi`. Puis `/commands reload`. Un dossier non fiable les ignore, comme toute commande personnalisée.
+- **Le skill**, dans Gemini CLI : `gemini skills install <dossier du skill, ou fichier .skill>` l'installe dans `~/.gemini/skills/explication-hote-ia/`, pour tous les projets ; avec `--scope workspace`, dans `.gemini/skills/` du projet. Puis, dans ce dossier, l'extraction et la recette, et `/skills reload` dans une session ouverte (module `diffusion`, § 3). Dans une autre IA, la transmission collée le matérialise dans `.skills/explication-hote-ia/` (module `diffusion`, § 6).
+- **Le sous-agent et les commandes**, à la demande du développeur : la commande du module `diffusion`, § 4, lancée depuis le dossier du skill, copie `agent/explicateur-hote.md` dans `~/.gemini/agents/`, en remplaçant, dans la copie, `<DOSSIER_DU_SKILL>` par le chemin absolu du dossier du skill (`/home/<nom>/.gemini/skills/explication-hote-ia`, `C:\Users\<nom>\.gemini\skills\explication-hote-ia`), et `commandes/hote/explique.toml`, `carte.toml` et `pourquoi.toml` dans `~/.gemini/commands/hote/` ; elles deviennent `/hote:explique`, `/hote:carte` et `/hote:pourquoi`. Puis `/agents reload`, `/commands reload` et `/agents list`. Le fichier du skill ne change jamais : seule la copie installée s'adapte. Un dossier non fiable ignore les commandes, comme toute commande personnalisée. La commande de retrait du même module, § 5, les supprime (D12.INV-4).
 - **Autre outil à sous-agents** : copier la définition dans son dossier d'agents, et nommer dans l'en-tête de la copie ses outils de shell et de lecture de fichiers.
 - **Autre outil, sans sous-agents** : le corps de la définition, sous l'en-tête, sert de consigne système à un agent qui dispose d'un shell et d'une lecture de fichiers.
 - **Session interactive** : le skill sert dans une session interactive. En mode non interactif (`-p`), Gemini CLI ne déclare au modèle ni `activate_skill` ni `run_shell_command`, faute de confirmation possible (repère H17) : le skill n'y fonctionne qu'avec une règle de politique qui les autorise, que le skill ne propose pas.
@@ -102,7 +101,7 @@ Rejoués avec le développeur à l'installation, puis à chaque version du skill
 ```markdown
 ---
 name: explicateur-hote
-description: Explicateur de l'outil d'IA hôte (skill explication-hote-ia 1.0.2). À solliciter pour une carte de cette installation (réglages et leur couche, confiance du dossier, fichiers de contexte, skills, sous-agents, commandes, extensions, serveurs MCP, hooks, politiques) ou pour diagnostiquer un comportement de l'hôte (« pourquoi ce skill n'apparaît pas », « pourquoi ce GEMINI.md n'est pas suivi »). Lecture seule ; chaque affirmation porte sa provenance. Ne voit pas le contexte de la session qui l'appelle.
+description: Explicateur de l'outil d'IA hôte (skill explication-hote-ia 1.1.0). À solliciter pour une carte de cette installation (réglages et leur couche, confiance du dossier, fichiers de contexte, skills, sous-agents, commandes, extensions, serveurs MCP, hooks, politiques) ou pour diagnostiquer un comportement de l'hôte (« pourquoi ce skill n'apparaît pas », « pourquoi ce GEMINI.md n'est pas suivi »). Lecture seule ; chaque affirmation porte sa provenance. Ne voit pas le contexte de la session qui l'appelle.
 kind: local
 tools:
   - run_shell_command
@@ -182,7 +181,7 @@ Entre deux sources contradictoires, l'observation l'emporte sur la documentation
 
 <!-- fichier : commandes/hote/explique.toml -->
 ```toml
-description = "Explique le fonctionnement de l'hôte d'IA, appliqué à cette installation ; sans question, le parcours découverte (skill explication-hote-ia 1.0.2)"
+description = "Explique le fonctionnement de l'hôte d'IA, appliqué à cette installation ; sans question, le parcours découverte (skill explication-hote-ia 1.1.0)"
 prompt = """
 Active le skill explication-hote-ia, puis applique son mode « expliquer ».
 Question du développeur : {{args}}
@@ -193,7 +192,7 @@ Chaque affirmation sur l'hôte porte son étiquette de provenance et sa source.
 
 <!-- fichier : commandes/hote/carte.toml -->
 ```toml
-description = "Carte de cette installation de l'hôte d'IA : réglages, confiance, contextes, composants (skill explication-hote-ia 1.0.2)"
+description = "Carte de cette installation de l'hôte d'IA : réglages, confiance, contextes, composants (skill explication-hote-ia 1.1.0)"
 prompt = """
 Active le skill explication-hote-ia, puis applique son mode « carte » : lance l'instantané, en commençant par hote, puis présente la carte de cette installation, chaque point avec son étiquette de provenance et sa source.
 Précision du développeur, s'il y en a une : {{args}}
@@ -202,7 +201,7 @@ Précision du développeur, s'il y en a une : {{args}}
 
 <!-- fichier : commandes/hote/pourquoi.toml -->
 ```toml
-description = "Diagnostique un comportement de l'hôte d'IA à partir de ce qui s'observe (skill explication-hote-ia 1.0.2)"
+description = "Diagnostique un comportement de l'hôte d'IA à partir de ce qui s'observe (skill explication-hote-ia 1.1.0)"
 prompt = """
 Active le skill explication-hote-ia, puis applique son mode « pourquoi » au comportement suivant : {{args}}
 Suis la méthode du module diagnostic : chaque hypothèse confirmée ou écartée par une observation nommée, la cause retenue étiquetée, la correction décrite sans être appliquée.

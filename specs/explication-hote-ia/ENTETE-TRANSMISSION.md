@@ -12,13 +12,15 @@ Ce texte contient à la fois la consigne de travail et le skill complet. Il n'y 
 
 ## Étape 0 : matérialiser le skill
 
-Dans Gemini CLI, avec un clone du dépôt Agent2Prompt, l'installateur fait cette étape sans IA et vérifie chaque fichier : `node <Agent2Prompt>/tools/installer.mjs explication-hote-ia --utilisateur` l'installe dans `~/.gemini/skills/explication-hote-ia/`, pour tous les projets. Passe alors directement à l'étape 1, dans ce dossier.
+Si le développeur dispose aussi du dossier du skill, ou d'un fichier `.skill`, et que ton hôte est Gemini CLI, l'hôte fait cette étape sans IA : `gemini skills install <dossier ou fichier .skill>` installe le skill dans `~/.gemini/skills/explication-hote-ia/`, pour tous les projets (module `diffusion`, § 3). Passe alors directement à l'étape 1, dans ce dossier. Rien d'autre n'est nécessaire : le skill se suffit, sans dépôt ni outil extérieur.
 
 Sinon :
 
 1. Crée le dossier `.skills/explication-hote-ia/` à la racine du projet, ou à l'emplacement que le développeur indique. Dans un dépôt git, ajoute `/.skills/` à `.git/info/exclude` s'il n'y est pas : le skill ne doit pas apparaître dans `git status`. Si ton hôte est Gemini CLI, ajoute aussi à `.geminiignore` les lignes `!/.skills/` et `!/.skills/explication-hote-ia/`, sans quoi ses outils de lecture refuseraient les modules du skill.
 2. Pour chaque bloc `<<<FICHIER chemin>>>` … `<<<FIN chemin>>>`, crée le fichier `chemin` dans ce dossier, avec le contenu exact compris entre les deux lignes délimitrices. Ces deux lignes ne font pas partie du fichier. Ne reformule rien, ne traduis rien, ne complète rien.
 3. Si tu disposes d'un shell, vérifie chaque fichier avec `sha256sum -c` contre la table d'intégrité en fin de texte ; sous Windows, Git Bash fournit `sha256sum`, et `certutil -hashfile <fichier> SHA256` donne l'empreinte d'un fichier depuis CMD. Signale tout écart avant de continuer.
+
+Parmi ces fichiers, `MODE-EMPLOI.md` s'adresse au développeur : il y trouve les mêmes étapes et les mêmes commandes. Dans Gemini CLI, un skill matérialisé ainsi ne devient un skill de l'hôte, découvert dans toutes ses sessions, qu'une fois installé ; le module `diffusion`, § 6, dit comment, après l'étape 2.
 
 ## Étape 1 : lecture
 
@@ -32,7 +34,7 @@ Lis `SKILL.md`, `manifest.json`, puis les modules actifs dans l'ordre indiqué p
 
 ## Étape 3 : le sous-agent et les commandes
 
-Propose au développeur d'installer le sous-agent `agent/explicateur-hote.md` et les commandes `/hote:explique`, `/hote:carte` et `/hote:pourquoi` (module `agent`, § 2). N'écris dans ses dossiers de configuration qu'avec son accord ; dans la copie installée du sous-agent, remplace `<DOSSIER_DU_SKILL>` par le chemin absolu du dossier du skill.
+Propose au développeur d'installer le sous-agent `agent/explicateur-hote.md` et les commandes `/hote:explique`, `/hote:carte` et `/hote:pourquoi` (module `agent`, § 2). N'écris dans ses dossiers de configuration qu'avec son accord ; dans la copie installée du sous-agent, remplace `<DOSSIER_DU_SKILL>` par le chemin absolu du dossier du skill. Dans Gemini CLI, la commande du module `diffusion`, § 4, lancée depuis le dossier du skill, fait les deux ; celle du § 5 les retire.
 
 ## Étape 4 : premier instantané
 
@@ -46,6 +48,7 @@ Propose au développeur d'installer le sous-agent `agent/explicateur-hote.md` et
 - La documentation qui fait foi est celle de la version installée de l'hôte ; un repère d'une autre version se signale « à revérifier ».
 - Aucune valeur secrète n'est recopiée, ni dans une réponse, ni dans un fichier.
 - Gemini CLI est le seul hôte que tu nommes ; un autre se décrit par ce qui s'en observe.
+- Le skill se suffit : n'ajoute aucune étape qui demande un dépôt, un outil ou un fichier extérieur au dossier du skill, ni le réseau.
 - N'applique aucune dimension au statut `reserved`.
 
 Commence par l'étape 0, puis l'étape 1, puis l'étape 2.

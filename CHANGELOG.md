@@ -4,6 +4,29 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-11-07 : explication-hote-ia 1.1.0
+
+- **explication-hote-ia 1.1.0** : version mineure. Le développeur a demandé que le skill, bien que maintenu dans ce dépôt, en soit complètement indépendant, pour une diffusion autonome, avec un mode d'emploi à côté de lui.
+  - Dimension D12, diffusion autonome : module `diffusion` et invariants D12.INV-1 à D12.INV-5. Le dossier du skill se suffit : l'installer, le vérifier et s'en servir ne demandent que ce dossier, Node 20 ou plus récent et Gemini CLI ; aucune étape du skill ne passe par le dépôt, par un outil extérieur ou par le réseau ; seul Gemini CLI parle à son modèle, comme sans le skill.
+  - `specs/explication-hote-ia/MODE-EMPLOI.md`, à côté du point d'entrée : installer, vérifier, utiliser, mettre à jour, retirer, diffuser. Déclaré comme module de D12, il part avec le dossier et avec la transmission ; ses commandes sont, à l'identique, celles des modules.
+  - Installation par Gemini CLI lui-même : `gemini skills install`, depuis le dossier ou un fichier `.skill` (une archive zip du dossier), puis l'extraction et la recette. Le sous-agent et les commandes s'installent par une commande que le développeur lance, et une commande de retrait les supprime ; avec `gemini skills uninstall`, rien ne reste.
+  - Plus aucune dépendance au dépôt : l'en-tête de transmission et le module `agent` n'installent plus par `tools/installer.mjs` ; le contrat de version est écrit dans le point d'entrée ; les modules `hote`, `composants` et `recette` ne nomment le dépôt que comme origine et lieu de vérification.
+- `docs/explication-hote-ia/mode-emploi.md` garde « Comprendre l'IA avant de s'en servir », les sept questions ; l'installation et l'usage passent dans le mode d'emploi joint au skill, vers lequel il renvoie.
+- Outillage : la recette des repères installe le skill comme le dit le mode d'emploi, `gemini skills install` depuis le dossier et depuis un fichier `.skill`, commandes du mode d'emploi, retrait, sans plus passer par `tools/installer.mjs` ; le workflow de recette lance, sous bash et sous CMD, les commandes du mode d'emploi qui installent puis retirent le sous-agent et les commandes, et vérifie que sa commande d'extraction est celle du module `execution`.
+- README : ligne d'explication-hote-ia, mode d'emploi du skill dans le tableau des documents, installation autonome signalée dans « Installer un skill dans Gemini CLI ».
+- Vérifications :
+  - recette de 28 tests réussie sous Node 20, 24 et 26.13.0, sous Linux, en rejouant les étapes bash du workflow, commandes du sous-agent et du retrait comprises ; 23 défauts réintroduits un à un, tous attrapés sous Node 26.13.0 ;
+  - repères : 32 constats tenus contre `@google/gemini-cli` 0.67.0, sous Node 26.13.0, dans un espace réseau isolé, dont 5 pour la diffusion autonome ; `strace` ne relève aucune connexion hors de la boucle locale ;
+  - les deux commandes qui font le fichier `.skill`, `python3 -m zipfile` et `tar --format zip`, donnent un fichier que Gemini CLI 0.67.0 installe ;
+  - en-têtes YAML lus sans erreur par js-yaml ; contrat avec Gemini CLI tenu ; vérificateur, glossaire, transmission (aller-retour identique) et recette de l'installateur (17 tests) à jour.
+- Soumis à ratification :
+  - D12 comme nouvelle dimension, d'où la version mineure 1.1.0 ;
+  - la diffusion par le dossier ou par un fichier `.skill`, installé par `gemini skills install` ;
+  - deux guides : le mode d'emploi joint au skill pour installer et utiliser, et `docs/` qui garde « Comprendre » ;
+  - les mentions du dépôt gardées comme origine et lieu de vérification, sans aucune étape qui en dépende ;
+  - le mode d'emploi déclaré comme module de D12, donc transmis avec le skill ;
+  - la recette des repères qui installe le skill comme le dit le mode d'emploi, et non plus par `tools/installer.mjs`.
+
 ### 2026-11-07 : explication-hote-ia 1.0.2
 
 - **explication-hote-ia 1.0.2** : correctif. L'en-tête de transmission et le module `recette` citaient encore les scénarios A1 à A10 : à l'installation, l'IA rejouait les scénarios sans A11 (« c'est une boîte noire ») ni A12 (« est-ce que tu envoies tout mon code chez Google ? »), ceux du parcours découverte. Ils citent A1 à A12, comme le point d'entrée et le module `agent`. Le tableau des dimensions porte la version courante ; la version annoncée par le script, le sous-agent et les commandes passe à 1.0.2. Aucun comportement ni aucun invariant modifié. Archive 1.0.1 ; la transmission 1.0.1 reste telle qu'elle a été publiée.

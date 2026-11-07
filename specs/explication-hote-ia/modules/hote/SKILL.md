@@ -55,7 +55,7 @@ Sous Linux et WSL, quand le processus parent est l'hôte, le script rend ses opt
 
 ## 5. Hôte non reconnu (D2.INV-3)
 
-Gemini CLI est le seul hôte que le skill nomme, selon la règle du dépôt Agent2Prompt depuis le 2 novembre 2026 : l'IA locale ne lit que des consignes qui la concernent. Un autre hôte se décrit par ce qui s'en observe, sans lui prêter de nom :
+Gemini CLI est le seul hôte que le skill nomme. C'est une règle du skill, reprise du dépôt où il est maintenu, depuis le 2 novembre 2026 : l'IA locale ne lit que des consignes qui la concernent. Un autre hôte se décrit par ce qui s'en observe, sans lui prêter de nom :
 
 - `hote.famille` vaut `inconnue`, `certitude` vaut `aucune` ;
 - `hote.generique` liste, en déduits, les dossiers cachés de la racine et de l'accueil qui contiennent `skills`, `agents`, `commands`, `rules`, `prompts` ou un `settings.json`, et les fichiers de consignes en capitales à la racine (hors `README`, `CHANGELOG`, `LICENSE`, `CONTRIBUTING`, `SECURITY`, `CODE_OF_CONDUCT`) ;
