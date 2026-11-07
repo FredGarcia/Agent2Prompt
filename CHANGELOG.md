@@ -12,7 +12,7 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
   - recette de 28 tests réussie sous Node 20, 24 et 26.13.0, sous Linux, après matérialisation de la transmission et extraction des six fichiers par la commande du module `execution`, § 8 ; 23 défauts réintroduits un à un, tous attrapés sous Node 26.13.0 ;
   - repères : 29 constats tenus contre `@google/gemini-cli` 0.67.0, sous Node 26.13.0, dans un espace réseau isolé ; `strace` ne relève aucune connexion hors de la boucle locale ;
   - en-têtes YAML lus sans erreur par js-yaml ; contrat avec Gemini CLI tenu ; vérificateur, glossaire, transmission (aller-retour identique) et recette de l'installateur (17 tests) à jour.
-- Soumis à ratification :
+- Décisions ratifiées (pull request n° 46) :
   - la correction publiée en version 1.0.2, sans attendre une prochaine évolution ;
   - la version annoncée par le script, le sous-agent et les commandes portée à 1.0.2, bien que leur comportement ne change pas.
 
