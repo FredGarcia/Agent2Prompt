@@ -4,6 +4,29 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-11-07 : agent2test 1.3.1, agent-tdd-jira 1.3.4, agent2dev 1.1.3, orchestrateur-c7e 3.5.3
+
+- Le poste de la mission est passé à Node 26.13.0 le 6 novembre 2026 ; à la demande du développeur, les spécifications et l'intégration continue en tiennent compte.
+  - **agent2test 1.3.1** : correctif. Node 26.13.0 recommandé, à la place de Node 24 : manifeste, règles globales, module `exploitation` (schéma de la topologie, message de démarrage). Minimum inchangé, Node 22.13 (D18.INV-1). Entrée : agent-tdd-jira 1.3.4. Archive 1.3.0.
+  - **agent2dev 1.1.3** : correctif. Node 26.13.0 recommandé, à la place de Node 24 : manifeste, règles globales, module `exploitation` (schéma, message de démarrage, prérequis du guide) ; minimum inchangé, Node 22.13. Méthode : agent-tdd-jira 1.3.4 ; binôme : agent2test 1.3.1 ; exemples du journal à la version 1.1.3. Archive 1.1.2.
+  - **agent-tdd-jira 1.3.4** : correctif. Référence à agent2test 1.3.1 ; `lire-acceptation.mjs` inchangé. Archive 1.3.3.
+  - **orchestrateur-c7e 3.5.3** : correctif. Référence à agent-tdd-jira 1.3.4. Archive 3.5.2.
+  - Aucune dimension ni aucun invariant modifié. Les quatre spécifications se référencent et se publient dans un même commit (`EVOLUTION.md`, section 7) ; les transmissions agent2test 1.3.0, agent-tdd-jira 1.3.3, agent2dev 1.1.2 et orchestrateur-c7e 3.5.2, publiées, restent telles quelles.
+- Intégration continue : chaque matrice de Node garde ses versions et ajoute 26.13.0, sous Linux et sous Windows (vérificateur, installateur, recettes de skill4appli, de sonarqube et de capture-sprint-jira) ; le contrat de Gemini CLI se vérifie sous Node 26.13.0, à la place de Node 24. skill4appli (Node 22 et 24) et capture-sprint-jira (Node 20 et 22) énoncent des versions qui restent vérifiées : leurs spécifications ne changent pas.
+- Modes d'emploi d'Agent2Test et d'Agent2Dev : Node 26.13.0 recommandé ; modes d'emploi de l'agent TDD et de l'orchestrateur à leur nouvelle version.
+- Entrée du 2026-11-06 : décisions ratifiées par la pull request n° 40.
+- Vérifications sous Node 26.13.0 (SQLite 3.54.0 intégré), avant les montées :
+  - vérificateur : 13 spécifications, transmissions fidèles ; recette de l'installateur : 17 tests ; contrat de Gemini CLI 0.66.0 tenu ;
+  - recettes rejouées comme dans les workflows, transmission matérialisée puis extraite : skill4appli 1.1.1, 34 tests ; sonarqube 1.1.0, 26 tests, et 5 sautés dans la recette réelle, sans serveur SonarQube ; capture-sprint-jira 1.2.2 sous xvfb avec Chrome, 20 scénarios, 132 contrôles ;
+  - implémentation de référence du constat d'agent2test, hors dépôt : 18 tests en monde simulé ; exemple TAB-1 et treize contre-épreuves, 136 contrôles, aucun écart ;
+  - `node:sqlite` : FTS5 et le tokeniseur `trigram` avec `remove_diacritics` disponibles ; `setAuthorizer` présent, il refuse à la préparation une instruction qui touche la table d'un autre espace : le scénario BD12 d'agent2test s'exécute ;
+  - seul changement de comportement relevé : depuis Node 23, `node --test` écrit au format spec même quand sa sortie est redirigée ; les recettes du dépôt demandent le format TAP ou ont leur propre lanceur, et n'en dépendent pas ;
+  - après les montées : vérificateur, glossaire, quatre transmissions (aller-retour identique) et README à jour.
+- Soumis à ratification :
+  - Node 26.13.0 recommandé pour Agent2Test et Agent2Dev, le minimum restant Node 22.13 ;
+  - la version exacte 26.13.0 dans les workflows, plutôt que la dernière version 26 ;
+  - l'ajout de 26.13.0 aux matrices, sans en retirer de version.
+
 ### 2026-11-06 : agent2test 1.3.0, agent-tdd-jira 1.3.3, agent2dev 1.1.2, orchestrateur-c7e 3.5.2
 
 - **agent2test 1.3.0** : dimension D25 active, le constat perceptif, dans le module `navigateur`, à la demande du développeur : « démontrer que Playwright prend bien le rôle d'une personne qui navigue vers une page, l'observe et rend compte de ce qu'elle voit ou ne voit pas ».
@@ -24,7 +47,7 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
   - des contrôles naïfs sur le DOM se trompent sur quatre contre-épreuves (`dir="rtl"`, page sans tableau, « REE 2026 », titre affiché mais non associé), que le navigateur juge correctement ;
   - ressemblance de l'œil dessiné de 16 à 64 px, en bleu, noir ou rouge, à sa référence de 48 px : de 0,88 à 0,95 ; œil barré : de 0,46 à 0,54 ;
   - vérificateur, glossaire, quatre transmissions (aller-retour identique) et README à jour.
-- Soumis à ratification :
+- Décisions ratifiées (pull request n° 40) :
   - les trois canaux et leur source, et la règle « rien d'autre n'établit un constat » ;
   - « gauche » et « droite » pris comme bords à l'écran, l'ordre de lecture rapporté en remarque sans décider ;
   - la reconnaissance d'un pictogramme par ressemblance à une référence ratifiée avec le profil, au seuil de 0,80 ;

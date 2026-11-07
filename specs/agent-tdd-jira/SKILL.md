@@ -1,10 +1,10 @@
 ---
 name: agent-tdd-jira
 description: Agent de développement TDD qui part d'une demande Jira enregistrée en MHTML, l'analyse avec ses commentaires, établit les US et leurs critères d'acceptation numérotés, décline chaque critère en scénarios Gherkin, propose au développeur des variantes de réalisation back Java et front Angular pour chaque scénario, puis réalise les scénarios choisis un par un en cycle rouge, vert, remanié, avec traçabilité de la demande jusqu'aux commits ; en binôme avec Agent2Test, il reçoit un verdict d'acceptation par critère et corrige en TDD les défauts applicatifs confirmés ; en mode parallèle, il travaille dans un worktree géré par le kit agents-paralleles-gitlab.
-version: 1.3.3
+version: 1.3.4
 ---
 
-# Agent de développement TDD à partir d'une demande Jira, version 1.3.3
+# Agent de développement TDD à partir d'une demande Jira, version 1.3.4
 
 Ce document est le point d'entrée du skill. Il fixe le parcours de l'agent, ses points de validation, le registre des dimensions et les invariants. Les règles détaillées sont dans `modules/`.
 
@@ -87,7 +87,7 @@ Clause de second ordre : l'agent interprète une demande écrite par d'autres. S
 
 ## 5. Registre des dimensions
 
-| ID | Dimension | Introduite | Statut 1.3.3 | Dépend de | Module |
+| ID | Dimension | Introduite | Statut 1.3.4 | Dépend de | Module |
 |---|---|---|---|---|---|
 | D1 | Ingestion d'une demande Jira en MHTML | 1.0 | active | | `ingestion-jira` |
 | D2 | Analyse et scénarios Gherkin | 1.0 | active | D1, D10 | `analyse-demande` |
@@ -227,3 +227,5 @@ Point d'extension ajouté en 1.2.0 :
 **1.3.2** (2026-10-24) : correctif. Référence à agent2test 1.2.0, dont les données tiennent dans un fichier SQLite unique, ouvert par un agent médiateur, et qui remplace le relais n8n par un échange par dossiers facultatif. Le module `binome-agent2test` parle désormais d'échange : quand la tête de développement le prévoit, comme Agent2Dev, la remise et le journal de tests passent par des dossiers d'échange, chaque tête écrivant dans sa propre boîte de sortie et lisant celle de l'autre, sans aucune connexion ni décision ; le développeur redémarre toujours l'application et ouvre la campagne lui-même ; en mode parallèle, le journal relevé se range dans `travail/<CLÉ>/acceptation/`, comme un journal déposé. Aucune dimension ni aucun invariant modifié ; `lire-acceptation.mjs` inchangé. Archive : `archives/SKILL-v1.3.1.md`.
 
 **1.3.3** (2026-11-06) : correctif. Référence à agent2test 1.3.0, dont le navigateur joue une personne qui regarde la page et rend, pour chaque étape `verifier`, un témoignage : ce qu'il a vu, ce qu'il n'a pas vu, canal par canal (`agent2test:D25.INV-7`). Le module `binome-agent2test` s'en sert pour reproduire un défaut confirmé : le test rouge part aussi de ce témoignage. Le journal de tests garde son format `agent2test.journal-de-tests/1`, augmenté du seul champ `scenarios[].etapes[].temoignage` ; `lire-acceptation.mjs` inchangé, ses sorties sur le journal d'exemple aussi. Aucune dimension ni aucun invariant modifié. Archive : `archives/SKILL-v1.3.2.md`.
+
+**1.3.4** (2026-11-07) : correctif. Référence à agent2test 1.3.1, dont seule la version recommandée de Node change : Node 26.13.0, version du poste de la mission, à la place de Node 24 ; le journal de tests et son format `agent2test.journal-de-tests/1` sont identiques. Le module `binome-agent2test` cite la 1.3.1. Aucune dimension ni aucun invariant modifié ; `lire-acceptation.mjs` inchangé. Archive : `archives/SKILL-v1.3.3.md`.

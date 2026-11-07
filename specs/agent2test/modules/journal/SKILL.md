@@ -15,7 +15,7 @@ status: active
 {
   "n": 1234,
   "horodatage": "2026-10-21T10:15:02.123Z",
-  "specVersion": "1.3.0",
+  "specVersion": "1.3.1",
   "campagne": "C-20261021-001",
   "correlation": "8f2c…",
   "parent": "77a1…",
@@ -69,7 +69,7 @@ Format JSON, `agent2test.journal-de-tests/1`, celui que lit agent-tdd-jira (`age
   "campagne": "C-20261021-001",
   "demande": { "cle": "ECR-77", "texte": "Export des retours d'expérience en CSV" },
   "versions": {
-    "specification": "1.3.0", "plan": "P-14", "referentiel": "R-9", "constitution": "<sha256>",
+    "specification": "1.3.1", "plan": "P-14", "referentiel": "R-9", "constitution": "<sha256>",
     "sources": [{ "chemin": "docs/demandes/ECR-77/us.md", "empreinte": "<sha256>" }, { "chemin": "docs/demandes/ECR-77/ECR-77.feature", "empreinte": "<sha256>" }],
     "application": { "commit": "<sha1 de HEAD>", "fichiersModifies": [] }
   },
@@ -111,7 +111,7 @@ Règles :
 - Tout contenu produit par le moteur (motif de sélection, parcours, réparation, leçon) est marqué « produit par <moteur>, fiche <fiche> » et figure dans `origineIA` (D10.INV-3).
 - `empreinteFin` est l'empreinte de la ligne `campagne.close` ; un journal de tests produit avant la clôture porte la mention « provisoire » et aucune empreinte de fin (D10.INV-4).
 - Les fichiers produits vont dans `rapports/<campagne>/journal-de-tests.{md,json,xml,html}`.
-- **Contrat de lecture** : agent-tdd-jira 1.3.3 lit ce JSON pour reporter un verdict par critère et corriger les défauts confirmés (`agent-tdd-jira:D7.INV-3`). Il s'appuie sur `format`, `campagne`, `demande.cle`, `versions.plan`, `versions.sources`, `versions.application`, `matrice` (critère, verdict de la liste fermée, motif, scénarios), `scenarios` (identifiant, cause, étapes), `decisions` et `desaccords` avec leur cible, et `empreinteFin`. Changer le sens ou la forme de l'un de ces champs change le format, donc son nom (`agent2test.journal-de-tests/2`).
+- **Contrat de lecture** : agent-tdd-jira 1.3.4 lit ce JSON pour reporter un verdict par critère et corriger les défauts confirmés (`agent-tdd-jira:D7.INV-3`). Il s'appuie sur `format`, `campagne`, `demande.cle`, `versions.plan`, `versions.sources`, `versions.application`, `matrice` (critère, verdict de la liste fermée, motif, scénarios), `scenarios` (identifiant, cause, étapes), `decisions` et `desaccords` avec leur cible, et `empreinteFin`. Changer le sens ou la forme de l'un de ces champs change le format, donc son nom (`agent2test.journal-de-tests/2`).
 
 ## 4. Pièges connus
 

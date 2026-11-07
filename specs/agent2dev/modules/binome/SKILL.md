@@ -7,7 +7,7 @@ status: active
 
 # Module `binome` (D10)
 
-Le `binome` applique le module `binome-agent2test` du skill. Agent2Test (spécification `agent2test` 1.3.0) est la tête de test ; Agent2Dev est la tête de développement ; le développeur fait le lien. Les deux têtes ne s'appellent jamais : elles échangent des fichiers, que le développeur porte, ou que l'échange par dossiers dépose et relève quand il est activé (module `echange`).
+Le `binome` applique le module `binome-agent2test` du skill. Agent2Test (spécification `agent2test` 1.3.1) est la tête de test ; Agent2Dev est la tête de développement ; le développeur fait le lien. Les deux têtes ne s'appellent jamais : elles échangent des fichiers, que le développeur porte, ou que l'échange par dossiers dépose et relève quand il est activé (module `echange`).
 
 ## 1. Remise (D10.INV-1)
 
