@@ -19,7 +19,7 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
   - repères : 29 constats tenus contre `@google/gemini-cli` 0.67.0, sous Node 26.13.0, dans un espace réseau isolé ; `strace` ne relève aucune connexion hors de la boucle locale ;
   - en-têtes YAML du skill, de ses modules et du sous-agent lus sans erreur par js-yaml, le lecteur de Gemini CLI ; contrat avec Gemini CLI sans erreur ;
   - vérificateur, glossaire, transmission et recette de l'installateur (17 tests) à jour.
-- Soumis à ratification :
+- Décisions ratifiées (pull request n° 44) :
   - le parcours découverte comme réponse par défaut de `/hote:explique` sans question ;
   - les étiquettes en clair pour qui découvre l'outil ;
   - les invariants D7.INV-4 et D7.INV-5 ;
@@ -518,7 +518,7 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
   - PowerPoint : dix-huit diapositives ; une section « Le changement de paradigme » réunit les deux nouvelles et « Ce qui change dans un ticket » ; le renvoi de l'annexe B vise désormais les diapositives 12 et 13.
   - Markdown : quinze sections ; la liste des questions passe de « Ce qui change dans un ticket » à la section 5.
 - Vérifications : PowerPoint validé, rendu et relu diapositive par diapositive ; schéma Mermaid rendu ; invariants cités en exemple confrontés au socle back-front et au modèle des invariants d'`orchestrateur-c7e` ; aucun nom de client ni de mission.
-- Soumis à ratification :
+- Décisions ratifiées (pull request n° 34) :
   - la section « Le changement de paradigme » du PowerPoint, qui reprend « Ce qui change dans un ticket » ;
   - les invariants cités en exemple : contrat d'API et format des erreurs, pagination, sécurité, accessibilité, migrations réversibles.
 
