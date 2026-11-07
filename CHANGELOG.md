@@ -19,7 +19,7 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
   - repères : 32 constats tenus contre `@google/gemini-cli` 0.67.0, sous Node 26.13.0, dans un espace réseau isolé, dont 5 pour la diffusion autonome ; `strace` ne relève aucune connexion hors de la boucle locale ;
   - les deux commandes qui font le fichier `.skill`, `python3 -m zipfile` et `tar --format zip`, donnent un fichier que Gemini CLI 0.67.0 installe ;
   - en-têtes YAML lus sans erreur par js-yaml ; contrat avec Gemini CLI tenu ; vérificateur, glossaire, transmission (aller-retour identique) et recette de l'installateur (17 tests) à jour.
-- Soumis à ratification :
+- Décisions ratifiées (pull request n° 47) :
   - D12 comme nouvelle dimension, d'où la version mineure 1.1.0 ;
   - la diffusion par le dossier ou par un fichier `.skill`, installé par `gemini skills install` ;
   - deux guides : le mode d'emploi joint au skill pour installer et utiliser, et `docs/` qui garde « Comprendre » ;
