@@ -54,7 +54,7 @@ La recette ne lance jamais Gemini CLI et n'a besoin d'aucun réseau. Lancée par
 | T27 | clés de chemin comme l'hôte, selon la plateforme ; lecture des en-têtes YAML | D3.INV-3, D4.INV-1 |
 | T28 | racine égale à l'accueil : la couche du workspace n'est pas comptée deux fois | D3.INV-1 |
 
-D6, D7 et D9 portent sur la conduite de l'agent : ils se vérifient par les scénarios A1 à A10 du module `agent` et, pour les repères, par la recette du § 4.
+D6, D7 et D9 portent sur la conduite de l'agent : ils se vérifient par les scénarios A1 à A12 du module `agent` et, pour les repères, par la recette du § 4.
 
 ## 3. Contre-épreuves
 
@@ -115,7 +115,7 @@ Le workflow `.github/workflows/recette-explication-hote-ia.yml` du dépôt Agent
 
 <!-- fichier : tests/instantane-hote.test.mjs -->
 ```js
-// Recette de explication-hote-ia 1.0.1 : node --test tests/instantane-hote.test.mjs
+// Recette de explication-hote-ia 1.0.2 : node --test tests/instantane-hote.test.mjs
 // Node 20 ou plus récent, modules natifs. Chaque test bâtit son propre monde dans un dossier temporaire :
 // un accueil, un dossier système, un faux paquet de Gemini CLI et un dépôt, puis interroge le script,
 // importé ou lancé comme le ferait l'agent. Le monde contient des secrets témoins qui ne doivent jamais

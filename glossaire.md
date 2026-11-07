@@ -27,7 +27,7 @@ La colonne « Repris dans » cite les modules de la spécification qui reprennen
 | [`analyse-projet`](#analyse-projet-102) | 1.0.2 | 5 | 1 | 16 |
 | [`angular`](#angular-101) | 1.0.1 | 8 | 2 | 30 |
 | [`capture-sprint-jira`](#capture-sprint-jira-122) | 1.2.2 | 9 | 2 | 39 |
-| [`explication-hote-ia`](#explication-hote-ia-101) | 1.0.1 | 9 | 2 | 32 |
+| [`explication-hote-ia`](#explication-hote-ia-102) | 1.0.2 | 9 | 2 | 32 |
 | [`java`](#java-111) | 1.1.1 | 7 | 1 | 29 |
 | [`orchestrateur-c7e`](#orchestrateur-c7e-353) | 3.5.3 | 10 | 1 | 33 |
 | [`skill4appli`](#skill4appli-111) | 1.1.1 | 9 | 3 | 34 |
@@ -886,7 +886,7 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 | **D12.INV-3** | la capture d'un ticket seul remplace son fichier, retire sa copie d'un autre dossier de catégorie, et remplace ou ajoute son entrée dans `rapport.json`, avec le choix noté et les décomptes recalculés, ou crée ce rapport ; en cas d'erreur, rien n'est écrit. | `ticket`, `recette` |
 | **D12.INV-4** | après la capture d'un ticket seul, réussie ou non, le navigateur revient à la page où il était. | `ticket`, `recette` |
 
-## explication-hote-ia 1.0.1
+## explication-hote-ia 1.0.2
 
 Agent qui explique le fonctionnement de l'outil d'IA qui l'exécute, Gemini CLI ou un hôte non reconnu décrit sans être nommé, d'abord pour les développeurs qui hésitent à s'en servir faute d'en voir le fonctionnement : parcours découverte qui ouvre la boîte noire, en langage simple ; boucle d'un tour, assemblage du contexte, outils et politique, confiance, composants, mémoire, modèle, ce qui sort du poste, angles morts ; carte de l'installation et diagnostic ; chaque affirmation étiquetée par sa provenance ; script Node en lecture seule qui ne rend aucun secret. Point d'entrée : [`specs/explication-hote-ia/SKILL.md`](specs/explication-hote-ia/SKILL.md).
 

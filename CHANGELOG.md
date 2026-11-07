@@ -4,6 +4,18 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-11-07 : explication-hote-ia 1.0.2
+
+- **explication-hote-ia 1.0.2** : correctif. L'en-tête de transmission et le module `recette` citaient encore les scénarios A1 à A10 : à l'installation, l'IA rejouait les scénarios sans A11 (« c'est une boîte noire ») ni A12 (« est-ce que tu envoies tout mon code chez Google ? »), ceux du parcours découverte. Ils citent A1 à A12, comme le point d'entrée et le module `agent`. Le tableau des dimensions porte la version courante ; la version annoncée par le script, le sous-agent et les commandes passe à 1.0.2. Aucun comportement ni aucun invariant modifié. Archive 1.0.1 ; la transmission 1.0.1 reste telle qu'elle a été publiée.
+- `docs/explication-hote-ia/mode-emploi.md` : renvois à la version 1.0.2 et à sa transmission.
+- Vérifications :
+  - recette de 28 tests réussie sous Node 20, 24 et 26.13.0, sous Linux, après matérialisation de la transmission et extraction des six fichiers par la commande du module `execution`, § 8 ; 23 défauts réintroduits un à un, tous attrapés sous Node 26.13.0 ;
+  - repères : 29 constats tenus contre `@google/gemini-cli` 0.67.0, sous Node 26.13.0, dans un espace réseau isolé ; `strace` ne relève aucune connexion hors de la boucle locale ;
+  - en-têtes YAML lus sans erreur par js-yaml ; contrat avec Gemini CLI tenu ; vérificateur, glossaire, transmission (aller-retour identique) et recette de l'installateur (17 tests) à jour.
+- Soumis à ratification :
+  - la correction publiée en version 1.0.2, sans attendre une prochaine évolution ;
+  - la version annoncée par le script, le sous-agent et les commandes portée à 1.0.2, bien que leur comportement ne change pas.
+
 ### 2026-11-07 : explication-hote-ia 1.0.1
 
 - **explication-hote-ia 1.0.1** : correctif. Le développeur a précisé la destination du skill : l'équipe, qui le diffuse aux développeurs hésitant à se servir de l'IA sans en connaître le fonctionnement. L'hésitation qui revient le plus est le sentiment d'une boîte noire.

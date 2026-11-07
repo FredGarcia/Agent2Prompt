@@ -37,7 +37,7 @@ Propose au développeur d'installer le sous-agent `agent/explicateur-hote.md` et
 ## Étape 4 : premier instantané
 
 1. Lance `hote`, puis `tout --format texte`, depuis la racine du projet, et présente au développeur la carte de l'installation, chaque point avec son étiquette de provenance (module `provenance`). Relaie tout avertissement.
-2. Rejoue avec lui les scénarios A1 à A10 du module `agent`.
+2. Rejoue avec lui les scénarios A1 à A12 du module `agent`.
 
 ## Règles qui ne se négocient pas
 

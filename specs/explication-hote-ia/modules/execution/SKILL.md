@@ -82,17 +82,17 @@ Six fichiers sont tirés des blocs annotés `<!-- fichier : chemin -->` des modu
 
 | Fichier | Module, section | Empreinte sha256 |
 |---|---|---|
-| `scripts/instantane-hote.mjs` | `execution`, § 11 | `7dfbfd601864d9a08c89188b785bef495dfd785ab57e0308b4acc101da8cf7f0` |
-| `tests/instantane-hote.test.mjs` | `recette`, § 6 | `976360684e78479008aa9a4b36f1212bbb20266c0267de351bd05ab5ada61563` |
-| `agent/explicateur-hote.md` | `agent`, § 8 | `eacffb49dc139726221323b531fc25a22dae6ec969ee6f79d963ab63fc9e65f2` |
-| `commandes/hote/explique.toml` | `agent`, § 9 | `9acced154b0f7d38317095ee755786bcd96f6dad142b6a904934fa8098c8be76` |
-| `commandes/hote/carte.toml` | `agent`, § 9 | `14ebc6680f566a53dd84ed2df93d44cd90e8e82e9b1479e9efe9eb1969c2aa75` |
-| `commandes/hote/pourquoi.toml` | `agent`, § 9 | `434f503fcd2d740f684c72ff8344c5ebf6a6fae04e0b0a8bb157bce8e15eac87` |
+| `scripts/instantane-hote.mjs` | `execution`, § 11 | `867c5c1ad2aee35701f7146c31411fd3d685a6762f36c129075d3ed482398331` |
+| `tests/instantane-hote.test.mjs` | `recette`, § 6 | `c624743119a2192a2c072c1798756ec57af9df3cd5bcabdd51461ad3f4c5fe77` |
+| `agent/explicateur-hote.md` | `agent`, § 8 | `fde9150327be90c3928d26904724c4049b9c06d17603de262b91f2cfdaaec93e` |
+| `commandes/hote/explique.toml` | `agent`, § 9 | `2533fd7615fe9532781f19f6a79e55952c0e9e5c91fa7b71afc9d2d6c8f6074d` |
+| `commandes/hote/carte.toml` | `agent`, § 9 | `26176bb67038b6972251b1c5bfa1bca678267c72614b14156bb9f8a3e8bb653f` |
+| `commandes/hote/pourquoi.toml` | `agent`, § 9 | `11f7a411986900ce2fb15f8766693117c240b3cf19643a5fc0ec605246833b56` |
 
 Depuis le dossier du skill, cette commande d'une ligne écrit les six fichiers, compare leurs empreintes à celles du tableau et sort avec le code 1 au moindre écart. Elle ne contient ni `$`, ni accent grave, ni `!`, ni `%`, ni guillemet intérieur : elle se colle telle quelle dans bash, zsh, CMD ou PowerShell, et dans un fichier `.cmd`. Elle lit aussi des modules aux fins de ligne CRLF.
 
 ```text
-node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'scripts/instantane-hote.mjs': '7dfbfd601864d9a08c89188b785bef495dfd785ab57e0308b4acc101da8cf7f0', 'tests/instantane-hote.test.mjs': '976360684e78479008aa9a4b36f1212bbb20266c0267de351bd05ab5ada61563', 'agent/explicateur-hote.md': 'eacffb49dc139726221323b531fc25a22dae6ec969ee6f79d963ab63fc9e65f2', 'commandes/hote/explique.toml': '9acced154b0f7d38317095ee755786bcd96f6dad142b6a904934fa8098c8be76', 'commandes/hote/carte.toml': '14ebc6680f566a53dd84ed2df93d44cd90e8e82e9b1479e9efe9eb1969c2aa75', 'commandes/hote/pourquoi.toml': '434f503fcd2d740f684c72ff8344c5ebf6a6fae04e0b0a8bb157bce8e15eac87' }; const vus = new Set(); let ecarts = 0; for (const module of ['modules/execution/SKILL.md', 'modules/recette/SKILL.md', 'modules/agent/SKILL.md']) { const texte = fs.readFileSync(module, 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); vus.add(m[1]); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (conforme === false) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } } for (const f of Object.keys(attendu)) if (vus.has(f) === false) { ecarts++; console.log('ABSENT    ' + f); } if (ecarts > 0) process.exitCode = 1;"
+node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'scripts/instantane-hote.mjs': '867c5c1ad2aee35701f7146c31411fd3d685a6762f36c129075d3ed482398331', 'tests/instantane-hote.test.mjs': 'c624743119a2192a2c072c1798756ec57af9df3cd5bcabdd51461ad3f4c5fe77', 'agent/explicateur-hote.md': 'fde9150327be90c3928d26904724c4049b9c06d17603de262b91f2cfdaaec93e', 'commandes/hote/explique.toml': '2533fd7615fe9532781f19f6a79e55952c0e9e5c91fa7b71afc9d2d6c8f6074d', 'commandes/hote/carte.toml': '26176bb67038b6972251b1c5bfa1bca678267c72614b14156bb9f8a3e8bb653f', 'commandes/hote/pourquoi.toml': '11f7a411986900ce2fb15f8766693117c240b3cf19643a5fc0ec605246833b56' }; const vus = new Set(); let ecarts = 0; for (const module of ['modules/execution/SKILL.md', 'modules/recette/SKILL.md', 'modules/agent/SKILL.md']) { const texte = fs.readFileSync(module, 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); vus.add(m[1]); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (conforme === false) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } } for (const f of Object.keys(attendu)) if (vus.has(f) === false) { ecarts++; console.log('ABSENT    ' + f); } if (ecarts > 0) process.exitCode = 1;"
 ```
 
 Puis la recette, depuis le même dossier :
@@ -122,7 +122,7 @@ node --test tests/instantane-hote.test.mjs
 <!-- fichier : scripts/instantane-hote.mjs -->
 ```js
 #!/usr/bin/env node
-// explication-hote-ia 1.0.1 : instantané en lecture seule de l'outil d'IA qui exécute l'agent
+// explication-hote-ia 1.0.2 : instantané en lecture seule de l'outil d'IA qui exécute l'agent
 // (Gemini CLI, ou un hôte non reconnu décrit de façon générique), pour l'agent qui l'explique.
 // Usage : node scripts/instantane-hote.mjs <commande> [options]   (aide : --help)
 // Commandes : hote, config, contexte, composants, doc [chemin], tout.
@@ -137,7 +137,7 @@ import { basename, dirname, isAbsolute, join, relative, resolve, sep } from 'nod
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 
-export const VERSION = '1.0.1';
+export const VERSION = '1.0.2';
 export const SCHEMA = 1;
 export const CODES = { OK: 0, USAGE: 1, INTROUVABLE: 2, REFUS: 3, INTERNE: 4 };
 export const COMMANDES = ['hote', 'config', 'contexte', 'composants', 'doc', 'tout'];
