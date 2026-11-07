@@ -2,15 +2,17 @@
 // Lancé par .github/workflows/recette-explication-hote-ia.yml, sous Linux, à côté du paquet
 // @google/gemini-cli à la version épinglée : node reperes-hote.mjs <racine du dépôt> <dossier du paquet>.
 //
-// Gemini CLI tourne dans un accueil isolé (GEMINI_CLI_HOME), avec une clé factice, contre une fausse API
-// locale (127.0.0.1, port libre) qui enregistre chaque requête et répond « clé invalide ». On observe ainsi
+// Gemini CLI tourne dans un accueil isolé (GEMINI_CLI_HOME), où le skill est installé comme le dit son mode
+// d'emploi, par gemini skills install et les commandes de MODE-EMPLOI.md, puis retiré de même (D12). Il a une
+// clé factice et parle à une fausse API locale (127.0.0.1, port libre), qui enregistre chaque requête et
+// répond « clé invalide ». On observe ainsi
 // exactement ce que l'hôte envoie au modèle, son prompt système exporté et sa transcription, puis on
 // vérifie les repères du module modele-hote et le script du skill sur ces mêmes traces (D9.INV-1).
 // Toute autre sortie de l'hôte passe par un proxy témoin local, qui note l'hôte visé et refuse la
 // connexion : rien ne quitte le poste, et ce que l'hôte cherche à joindre devient un constat (H1).
 import { execFileSync, spawn } from 'node:child_process';
 import { createServer } from 'node:http';
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -58,8 +60,9 @@ await new Promise((r) => temoin.listen(0, '127.0.0.1', r));
 const proxy = `http://127.0.0.1:${temoin.address().port}`;
 const vers = (liste, hote) => liste.some((s) => s === `${hote}:443` || s.startsWith(`https://${hote}`) || s.startsWith(`http://${hote}`));
 
-// Accueil isolé : authentification par clé, mémoire globale témoin, sous-agent et commandes du skill.
-// Les réglages de retrait coupent les statistiques d'usage et la recherche de mise à jour.
+// Accueil isolé : authentification par clé, mémoire globale témoin ; le skill, son sous-agent et ses commandes y
+// sont installés comme le dit son mode d'emploi. Les réglages de retrait coupent les statistiques d'usage et la
+// recherche de mise à jour.
 const reglages = (retrait) => JSON.stringify({
   security: { auth: { selectedType: 'gemini-api-key' } },
   ...(retrait ? { privacy: { usageStatisticsEnabled: false }, general: { enableAutoUpdate: false, enableAutoUpdateNotification: false } } : {}),
@@ -71,17 +74,6 @@ mkdirSync(projet, { recursive: true });
 writeFileSync(join(projet, 'GEMINI.md'), 'Repère : consigne du projet témoin.\n');
 const envGit = { ...process.env, GIT_CONFIG_GLOBAL: join(base, 'gitconfig'), GIT_CONFIG_NOSYSTEM: '1' };
 execFileSync('git', ['init', '-q'], { cwd: projet, env: envGit });
-execFileSync(process.execPath, [join(depot, 'tools', 'installer.mjs'), 'explication-hote-ia', '--visible'], { cwd: projet, env: { ...envGit, GEMINI_CLI_HOME: accueil }, stdio: 'ignore' });
-const skill = join(projet, '.gemini', 'skills', 'explication-hote-ia');
-constat(existsSync(join(skill, 'SKILL.md')), 'skill installé par tools/installer.mjs dans .gemini/skills/');
-// Extraction des fichiers exécutables, comme à l'étape 2 de la consigne.
-const execution = readFileSync(join(skill, 'modules', 'execution', 'SKILL.md'), 'utf8');
-const extraction = /\x60{3}text\n(node -e .+)\n\x60{3}/.exec(execution.split('## 8. Matérialiser les fichiers exécutables')[1] ?? '')?.[1];
-execFileSync('bash', ['-c', extraction], { cwd: skill, stdio: 'ignore' });
-constat(existsSync(join(skill, 'scripts', 'instantane-hote.mjs')), 'six fichiers extraits par la commande du module execution, § 8');
-mkdirSync(join(accueil, '.gemini', 'agents'), { recursive: true });
-writeFileSync(join(accueil, '.gemini', 'agents', 'explicateur-hote.md'), readFileSync(join(skill, 'agent', 'explicateur-hote.md'), 'utf8').replaceAll('<DOSSIER_DU_SKILL>', skill));
-cpSync(join(skill, 'commandes', 'hote'), join(accueil, '.gemini', 'commands', 'hote'), { recursive: true });
 
 // L'hôte se met en mode non interactif quand CI ou GITHUB_ACTIONS vaut true (H17) : ces variables, que
 // l'intégration continue pose, sont retirées de son environnement, pour observer le poste d'un développeur.
@@ -104,6 +96,41 @@ const env = {
   NODE_USE_ENV_PROXY: '1',
 };
 const avecExport = (exportation) => (exportation ? { GEMINI_WRITE_SYSTEM_MD: exportation } : {});
+
+// Installation comme le dit le mode d'emploi joint au skill (D12) : la commande de Gemini CLI, depuis le dossier
+// du skill, au niveau utilisateur, puis les commandes du mode d'emploi, prises telles qu'il les donne. Aucune
+// étape ne passe par un outil du dépôt.
+const source = join(depot, 'specs', 'explication-hote-ia');
+const guide = readFileSync(join(source, 'MODE-EMPLOI.md'), 'utf8');
+const duGuide = (repere) => new RegExp(`^<!-- commande : ${repere} -->\\n\\x60{3}text\\n(node -e .+)\\n\\x60{3}$`, 'm').exec(guide)?.[1];
+const hoteCli = (...args) => execFileSync(process.execPath, [gemini, ...args], { cwd: projet, env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+const shell = (commande, cwd) => (commande ? execFileSync('bash', ['-c', commande], { cwd, env, encoding: 'utf8' }) : '');
+const nomsDeSkills = (liste) => [...liste.matchAll(/^(\S+) \[(?:Enabled|Disabled)\]$/gm)].map((m) => m[1]);
+hoteCli('skills', 'install', source, '--consent');
+const skill = join(accueil, '.gemini', 'skills', 'explication-hote-ia');
+const decouverts = nomsDeSkills(hoteCli('skills', 'list'));
+constat(existsSync(join(skill, 'SKILL.md')) && existsSync(join(skill, 'MODE-EMPLOI.md')) && readdirSync(join(accueil, '.gemini', 'skills')).join(',') === 'explication-hote-ia' && decouverts.join(',') === 'explication-hote-ia', `D12 : gemini skills install installe le skill depuis son dossier, au niveau utilisateur, mode d'emploi compris ; un seul skill découvert, les modules ne sont pas pris pour des skills (${decouverts.join(', ') || 'aucun'})`);
+const execution = readFileSync(join(skill, 'modules', 'execution', 'SKILL.md'), 'utf8');
+const diffusion = readFileSync(join(skill, 'modules', 'diffusion', 'SKILL.md'), 'utf8');
+const extraction = duGuide('extraction');
+const extraits = (shell(extraction, skill).match(/^conforme {2}/gm) ?? []).length;
+constat(extraction !== undefined && extraction === /\x60{3}text\n(node -e .+)\n\x60{3}/.exec(execution.split('## 8. Matérialiser les fichiers exécutables')[1] ?? '')?.[1] && extraits === 6 && existsSync(join(skill, 'scripts', 'instantane-hote.mjs')), `D12 : la commande d'extraction du mode d'emploi est celle du module execution, § 8 ; lancée dans le dossier installé, elle écrit les six fichiers (${extraits} conformes)`);
+const sousAgent = duGuide('sous-agent-et-commandes');
+shell(sousAgent, skill);
+const copieAgent = join(accueil, '.gemini', 'agents', 'explicateur-hote.md');
+const copies = [copieAgent, ...['explique.toml', 'carte.toml', 'pourquoi.toml'].map((f) => join(accueil, '.gemini', 'commands', 'hote', f))];
+const agentInstalle = existsSync(copieAgent) ? readFileSync(copieAgent, 'utf8') : '';
+constat(sousAgent !== undefined && diffusion.includes(sousAgent) && copies.every(existsSync) && agentInstalle.includes(`node "${skill}/scripts/instantane-hote.mjs"`) && !agentInstalle.includes('<DOSSIER_DU_SKILL>'), 'D12 : la commande du mode d\'emploi, celle du module diffusion, § 4, copie le sous-agent, chemin du dossier installé substitué, et les trois commandes dans l\'accueil de l\'hôte');
+// Un fichier .skill, fait par la commande du mode d'emploi depuis une copie du dossier, au niveau du projet.
+const zone = join(base, 'diffusion');
+cpSync(source, join(zone, 'explication-hote-ia'), { recursive: true });
+const commandeSkill = /^\| Linux \| \x60(python3 -m zipfile [^\x60]+)\x60 \|$/m.exec(guide)?.[1];
+shell(commandeSkill, zone);
+hoteCli('skills', 'install', join(zone, 'explication-hote-ia.skill'), '--consent', '--scope', 'workspace');
+const auProjet = join(projet, '.gemini', 'skills', 'explication-hote-ia');
+const installeAuProjet = existsSync(join(auProjet, 'SKILL.md')) && existsSync(join(auProjet, 'MODE-EMPLOI.md'));
+hoteCli('skills', 'uninstall', 'explication-hote-ia', '--scope', 'workspace');
+constat(commandeSkill !== undefined && installeAuProjet && !existsSync(auProjet) && existsSync(join(skill, 'SKILL.md')), 'D12 : un fichier .skill, fait par la commande du mode d\'emploi, s\'installe au niveau du projet ; gemini skills uninstall --scope workspace le retire, sans toucher au niveau utilisateur');
 
 /** Session non interactive : attend la fin du processus (la fausse API refuse la clé). */
 async function nonInteractive(prompt, exportation) {
@@ -231,6 +258,13 @@ const absents = cites.filter((x) => !doc.includes(x));
 constat(absents.length === 0, `script : les documents cités par les modules sont dans la documentation embarquée${absents.length ? ` (absents : ${absents.join(', ')})` : ''}`);
 const comp = lancer('composants', '--paquet', paquet).composants;
 constat(comp.commandes.some((x) => x.commande === '/hote:carte') && comp.sous_agents.some((x) => x.nom === 'explicateur-hote' && x.ecarts.length === 0), 'script : commandes /hote:* et sous-agent explicateur-hote vus, sans écart d\'en-tête');
+
+// Retrait comme le dit le mode d'emploi : sa commande, lancée hors du dossier du skill, puis gemini skills uninstall.
+const retrait = duGuide('retrait');
+shell(retrait, base);
+hoteCli('skills', 'uninstall', 'explication-hote-ia');
+const restes = [...copies, join(accueil, '.gemini', 'commands', 'hote'), skill].filter((f) => existsSync(f));
+constat(retrait !== undefined && diffusion.includes(retrait) && restes.length === 0, `D12 : la commande de retrait du mode d'emploi, celle du module diffusion, § 5, supprime le sous-agent et les commandes, et gemini skills uninstall le skill : rien ne reste${restes.length ? ` (restent : ${restes.join(', ')})` : ''}`);
 
 const hotesVises = [...new Set(sorties.map((s) => s.replace(/^https?:\/\//, '').split(/[/:]/)[0]))].sort();
 console.log(`\nDemandes de sortie notées par le proxy témoin, toutes refusées : ${sorties.length} (${hotesVises.join(', ') || 'aucune'}).`);

@@ -3,10 +3,12 @@ name: Recette de explication-hote-ia
 # La spécification explication-hote-ia contient son script, sa recette, son sous-agent et ses commandes.
 # Le travail « recette » suit le chemin de l'IA du développeur, sous Linux et sous Windows : matérialiser
 # la transmission courante, extraire les six fichiers par la commande du module execution, § 8, puis
-# lancer la recette. Le travail « repères » confronte les repères du module modele-hote au Gemini CLI
-# réel, à une version épinglée et sous Node 26.13.0, celui du poste de la mission, contre une fausse API
-# locale et un proxy témoin qui refuse toute autre sortie ; strace relève chaque connexion, et le travail
-# échoue si l'une quitte la boucle locale.
+# lancer la recette ; enfin, lancer les commandes du mode d'emploi qui installent puis retirent le
+# sous-agent et les commandes, dans un accueil temporaire. Le travail « repères » installe le skill comme
+# le dit son mode d'emploi et confronte les repères du module modele-hote au Gemini CLI réel, à une
+# version épinglée et sous Node 26.13.0, celui du poste de la mission, contre une fausse API locale et un
+# proxy témoin qui refuse toute autre sortie ; strace relève chaque connexion, et le travail échoue si
+# l'une quitte la boucle locale.
 
 on:
   pull_request:
@@ -76,6 +78,22 @@ jobs:
           }
           writeFileSync(join(cible, 'extraire.sh'), `${commande}\n`);
           writeFileSync(join(cible, 'extraire.cmd'), `@echo off\r\n${commande}\r\nif errorlevel 1 exit /b 1\r\n`);
+          // Le mode d'emploi joint au skill porte la même commande d'extraction, et celles du sous-agent et du retrait.
+          const guide = readFileSync(join(cible, 'MODE-EMPLOI.md'), 'utf8');
+          const duGuide = (repere) => new RegExp(`^<!-- commande : ${repere} -->\\n\\x60{3}text\\n(node -e .+)\\n\\x60{3}$`, 'm').exec(guide)?.[1];
+          if (duGuide('extraction') !== commande) {
+            console.log("::error title=Mode d'emploi::sa commande d'extraction n'est pas celle du module execution, § 8");
+            process.exit(1);
+          }
+          for (const [repere, nom] of [['sous-agent-et-commandes', 'sous-agent'], ['retrait', 'retrait']]) {
+            const c = duGuide(repere);
+            if (!c) {
+              console.log(`::error title=Mode d'emploi::commande ${repere} introuvable`);
+              process.exit(1);
+            }
+            writeFileSync(join(cible, `${nom}.sh`), `${c}\n`);
+            writeFileSync(join(cible, `${nom}.cmd`), `@echo off\r\n${c}\r\nif errorlevel 1 exit /b 1\r\n`);
+          }
           console.log(`explication-hote-ia ${version} : ${fichiers.length} fichiers matérialisés dans ${cible}`);
           if (ecarts.length > 0) process.exit(1);
           FIN
@@ -98,6 +116,27 @@ jobs:
           });
           const compte = (cle) => Number(new RegExp(`^# ${cle} (\\d+)$`, 'm').exec(texte)?.[1] ?? 0);
           console.log(`::notice title=${propriete(`Recette ${libelle}`)}::${compte('tests')} tests, ${compte('pass')} réussis, ${compte('skipped')} sautés, ${compte('fail')} échecs`);
+          FIN
+          cat > "$RUNNER_TEMP/installation.mjs" <<'FIN'
+          import { existsSync, readFileSync } from 'node:fs';
+          import { join } from 'node:path';
+          // Effet des commandes du mode d'emploi dans l'accueil temporaire : « installe » ou « retire ».
+          const attendu = process.argv[2];
+          const gemini = join(process.env.GEMINI_CLI_HOME, '.gemini');
+          const agent = join(gemini, 'agents', 'explicateur-hote.md');
+          const commandes = ['explique.toml', 'carte.toml', 'pourquoi.toml'].map((f) => join(gemini, 'commands', 'hote', f));
+          const fautes = [];
+          if (attendu === 'installe') {
+            const texte = existsSync(agent) ? readFileSync(agent, 'utf8') : '';
+            if (!texte.includes(`node "${process.cwd()}/scripts/instantane-hote.mjs"`)) fautes.push('sous-agent absent, ou sans le chemin du dossier du skill');
+            if (texte.includes('<DOSSIER_DU_SKILL>')) fautes.push('sous-agent : <DOSSIER_DU_SKILL> non remplacé');
+            for (const f of commandes) if (!existsSync(f)) fautes.push(`commande absente : ${f}`);
+          } else {
+            for (const f of [agent, ...commandes, join(gemini, 'commands', 'hote')]) if (existsSync(f)) fautes.push(`reste : ${f}`);
+          }
+          for (const f of fautes) console.log(`::error title=Mode d'emploi, sous-agent et commandes (${attendu})::${f}`);
+          console.log(`${attendu} : ${fautes.length === 0 ? 'conforme' : `${fautes.length} écart(s)`}`);
+          process.exitCode = fautes.length === 0 ? 0 : 1;
           FIN
           node "$RUNNER_TEMP/materialiser.mjs"
 
@@ -136,6 +175,30 @@ jobs:
           set statut=%errorlevel%
           node "%RUNNER_TEMP%\annoter.mjs" recette.tap "${{ runner.os }}, Node ${{ matrix.node }}"
           exit /b %statut%
+
+      - name: Sous-agent et commandes, puis retrait, par les commandes du mode d'emploi, sous bash
+        if: runner.os != 'Windows'
+        shell: bash
+        working-directory: ${{ runner.temp }}/explication-hote-ia
+        env:
+          GEMINI_CLI_HOME: ${{ runner.temp }}/accueil
+        run: |
+          bash sous-agent.sh
+          node "$RUNNER_TEMP/installation.mjs" installe
+          bash retrait.sh
+          node "$RUNNER_TEMP/installation.mjs" retire
+
+      - name: Sous-agent et commandes, puis retrait, par les commandes du mode d'emploi, sous CMD
+        if: runner.os == 'Windows'
+        shell: cmd
+        working-directory: ${{ runner.temp }}\explication-hote-ia
+        env:
+          GEMINI_CLI_HOME: ${{ runner.temp }}\accueil
+        run: |
+          call sous-agent.cmd || exit /b 1
+          node "%RUNNER_TEMP%\installation.mjs" installe || exit /b 1
+          call retrait.cmd || exit /b 1
+          node "%RUNNER_TEMP%\installation.mjs" retire
 
   reperes:
     name: repères contre Gemini CLI (@google/gemini-cli 0.67.0, Node 26.13.0)
