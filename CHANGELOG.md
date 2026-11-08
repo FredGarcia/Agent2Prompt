@@ -4,6 +4,17 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Prototypes
 
+### 2026-11-08 : skill de ticket C7E, lot 2
+
+- **Lot 2, fabrique et Monteur** : un skill de ticket par nœud de l'arbre, avec sa transmission tirée par `tools/bundle.mjs`.
+  - `outils/fabrique.mjs` : fabrique abstraite `FabriqueSkillTicket` et fabrique concrète `FabriqueJavaAngularPostgreSQL` (référentiels, agents et commandes de la pile) ; consigne en patron de méthode, même squelette pour tous les nœuds ; blocs du référentiel copiés puis paramétrés, preuves des options retenues ou sans objet selon les valeurs choisies ;
+  - `outils/monteur.mjs` : Monteur nœud par nœud, écriture des skills, transmission, aller-retour, et contrôle de l'héritage H1 à H6 (provenance complète, invariants et sections de la méthode de l'orchestrateur mot pour mot, copies identiques à leur source à la version épinglée, invariants cités définis, ticket du manifeste) ; rien n'est écrit au moindre écart ;
+  - `outils/sources.mjs` : sources de l'héritage à leur version épinglée, archives comprises, fins de ligne normalisées ; `outils/generer.mjs` : commandes `generer` et `verifier` ;
+  - `outils/arbre.mjs` : ordre de résolution d'un sous-arbre, avec ses préalables extérieurs ;
+  - transmissions attendues des cinq skills de l'arbre d'essai, `exemples/ABCDE-3620-skills/transmissions/`.
+- Choix à valider avec le lot : la fiche se répartit entre le skill ratifié, l'analyse (`analyse.md`, copie de travail de `ticket.toml`) et `remise.md` ; un dossier par sous-ticket sous celui de la clé Jira ; une branche et une clé pour tout l'arbre, le sous-ticket cité dans le corps des commits ; agents au format des sous-agents de Gemini CLI 0.67.0, installés au lot 3.
+- Vérifications : recette de 124 tests, dont 34 du lot 2 (transmissions identiques aux attendues, aller-retour, reproductibilité, tickets en CRLF, héritage complet, préalables d'un sous-arbre, quatorze altérations rejetées dont l'invariant omis du critère P1, ligne de commande, installation par `tools/installer.mjs`) ; mêmes résultats et mêmes transmissions, octet pour octet, sur une copie du dépôt toute en CRLF ; 49 en-têtes YAML lus par js-yaml ; workflow étendu à la génération et à la vérification des transmissions, et aux sources dont héritent les skills de ticket.
+
 ### 2026-11-08 : skill de ticket C7E, lot 1
 
 - **Prototype** `prototypes/skill-ticket/`, hors de `specs/` : chaque ticket résolu par un skill de ticket et ses agents, assemblés depuis le référentiel des méso-contrats sur le modèle fractal et récursif C7E. Décisions ratifiées : assemblage depuis le référentiel, skill de ticket à la place de la fiche de transformation, sous-tickets sur n niveaux avec un plafond réglable (3), un seul parent, exécution par l'installateur dans Gemini CLI, retours humains comme référence de l'observation, fabrique abstraite de skill-ticket par pile technique, ratification de l'arbre puis de chaque feuille.
