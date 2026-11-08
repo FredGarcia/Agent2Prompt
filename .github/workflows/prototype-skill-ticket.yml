@@ -2,20 +2,31 @@ name: Prototype skill de ticket
 
 # Prototype de l'orchestrateur C7E : un ticket résolu par des skills de ticket, assemblés depuis le
 # référentiel des méso-contrats. Ce workflow joue la recette du prototype sous Linux et sous Windows,
-# puis le plan de l'arbre d'essai ABCDE-3620. Il suit aussi le module referentiel de l'orchestrateur,
-# dont le prototype lit le modèle.
+# le plan de l'arbre d'essai ABCDE-3620, la génération de ses skills de ticket et la vérification de
+# leurs transmissions attendues. Il suit aussi les sources dont héritent les skills de ticket :
+# l'orchestrateur, le socle, les référentiels Java et Angular, et les outils de transmission.
 
 on:
   pull_request:
     paths:
       - 'prototypes/skill-ticket/**'
-      - 'specs/orchestrateur-c7e/modules/referentiel/**'
+      - 'specs/orchestrateur-c7e/**'
+      - 'specs/socle-back-front/**'
+      - 'specs/java/**'
+      - 'specs/angular/**'
+      - 'tools/bundle.mjs'
+      - 'tools/installer.mjs'
       - '.github/workflows/prototype-skill-ticket.yml'
   push:
     branches: [main]
     paths:
       - 'prototypes/skill-ticket/**'
-      - 'specs/orchestrateur-c7e/modules/referentiel/**'
+      - 'specs/orchestrateur-c7e/**'
+      - 'specs/socle-back-front/**'
+      - 'specs/java/**'
+      - 'specs/angular/**'
+      - 'tools/bundle.mjs'
+      - 'tools/installer.mjs'
       - '.github/workflows/prototype-skill-ticket.yml'
 
 permissions:
@@ -41,3 +52,9 @@ jobs:
 
       - name: Plan de l'arbre d'essai
         run: node prototypes/skill-ticket/outils/arbre.mjs plan prototypes/skill-ticket/exemples/ABCDE-3620
+
+      - name: Génération des skills de ticket de l'arbre d'essai
+        run: node prototypes/skill-ticket/outils/generer.mjs generer prototypes/skill-ticket/exemples/ABCDE-3620 --sortie "${{ runner.temp }}/skills-de-ticket"
+
+      - name: Vérification des transmissions attendues
+        run: node prototypes/skill-ticket/outils/generer.mjs verifier prototypes/skill-ticket/exemples/ABCDE-3620-skills/transmissions

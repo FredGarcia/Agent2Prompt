@@ -24,9 +24,10 @@ const comparerReferences = (a, b) => a.localeCompare(b, 'fr', { numeric: true })
 
 /** Nœud du Composite : un ticket, ou un sous-ticket à n'importe quelle profondeur. */
 export class NoeudTicket {
-  constructor(donnees, fichier) {
+  constructor(donnees, fichier, texte) {
     this.donnees = donnees;
     this.fichier = fichier;
+    this.texte = texte; // texte source du nœud, fins de ligne normalisées
     this.ticket = donnees?.ticket ?? {};
     this.reference = this.ticket.reference;
     this.parent = null;
@@ -88,7 +89,8 @@ export function chargerArbre(dossier) {
   const fichiers = readdirSync(dossier).filter((f) => f.toLowerCase().endsWith('.toml')).sort(comparerReferences);
   for (const fichier of fichiers) {
     try {
-      entrees.push({ donnees: lireToml(lireTexte(join(dossier, fichier)), fichier), fichier });
+      const texte = lireTexte(join(dossier, fichier));
+      entrees.push({ donnees: lireToml(texte, fichier), fichier, texte });
     } catch (e) {
       if (!(e instanceof ErreurToml)) throw e;
       erreurs.push(e.message);
@@ -105,8 +107,8 @@ export function construireArbre(entrees) {
   const erreurs = [];
   const noeuds = [];
   const parReference = new Map();
-  for (const { donnees, fichier } of entrees) {
-    const n = new NoeudTicket(donnees, fichier);
+  for (const { donnees, fichier, texte } of entrees) {
+    const n = new NoeudTicket(donnees, fichier, texte);
     if (!donnees?.ticket || typeof n.reference !== 'string' || n.reference === '') {
       erreurs.push(`${fichier} : table [ticket] ou référence absente`);
       continue;
@@ -185,15 +187,18 @@ function cycleDeDependances(noeuds, parReference) {
 /**
  * Ordre de résolution : une feuille se résout après ses dépendances, un nœud composé se clôt après
  * ses sous-tickets et ses dépendances. À égalité, l'ordre de l'arbre (préfixe). Les nœuds pris dans
- * un cycle restent dans `reste`.
+ * un cycle restent dans `reste`. Pour un sous-arbre (`racine` donnée), les dépendances vers un
+ * ticket extérieur sont des préalables, rendus dans `externes`.
  */
-export function ordreDeResolution(arbre) {
-  const { racine, parReference } = arbre;
-  if (!racine) return { ordre: [], reste: [] };
+export function ordreDeResolution(arbre, racine = arbre.racine) {
+  const { parReference } = arbre;
+  if (!racine) return { ordre: [], reste: [], externes: [] };
   const prefixe = [];
   racine.accepter({ visiter: (n) => prefixe.push(n) });
+  const dedans = new Set(prefixe);
   const rang = new Map(prefixe.map((n, k) => [n, k]));
-  const attentes = new Map(prefixe.map((n) => [n, new Set([...n.enfants, ...dependancesAdmises(n, parReference)])]));
+  const externes = prefixe.flatMap((n) => dependancesAdmises(n, parReference).filter((d) => !dedans.has(d)).map((d) => ({ noeud: n, dependance: d })));
+  const attentes = new Map(prefixe.map((n) => [n, new Set([...n.enfants, ...dependancesAdmises(n, parReference).filter((d) => dedans.has(d))])]));
   const ordre = [];
   const faits = new Set();
   for (;;) {
@@ -204,7 +209,7 @@ export function ordreDeResolution(arbre) {
     faits.add(n);
     ordre.push({ noeud: n, action: n.estFeuille ? 'résoudre' : 'clore' });
   }
-  return { ordre, reste: prefixe.filter((n) => !faits.has(n)).map((n) => n.reference) };
+  return { ordre, reste: prefixe.filter((n) => !faits.has(n)).map((n) => n.reference), externes };
 }
 
 /** Couches touchées par les options des feuilles de l'arbre. */
