@@ -85,7 +85,7 @@ Suis `SKILL.md` à partir de sa section 4. Rien n'est modifié avant la ratifica
     ],
     "genere_par": {
       "prototype": "skill-ticket",
-      "lot": 3,
+      "lot": 4,
       "fabrique": "java-angular-postgresql",
       "orchestrateur": "3.5.3"
     }
@@ -159,7 +159,7 @@ version: 1.0.0
 
 # Skill de ticket ABCDE-3620-1.1
 
-> Produit par le générateur C7E (prototype « skill de ticket », lot 3), fabrique `java-angular-postgresql`, référentiel des méso-contrats 3.3.0, orchestrateur-c7e 3.5.3. Ce skill remplace la fiche de transformation comme objet ratifié avant toute modification ; il reste identique à sa transmission. Si tu y relèves une ambiguïté ou une contradiction, signale-la au développeur ; ne corrige pas le skill toi-même.
+> Produit par le générateur C7E (prototype « skill de ticket », lot 4), fabrique `java-angular-postgresql`, référentiel des méso-contrats 3.3.0, orchestrateur-c7e 3.5.3. Ce skill remplace la fiche de transformation comme objet ratifié avant toute modification ; il reste identique à sa transmission. Si tu y relèves une ambiguïté ou une contradiction, signale-la au développeur ; ne corrige pas le skill toi-même.
 
 ## 1. Place dans l'arbre
 
@@ -174,10 +174,10 @@ Base : date-heure de la dernière ligne enregistrée d'une commande, par une req
 
 Intention : Lire la date-heure maximale des lignes d'une commande sans charger les lignes.
 
-| Critère | Énoncé | Soutient |
-|---|---|---|
-| C1 | La date-heure maximale des lignes d'une commande se lit en une seule requête, sans charger les lignes. | ABCDE-3620-1:C4 |
-| C2 | Pour une commande sans ligne, l'agrégat renvoie null. | ABCDE-3620-1:C3 |
+| Critère | Énoncé | Soutient | Critère d'acceptation |
+|---|---|---|---|
+| C1 | La date-heure maximale des lignes d'une commande se lit en une seule requête, sans charger les lignes. | ABCDE-3620-1:C4 | ABCDE-3620-CA04 |
+| C2 | Pour une commande sans ligne, l'agrégat renvoie null. | ABCDE-3620-1:C3 | ABCDE-3620-CA03 |
 
 ## 3. Méso-contrats et options
 
@@ -197,16 +197,16 @@ Composition confirmée : M02 (module `meso-contrats`). Méso-contrats transverse
 ## 5. Analyse (d=0), avant toute modification
 
 1. Écris la copie de travail de `ticket.toml` dans `docs/demandes/ABCDE-3620/ABCDE-3620-1.1/ticket.toml`. Tu ne la complètes que de ce que demandent les options (repérage, valeurs relevées) ; sa demande, sa composition et ses options ne changent pas.
-2. Lis l'architecture réelle : code, contrat, migrations, tests existants, conventions du projet. Le disque fait foi.
+2. Fais cartographier l'architecture réelle par le sous-agent `ticket-abcde-3620-analyste`, en lecture seule, par l'outil `invoke_agent`, avec la référence de ce ticket et ses couches : code, contrat, migrations, tests existants, conventions du projet. Vérifie ses constats ; le disque fait foi.
 3. Cartographie l'impact : dépendances explicites et détectées, autres consommateurs. Si la demande sort des empreintes de la composition, arrête-toi et remonte-la au ticket parent, ou au développeur pour la racine, sans changer de composition (D11.INV-4).
 4. Pour chaque option, relève ce que son module demande à l'analyse.
 5. Choisis la configuration : mode, concepts et poids, profondeur, niveau de preuve, justifiés par la criticité selon la grille du fichier d'invariants du projet (module `methode`, § 2 et § 7.1 ; D2.INV-1).
-6. Déduis les tests des critères et des risques, avec les preuves des options et les exigences des méso-contrats transverses (module `recette` ; D10.INV-3).
-7. Écris `docs/demandes/ABCDE-3620/ABCDE-3620-1.1/analyse.md` : cartographie d'impact, configuration retenue et sa justification, stratégie (slots engagés, gate contrats, points de retour arrière), tests déduits.
+6. Déduis les tests des critères et des risques : les scénarios de `docs/demandes/ABCDE-3620/ABCDE-3620.feature` que ce ticket réalise (module `recette`, scénarios à réaliser), les preuves des options et les exigences des méso-contrats transverses (D10.INV-3). Un critère sans scénario de sa couche remonte au skill racine, qui seul modifie les documents de la clé.
+7. Écris `docs/demandes/ABCDE-3620/ABCDE-3620-1.1/analyse.md` : cartographie d'impact, configuration retenue et sa justification, stratégie (slots engagés, gate contrats, points de retour arrière), scénarios et tests déduits.
 
 ## 6. Ratification
 
-Présente au développeur ce skill et son analyse : objectif, critères, méso-contrats et options avec leur paramétrage, invariants, configuration, cartographie, stratégie et tests déduits, avec la copie de travail de `ticket.toml`. **Point de ratification** : rien n'est modifié avant sa réponse (D3.INV-1, la fiche étant ce skill). Ajoute sa décision à `docs/demandes/ABCDE-3620/ABCDE-3620-1.1/retours.md`, sur une ligne `- AAAA-MM-JJ, <nom> : ABCDE-3620-1.1 ratifié`, ou `… non ratifié, <motif>`, avec la date et son nom.
+Présente au développeur ce skill et son analyse : objectif, critères, méso-contrats et options avec leur paramétrage, invariants, configuration, cartographie, stratégie, scénarios et tests déduits, avec la copie de travail de `ticket.toml`. **Point de ratification** : rien n'est modifié avant sa réponse (D3.INV-1, la fiche étant ce skill). Ajoute sa décision à `docs/demandes/ABCDE-3620/ABCDE-3620-1.1/retours.md`, sur une ligne `- AAAA-MM-JJ, <nom> : ABCDE-3620-1.1 ratifié`, ou `… non ratifié, <motif>`, avec la date et son nom.
 
 ## 7. Transformation, après la ratification
 
@@ -220,13 +220,15 @@ Présente au développeur ce skill et son analyse : objectif, critères, méso-c
 8. **É6, Évolutif** (contrôle de l'évolution : tests déduits, mesures, dossier de preuves) : exécuter tous les tests déduits et les gates (module `methode`, § 5.1), mesurer, produire le dossier de preuves (module `recette`).
 9. **É7, Environnement** (livraison dans l'environnement, validation métier, mesures en usage, capitalisation) : remettre `remise.md` au développeur (section 8) ; la validation métier, la livraison et la mesure en usage appartiennent à l'équipe, l'IA ne publie rien (D4.INV-3) ; capitaliser et clore par une rétrospective de second ordre (module `methode`, § 6).
 
-Chaque commit porte un seul slot et commence par `ABCDE-3620 : [É<n>-<DOMAINE>] ` (D4.INV-2), son corps cite `Sous-ticket : ABCDE-3620-1.1` ; l'IA ne pousse, ne fusionne, ne rebase ni ne pose de tag (D4.INV-3).
+Chaque commit porte un seul slot et commence par `ABCDE-3620 : [É<n>-<DOMAINE>] `, ou `ABCDE-3620 Snn : [É<n>-<DOMAINE>] ` pour le commit d'un scénario (D4.INV-2), son corps cite `Sous-ticket : ABCDE-3620-1.1` ; l'IA ne pousse, ne fusionne, ne rebase ni ne pose de tag (D4.INV-3).
 
-Les options de chaque couche se confient à son agent, par l'outil `invoke_agent` : `ticket-abcde-3620-1-1-persistance` (persistance). Chaque agent travaille dans son propre contexte et rend son rapport ; ce skill garde la ratification, la recette et la remise.
+Les options de chaque couche se confient à son agent, par l'outil `invoke_agent` : `ticket-abcde-3620-1-1-persistance` (persistance). Chaque agent réalise ses scénarios un à un en cycle TDD (agent-tdd-jira, module `cycle-tdd`), dans son propre contexte, et te présente chacun : fais-le accepter au développeur (V4) avant le commit et avant le scénario suivant. Ce skill garde la ratification, la recette et la remise.
+
+Avant É6, le sous-agent `ticket-abcde-3620-relecteur` relit les commits de ce ticket, couche par couche, en mode revue du référentiel de la couche ; un constat bloquant se corrige par l'agent de la couche, après la décision du développeur, dans un commit de rétroaction qui cite la revue (D6.INV-1). En É6, le sous-agent `ticket-abcde-3620-qualite` examine le diff avec la branche cible (sonarqube, module `examen-local`) ; aucune écriture vers SonarQube sans la validation explicite du développeur, et le jeton ne se lit que dans la variable `SONAR_TOKEN` (sonarqube:D1.INV-2, sonarqube:D1.INV-3). Leurs rapports vont dans `remise.md`.
 
 ## 8. Remise
 
-`docs/demandes/ABCDE-3620/ABCDE-3620-1.1/remise.md`, complète à la remise (D3.INV-3) : modifications par slot, avec les commits ; dossier de preuves ; écarts ajoutés au registre des écarts ; boucle de second ordre (observations É6 et É7, commits de rétroaction, entrées proposées) ; capitalisation ; indicateurs et leur calcul (module `methode`, § 8). Puis renvoie le développeur au skill de ABCDE-3620-1, `/ticket:abcde-3620-1`, dans une nouvelle session : il indique la suite.
+`docs/demandes/ABCDE-3620/ABCDE-3620-1.1/remise.md`, complète à la remise (D3.INV-3) : modifications par slot, avec les commits ; dossier de preuves, scénario par scénario ; rapports du relecteur et de l'agent qualité ; écarts ajoutés au registre des écarts ; boucle de second ordre (observations É6 et É7, commits de rétroaction, entrées proposées) ; capitalisation ; indicateurs et leur calcul (module `methode`, § 8) ; et, sous le titre « Contributions aux kits », ce que le skill racine assemble à la clôture de l'arbre : les commits, avec leur empreinte et leur titre ; les tests et les scénarios qu'ils portent ; les données de démonstration, déposées dans `docs/demandes/ABCDE-3620/ABCDE-3620-1.1/demo/`, et les commandes de lancement. Puis renvoie le développeur au skill de ABCDE-3620-1, `/ticket:abcde-3620-1`, dans une nouvelle session : il indique la suite.
 
 ## 9. Retours du développeur
 
@@ -387,10 +389,19 @@ description: Recette de ABCDE-3620-1.1, critères à prouver, preuves des option
 
 ## Critères à prouver
 
-| Critère | Énoncé | Soutient |
+| Critère | Énoncé | Soutient | Critère d'acceptation |
+|---|---|---|---|
+| ABCDE-3620-1.1:C1 | La date-heure maximale des lignes d'une commande se lit en une seule requête, sans charger les lignes. | ABCDE-3620-1:C4 | ABCDE-3620-CA04 |
+| ABCDE-3620-1.1:C2 | Pour une commande sans ligne, l'agrégat renvoie null. | ABCDE-3620-1:C3 | ABCDE-3620-CA03 |
+
+## Scénarios à réaliser
+
+Chaque critère se prouve par les scénarios de `docs/demandes/ABCDE-3620/ABCDE-3620.feature` qui portent son critère d'acceptation et l'étiquette d'une couche de ce ticket (`@back`), hors `@en-attente` et `@propose`. Les agents de couche les réalisent en cycle TDD (section 7 de `SKILL.md`) ; chaque test porte l'étiquette de son scénario (agent-tdd-jira:D6.INV-2).
+
+| Critère | Critère d'acceptation | Scénarios |
 |---|---|---|
-| ABCDE-3620-1.1:C1 | La date-heure maximale des lignes d'une commande se lit en une seule requête, sans charger les lignes. | ABCDE-3620-1:C4 |
-| ABCDE-3620-1.1:C2 | Pour une commande sans ligne, l'agrégat renvoie null. | ABCDE-3620-1:C3 |
+| ABCDE-3620-1.1:C1 | ABCDE-3620-CA04 | `@ABCDE-3620-CA04` et `@back` |
+| ABCDE-3620-1.1:C2 | ABCDE-3620-CA03 | `@ABCDE-3620-CA03` et `@back` |
 
 ## Preuves exigées par les options
 
@@ -416,7 +427,7 @@ Les commandes que fixe le fichier d'invariants du projet priment sur celles-ci.
 
 ## Dossier de preuves
 
-Dans `docs/demandes/ABCDE-3620/ABCDE-3620-1.1/remise.md` : test, critère ou risque, résultat ; gates passées.
+Dans `docs/demandes/ABCDE-3620/ABCDE-3620-1.1/remise.md` : test, scénario, critère ou risque, résultat ; gates passées ; contributions aux kits de l'arbre (section 8 de `SKILL.md`).
 <<<FIN modules/recette/SKILL.md>>>
 
 <<<FICHIER modules/methode/SKILL.md>>>
@@ -1320,7 +1331,7 @@ Fichier `docs/c7e/registre-ecarts.md` ⚠️ ADAPTER (emplacement), créé à l'
 <<<FICHIER agents/ticket-abcde-3620-1-1-persistance.md>>>
 ---
 name: ticket-abcde-3620-1-1-persistance
-description: Agent persistance du skill de ticket ABCDE-3620-1.1 (PostgreSQL et Liquibase), qui réalise les options persistance du ticket après la ratification du skill, sous les invariants hérités.
+description: Agent persistance du skill de ticket ABCDE-3620-1.1 (PostgreSQL et Liquibase), qui réalise les options persistance du ticket en cycle TDD, scénario par scénario, après la ratification du skill, sous les invariants hérités.
 kind: local
 tools:
   - read_file
@@ -1340,15 +1351,24 @@ Tu réalises, pour le ticket ABCDE-3620-1.1, la couche persistance : PostgreSQL 
 
 - option `persistance.crud`, slots É1, étiquettes `[É1-DB]` : `.gemini/skills/ticket-abcde-3620-1-1/modules/option-persistance-crud/SKILL.md`
 
+## Scénarios, en cycle TDD
+
+Tu réalises un à un les scénarios de `docs/demandes/ABCDE-3620/ABCDE-3620.feature` qui portent l'un des critères d'acceptation de ce ticket (`@ABCDE-3620-CA03`, `@ABCDE-3620-CA04`) et l'étiquette `@back`, hors `@en-attente` et `@propose`, en cycle rouge, vert, remanié, selon `.gemini/skills/ticket-abcde-3620/references/agent-tdd-jira/cycle-tdd.md` :
+
+- le test s'écrit d'abord, étiqueté avec son scénario (`@Tag("ABCDE-3620-Snn")`), et échoue pour la raison attendue avant tout code de production (agent-tdd-jira:D5.INV-1) ;
+- le code minimal le fait passer, la suite du module reste verte, puis le remaniement applique les invariants du référentiel, sans changer le comportement (agent-tdd-jira:D5.INV-2, agent-tdd-jira:D5.INV-3) ;
+- chaque scénario se présente au skill du ticket, qui le fait accepter au développeur (V4), avant le suivant ; puis il se commite, un slot par commit : `ABCDE-3620 Snn : [É<n>-<DOMAINE>] <type>(<portée>): <description>`, le corps citant `Sous-ticket : ABCDE-3620-1.1`.
+
 ## Règles
 
 - Aucune modification avant la ratification du skill par le développeur : la ligne `- AAAA-MM-JJ, <nom> : ABCDE-3620-1.1 ratifié` dans `docs/demandes/ABCDE-3620/ABCDE-3620-1.1/retours.md` (D3.INV-1, la fiche étant ce skill).
 - Les invariants hérités s'appliquent : `.gemini/skills/ticket-abcde-3620-1-1/modules/invariants/SKILL.md`, `.gemini/skills/ticket-abcde-3620-1-1/socle/SKILL.md`, la copie du projet du fichier d'invariants et `.gemini/skills/ticket-abcde-3620-1-1/references/java.md`.
-- Un slot par commit ; chaque commit commence par `ABCDE-3620 : ` suivi de l'étiquette de son slot (D4.INV-2), et son corps cite `Sous-ticket : ABCDE-3620-1.1` ; tu ne pousses, ne fusionnes, ne rebases ni ne poses de tag (D4.INV-3).
+- Un slot par commit ; chaque commit commence par `ABCDE-3620 : `, ou `ABCDE-3620 Snn : ` pour un scénario, suivi de l'étiquette de son slot (D4.INV-2), et son corps cite `Sous-ticket : ABCDE-3620-1.1` ; tu ne pousses, ne fusionnes, ne rebases ni ne poses de tag (D4.INV-3).
 - Tu ne sors pas de ta couche : un besoin hors de ton périmètre remonte au skill du ticket.
 
 ## Rapport
 
+- Pour chaque scénario : son critère d'acceptation, le rouge avec son message d'échec, le vert, le remaniement, les suites et leurs résultats, les fichiers, le commit (cycle-tdd, § 6).
 - Chaque constat cite sa preuve : test, commande et sortie, ou réponse du développeur.
 - Chaque choix du développeur parmi tes propositions, et chaque correction qu'il demande sur tes actions, s'ajoute à `docs/demandes/ABCDE-3620/ABCDE-3620-1.1/retours.md` : c'est la référence de ton observation.
 <<<FIN agents/ticket-abcde-3620-1-1-persistance.md>>>
@@ -1367,16 +1387,16 @@ Précision du développeur, s'il y en a une : {{args}}
 
 Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichiers ont été matérialisés.
 
-    af61b0e47645e08b2ebdac58858912f1acab71931e5269b9d2e31749451c67c7  manifest.json
-    842c3766f61a87c23525c741eb21551b5c492648cbd5ff94484841076278c18e  SKILL.md
+    20a4d9ab3925a39d0caae6bb57889983646d7911a8d50a9b6e53a9ff05352cdd  manifest.json
+    fcb83d13703842ad470d5accd90122c09de200d936e81a9b1e2dcf290b16819b  SKILL.md
     3dd01b85794d05f8856234f53a76e7b679e4717c900d7994d4ec5a966db7751f  ticket.toml
     427b91753721d9837d87a6ac8929c11124df6101bf959918468043b9dd6f88de  modules/meso-contrats/SKILL.md
     86a98a76275998dda7eb1918ba14623af7f6ee89f13b9a960b937180b3766307  modules/option-persistance-crud/SKILL.md
-    0fd8d3282a64abaa82b6e90a677e40a1ceb2ac17ae5b0edd4a8df68b505fc386  modules/recette/SKILL.md
+    ce14f42b61bb11269228e02aa7b2faffbbbf087a906cf10e1b875ca3f8415b89  modules/recette/SKILL.md
     ed8cc63e18f4ceaf67ff3506aee5040633778ddb761469c9284af832bb1682c2  modules/methode/SKILL.md
     851f676c33a47bfb52d3d52dd86a8d3f07fd64dba6072574d637a396e57fc4b9  modules/invariants/SKILL.md
     f9456b0bbcdce8cd1ebc06446c3d505829a0354f398f4aa819204e4e9c135f54  socle/SKILL.md
     4bb52253c4504f4a804460442b1711a9caab8e364528171f2afb9ba7d5acfccf  references/java.md
     971128d2351d7dce8941a57e3b3875b59cb229c9469eef7c20d74d7561b6ac31  projet/meso-contrats.md
-    7f98f95c785f612161f40b3e8d097c3b077fb9b7ca6203a64086d437a1d8a044  agents/ticket-abcde-3620-1-1-persistance.md
+    268768de405da3b43e994357a9bd60955e57c59d2a6d33e7a3dfcf6e8b148e58  agents/ticket-abcde-3620-1-1-persistance.md
     63771089b249fa23c49e660dae061c01c724a87254872af62d7e0bac1f059a83  commandes/ticket/abcde-3620-1-1.toml

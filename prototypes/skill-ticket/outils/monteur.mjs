@@ -1,4 +1,4 @@
-// Monteur des skills de ticket (prototype « skill de ticket », lots 2 et 3).
+// Monteur des skills de ticket (prototype « skill de ticket », lots 2 à 4).
 //
 // Le Monteur assemble, nœud par nœud, le skill de chaque ticket de l'arbre avec les pièces que lui
 // donne la fabrique de la pile ; il ne choisit rien lui-même. Il écrit chaque skill dans un dossier,
@@ -15,7 +15,7 @@ import { lireToml } from './toml.mjs';
 import { chargerReferentiel } from './referentiel.mjs';
 import { chargerArbre, verifierArbre } from './arbre.mjs';
 import { FABRIQUES, VERSION_SKILL, couchesDuTicket, nomSkill, sha256 } from './fabrique.mjs';
-import { chargerProjet, chargerSources, extraireSection, idInvariant, lignesInvariants, resoudre } from './sources.mjs';
+import { BOITE, blocDeCode, chargerProjet, chargerSources, extraireSection, idInvariant, lignesInvariants, resoudre } from './sources.mjs';
 
 export const DOSSIER_TRANSMISSIONS = 'transmissions';
 const DEFINITION = /\*\*((?:D|SC)\d+\.INV-\d+)\*\*/g;
@@ -36,6 +36,8 @@ export class Monteur {
       ...f.modules(n),
       f.recette(n),
       ...f.sousTickets(n),
+      ...f.documents(n),
+      ...f.kits(n),
       f.methode(n),
       f.invariants(n),
       ...copies.map((c) => c.fichier),
@@ -86,13 +88,14 @@ export function verifierHeritage(fichiers, { projet } = {}) {
   if (ticket && ticket.reference !== t.reference) erreurs.push(`ticket.toml : référence ${ticket.reference}, manifeste ${t.reference}`);
 
   // Héritages requis : la méthode, le socle et le projet pour tout nœud ; les référentiels de la pile
-  // des couches touchées pour une feuille.
+  // des couches touchées pour une feuille ; la boîte à outils de l'arbre pour la racine (lot 4).
   const requis = ['modules/methode/SKILL.md', 'modules/invariants/SKILL.md', 'socle/SKILL.md', 'projet/meso-contrats.md'];
   const Fabrique = FABRIQUES[t.genere_par?.fabrique];
   if (!Fabrique) erreurs.push(`fabrique inconnue : ${t.genere_par?.fabrique ?? '(absente)'}`);
   else if ((t.enfants ?? []).length === 0 && ticket) {
     for (const nom of Fabrique.referencesRequises(couchesDuTicket(ticket))) requis.push(`references/${nom}.md`);
   }
+  if (t.parent === null && (t.genere_par?.lot ?? 0) >= 4) requis.push(...BOITE.map((b) => b.path));
   for (const p of requis) if (!herites.has(p)) erreurs.push(`héritage absent du manifeste : ${p}`);
 
   for (const h of t.herites) {
@@ -116,6 +119,8 @@ export function verifierHeritage(fichiers, { projet } = {}) {
       for (const l of lignes) if (!presentes.has(l)) erreurs.push(`invariant omis ou altéré : ${idInvariant(l)} (${origine})`);
       if (h.invariants !== lignes.length) erreurs.push(`${h.path} : ${h.invariants} invariants déclarés, ${lignes.length} dans ${origine}`);
     } else if (h.sections !== undefined) {
+      // Sections reprises mot pour mot : la méthode de l'orchestrateur, ou un extrait de la boîte à outils.
+      const quoi = h.path === 'modules/methode/SKILL.md' ? 'de la méthode' : `de ${h.path}`;
       for (const s of h.sections) {
         let texte;
         try {
@@ -124,8 +129,19 @@ export function verifierHeritage(fichiers, { projet } = {}) {
           erreurs.push(`${h.path} : ${e.message} dans ${origine}`);
           continue;
         }
-        if (!contenu.includes(texte)) erreurs.push(`section § ${s} de la méthode omise ou altérée (${origine})`);
+        if (!contenu.includes(texte)) erreurs.push(`section § ${s} ${quoi} omise ou altérée (${origine})`);
       }
+      if (h.sha256 !== undefined && sha256(contenu) !== h.sha256) erreurs.push(`${h.path} : empreinte différente de celle du manifeste, copie altérée`);
+    } else if (h.bloc !== undefined) {
+      // Script tiré d'un bloc de code d'une section, à l'identique.
+      let attendu = null;
+      try {
+        attendu = blocDeCode(source, h.bloc.section, h.bloc.langage).replace(/\n*$/, '\n');
+      } catch (e) {
+        erreurs.push(`${h.path} : ${e.message} dans ${origine}`);
+      }
+      if (attendu !== null && contenu !== attendu) erreurs.push(`${h.path} : différent du bloc ${h.bloc.langage} du § ${h.bloc.section} de ${origine}, copie altérée`);
+      if (sha256(contenu) !== h.sha256) erreurs.push(`${h.path} : empreinte différente de celle du manifeste, copie altérée`);
     } else {
       if (sha256(contenu) !== h.sha256) erreurs.push(`${h.path} : empreinte différente de celle du manifeste, copie altérée`);
       if (source !== null && contenu !== source.replace(/\n*$/, '\n')) erreurs.push(`${h.path} : différent de ${origine}, copie altérée`);

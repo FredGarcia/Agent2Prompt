@@ -1,0 +1,77 @@
+{
+  "format": "agent2test.remise/1",
+  "id": "R-ABCDE-3620-1",
+  "date": "2026-11-05T15:30:00Z",
+  "demande": {
+    "cle": "ABCDE-3620",
+    "texte": "Commande : variante sans les lignes, résumé à la même URI avec la date-heure de la dernière ligne enregistrée, lignes en temps réel"
+  },
+  "racine": "/home/dev/projets/commandes",
+  "plan": {
+    "adaptateur": "agent-tdd-jira",
+    "dossier": "docs/demandes/ABCDE-3620",
+    "sources": [
+      {
+        "chemin": "docs/demandes/ABCDE-3620/us.md",
+        "empreinte": "72ae7e81c4cdebcd308e76528d7bab44958b68ed9adf5409cfcd9899d001af6f"
+      },
+      {
+        "chemin": "docs/demandes/ABCDE-3620/ABCDE-3620.feature",
+        "empreinte": "c9c5d3de61ec4451b4170da4e85689a51545039179133503e7fcaada684a6db8"
+      }
+    ]
+  },
+  "commit": "3743b46b62b33440edec14c84575e6dab05e6b16",
+  "changements": {
+    "git": "main...HEAD"
+  },
+  "criteres": [
+    {
+      "id": "ABCDE-3620-CA01",
+      "statut": "validé"
+    },
+    {
+      "id": "ABCDE-3620-CA02",
+      "statut": "validé"
+    },
+    {
+      "id": "ABCDE-3620-CA03",
+      "statut": "validé"
+    },
+    {
+      "id": "ABCDE-3620-CA04",
+      "statut": "validé"
+    },
+    {
+      "id": "ABCDE-3620-CA05",
+      "statut": "validé"
+    }
+  ],
+  "jouables": [
+    "ABCDE-3620-S05",
+    "ABCDE-3620-S06",
+    "ABCDE-3620-S07"
+  ],
+  "nonJouables": [
+    {
+      "scenario": "ABCDE-3620-S01",
+      "motif": "limité au back"
+    },
+    {
+      "scenario": "ABCDE-3620-S02",
+      "motif": "limité au back"
+    },
+    {
+      "scenario": "ABCDE-3620-S03",
+      "motif": "limité au back"
+    },
+    {
+      "scenario": "ABCDE-3620-S04",
+      "motif": "limité au back"
+    }
+  ],
+  "roles": [
+    "GESTIONNAIRE"
+  ],
+  "prealables": []
+}

@@ -378,10 +378,13 @@ function etatsDesNoeuds(ws, releve) {
   const racine = releve.noeuds.find((n) => n.parent === null);
   const arbreRatifie = racine.enfants.length === 0 || ratifie(racine, `arbre ${racine.reference}`);
   const clos = (n) => fichier(n, 'remise.md') !== null;
+  // Lot 4 : un skill racine qui porte le module `documents` rédige d'abord les documents de la clé.
+  const documentsARediger = existsSync(join(ws, '.gemini', 'skills', racine.nom, 'modules', 'documents', 'SKILL.md')) && fichier(racine, 'us.md') === null;
   return releve.noeuds.map((n) => {
     const enfantsClos = n.enfants.every((e) => clos(parReference.get(e)));
     let etat;
     if (clos(n)) etat = 'clos';
+    else if (n.parent === null && documentsARediger) etat = 'documents à rédiger';
     else if (n.enfants.length > 0) {
       if (n.parent === null && !arbreRatifie) etat = 'arbre à ratifier';
       else etat = enfantsClos ? 'prêt à clore' : 'en cours';

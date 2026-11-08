@@ -1,0 +1,10 @@
+<section aria-labelledby="titre-lignes">
+  <h2 id="titre-lignes">Lignes de la commande</h2>
+  <p>Dernier enregistrement : {{ store.dernierEnregistrement() | date: 'dd/MM/yyyy HH:mm' }}</p>
+  <ul>
+    @for (ligne of store.lignes(); track ligne.id) {
+      <li>{{ ligne.libelle }}, {{ ligne.quantite }}</li>
+    }
+  </ul>
+  <div class="visually-hidden" aria-live="polite">{{ store.annonce() }}</div>
+</section>

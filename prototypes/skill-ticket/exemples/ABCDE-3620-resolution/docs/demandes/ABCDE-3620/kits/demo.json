@@ -1,0 +1,48 @@
+{
+  "format": "skill-ticket.kit/1",
+  "kit": "demo",
+  "cle": "ABCDE-3620",
+  "parcours": "docs/demandes/ABCDE-3620/kits/demo/parcours.md",
+  "scenarios": [
+    "ABCDE-3620-S05",
+    "ABCDE-3620-S06",
+    "ABCDE-3620-S07"
+  ],
+  "donnees": [
+    "docs/demandes/ABCDE-3620/ABCDE-3620-2/demo/donnees.sql"
+  ],
+  "commandes": [
+    "./mvnw -f back/pom.xml spring-boot:run -Dspring-boot.run.profiles=demo",
+    "npm --prefix front start"
+  ],
+  "captures": [
+    {
+      "scenario": "ABCDE-3620-S05",
+      "capture": "docs/demandes/ABCDE-3620/ABCDE-3620-2/captures/ABCDE-3620-S05.png",
+      "image_objectif": null
+    },
+    {
+      "scenario": "ABCDE-3620-S06",
+      "capture": "docs/demandes/ABCDE-3620/ABCDE-3620-2/captures/ABCDE-3620-S06.png",
+      "image_objectif": null
+    }
+  ],
+  "fichiers": [
+    {
+      "chemin": "docs/demandes/ABCDE-3620/kits/demo/parcours.md",
+      "sha256": "794e85e13181aad59c32100a39801e692168ebb81394ab4b0564e9d881e5334b"
+    },
+    {
+      "chemin": "docs/demandes/ABCDE-3620/ABCDE-3620-2/demo/donnees.sql",
+      "sha256": "bba7898aaff0327c4bcc653bb39df8fd5c4fc3adf105eb7861855edb9eef5f51"
+    },
+    {
+      "chemin": "docs/demandes/ABCDE-3620/ABCDE-3620-2/captures/ABCDE-3620-S05.png",
+      "sha256": "5af52444953a73f0d3ed825ee12b70132e0689a30263aaa788915704f7d39123"
+    },
+    {
+      "chemin": "docs/demandes/ABCDE-3620/ABCDE-3620-2/captures/ABCDE-3620-S06.png",
+      "sha256": "a0f872a8dfcf362b979a5689aea9e726dd083e60f35ebfe12278830d809cb479"
+    }
+  ]
+}
