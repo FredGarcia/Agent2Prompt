@@ -87,7 +87,7 @@ Suis `SKILL.md` à partir de sa section 4. Rien n'est modifié avant la ratifica
     ],
     "genere_par": {
       "prototype": "skill-ticket",
-      "lot": 5,
+      "lot": 6,
       "fabrique": "java-angular-postgresql",
       "orchestrateur": "3.5.3"
     }
@@ -166,7 +166,7 @@ version: 1.0.0
 
 # Skill de ticket ABCDE-3620-2
 
-> Produit par le générateur C7E (prototype « skill de ticket », lot 5), fabrique `java-angular-postgresql`, référentiel des méso-contrats 3.3.0, orchestrateur-c7e 3.5.3. Ce skill remplace la fiche de transformation comme objet ratifié avant toute modification ; il reste identique à sa transmission. Si tu y relèves une ambiguïté ou une contradiction, signale-la au développeur ; ne corrige pas le skill toi-même.
+> Produit par le générateur C7E (prototype « skill de ticket », lot 6), fabrique `java-angular-postgresql`, référentiel des méso-contrats 3.3.0, orchestrateur-c7e 3.5.3. Ce skill remplace la fiche de transformation comme objet ratifié avant toute modification ; il reste identique à sa transmission. Si tu y relèves une ambiguïté ou une contradiction, signale-la au développeur ; ne corrige pas le skill toi-même.
 
 ## 1. Place dans l'arbre
 
@@ -200,8 +200,8 @@ Composition confirmée : M03 (module `meso-contrats`). Méso-contrats transverse
 
 1. Vérifie que ce skill est intact : s'il a été installé par l'installateur du dépôt Agent2Prompt, `sha256sum -c integrite.sha256` depuis son dossier.
 2. Lis la copie du projet du fichier d'invariants (`docs/c7e/meso-contrats.md` par défaut) et compare-la à `projet/meso-contrats.md`, l'état sur lequel ce skill a été produit. La copie du projet fait foi ; si elles diffèrent, dis-le au développeur avant tout le reste. Une valeur `ADAPTER` restée telle se signale, jamais devinée (D8.INV-1).
-3. Lis l'état du champ de l'arbre, `node .gemini/skills/ticket-abcde-3620/outils/champ.mjs etat docs/demandes/ABCDE-3620` : ratifications, critères de ce ticket menacés ou en écart, désaccords et observations attendues. Traite d'abord ce qui t'est attribué, au niveau le plus bas qui peut le traiter (module `champ` du skill racine, section 6).
-4. Vérifie dans cet état que l'arbre a été ratifié : « arbre ABCDE-3620 : ratifié ». Sinon, arrête-toi et renvoie le développeur au skill racine, `/ticket:abcde-3620`.
+3. Lis ta vue augmentée, `node .gemini/skills/ticket-abcde-3620/outils/vue.mjs generer docs/demandes/ABCDE-3620 --noeud ABCDE-3620-2` : les ancres de ce ticket, critères, scénarios et nœud, avec ce que chaque niveau y a déposé, les ratifications, et ce qui est à traiter : critères menacés ou en écart, désaccords, observations attendues. Traite d'abord ce qui t'est attribué, au niveau le plus bas qui peut le traiter (modules `vue` et `champ` du skill racine). Un champ altéré ne donne pas de vue : arrête-toi et montre au développeur ce que dit `node .gemini/skills/ticket-abcde-3620/outils/champ.mjs verifier docs/demandes/ABCDE-3620`.
+4. Vérifie dans cette vue que l'arbre a été ratifié : « arbre ABCDE-3620 : ratifié ». Sinon, arrête-toi et renvoie le développeur au skill racine, `/ticket:abcde-3620`.
 5. Vérifie que ABCDE-3620-1.2 est clos : remise écrite et critères prouvés. Sinon, arrête-toi et dis au développeur ce qui manque.
 
 ## 5. Analyse (d=0), avant toute modification
@@ -243,7 +243,9 @@ Avant É6, le sous-agent `ticket-abcde-3620-relecteur` relit les commits de ce t
 
 Le champ de l'arbre, `docs/demandes/ABCDE-3620/champ.jsonl`, reçoit en ajout seul ce que fait chaque niveau : les actions que tu proposes ou réalises, les retours du développeur (ses choix parmi tes propositions, ses corrections sur tes actions, ses ratifications) et les observations, chacune avec sa preuve. Dépose chacun par `node .gemini/skills/ticket-abcde-3620/outils/champ.mjs deposer docs/demandes/ABCDE-3620 <type> …`, jamais à la main (module `champ` du skill racine). La référence de ton observation est un retour du développeur ou une preuve : une auto-évaluation sans preuve ni retour n'est pas une observation.
 
-Après chaque correction du développeur, et à chaque lancement, `node .gemini/skills/ticket-abcde-3620/outils/champ.mjs etat docs/demandes/ABCDE-3620` montre les critères menacés, les désaccords et les observations attendues : invoque l'observateur d'ordre 2 ou d'ordre 3 de l'arbre quand il en attend une, puis présente sa proposition au développeur, qui la retient ou la refuse. Les retours orientent le travail ; ils ne lèvent aucun invariant ni aucune preuve.
+Après chaque correction du développeur, et à chaque lancement, ta vue augmentée, `node .gemini/skills/ticket-abcde-3620/outils/vue.mjs generer docs/demandes/ABCDE-3620 --noeud ABCDE-3620-2`, montre les critères menacés, les désaccords et les observations attendues, sur tes ancres et avec ce que les autres niveaux y ont déposé : invoque l'observateur d'ordre 2 ou d'ordre 3 de l'arbre quand il en attend une, puis présente sa proposition au développeur, qui la retient ou la refuse. Les retours orientent le travail ; ils ne lèvent aucun invariant ni aucune preuve.
+
+Le ticket n'est jamais réécrit : ce sont les calques posés sur ses ancres qui changent. Le développeur lit la vue entière de l'arbre dans `docs/demandes/ABCDE-3620/vue.html`, que `node .gemini/skills/ticket-abcde-3620/outils/vue.mjs generer docs/demandes/ABCDE-3620` régénère d'après le champ et les documents de la clé (module `vue` du skill racine).
 
 ## 10. Invariants hérités
 
@@ -1436,8 +1438,8 @@ Précision du développeur, s'il y en a une : {{args}}
 
 Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichiers ont été matérialisés.
 
-    8d2c3cc2f7548c6d1872ebbd76484d9e0bdd5be3a96a72ef8a4bef90cbdc4e62  manifest.json
-    146055c334bfdb5ba6939f901c852908044f72d4b1a4834752c6397363b0da89  SKILL.md
+    ce075f79c196195bd4a279519221482eea352285cb7c581540183511f2d39007  manifest.json
+    4015cde77799ee43cf92eb86a276a8f76d5b6868837f134dcd3c6b4fee5f5f58  SKILL.md
     c032f265e415be12c6038faca3763cdabedef71ec0d816ffbcc02016bc3febd7  ticket.toml
     f5c24f80545ceb692af5806b0768afafd537a8cdf121077e40d9a27dea6ebde3  modules/meso-contrats/SKILL.md
     d48f4102539dcffecea8a8a04a61c6e54a271c372bc5dd6014f27902a7bf26f5  modules/option-frontend-elements_graphiques/SKILL.md

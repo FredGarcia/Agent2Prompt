@@ -1,4 +1,4 @@
-// Fabrique abstraite de skill-ticket (prototype « skill de ticket », lots 2 à 5).
+// Fabrique abstraite de skill-ticket (prototype « skill de ticket », lots 2 à 6).
 //
 // Une fabrique produit, pour un nœud de l'arbre de tickets, la famille cohérente des fichiers de son
 // skill : la consigne (SKILL.md), le ticket (ticket.toml), les blocs du référentiel copiés puis
@@ -9,7 +9,9 @@
 // sous-agents de rôle (rédacteur, analyste, relecteur, qualité) et leurs références, copiées des skills
 // du dépôt à leur version épinglée, avec les scripts de contrôle. Au lot 5, il porte le champ
 // d'observation de l'arbre et ses observateurs d'ordre 2 et 3 ; chaque nœud y dépose ses actions, les
-// retours du développeur et ses observations, ratifications comprises. La consigne suit un patron
+// retours du développeur et ses observations, ratifications comprises. Au lot 6, il porte la vue
+// augmentée de l'arbre : les ancres du ticket, jamais réécrit, avec les calques de ce que le champ en
+// dit ; chaque nœud lit la sienne à son lancement, le développeur la vue entière. La consigne suit un patron
 // de méthode : le même squelette pour tous les nœuds, des crochets selon la nature du nœud et selon la
 // pile. Une fabrique concrète par pile technique fixe ce qui dépend de la pile : référentiels experts,
 // agents, commandes de recette. Le choix des méso-contrats n'est pas le sien : il vient du ticket,
@@ -24,7 +26,7 @@ import { extraireSection } from './sources.mjs';
 
 export const VERSION_SKILL = '1.0.0';
 /** Lot du prototype qui a produit le générateur, inscrit dans chaque skill. */
-export const LOT = 5;
+export const LOT = 6;
 
 /** Format du rattachement des critères de l'arbre aux critères de la clé Jira, lu par les scripts de contrôle. */
 export const FORMAT_RATTACHEMENT = 'skill-ticket.rattachement/1';
@@ -69,7 +71,8 @@ const USAGES_BOITE = {
   'outils/verifier-documents.mjs': 'script de contrôle des documents de la clé contre le rattachement de l\'arbre',
   'outils/verifier-kits.mjs': 'script de contrôle des kits dev, test et démo et de la remise à Agent2Test',
   'outils/champ.mjs': 'script du champ d\'observation : dépôt, vérification et état',
-  [FICHIER_RATTACHEMENT]: 'rattachement des critères de l\'arbre aux critères de la clé, pour les scripts de contrôle et le champ',
+  'outils/vue.mjs': 'script de la vue augmentée : calques et états de chaque ancre, d\'après le champ',
+  [FICHIER_RATTACHEMENT]: 'rattachement des critères de l\'arbre aux critères de la clé, pour les scripts de contrôle, le champ et la vue',
 };
 export const sha256 = (texte) => createHash('sha256').update(texte, 'utf8').digest('hex');
 
@@ -516,7 +519,7 @@ export class FabriqueSkillTicket {
         nature: this.nature(x),
         dossier: this.dossier(x),
         etiquettes: this.etiquettesCouches(x),
-        criteres: x.criteres.map((c) => ({ id: c.id, ca: this.caDe(x, c), soutient: c.soutient ?? [] })),
+        criteres: x.criteres.map((c) => ({ id: c.id, enonce: c.enonce, ca: this.caDe(x, c), soutient: c.soutient ?? [] })),
         images: this.imagesObjectif(x),
       })),
     };
@@ -530,6 +533,16 @@ export class FabriqueSkillTicket {
   /** Commande du champ d'observation de l'arbre, depuis la racine du projet. */
   commandeChamp(n, commande) {
     return `node ${this.outil(n, 'outils/champ.mjs')} ${commande} docs/demandes/${this.cle(n)}`;
+  }
+
+  /** Commande de la vue augmentée de l'arbre, depuis la racine du projet ; avec `noeud`, la vue de ce nœud, sur la sortie. */
+  commandeVue(n, commande, noeud = null) {
+    return `node ${this.outil(n, 'outils/vue.mjs')} ${commande} docs/demandes/${this.cle(n)}${noeud ? ` --noeud ${noeud}` : ''}`;
+  }
+
+  /** Présentation de la vue entière au développeur, par la racine : à la ratification de l'arbre et à la clôture. */
+  vueAuDeveloppeur(n, contenu) {
+    return `Génère la vue augmentée de l'arbre, \`${this.commandeVue(n, 'generer')}\`, et invite le développeur à ouvrir \`docs/demandes/${this.cle(n)}/vue.html\` dans son navigateur : ${contenu}.`;
   }
 
   /** Dépôt de la ratification d'un nœud dans le champ, à compléter du nom et de la réponse du développeur. */
@@ -825,6 +838,86 @@ export class FabriqueSkillTicket {
     ])];
   }
 
+  /**
+   * Vue augmentée de l'arbre (skill racine, lot 6) : les ancres du ticket, jamais réécrit, avec les calques
+   * de ce que le champ en dit et un état qui résume leur pile ; ses commandes et ses lecteurs.
+   */
+  vue(n) {
+    if (!n.estRacine) return [];
+    const cle = this.cle(n);
+    const d = `docs/demandes/${cle}`;
+    const feuille = n.feuilles()[0];
+    const exemple = feuille.estRacine ? n.reference : feuille.reference;
+    return [fichier('modules/vue/SKILL.md', [
+      frontmatter({ name: 'vue', description: `Vue augmentée de l'arbre ${cle}, dont les ancres du ticket, jamais réécrit, portent les calques de ce que le champ d'observation en dit (ordre 1, 2, 3 et humain) et un état qui résume leur pile ; vue entière pour le développeur, vue d'un nœud pour sa session.` }),
+      `# Vue augmentée de l'arbre ${cle}`,
+      '',
+      `Chaque niveau voit le ticket augmenté des observations des autres niveaux. Le ticket n'est jamais réécrit par ceux qui l'observent : ses ancres restent celles de ses documents, et les calques posés sur elles changent avec le champ d'observation (module \`champ\`). La vue se tire du champ et des documents de la clé par \`outils/vue.mjs\` ; elle ne s'écrit ni ne se corrige à la main.`,
+      '',
+      '## 1. Ancres',
+      '',
+      tableau(['Ancre', 'D\'où elle vient'], [
+        ['critère d\'acceptation', `\`${d}/us.md\` (énoncé et statut), rattaché au critère de la racine qui le porte (\`${FICHIER_RATTACHEMENT}\`)`],
+        ['critère d\'un nœud', `le rattachement, avec son énoncé et le critère du parent qu'il soutient`],
+        ['scénario', `\`${d}/${cle}.feature\`, avec ses étiquettes ; il se range sous les critères d'acceptation qu'il prouve`],
+        ['nœud', 'l\'arbre : la racine, les nœuds composés, les feuilles'],
+        ['née du champ', 'une ancre que seul le champ connaît : contrat partagé entre nœuds, fichier, commit, option'],
+      ]),
+      '',
+      '## 2. Piles',
+      '',
+      'La pile d\'une ancre réunit les enregistrements qui l\'atteignent. Une action, une observation d\'ordre 1 et un écart atteignent leur ancre ; une correction atteint celle de l\'action qu\'elle vise, un choix celle de la proposition qu\'il tranche ; une observation d\'ordre 2 ou 3 atteint son ancre, s\'il y en a une, et celles des enregistrements qu\'elle observe ; une ratification atteint son nœud. Un enregistrement figure dans la pile de chaque ancre qu\'il atteint, et seulement là.',
+      '',
+      '## 3. Calques',
+      '',
+      tableau(['Calque', 'Ce qu\'il porte'], [
+        ['ordre 1', 'les actions, les verdicts et les écarts des agents et des skills'],
+        ['ordre 2', 'les propositions de l\'observateur d\'ordre 2 de l\'arbre'],
+        ['ordre 3', 'les examens, les veilles et le bilan de l\'observateur d\'ordre 3'],
+        ['humain', 'les retours du développeur, dans ses mots : choix, corrections, ratifications'],
+      ]),
+      '',
+      'Chaque enregistrement y garde son numéro, sa date, son nœud, son auteur et sa preuve. Masquer un calque ne change pas l\'état de l\'ancre.',
+      '',
+      '## 4. États et marques',
+      '',
+      tableau(['Ancre', 'État, qui résume sa pile'], [
+        ['critère', 'celui que lui donne le champ : en écart, menacé, prouvé, à prouver (module `champ`, section 6)'],
+        ['contrat, fichier, commit, option', 'en désaccord, en écart, conforme ou non observée, d\'après les derniers verdicts d\'ordre 1 de chaque nœud'],
+        ['scénario', 'à réaliser, réalisé, ou à reprendre quand sa dernière action a été corrigée ; en écart ou en désaccord d\'après les verdicts'],
+        ['nœud', 'ratifié, non ratifié ou à ratifier ; un nœud composé n\'a pas de ratification propre'],
+      ]),
+      '',
+      'Des marques s\'y ajoutent : un désaccord sur un critère, une observation attendue (ordre 2, ordre 3, décision du développeur, mise en veille), un motif en veille. « À traiter » vient en tête de la vue : désaccords, écarts, menaces, puis observations attendues.',
+      '',
+      '## 5. Commandes',
+      '',
+      'Depuis la racine du projet :',
+      '',
+      '```bash',
+      this.commandeVue(n, 'generer'),
+      this.commandeVue(n, 'generer', exemple),
+      `${this.commandeVue(n, 'generer')} --json`,
+      this.commandeVue(n, 'verifier'),
+      '```',
+      '',
+      `\`generer\` écrit \`${d}/vue.html\`, pour le développeur, et \`${d}/vue.md\`. Avec \`--noeud\`, il écrit sur la sortie la vue de ce nœud, sans rien écrire : ses critères avec ceux qui les soutiennent, les scénarios qui les prouvent, son nœud, et les autres ancres où il a déposé, avec ce que les autres niveaux y ont mis ; la vue du nœud racine est la vue entière. \`--json\` donne le modèle de la vue. \`verifier\` dit si les vues écrites sont à jour, périmées ou modifiées. Un champ altéré ne donne pas de vue : \`${this.commandeChamp(n, 'verifier')}\` dit où. Même champ et mêmes documents : même vue, octet pour octet.`,
+      '',
+      '## 6. Lecteurs',
+      '',
+      '- Le skill de chaque nœud lit sa vue à chaque lancement, et après chaque correction du développeur.',
+      `- Les observateurs d'ordre 2 et 3 lisent la vue entière, \`${this.commandeVue(n, 'generer', cle)}\`.`,
+      '- Le skill racine présente la vue entière au développeur à la ratification de l\'arbre et à la clôture, et la cite dans sa remise.',
+      '- Le développeur ouvre `vue.html` dans son navigateur quand il veut : calques à afficher ou masquer, filtre par nœud, états écrits en toutes lettres ; la page se lit au clavier et sans JavaScript.',
+      '',
+      '## 7. Ce qui ne se fait pas',
+      '',
+      '- Écrire ou corriger la vue à la main : elle se régénère, et `verifier` signale une vue modifiée ou périmée.',
+      '- Commiter la vue : comme le champ et les kits, elle reste hors des commits de l\'arbre.',
+      '- Réécrire le ticket pour qu\'il dise ce que la vue montre : les documents de la clé ne changent que par le skill racine, avec le développeur.',
+    ])];
+  }
+
   /** Sections de la méthode de l'orchestrateur, mot pour mot. */
   methode(n) {
     const o = this.S.orchestrateur;
@@ -1105,10 +1198,10 @@ export class FabriqueSkillTicket {
     const cle = n.reference;
     const racine = `.gemini/skills/${nomSkill(cle)}/`;
     const outils = ['read_file', 'list_directory', 'glob', 'grep_search', 'run_shell_command'];
-    const etat = this.commandeChamp(n, 'etat');
+    const vue = this.commandeVue(n, 'generer', cle);
     const deposer = this.commandeChamp(n, 'deposer');
     const communs = [
-      `- Tu ne crées, ne modifies ni ne supprimes aucun fichier ; ta seule écriture est le dépôt de tes observations par \`${racine}outils/champ.mjs\`. Tes autres commandes ne font que lire.`,
+      `- Tu ne crées, ne modifies ni ne supprimes aucun fichier ; ta seule écriture est le dépôt de tes observations par \`${racine}outils/champ.mjs\`. Tes autres commandes ne font que lire : la vue se lit avec \`--noeud\`, qui n'écrit rien.`,
       '- Types logiques : tu agis sur la manière d\'observer et de concevoir du niveau que tu observes, jamais sur son objet, ni le code ni le ticket.',
       '- Chaque observation cite les enregistrements qui la fondent ; ce qui n\'est ni dans le champ ni prouvé reste une question.',
       '- Ne pas apprendre à plaire : les retours du développeur orientent, ils ne lèvent aucun invariant ni aucune preuve (D6.INV-3).',
@@ -1126,11 +1219,12 @@ export class FabriqueSkillTicket {
         '## Références',
         '',
         `- \`${racine}modules/champ/SKILL.md\` : enregistrements, ordres, déclencheurs ;`,
+        `- \`${racine}modules/vue/SKILL.md\` : ancres, piles, calques et états de la vue augmentée ;`,
         `- \`${racine}modules/methode/SKILL.md\`, § 6 et § 7.2 : boucle de second ordre et registre des concepts de l'orchestrateur.`,
         '',
         '## Méthode',
         '',
-        `1. \`${etat}\` : l'attente d'ordre 2, son motif et ses corrections.`,
+        `1. Lis la vue entière de l'arbre, \`${vue}\` : l'attente d'ordre 2 dans « À traiter », son motif et ses corrections, et, sur les ancres qu'elles atteignent, les calques de chaque niveau.`,
         '2. Relis chaque correction, l\'action qu\'elle vise et les observations d\'ordre 1 du même nœud. Cherche ce que la manière de travailler n\'a pas vu : concept absent, paramètre mal réglé, risque non déduit, convention du projet ignorée (orchestrateur, § 6, étape 3).',
         '3. Formule une adaptation de la manière de travailler : ce que les agents vérifieront ou proposeront autrement, et à quel moment. Si les corrections ne montrent aucune cause commune de méthode, ton verdict est conforme.',
         `4. Dépose ton observation : \`${deposer} observation --noeud <nœud de l'attente> --auteur ${this.nomRole(n, 'observateur-2')} --ordre 2 --verdict proposition --motif <motif> --observe <n des corrections et des actions> --preuve enregistrements:<mêmes n> --proposition "<adaptation>"\`, ou \`--verdict conforme\` sans proposition.`,
@@ -1152,12 +1246,15 @@ export class FabriqueSkillTicket {
         '## Références',
         '',
         `- \`${racine}modules/champ/SKILL.md\` : ordres, déclencheurs, récursion bornée ;`,
+        `- \`${racine}modules/vue/SKILL.md\` : la vue augmentée de l'arbre ;`,
         `- \`${racine}modules/methode/SKILL.md\`, § 6 et § 7.2.`,
         '',
         '## Méthode',
         '',
+        `Lis d'abord la vue entière de l'arbre, \`${vue}\` : ce qui t'est attendu dans « À traiter », et la proposition posée, au calque de l'ordre 2, sur les ancres qu'elle observe.`,
+        '',
         `- **Examen** : la proposition cite-t-elle ses preuves, des corrections qui portent bien son motif et les actions qu'elles visent ? Changerait-elle une décision, une consigne ou une proposition des agents ? Dépose \`${deposer} observation --noeud <nœud> --auteur ${this.nomRole(n, 'observateur-3')} --ordre 3 --verdict fondee --observe <n de la proposition> --preuve enregistrements:<n>\`, ou \`--verdict infondee\` avec la raison dans \`--commentaire\`.`,
-        `- **Veille** : quand \`${etat}\` attend une mise en veille, dépose par la même commande \`--verdict veille --motif <motif> --observe <n des propositions refusées> --preuve enregistrements:<mêmes n>\` : l'ordre 2 ne s'éveille plus sur ce motif.`,
+        `- **Veille** : quand la vue attend une mise en veille, dépose par la même commande \`--verdict veille --motif <motif> --observe <n des propositions refusées> --preuve enregistrements:<mêmes n>\` : l'ordre 2 ne s'éveille plus sur ce motif.`,
         '- **Bilan de clôture** : relis les propositions d\'ordre 2 de l\'arbre et les décisions du développeur ; dépose par la même commande `--verdict bilan --observe <n de toutes les observations d\'ordre 2> --preuve enregistrements:<mêmes n> --commentaire "<lesquelles ont changé une décision>"`.',
         '',
         '## Règles',
@@ -1244,7 +1341,9 @@ export class FabriqueSkillTicket {
       '',
       `Le champ de l'arbre, \`docs/demandes/${this.cle(n)}/champ.jsonl\`, reçoit en ajout seul ce que fait chaque niveau : les actions que tu proposes ou réalises, les retours du développeur (ses choix parmi tes propositions, ses corrections sur tes actions, ses ratifications) et les observations, chacune avec sa preuve. Dépose chacun par \`${this.commandeChamp(n, 'deposer')} <type> …\`, jamais à la main (module \`champ\` du skill racine). La référence de ton observation est un retour du développeur ou une preuve : une auto-évaluation sans preuve ni retour n'est pas une observation.`,
       '',
-      `Après chaque correction du développeur, et à chaque lancement, \`${this.commandeChamp(n, 'etat')}\` montre les critères menacés, les désaccords et les observations attendues : invoque l'observateur d'ordre 2 ou d'ordre 3 de l'arbre quand il en attend une, puis présente sa proposition au développeur, qui la retient ou la refuse. Les retours orientent le travail ; ils ne lèvent aucun invariant ni aucune preuve.`,
+      `Après chaque correction du développeur, et à chaque lancement, ta vue augmentée, \`${this.commandeVue(n, 'generer', n.reference)}\`, montre les critères menacés, les désaccords et les observations attendues, sur tes ancres et avec ce que les autres niveaux y ont déposé : invoque l'observateur d'ordre 2 ou d'ordre 3 de l'arbre quand il en attend une, puis présente sa proposition au développeur, qui la retient ou la refuse. Les retours orientent le travail ; ils ne lèvent aucun invariant ni aucune preuve.`,
+      '',
+      `Le ticket n'est jamais réécrit : ce sont les calques posés sur ses ancres qui changent. Le développeur lit la vue entière de l'arbre dans \`docs/demandes/${this.cle(n)}/vue.html\`, que \`${this.commandeVue(n, 'generer')}\` régénère d'après le champ et les documents de la clé (module \`vue\` du skill racine).`,
       '',
       '## 10. Invariants hérités',
       '',
@@ -1264,7 +1363,7 @@ export class FabriqueSkillTicket {
   placeDansArbre(n) {
     const racine = this.racine(n);
     const lignes = [`- Nature : ${this.nature(n)}${n.estFeuille ? ' ; ce skill agit sur le code, par ses agents.' : ' ; ce skill coordonne ses sous-tickets et n\'agit pas sur le code.'}`];
-    if (n.estRacine) lignes.push('- Boîte à outils de l\'arbre : ce skill porte les documents de la clé (module `documents`), les kits (module `kits`), le champ d\'observation et ses observateurs d\'ordre 2 et 3 (module `champ`), les sous-agents de rôle, rédacteur, analyste, relecteur et qualité, que les skills des nœuds invoquent, et leurs références, copiées des skills du dépôt à leur version épinglée (`references/`, `outils/`).');
+    if (n.estRacine) lignes.push('- Boîte à outils de l\'arbre : ce skill porte les documents de la clé (module `documents`), les kits (module `kits`), le champ d\'observation et ses observateurs d\'ordre 2 et 3 (module `champ`), la vue augmentée de l\'arbre (module `vue`), les sous-agents de rôle, rédacteur, analyste, relecteur et qualité, que les skills des nœuds invoquent, et leurs références, copiées des skills du dépôt à leur version épinglée (`references/`, `outils/`).');
     if (!n.estRacine) {
       const parent = `${n.parent.reference} (skill \`${nomSkill(n.parent.reference)}\`)`;
       lignes.push(n.parent === racine ? `- Parent : ${parent}, le ticket racine ; profondeur ${n.profondeur}.` : `- Parent : ${parent} ; ticket racine : ${racine.reference} ; profondeur ${n.profondeur}.`);
@@ -1288,8 +1387,8 @@ export class FabriqueSkillTicket {
     const etapes = [
       'Vérifie que ce skill est intact : s\'il a été installé par l\'installateur du dépôt Agent2Prompt, `sha256sum -c integrite.sha256` depuis son dossier.',
       'Lis la copie du projet du fichier d\'invariants (`docs/c7e/meso-contrats.md` par défaut) et compare-la à `projet/meso-contrats.md`, l\'état sur lequel ce skill a été produit. La copie du projet fait foi ; si elles diffèrent, dis-le au développeur avant tout le reste. Une valeur `ADAPTER` restée telle se signale, jamais devinée (D8.INV-1).',
-      `Lis l'état du champ de l'arbre, \`${this.commandeChamp(n, 'etat')}\` : ratifications, critères ${n.estFeuille ? 'de ce ticket' : 'de ce nœud et de ses sous-tickets'} menacés ou en écart, désaccords et observations attendues. Traite d'abord ce qui t'est attribué, au niveau le plus bas qui peut le traiter (module \`champ\` du skill racine, section 6).`,
-      ...(n.estRacine ? [] : [`Vérifie dans cet état que l'arbre a été ratifié : « ${objetRatification(racine)} : ratifié ». Sinon, arrête-toi et renvoie le développeur au skill racine, \`${commandeSkill(racine.reference)}\`.`]),
+      `Lis ta vue augmentée, \`${this.commandeVue(n, 'generer', n.reference)}\` : ${n.estRacine ? 'la vue entière de l\'arbre' : `les ancres de ce ${n.estFeuille ? 'ticket' : 'nœud et de ses sous-tickets'}`}, critères, scénarios et nœud, avec ce que chaque niveau y a déposé, les ratifications, et ce qui est à traiter : critères menacés ou en écart, désaccords, observations attendues. Traite d'abord ce qui t'est attribué, au niveau le plus bas qui peut le traiter (modules \`vue\` et \`champ\` du skill racine). Un champ altéré ne donne pas de vue : arrête-toi et montre au développeur ce que dit \`${this.commandeChamp(n, 'verifier')}\`.`,
+      ...(n.estRacine ? [] : [`Vérifie dans cette vue que l'arbre a été ratifié : « ${objetRatification(racine)} : ratifié ». Sinon, arrête-toi et renvoie le développeur au skill racine, \`${commandeSkill(racine.reference)}\`.`]),
       n.dependances.length > 0
         ? `Vérifie que ${liste(n.dependances)} ${n.dependances.length > 1 ? 'sont clos' : 'est clos'} : remise écrite et critères prouvés. Sinon, arrête-toi et dis au développeur ce qui manque.`
         : 'Ce ticket ne dépend d\'aucun autre.',
@@ -1319,14 +1418,14 @@ export class FabriqueSkillTicket {
       ...(n.estRacine
         ? [
           `**Documents à rédiger**, sans \`${this.dossier(n)}us.md\` : fais rédiger les documents de la clé par le sous-agent rédacteur, puis passe leurs contrôles sans écart (module \`documents\`, sections 4 et 5) ; ensuite, ratification (section 6).`,
-          `**Arbre non ratifié**, documents écrits, sans « ${objetRatification(n)} : ratifié » dans l'état du champ : passe à la ratification (section 6).`,
+          `**Arbre non ratifié**, documents écrits, sans « ${objetRatification(n)} : ratifié » dans la vue : passe à la ratification (section 6).`,
         ]
         : []),
-      `**Sous-tickets en cours** : montre l'état de chacun d'après le champ (ratifications, critères menacés ou en écart, désaccords, attentes) et son dossier (\`analyse.md\`, \`remise.md\`), puis le ou les sous-tickets prêts dans l'ordre du module \`sous-tickets\`, avec leur commande, à lancer dans une nouvelle session. Arrête-toi là.`,
+      `**Sous-tickets en cours** : montre l'état de chacun d'après la vue (ratifications, critères menacés ou en écart, désaccords, attentes) et son dossier (\`analyse.md\`, \`remise.md\`), puis le ou les sous-tickets prêts dans l'ordre du module \`sous-tickets\`, avec leur commande, à lancer dans une nouvelle session. Arrête-toi là.`,
       '**Tous les sous-tickets clos**, chacun avec sa `remise.md` : passe à la clôture (section 7).',
     ];
     return [
-      `Ce nœud ne lit ni ne modifie le code, et n'active pas dans sa session le skill d'un sous-ticket : chaque nœud se traite dans sa propre session, lancée par le développeur. À chaque lancement, ce skill reconnaît où en est ${n.estRacine ? 'l\'arbre' : 'son sous-arbre'}, d'après le champ, \`${this.commandeChamp(n, 'etat')}\`, et les dossiers sous \`docs/demandes/${this.racine(n).reference}/\` :`,
+      `Ce nœud ne lit ni ne modifie le code, et n'active pas dans sa session le skill d'un sous-ticket : chaque nœud se traite dans sa propre session, lancée par le développeur. À chaque lancement, ce skill reconnaît où en est ${n.estRacine ? 'l\'arbre' : 'son sous-arbre'}, d'après sa vue augmentée, \`${this.commandeVue(n, 'generer', n.reference)}\`, et les dossiers sous \`docs/demandes/${this.racine(n).reference}/\` :`,
       '',
       ...etats.map((e, k) => `${k + 1}. ${e}`),
     ];
@@ -1337,7 +1436,7 @@ export class FabriqueSkillTicket {
     const documents = 'les statuts des critères mis à jour et leurs contrôles repassés sans écart';
     const commit = 'puis les documents se commitent sur la branche de l\'arbre (module `documents`, section 6)';
     if (n.estRacine && !n.estFeuille) {
-      return [`Avant toute autre action, présente au développeur l'arbre complet : les sous-tickets et leurs méso-contrats, l'ordre de résolution et les critères, avec la façon dont chaque critère de la racine est soutenu (modules \`sous-tickets\` et \`recette\`), et les documents de la clé, qui se ratifient avec lui (module \`documents\`, section 6). **Point de ratification** : rien ne commence avant sa réponse. Une fois ${documents}, ${depot} ; ${commit}. Elle couvre l'arbre ; chaque feuille se ratifie encore avant sa première action. Une fois l'arbre ratifié, indique le premier sous-ticket prêt et sa commande, à lancer dans une nouvelle session.`];
+      return [`Avant toute autre action, présente au développeur l'arbre complet : les sous-tickets et leurs méso-contrats, l'ordre de résolution et les critères, avec la façon dont chaque critère de la racine est soutenu (modules \`sous-tickets\` et \`recette\`), et les documents de la clé, qui se ratifient avec lui (module \`documents\`, section 6). ${this.vueAuDeveloppeur(n, 'les critères d\'acceptation, ceux qui les soutiennent et les scénarios qui les prouvent, encore sans calque')} **Point de ratification** : rien ne commence avant sa réponse. Une fois ${documents}, ${depot} ; ${commit}. Elle couvre l'arbre ; chaque feuille se ratifie encore avant sa première action. Une fois l'arbre ratifié, indique le premier sous-ticket prêt et sa commande, à lancer dans une nouvelle session.`];
     }
     if (!n.estFeuille) return ['Pas de ratification propre : l\'arbre a été ratifié sur le skill racine. Ce nœud coordonne ses sous-tickets.'];
     const presentation = `Présente au développeur ce skill et son analyse : objectif, critères, méso-contrats et options avec leur paramétrage, invariants, configuration, cartographie, stratégie, scénarios et tests déduits, avec la copie de travail de \`ticket.toml\`${n.estRacine ? ', et les documents de la clé, qui se ratifient avec lui (module `documents`, section 6)' : ''}. **Point de ratification** : rien n'est modifié avant sa réponse (D3.INV-1, la fiche étant ce skill).`;
@@ -1402,7 +1501,7 @@ export class FabriqueSkillTicket {
       ...(n.estRacine
         ? [
           '',
-          `Si l'ordre 2 a proposé des adaptations, invoque l'observateur d'ordre 3 de l'arbre, \`${this.nomRole(n, 'observateur-3')}\`, pour le bilan de clôture : lesquelles ont changé une décision (module \`champ\`, section 4). Puis assemble les kits dev, test et démo et la remise à Agent2Test, et contrôle-les sans écart (module \`kits\`).`,
+          `Si l'ordre 2 a proposé des adaptations, invoque l'observateur d'ordre 3 de l'arbre, \`${this.nomRole(n, 'observateur-3')}\`, pour le bilan de clôture : lesquelles ont changé une décision (module \`champ\`, section 4). ${this.vueAuDeveloppeur(n, 'chaque critère d\'acceptation avec ses preuves, les désaccords et les décisions')} Puis assemble les kits dev, test et démo et la remise à Agent2Test, et contrôle-les sans écart (module \`kits\`).`,
         ]
         : []),
     ];
@@ -1415,7 +1514,7 @@ export class FabriqueSkillTicket {
       ? 'Ce skill étant aussi la racine de l\'arbre, cette remise s\'écrit dans l\'ordre d\'assemblage des kits dev, test et démo et de la remise à Agent2Test (module `kits`, section 5), qui s\'y citent par leur chemin.'
       : 'Les kits dev, test et démo s\'y citent par leur chemin (module `kits`).';
     const racine = n.estRacine
-      ? ` ${kits} L'état final du champ, \`${this.commandeChamp(n, 'etat')}\`, s'y reporte : critères prouvés, désaccords et leurs décisions au registre des écarts, propositions d'ordre 2 retenues ou refusées${n.estFeuille ? `, avec le bilan de clôture de l'observateur d'ordre 3 si l'ordre 2 a proposé des adaptations` : ''}. Donne au développeur la remise à Agent2Test, qu'il dépose lui-même, le rapport final par critère (\`references/agent-tdd-jira/tracabilite.md\`, § 4) et le projet de commentaire Jira, qu'il publie lui-même (§ 5) : ce skill n'écrit jamais dans Jira.`
+      ? ` ${kits} L'état final du champ, \`${this.commandeChamp(n, 'etat')}\`, s'y reporte : critères prouvés, désaccords et leurs décisions au registre des écarts, propositions d'ordre 2 retenues ou refusées${n.estFeuille ? `, avec le bilan de clôture de l'observateur d'ordre 3 si l'ordre 2 a proposé des adaptations` : ''} ; la vue finale, \`docs/demandes/${this.cle(n)}/vue.html\`, s'y cite par son chemin, à jour (\`${this.commandeVue(n, 'verifier')}\`). Donne au développeur la remise à Agent2Test, qu'il dépose lui-même, le rapport final par critère (\`references/agent-tdd-jira/tracabilite.md\`, § 4) et le projet de commentaire Jira, qu'il publie lui-même (§ 5) : ce skill n'écrit jamais dans Jira.`
       : '';
     if (!n.estFeuille) return [`${remise} : pour chaque critère, les preuves de ceux qui le soutiennent ; les écarts remontés et leurs décisions ; l'état de chaque sous-ticket.${racine} ${suite}`];
     const front = this.couches(n).includes('frontend');
@@ -1449,6 +1548,7 @@ export class FabriqueSkillTicket {
     if (m === 'documents') return 'documents de la clé selon agent-tdd-jira, rattachement des critères, contrôles et ratification';
     if (m === 'kits') return 'kits dev, test et démo, remise à Agent2Test, assemblage et contrôle';
     if (m === 'champ') return 'champ d\'observation de l\'arbre : enregistrements, commandes, ordres, déclencheurs, propagation, désaccords';
+    if (m === 'vue') return 'vue augmentée de l\'arbre : ancres, piles, calques, états, commandes, lecteurs';
     if (m === 'methode') return 'sections de la méthode de l\'orchestrateur, mot pour mot';
     if (m === 'invariants') return 'invariants hérités, correspondances, invariants de l\'orchestrateur mot pour mot';
     return m ? `module \`${m}\`` : '';

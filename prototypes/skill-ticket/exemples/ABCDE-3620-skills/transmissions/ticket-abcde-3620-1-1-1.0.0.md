@@ -85,7 +85,7 @@ Suis `SKILL.md` à partir de sa section 4. Rien n'est modifié avant la ratifica
     ],
     "genere_par": {
       "prototype": "skill-ticket",
-      "lot": 5,
+      "lot": 6,
       "fabrique": "java-angular-postgresql",
       "orchestrateur": "3.5.3"
     }
@@ -159,7 +159,7 @@ version: 1.0.0
 
 # Skill de ticket ABCDE-3620-1.1
 
-> Produit par le générateur C7E (prototype « skill de ticket », lot 5), fabrique `java-angular-postgresql`, référentiel des méso-contrats 3.3.0, orchestrateur-c7e 3.5.3. Ce skill remplace la fiche de transformation comme objet ratifié avant toute modification ; il reste identique à sa transmission. Si tu y relèves une ambiguïté ou une contradiction, signale-la au développeur ; ne corrige pas le skill toi-même.
+> Produit par le générateur C7E (prototype « skill de ticket », lot 6), fabrique `java-angular-postgresql`, référentiel des méso-contrats 3.3.0, orchestrateur-c7e 3.5.3. Ce skill remplace la fiche de transformation comme objet ratifié avant toute modification ; il reste identique à sa transmission. Si tu y relèves une ambiguïté ou une contradiction, signale-la au développeur ; ne corrige pas le skill toi-même.
 
 ## 1. Place dans l'arbre
 
@@ -191,8 +191,8 @@ Composition confirmée : M02 (module `meso-contrats`). Méso-contrats transverse
 
 1. Vérifie que ce skill est intact : s'il a été installé par l'installateur du dépôt Agent2Prompt, `sha256sum -c integrite.sha256` depuis son dossier.
 2. Lis la copie du projet du fichier d'invariants (`docs/c7e/meso-contrats.md` par défaut) et compare-la à `projet/meso-contrats.md`, l'état sur lequel ce skill a été produit. La copie du projet fait foi ; si elles diffèrent, dis-le au développeur avant tout le reste. Une valeur `ADAPTER` restée telle se signale, jamais devinée (D8.INV-1).
-3. Lis l'état du champ de l'arbre, `node .gemini/skills/ticket-abcde-3620/outils/champ.mjs etat docs/demandes/ABCDE-3620` : ratifications, critères de ce ticket menacés ou en écart, désaccords et observations attendues. Traite d'abord ce qui t'est attribué, au niveau le plus bas qui peut le traiter (module `champ` du skill racine, section 6).
-4. Vérifie dans cet état que l'arbre a été ratifié : « arbre ABCDE-3620 : ratifié ». Sinon, arrête-toi et renvoie le développeur au skill racine, `/ticket:abcde-3620`.
+3. Lis ta vue augmentée, `node .gemini/skills/ticket-abcde-3620/outils/vue.mjs generer docs/demandes/ABCDE-3620 --noeud ABCDE-3620-1.1` : les ancres de ce ticket, critères, scénarios et nœud, avec ce que chaque niveau y a déposé, les ratifications, et ce qui est à traiter : critères menacés ou en écart, désaccords, observations attendues. Traite d'abord ce qui t'est attribué, au niveau le plus bas qui peut le traiter (modules `vue` et `champ` du skill racine). Un champ altéré ne donne pas de vue : arrête-toi et montre au développeur ce que dit `node .gemini/skills/ticket-abcde-3620/outils/champ.mjs verifier docs/demandes/ABCDE-3620`.
+4. Vérifie dans cette vue que l'arbre a été ratifié : « arbre ABCDE-3620 : ratifié ». Sinon, arrête-toi et renvoie le développeur au skill racine, `/ticket:abcde-3620`.
 5. Ce ticket ne dépend d'aucun autre.
 
 ## 5. Analyse (d=0), avant toute modification
@@ -235,7 +235,9 @@ Avant É6, le sous-agent `ticket-abcde-3620-relecteur` relit les commits de ce t
 
 Le champ de l'arbre, `docs/demandes/ABCDE-3620/champ.jsonl`, reçoit en ajout seul ce que fait chaque niveau : les actions que tu proposes ou réalises, les retours du développeur (ses choix parmi tes propositions, ses corrections sur tes actions, ses ratifications) et les observations, chacune avec sa preuve. Dépose chacun par `node .gemini/skills/ticket-abcde-3620/outils/champ.mjs deposer docs/demandes/ABCDE-3620 <type> …`, jamais à la main (module `champ` du skill racine). La référence de ton observation est un retour du développeur ou une preuve : une auto-évaluation sans preuve ni retour n'est pas une observation.
 
-Après chaque correction du développeur, et à chaque lancement, `node .gemini/skills/ticket-abcde-3620/outils/champ.mjs etat docs/demandes/ABCDE-3620` montre les critères menacés, les désaccords et les observations attendues : invoque l'observateur d'ordre 2 ou d'ordre 3 de l'arbre quand il en attend une, puis présente sa proposition au développeur, qui la retient ou la refuse. Les retours orientent le travail ; ils ne lèvent aucun invariant ni aucune preuve.
+Après chaque correction du développeur, et à chaque lancement, ta vue augmentée, `node .gemini/skills/ticket-abcde-3620/outils/vue.mjs generer docs/demandes/ABCDE-3620 --noeud ABCDE-3620-1.1`, montre les critères menacés, les désaccords et les observations attendues, sur tes ancres et avec ce que les autres niveaux y ont déposé : invoque l'observateur d'ordre 2 ou d'ordre 3 de l'arbre quand il en attend une, puis présente sa proposition au développeur, qui la retient ou la refuse. Les retours orientent le travail ; ils ne lèvent aucun invariant ni aucune preuve.
+
+Le ticket n'est jamais réécrit : ce sont les calques posés sur ses ancres qui changent. Le développeur lit la vue entière de l'arbre dans `docs/demandes/ABCDE-3620/vue.html`, que `node .gemini/skills/ticket-abcde-3620/outils/vue.mjs generer docs/demandes/ABCDE-3620` régénère d'après le champ et les documents de la clé (module `vue` du skill racine).
 
 ## 10. Invariants hérités
 
@@ -1391,8 +1393,8 @@ Précision du développeur, s'il y en a une : {{args}}
 
 Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichiers ont été matérialisés.
 
-    2b8ffe3b213c22d251cbbc6afa606257246d97ecccc39eef82c94e703ff06c54  manifest.json
-    bd23c36d00f117a34fc15dfaabd0361980f7ed6abbd30d46046e2fadf1442f13  SKILL.md
+    c5f0d63296a5431335e9949a3bda3d6fccd4f5ec9e6a0046fc56b5f6cb5a3e1f  manifest.json
+    8b5e8543bf34f1c7a7d19487844dce665fef0ef471dafc27eaa93115a52b2f6b  SKILL.md
     3dd01b85794d05f8856234f53a76e7b679e4717c900d7994d4ec5a966db7751f  ticket.toml
     427b91753721d9837d87a6ac8929c11124df6101bf959918468043b9dd6f88de  modules/meso-contrats/SKILL.md
     86a98a76275998dda7eb1918ba14623af7f6ee89f13b9a960b937180b3766307  modules/option-persistance-crud/SKILL.md

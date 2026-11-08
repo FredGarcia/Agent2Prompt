@@ -268,13 +268,15 @@ test('commandes : TOML de Gemini CLI, description et invite qui active le skill 
 test('cycle de vie : une session par nœud, ratification de l\'arbre vérifiée, états de la racine', () => {
   const consigne = (nom) => fichiersDe(attendue(nom)).get('SKILL.md');
   assert.match(consigne('ticket-abcde-3620'), /1\. \*\*Documents à rédiger\*\*[^\n]*\n2\. \*\*Arbre non ratifié\*\*[^\n]*\n3\. \*\*Sous-tickets en cours\*\*[^\n]*\n4\. \*\*Tous les sous-tickets clos\*\*/);
-  assert.match(consigne('ticket-abcde-3620'), /2\. \*\*Arbre non ratifié\*\*, documents écrits, sans « arbre ABCDE-3620 : ratifié » dans l'état du champ/);
+  assert.match(consigne('ticket-abcde-3620'), /2\. \*\*Arbre non ratifié\*\*, documents écrits, sans « arbre ABCDE-3620 : ratifié » dans la vue/);
   assert.doesNotMatch(consigne('ticket-abcde-3620-1'), /Arbre non ratifié/);
   for (const nom of NOMS) {
-    assert.match(consigne(nom), /\n3\. Lis l'état du champ de l'arbre, `node \.gemini\/skills\/ticket-abcde-3620\/outils\/champ\.mjs etat docs\/demandes\/ABCDE-3620` : ratifications, critères de ce (nœud et de ses sous-tickets|ticket) menacés ou en écart/, nom);
+    const reference = nom.replace(/^ticket-/, '').toUpperCase().replace(/^(ABCDE-3620)-(\d)-(\d)$/, '$1-$2.$3');
+    assert.ok(consigne(nom).includes(`\n3. Lis ta vue augmentée, \`node .gemini/skills/ticket-abcde-3620/outils/vue.mjs generer docs/demandes/ABCDE-3620 --noeud ${reference}\` : `), nom);
+    assert.match(consigne(nom), /Un champ altéré ne donne pas de vue : arrête-toi et montre au développeur ce que dit `node \.gemini\/skills\/ticket-abcde-3620\/outils\/champ\.mjs verifier docs\/demandes\/ABCDE-3620`\./, nom);
   }
   for (const nom of NOMS.slice(1)) {
-    assert.match(consigne(nom), /\n4\. Vérifie dans cet état que l'arbre a été ratifié : « arbre ABCDE-3620 : ratifié »\. Sinon, arrête-toi et renvoie le développeur au skill racine, `\/ticket:abcde-3620`\./, nom);
+    assert.match(consigne(nom), /\n4\. Vérifie dans cette vue que l'arbre a été ratifié : « arbre ABCDE-3620 : ratifié »\. Sinon, arrête-toi et renvoie le développeur au skill racine, `\/ticket:abcde-3620`\./, nom);
   }
   assert.match(consigne('ticket-abcde-3620-1-2'), /Puis renvoie le développeur au skill de ABCDE-3620-1, `\/ticket:abcde-3620-1`, dans une nouvelle session/);
   assert.match(consigne('ticket-abcde-3620-1-2'), /par l'outil `invoke_agent` : `ticket-abcde-3620-1-2-back` \(backend\)/);
@@ -564,6 +566,66 @@ test('lot 5 : un ticket sans sous-ticket porte le champ et ses observateurs ; il
   assert.deepStrictEqual(sectionsMethode(arbre.racine), ['2', '5.1', '5.2', '6', '7.1', '7.2', '8', '11.5']);
   for (const rel of ['modules/champ/SKILL.md', 'outils/champ.mjs', 'agents/ticket-abcde-3621-observateur-2.md', 'agents/ticket-abcde-3621-observateur-3.md', 'agents/ticket-abcde-3621-persistance.md']) assert.ok(f.has(rel), rel);
   assert.ok(f.get('SKILL.md').includes('--noeud ABCDE-3621 --auteur ticket-abcde-3621 --nature ratification --objet "ABCDE-3621" --decision ratifié'));
+});
+
+// ---- Lot 6 : vue augmentée ----
+
+test('lot 6 : la racine porte la vue augmentée, son script identique à sa source, et son module', () => {
+  const f = fichiersDe(attendue('ticket-abcde-3620'));
+  assert.equal(f.get('outils/vue.mjs'), lireTexte(join(ICI, '..', 'outils', 'vue.mjs')));
+  assert.deepStrictEqual(JSON.parse(f.get('manifest.json')).ticket.herites.find((h) => h.path === 'outils/vue.mjs'), { path: 'outils/vue.mjs', from: 'prototypes/skill-ticket/outils/vue.mjs', sha256: sha256(f.get('outils/vue.mjs')) });
+  const module = f.get('modules/vue/SKILL.md');
+  assert.deepStrictEqual(module.split('\n').filter((l) => l.startsWith('## ')), ['## 1. Ancres', '## 2. Piles', '## 3. Calques', '## 4. États et marques', '## 5. Commandes', '## 6. Lecteurs', '## 7. Ce qui ne se fait pas']);
+  for (const commande of [
+    'node .gemini/skills/ticket-abcde-3620/outils/vue.mjs generer docs/demandes/ABCDE-3620\n',
+    'node .gemini/skills/ticket-abcde-3620/outils/vue.mjs generer docs/demandes/ABCDE-3620 --noeud ABCDE-3620-1.1\n',
+    'node .gemini/skills/ticket-abcde-3620/outils/vue.mjs verifier docs/demandes/ABCDE-3620\n',
+  ]) assert.ok(module.includes(commande), commande);
+  assert.match(module, /Le ticket n'est jamais réécrit par ceux qui l'observent/);
+  for (const nom of NOMS.slice(1)) assert.ok(!fichiersDe(attendue(nom)).has('modules/vue/SKILL.md'), nom);
+  assert.match(f.get('SKILL.md'), /la vue augmentée de l'arbre \(module `vue`\)/);
+});
+
+test('lot 6 : le rattachement porte l\'énoncé de chaque critère des nœuds, celui de leur ticket', () => {
+  const r = JSON.parse(fichiersDe(attendue('ticket-abcde-3620')).get('outils/rattachement.json'));
+  const arbre = chargerArbre(EXEMPLE);
+  for (const n of r.noeuds) {
+    const ticket = arbre.parReference.get(n.reference).criteres;
+    assert.deepStrictEqual(n.criteres.map((c) => [c.id, c.enonce]), ticket.map((c) => [c.id, c.enonce]), n.reference);
+  }
+});
+
+test('lot 6 : la racine présente la vue à la ratification de l\'arbre et à la clôture, et la cite dans sa remise ; les observateurs lisent la vue entière', () => {
+  const f = fichiersDe(attendue('ticket-abcde-3620'));
+  const skill = f.get('SKILL.md');
+  const presentation = 'Génère la vue augmentée de l\'arbre, `node .gemini/skills/ticket-abcde-3620/outils/vue.mjs generer docs/demandes/ABCDE-3620`, et invite le développeur à ouvrir `docs/demandes/ABCDE-3620/vue.html` dans son navigateur : ';
+  assert.ok(skill.includes(`${presentation}les critères d'acceptation, ceux qui les soutiennent et les scénarios qui les prouvent, encore sans calque. **Point de ratification**`));
+  assert.ok(skill.includes(`${presentation}chaque critère d'acceptation avec ses preuves, les désaccords et les décisions. Puis assemble les kits`));
+  assert.match(skill, /la vue finale, `docs\/demandes\/ABCDE-3620\/vue\.html`, s'y cite par son chemin, à jour \(`node \.gemini\/skills\/ticket-abcde-3620\/outils\/vue\.mjs verifier docs\/demandes\/ABCDE-3620`\)/);
+  for (const ordre of [2, 3]) {
+    const agent = f.get(`agents/ticket-abcde-3620-observateur-${ordre}.md`);
+    assert.ok(agent.includes('`node .gemini/skills/ticket-abcde-3620/outils/vue.mjs generer docs/demandes/ABCDE-3620 --noeud ABCDE-3620`'), `ordre ${ordre}`);
+    assert.match(agent, /la vue se lit avec `--noeud`, qui n'écrit rien/);
+    assert.match(agent, /`\.gemini\/skills\/ticket-abcde-3620\/modules\/vue\/SKILL\.md`/);
+    assert.doesNotMatch(agent, /champ\.mjs etat/, 'l\'observateur lit la vue, plus l\'état brut du champ');
+  }
+  for (const nom of NOMS) {
+    const consigne = fichiersDe(attendue(nom)).get('SKILL.md');
+    assert.match(consigne, /Le développeur lit la vue entière de l'arbre dans `docs\/demandes\/ABCDE-3620\/vue\.html`, que `node \.gemini\/skills\/ticket-abcde-3620\/outils\/vue\.mjs generer docs\/demandes\/ABCDE-3620` régénère/, nom);
+  }
+  assert.match(fichiersDe(attendue('ticket-abcde-3620-1')).get('SKILL.md'), /d'après sa vue augmentée, `node \.gemini\/skills\/ticket-abcde-3620\/outils\/vue\.mjs generer docs\/demandes\/ABCDE-3620 --noeud ABCDE-3620-1`/);
+});
+
+test('lot 6 : un skill racine produit au lot 5 reste vérifiable sans le script de la vue ; au lot 6, le script est requis', () => {
+  const sansVue = (lot) => (fs) => {
+    fs.splice(fs.findIndex((x) => x.rel === 'outils/vue.mjs'), 1);
+    majManifeste(fs, (j) => {
+      j.ticket.genere_par.lot = lot;
+      j.ticket.herites = j.ticket.herites.filter((h) => h.path !== 'outils/vue.mjs');
+    });
+  };
+  assert.deepStrictEqual(verifierTransmission(retoucher(attendue('ticket-abcde-3620'), sansVue(5))).erreurs, []);
+  attendreEcart(verifierTransmission(retoucher(attendue('ticket-abcde-3620'), sansVue(6))).erreurs, /héritage absent du manifeste : outils\/vue\.mjs/);
 });
 
 // ---- Ligne de commande et installateur ----

@@ -1,6 +1,6 @@
 # Prototype : skill de ticket C7E
 
-**Statut** : lots 1 à 5 livrés : modèle et vérification de l'arbre, fabrique et Monteur des skills de ticket, installation de l'arbre dans Gemini CLI, documents de la clé Jira, sous-agents de rôle et kits dev, test et démo, puis champ d'observation de l'arbre et ses observateurs d'ordre 2 et 3 ; les choix du lot 5 attendent la validation du développeur. Les lots 6 et 7 suivent, chacun validé par le développeur. Rien ici n'est encore une spécification versionnée : le prototype reste hors de `specs/` jusqu'à son bilan, après quoi il entrera dans l'orchestrateur C7E, probablement en version majeure, ou dans une spécification de générateur à part.
+**Statut** : lots 1 à 6 livrés : modèle et vérification de l'arbre, fabrique et Monteur des skills de ticket, installation de l'arbre dans Gemini CLI, documents de la clé Jira, sous-agents de rôle et kits dev, test et démo, champ d'observation de l'arbre et ses observateurs d'ordre 2 et 3, puis vue augmentée de l'arbre ; les choix du lot 6 attendent la validation du développeur. Le lot 7, recette et bilan, suit, validé par le développeur. Rien ici n'est encore une spécification versionnée : le prototype reste hors de `specs/` jusqu'à son bilan, après quoi il entrera dans l'orchestrateur C7E, probablement en version majeure, ou dans une spécification de générateur à part.
 
 ## Objet
 
@@ -35,6 +35,14 @@ Ratifié ensuite, le même jour, après le lot 4 :
 17. **Script `outils/champ.mjs`** dans la boîte à outils de la racine, `deposer`, `verifier` et `etat` : le script décide quand, les sous-agents formulent quoi. Deux corrections au même motif font attendre l'ordre 2 ; un écart sur un critère menace, de proche en proche, les critères qu'il soutient jusqu'au critère d'acceptation ; des verdicts contraires de deux nœuds sur une même ancre forment un désaccord, inscrit au registre des écarts (D6.INV-3). Un écart se traite au niveau le plus bas qui le peut.
 18. **Ordres d'observation** : 1, les agents et les skills, une correction étant un commit de rétroaction qui cite son observation ; 2, l'observateur de l'arbre, qui propose une adaptation de la méthode, entrée `proposed` du registre des concepts, jamais une action sur le code ; 3, éveillé par une proposition d'ordre 2 ou par la clôture, qui vérifie les preuves et l'effet sur la décision, et met l'ordre 2 en veille sur un motif après deux propositions refusées ; l'humain au-dessus. Les observateurs d'ordre 2 et 3 et le module `champ` sont sur la racine.
 19. **Recette P5** sur retours simulés pour ABCDE-3620, et altérations du champ.
+
+Ratifié ensuite, le même jour, après le lot 5 (plan du lot 6, tel que proposé) :
+
+20. **Vue augmentée** : ses ancres sont celles que porte le ticket, qui n'est jamais réécrit (critères d'acceptation de `us.md`, critères de chaque nœud, dont le rattachement reçoit les énoncés, scénarios du fichier Gherkin, nœuds), et celles que seul le champ connaît, marquées « nées du champ ». La pile d'une ancre réunit les enregistrements qui l'atteignent, directement par leur ancre ou par ce qu'ils visent ou observent ; une ratification atteint son nœud.
+21. **Quatre calques** posés sur chaque ancre (Décorateur) : ordre 1, ordre 2, ordre 3, humain, chaque enregistrement avec son numéro et sa preuve ; masquer un calque ne change pas l'état. L'état d'une ancre résume sa pile : celui du champ pour un critère ; en désaccord, en écart, conforme ou non observée pour une autre ancre observée ; à réaliser, réalisé ou à reprendre pour un scénario ; ratifié, non ratifié ou à ratifier pour un nœud ; avec des marques pour une observation attendue et un motif en veille. Gravité d'abord : désaccord, écart, menace, attente.
+22. **Second visiteur des critères**, qui range la vue par critère d'acceptation, chaque critère suivi de ceux qui le soutiennent et des scénarios qui le prouvent ; formats `vue.html` pour le développeur (autonome, accessible, lisible sans JavaScript), `vue.md` pour les agents, `--json` pour les outils ; même champ et mêmes documents, même vue.
+23. **Script `outils/vue.mjs`** dans la boîte à outils de la racine, `generer [--noeud]` et `verifier` ; un champ altéré ne donne pas de vue ; la vue n'est pas commitée. Chaque nœud lit sa vue à son lancement, les observateurs d'ordre 2 et 3 la vue entière ; la racine la présente au développeur à la ratification de l'arbre et à la clôture, et la cite dans sa remise ; `liste` dit si elle est à jour.
+24. **Recette P6** : vues de l'essai à plusieurs moments et du projet résolu, identiques aux vues versionnées ; piles recalculées et états du champ comparés à la vue ; altérations ; structure accessible vérifiée sans dépendance.
 
 ## Arbre d'essai : ABCDE-3620 sur trois niveaux
 
@@ -113,14 +121,15 @@ Le skill du nœud `ABCDE-3620-1.2` s'appelle `ticket-abcde-3620-1-2` (référenc
 | `commandes/ticket/<nœud>.toml` | la commande Gemini CLI qui lance le skill dans une session, `/ticket:<nœud>` (lot 3) | tous |
 | `modules/documents/`, `modules/kits/`, `outils/`, `references/<skill>…`, `agents/<skill>-<rôle>.md` | boîte à outils de l'arbre : documents de la clé, kits, scripts de contrôle, références des sous-agents de rôle et ces sous-agents (lot 4) | racine |
 | `modules/champ/`, `outils/champ.mjs`, `agents/<skill>-observateur-2.md`, `agents/<skill>-observateur-3.md` | champ d'observation de l'arbre, son script et ses observateurs d'ordre 2 et 3 (lot 5) | racine |
+| `modules/vue/`, `outils/vue.mjs` | vue augmentée de l'arbre et son script (lot 6) | racine |
 
-L'arbre d'essai donne cinq skills, de 11 à 41 fichiers ; leurs transmissions attendues sont versionnées dans `exemples/ABCDE-3620-skills/transmissions/` : de 69 000 à 112 000 caractères pour les nœuds, 395 000 pour la racine, qui porte la boîte à outils, contre 230 000 pour la transmission de l'orchestrateur. Un sous-agent ne charge que ses références ; la mesure du contexte chargé reste celle du lot 7.
+L'arbre d'essai donne cinq skills, de 11 à 43 fichiers ; leurs transmissions attendues sont versionnées dans `exemples/ABCDE-3620-skills/transmissions/` : de 69 000 à 112 000 caractères pour les nœuds, 452 000 pour la racine, qui porte la boîte à outils, contre 230 000 pour la transmission de l'orchestrateur. Un sous-agent ne charge que ses références ; la mesure du contexte chargé reste celle du lot 7.
 
 ### Contrôle de l'héritage
 
 | Règle | Contenu |
 |---|---|
-| H1 | la provenance déclarée est complète : méthode, invariants de l'orchestrateur, socle, invariants du projet, et, pour une feuille, le référentiel de la pile de chaque couche touchée ; pour la racine, depuis le lot 4, toute la boîte à outils de son lot (le script du champ depuis le lot 5) |
+| H1 | la provenance déclarée est complète : méthode, invariants de l'orchestrateur, socle, invariants du projet, et, pour une feuille, le référentiel de la pile de chaque couche touchée ; pour la racine, depuis le lot 4, toute la boîte à outils de son lot (le script du champ depuis le lot 5, celui de la vue depuis le lot 6) |
 | H2 | chaque invariant de l'orchestrateur, à la version déclarée, figure mot pour mot dans `modules/invariants`, et leur nombre est celui déclaré |
 | H3 | chaque section de la méthode déclarée figure mot pour mot dans `modules/methode`, et chaque section d'un extrait de la boîte à outils dans son fichier |
 | H4 | chaque copie a l'empreinte que déclare le manifeste, et elle est identique à sa source à la version épinglée, courante ou archivée ; un module de skill à la version de son skill ; un script tiré d'un bloc de code, à ce bloc |
@@ -147,7 +156,7 @@ Le Monteur applique ces règles avant d'écrire : un skill qui omet ou altère u
 | Commande | Effet |
 |---|---|
 | `installer <dossier ou transmissions>` | vérifie chaque transmission (intégrité et héritage, lot 2) et que l'ensemble forme un arbre complet ; installe les skills par `tools/installer.mjs` ; copie les agents des feuilles dans `.gemini/agents/` et les commandes des nœuds dans `.gemini/commands/ticket/` ; écrit le relevé et une copie des transmissions dans `.gemini/skill-ticket/<clé>/` ; masque le tout à Git, comme `tools/installer.mjs` masque les skills. Rien n'est écrit au moindre écart ; un fichier modifié depuis l'installation n'est remplacé qu'avec `--forcer` |
-| `liste` | arbres installés, et état de chaque nœud d'après le champ d'observation et les dossiers du ticket : documents à rédiger, arbre à ratifier, en attente, prêt, analysé, ratifié, prêt à clore, clos ; puis l'état du champ : critères prouvés, en écart, menacés, désaccords, observations attendues, et un champ altéré avec la commande qui dit où (lot 5) |
+| `liste` | arbres installés, et état de chaque nœud d'après le champ d'observation et les dossiers du ticket : documents à rédiger, arbre à ratifier, en attente, prêt, analysé, ratifié, prêt à clore, clos ; puis l'état du champ : critères prouvés, en écart, menacés, désaccords, observations attendues, et un champ altéré avec la commande qui dit où (lot 5) ; enfin la vue augmentée : son chemin, à jour, périmée, modifiée ou absente, avec la commande qui la régénère (lot 6) |
 | `verifier [<clé>]` | fichiers installés intacts ; si Gemini CLI est là, ses skills découverts et activés, ses agents chargés sans erreur, et un dossier non fiable signalé |
 | `lancer <référence>` | ouvre Gemini CLI dans le workspace, en mode interactif, sur la phrase qui active le skill du nœud : `gemini -i "Active le skill …"` |
 | `retirer <clé>` | archive les transmissions dans `docs/demandes/<clé>/skills/`, où elles se versionnent avec le ticket, puis retire skills, agents, commandes et relevé |
@@ -156,7 +165,7 @@ Gemini CLI se désigne par `--gemini <exécutable>` ou par la variable `SKILL_TI
 
 ### Cycle de vie d'un nœud
 
-Chaque nœud se traite dans **sa propre session** de Gemini CLI, avec son propre contexte (décision 8), que le développeur lance par la commande du nœud ou par `lancer`. Aucun skill n'active celui d'un sous-ticket dans sa session. Les états se lisent dans les dossiers du ticket et, depuis le lot 5, dans son champ d'observation :
+Chaque nœud se traite dans **sa propre session** de Gemini CLI, avec son propre contexte (décision 8), que le développeur lance par la commande du nœud ou par `lancer`. Aucun skill n'active celui d'un sous-ticket dans sa session. Les états se lisent dans les dossiers du ticket et, depuis le lot 5, dans son champ d'observation, que chaque nœud lit dans sa vue augmentée depuis le lot 6 :
 
 | Nœud | États |
 |---|---|
@@ -299,7 +308,7 @@ La recette vérifie aussi la mise en veille après deux propositions refusées, 
 
 L'invocation des observateurs par les skills, sur les attentes du champ, demande un modèle : comme P4, elle s'essaie dans Gemini CLI, sur le poste.
 
-### Choix du lot 5, à valider
+### Choix du lot 5, validés le 8 novembre 2026
 
 1. **Seuils** : deux corrections au même motif, comptées dans tout l'arbre, éveillent l'ordre 2 ; deux propositions refusées sur un motif, sans proposition retenue depuis, appellent la veille. Le motif, en minuscules et tirets, est choisi par le skill qui dépose la correction.
 2. **États des critères** d'après le dernier verdict d'ordre 1 de chaque nœud ; propagation par un visiteur des critères de l'arbre, construits depuis les « soutient » du rattachement, dans le skill racine installé, sans le modèle de l'arbre ; la vue augmentée du lot 6 y ajoutera son visiteur.
@@ -309,6 +318,41 @@ L'invocation des observateurs par les skills, sur les attentes du champ, demande
 6. **Intégrité** : `champ.tete` garde l'empreinte de la dernière ligne ; un champ altéré refuse tout dépôt ; un verrou de fichier sérialise les dépôts de deux sessions ; dates en UTC, non décroissantes.
 7. **Compatibilité** : un skill racine produit au lot 4 reste vérifiable sans le script du champ ; `liste` lit `retours.md` quand le champ ne dit rien d'un objet.
 8. **Ticket sans sous-ticket** : sa racine porte aussi le champ et les observateurs, avec les sections de la méthode d'une feuille et le § 7.2 ; il se ratifie sous sa référence.
+
+## Vue augmentée (lot 6)
+
+Chaque niveau voit le ticket augmenté des observations des autres niveaux (décisions 20 à 23). Le ticket n'est jamais réécrit : ses ancres restent celles de ses documents, et les calques posés sur elles changent avec le champ. `outils/vue.mjs`, livré tel quel dans le skill racine à côté de `champ.mjs`, tire la vue du champ et des documents de la clé ; elle ne s'écrit ni ne se corrige à la main.
+
+| Commande | Effet |
+|---|---|
+| `generer <dossier>` | écrit `vue.html`, pour le développeur, et `vue.md` dans le dossier de la clé ; un champ altéré ne donne pas de vue |
+| `generer <dossier> --noeud <référence>` | écrit sur la sortie la vue de ce nœud, en Markdown, sans rien écrire : ses critères avec ceux qui les soutiennent, les scénarios qui les prouvent, son nœud, et les autres ancres où il a déposé, avec ce que les autres niveaux y ont mis ; la vue du nœud racine est la vue entière ; elle se lit même avant le premier dépôt |
+| `generer <dossier> --json` | le modèle de la vue, `skill-ticket.vue/1` : ancres, état, marques, calques, rangement, à traiter |
+| `verifier <dossier>` | les vues écrites sont-elles à jour, périmées (tirées d'un champ plus court), modifiées ou absentes ? |
+
+La vue s'ouvre sur ce qui est à traiter, par gravité : désaccords, écarts, menaces, observations attendues ; puis chaque critère d'acceptation, suivi des critères qui le soutiennent jusqu'aux feuilles et des scénarios qui le prouvent ; les nœuds ; les ancres nées du champ. Un critère d'un nœud dit l'état de ce qu'il soutient : une feuille voit l'effet de ses écarts sur son parent et sur le critère d'acceptation. La page `vue.html` est autonome, sans réseau ni ressource extérieure : calques à afficher ou masquer, filtre par nœud avec un message d'état, états écrits en toutes lettres avec un symbole d'appoint, thèmes clair et sombre aux contrastes AA, lisible au clavier et sans JavaScript, ses commandes n'apparaissant qu'avec lui.
+
+### Recette P6
+
+`tests/vue-scenarios.mjs` rejoue le scénario d'essai du champ jusqu'à un moment choisi, dans un projet temporaire qui porte les documents de la clé :
+
+- `exemples/ABCDE-3620-champ/vues/champ-n06.md` : deux corrections au motif `requete-native` ; l'observation d'ordre 2 attendue se pose sur les scénarios S03 et S04, que les corrections atteignent ;
+- `champ-n15.md` : l'écart sur ABCDE-3620-1.2:C3 menace ABCDE-3620-1:C3 et CA03, en tête de « À traiter » ;
+- `champ-n21.md` : le contrat du canal des lignes, né du champ, en désaccord, avec son écart au registre ;
+- la vue finale de l'essai, `docs/demandes/ABCDE-3620/vue.html` et `vue.md`, et celle du projet résolu, que sa remise cite : tous les critères prouvés, rien à traiter.
+
+La recette compare ces vues à celles qu'elle regénère, octet pour octet ; recalcule les piles sans le script, à plusieurs dépôts de l'essai, et les compare au modèle comme à la page, ancre par ancre et calque par calque ; compare l'état de chaque critère à celui du champ, à chaque dépôt ; vérifie la vue d'un nœud, le Décorateur et le Visiteur ; relève une vue périmée, modifiée à la main ou absente et un champ altéré ; vérifie la structure accessible de la page sans dépendance : langue, titre, un seul titre de premier niveau et aucun niveau sauté, libellés des commandes, liens internes, aucune ressource extérieure, états écrits. `node tests/vue-scenarios.mjs --ecrire` réécrit les vues versionnées après un changement voulu du rendu.
+
+### Choix du lot 6, à valider
+
+1. **Critère en désaccord** : il garde l'état que lui donne le champ ; le désaccord s'y ajoute en marque et le met en tête de « À traiter ». Les autres ancres prennent l'état « en désaccord ».
+2. **Scénario** : réalisé dès une réalisation ou un verdict conforme ; à reprendre quand sa dernière action a été corrigée, jusqu'à une nouvelle réalisation.
+3. **Nœuds concernés** par une ancre, pour le filtre et la vue d'un nœud : le sien, ceux qui y ont déposé ; pour un scénario, les nœuds dont un critère porte l'un de ses critères d'acceptation et, pour une feuille, qui partagent son étiquette de couche.
+4. **Vue d'un nœud** : les ratifications de tout l'arbre, puis ses ancres ; la vue du nœud racine est la vue entière ; elle se lit même avant que le dossier de la clé existe.
+5. **Page** : commandes révélées par un script en ligne, masquées sans JavaScript, où la page reste entière ; légende repliable ; aucune ressource extérieure.
+6. **Fraîcheur** : `verifier` regénère et compare ; « périmée » quand la vue écrite vient d'un champ plus court, « modifiée » sinon, à la main ou d'après d'autres documents.
+7. **Exemples** : les documents de la clé du projet résolu copiés dans le projet d'essai ; vues des trois moments versionnées en Markdown, vues finales en HTML et en Markdown.
+8. **Compatibilité** : un skill racine du lot 5 reste vérifiable sans le script de la vue ; un rattachement sans énoncés des critères des nœuds donne une vue sans ces énoncés.
 
 ## Commandes
 
@@ -324,6 +368,7 @@ node prototypes/skill-ticket/outils/verifier-documents.mjs <projet>/docs/demande
 node prototypes/skill-ticket/outils/verifier-kits.mjs <projet>/docs/demandes/<clé> --rattachement <dossier>/ticket-<clé>/outils/rattachement.json [--depot]
 node prototypes/skill-ticket/outils/champ.mjs etat|verifier <projet>/docs/demandes/<clé> --rattachement <dossier>/ticket-<clé>/outils/rattachement.json
 node prototypes/skill-ticket/outils/champ.mjs deposer <projet>/docs/demandes/<clé> <type> --noeud <référence> --auteur <nom> … --rattachement <dossier>/ticket-<clé>/outils/rattachement.json
+node prototypes/skill-ticket/outils/vue.mjs generer|verifier <projet>/docs/demandes/<clé> [--noeud <référence>] [--json] --rattachement <dossier>/ticket-<clé>/outils/rattachement.json
 node --test "prototypes/skill-ticket/tests/*.test.mjs"
 ```
 
@@ -344,7 +389,7 @@ node prototypes/skill-ticket/outils/generer.mjs generer prototypes/skill-ticket/
 | Composant | Patron | Lot |
 |---|---|---|
 | `NoeudTicket` : même interface pour un ticket et ses sous-tickets, sur n niveaux | Composite | 1, livré |
-| parcours de l'arbre par les vérifications ; parcours des critères de l'arbre par le champ, qui propage les menaces d'un critère à ceux qu'il soutient | Visiteur | 1 et 5, livrés |
+| parcours de l'arbre par les vérifications ; parcours des critères de l'arbre par le champ, qui propage les menaces d'un critère à ceux qu'il soutient, puis par la vue, qui range ses ancres | Visiteur | 1, 5 et 6, livrés |
 | ordre de résolution : un nœud prêt quand ses prérequis sont clos ; cycle de vie d'un nœud | Observateur, État | 1 et 3, livrés |
 | `FabriqueSkillTicket` et `FabriqueJavaAngularPostgreSQL` : la famille de fichiers d'un nœud, référentiels, agents et commandes de la pile | Fabrique abstraite | 2, livré |
 | `Monteur` : assemblage nœud par nœud, blocs du référentiel copiés puis paramétrés | Monteur, Prototype | 2, livré |
@@ -354,9 +399,9 @@ node prototypes/skill-ticket/outils/generer.mjs generer prototypes/skill-ticket/
 | champ d'observation partagé, en ajout seul : les niveaux ne se parlent que par lui | Médiateur | 5, livré |
 | escalade ordre 1, 2, 3, puis humain, au niveau le plus bas qui le peut | Chaîne de responsabilité | 5, livré |
 | actions enregistrées, corrections humaines qui les visent | Commande | 5, livré |
-| vue augmentée : calques posés sur les ancres du ticket | Décorateur | 6 |
+| vue augmentée : calques posés sur les ancres du ticket, sans toucher à leur état | Décorateur | 6, livré |
 
-`outils/toml.mjs` lit le sous-ensemble de TOML 1.0 du référentiel et des tickets, sans dépendance ; sa recette le compare aux lectures de `tomllib` (Python), versionnées dans `tests/fixtures/toml/` et `tests/attendus/`. `outils/sources.mjs` lit les sources de l'héritage à leur version épinglée, archives comprises, fins de ligne normalisées ; `outils/fabrique.mjs` porte les fabriques, `outils/monteur.mjs` le Monteur et le contrôle de l'héritage, `outils/generer.mjs` la ligne de commande du générateur, `outils/installer-arbre.mjs` l'installation, le lancement et le retrait d'un arbre dans Gemini CLI, `outils/verifier-documents.mjs` et `outils/verifier-kits.mjs` les contrôles des documents et des kits, `outils/champ.mjs` le champ d'observation, livrés tels quels dans le skill racine.
+`outils/toml.mjs` lit le sous-ensemble de TOML 1.0 du référentiel et des tickets, sans dépendance ; sa recette le compare aux lectures de `tomllib` (Python), versionnées dans `tests/fixtures/toml/` et `tests/attendus/`. `outils/sources.mjs` lit les sources de l'héritage à leur version épinglée, archives comprises, fins de ligne normalisées ; `outils/fabrique.mjs` porte les fabriques, `outils/monteur.mjs` le Monteur et le contrôle de l'héritage, `outils/generer.mjs` la ligne de commande du générateur, `outils/installer-arbre.mjs` l'installation, le lancement et le retrait d'un arbre dans Gemini CLI, `outils/verifier-documents.mjs` et `outils/verifier-kits.mjs` les contrôles des documents et des kits, `outils/champ.mjs` le champ d'observation, `outils/vue.mjs` la vue augmentée, livrés tels quels dans le skill racine.
 
 ## Lots et critères d'acceptation
 
@@ -366,8 +411,8 @@ node prototypes/skill-ticket/outils/generer.mjs generer prototypes/skill-ticket/
 | 2 | fabrique et Monteur : un skill par nœud, sa transmission par `bundle.mjs` | P1 (invariant omis), P2, P3 | livré |
 | 3 | installation de l'arbre dans Gemini CLI, activation vérifiée sur le poste du développeur | P4 | livré |
 | 4 | documents d'agent-tdd-jira, sous-agents de rôle, kits dev, test et démo | P8, P9 | livré |
-| 5 | champ d'observation, retours humains simulés, observateurs d'ordre 2 et 3, escalade, propagation | P5 | livré, choix à valider |
-| 6 | vue augmentée générée depuis le champ | P6 | à venir |
+| 5 | champ d'observation, retours humains simulés, observateurs d'ordre 2 et 3, escalade, propagation | P5 | livré |
+| 6 | vue augmentée générée depuis le champ | P6 | livré, choix à valider |
 | 7 | recette, mesure du contexte, bilan | P7 | à venir |
 
 - **P1** : l'arbre d'essai passe le vérificateur ; sont rejetés : deux parents, un cycle de dépendances, une dépendance vers un ancêtre, une profondeur au-delà du plafond, une possibilité du parent portée par aucun sous-ticket, une option hors de la composition, un invariant omis (lot 2).

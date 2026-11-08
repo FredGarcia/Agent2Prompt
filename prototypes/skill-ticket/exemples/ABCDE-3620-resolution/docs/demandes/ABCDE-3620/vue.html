@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="generator" content="skill-ticket vue.mjs, skill-ticket.vue/1">
+<title>Vue augmentée de ABCDE-3620</title>
+<style>
+:root{color-scheme:light dark;--fond:#ffffff;--surface:#f3f4f6;--texte:#1d1d20;--discret:#4f525a;--bord:#8d9099;--lien:#0b57a4;--focus:#b3470a;--grave:#a3190f;--alerte:#8a4b00;--neutre:#4a4d55;--bon:#1d6b33}
+@media (prefers-color-scheme:dark){:root{--fond:#16171a;--surface:#202226;--texte:#ececef;--discret:#b5b7be;--bord:#7d808a;--lien:#8cc2ff;--focus:#ffb37a;--grave:#ff8f86;--alerte:#ffc266;--neutre:#c6c8ce;--bon:#86dca0}}
+*{box-sizing:border-box}
+body{margin:0 auto;max-width:72rem;padding:1rem;font:1rem/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--fond);color:var(--texte)}
+a{color:var(--lien)}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+header{margin-bottom:.75rem}
+header p{margin:.25rem 0}
+.provenance,.ratifications{color:var(--discret)}
+#commandes{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem 1.25rem;margin:.5rem 0}
+#commandes[hidden]{display:none}
+#commandes fieldset{border:1px solid var(--bord);margin:0;padding:.25rem .75rem .4rem}
+#commandes label{margin-right:.9rem;white-space:nowrap}
+#statut-filtre{flex-basis:100%;margin:0;color:var(--discret)}
+input,select,button{font:inherit}
+select{padding:.15rem .3rem;color:var(--texte);background:var(--fond);border:1px solid var(--bord)}
+.legende{margin:.5rem 0}
+.legende summary{cursor:pointer;color:var(--lien)}
+nav{border-top:1px solid var(--bord);border-bottom:1px solid var(--bord);padding:.4rem 0;margin:.75rem 0 1rem}
+nav ul{display:flex;flex-wrap:wrap;gap:.25rem 1.1rem;list-style:none;margin:0;padding:0}
+.ancre{border-left:.3rem solid var(--bord);padding:.25rem 0 .25rem .9rem;margin:1rem 0}
+.ancre .ancre{margin-left:.5rem}
+.ancre-grave{border-left-color:var(--grave)}.ancre-alerte{border-left-color:var(--alerte)}.ancre-bon{border-left-color:var(--bon)}
+h1,h2,h3,h4,h5,h6{line-height:1.25;margin:.75rem 0 .25rem;overflow-wrap:break-word}
+h1{font-size:1.75rem}h2{font-size:1.4rem}h3{font-size:1.2rem}h4{font-size:1.08rem}h5,h6{font-size:1rem}
+li,p{overflow-wrap:break-word}
+.etat{margin:.25rem 0;font-weight:600}
+.etat-grave{color:var(--grave)}.etat-alerte{color:var(--alerte)}.etat-neutre{color:var(--neutre)}.etat-bon{color:var(--bon)}
+.enonce{margin:.25rem 0;padding:.4rem .6rem;background:var(--surface)}
+.detail,.renvoi,.vide{color:var(--discret);margin:.25rem 0}
+.marques{margin:.25rem 0;padding-left:1.25rem}
+.calque{background:var(--surface);margin:.4rem 0;padding:.3rem .6rem}
+.nom-calque{font-weight:600;margin:0}
+.enregistrements{margin:.2rem 0;padding-left:1.25rem}
+.numero{font-variant-numeric:tabular-nums;font-weight:600}
+code{font-size:.95em}
+.sans-ordre-1 .calque-ordre-1,.sans-ordre-2 .calque-ordre-2,.sans-ordre-3 .calque-ordre-3,.sans-humain .calque-humain{display:none}
+</style>
+</head>
+<body>
+<header>
+<h1>Vue augmentée de ABCDE-3620</h1>
+<p class="provenance">Tirée du champ d&#39;observation de l&#39;arbre au n° 12 (dernier enregistrement du 2026-11-05 11:05 UTC, empreinte de tête 12939fa6fe5b211b), chaîne intacte. Le ticket n&#39;est pas réécrit : ses ancres portent les calques de ce que le champ en dit.</p>
+<p class="ratifications"><strong>Ratifications</strong> : arbre ABCDE-3620 : ratifié (n° 1) ; ABCDE-3620-1.1 : ratifié (n° 2) ; ABCDE-3620-1.2 : ratifié (n° 5) ; ABCDE-3620-2 : ratifié (n° 10).</p>
+</header>
+<div id="commandes" hidden>
+<fieldset><legend>Calques affichés</legend>
+<label><input type="checkbox" checked data-calque="ordre-1"> Ordre 1</label>
+<label><input type="checkbox" checked data-calque="ordre-2"> Ordre 2</label>
+<label><input type="checkbox" checked data-calque="ordre-3"> Ordre 3</label>
+<label><input type="checkbox" checked data-calque="humain"> Humain</label>
+</fieldset>
+<label for="filtre-noeud">Nœud</label> <select id="filtre-noeud"><option value="">Tous les nœuds</option>
+<option value="ABCDE-3620">ABCDE-3620</option>
+<option value="ABCDE-3620-1">ABCDE-3620-1</option>
+<option value="ABCDE-3620-1.1">ABCDE-3620-1.1</option>
+<option value="ABCDE-3620-1.2">ABCDE-3620-1.2</option>
+<option value="ABCDE-3620-2">ABCDE-3620-2</option>
+</select>
+<p id="statut-filtre" role="status"></p>
+</div>
+<details class="legende"><summary>Lire les calques et les états</summary>
+<ul>
+<li><strong>Ordre 1</strong> : actions, verdicts et écarts des agents et des skills.</li>
+<li><strong>Ordre 2</strong> : propositions de l&#39;observateur d&#39;ordre 2 de l&#39;arbre.</li>
+<li><strong>Ordre 3</strong> : examens, veilles et bilan de l&#39;observateur d&#39;ordre 3.</li>
+<li><strong>Humain</strong> : retours du développeur : choix, corrections, ratifications.</li>
+</ul>
+<p>Chaque ancre du ticket porte son état, écrit en toutes lettres : il résume tout ce qui l'atteint dans le champ, et masquer un calque ne le change pas. Les ancres nées du champ sont celles que le ticket ne nomme pas.</p>
+</details>
+<nav aria-label="Sommaire">
+<ul>
+<li><a href="#s-a-traiter">À traiter</a></li>
+<li><a href="#a-critere-abcde-3620-c1">ABCDE-3620-CA01</a></li>
+<li><a href="#a-critere-abcde-3620-c2">ABCDE-3620-CA02</a></li>
+<li><a href="#a-critere-abcde-3620-c3">ABCDE-3620-CA03</a></li>
+<li><a href="#a-critere-abcde-3620-c4">ABCDE-3620-CA04</a></li>
+<li><a href="#a-critere-abcde-3620-c5">ABCDE-3620-CA05</a></li>
+<li><a href="#s-noeuds">Nœuds</a></li>
+</ul>
+</nav>
+<main>
+<section aria-labelledby="s-a-traiter">
+<h2 id="s-a-traiter">À traiter</h2>
+<p>Rien à traiter.</p>
+</section>
+<section aria-labelledby="s-criteres">
+<h2 id="s-criteres">Critères d'acceptation</h2>
+<article id="a-critere-abcde-3620-c1" class="ancre ancre-bon" data-ancre="critere:ABCDE-3620:C1" data-etat="prouvé" data-noeuds="ABCDE-3620 ABCDE-3620-1 ABCDE-3620-1.2">
+<h3>ABCDE-3620-CA01 · ABCDE-3620:C1</h3>
+<p class="etat etat-bon"><span class="symbole" aria-hidden="true">✓</span> État : <strong>prouvé</strong></p>
+<p class="enonce">Sans paramètre, GET /api/v1/commandes/{id} renvoie CommandeDto, inchangée.</p>
+<p class="detail">Statut dans us.md : validé</p>
+<p class="vide">Rien n&#39;est déposé directement sur ce critère : son état vient des critères qui le soutiennent.</p>
+<article id="a-critere-abcde-3620-1-c1" class="ancre ancre-bon" data-ancre="critere:ABCDE-3620-1:C1" data-etat="prouvé" data-noeuds="ABCDE-3620-1 ABCDE-3620-1.2">
+<h4>ABCDE-3620-1:C1</h4>
+<p class="etat etat-bon"><span class="symbole" aria-hidden="true">✓</span> État : <strong>prouvé</strong></p>
+<p class="enonce">Sans paramètre, la réponse de GET /api/v1/commandes/{id} est identique à celle d&#39;avant le ticket.</p>
+<p class="detail">Soutient ABCDE-3620:C1 (prouvé) ; critère d&#39;acceptation ABCDE-3620-CA01 (prouvé)</p>
+<p class="vide">Rien n&#39;est déposé directement sur ce critère : son état vient des critères qui le soutiennent.</p>
+<article id="a-critere-abcde-3620-1-2-c1" class="ancre ancre-bon" data-ancre="critere:ABCDE-3620-1.2:C1" data-etat="prouvé" data-noeuds="ABCDE-3620-1.2">
+<h5>ABCDE-3620-1.2:C1</h5>
+<p class="etat etat-bon"><span class="symbole" aria-hidden="true">✓</span> État : <strong>prouvé</strong></p>
+<p class="enonce">Sans paramètre vue, la réponse de GET /api/v1/commandes/{id} reste CommandeDto, identique.</p>
+<p class="detail">Soutient ABCDE-3620-1:C1 (prouvé) ; critère d&#39;acceptation ABCDE-3620-CA01 (prouvé)</p>
+<div class="calque calque-ordre-1">
+<p class="nom-calque">Ordre 1</p>
+<ol class="enregistrements">
+<li><span class="numero">n° 6</span> · <time datetime="2026-11-04T08:25:00Z">2026-11-04 08:25 UTC</time> · ABCDE-3620-1.2 · ticket-abcde-3620-1-2-back : conforme ; preuve test : back/src/test/java/fr/exemple/commande/CommandeControllerSansVueTest.java</li>
+</ol>
+</div>
+</article>
+</article>
+<h4>Scénarios qui prouvent ABCDE-3620-CA01</h4>
+<article id="a-scenario-abcde-3620-s01" class="ancre ancre-neutre" data-ancre="scenario:ABCDE-3620-S01" data-etat="à réaliser" data-noeuds="ABCDE-3620 ABCDE-3620-1 ABCDE-3620-1.2">
+<h5>ABCDE-3620-S01 · Sans paramètre, la réponse reste celle d&#39;avant le ticket</h5>
+<p class="etat etat-neutre"><span class="symbole" aria-hidden="true">○</span> État : <strong>à réaliser</strong></p>
+<p class="detail">Étiquettes : <code>@role-GESTIONNAIRE</code> <code>@ABCDE-3620-S01</code> <code>@ABCDE-3620-CA01</code> <code>@back</code></p>
+<p class="vide">Rien n&#39;est encore déposé sur cette ancre.</p>
+</article>
+
+</article>
+<article id="a-critere-abcde-3620-c2" class="ancre ancre-bon" data-ancre="critere:ABCDE-3620:C2" data-etat="prouvé" data-noeuds="ABCDE-3620 ABCDE-3620-1 ABCDE-3620-1.2">
+<h3>ABCDE-3620-CA02 · ABCDE-3620:C2</h3>
+<p class="etat etat-bon"><span class="symbole" aria-hidden="true">✓</span> État : <strong>prouvé</strong></p>
+<p class="enonce">Avec vue=resume, la réponse ne contient pas lignes, et contient lignesDernierEnregistrement au format ISO 8601 avec fuseau.</p>
+<p class="detail">Statut dans us.md : validé</p>
+<p class="vide">Rien n&#39;est déposé directement sur ce critère : son état vient des critères qui le soutiennent.</p>
+<article id="a-critere-abcde-3620-1-c2" class="ancre ancre-bon" data-ancre="critere:ABCDE-3620-1:C2" data-etat="prouvé" data-noeuds="ABCDE-3620-1 ABCDE-3620-1.2">
+<h4>ABCDE-3620-1:C2</h4>
+<p class="etat etat-bon"><span class="symbole" aria-hidden="true">✓</span> État : <strong>prouvé</strong></p>
+<p class="enonce">Avec vue=resume, la réponse est un CommandeResumeDto sans lignes, avec lignesDernierEnregistrement.</p>
+<p class="detail">Soutient ABCDE-3620:C2 (prouvé) ; critère d&#39;acceptation ABCDE-3620-CA02 (prouvé)</p>
+<p class="vide">Rien n&#39;est déposé directement sur ce critère : son état vient des critères qui le soutiennent.</p>
+<article id="a-critere-abcde-3620-1-2-c2" class="ancre ancre-bon" data-ancre="critere:ABCDE-3620-1.2:C2" data-etat="prouvé" data-noeuds="ABCDE-3620-1.2">
+<h5>ABCDE-3620-1.2:C2</h5>
+<p class="etat etat-bon"><span class="symbole" aria-hidden="true">✓</span> État : <strong>prouvé</strong></p>
+<p class="enonce">Avec vue=resume, la réponse est un CommandeResumeDto sans lignes, avec lignesDernierEnregistrement en ISO 8601 avec fuseau.</p>
+<p class="detail">Soutient ABCDE-3620-1:C2 (prouvé) ; critère d&#39;acceptation ABCDE-3620-CA02 (prouvé)</p>
+<div class="calque calque-ordre-1">
+<p class="nom-calque">Ordre 1</p>
+<ol class="enregistrements">
+<li><span class="numero">n° 7</span> · <time datetime="2026-11-04T09:10:00Z">2026-11-04 09:10 UTC</time> · ABCDE-3620-1.2 · ticket-abcde-3620-1-2-back : conforme ; preuve test : back/src/test/java/fr/exemple/commande/CommandeControllerVueResumeTest.java</li>
+</ol>
+</div>
+</article>
+</article>
+<h4>Scénarios qui prouvent ABCDE-3620-CA02</h4>
+<article id="a-scenario-abcde-3620-s02" class="ancre ancre-neutre" data-ancre="scenario:ABCDE-3620-S02" data-etat="à réaliser" data-noeuds="ABCDE-3620 ABCDE-3620-1 ABCDE-3620-1.2">
+<h5>ABCDE-3620-S02 · La variante résumée remplace les lignes par la date-heure de la dernière</h5>
+<p class="etat etat-neutre"><span class="symbole" aria-hidden="true">○</span> État : <strong>à réaliser</strong></p>
+<p class="detail">Étiquettes : <code>@role-GESTIONNAIRE</code> <code>@ABCDE-3620-S02</code> <code>@ABCDE-3620-CA02</code> <code>@back</code></p>
+<p class="vide">Rien n&#39;est encore déposé sur cette ancre.</p>
+</article>
+
+</article>
+<article id="a-critere-abcde-3620-c3" class="ancre ancre-bon" data-ancre="critere:ABCDE-3620:C3" data-etat="prouvé" data-noeuds="ABCDE-3620 ABCDE-3620-1 ABCDE-3620-1.1 ABCDE-3620-1.2">
+<h3>ABCDE-3620-CA03 · ABCDE-3620:C3</h3>
+<p class="etat etat-bon"><span class="symbole" aria-hidden="true">✓</span> État : <strong>prouvé</strong></p>
+<p class="enonce">Pour une commande sans ligne, lignesDernierEnregistrement vaut null.</p>
+<p class="detail">Statut dans us.md : validé</p>
+<p class="vide">Rien n&#39;est déposé directement sur ce critère : son état vient des critères qui le soutiennent.</p>
+<article id="a-critere-abcde-3620-1-c3" class="ancre ancre-bon" data-ancre="critere:ABCDE-3620-1:C3" data-etat="prouvé" data-noeuds="ABCDE-3620-1 ABCDE-3620-1.1 ABCDE-3620-1.2">
+<h4>ABCDE-3620-1:C3</h4>
+<p class="etat etat-bon"><span class="symbole" aria-hidden="true">✓</span> État : <strong>prouvé</strong></p>
+<p class="enonce">Pour une commande sans ligne, lignesDernierEnregistrement vaut null, documenté au contrat.</p>
+<p class="detail">Soutient ABCDE-3620:C3 (prouvé) ; critère d&#39;acceptation ABCDE-3620-CA03 (prouvé)</p>
+<p class="vide">Rien n&#39;est déposé directement sur ce critère : son état vient des critères qui le soutiennent.</p>
+<article id="a-critere-abcde-3620-1-1-c2" class="ancre ancre-bon" data-ancre="critere:ABCDE-3620-1.1:C2" data-etat="prouvé" data-noeuds="ABCDE-3620-1.1">
+<h5>ABCDE-3620-1.1:C2</h5>
+<p class="etat etat-bon"><span class="symbole" aria-hidden="true">✓</span> État : <strong>prouvé</strong></p>
+<p class="enonce">Pour une commande sans ligne, l&#39;agrégat renvoie null.</p>
+<p class="detail">Soutient ABCDE-3620-1:C3 (prouvé) ; critère d&#39;acceptation ABCDE-3620-CA03 (prouvé)</p>
+<div class="calque calque-ordre-1">
+<p class="nom-calque">Ordre 1</p>
+<ol class="enregistrements">
+<li><span class="numero">n° 4</span> · <time datetime="2026-11-03T13:45:00Z">2026-11-03 13:45 UTC</time> · ABCDE-3620-1.1 · ticket-abcde-3620-1-1-persistance : conforme ; preuve test : back/src/test/java/fr/exemple/commande/LigneCommandeRepositorySansLigneTest.java</li>
+</ol>
+</div>
+</article>
+<article id="a-critere-abcde-3620-1-2-c3" class="ancre ancre-bon" data-ancre="critere:ABCDE-3620-1.2:C3" data-etat="prouvé" data-noeuds="ABCDE-3620-1.2">
+<h5>ABCDE-3620-1.2:C3</h5>
+<p class="etat etat-bon"><span class="symbole" aria-hidden="true">✓</span> État : <strong>prouvé</strong></p>
+<p class="enonce">Avec vue=resume, une commande sans ligne donne lignesDernierEnregistrement à null, documenté au contrat.</p>
+<p class="detail">Soutient ABCDE-3620-1:C3 (prouvé) ; critère d&#39;acceptation ABCDE-3620-CA03 (prouvé)</p>
+<div class="calque calque-ordre-1">
+<p class="nom-calque">Ordre 1</p>
+<ol class="enregistrements">
+<li><span class="numero">n° 8</span> · <time datetime="2026-11-04T09:55:00Z">2026-11-04 09:55 UTC</time> · ABCDE-3620-1.2 · ticket-abcde-3620-1-2-back : conforme ; preuve test : back/src/test/java/fr/exemple/commande/CommandeControllerSansLigneTest.java</li>
+</ol>
+</div>
+</article>
+</article>
+<h4>Scénarios qui prouvent ABCDE-3620-CA03</h4>
+<article id="a-scenario-abcde-3620-s03" class="ancre ancre-neutre" data-ancre="scenario:ABCDE-3620-S03" data-etat="à réaliser" data-noeuds="ABCDE-3620 ABCDE-3620-1 ABCDE-3620-1.1 ABCDE-3620-1.2">
+<h5>ABCDE-3620-S03 · Une commande sans ligne donne une date-heure nulle</h5>
+<p class="etat etat-neutre"><span class="symbole" aria-hidden="true">○</span> État : <strong>à réaliser</strong></p>
+<p class="detail">Étiquettes : <code>@role-GESTIONNAIRE</code> <code>@ABCDE-3620-S03</code> <code>@ABCDE-3620-CA03</code> <code>@back</code></p>
+<p class="vide">Rien n&#39;est encore déposé sur cette ancre.</p>
+</article>
+
+</article>
+<article id="a-critere-abcde-3620-c4" class="ancre ancre-bon" data-ancre="critere:ABCDE-3620:C4" data-etat="prouvé" data-noeuds="ABCDE-3620 ABCDE-3620-1 ABCDE-3620-1.1">
+<h3>ABCDE-3620-CA04 · ABCDE-3620:C4</h3>
+<p class="etat etat-bon"><span class="symbole" aria-hidden="true">✓</span> État : <strong>prouvé</strong></p>
+<p class="enonce">La date-heure se calcule en une seule requête, sans charger les lignes.</p>
+<p class="detail">Statut dans us.md : validé</p>
+<p class="vide">Rien n&#39;est déposé directement sur ce critère : son état vient des critères qui le soutiennent.</p>
+<article id="a-critere-abcde-3620-1-c4" class="ancre ancre-bon" data-ancre="critere:ABCDE-3620-1:C4" data-etat="prouvé" data-noeuds="ABCDE-3620-1 ABCDE-3620-1.1">
+<h4>ABCDE-3620-1:C4</h4>
+<p class="etat etat-bon"><span class="symbole" aria-hidden="true">✓</span> État : <strong>prouvé</strong></p>
+<p class="enonce">La date-heure du résumé se calcule en une seule requête, sans charger les lignes.</p>
+<p class="detail">Soutient ABCDE-3620:C4 (prouvé) ; critère d&#39;acceptation ABCDE-3620-CA04 (prouvé)</p>
+<p class="vide">Rien n&#39;est déposé directement sur ce critère : son état vient des critères qui le soutiennent.</p>
+<article id="a-critere-abcde-3620-1-1-c1" class="ancre ancre-bon" data-ancre="critere:ABCDE-3620-1.1:C1" data-etat="prouvé" data-noeuds="ABCDE-3620-1.1">
+<h5>ABCDE-3620-1.1:C1</h5>
+<p class="etat etat-bon"><span class="symbole" aria-hidden="true">✓</span> État : <strong>prouvé</strong></p>
+<p class="enonce">La date-heure maximale des lignes d&#39;une commande se lit en une seule requête, sans charger les lignes.</p>
+<p class="detail">Soutient ABCDE-3620-1:C4 (prouvé) ; critère d&#39;acceptation ABCDE-3620-CA04 (prouvé)</p>
+<div class="calque calque-ordre-1">
+<p class="nom-calque">Ordre 1</p>
+<ol class="enregistrements">
+<li><span class="numero">n° 3</span> · <time datetime="2026-11-03T13:15:00Z">2026-11-03 13:15 UTC</time> · ABCDE-3620-1.1 · ticket-abcde-3620-1-1-persistance : conforme ; preuve test : back/src/test/java/fr/exemple/commande/LigneCommandeRepositoryAgregatTest.java</li>
+</ol>
+</div>
+</article>
+</article>
+<h4>Scénarios qui prouvent ABCDE-3620-CA04</h4>
+<article id="a-scenario-abcde-3620-s04" class="ancre ancre-neutre" data-ancre="scenario:ABCDE-3620-S04" data-etat="à réaliser" data-noeuds="ABCDE-3620 ABCDE-3620-1 ABCDE-3620-1.1">
+<h5>ABCDE-3620-S04 · La date-heure se lit en une seule requête</h5>
+<p class="etat etat-neutre"><span class="symbole" aria-hidden="true">○</span> État : <strong>à réaliser</strong></p>
+<p class="detail">Étiquettes : <code>@role-GESTIONNAIRE</code> <code>@ABCDE-3620-S04</code> <code>@ABCDE-3620-CA04</code> <code>@back</code></p>
+<p class="vide">Rien n&#39;est encore déposé sur cette ancre.</p>
+</article>
+
+</article>
+<article id="a-critere-abcde-3620-c5" class="ancre ancre-bon" data-ancre="critere:ABCDE-3620:C5" data-etat="prouvé" data-noeuds="ABCDE-3620 ABCDE-3620-1 ABCDE-3620-1.2 ABCDE-3620-2">
+<h3>ABCDE-3620-CA05 · ABCDE-3620:C5</h3>
+<p class="etat etat-bon"><span class="symbole" aria-hidden="true">✓</span> État : <strong>prouvé</strong></p>
+<p class="enonce">La liste des lignes et la date-heure du résumé se mettent à jour en temps réel à l&#39;écran, annoncées sans déplacer le focus.</p>
+<p class="detail">Statut dans us.md : validé</p>
+<p class="vide">Rien n&#39;est déposé directement sur ce critère : son état vient des critères qui le soutiennent.</p>
+<article id="a-critere-abcde-3620-1-c5" class="ancre ancre-bon" data-ancre="critere:ABCDE-3620-1:C5" data-etat="prouvé" data-noeuds="ABCDE-3620-1 ABCDE-3620-1.2">
+<h4>ABCDE-3620-1:C5</h4>
+<p class="etat etat-bon"><span class="symbole" aria-hidden="true">✓</span> État : <strong>prouvé</strong></p>
+<p class="enonce">Chaque changement des lignes publie, après commit, un événement qui porte la date-heure recalculée.</p>
+<p class="detail">Soutient ABCDE-3620:C5 (prouvé) ; critère d&#39;acceptation ABCDE-3620-CA05 (prouvé)</p>
+<p class="vide">Rien n&#39;est déposé directement sur ce critère : son état vient des critères qui le soutiennent.</p>
+<article id="a-critere-abcde-3620-1-2-c4" class="ancre ancre-bon" data-ancre="critere:ABCDE-3620-1.2:C4" data-etat="prouvé" data-noeuds="ABCDE-3620-1.2">
+<h5>ABCDE-3620-1.2:C4</h5>
+<p class="etat etat-bon"><span class="symbole" aria-hidden="true">✓</span> État : <strong>prouvé</strong></p>
+<p class="enonce">Chaque changement des lignes publie, après commit, un événement CloudEvents qui porte la date-heure recalculée.</p>
+<p class="detail">Soutient ABCDE-3620-1:C5 (prouvé) ; critère d&#39;acceptation ABCDE-3620-CA05 (prouvé)</p>
+<div class="calque calque-ordre-1">
+<p class="nom-calque">Ordre 1</p>
+<ol class="enregistrements">
+<li><span class="numero">n° 9</span> · <time datetime="2026-11-04T14:50:00Z">2026-11-04 14:50 UTC</time> · ABCDE-3620-1.2 · ticket-abcde-3620-1-2-back : conforme ; preuve test : back/src/test/java/fr/exemple/commande/LignesCommandePublieurTest.java</li>
+</ol>
+</div>
+</article>
+</article>
+<article id="a-critere-abcde-3620-2-c1" class="ancre ancre-bon" data-ancre="critere:ABCDE-3620-2:C1" data-etat="prouvé" data-noeuds="ABCDE-3620-2">
+<h4>ABCDE-3620-2:C1</h4>
+<p class="etat etat-bon"><span class="symbole" aria-hidden="true">✓</span> État : <strong>prouvé</strong></p>
+<p class="enonce">La liste des lignes et la date-heure du résumé se mettent à jour à l&#39;écran sans rechargement ; après une coupure, l&#39;écran reprend par l&#39;instantané et son ETag.</p>
+<p class="detail">Soutient ABCDE-3620:C5 (prouvé) ; critère d&#39;acceptation ABCDE-3620-CA05 (prouvé)</p>
+<div class="calque calque-ordre-1">
+<p class="nom-calque">Ordre 1</p>
+<ol class="enregistrements">
+<li><span class="numero">n° 11</span> · <time datetime="2026-11-05T11:00:00Z">2026-11-05 11:00 UTC</time> · ABCDE-3620-2 · ticket-abcde-3620-2-front : conforme ; preuve test : front/src/app/commande/lignes-commande.temps-reel.spec.ts</li>
+</ol>
+</div>
+</article>
+<article id="a-critere-abcde-3620-2-c2" class="ancre ancre-bon" data-ancre="critere:ABCDE-3620-2:C2" data-etat="prouvé" data-noeuds="ABCDE-3620-2">
+<h4>ABCDE-3620-2:C2</h4>
+<p class="etat etat-bon"><span class="symbole" aria-hidden="true">✓</span> État : <strong>prouvé</strong></p>
+<p class="enonce">Chaque mise à jour est annoncée par une région aria-live polite, sans déplacer le focus.</p>
+<p class="detail">Soutient ABCDE-3620:C5 (prouvé) ; critère d&#39;acceptation ABCDE-3620-CA05 (prouvé)</p>
+<div class="calque calque-ordre-1">
+<p class="nom-calque">Ordre 1</p>
+<ol class="enregistrements">
+<li><span class="numero">n° 12</span> · <time datetime="2026-11-05T11:05:00Z">2026-11-05 11:05 UTC</time> · ABCDE-3620-2 · ticket-abcde-3620-2-front : conforme ; preuve test : front/src/app/commande/lignes-commande.annonce.spec.ts</li>
+</ol>
+</div>
+</article>
+<h4>Scénarios qui prouvent ABCDE-3620-CA05</h4>
+<article id="a-scenario-abcde-3620-s05" class="ancre ancre-neutre" data-ancre="scenario:ABCDE-3620-S05" data-etat="à réaliser" data-noeuds="ABCDE-3620 ABCDE-3620-1 ABCDE-3620-1.2 ABCDE-3620-2">
+<h5>ABCDE-3620-S05 · Une ligne ajoutée apparaît à l&#39;écran et met à jour la date-heure</h5>
+<p class="etat etat-neutre"><span class="symbole" aria-hidden="true">○</span> État : <strong>à réaliser</strong></p>
+<p class="detail">Étiquettes : <code>@role-GESTIONNAIRE</code> <code>@ABCDE-3620-S05</code> <code>@ABCDE-3620-CA05</code> <code>@back</code> <code>@front</code></p>
+<p class="vide">Rien n&#39;est encore déposé sur cette ancre.</p>
+</article>
+
+<article id="a-scenario-abcde-3620-s06" class="ancre ancre-neutre" data-ancre="scenario:ABCDE-3620-S06" data-etat="à réaliser" data-noeuds="ABCDE-3620 ABCDE-3620-1 ABCDE-3620-2">
+<h5>ABCDE-3620-S06 · Une mise à jour est annoncée sans déplacer le focus</h5>
+<p class="etat etat-neutre"><span class="symbole" aria-hidden="true">○</span> État : <strong>à réaliser</strong></p>
+<p class="detail">Étiquettes : <code>@role-GESTIONNAIRE</code> <code>@ABCDE-3620-S06</code> <code>@ABCDE-3620-CA05</code> <code>@front</code></p>
+<p class="vide">Rien n&#39;est encore déposé sur cette ancre.</p>
+</article>
+
+<article id="a-scenario-abcde-3620-s07" class="ancre ancre-neutre" data-ancre="scenario:ABCDE-3620-S07" data-etat="à réaliser" data-noeuds="ABCDE-3620 ABCDE-3620-1 ABCDE-3620-1.2 ABCDE-3620-2">
+<h5>ABCDE-3620-S07 · Après une coupure, l&#39;écran reprend par l&#39;instantané</h5>
+<p class="etat etat-neutre"><span class="symbole" aria-hidden="true">○</span> État : <strong>à réaliser</strong></p>
+<p class="detail">Étiquettes : <code>@role-GESTIONNAIRE</code> <code>@ABCDE-3620-S07</code> <code>@ABCDE-3620-CA05</code> <code>@back</code> <code>@front</code></p>
+<p class="vide">Rien n&#39;est encore déposé sur cette ancre.</p>
+</article>
+
+</article>
+</section>
+<section aria-labelledby="s-noeuds">
+<h2 id="s-noeuds">Nœuds</h2>
+<article id="a-noeud-abcde-3620" class="ancre ancre-bon" data-ancre="noeud:ABCDE-3620" data-etat="ratifié" data-noeuds="ABCDE-3620">
+<h3>ABCDE-3620 (racine)</h3>
+<p class="etat etat-bon"><span class="symbole" aria-hidden="true">✓</span> État : <strong>ratifié</strong></p>
+<div class="calque calque-humain">
+<p class="nom-calque">Humain</p>
+<ol class="enregistrements">
+<li><span class="numero">n° 1</span> · <time datetime="2026-11-03T08:55:00Z">2026-11-03 08:55 UTC</time> · ABCDE-3620 · ticket-abcde-3620 : ratification de « arbre ABCDE-3620 » : ratifié, par Développeur d&#39;exemple : « Arbre et documents de la clé ratifiés »</li>
+</ol>
+</div>
+</article>
+<article id="a-noeud-abcde-3620-1" class="ancre ancre-neutre" data-ancre="noeud:ABCDE-3620-1" data-etat="sans ratification propre" data-noeuds="ABCDE-3620-1">
+<h3>ABCDE-3620-1 (composé)</h3>
+<p class="etat etat-neutre"><span class="symbole" aria-hidden="true">·</span> État : <strong>sans ratification propre</strong></p>
+<p class="vide">Rien n&#39;est encore déposé sur cette ancre.</p>
+</article>
+<article id="a-noeud-abcde-3620-1-1" class="ancre ancre-bon" data-ancre="noeud:ABCDE-3620-1.1" data-etat="ratifié" data-noeuds="ABCDE-3620-1.1">
+<h3>ABCDE-3620-1.1 (feuille)</h3>
+<p class="etat etat-bon"><span class="symbole" aria-hidden="true">✓</span> État : <strong>ratifié</strong></p>
+<div class="calque calque-humain">
+<p class="nom-calque">Humain</p>
+<ol class="enregistrements">
+<li><span class="numero">n° 2</span> · <time datetime="2026-11-03T12:30:00Z">2026-11-03 12:30 UTC</time> · ABCDE-3620-1.1 · ticket-abcde-3620-1-1 : ratification de « ABCDE-3620-1.1 » : ratifié, par Développeur d&#39;exemple : « Skill et analyse ratifiés »</li>
+</ol>
+</div>
+</article>
+<article id="a-noeud-abcde-3620-1-2" class="ancre ancre-bon" data-ancre="noeud:ABCDE-3620-1.2" data-etat="ratifié" data-noeuds="ABCDE-3620-1.2">
+<h3>ABCDE-3620-1.2 (feuille)</h3>
+<p class="etat etat-bon"><span class="symbole" aria-hidden="true">✓</span> État : <strong>ratifié</strong></p>
+<div class="calque calque-humain">
+<p class="nom-calque">Humain</p>
+<ol class="enregistrements">
+<li><span class="numero">n° 5</span> · <time datetime="2026-11-04T07:50:00Z">2026-11-04 07:50 UTC</time> · ABCDE-3620-1.2 · ticket-abcde-3620-1-2 : ratification de « ABCDE-3620-1.2 » : ratifié, par Développeur d&#39;exemple : « Skill et analyse ratifiés »</li>
+</ol>
+</div>
+</article>
+<article id="a-noeud-abcde-3620-2" class="ancre ancre-bon" data-ancre="noeud:ABCDE-3620-2" data-etat="ratifié" data-noeuds="ABCDE-3620-2">
+<h3>ABCDE-3620-2 (feuille)</h3>
+<p class="etat etat-bon"><span class="symbole" aria-hidden="true">✓</span> État : <strong>ratifié</strong></p>
+<div class="calque calque-humain">
+<p class="nom-calque">Humain</p>
+<ol class="enregistrements">
+<li><span class="numero">n° 10</span> · <time datetime="2026-11-05T08:00:00Z">2026-11-05 08:00 UTC</time> · ABCDE-3620-2 · ticket-abcde-3620-2 : ratification de « ABCDE-3620-2 » : ratifié, par Développeur d&#39;exemple : « Skill et analyse ratifiés »</li>
+</ol>
+</div>
+</article>
+</section>
+</main>
+<script>
+(()=>{const c=document.getElementById('commandes');c.hidden=false;
+for(const i of c.querySelectorAll('input[data-calque]'))i.addEventListener('change',()=>document.body.classList.toggle('sans-'+i.dataset.calque,!i.checked));
+const f=document.getElementById('filtre-noeud'),s=document.getElementById('statut-filtre');
+f.addEventListener('change',()=>{for(const a of document.querySelectorAll('main [data-noeuds]'))a.hidden=f.value!==''&&!a.dataset.noeuds.split(' ').includes(f.value);
+const n=document.querySelectorAll('main article.ancre:not([hidden])').length;s.textContent=f.value===''?'Tous les nœuds : '+n+' ancres affichées.':'Nœud '+f.value+' : '+n+' ancres affichées.';});})();
+</script>
+</body>
+</html>

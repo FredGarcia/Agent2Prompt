@@ -119,14 +119,14 @@ export function contexteDe(r) {
   };
 }
 
-const estFeuille = (ctx, reference) => ['feuille', 'racine et feuille'].includes(ctx.noeuds.get(reference)?.nature);
+export const estFeuille = (ctx, reference) => ['feuille', 'racine et feuille'].includes(ctx.noeuds.get(reference)?.nature);
 
 /** Clé d'une ancre ; un critère d'acceptation de la clé se confond avec le critère de la racine qui le porte. */
-function cleAncre(ancre, ctx) {
+export function cleAncre(ancre, ctx) {
   if (ancre?.type === 'ca' && ctx.cas.has(ancre.ref)) return `critere:${ctx.cas.get(ancre.ref)}`;
   return `${ancre?.type}:${ancre?.ref}`;
 }
-const decrireAncre = (a) => ({ critere: `critère ${a.ref}`, ca: `critère d'acceptation ${a.ref}`, contrat: `contrat « ${a.ref} »`, noeud: `nœud ${a.ref}` }[a.type] ?? `${a.type} ${a.ref}`);
+export const decrireAncre = (a) => ({ critere: `critère ${a.ref}`, ca: `critère d'acceptation ${a.ref}`, contrat: `contrat « ${a.ref} »`, noeud: `nœud ${a.ref}` }[a.type] ?? `${a.type} ${a.ref}`);
 
 // ---- Contrôle d'un enregistrement, contre ceux qui le précèdent ----
 

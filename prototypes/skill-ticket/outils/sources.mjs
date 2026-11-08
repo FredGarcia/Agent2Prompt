@@ -166,6 +166,7 @@ export const BOITE = [
   { path: 'outils/verifier-documents.mjs', outil: 'verifier-documents.mjs' },
   { path: 'outils/verifier-kits.mjs', outil: 'verifier-kits.mjs' },
   { path: 'outils/champ.mjs', outil: 'champ.mjs', depuis: 5 },
+  { path: 'outils/vue.mjs', outil: 'vue.mjs', depuis: 6 },
 ];
 
 /**
