@@ -4,6 +4,18 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Prototypes
 
+### 2026-11-08 : skill de ticket C7E, lot 4
+
+- **Lot 3 validé** par le développeur, choix compris.
+- **Lot 4, documents de la clé, sous-agents de rôle et kits** :
+  - boîte à outils du skill racine : agent-tdd-jira 1.3.4 (point d'entrée, modules `ingestion-jira`, `us-criteres`, `analyse-demande`, `cycle-tdd`, `tracabilite`, extrait de `binome-agent2test`), agent2test 1.3.1 (extraits des modules `plan` et `echange`), analyse-projet 1.0.2, modules `revue` de java 1.1.1 et angular 1.0.1, sonarqube 1.1.0, scripts `extraire-jira.mjs` et `controler-criteres.mjs` tirés d'agent-tdd-jira, `verifier-documents.mjs` et `verifier-kits.mjs` du prototype, `rattachement.json` ; contrôle de l'héritage étendu aux extraits, aux blocs de code et aux modules, résolus à la version de leur skill ;
+  - quatre sous-agents de rôle sur la racine, rédacteur, analyste, relecteur et qualité, ces trois derniers sans outil d'écriture ; agents de couche des feuilles en cycle TDD d'agent-tdd-jira, scénario par scénario ;
+  - consignes : documents de la clé rédigés avant la ratification de l'arbre, qui tient lieu de V2, puis commités ; critère d'acceptation de la clé dans les critères de chaque nœud ; analyste, relecteur et agent qualité dans les feuilles ; contributions aux kits dans leurs remises ; kits et remise à Agent2Test à la clôture ; état « documents à rédiger » dans `liste` ;
+  - `outils/verifier-documents.mjs` (P8) et `outils/verifier-kits.mjs` (P9, avec `--depot` pour la branche, les commits, HEAD et l'arbre de travail) ;
+  - projet d'exemple résolu `exemples/ABCDE-3620-resolution/`, dont la recette reconstruit l'historique Git à l'identique.
+- Choix à valider avec le lot : boîte à outils sur la racine seule, épingles, numérotation et rattachement des critères, ratification valant V2 et documents commités à la ratification, commits de scénario, kits non commités avant la campagne, démonstration, sous-agents sans outil d'écriture.
+- Vérifications : recette de 179 tests, dont 40 du lot 4 (boîte à outils et ses altérations, rattachement, sous-agents, documents et kits du projet d'exemple et leurs altérations, historique reconstruit) ; avec Gemini CLI 0.67.0 réel, cinq skills découverts et sept agents chargés ; mêmes résultats sous Node 20, 22 et 24 et sur une copie du dépôt en CRLF ; workflow : documents et kits du projet d'exemple contrôlés par les scripts du skill racine.
+
 ### 2026-11-08 : skill de ticket C7E, lot 3
 
 - **Plan ratifié après le lot 2** (décisions 10 à 14 du README du prototype) : documents d'agent-tdd-jira rédigés par le skill racine, sous-agents de rôle tirés des skills du dépôt, kits dev, test et démo, Agent2Test tel quel et Agent2Dev hors du prototype ; un lot « documents et kits » prend la place 4, l'observation passe au lot 5, la vue augmentée au lot 6, la recette et le bilan au lot 7 ; critères P8 et P9.

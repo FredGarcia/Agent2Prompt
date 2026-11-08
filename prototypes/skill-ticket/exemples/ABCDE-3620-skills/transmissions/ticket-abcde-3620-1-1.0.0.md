@@ -76,7 +76,7 @@ Suis `SKILL.md` à partir de sa section 4. Rien n'est modifié avant la ratifica
     ],
     "genere_par": {
       "prototype": "skill-ticket",
-      "lot": 3,
+      "lot": 4,
       "fabrique": "java-angular-postgresql",
       "orchestrateur": "3.5.3"
     }
@@ -140,7 +140,7 @@ version: 1.0.0
 
 # Skill de ticket ABCDE-3620-1
 
-> Produit par le générateur C7E (prototype « skill de ticket », lot 3), fabrique `java-angular-postgresql`, référentiel des méso-contrats 3.3.0, orchestrateur-c7e 3.5.3. Ce skill remplace la fiche de transformation comme objet ratifié avant toute modification ; il reste identique à sa transmission. Si tu y relèves une ambiguïté ou une contradiction, signale-la au développeur ; ne corrige pas le skill toi-même.
+> Produit par le générateur C7E (prototype « skill de ticket », lot 4), fabrique `java-angular-postgresql`, référentiel des méso-contrats 3.3.0, orchestrateur-c7e 3.5.3. Ce skill remplace la fiche de transformation comme objet ratifié avant toute modification ; il reste identique à sa transmission. Si tu y relèves une ambiguïté ou une contradiction, signale-la au développeur ; ne corrige pas le skill toi-même.
 
 ## 1. Place dans l'arbre
 
@@ -156,13 +156,13 @@ Back : variante sans les lignes, résumé avec la date-heure de la dernière lig
 
 Intention : Servir la variante résumée de la commande et publier les changements de ses lignes.
 
-| Critère | Énoncé | Soutient |
-|---|---|---|
-| C1 | Sans paramètre, la réponse de GET /api/v1/commandes/{id} est identique à celle d'avant le ticket. | ABCDE-3620:C1 |
-| C2 | Avec vue=resume, la réponse est un CommandeResumeDto sans lignes, avec lignesDernierEnregistrement. | ABCDE-3620:C2 |
-| C3 | Pour une commande sans ligne, lignesDernierEnregistrement vaut null, documenté au contrat. | ABCDE-3620:C3 |
-| C4 | La date-heure du résumé se calcule en une seule requête, sans charger les lignes. | ABCDE-3620:C4 |
-| C5 | Chaque changement des lignes publie, après commit, un événement qui porte la date-heure recalculée. | ABCDE-3620:C5 |
+| Critère | Énoncé | Soutient | Critère d'acceptation |
+|---|---|---|---|
+| C1 | Sans paramètre, la réponse de GET /api/v1/commandes/{id} est identique à celle d'avant le ticket. | ABCDE-3620:C1 | ABCDE-3620-CA01 |
+| C2 | Avec vue=resume, la réponse est un CommandeResumeDto sans lignes, avec lignesDernierEnregistrement. | ABCDE-3620:C2 | ABCDE-3620-CA02 |
+| C3 | Pour une commande sans ligne, lignesDernierEnregistrement vaut null, documenté au contrat. | ABCDE-3620:C3 | ABCDE-3620-CA03 |
+| C4 | La date-heure du résumé se calcule en une seule requête, sans charger les lignes. | ABCDE-3620:C4 | ABCDE-3620-CA04 |
+| C5 | Chaque changement des lignes publie, après commit, un événement qui porte la date-heure recalculée. | ABCDE-3620:C5 | ABCDE-3620-CA05 |
 
 ## 3. Méso-contrats et options
 
@@ -202,7 +202,7 @@ La référence de ton observation est le retour du développeur : ses choix parm
 
 ## 10. Invariants hérités
 
-Le module `invariants` liste ce dont ce skill hérite, sans affaiblissement : le socle back-front, les invariants du projet, les référentiels de la pile et, mot pour mot, les invariants de l'orchestrateur, avec leurs correspondances dans un skill de ticket. La précédence des règles suit le module `methode` (§ 11.5).
+Le module `invariants` liste ce dont ce skill hérite, sans affaiblissement : le socle back-front, les invariants du projet et, mot pour mot, les invariants de l'orchestrateur, avec leurs correspondances dans un skill de ticket. La précédence des règles suit le module `methode` (§ 11.5).
 
 ## 11. Fichiers
 
@@ -319,25 +319,25 @@ description: Recette de ABCDE-3620-1, critères à prouver, preuve par agrégati
 
 ## Critères à prouver
 
-| Critère | Énoncé | Soutient |
-|---|---|---|
-| ABCDE-3620-1:C1 | Sans paramètre, la réponse de GET /api/v1/commandes/{id} est identique à celle d'avant le ticket. | ABCDE-3620:C1 |
-| ABCDE-3620-1:C2 | Avec vue=resume, la réponse est un CommandeResumeDto sans lignes, avec lignesDernierEnregistrement. | ABCDE-3620:C2 |
-| ABCDE-3620-1:C3 | Pour une commande sans ligne, lignesDernierEnregistrement vaut null, documenté au contrat. | ABCDE-3620:C3 |
-| ABCDE-3620-1:C4 | La date-heure du résumé se calcule en une seule requête, sans charger les lignes. | ABCDE-3620:C4 |
-| ABCDE-3620-1:C5 | Chaque changement des lignes publie, après commit, un événement qui porte la date-heure recalculée. | ABCDE-3620:C5 |
+| Critère | Énoncé | Soutient | Critère d'acceptation |
+|---|---|---|---|
+| ABCDE-3620-1:C1 | Sans paramètre, la réponse de GET /api/v1/commandes/{id} est identique à celle d'avant le ticket. | ABCDE-3620:C1 | ABCDE-3620-CA01 |
+| ABCDE-3620-1:C2 | Avec vue=resume, la réponse est un CommandeResumeDto sans lignes, avec lignesDernierEnregistrement. | ABCDE-3620:C2 | ABCDE-3620-CA02 |
+| ABCDE-3620-1:C3 | Pour une commande sans ligne, lignesDernierEnregistrement vaut null, documenté au contrat. | ABCDE-3620:C3 | ABCDE-3620-CA03 |
+| ABCDE-3620-1:C4 | La date-heure du résumé se calcule en une seule requête, sans charger les lignes. | ABCDE-3620:C4 | ABCDE-3620-CA04 |
+| ABCDE-3620-1:C5 | Chaque changement des lignes publie, après commit, un événement qui porte la date-heure recalculée. | ABCDE-3620:C5 | ABCDE-3620-CA05 |
 
 ## Recette par agrégation
 
 Ce nœud n'agit pas sur le code. Chacun de ses critères est prouvé quand les critères qui le soutiennent, dans ses sous-tickets, sont prouvés :
 
-| Critère | Soutenu par |
-|---|---|
-| ABCDE-3620-1:C1 | ABCDE-3620-1.2:C1 |
-| ABCDE-3620-1:C2 | ABCDE-3620-1.2:C2 |
-| ABCDE-3620-1:C3 | ABCDE-3620-1.1:C2, ABCDE-3620-1.2:C3 |
-| ABCDE-3620-1:C4 | ABCDE-3620-1.1:C1 |
-| ABCDE-3620-1:C5 | ABCDE-3620-1.2:C4 |
+| Critère | Critère d'acceptation | Soutenu par |
+|---|---|---|
+| ABCDE-3620-1:C1 | ABCDE-3620-CA01 | ABCDE-3620-1.2:C1 |
+| ABCDE-3620-1:C2 | ABCDE-3620-CA02 | ABCDE-3620-1.2:C2 |
+| ABCDE-3620-1:C3 | ABCDE-3620-CA03 | ABCDE-3620-1.1:C2, ABCDE-3620-1.2:C3 |
+| ABCDE-3620-1:C4 | ABCDE-3620-CA04 | ABCDE-3620-1.1:C1 |
+| ABCDE-3620-1:C5 | ABCDE-3620-CA05 | ABCDE-3620-1.2:C4 |
 
 Le bilan va dans `docs/demandes/ABCDE-3620/ABCDE-3620-1/remise.md` : pour chaque critère, les preuves de ceux qui le soutiennent, avec le dossier du sous-ticket qui les porte.
 <<<FIN modules/recette/SKILL.md>>>
@@ -981,11 +981,11 @@ Précision du développeur, s'il y en a une : {{args}}
 
 Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichiers ont été matérialisés.
 
-    76fc2f09c18bbb7c6f308ade81fc0f9bb11ad8679e5f2f54b26090e1ff206751  manifest.json
-    2b2769d1470a1d6a822590bc39e9bf5cdd1d875fc655d86065bb1f1b249b9e79  SKILL.md
+    b9ec99754d693fa35f2714a494805cebaa8381e928ecbc02da16e0bd14d46742  manifest.json
+    cf302a6ab96e382ea5bc43832ea40116fb0ed992416e0647b902fe43f487fde1  SKILL.md
     7df42cef88f4d5430f180e2e6bf756f9669c92901873e5eb30ca4c5a614123a2  ticket.toml
     9093534668bfbb756b6718da836fe3ee37bb8a96dfde88ee3fb17e3914974bab  modules/meso-contrats/SKILL.md
-    fe917ac1846622946c519bad16adc501486fb26a7e596842341e05fc85b811df  modules/recette/SKILL.md
+    acca479b164432fc8c52dc9966c18345265cfc564923312fba3085b1573d9497  modules/recette/SKILL.md
     8df61b253b8b4c76aa921884f6c1567b620874a4e88ca84b475bce0bf0a0b763  modules/sous-tickets/SKILL.md
     ed12806114c6397da6607afeff7e391a622eeccf61b51d37c6762157d03c011f  modules/methode/SKILL.md
     9d838ad7d9d2fff80a326e9009574232c5bca4ce858f07d063fbc4584d72e0be  modules/invariants/SKILL.md

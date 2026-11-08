@@ -1,7 +1,9 @@
 // Recette du lot 3 : l'arbre de skills de ticket s'installe dans un workspace de Gemini CLI, avec ses
 // agents, ses commandes et son relevé, masqués à Git ; il se liste, se vérifie, se lance nœud par nœud et
 // se retire en archivant ses transmissions. Avec Gemini CLI réel (variable SKILL_TICKET_GEMINI), les
-// skills sont découverts et les agents chargés : la partie du critère P4 qui se vérifie sans modèle.
+// skills sont découverts et les agents chargés : la partie du critère P4 qui se vérifie sans modèle. Au
+// lot 4, les sous-agents de rôle de la racine s'installent avec les agents de couche, et la racine
+// commence par les documents de la clé.
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -18,7 +20,10 @@ const ICI = dirname(fileURLToPath(import.meta.url));
 const OUTIL = join(ICI, '..', 'outils', 'installer-arbre.mjs');
 const TRANSMISSIONS = join(ICI, '..', 'exemples', 'ABCDE-3620-skills', 'transmissions');
 const NOMS = ['ticket-abcde-3620', 'ticket-abcde-3620-1', 'ticket-abcde-3620-1-1', 'ticket-abcde-3620-1-2', 'ticket-abcde-3620-2'];
-const AGENTS = ['ticket-abcde-3620-1-1-persistance.md', 'ticket-abcde-3620-1-2-back.md', 'ticket-abcde-3620-2-front.md'];
+const AGENTS = [
+  'ticket-abcde-3620-1-1-persistance.md', 'ticket-abcde-3620-1-2-back.md', 'ticket-abcde-3620-2-front.md',
+  'ticket-abcde-3620-analyste.md', 'ticket-abcde-3620-qualite.md', 'ticket-abcde-3620-redacteur.md', 'ticket-abcde-3620-relecteur.md',
+];
 const COMMANDES = ['abcde-3620-1-1.toml', 'abcde-3620-1-2.toml', 'abcde-3620-1.toml', 'abcde-3620-2.toml', 'abcde-3620.toml'];
 const GEMINI = process.env.SKILL_TICKET_GEMINI;
 
@@ -34,11 +39,11 @@ const depotGit = () => {
   return ws;
 };
 
-test('installer : cinq skills, trois agents, cinq commandes, un relevé', () => {
+test('installer : cinq skills, sept agents, cinq commandes, un relevé', () => {
   const ws = temporaire('ws-');
   const r = installer(ws);
   assert.equal(r.status, 0, r.stderr);
-  assert.match(r.stdout, /arbre ABCDE-3620 installé : 5 skills, 3 agents, 5 commandes/);
+  assert.match(r.stdout, /arbre ABCDE-3620 installé : 5 skills, 7 agents, 5 commandes/);
   for (const nom of NOMS) assert.ok(existsSync(join(ws, '.gemini', 'skills', nom, 'integrite.sha256')), nom);
   assert.deepStrictEqual(readdirSync(join(ws, '.gemini', 'agents')).sort(), AGENTS);
   assert.deepStrictEqual(readdirSync(join(ws, '.gemini', 'commands', 'ticket')).sort(), COMMANDES);
@@ -128,13 +133,13 @@ test('dépôt Git, --visible : skills, agents, commandes et relevé apparaissent
   assert.match(statut, /\.gemini\/skills\/ticket-abcde-3620\/SKILL\.md/);
 });
 
-test('liste : état de chaque nœud, de la ratification de l\'arbre à la clôture', () => {
+test('liste : état de chaque nœud, des documents de la clé à la clôture', () => {
   const ws = temporaire('ws-');
   assert.equal(installer(ws).status, 0);
   const etats = () => Object.fromEntries(lancer(['liste', '--workspace', ws]).stdout.trim().split('\n').slice(1)
     .map((l) => /^ {2}(\S+)\s+\S+\s+\S+\s+(.+)$/.exec(l)).map((m) => [m[1], m[2]]));
   assert.deepStrictEqual(etats(), {
-    'ABCDE-3620': 'arbre à ratifier',
+    'ABCDE-3620': 'documents à rédiger',
     'ABCDE-3620-1': 'en cours',
     'ABCDE-3620-1.1': 'en attente de la ratification de l\'arbre',
     'ABCDE-3620-1.2': 'en attente de la ratification de l\'arbre',
@@ -145,6 +150,8 @@ test('liste : état de chaque nœud, de la ratification de l\'arbre à la clôtu
     mkdirSync(d, { recursive: true });
     return d;
   };
+  writeFileSync(join(dossier(), 'us.md'), '# ABCDE-3620 : US et critères d\'acceptation\n');
+  assert.equal(etats()['ABCDE-3620'], 'arbre à ratifier');
   writeFileSync(join(dossier(), 'retours.md'), '- 2026-11-08, Fred : arbre ABCDE-3620 ratifié\n');
   assert.equal(etats()['ABCDE-3620-1.1'], 'prêt');
   writeFileSync(join(dossier('ABCDE-3620-1.1'), 'analyse.md'), 'analyse\n');
@@ -163,7 +170,7 @@ test('verifier : fichiers intacts, puis un agent modifié est signalé', () => {
   assert.equal(installer(ws).status, 0);
   const ok = lancer(['verifier', 'ABCDE-3620', '--workspace', ws], { env: { PATH: '' } });
   assert.equal(ok.status, 0, ok.stderr);
-  assert.match(ok.stdout, /5 skills, 3 agents et 5 commandes installés et intacts/);
+  assert.match(ok.stdout, /5 skills, 7 agents et 5 commandes installés et intacts/);
   assert.match(ok.stdout, /Gemini CLI introuvable : découverte des skills et des agents non vérifiée/);
   writeFileSync(join(ws, '.gemini', 'agents', 'ticket-abcde-3620-1-1-persistance.md'), 'autre\n');
   const ko = lancer(['verifier', '--workspace', ws], { env: { PATH: '' } });

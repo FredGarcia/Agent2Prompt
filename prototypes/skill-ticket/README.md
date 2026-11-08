@@ -1,6 +1,6 @@
 # Prototype : skill de ticket C7E
 
-**Statut** : lots 1 à 3 livrés : modèle et vérification de l'arbre, fabrique et Monteur des skills de ticket, installation de l'arbre dans Gemini CLI ; le critère P4 attend sa vérification sur le poste du développeur. Les lots 4 à 7 suivent, chacun validé par le développeur. Rien ici n'est encore une spécification versionnée : le prototype reste hors de `specs/` jusqu'à son bilan, après quoi il entrera dans l'orchestrateur C7E, probablement en version majeure, ou dans une spécification de générateur à part.
+**Statut** : lots 1 à 4 livrés : modèle et vérification de l'arbre, fabrique et Monteur des skills de ticket, installation de l'arbre dans Gemini CLI, puis documents de la clé Jira, sous-agents de rôle et kits dev, test et démo ; les choix du lot 4 attendent la validation du développeur. Les lots 5 à 7 suivent, chacun validé par le développeur. Rien ici n'est encore une spécification versionnée : le prototype reste hors de `specs/` jusqu'à son bilan, après quoi il entrera dans l'orchestrateur C7E, probablement en version majeure, ou dans une spécification de générateur à part.
 
 ## Objet
 
@@ -103,18 +103,19 @@ Le skill du nœud `ABCDE-3620-1.2` s'appelle `ticket-abcde-3620-1-2` (référenc
 | `projet/meso-contrats.md` | invariants du projet dans l'état où le skill a été produit ; au démarrage, la copie du projet fait foi | tous |
 | `agents/<skill>-<couche>.md` | un agent par couche touchée, au format des sous-agents de Gemini CLI 0.67.0 | feuilles |
 | `commandes/ticket/<nœud>.toml` | la commande Gemini CLI qui lance le skill dans une session, `/ticket:<nœud>` (lot 3) | tous |
+| `modules/documents/`, `modules/kits/`, `outils/`, `references/<skill>…`, `agents/<skill>-<rôle>.md` | boîte à outils de l'arbre : documents de la clé, kits, scripts de contrôle, références des sous-agents de rôle et ces sous-agents (lot 4) | racine |
 
-L'arbre d'essai donne cinq skills, de 11 à 15 fichiers ; leurs transmissions attendues sont versionnées dans `exemples/ABCDE-3620-skills/transmissions/` (de 67 000 à 105 000 caractères, contre 230 000 pour la transmission de l'orchestrateur ; la mesure du contexte chargé reste celle du lot 7).
+L'arbre d'essai donne cinq skills, de 11 à 37 fichiers ; leurs transmissions attendues sont versionnées dans `exemples/ABCDE-3620-skills/transmissions/` : de 69 000 à 112 000 caractères pour les nœuds, 336 000 pour la racine, qui porte la boîte à outils, contre 230 000 pour la transmission de l'orchestrateur. Un sous-agent ne charge que ses références ; la mesure du contexte chargé reste celle du lot 7.
 
 ### Contrôle de l'héritage
 
 | Règle | Contenu |
 |---|---|
-| H1 | la provenance déclarée est complète : méthode, invariants de l'orchestrateur, socle, invariants du projet, et, pour une feuille, le référentiel de la pile de chaque couche touchée |
+| H1 | la provenance déclarée est complète : méthode, invariants de l'orchestrateur, socle, invariants du projet, et, pour une feuille, le référentiel de la pile de chaque couche touchée ; pour la racine, depuis le lot 4, toute la boîte à outils |
 | H2 | chaque invariant de l'orchestrateur, à la version déclarée, figure mot pour mot dans `modules/invariants`, et leur nombre est celui déclaré |
-| H3 | chaque section de la méthode déclarée figure mot pour mot dans `modules/methode` |
-| H4 | chaque copie a l'empreinte que déclare le manifeste, et elle est identique à sa source à la version épinglée, courante ou archivée |
-| H5 | chaque invariant cité par la consigne, les modules et les agents est défini par l'orchestrateur ou par le socle |
+| H3 | chaque section de la méthode déclarée figure mot pour mot dans `modules/methode`, et chaque section d'un extrait de la boîte à outils dans son fichier |
+| H4 | chaque copie a l'empreinte que déclare le manifeste, et elle est identique à sa source à la version épinglée, courante ou archivée ; un module de skill à la version de son skill ; un script tiré d'un bloc de code, à ce bloc |
+| H5 | chaque invariant cité par la consigne, les modules et les agents est défini par l'orchestrateur ou par le socle ; celui d'un autre skill se cite avec son nom, `agent-tdd-jira:D10.INV-1` |
 | H6 | le ticket transmis est celui que nomme le manifeste |
 
 Le Monteur applique ces règles avant d'écrire : un skill qui omet ou altère un invariant n'est pas écrit, ni aucun autre de l'arbre. `generer.mjs verifier` les applique à des transmissions, avec leur table d'intégrité, contre les sources du dépôt.
@@ -137,7 +138,7 @@ Le Monteur applique ces règles avant d'écrire : un skill qui omet ou altère u
 | Commande | Effet |
 |---|---|
 | `installer <dossier ou transmissions>` | vérifie chaque transmission (intégrité et héritage, lot 2) et que l'ensemble forme un arbre complet ; installe les skills par `tools/installer.mjs` ; copie les agents des feuilles dans `.gemini/agents/` et les commandes des nœuds dans `.gemini/commands/ticket/` ; écrit le relevé et une copie des transmissions dans `.gemini/skill-ticket/<clé>/` ; masque le tout à Git, comme `tools/installer.mjs` masque les skills. Rien n'est écrit au moindre écart ; un fichier modifié depuis l'installation n'est remplacé qu'avec `--forcer` |
-| `liste` | arbres installés, et état de chaque nœud d'après son dossier : arbre à ratifier, en attente, prêt, analysé, ratifié, prêt à clore, clos |
+| `liste` | arbres installés, et état de chaque nœud d'après son dossier : documents à rédiger, arbre à ratifier, en attente, prêt, analysé, ratifié, prêt à clore, clos |
 | `verifier [<clé>]` | fichiers installés intacts ; si Gemini CLI est là, ses skills découverts et activés, ses agents chargés sans erreur, et un dossier non fiable signalé |
 | `lancer <référence>` | ouvre Gemini CLI dans le workspace, en mode interactif, sur la phrase qui active le skill du nœud : `gemini -i "Active le skill …"` |
 | `retirer <clé>` | archive les transmissions dans `docs/demandes/<clé>/skills/`, où elles se versionnent avec le ticket, puis retire skills, agents, commandes et relevé |
@@ -150,7 +151,7 @@ Chaque nœud se traite dans **sa propre session** de Gemini CLI, avec son propre
 
 | Nœud | États |
 |---|---|
-| racine | arbre à ratifier (présentation, puis ratification) ; en cours (état des sous-tickets, prochain nœud prêt et sa commande) ; prêt à clore ; clos |
+| racine | documents à rédiger (lot 4) ; arbre à ratifier (présentation, puis ratification) ; en cours (état des sous-tickets, prochain nœud prêt et sa commande) ; prêt à clore (puis kits, lot 4) ; clos |
 | nœud composé | en cours ; prêt à clore ; clos |
 | feuille | en attente de la ratification de l'arbre, ou d'un ticket dont elle dépend ; prêt ; analysé, à ratifier ; ratifié, en transformation ; clos |
 
@@ -158,7 +159,7 @@ Une ratification s'écrit dans `retours.md` sur une ligne de forme fixe, `- AAAA
 
 ### Contrat avec Gemini CLI
 
-Vérifié avec Gemini CLI 0.67.0, sans modèle : `gemini skills list`, lancé dans le workspace de confiance, découvre et active les cinq skills ; il charge les trois agents sans erreur, alors qu'il refuse un agent au nom ou aux outils invalides ; dans un dossier non fiable, il ignore skills et agents. Le job `contrat-gemini` du workflow le rejoue sous Linux et sous Windows.
+Vérifié avec Gemini CLI 0.67.0, sans modèle : `gemini skills list`, lancé dans le workspace de confiance, découvre et active les cinq skills ; il charge sans erreur les sept agents, trois agents de couche et, depuis le lot 4, quatre sous-agents de rôle, alors qu'il refuse un agent au nom ou aux outils invalides ; dans un dossier non fiable, il ignore skills et agents. Le job `contrat-gemini` du workflow le rejoue sous Linux et sous Windows.
 
 ### Recette P4 sur le poste du développeur
 
@@ -171,7 +172,7 @@ La présentation de l'arbre et l'attente de la ratification demandent un modèle
 5. `node <dépôt>/prototypes/skill-ticket/outils/installer-arbre.mjs liste` : racine « en cours », ABCDE-3620-1.1 « prêt ».
 6. `node <dépôt>/prototypes/skill-ticket/outils/installer-arbre.mjs retirer ABCDE-3620 --sans-archive` pour finir.
 
-### Choix du lot 3, à valider
+### Choix du lot 3, validés le 8 novembre 2026
 
 1. **Une session par nœud**, lancée par le développeur ; la racine et les nœuds composés reconnaissent leur état d'après les dossiers, et indiquent le prochain nœud prêt avec sa commande.
 2. **Ratification en une ligne de forme fixe** dans `retours.md`, reconnue par les skills et par `liste`, en attendant le champ d'observation du lot 5.
@@ -179,6 +180,74 @@ La présentation de l'arbre et l'attente de la ratification demandent un modèle
 4. **Retrait avec archivage** des transmissions dans `docs/demandes/<clé>/skills/` : le skill ratifié y est rangé comme l'était la fiche (D3.INV-3).
 5. **Version 1.0.0 maintenue** : l'installation se reconnaît à sa table d'intégrité ; une transmission régénérée remplace une installation intacte, et refuse une installation modifiée, sauf `--forcer`.
 6. **Contrat Gemini CLI épinglé à 0.67.0**, la version de référence du dépôt (skill explication-hote-ia).
+
+## Documents et kits (lot 4)
+
+Le skill racine porte la **boîte à outils de l'arbre** (décisions 10 à 12) : les documents de la clé Jira selon agent-tdd-jira, les kits dev, test et démo, les quatre sous-agents de rôle et leurs références, copiées des skills du dépôt à leur version épinglée, avec les scripts de contrôle. Les feuilles et les sous-agents lisent ces références dans le skill racine installé (`.gemini/skills/ticket-<clé>/`) : rien n'est dupliqué d'un nœud à l'autre.
+
+### Boîte à outils de la racine
+
+| Fichier du skill racine | Source | Usage |
+|---|---|---|
+| `references/agent-tdd-jira.md`, `references/agent-tdd-jira/{ingestion-jira,us-criteres,analyse-demande,cycle-tdd,tracabilite}.md` | agent-tdd-jira, point d'entrée et modules, en entier | rédacteur, agents de couche, kit test |
+| `references/agent-tdd-jira/binome-agent2test.md` | agent-tdd-jira, module `binome-agent2test`, extrait § 3 et § 4 | étiquettes du binôme, remise du plan |
+| `references/agent2test/plan.md`, `references/agent2test/remise.md` | agent2test, modules `plan` § 2 et `echange` § 3, extraits | jouabilité, format `agent2test.remise/1` |
+| `references/analyse-projet.md`, `references/analyse-projet/cartographie.md` | analyse-projet, point d'entrée et module `cartographie` | analyste |
+| `references/java/revue.md`, `references/angular/revue.md` | java et angular, modules `revue` | relecteur |
+| `references/sonarqube.md`, `references/sonarqube/examen-local.md` | sonarqube, point d'entrée et module `examen-local` | agent qualité |
+| `outils/extraire-jira.mjs`, `outils/controler-criteres.mjs` | agent-tdd-jira, blocs de code de `ingestion-jira` § 3 et `us-criteres` § 7, à l'identique | extraction d'une capture MHTML, contrôle des US et des scénarios |
+| `outils/verifier-documents.mjs`, `outils/verifier-kits.mjs` | ce prototype, tels quels | contrôles P8 et P9 |
+| `outils/rattachement.json` | produit par la fabrique | critères de l'arbre rattachés aux critères de la clé, couches, images de l'objectif |
+
+Épingles : agent-tdd-jira et les référentiels Java et Angular suivent l'orchestrateur ; Agent2Test suit agent-tdd-jira ; analyse-projet et sonarqube suivent `EPINGLES_PROTOTYPE` (`outils/sources.mjs`). Un module de skill ne déclare pas de version et n'est pas archivé : il se résout à la version de son skill, et une nouvelle version de l'un de ces skills arrête la génération jusqu'à ce que le prototype la reprenne. Le workflow suit leurs spécifications pour le signaler.
+
+Le contrôle de l'héritage couvre la boîte : un extrait reprend ses sections mot pour mot, un script tiré d'un bloc de code lui est identique, un module se résout à la version de son skill, et la racine d'un arbre du lot 4 porte toute la boîte. Un invariant d'un autre skill se cite avec son nom (`agent-tdd-jira:D10.INV-1`), comme dans les skills du dépôt.
+
+### Sous-agents de rôle
+
+| Sous-agent | Invoqué par | Méthode | Outils |
+|---|---|---|---|
+| `ticket-<clé>-redacteur` | la racine, avant la ratification de l'arbre | agent-tdd-jira : `demande.json`, `us.md`, fichier Gherkin | lecture et écriture, limitée à `docs/demandes/<clé>/` |
+| `ticket-<clé>-analyste` | chaque feuille, à l'analyse | analyse-projet, module `cartographie` ; skill4appli s'il est installé | lecture seule |
+| `ticket-<clé>-relecteur` | chaque feuille, avant É6 | java ou angular en mode revue | lecture seule |
+| `ticket-<clé>-qualite` | chaque feuille, en É6 | sonarqube, module `examen-local` ; jeton par `SONAR_TOKEN`, aucune écriture vers SonarQube sans validation explicite | lecture seule |
+
+Les agents de couche des feuilles réalisent leurs scénarios en cycle TDD d'agent-tdd-jira : les scénarios du fichier Gherkin qui portent l'un des critères d'acceptation de la feuille et l'étiquette de sa couche, un à un, test étiqueté d'abord, accepté par le développeur (V4) avant le suivant, commité `<CLÉ> Snn : [É<n>-<DOMAINE>] …`.
+
+### Documents de la clé
+
+Le k-ième critère de la racine devient `<CLÉ>-CAkk`, repris mot pour mot, origine « repris » ; chaque critère d'un sous-ticket se rattache aux critères de la clé par la chaîne de ses « soutient », et se prouve par leurs scénarios, de sa couche pour une feuille. Pour ABCDE-3620 : ABCDE-3620-1.1 porte CA04 et CA03 (`@back`), ABCDE-3620-1.2 CA01, CA02, CA03 et CA05 (`@back`), ABCDE-3620-2 CA05 (`@front`).
+
+Déroulé de la racine : le rédacteur écrit les trois documents, statuts « à valider » ; `controler-criteres.mjs` et `verifier-documents.mjs` passent sans écart ; l'arbre se présente avec eux, et sa ratification tient lieu de V2 (et de V1 si une capture MHTML a été extraite) ; les statuts passent à « validé », les contrôles repassent, la ligne de ratification s'écrit, puis les documents se commitent seuls sur la branche de l'arbre : `<CLÉ> : [É6-C7E] docs(demande): US, critères d'acceptation et scénarios ratifiés`. Sans capture MHTML, `demande.json` part du ticket racine, avec la limite « capture MHTML absente ».
+
+### Kits
+
+À la clôture, la racine relève les contributions aux kits dans la remise de chaque feuille, puis écrit dans `docs/demandes/<clé>/kits/` trois manifestes fermés au format `skill-ticket.kit/1`, chaque fichier cité avec son empreinte sha256 :
+
+| Kit | Contenu |
+|---|---|
+| dev, `dev.json` | branche, commits dans l'ordre de l'historique (empreinte, sous-ticket, titre), remise de chaque nœud, chemin de la remise à Agent2Test |
+| test, `test.json` | plan (`us.md`, fichier Gherkin), `demande.json`, tests et scénarios qu'ils portent, matrice de traçabilité, ouverture de la campagne d'Agent2Test |
+| démo, `demo.json` | parcours tiré des scénarios `@front` validés, données et commandes de lancement, captures de l'écran livré comparées aux images de l'objectif |
+
+La remise `agent2test.remise/1` se rédige en dernier, au commit de tête de la branche, avec la prévision de jouabilité du module `plan` d'Agent2Test ; les kits ne se commitent pas avant la campagne, pour que le commit remis reste la tête de la branche. `verifier-kits.mjs --depot` le vérifie aussi dans le dépôt : branche, commits, ligne `Sous-ticket` de chaque commit de feuille, HEAD, aucun fichier suivi modifié.
+
+### Projet d'exemple résolu
+
+`exemples/ABCDE-3620-resolution/` est un projet réduit tel que l'arbre ABCDE-3620 le laisse à sa clôture : documents de la clé, remises, matrice, parcours, données, captures, kits et remise à Agent2Test. Ses fichiers de code et de test, réduits, entrent chacun une fois dans l'historique, que la recette reconstruit à l'identique dans un dépôt Git temporaire, aux dates fixées par `tests/fixtures/historique-ABCDE-3620.json`. La recette contrôle ce projet avec les copies des scripts que livre la transmission du skill racine (P8, P9), puis des altérations : critère reformulé, scénario sans l'étiquette de sa couche, schéma de `demande.json`, fichier modifié après le kit, feuille sans commit, titre hors format, test sans étiquette, remise au champ inconnu, jouables faux, commit autre que la tête, image de l'objectif sans capture.
+
+La rédaction des documents et l'assemblage des kits demandent un modèle : comme P4, ils s'essaient dans Gemini CLI, sur le poste. Après `installer-arbre.mjs installer` et `lancer ABCDE-3620`, le skill racine est « documents à rédiger » : il invoque le rédacteur, passe les deux contrôles, puis présente l'arbre et les documents avant la ratification.
+
+### Choix du lot 4, à valider
+
+1. **Boîte à outils sur la racine seule**, lue par les feuilles et les sous-agents dans le skill racine installé ; références copiées en entier ou par extraits, scripts tirés des blocs de code, sous le contrôle de l'héritage.
+2. **Épingles** : agent-tdd-jira et Java, Angular par l'orchestrateur, Agent2Test par agent-tdd-jira, analyse-projet 1.0.2 et sonarqube 1.1.0 par le prototype ; un module se résout à la version courante de son skill, faute d'archive.
+3. **Critères de la clé** : rang de la racine pour la numérotation, énoncé mot pour mot ; rattachement des sous-tickets par les « soutient » ; un critère de la racine jugé non vérifiable remonte au développeur, sans reformulation par le rédacteur.
+4. **Ratification de l'arbre valant V2**, puis documents commités seuls à la ratification, et non avec le premier scénario, pour que toutes les feuilles partent du même plan ; commit de la racine au slot É6, domaine C7E.
+5. **Commits de scénario** `<CLÉ> Snn : [É<n>-<DOMAINE>] …`, un slot chacun, corps `Sous-ticket : <référence>`, acceptés un à un (V4).
+6. **Kits en manifestes fermés** non commités avant la campagne ; remise rédigée en dernier, au commit de tête ; captures et données de démonstration déposées par les feuilles dans leur dossier ; préalables de la remise : les noms des batchs `@batch-<nom>` des scénarios jouables, le schéma d'Agent2Test n'en fixant pas la forme.
+7. **Démo** : les scénarios `@front` d'un critère validé, ni proposés ni en attente ; une capture exigée pour chaque image de l'objectif, facultative sinon.
+8. **Sous-agents analyste, relecteur et qualité sans outil d'écriture** ; leur shell ne sert qu'à lire, par consigne ; le rédacteur n'écrit que dans le dossier de la clé.
 
 ## Commandes
 
@@ -190,6 +259,8 @@ node prototypes/skill-ticket/outils/arbre.mjs plan prototypes/skill-ticket/exemp
 node prototypes/skill-ticket/outils/generer.mjs generer prototypes/skill-ticket/exemples/ABCDE-3620 --sortie <dossier>
 node prototypes/skill-ticket/outils/generer.mjs verifier <dossier>/transmissions
 node prototypes/skill-ticket/outils/installer-arbre.mjs installer <dossier>/transmissions --workspace <workspace>
+node prototypes/skill-ticket/outils/verifier-documents.mjs <projet>/docs/demandes/<clé> --rattachement <dossier>/ticket-<clé>/outils/rattachement.json --controleur <dossier>/ticket-<clé>/outils/controler-criteres.mjs
+node prototypes/skill-ticket/outils/verifier-kits.mjs <projet>/docs/demandes/<clé> --rattachement <dossier>/ticket-<clé>/outils/rattachement.json [--depot]
 node --test "prototypes/skill-ticket/tests/*.test.mjs"
 ```
 
@@ -197,7 +268,7 @@ Sous Windows, les mêmes commandes passent dans PowerShell, avec `\` ou `/` dans
 
 Un arbre s'installe par `installer-arbre.mjs` (section précédente) ; une transmission seule s'installe aussi comme les autres, `node tools/installer.mjs <dossier>/transmissions/ticket-abcde-3620-1-2-1.0.0.md`, mais sans ses agents ni sa commande. Avec `SKILL_TICKET_GEMINI` pointant vers Gemini CLI, la recette vérifie aussi la découverte des skills et le chargement des agents.
 
-Les transmissions attendues changent dès que change une source dont héritent les skills de ticket (orchestrateur, socle, référentiels, modèle des invariants du projet) : la recette le signale, et elles se régénèrent par
+Les transmissions attendues changent dès que change une source dont héritent les skills de ticket (orchestrateur, socle, référentiels, modèle des invariants du projet, skills et scripts de la boîte à outils de la racine) : la recette le signale, et elles se régénèrent par
 
 ```bash
 node prototypes/skill-ticket/outils/generer.mjs generer prototypes/skill-ticket/exemples/ABCDE-3620 --sortie prototypes/skill-ticket/exemples/ABCDE-3620-skills
@@ -216,12 +287,13 @@ node prototypes/skill-ticket/outils/generer.mjs generer prototypes/skill-ticket/
 | `Monteur` : assemblage nœud par nœud, blocs du référentiel copiés puis paramétrés | Monteur, Prototype | 2, livré |
 | consigne du nœud : même squelette, crochets selon la nature du nœud et selon la pile | Patron de méthode | 2, livré |
 | exécuteur Gemini CLI par l'installateur ; place prévue pour le binôme Agent2Dev et Agent2Test, ou n8n | Pont | 3 |
+| sous-agents de rôle, chacun dans son contexte, invoqués par les nœuds ; kits assemblés depuis les remises des feuilles | Stratégie, Monteur | 4, livré |
 | champ d'observation partagé, en ajout seul | Médiateur | 5 |
 | escalade ordre 1, 2, 3, puis humain | Chaîne de responsabilité | 5 |
 | actions enregistrées, corrections humaines qui les visent | Commande | 5 |
 | vue augmentée : calques posés sur les ancres du ticket | Décorateur | 6 |
 
-`outils/toml.mjs` lit le sous-ensemble de TOML 1.0 du référentiel et des tickets, sans dépendance ; sa recette le compare aux lectures de `tomllib` (Python), versionnées dans `tests/fixtures/toml/` et `tests/attendus/`. `outils/sources.mjs` lit les sources de l'héritage à leur version épinglée, archives comprises, fins de ligne normalisées ; `outils/fabrique.mjs` porte les fabriques, `outils/monteur.mjs` le Monteur et le contrôle de l'héritage, `outils/generer.mjs` la ligne de commande du générateur, `outils/installer-arbre.mjs` l'installation, le lancement et le retrait d'un arbre dans Gemini CLI.
+`outils/toml.mjs` lit le sous-ensemble de TOML 1.0 du référentiel et des tickets, sans dépendance ; sa recette le compare aux lectures de `tomllib` (Python), versionnées dans `tests/fixtures/toml/` et `tests/attendus/`. `outils/sources.mjs` lit les sources de l'héritage à leur version épinglée, archives comprises, fins de ligne normalisées ; `outils/fabrique.mjs` porte les fabriques, `outils/monteur.mjs` le Monteur et le contrôle de l'héritage, `outils/generer.mjs` la ligne de commande du générateur, `outils/installer-arbre.mjs` l'installation, le lancement et le retrait d'un arbre dans Gemini CLI, `outils/verifier-documents.mjs` et `outils/verifier-kits.mjs` les contrôles des documents et des kits, livrés tels quels dans le skill racine.
 
 ## Lots et critères d'acceptation
 
@@ -229,8 +301,8 @@ node prototypes/skill-ticket/outils/generer.mjs generer prototypes/skill-ticket/
 |---|---|---|---|
 | 1 | modèle et vérification de l'arbre | P1, sauf l'invariant omis | livré |
 | 2 | fabrique et Monteur : un skill par nœud, sa transmission par `bundle.mjs` | P1 (invariant omis), P2, P3 | livré |
-| 3 | installation de l'arbre dans Gemini CLI, activation vérifiée sur le poste du développeur | P4 | livré, P4 à vérifier sur le poste |
-| 4 | documents d'agent-tdd-jira, sous-agents de rôle, kits dev, test et démo | P8, P9 | à venir |
+| 3 | installation de l'arbre dans Gemini CLI, activation vérifiée sur le poste du développeur | P4 | livré |
+| 4 | documents d'agent-tdd-jira, sous-agents de rôle, kits dev, test et démo | P8, P9 | livré, choix à valider |
 | 5 | champ d'observation, retours humains simulés, visiteurs, escalade, propagation | P5 | à venir |
 | 6 | vue augmentée générée depuis le champ | P6 | à venir |
 | 7 | recette, mesure du contexte, bilan | P7 | à venir |

@@ -3,9 +3,11 @@ name: Prototype skill de ticket
 # Prototype de l'orchestrateur C7E : un ticket résolu par des skills de ticket, assemblés depuis le
 # référentiel des méso-contrats. Ce workflow joue la recette du prototype sous Linux et sous Windows,
 # le plan de l'arbre d'essai ABCDE-3620, la génération de ses skills de ticket, la vérification de
-# leurs transmissions attendues et leur installation dans un workspace. Le contrat avec Gemini CLI
-# 0.67.0 vérifie que ses skills sont découverts et ses agents chargés. Il suit aussi les sources dont
-# héritent les skills de ticket : l'orchestrateur, le socle, les référentiels Java et Angular, et les
+# leurs transmissions attendues, leur installation dans un workspace et le contrôle des documents et
+# des kits du projet d'exemple résolu, par les scripts que livre le skill racine. Le contrat avec Gemini
+# CLI 0.67.0 vérifie que ses skills sont découverts et ses agents chargés. Il suit aussi les sources dont
+# héritent les skills de ticket : l'orchestrateur, le socle, les référentiels Java et Angular, les skills
+# de la boîte à outils de la racine (agent-tdd-jira, Agent2Test, analyse-projet, sonarqube), et les
 # outils de transmission et d'installation.
 
 on:
@@ -16,6 +18,10 @@ on:
       - 'specs/socle-back-front/**'
       - 'specs/java/**'
       - 'specs/angular/**'
+      - 'specs/agent-tdd-jira/**'
+      - 'specs/agent2test/**'
+      - 'specs/analyse-projet/**'
+      - 'specs/sonarqube/**'
       - 'tools/bundle.mjs'
       - 'tools/installer.mjs'
       - '.github/workflows/prototype-skill-ticket.yml'
@@ -27,6 +33,10 @@ on:
       - 'specs/socle-back-front/**'
       - 'specs/java/**'
       - 'specs/angular/**'
+      - 'specs/agent-tdd-jira/**'
+      - 'specs/agent2test/**'
+      - 'specs/analyse-projet/**'
+      - 'specs/sonarqube/**'
       - 'tools/bundle.mjs'
       - 'tools/installer.mjs'
       - '.github/workflows/prototype-skill-ticket.yml'
@@ -60,6 +70,15 @@ jobs:
 
       - name: Vérification des transmissions attendues
         run: node prototypes/skill-ticket/outils/generer.mjs verifier prototypes/skill-ticket/exemples/ABCDE-3620-skills/transmissions
+
+      - name: Documents et kits du projet d'exemple, contrôlés par les scripts du skill racine
+        shell: bash
+        run: |
+          outils="$RUNNER_TEMP/skills-de-ticket/ticket-abcde-3620/outils"
+          demande=prototypes/skill-ticket/exemples/ABCDE-3620-resolution/docs/demandes/ABCDE-3620
+          node "$outils/controler-criteres.mjs" "$demande"
+          node "$outils/verifier-documents.mjs" "$demande" --rattachement "$outils/rattachement.json"
+          node "$outils/verifier-kits.mjs" "$demande" --rattachement "$outils/rattachement.json"
 
       - name: Installation de l'arbre d'essai dans un workspace, puis retrait
         shell: bash

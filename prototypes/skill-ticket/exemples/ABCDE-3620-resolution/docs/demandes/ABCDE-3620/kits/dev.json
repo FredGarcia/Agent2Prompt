@@ -1,0 +1,93 @@
+{
+  "format": "skill-ticket.kit/1",
+  "kit": "dev",
+  "cle": "ABCDE-3620",
+  "branche": "feature/ABCDE-3620-commande-resume-temps-reel",
+  "commits": [
+    {
+      "sha": "3ba4903ad72c76f8bab36d5c3e9378c968220d59",
+      "sous_ticket": "ABCDE-3620",
+      "titre": "ABCDE-3620 : [É6-C7E] docs(demande): US, critères d'acceptation et scénarios ratifiés"
+    },
+    {
+      "sha": "d7e25cc2d75a3d3d97adbe24a9f403b01b68a6c5",
+      "sous_ticket": "ABCDE-3620-1.1",
+      "titre": "ABCDE-3620 S04 : [É1-DB] feat(jpa): date-heure maximale des lignes par une requête d'agrégat"
+    },
+    {
+      "sha": "9a77ef847b3446f034aafe656067940d65556c45",
+      "sous_ticket": "ABCDE-3620-1.1",
+      "titre": "ABCDE-3620 S03 : [É1-DB] test(jpa): agrégat vide pour une commande sans ligne"
+    },
+    {
+      "sha": "4f6c65900fe55df3ebe2a55a522068ec8e14e899",
+      "sous_ticket": "ABCDE-3620-1.2",
+      "titre": "ABCDE-3620 S01 : [É3-API] test(spring): réponse inchangée sans paramètre vue"
+    },
+    {
+      "sha": "b72c45cbbd651c258e1137ce3dd00794663ec4e7",
+      "sous_ticket": "ABCDE-3620-1.2",
+      "titre": "ABCDE-3620 S02 : [É3-API] feat(spring): variante résumée à la même URI, paramètre vue=resume"
+    },
+    {
+      "sha": "d2c98977e1bcfafef9679201f3ee81ac29f0a567",
+      "sous_ticket": "ABCDE-3620-1.2",
+      "titre": "ABCDE-3620 S03 : [É3-API] test(spring): lignesDernierEnregistrement à null pour une commande sans ligne"
+    },
+    {
+      "sha": "78afeb1d6f45522dce4860438a31693dde8075bc",
+      "sous_ticket": "ABCDE-3620-1.2",
+      "titre": "ABCDE-3620 S05 : [É3-API] feat(stomp): événement des lignes après commit, avec la date-heure recalculée"
+    },
+    {
+      "sha": "3b14ac1027e4ffa481cb5722a393d91d38bd6a84",
+      "sous_ticket": "ABCDE-3620-1.2",
+      "titre": "ABCDE-3620 S07 : [É3-API] feat(spring): en-tête ETag de la liste des lignes, égal à la dernière séquence"
+    },
+    {
+      "sha": "80dd900fc250fe4394892da632dd9f8d7dfd0169",
+      "sous_ticket": "ABCDE-3620-2",
+      "titre": "ABCDE-3620 S05 : [É5-UI] feat(angular): lignes et date-heure tenues à jour par le canal des lignes"
+    },
+    {
+      "sha": "cf690bed686a533ef351b325c6e18f739c19cef7",
+      "sous_ticket": "ABCDE-3620-2",
+      "titre": "ABCDE-3620 S06 : [É5-UI] test(angular): annonce polie des mises à jour, sans déplacer le focus"
+    },
+    {
+      "sha": "3743b46b62b33440edec14c84575e6dab05e6b16",
+      "sous_ticket": "ABCDE-3620-2",
+      "titre": "ABCDE-3620 S07 : [É2-UI] test(angular): reprise par l'instantané et son ETag après une coupure"
+    }
+  ],
+  "remises": [
+    "docs/demandes/ABCDE-3620/remise.md",
+    "docs/demandes/ABCDE-3620/ABCDE-3620-1/remise.md",
+    "docs/demandes/ABCDE-3620/ABCDE-3620-1.1/remise.md",
+    "docs/demandes/ABCDE-3620/ABCDE-3620-1.2/remise.md",
+    "docs/demandes/ABCDE-3620/ABCDE-3620-2/remise.md"
+  ],
+  "remise_agent2test": "docs/demandes/ABCDE-3620/kits/remise-agent2test.json",
+  "fichiers": [
+    {
+      "chemin": "docs/demandes/ABCDE-3620/remise.md",
+      "sha256": "9e926f6c338f552b0ae7d9cce3c445f2e2c2bb78f6af39dc3b80fa677c990625"
+    },
+    {
+      "chemin": "docs/demandes/ABCDE-3620/ABCDE-3620-1/remise.md",
+      "sha256": "1bd5e5cc361eca0344957e86e9c921ea115c4eefa4d4e470697281819a04808d"
+    },
+    {
+      "chemin": "docs/demandes/ABCDE-3620/ABCDE-3620-1.1/remise.md",
+      "sha256": "d8ae29653fb81493d7a79b01b066886bcadabed698c2118503d73b48b31b23e2"
+    },
+    {
+      "chemin": "docs/demandes/ABCDE-3620/ABCDE-3620-1.2/remise.md",
+      "sha256": "a23beaf0e8714ce8b917c15e237ecf91a2b535438b3805ddd5005c07cdc06776"
+    },
+    {
+      "chemin": "docs/demandes/ABCDE-3620/ABCDE-3620-2/remise.md",
+      "sha256": "c624476f3a4eae3757dd491802e3665e16a10f268f43ceb6aca14b0df26f93cc"
+    }
+  ]
+}

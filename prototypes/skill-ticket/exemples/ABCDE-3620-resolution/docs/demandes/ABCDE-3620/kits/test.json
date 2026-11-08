@@ -1,0 +1,135 @@
+{
+  "format": "skill-ticket.kit/1",
+  "kit": "test",
+  "cle": "ABCDE-3620",
+  "plan": [
+    "docs/demandes/ABCDE-3620/us.md",
+    "docs/demandes/ABCDE-3620/ABCDE-3620.feature"
+  ],
+  "demande": "docs/demandes/ABCDE-3620/demande.json",
+  "tests": [
+    {
+      "chemin": "back/src/test/java/fr/exemple/commande/LigneCommandeRepositoryAgregatTest.java",
+      "scenarios": [
+        "ABCDE-3620-S04"
+      ]
+    },
+    {
+      "chemin": "back/src/test/java/fr/exemple/commande/LigneCommandeRepositorySansLigneTest.java",
+      "scenarios": [
+        "ABCDE-3620-S03"
+      ]
+    },
+    {
+      "chemin": "back/src/test/java/fr/exemple/commande/CommandeControllerSansVueTest.java",
+      "scenarios": [
+        "ABCDE-3620-S01"
+      ]
+    },
+    {
+      "chemin": "back/src/test/java/fr/exemple/commande/CommandeControllerVueResumeTest.java",
+      "scenarios": [
+        "ABCDE-3620-S02"
+      ]
+    },
+    {
+      "chemin": "back/src/test/java/fr/exemple/commande/CommandeControllerSansLigneTest.java",
+      "scenarios": [
+        "ABCDE-3620-S03"
+      ]
+    },
+    {
+      "chemin": "back/src/test/java/fr/exemple/commande/LignesCommandePublieurTest.java",
+      "scenarios": [
+        "ABCDE-3620-S05"
+      ]
+    },
+    {
+      "chemin": "back/src/test/java/fr/exemple/commande/LignesCommandeEtagTest.java",
+      "scenarios": [
+        "ABCDE-3620-S07"
+      ]
+    },
+    {
+      "chemin": "front/src/app/commande/lignes-commande.temps-reel.spec.ts",
+      "scenarios": [
+        "ABCDE-3620-S05"
+      ]
+    },
+    {
+      "chemin": "front/src/app/commande/lignes-commande.annonce.spec.ts",
+      "scenarios": [
+        "ABCDE-3620-S06"
+      ]
+    },
+    {
+      "chemin": "front/src/app/commande/lignes-commande.reprise.spec.ts",
+      "scenarios": [
+        "ABCDE-3620-S07"
+      ]
+    }
+  ],
+  "matrice": "docs/demandes/ABCDE-3620/kits/matrice.md",
+  "campagne": {
+    "adaptateur": "agent-tdd-jira",
+    "dossier": "docs/demandes/ABCDE-3620"
+  },
+  "fichiers": [
+    {
+      "chemin": "docs/demandes/ABCDE-3620/us.md",
+      "sha256": "72ae7e81c4cdebcd308e76528d7bab44958b68ed9adf5409cfcd9899d001af6f"
+    },
+    {
+      "chemin": "docs/demandes/ABCDE-3620/ABCDE-3620.feature",
+      "sha256": "c9c5d3de61ec4451b4170da4e85689a51545039179133503e7fcaada684a6db8"
+    },
+    {
+      "chemin": "docs/demandes/ABCDE-3620/demande.json",
+      "sha256": "17c39ef96fe7dc65ac41b7d78ad18647554f13d54fc4db04f5d24ca6beeaa0c1"
+    },
+    {
+      "chemin": "back/src/test/java/fr/exemple/commande/LigneCommandeRepositoryAgregatTest.java",
+      "sha256": "625036d9dfbbdc53828a7fe6b5fedeab4d208dcdb91b4a3d67df40f4f8edc591"
+    },
+    {
+      "chemin": "back/src/test/java/fr/exemple/commande/LigneCommandeRepositorySansLigneTest.java",
+      "sha256": "73d324604cf91a76945abc031bfcef78d064b781ee96c17be3af38ca05656ed9"
+    },
+    {
+      "chemin": "back/src/test/java/fr/exemple/commande/CommandeControllerSansVueTest.java",
+      "sha256": "1325da291581d53818320deb0e5f8b54c7f7f81c289be9ea39ef68747c72e506"
+    },
+    {
+      "chemin": "back/src/test/java/fr/exemple/commande/CommandeControllerVueResumeTest.java",
+      "sha256": "2c36ad6f9b26fcabef06436c3f5967d36b3860f9f21151d4093b9d73c9026738"
+    },
+    {
+      "chemin": "back/src/test/java/fr/exemple/commande/CommandeControllerSansLigneTest.java",
+      "sha256": "0cde1bb15e7463ce3f7bc10642a372682bde8c09322d3f43edde45ed13c0f1c1"
+    },
+    {
+      "chemin": "back/src/test/java/fr/exemple/commande/LignesCommandePublieurTest.java",
+      "sha256": "f48619ed761d34fb1cfe481008355c30c01dd42a442138349a6a84234190f297"
+    },
+    {
+      "chemin": "back/src/test/java/fr/exemple/commande/LignesCommandeEtagTest.java",
+      "sha256": "6480d8257dc2f93901ade849c554173e64ac78558b9521109d46b4d6c0bf3757"
+    },
+    {
+      "chemin": "front/src/app/commande/lignes-commande.temps-reel.spec.ts",
+      "sha256": "91647940ac1fb0b52dda07d25ead07eb16804a8c80ddd4fe2e7ad3713301135b"
+    },
+    {
+      "chemin": "front/src/app/commande/lignes-commande.annonce.spec.ts",
+      "sha256": "fd1952547f9e9edc431c8368c1043306743d11f0a6735874d58eb5a6ced997dc"
+    },
+    {
+      "chemin": "front/src/app/commande/lignes-commande.reprise.spec.ts",
+      "sha256": "dd87cdad6aad6e3151eddde589871a28ce72108d320e08aa912b22cba3395d67"
+    },
+    {
+      "chemin": "docs/demandes/ABCDE-3620/kits/matrice.md",
+      "sha256": "e03cb5c71a1cb61f8952f77e2495babbc8dc99fd14ded852f09422dfa90eca5a"
+    }
+  ]
+}

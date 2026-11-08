@@ -1,13 +1,17 @@
-// Fabrique abstraite de skill-ticket (prototype « skill de ticket », lots 2 et 3).
+// Fabrique abstraite de skill-ticket (prototype « skill de ticket », lots 2 à 4).
 //
 // Une fabrique produit, pour un nœud de l'arbre de tickets, la famille cohérente des fichiers de son
 // skill : la consigne (SKILL.md), le ticket (ticket.toml), les blocs du référentiel copiés puis
 // paramétrés (méso-contrats, options), la recette, la coordination des sous-tickets, les héritages
 // (invariants et sections de la méthode de l'orchestrateur, socle, référentiels de la pile, invariants
-// du projet), les agents et, au lot 4, les observateurs. La consigne suit un patron de méthode : le même
-// squelette pour tous les nœuds, des crochets selon la nature du nœud et selon la pile. Une fabrique
-// concrète par pile technique fixe ce qui dépend de la pile : référentiels experts, agents, commandes
-// de recette. Le choix des méso-contrats n'est pas le sien : il vient du ticket, qualifié avant.
+// du projet), les agents et, au lot 5, les observateurs. Au lot 4, le skill racine porte en plus la
+// boîte à outils de l'arbre : les documents de la clé Jira selon agent-tdd-jira, les kits dev, test et
+// démo, les sous-agents de rôle (rédacteur, analyste, relecteur, qualité) et leurs références, copiées
+// des skills du dépôt à leur version épinglée, avec les scripts de contrôle. La consigne suit un patron
+// de méthode : le même squelette pour tous les nœuds, des crochets selon la nature du nœud et selon la
+// pile. Une fabrique concrète par pile technique fixe ce qui dépend de la pile : référentiels experts,
+// agents, commandes de recette. Le choix des méso-contrats n'est pas le sien : il vient du ticket,
+// qualifié avant.
 //
 // Rien n'est tiré au hasard ni daté : la même entrée donne les mêmes fichiers, octet pour octet.
 
@@ -18,7 +22,52 @@ import { extraireSection } from './sources.mjs';
 
 export const VERSION_SKILL = '1.0.0';
 /** Lot du prototype qui a produit le générateur, inscrit dans chaque skill. */
-export const LOT = 3;
+export const LOT = 4;
+
+/** Format du rattachement des critères de l'arbre aux critères de la clé Jira, lu par les scripts de contrôle. */
+export const FORMAT_RATTACHEMENT = 'skill-ticket.rattachement/1';
+export const FICHIER_RATTACHEMENT = 'outils/rattachement.json';
+
+/** Critère de la clé Jira : le k-ième critère de la racine devient `<CLÉ>-CAkk` (agent-tdd-jira, module us-criteres, § 2). */
+export const identifiantCa = (cle, k) => `${cle}-CA${String(k).padStart(2, '0')}`;
+
+/** Étiquette Gherkin d'une couche (agent-tdd-jira, module analyse-demande, § 5). */
+export const ETIQUETTES_COUCHES = { persistance: '@back', backend: '@back', frontend: '@front' };
+
+/**
+ * Sous-agents de rôle de l'arbre, définis par le skill racine et invoqués par les skills des nœuds, chacun
+ * dans son propre contexte. `ecrit` : l'agent écrit des fichiers ; sinon il lit seulement et rend son rapport.
+ */
+export const ROLES = {
+  redacteur: { titre: 'rédacteur', ecrit: true },
+  analyste: { titre: 'analyste', ecrit: false },
+  relecteur: { titre: 'relecteur', ecrit: false },
+  qualite: { titre: 'qualité', ecrit: false },
+};
+
+/** Ce que sert chaque fichier de la boîte à outils, pour le tableau des fichiers du skill racine. */
+const USAGES_BOITE = {
+  'references/agent-tdd-jira.md': 'méthode, points de validation et invariants, pour le rédacteur et les agents de couche',
+  'references/agent-tdd-jira/ingestion-jira.md': 'demande.json au schéma version 1, pour le rédacteur',
+  'references/agent-tdd-jira/us-criteres.md': 'US et critères d\'acceptation numérotés, us.md, pour le rédacteur',
+  'references/agent-tdd-jira/analyse-demande.md': 'exigences, questions et scénarios Gherkin, pour le rédacteur',
+  'references/agent-tdd-jira/cycle-tdd.md': 'cycle rouge, vert, remanié, pour les agents de couche des feuilles',
+  'references/agent-tdd-jira/tracabilite.md': 'matrice de traçabilité, pour le kit test',
+  'references/agent-tdd-jira/binome-agent2test.md': 'étiquettes du binôme et remise du plan, pour le rédacteur et la remise à Agent2Test',
+  'references/agent2test/plan.md': 'jouabilité des scénarios selon Agent2Test, pour la remise',
+  'references/agent2test/remise.md': 'format agent2test.remise/1, pour la remise',
+  'references/analyse-projet.md': 'règles globales et invariants, pour l\'analyste',
+  'references/analyse-projet/cartographie.md': 'cartographie du projet, pour l\'analyste',
+  'references/java/revue.md': 'mode revue du référentiel Java, pour le relecteur',
+  'references/angular/revue.md': 'mode revue du référentiel Angular, pour le relecteur',
+  'references/sonarqube.md': 'règles globales, jeton et invariants, pour l\'agent qualité',
+  'references/sonarqube/examen-local.md': 'examen local de la qualité, pour l\'agent qualité',
+  'outils/extraire-jira.mjs': 'script d\'extraction d\'une capture MHTML de Jira, pour le rédacteur',
+  'outils/controler-criteres.mjs': 'script de contrôle des US, des critères et des scénarios',
+  'outils/verifier-documents.mjs': 'script de contrôle des documents de la clé contre le rattachement de l\'arbre',
+  'outils/verifier-kits.mjs': 'script de contrôle des kits dev, test et démo et de la remise à Agent2Test',
+  [FICHIER_RATTACHEMENT]: 'rattachement des critères de l\'arbre aux critères de la clé, pour les scripts de contrôle',
+};
 export const sha256 = (texte) => createHash('sha256').update(texte, 'utf8').digest('hex');
 
 /** Sections de la méthode de l'orchestrateur recopiées dans le module `methode`, selon la nature du nœud. */
@@ -156,6 +205,53 @@ export class FabriqueSkillTicket {
     return this.R.instancesOptions(n.ticket);
   }
 
+  /** Clé Jira de l'arbre : la référence du ticket racine. */
+  cle(n) {
+    return this.racine(n).reference;
+  }
+
+  /**
+   * Critères de la clé que soutient chaque critère de l'arbre (`<référence>:<id>` → identifiants
+   * `<CLÉ>-CAnn`) : ceux de la racine par leur rang, ceux d'un sous-ticket par la chaîne de ses « soutient ».
+   */
+  criteresDeLaCle() {
+    if (this._criteresDeLaCle) return this._criteresDeLaCle;
+    const racine = this.ctx.arbre.racine;
+    const carte = new Map(racine.criteres.map((c, k) => [`${racine.reference}:${c.id}`, [identifiantCa(racine.reference, k + 1)]]));
+    const visiter = (n) => {
+      for (const e of n.enfants) {
+        for (const c of e.criteres) {
+          const ca = [...new Set((c.soutient ?? []).flatMap((s) => carte.get(s) ?? []))].sort();
+          carte.set(`${e.reference}:${c.id}`, ca);
+        }
+        visiter(e);
+      }
+    };
+    visiter(racine);
+    this._criteresDeLaCle = carte;
+    return carte;
+  }
+
+  caDe(n, c) {
+    return this.criteresDeLaCle().get(`${n.reference}:${c.id}`) ?? [];
+  }
+
+  /** Étiquettes Gherkin des couches d'une feuille ; aucune pour un nœud composé, qui prouve par agrégation. */
+  etiquettesCouches(n) {
+    return n.estFeuille ? [...new Set(this.couches(n).map((c) => ETIQUETTES_COUCHES[c]))] : [];
+  }
+
+  /** Images de l'objectif désignées par les options front d'une feuille (`image_objectif`). */
+  imagesObjectif(n) {
+    if (!n.estFeuille) return [];
+    return [...new Set(this.options(n).filter((o) => o.couche === 'frontend' && typeof o.instance.image_objectif === 'string').map((o) => o.instance.image_objectif))];
+  }
+
+  /** Nom d'un sous-agent de rôle de l'arbre, défini par le skill racine. */
+  nomRole(n, role) {
+    return `${nomSkill(this.cle(n))}-${role}`;
+  }
+
   /** Couches touchées : celles des options de la feuille, ou de toutes les feuilles du sous-arbre. */
   couches(n) {
     const touchees = new Set(n.feuilles().flatMap((f) => couchesDuTicket(f.ticket)));
@@ -284,17 +380,32 @@ export class FabriqueSkillTicket {
     ]);
   }
 
-  /** Critères du nœud ; la colonne « Soutient » pour un sous-ticket seulement, la racine ne soutient rien. */
+  /**
+   * Critères du nœud, avec le critère d'acceptation de la clé qu'ils portent ou soutiennent ; la colonne
+   * « Soutient » pour un sous-ticket seulement, la racine ne soutient rien.
+   */
   tableauCriteres(n, prefixe = '') {
-    if (n.estRacine) return tableau(['Critère', 'Énoncé'], n.criteres.map((c) => [`${prefixe}${c.id}`, c.enonce]));
-    return tableau(['Critère', 'Énoncé', 'Soutient'], n.criteres.map((c) => [`${prefixe}${c.id}`, c.enonce, (c.soutient ?? []).join(', ')]));
+    const ca = (c) => this.caDe(n, c).join(', ') || '—';
+    if (n.estRacine) return tableau(['Critère', 'Énoncé', 'Critère d\'acceptation'], n.criteres.map((c) => [`${prefixe}${c.id}`, c.enonce, ca(c)]));
+    return tableau(['Critère', 'Énoncé', 'Soutient', 'Critère d\'acceptation'], n.criteres.map((c) => [`${prefixe}${c.id}`, c.enonce, (c.soutient ?? []).join(', '), ca(c)]));
   }
 
-  /** Recette : critères à prouver ; pour une feuille, preuves des options, transverses, commandes de la pile. */
+  /** Recette : critères à prouver ; pour une feuille, scénarios, preuves des options, transverses, commandes de la pile. */
   recette(n) {
     const criteres = this.tableauCriteres(n, `${n.reference}:`);
+    const cle = this.cle(n);
+    const feature = `docs/demandes/${cle}/${cle}.feature`;
+    const etiquettes = this.etiquettesCouches(n).map((e) => `\`${e}\``);
     const corps = n.estFeuille
       ? [
+        '## Scénarios à réaliser',
+        '',
+        `Chaque critère se prouve par les scénarios de \`${feature}\` qui portent son critère d'acceptation et l'étiquette d'une couche de ce ticket (${liste(etiquettes)}), hors \`@en-attente\` et \`@propose\`. Les agents de couche les réalisent en cycle TDD (section 7 de \`SKILL.md\`) ; chaque test porte l'étiquette de son scénario (agent-tdd-jira:D6.INV-2).`,
+        '',
+        tableau(['Critère', 'Critère d\'acceptation', 'Scénarios'], n.criteres.map((c) => [
+          `${n.reference}:${c.id}`, this.caDe(n, c).join(', '), `${this.caDe(n, c).map((x) => `\`@${x}\``).join(' ou ')} et ${etiquettes.join(' ou ')}`,
+        ])),
+        '',
         '## Preuves exigées par les options',
         '',
         ...this.optionsGroupees(n).map(({ couche, option, catalogue, instances }) => {
@@ -323,16 +434,16 @@ export class FabriqueSkillTicket {
         '',
         '## Dossier de preuves',
         '',
-        `Dans \`${this.dossier(n)}remise.md\` : test, critère ou risque, résultat ; gates passées.`,
+        `Dans \`${this.dossier(n)}remise.md\` : test, scénario, critère ou risque, résultat ; gates passées ; contributions aux kits de l'arbre (section 8 de \`SKILL.md\`).`,
       ]
       : [
         '## Recette par agrégation',
         '',
         'Ce nœud n\'agit pas sur le code. Chacun de ses critères est prouvé quand les critères qui le soutiennent, dans ses sous-tickets, sont prouvés :',
         '',
-        tableau(['Critère', 'Soutenu par'], n.criteres.map((c) => {
+        tableau(['Critère', 'Critère d\'acceptation', 'Soutenu par'], n.criteres.map((c) => {
           const ref = `${n.reference}:${c.id}`;
-          return [ref, n.enfants.flatMap((e) => e.criteres.filter((x) => (x.soutient ?? []).includes(ref)).map((x) => `${e.reference}:${x.id}`)).join(', ')];
+          return [ref, this.caDe(n, c).join(', '), n.enfants.flatMap((e) => e.criteres.filter((x) => (x.soutient ?? []).includes(ref)).map((x) => `${e.reference}:${x.id}`)).join(', ')];
         })),
         '',
         `Le bilan va dans \`${this.dossier(n)}remise.md\` : pour chaque critère, les preuves de ceux qui le soutiennent, avec le dossier du sous-ticket qui les porte.`,
@@ -379,6 +490,219 @@ export class FabriqueSkillTicket {
     ])];
   }
 
+  /** Rattachement des critères de l'arbre aux critères de la clé, et images de l'objectif des feuilles. */
+  contenuRattachement(n) {
+    const racine = this.racine(n);
+    const cle = racine.reference;
+    const noeuds = [];
+    racine.accepter({ visiter: (x) => (!x.estRacine || x.estFeuille ? noeuds.push(x) : undefined) });
+    return {
+      format: FORMAT_RATTACHEMENT,
+      cle,
+      criteres: racine.criteres.map((c, k) => ({ ca: identifiantCa(cle, k + 1), critere: `${cle}:${c.id}`, enonce: c.enonce })),
+      noeuds: noeuds.map((x) => ({
+        reference: x.reference,
+        nature: this.nature(x),
+        dossier: this.dossier(x),
+        etiquettes: this.etiquettesCouches(x),
+        criteres: x.criteres.map((c) => ({ id: c.id, ca: this.caDe(x, c) })),
+        images: this.imagesObjectif(x),
+      })),
+    };
+  }
+
+  /** Chemin d'un fichier de la boîte à outils dans le skill racine installé. */
+  outil(n, rel) {
+    return `.gemini/skills/${nomSkill(this.cle(n))}/${rel}`;
+  }
+
+  /**
+   * Documents de la clé Jira, selon agent-tdd-jira, et rattachement des critères (skill racine) : rédigés
+   * par le sous-agent rédacteur avant la ratification de l'arbre, contrôlés par script, ratifiés avec lui.
+   */
+  documents(n) {
+    if (!n.estRacine) return [];
+    const r = this.contenuRattachement(n);
+    const cle = r.cle;
+    const dossier = this.dossier(n);
+    const versionTdd = this.S.boite.versions['agent-tdd-jira'];
+    const images = r.noeuds.flatMap((x) => x.images.map((i) => `\`${i}\` (${x.reference})`));
+    const sousTickets = r.noeuds.filter((x) => x.reference !== cle);
+    return [
+      fichier('modules/documents/SKILL.md', [
+        frontmatter({ name: 'documents', description: `Documents de la clé Jira ${cle} selon agent-tdd-jira ${versionTdd}, demande.json, us.md et ${cle}.feature, rédigés par le sous-agent rédacteur avant la ratification de l'arbre, avec le rattachement des critères des sous-tickets et les contrôles par script.` }),
+        `# Documents de la clé ${cle}`,
+        '',
+        `Avant la ratification de l'arbre, les documents de la clé Jira se rédigent dans \`${dossier}\`, avec la méthode d'agent-tdd-jira ${versionTdd}, incluse dans ce skill (\`references/agent-tdd-jira.md\` et \`references/agent-tdd-jira/\`). Ils sont le plan commun de l'arbre : chaque sous-ticket prouve ses critères par leurs scénarios, et Agent2Test les reçoit tels quels à la remise. Ils se ratifient avec l'arbre, ce qui tient lieu de la validation V2 d'agent-tdd-jira.`,
+        '',
+        '## 1. Les trois documents',
+        '',
+        tableau(['Document', 'Méthode', 'Contenu'], [
+          ['`demande.json`', '`references/agent-tdd-jira/ingestion-jira.md`, § 2 à § 6', `schéma version 1 (§ 4). Si le développeur fournit la capture MHTML du ticket (dossier IA de capture-sprint-jira, ou page enregistrée selon le § 2), le rédacteur l'extrait avec \`outils/extraire-jira.mjs\`, sans la retoucher (agent-tdd-jira:D1.INV-1) ; sinon il part du ticket racine : \`source.fichier\` vaut \`ticket.toml\`, et la limite « capture MHTML absente » s'inscrit dans \`limites\`. Les commentaires gardent leur ordre ; chaque image de l'objectif d'un sous-ticket figure parmi les pièces.`],
+          ['`us.md`', '`references/agent-tdd-jira/us-criteres.md`, § 1 à § 4', `au moins une US \`${cle}-USnn\` ; chaque critère de la racine repris mot pour mot sous son identifiant (section 2), origine « repris », statut « à valider » jusqu'à la ratification ; les exigences \`EX-nn\`, rattachées à un critère ou à une question (agent-tdd-jira:D10.INV-4).`],
+          [`\`${cle}.feature\``, '`references/agent-tdd-jira/analyse-demande.md`, § 5 et § 6 ; `references/agent-tdd-jira/binome-agent2test.md`, § 3', `Gherkin en français ; chaque scénario étiqueté \`@${cle}-Snn\`, avec le ou les critères qu'il illustre (\`@${cle}-CAnn\`), ses couches (\`@back\`, \`@front\`) et les étiquettes du binôme avec Agent2Test (\`@role-<nom>\`, \`@batch-<nom>\`, \`@redemarrage\`, \`@ecriture-base\`).`],
+        ]),
+        '',
+        'Images de l\'objectif des feuilles : ' + (images.length > 0 ? `${liste(images)}.` : 'aucune.'),
+        '',
+        '## 2. Critères de la racine',
+        '',
+        `Le k-ième critère de la racine devient \`${cle}-CAkk\`, et son énoncé se reprend mot pour mot :`,
+        '',
+        tableau(['Critère d\'acceptation', 'Critère', 'Énoncé'], r.criteres.map((c) => [c.ca, c.critere, c.enonce])),
+        '',
+        `Les identifiants ne se renumérotent jamais (agent-tdd-jira:D10.INV-1). Un critère proposé par le rédacteur prend le numéro suivant, avec l'origine « proposé », et se ratifie avec l'arbre. Si \`controler-criteres.mjs\` juge non vérifiable l'énoncé d'un critère de la racine, le rédacteur ne le reformule pas : l'écart remonte au développeur, qui corrige le ticket racine, puis l'arbre se régénère.`,
+        '',
+        '## 3. Critères des sous-tickets',
+        '',
+        'Chaque critère d\'un sous-ticket se rattache, par la chaîne de ses « soutient », à des critères d\'acceptation de la clé. Il se prouve par leurs scénarios ; pour une feuille, par ceux qui portent aussi l\'étiquette d\'une de ses couches. Chacun a donc au moins un tel scénario.',
+        '',
+        ...(sousTickets.length > 0
+          ? [tableau(['Sous-ticket', 'Critère', 'Critère d\'acceptation', 'Scénarios attendus'], sousTickets.flatMap((x) => x.criteres.map((c) => [
+            x.reference, c.id, c.ca.join(', '), `au moins un ${c.ca.map((a) => `\`@${a}\``).join(' ou ')}${x.etiquettes.length > 0 ? ` avec ${x.etiquettes.map((e) => `\`${e}\``).join(' ou ')}` : ''}`,
+          ])))]
+          : ['Ce ticket n\'a pas de sous-ticket.']),
+        '',
+        `\`${FICHIER_RATTACHEMENT}\` porte ces tableaux et les images de l'objectif des feuilles, pour les scripts de contrôle.`,
+        '',
+        '## 4. Rédaction, par le sous-agent rédacteur',
+        '',
+        '1. Demande au développeur s\'il fournit la capture MHTML du ticket, et son chemin ; sinon, le rédacteur part du ticket racine.',
+        `2. Confie la rédaction au sous-agent \`${this.nomRole(n, 'redacteur')}\`, par l'outil \`invoke_agent\`, avec ce chemin s'il y en a un. Il écrit les trois documents dans son propre contexte, et seulement eux, puis rend son rapport.`,
+        '3. Une contradiction entre la description et les commentaires, ou une ambiguïté, devient une question `Qn` (analyse-demande, § 4) : le critère concerné passe « en attente de Qn », et ses scénarios portent `@en-attente`. Rien ne se tranche en silence.',
+        '',
+        '## 5. Contrôles, sans écart',
+        '',
+        'Depuis la racine du projet :',
+        '',
+        '```bash',
+        `node ${this.outil(n, 'outils/controler-criteres.mjs')} ${dossier.replace(/\/$/, '')}`,
+        `node ${this.outil(n, 'outils/verifier-documents.mjs')} ${dossier.replace(/\/$/, '')} --rattachement ${this.outil(n, FICHIER_RATTACHEMENT)}`,
+        '```',
+        '',
+        'Le premier est le script d\'agent-tdd-jira (us-criteres, § 7), à l\'identique. Le second vérifie que le premier ne signale aucun écart, que `demande.json` suit le schéma version 1 et porte les images de l\'objectif, que les critères de la racine sont repris mot pour mot, et que chaque critère d\'un sous-ticket est illustré par un scénario, de sa couche pour une feuille. Un écart se corrige avant la ratification, ou devient une question au développeur.',
+        '',
+        '## 6. Ratification, qui tient lieu de V2',
+        '',
+        'Au point de ratification de l\'arbre (section 6 de `SKILL.md`), présente avec lui :',
+        '',
+        '- le résumé de l\'extraction, si une capture MHTML a été extraite (ingestion-jira, § 6), qui tient lieu de V1 ;',
+        '- le résumé V2 (us-criteres, § 6), le tableau des exigences, les questions et le fichier Gherkin ;',
+        '- le rattachement des critères des sous-tickets (section 3).',
+        '',
+        'Après la réponse du développeur :',
+        '',
+        '1. Les statuts passent de « à valider » à « validé », « en attente de Qn » ou « retiré : <raison> », selon sa décision ; la colonne « Scénarios » de `us.md` suit le fichier Gherkin.',
+        '2. Les deux contrôles de la section 5 repassent sans écart.',
+        '3. La ligne de ratification s\'ajoute à `retours.md`.',
+        `4. La branche de l'arbre se crée si elle n'existe pas, au format du projet, par défaut \`<type>/${cle}-<slug>\` (D4.INV-1) ; les trois documents s'y commitent, et rien d'autre : \`${cle} : [É6-C7E] docs(demande): US, critères d'acceptation et scénarios ratifiés\` (D4.INV-2). Dans un arbre, les documents se commitent à la ratification, et non avec le premier scénario (cycle-tdd, § 7) : toutes les feuilles partent du même plan.`,
+        '',
+        'Toute modification ultérieure de `us.md` ou du fichier Gherkin repasse par ce skill et par une nouvelle ratification. Un sous-ticket qui a besoin d\'un critère nouveau le remonte ici.',
+      ]),
+      fichier(FICHIER_RATTACHEMENT, JSON.stringify(r, null, 2)),
+    ];
+  }
+
+  /** Kits dev, test et démo, et remise à Agent2Test, assemblés à la clôture de l'arbre (skill racine). */
+  kits(n) {
+    if (!n.estRacine) return [];
+    const cle = this.cle(n);
+    const d = this.dossier(n);
+    const r = this.contenuRattachement(n);
+    const images = r.noeuds.flatMap((x) => x.images.map((i) => `\`${i}\` (${x.reference})`));
+    const json = (objet) => ['```json', JSON.stringify(objet, null, 2), '```'];
+    const fichiersExemple = [{ chemin: `${d}<fichier>`, sha256: '<sha256>' }];
+    return [fichier('modules/kits/SKILL.md', [
+      frontmatter({ name: 'kits', description: `Kits de l'arbre ${cle} assemblés à sa clôture par le skill racine, kit dev, kit test et kit démo, et remise à Agent2Test au format agent2test.remise/1, avec leurs manifestes fermés et leur contrôle par script.` }),
+      `# Kits de ${cle}`,
+      '',
+      `À la clôture de l'arbre, le skill racine assemble trois kits à partir des documents de la clé et des remises des nœuds, puis rédige la remise à Agent2Test. Chaque kit est un manifeste JSON fermé, dans \`${d}kits/\`, au format \`skill-ticket.kit/1\` : un champ inconnu ou absent est un écart. Chaque fichier qu'il cite figure dans sa liste \`fichiers\`, avec son empreinte sha256 sur le contenu brut, celle que donne \`sha256sum\`. Les chemins partent de la racine du projet, séparés par \`/\`.`,
+      '',
+      '## 1. Kit dev, `kits/dev.json`',
+      '',
+      'De quoi reprendre le code : la branche de l\'arbre, ses commits dans l\'ordre de l\'historique, la remise de chaque nœud et la remise à Agent2Test.',
+      '',
+      ...json({
+        format: 'skill-ticket.kit/1', kit: 'dev', cle, branche: `<type>/${cle}-<slug>`,
+        commits: [
+          { sha: '<sha1>', sous_ticket: cle, titre: `${cle} : [É6-C7E] docs(demande): US, critères d'acceptation et scénarios ratifiés` },
+          { sha: '<sha1>', sous_ticket: '<feuille>', titre: `${cle} Snn : [É<n>-<DOMAINE>] <type>(<portée>): <description>` },
+        ],
+        remises: [`${d}remise.md`, '<dossier de chaque sous-ticket>remise.md'],
+        remise_agent2test: `${d}kits/remise-agent2test.json`,
+        fichiers: fichiersExemple,
+      }),
+      '',
+      `- \`commits\` : chaque commit de l'arbre, un slot chacun (D4.INV-2). \`sous_ticket\` vaut ${cle} pour un commit de la racine, les documents ; sinon la feuille qui l'a produit, citée par la ligne \`Sous-ticket : <référence>\` du corps du commit. Chaque feuille a au moins un commit ; le dernier est la tête de la branche.`,
+      '- `remises` : le `remise.md` de chaque nœud, racine comprise ; chacun figure dans `fichiers`.',
+      '- `remise_agent2test` : le chemin de la remise (section 4), qui ne figure pas dans `fichiers` : elle se rédige après ce manifeste.',
+      '',
+      '## 2. Kit test, `kits/test.json`',
+      '',
+      'De quoi rejouer la preuve : le plan, les tests déduits et leurs scénarios, la matrice de traçabilité et l\'ouverture de la campagne d\'Agent2Test.',
+      '',
+      ...json({
+        format: 'skill-ticket.kit/1', kit: 'test', cle,
+        plan: [`${d}us.md`, `${d}${cle}.feature`],
+        demande: `${d}demande.json`,
+        tests: [{ chemin: '<fichier de test>', scenarios: [`${cle}-S01`] }],
+        matrice: `${d}kits/matrice.md`,
+        campagne: { adaptateur: 'agent-tdd-jira', dossier: d.replace(/\/$/, '') },
+        fichiers: fichiersExemple,
+      }),
+      '',
+      '- `tests` : les tests relevés dans les remises des feuilles ; chacun porte l\'étiquette de son scénario (agent-tdd-jira:D6.INV-2) ; chaque scénario ni `@en-attente` ni `@propose` a au moins un test.',
+      '- `matrice` : la matrice de traçabilité (`references/agent-tdd-jira/tracabilite.md`, § 3), construite par recherche (§ 2) ; elle cite chaque scénario.',
+      '- `campagne` : l\'adaptateur et le dossier avec lesquels le développeur ouvre la campagne d\'Agent2Test.',
+      '',
+      '## 3. Kit démo, `kits/demo.json`',
+      '',
+      'De quoi montrer le résultat : un parcours tiré des scénarios, les données et les commandes de lancement, et les captures de l\'écran livré, comparées aux images de l\'objectif.',
+      '',
+      ...json({
+        format: 'skill-ticket.kit/1', kit: 'demo', cle,
+        parcours: `${d}kits/demo/parcours.md`,
+        scenarios: [`${cle}-Snn`],
+        donnees: ['<dossier d\'une feuille>demo/<données>'],
+        commandes: ['<commande de lancement>'],
+        captures: [{ scenario: `${cle}-Snn`, capture: `<dossier de la feuille front>captures/${cle}-Snn.png`, image_objectif: null }],
+        fichiers: fichiersExemple,
+      }),
+      '',
+      '- `scenarios` : ceux que voit une personne, `@front`, qui illustrent un critère validé, ni `@propose` ni `@en-attente` ; le parcours les cite tous, dans l\'ordre de la démonstration, avec leurs étapes telles qu\'écrites.',
+      '- `donnees` et `commandes` : les données à charger, fichiers que les feuilles déposent dans leur dossier, et les commandes de lancement, relevées dans leurs remises.',
+      `- \`captures\` : l'écran livré, capturé par l'agent front de la feuille, et l'image de l'objectif à laquelle il est comparé, ou \`null\`. Chaque image de l'objectif a sa capture ; les écarts se décrivent dans le parcours. Images de l'objectif de cet arbre : ${images.length > 0 ? `${liste(images)}.` : 'aucune.'}`,
+      '',
+      '## 4. Remise à Agent2Test, `kits/remise-agent2test.json`',
+      '',
+      `Au format fermé \`agent2test.remise/1\` (\`references/agent2test/remise.md\`), rédigée en dernier, quand le dernier commit du kit dev est la tête de la branche et qu'aucun fichier suivi n'est modifié (binome-agent2test, § 4) :`,
+      '',
+      `- \`id\` : \`R-${cle}-<n>\` ; \`date\` en UTC ; \`racine\` : le chemin du projet, affiché et jamais ouvert par Agent2Test ;`,
+      `- \`plan\` : adaptateur \`agent-tdd-jira\`, dossier \`${d.replace(/\/$/, '')}\`, sources \`us.md\` et \`${cle}.feature\`, avec leur empreinte ;`,
+      '- `commit` : le dernier commit du kit dev ; `changements.git` : la plage depuis la branche de base ;',
+      '- `criteres` : chaque critère non retiré de `us.md`, avec son statut ;',
+      '- `jouables`, `nonJouables` avec leur motif, `roles` et `prealables` : la prévision, selon les règles de jouabilité d\'Agent2Test (`references/agent2test/plan.md`). Est jouable un scénario sans marque bloquante (`@propose`, `@en-attente`, `@back` sans `@front`, `@redemarrage`, `@ecriture-base`) qui illustre un critère validé ; les rôles sont ceux des étiquettes `@role-<nom>`, les préalables les batchs `@batch-<nom>` des scénarios jouables. Agent2Test décide à l\'ouverture.',
+      '',
+      'Ce skill ne transmet pas la remise à Agent2Test : il la donne au développeur, qui la dépose (binome-agent2test, § 4).',
+      '',
+      '## 5. Assemblage et contrôle',
+      '',
+      '1. Relève, dans le `remise.md` de chaque feuille, ses contributions aux kits : commits, tests et leurs scénarios, captures, données et commandes de démonstration.',
+      '2. Écris la matrice et le parcours, puis `kits/test.json` et `kits/demo.json`.',
+      '3. Écris le `remise.md` de la racine (section 8 de `SKILL.md`), puis `kits/dev.json`.',
+      '4. Rédige `kits/remise-agent2test.json`.',
+      '5. Contrôle, sans écart, depuis la racine du projet :',
+      '',
+      '```bash',
+      `node ${this.outil(n, 'outils/verifier-kits.mjs')} ${d.replace(/\/$/, '')} --rattachement ${this.outil(n, FICHIER_RATTACHEMENT)} --depot`,
+      '```',
+      '',
+      'Le script vérifie chaque manifeste, chaque empreinte, les commits dans le dépôt, la couverture des scénarios par les tests, le parcours et les captures, et la remise contre `us.md`, le fichier Gherkin et le kit dev.',
+      '',
+      'Les kits ne se commitent pas avant la campagne d\'Agent2Test : le commit remis doit rester la tête de la branche (agent2test, module echange, § 4). Le développeur les commite ensuite, s\'il le souhaite.',
+    ])];
+  }
+
   /** Sections de la méthode de l'orchestrateur, mot pour mot. */
   methode(n) {
     const o = this.S.orchestrateur;
@@ -407,6 +731,9 @@ export class FabriqueSkillTicket {
       `- du socle back-front ${this.S.socle.version}, inclus en entier dans \`socle/SKILL.md\` ;`,
       '- des invariants du projet : sa copie du fichier d\'invariants, comparée au démarrage à `projet/meso-contrats.md` ;',
       ...experts.map((e) => `- du référentiel \`${e.path}\` (${e.from.split('/')[1]} ${e.version}), pour ses sections « Versions cibles » et « Invariants », sans adopter son mode de travail ;`),
+      ...(n.estRacine
+        ? [`- des skills dont les sous-agents de rôle appliquent la méthode, recopiés dans \`references/\` et \`outils/\` à leur version épinglée (${Object.entries(this.S.boite.versions).map(([s, v]) => `${s} ${v}`).join(', ')}) : leurs invariants s'appliquent au travail fait avec eux, cités avec le nom de leur skill (\`agent-tdd-jira:D10.INV-1\`) ;`]
+        : []),
       `- des invariants de l'orchestrateur C7E ${o.version}, ci-dessous, mot pour mot.`,
       '',
       'Un invariant ne s\'affaiblit jamais. Une contradiction entre deux niveaux suit la précédence du module `methode` (§ 11.5) ; un écart s\'inscrit au registre des écarts, avec sa décision (D6.INV-3).',
@@ -432,10 +759,14 @@ export class FabriqueSkillTicket {
     ]);
   }
 
-  /** Héritages recopiés en entier : socle, référentiels de la pile pour une feuille, invariants du projet. */
+  /**
+   * Héritages recopiés : socle, référentiels de la pile pour une feuille, invariants du projet et, pour la
+   * racine, la boîte à outils de l'arbre (références des sous-agents de rôle et scripts de contrôle).
+   */
   copies(n) {
     const S = this.S;
-    return [S.socle, ...(n.estFeuille ? this.experts(this.couches(n)) : []), S.projet].map((s) => ({ source: s, fichier: fichier(s.path, s.contenu) }));
+    return [S.socle, ...(n.estFeuille ? this.experts(this.couches(n)) : []), S.projet, ...(n.estRacine ? S.boite.fichiers : [])]
+      .map((s) => ({ source: s, fichier: fichier(s.path, s.contenu) }));
   }
 
   /** Provenance de chaque héritage, pour le contrôle de l'héritage. */
@@ -444,7 +775,14 @@ export class FabriqueSkillTicket {
     return [
       { path: 'modules/invariants/SKILL.md', from: o.from, version: o.version, invariants: o.invariants.length },
       { path: 'modules/methode/SKILL.md', from: o.from, version: o.version, sections: SECTIONS_METHODE[n.estFeuille ? 'feuille' : 'compose'] },
-      ...copies.map(({ source, fichier: f }) => ({ path: f.rel, from: source.from, ...(source.version ? { version: source.version } : {}), sha256: sha256(f.contenu) })),
+      ...copies.map(({ source, fichier: f }) => ({
+        path: f.rel,
+        from: source.from,
+        ...(source.version ? { version: source.version } : {}),
+        ...(source.sections ? { sections: source.sections } : {}),
+        ...(source.bloc ? { bloc: source.bloc } : {}),
+        sha256: sha256(f.contenu),
+      })),
     ];
   }
 
@@ -454,23 +792,32 @@ export class FabriqueSkillTicket {
   }
 
   /**
-   * Un agent par couche touchée par une feuille ; un nœud composé coordonne sans agent. L'installateur
-   * copie chaque agent dans `.gemini/agents/` : son contexte est séparé de celui de la session, d'où les
-   * chemins complets vers les fichiers du skill installé.
+   * Agents du skill : un par couche touchée par une feuille ; et, sur la racine, les sous-agents de rôle de
+   * l'arbre. Un nœud composé qui n'est pas la racine coordonne sans agent. L'installateur copie chaque
+   * agent dans `.gemini/agents/` : son contexte est séparé de celui de la session, d'où les chemins
+   * complets vers les fichiers des skills installés.
    */
   agents(n) {
+    return [...this.agentsDeCouche(n), ...this.agentsDeRole(n)];
+  }
+
+  agentsDeCouche(n) {
     if (!n.estFeuille) return [];
     const nom = nomSkill(n.reference);
     const ici = `.gemini/skills/${nom}/`;
-    const racine = this.racine(n).reference;
+    const cle = this.cle(n);
+    const boite = `.gemini/skills/${nomSkill(cle)}/references/agent-tdd-jira/cycle-tdd.md`;
+    const cas = [...new Set(n.criteres.flatMap((c) => this.caDe(n, c)))].sort();
     return this.couches(n).map((couche) => {
       const a = this.agentDeCouche(couche);
       const groupes = this.optionsGroupees(n).filter((g) => g.couche === couche);
       const references = this.experts([couche]).map((e) => `\`${ici}${e.path}\``);
+      const etiquette = ETIQUETTES_COUCHES[couche];
+      const images = this.imagesObjectif(n);
       return fichier(`agents/${nom}-${a.suffixe}.md`, [
         frontmatter({
           name: `${nom}-${a.suffixe}`,
-          description: `Agent ${a.titre} du skill de ticket ${n.reference} (${a.technologies}), qui réalise les options ${couche} du ticket après la ratification du skill, sous les invariants hérités.`,
+          description: `Agent ${a.titre} du skill de ticket ${n.reference} (${a.technologies}), qui réalise les options ${couche} du ticket en cycle TDD, scénario par scénario, après la ratification du skill, sous les invariants hérités.`,
           kind: 'local',
           tools: a.outils,
         }),
@@ -482,19 +829,147 @@ export class FabriqueSkillTicket {
         '',
         ...groupes.map((g) => `- option \`${couche}.${g.option}\`, slots ${g.slots.slots}, étiquettes ${g.slots.etiquettes} : \`${ici}modules/option-${couche}-${g.option}/SKILL.md\``),
         '',
+        '## Scénarios, en cycle TDD',
+        '',
+        `Tu réalises un à un les scénarios de \`docs/demandes/${cle}/${cle}.feature\` qui portent l'un des critères d'acceptation de ce ticket (${cas.map((x) => `\`@${x}\``).join(', ')}) et l'étiquette \`${etiquette}\`, hors \`@en-attente\` et \`@propose\`, en cycle rouge, vert, remanié, selon \`${boite}\` :`,
+        '',
+        `- le test s'écrit d'abord, étiqueté avec son scénario (${couche === 'frontend' ? `\`describe('${cle}-Snn : …')\`` : `\`@Tag("${cle}-Snn")\``}), et échoue pour la raison attendue avant tout code de production (agent-tdd-jira:D5.INV-1) ;`,
+        '- le code minimal le fait passer, la suite du module reste verte, puis le remaniement applique les invariants du référentiel, sans changer le comportement (agent-tdd-jira:D5.INV-2, agent-tdd-jira:D5.INV-3) ;',
+        `- chaque scénario se présente au skill du ticket, qui le fait accepter au développeur (V4), avant le suivant ; puis il se commite, un slot par commit : \`${cle} Snn : [É<n>-<DOMAINE>] <type>(<portée>): <description>\`${n.estRacine ? '' : `, le corps citant \`Sous-ticket : ${n.reference}\``}${couche === 'frontend' ? ' ;' : '.'}`,
+        ...(couche === 'frontend'
+          ? [`- pour chaque scénario réalisé, une capture de l'écran livré, \`${this.dossier(n)}captures/${cle}-Snn.png\`, prise avec l'outil de bout en bout du projet s'il en a un, sinon demandée au développeur ; elle se compare à l'image de l'objectif ${images.length > 0 ? `(${liste(images.map((i) => `\`${i}\``))}, analysée dans \`${this.dossier(n)}analyse-image.md\`)` : 'quand le ticket en désigne une'}, et les écarts vont dans ton rapport.`]
+          : []),
+        '',
         '## Règles',
         '',
         `- Aucune modification avant la ratification du skill par le développeur : la ligne \`${ligneRatification(n.reference)}\` dans \`${this.dossier(n)}retours.md\` (D3.INV-1, la fiche étant ce skill).`,
         `- Les invariants hérités s'appliquent : \`${ici}modules/invariants/SKILL.md\`, \`${ici}socle/SKILL.md\`, la copie du projet du fichier d'invariants${references.length > 0 ? ` et ${liste(references)}` : ''}.`,
-        `- Un slot par commit ; chaque commit commence par \`${racine} : \` suivi de l'étiquette de son slot (D4.INV-2)${n.estRacine ? '' : `, et son corps cite \`Sous-ticket : ${n.reference}\``} ; tu ne pousses, ne fusionnes, ne rebases ni ne poses de tag (D4.INV-3).`,
+        `- Un slot par commit ; chaque commit commence par \`${cle} : \`, ou \`${cle} Snn : \` pour un scénario, suivi de l'étiquette de son slot (D4.INV-2)${n.estRacine ? '' : `, et son corps cite \`Sous-ticket : ${n.reference}\``} ; tu ne pousses, ne fusionnes, ne rebases ni ne poses de tag (D4.INV-3).`,
         '- Tu ne sors pas de ta couche : un besoin hors de ton périmètre remonte au skill du ticket.',
         '',
         '## Rapport',
         '',
+        '- Pour chaque scénario : son critère d\'acceptation, le rouge avec son message d\'échec, le vert, le remaniement, les suites et leurs résultats, les fichiers, le commit (cycle-tdd, § 6).',
         '- Chaque constat cite sa preuve : test, commande et sortie, ou réponse du développeur.',
         `- Chaque choix du développeur parmi tes propositions, et chaque correction qu'il demande sur tes actions, s'ajoute à \`${this.dossier(n)}retours.md\` : c'est la référence de ton observation.`,
       ]);
     });
+  }
+
+  /**
+   * Sous-agents de rôle de l'arbre, sur le skill racine : le rédacteur des documents de la clé, l'analyste
+   * en lecture seule, le relecteur en mode revue et l'agent qualité. Les skills des nœuds les invoquent
+   * par leur nom ; chacun lit ses références dans le skill racine installé.
+   */
+  agentsDeRole(n) {
+    if (!n.estRacine) return [];
+    const cle = n.reference;
+    const racine = `.gemini/skills/${nomSkill(cle)}/`;
+    const ref = (rel) => `\`${racine}${rel}\``;
+    const v = this.S.boite.versions;
+    const lecture = ['read_file', 'list_directory', 'glob', 'grep_search', 'run_shell_command'];
+    const ecriture = ['read_file', 'list_directory', 'glob', 'grep_search', 'write_file', 'replace', 'run_shell_command'];
+    const agent = (role, description, outils, lignes) => fichier(`agents/${this.nomRole(n, role)}.md`, [
+      frontmatter({ name: this.nomRole(n, role), description, kind: 'local', tools: outils }),
+      ...lignes,
+    ]);
+    const lectureSeule = `- Lecture seule : tu ne crées, ne modifies ni ne supprimes aucun fichier, et tes commandes ne font que lire (\`git log\`, \`git show\`, \`git diff\`, \`git grep\`) ; aucune commande qui construit, installe ou écrit. Tu rends ton rapport au skill qui t'invoque, qui l'écrit lui-même.`;
+    return [
+      agent('redacteur', `Rédacteur des documents de la clé Jira ${cle}, demande.json, us.md et fichier Gherkin, selon agent-tdd-jira ${v['agent-tdd-jira']}, invoqué par le skill racine avant la ratification de l'arbre.`, ecriture, [
+        `# Rédacteur des documents de ${cle}`,
+        '',
+        `Tu rédiges les documents de la clé Jira ${cle} dans \`${this.dossier(n)}\`, avec la méthode d'agent-tdd-jira ${v['agent-tdd-jira']}. Ton contexte est le tien : le skill racine \`${nomSkill(cle)}\` te confie ce travail et reçoit ton rapport. Commence par lire ${ref('modules/documents/SKILL.md')}, qui fixe les trois documents, les critères à reprendre et leur rattachement.`,
+        '',
+        '## Références',
+        '',
+        `- ${ref('references/agent-tdd-jira.md')} : méthode, points de validation et invariants d'agent-tdd-jira ;`,
+        `- ${ref('references/agent-tdd-jira/ingestion-jira.md')} (§ 2 à § 6) et ${ref('outils/extraire-jira.mjs')}, pour \`demande.json\` ;`,
+        `- ${ref('references/agent-tdd-jira/us-criteres.md')} (§ 1 à § 6), pour \`us.md\` ;`,
+        `- ${ref('references/agent-tdd-jira/analyse-demande.md')} (§ 2 à § 6) et ${ref('references/agent-tdd-jira/binome-agent2test.md')} (§ 3), pour les exigences, les questions et le fichier Gherkin ;`,
+        `- les tickets de l'arbre : ${ref('ticket.toml')} et celui de chaque sous-ticket, dans son skill installé (\`.gemini/skills/<skill du sous-ticket>/ticket.toml\`).`,
+        '',
+        '## Règles',
+        '',
+        `- Tu n'écris que dans \`${this.dossier(n)}\` : \`demande.json\`, \`us.md\`, \`${cle}.feature\`, et \`images/\` pour les pièces extraites. Tu ne touches ni au code, ni au schéma, ni à la configuration du projet, ni à la capture MHTML (agent-tdd-jira:D1.INV-1).`,
+        '- Chaque critère de la racine se reprend mot pour mot sous son identifiant, origine « repris », statut « à valider » ; chaque US et chaque critère absent du ticket est marqué « proposé » (agent-tdd-jira:D10.INV-2).',
+        '- Chaque critère d\'acceptation est illustré par au moins un scénario, et chaque critère d\'un sous-ticket par un scénario de son critère d\'acceptation, avec l\'étiquette de sa couche pour une feuille (module `documents`, section 3).',
+        '- Un scénario décrit un comportement : ni sélecteur, ni URL technique, ni identifiant de test (binome-agent2test, § 3). Il porte les étiquettes du binôme que la demande justifie, et rien de déduit du code.',
+        '- Une contradiction ou une ambiguïté devient une question `Qn` ; le critère concerné passe « en attente de Qn », ses scénarios portent `@en-attente`. Tu ne tranches rien en silence.',
+        `- Tu lances les deux contrôles du module \`documents\` (section 5) et corriges jusqu'à n'avoir aucun écart ; un écart qui ne se corrige pas devient une question.`,
+        '',
+        '## Rapport',
+        '',
+        '- Les documents écrits, avec la sortie des deux contrôles, mot pour mot.',
+        '- Le résumé V2 (us-criteres, § 6) et, si une capture MHTML a été extraite, le résumé de l\'extraction (ingestion-jira, § 6).',
+        '- Les questions, chacune avec les critères qu\'elle concerne.',
+      ]),
+      agent('analyste', `Analyste en lecture seule de l'arbre ${cle}, qui cartographie la partie du projet que touche un sous-ticket, selon analyse-projet ${v['analyse-projet']}, et rend sa cartographie au skill de la feuille.`, lecture, [
+        `# Analyste de l'arbre ${cle}`,
+        '',
+        `Tu cartographies, pour une feuille de l'arbre ${cle}, la partie du projet qu'elle touche, avec la méthode d'analyse-projet ${v['analyse-projet']}, en lecture seule. Ton contexte est le tien : le skill de la feuille qui t'invoque te donne sa référence et ses couches, et reçoit ta cartographie, qu'il écrit dans son \`analyse.md\`.`,
+        '',
+        '## Références',
+        '',
+        `- ${ref('references/analyse-projet.md')} : règles globales et invariants d'analyse-projet ;`,
+        `- ${ref('references/analyse-projet/cartographie.md')} : sections de la cartographie, versions, back, front, données, matrice de frontière ;`,
+        '- le skill de la feuille : son `ticket.toml`, ses modules d\'options et sa recette, dans `.gemini/skills/<skill de la feuille>/`.',
+        '',
+        '## Règles',
+        '',
+        lectureSeule,
+        '- Si skill4appli est installé dans le projet, ses requêtes sur l\'index du code et des branches, qui ne font que lire, servent à trouver symboles, dépendances et consommateurs ; sinon la recherche dans les fichiers.',
+        '- Le disque fait foi : chaque constat cite son fichier et sa ligne, ou sa commande et sa sortie ; ce qui n\'est pas observé reste une question.',
+        '- Périmètre : les couches de la feuille et leurs frontières ; une demande qui sort des empreintes de sa composition se signale, sans proposer d\'autre composition (D11.INV-4).',
+        '',
+        '## Rapport',
+        '',
+        '- La cartographie, limitée à la feuille, dans l\'ordre des sections du module `cartographie` : contexte, versions, back, front, données, matrice de frontière.',
+        '- L\'impact : dépendances explicites et détectées, autres consommateurs, risques, chacun avec sa preuve.',
+        '- Les questions.',
+      ]),
+      agent('relecteur', `Relecteur de l'arbre ${cle}, qui relit les commits d'une feuille en mode revue du référentiel de leur couche, java ${v.java} ou angular ${v.angular}, et rend son rapport au skill de la feuille.`, lecture, [
+        `# Relecteur de l'arbre ${cle}`,
+        '',
+        `Tu relis, pour une feuille de l'arbre ${cle}, les commits de sa couche, avec le mode revue du référentiel de cette couche : java ${v.java} pour la persistance et le back, angular ${v.angular} pour le front. Ton contexte est le tien : le skill de la feuille qui t'invoque te donne sa référence, la couche et ses commits (\`git log --grep "Sous-ticket : <référence>"\`), et reçoit ton rapport.`,
+        '',
+        '## Références',
+        '',
+        `- ${ref('references/java/revue.md')} et ${ref('references/angular/revue.md')} : déroulé, gravités, grille et format du rapport ;`,
+        '- le référentiel de la couche dans le skill de la feuille, `references/java.md` ou `references/angular.md`, pour ses versions cibles et ses invariants ;',
+        '- les modules d\'options et la recette de la feuille.',
+        '',
+        '## Règles',
+        '',
+        lectureSeule,
+        '- Chaque constat cite son fichier et sa ligne, sa gravité (revue, § 2) et l\'invariant qu\'il touche, avec le nom de son skill (`java:D3.INV-3`, `angular:D2.INV-1`).',
+        '- Tu ne corriges rien : la correction d\'un constat (revue, § 5) revient à l\'agent de la couche, après la décision du développeur, dans un commit de rétroaction qui cite la revue (D6.INV-1). Un constat bloquant arrête la remise de la feuille jusqu\'à sa correction.',
+        '',
+        '## Rapport',
+        '',
+        '- Au format du module revue (§ 4) : synthèse, constats, questions, points conformes notables.',
+      ]),
+      agent('qualite', `Agent qualité de l'arbre ${cle}, qui examine le diff d'une feuille avec la branche cible selon le module examen-local de sonarqube ${v.sonarqube}, sans écriture vers SonarQube sans validation explicite.`, lecture, [
+        `# Agent qualité de l'arbre ${cle}`,
+        '',
+        `Tu examines la qualité des modifications d'une feuille de l'arbre ${cle}, avec le module examen-local de sonarqube ${v.sonarqube} : le périmètre est le diff entre \`HEAD\` et la base de fusion avec la branche cible (sonarqube:D9.INV-3), les règles sont celles du profil qualité du projet. Ton contexte est le tien : le skill de la feuille qui t'invoque te donne sa référence et la branche cible, et reçoit ton rapport.`,
+        '',
+        '## Références',
+        '',
+        `- ${ref('references/sonarqube.md')} : règles globales, jeton et invariants de sonarqube ;`,
+        `- ${ref('references/sonarqube/examen-local.md')} : trois moteurs, cadrage, périmètre, restitution.`,
+        '',
+        '## Règles de jeton et de validation, inchangées',
+        '',
+        '- Tu ne demandes jamais au développeur de coller un jeton dans la conversation ; s\'il en colle un, tu le signales et recommandes sa révocation.',
+        '- Le jeton ne se lit que dans la variable d\'environnement `SONAR_TOKEN` : jamais affiché, journalisé, versionné, ni placé dans une URL ou un argument de commande (sonarqube:D1.INV-2).',
+        '- Aucune écriture vers SonarQube, analyse éphémère comprise, sans la validation explicite du lot d\'écritures proposé avec ses appels exacts (sonarqube:D1.INV-3, examen-local, § 5.2) ; l\'analyse éphémère se fait sous une branche `local-`, supprimée dans le même lot (sonarqube:D9.INV-2). Sans validation, tu te limites aux moteurs SonarLint et relecture par les règles.',
+        '- Tu ne modifies aucun fichier du projet, ne pousses rien, ne commentes aucune issue et ne changes aucun statut (sonarqube:D9.INV-6).',
+        '',
+        '## Rapport',
+        '',
+        '- La restitution du module examen-local (§ 8) : chaque constat avec son moteur, son fichier, sa ligne et sa règle ; un constat de relecture n\'est jamais compté comme une issue SonarQube (sonarqube:D9.INV-1).',
+      ]),
+    ];
   }
 
   /** Observateurs des ordres 1 à 3 : au lot 5 du prototype. */
@@ -507,7 +982,7 @@ export class FabriqueSkillTicket {
    * `.gemini/commands/ticket/`, elle devient `/ticket:<nœud>`.
    */
   commandes(n) {
-    const quoi = n.estFeuille ? 'démarrage, analyse, ratification, transformation et remise' : n.estRacine ? 'présentation et ratification de l\'arbre, suivi, puis clôture' : 'suivi des sous-tickets, puis clôture';
+    const quoi = n.estFeuille ? 'démarrage, analyse, ratification, transformation et remise' : n.estRacine ? 'documents de la clé, présentation et ratification de l\'arbre, suivi, puis clôture et kits' : 'suivi des sous-tickets, puis clôture';
     return [fichier(FICHIER_COMMANDE(n.reference), [
       `description = ${JSON.stringify(`Skill de ticket ${n.reference}, ${this.nature(n)} (${quoi}), dans cette session`)}`,
       'prompt = """',
@@ -522,7 +997,7 @@ export class FabriqueSkillTicket {
   description(n) {
     const m = this.R.mesoContrats.get(n.composition.principal);
     const place = n.estRacine ? (n.estFeuille ? 'ticket sans sous-ticket' : 'racine de son arbre') : `${this.nature(n)} de ${n.parent.reference}`;
-    const role = n.estFeuille ? `résoudre ce ${n.estRacine ? 'ticket' : 'sous-ticket'}` : n.estRacine ? 'présenter l\'arbre du ticket, le faire ratifier puis coordonner ses sous-tickets' : 'coordonner ses sous-tickets';
+    const role = n.estFeuille ? `résoudre ce ${n.estRacine ? 'ticket' : 'sous-ticket'}` : n.estRacine ? 'rédiger les documents de la clé, présenter l\'arbre et le faire ratifier, coordonner ses sous-tickets puis assembler les kits' : 'coordonner ses sous-tickets';
     const deps = n.dependances.length > 0 ? `, après la clôture de ${liste(n.dependances)}` : '';
     return sansDeuxPoints(`Skill de ticket ${n.reference}, ${place} (${decrireComposition(n.composition)}, ${m.nom.toLowerCase()}), produit par le générateur C7E. À activer pour ${role}${deps} ; rien ne se modifie avant sa ratification.`);
   }
@@ -576,7 +1051,12 @@ export class FabriqueSkillTicket {
       '',
       '## 10. Invariants hérités',
       '',
-      'Le module `invariants` liste ce dont ce skill hérite, sans affaiblissement : le socle back-front, les invariants du projet, les référentiels de la pile et, mot pour mot, les invariants de l\'orchestrateur, avec leurs correspondances dans un skill de ticket. La précédence des règles suit le module `methode` (§ 11.5).',
+      `Le module \`invariants\` liste ce dont ce skill hérite, sans affaiblissement : ${[
+        'le socle back-front',
+        'les invariants du projet',
+        ...(n.estFeuille ? ['les référentiels de la pile'] : []),
+        ...(n.estRacine ? ['les skills de la boîte à outils, cités avec le nom de leur skill'] : []),
+      ].join(', ')} et, mot pour mot, les invariants de l'orchestrateur, avec leurs correspondances dans un skill de ticket. La précédence des règles suit le module \`methode\` (§ 11.5).`,
       '',
       '## 11. Fichiers',
       '',
@@ -587,6 +1067,7 @@ export class FabriqueSkillTicket {
   placeDansArbre(n) {
     const racine = this.racine(n);
     const lignes = [`- Nature : ${this.nature(n)}${n.estFeuille ? ' ; ce skill agit sur le code, par ses agents.' : ' ; ce skill coordonne ses sous-tickets et n\'agit pas sur le code.'}`];
+    if (n.estRacine) lignes.push('- Boîte à outils de l\'arbre : ce skill porte les documents de la clé (module `documents`), les kits (module `kits`), les sous-agents de rôle, rédacteur, analyste, relecteur et qualité, que les skills des nœuds invoquent, et leurs références, copiées des skills du dépôt à leur version épinglée (`references/`, `outils/`).');
     if (!n.estRacine) {
       const parent = `${n.parent.reference} (skill \`${nomSkill(n.parent.reference)}\`)`;
       lignes.push(n.parent === racine ? `- Parent : ${parent}, le ticket racine ; profondeur ${n.profondeur}.` : `- Parent : ${parent} ; ticket racine : ${racine.reference} ; profondeur ${n.profondeur}.`);
@@ -621,20 +1102,28 @@ export class FabriqueSkillTicket {
   analyse(n) {
     const options = this.optionsGroupees(n);
     const image = options.some((g) => g.instances.some((i) => i.analyse_image !== undefined));
-    return [
-      `1. Écris la copie de travail de \`ticket.toml\` dans \`${this.dossier(n)}ticket.toml\`. Tu ne la complètes que de ce que demandent les options (repérage, valeurs relevées) ; sa demande, sa composition et ses options ne changent pas.`,
-      '2. Lis l\'architecture réelle : code, contrat, migrations, tests existants, conventions du projet. Le disque fait foi.',
-      '3. Cartographie l\'impact : dépendances explicites et détectées, autres consommateurs. Si la demande sort des empreintes de la composition, arrête-toi et remonte-la au ticket parent, ou au développeur pour la racine, sans changer de composition (D11.INV-4).',
-      `4. Pour chaque option, relève ce que son module demande à l'analyse${image ? ', et analyse l\'image de l\'objectif dans `analyse-image.md` (D10.INV-4)' : ''}.`,
-      '5. Choisis la configuration : mode, concepts et poids, profondeur, niveau de preuve, justifiés par la criticité selon la grille du fichier d\'invariants du projet (module `methode`, § 2 et § 7.1 ; D2.INV-1).',
-      '6. Déduis les tests des critères et des risques, avec les preuves des options et les exigences des méso-contrats transverses (module `recette` ; D10.INV-3).',
-      `7. Écris \`${this.dossier(n)}analyse.md\` : cartographie d'impact, configuration retenue et sa justification, stratégie (slots engagés, gate contrats, points de retour arrière), tests déduits.`,
+    const cle = this.cle(n);
+    const etapes = [
+      ...(n.estRacine ? [`Fais rédiger les documents de la clé ${cle} par le sous-agent rédacteur, puis passe leurs contrôles sans écart (module \`documents\`, sections 4 et 5) : ils se ratifient avec ce skill.`] : []),
+      `Écris la copie de travail de \`ticket.toml\` dans \`${this.dossier(n)}ticket.toml\`. Tu ne la complètes que de ce que demandent les options (repérage, valeurs relevées) ; sa demande, sa composition et ses options ne changent pas.`,
+      `Fais cartographier l'architecture réelle par le sous-agent \`${this.nomRole(n, 'analyste')}\`, en lecture seule, par l'outil \`invoke_agent\`, avec la référence de ce ticket et ses couches : code, contrat, migrations, tests existants, conventions du projet. Vérifie ses constats ; le disque fait foi.`,
+      'Cartographie l\'impact : dépendances explicites et détectées, autres consommateurs. Si la demande sort des empreintes de la composition, arrête-toi et remonte-la au ticket parent, ou au développeur pour la racine, sans changer de composition (D11.INV-4).',
+      `Pour chaque option, relève ce que son module demande à l'analyse${image ? ', et analyse l\'image de l\'objectif dans `analyse-image.md` (D10.INV-4)' : ''}.`,
+      'Choisis la configuration : mode, concepts et poids, profondeur, niveau de preuve, justifiés par la criticité selon la grille du fichier d\'invariants du projet (module `methode`, § 2 et § 7.1 ; D2.INV-1).',
+      `Déduis les tests des critères et des risques : les scénarios de \`docs/demandes/${cle}/${cle}.feature\` que ce ticket réalise (module \`recette\`, scénarios à réaliser), les preuves des options et les exigences des méso-contrats transverses (D10.INV-3). Un critère sans scénario de sa couche remonte au skill racine, qui seul modifie les documents de la clé.`,
+      `Écris \`${this.dossier(n)}analyse.md\` : cartographie d'impact, configuration retenue et sa justification, stratégie (slots engagés, gate contrats, points de retour arrière), scénarios et tests déduits.`,
     ];
+    return etapes.map((e, k) => `${k + 1}. ${e}`);
   }
 
   coordination(n) {
     const etats = [
-      ...(n.estRacine ? [`**Arbre non ratifié**, sans la ligne \`${ligneRatification(objetRatification(n))}\` dans \`${this.dossier(n)}retours.md\` : passe à la ratification (section 6).`] : []),
+      ...(n.estRacine
+        ? [
+          `**Documents à rédiger**, sans \`${this.dossier(n)}us.md\` : fais rédiger les documents de la clé par le sous-agent rédacteur, puis passe leurs contrôles sans écart (module \`documents\`, sections 4 et 5) ; ensuite, ratification (section 6).`,
+          `**Arbre non ratifié**, documents écrits, sans la ligne \`${ligneRatification(objetRatification(n))}\` dans \`${this.dossier(n)}retours.md\` : passe à la ratification (section 6).`,
+        ]
+        : []),
       `**Sous-tickets en cours** : montre l'état de chacun d'après son dossier (\`retours.md\`, \`analyse.md\`, \`remise.md\`), puis le ou les sous-tickets prêts dans l'ordre du module \`sous-tickets\`, avec leur commande, à lancer dans une nouvelle session. Arrête-toi là.`,
       '**Tous les sous-tickets clos**, chacun avec sa `remise.md` : passe à la clôture (section 7).',
     ];
@@ -646,11 +1135,16 @@ export class FabriqueSkillTicket {
   }
 
   ratification(n) {
+    const ligne = `sur une ligne \`${ligneRatification(objetRatification(n))}\`, ou \`… non ratifié, <motif>\`, avec la date et son nom`;
+    const documents = 'les statuts des critères mis à jour et leurs contrôles repassés sans écart ; puis les documents se commitent sur la branche de l\'arbre (module `documents`, section 6)';
     if (n.estRacine && !n.estFeuille) {
-      return [`Avant toute autre action, présente au développeur l'arbre complet : les sous-tickets et leurs méso-contrats, l'ordre de résolution et les critères, avec la façon dont chaque critère de la racine est soutenu (modules \`sous-tickets\` et \`recette\`). **Point de ratification** : rien ne commence avant sa réponse. Ajoute sa décision à \`${this.dossier(n)}retours.md\`, sur une ligne \`${ligneRatification(objetRatification(n))}\`, ou \`… non ratifié, <motif>\`, avec la date et son nom. Elle couvre l'arbre ; chaque feuille se ratifie encore avant sa première action. Une fois l'arbre ratifié, indique le premier sous-ticket prêt et sa commande, à lancer dans une nouvelle session.`];
+      return [`Avant toute autre action, présente au développeur l'arbre complet : les sous-tickets et leurs méso-contrats, l'ordre de résolution et les critères, avec la façon dont chaque critère de la racine est soutenu (modules \`sous-tickets\` et \`recette\`), et les documents de la clé, qui se ratifient avec lui (module \`documents\`, section 6). **Point de ratification** : rien ne commence avant sa réponse. Sa décision s'ajoute à \`${this.dossier(n)}retours.md\`, ${ligne}, une fois ${documents}. Elle couvre l'arbre ; chaque feuille se ratifie encore avant sa première action. Une fois l'arbre ratifié, indique le premier sous-ticket prêt et sa commande, à lancer dans une nouvelle session.`];
     }
     if (!n.estFeuille) return ['Pas de ratification propre : l\'arbre a été ratifié sur le skill racine. Ce nœud coordonne ses sous-tickets.'];
-    return [`Présente au développeur ce skill et son analyse : objectif, critères, méso-contrats et options avec leur paramétrage, invariants, configuration, cartographie, stratégie et tests déduits, avec la copie de travail de \`ticket.toml\`. **Point de ratification** : rien n'est modifié avant sa réponse (D3.INV-1, la fiche étant ce skill). Ajoute sa décision à \`${this.dossier(n)}retours.md\`, sur une ligne \`${ligneRatification(objetRatification(n))}\`, ou \`… non ratifié, <motif>\`, avec la date et son nom.`];
+    const presentation = `Présente au développeur ce skill et son analyse : objectif, critères, méso-contrats et options avec leur paramétrage, invariants, configuration, cartographie, stratégie, scénarios et tests déduits, avec la copie de travail de \`ticket.toml\`${n.estRacine ? ', et les documents de la clé, qui se ratifient avec lui (module `documents`, section 6)' : ''}. **Point de ratification** : rien n'est modifié avant sa réponse (D3.INV-1, la fiche étant ce skill).`;
+    return [n.estRacine
+      ? `${presentation} Sa décision s'ajoute à \`${this.dossier(n)}retours.md\`, ${ligne}, une fois ${documents}.`
+      : `${presentation} Ajoute sa décision à \`${this.dossier(n)}retours.md\`, ${ligne}.`];
   }
 
   transformation(n) {
@@ -695,21 +1189,34 @@ export class FabriqueSkillTicket {
     return [
       ...etapes.map((e, k) => `${k + 1}. ${e}`),
       '',
-      `Chaque commit porte un seul slot et commence par \`${racine} : [É<n>-<DOMAINE>] \` (D4.INV-2)${n.estRacine ? '' : `, son corps cite \`Sous-ticket : ${n.reference}\``} ; l'IA ne pousse, ne fusionne, ne rebase ni ne pose de tag (D4.INV-3).`,
+      `Chaque commit porte un seul slot et commence par \`${racine} : [É<n>-<DOMAINE>] \`, ou \`${racine} Snn : [É<n>-<DOMAINE>] \` pour le commit d'un scénario (D4.INV-2)${n.estRacine ? '' : `, son corps cite \`Sous-ticket : ${n.reference}\``} ; l'IA ne pousse, ne fusionne, ne rebase ni ne pose de tag (D4.INV-3).`,
       '',
-      `Les options de chaque couche se confient à son agent, par l'outil \`invoke_agent\` : ${liste(this.couches(n).map((c) => `\`${this.nomAgent(n, c)}\` (${c})`))}. Chaque agent travaille dans son propre contexte et rend son rapport ; ce skill garde la ratification, la recette et la remise.`,
+      `Les options de chaque couche se confient à son agent, par l'outil \`invoke_agent\` : ${liste(this.couches(n).map((c) => `\`${this.nomAgent(n, c)}\` (${c})`))}. Chaque agent réalise ses scénarios un à un en cycle TDD (agent-tdd-jira, module \`cycle-tdd\`), dans son propre contexte, et te présente chacun : fais-le accepter au développeur (V4) avant le commit et avant le scénario suivant. Ce skill garde la ratification, la recette et la remise.`,
+      '',
+      `Avant É6, le sous-agent \`${this.nomRole(n, 'relecteur')}\` relit les commits de ce ticket, couche par couche, en mode revue du référentiel de la couche ; un constat bloquant se corrige par l'agent de la couche, après la décision du développeur, dans un commit de rétroaction qui cite la revue (D6.INV-1). En É6, le sous-agent \`${this.nomRole(n, 'qualite')}\` examine le diff avec la branche cible (sonarqube, module \`examen-local\`) ; aucune écriture vers SonarQube sans la validation explicite du développeur, et le jeton ne se lit que dans la variable \`SONAR_TOKEN\` (sonarqube:D1.INV-2, sonarqube:D1.INV-3). Leurs rapports vont dans \`remise.md\`.`,
     ];
   }
 
   cloture(n) {
-    return [`${n.reference} se clôt quand tous ses sous-tickets sont clos et que chacun de ses critères est prouvé par ceux qui le soutiennent (module \`recette\`). Un critère non prouvé, ou un écart remonté par un sous-ticket, se présente au développeur avec ses preuves ; il ne se tranche pas en silence (D6.INV-3).`];
+    return [
+      `${n.reference} se clôt quand tous ses sous-tickets sont clos et que chacun de ses critères est prouvé par ceux qui le soutiennent (module \`recette\`). Un critère non prouvé, ou un écart remonté par un sous-ticket, se présente au développeur avec ses preuves ; il ne se tranche pas en silence (D6.INV-3).`,
+      ...(n.estRacine ? ['', 'Puis assemble les kits dev, test et démo et la remise à Agent2Test, et contrôle-les sans écart (module `kits`).'] : []),
+    ];
   }
 
   remise(n) {
     const remise = `\`${this.dossier(n)}remise.md\``;
     const suite = n.estRacine ? 'Le ticket est alors clos ; l\'installateur peut retirer l\'arbre, en archivant ses skills dans le dossier du ticket.' : `Puis renvoie le développeur au skill de ${n.parent.reference}, \`${commandeSkill(n.parent.reference)}\`, dans une nouvelle session : il indique la suite.`;
-    if (!n.estFeuille) return [`${remise} : pour chaque critère, les preuves de ceux qui le soutiennent ; les écarts remontés et leurs décisions ; l'état de chaque sous-ticket. ${suite}`];
-    return [`${remise}, complète à la remise (D3.INV-3) : modifications par slot, avec les commits ; dossier de preuves ; écarts ajoutés au registre des écarts ; boucle de second ordre (observations É6 et É7, commits de rétroaction, entrées proposées) ; capitalisation ; indicateurs et leur calcul (module \`methode\`, § 8). ${suite}`];
+    const kits = n.estFeuille
+      ? 'Ce skill étant aussi la racine de l\'arbre, cette remise s\'écrit dans l\'ordre d\'assemblage des kits dev, test et démo et de la remise à Agent2Test (module `kits`, section 5), qui s\'y citent par leur chemin.'
+      : 'Les kits dev, test et démo s\'y citent par leur chemin (module `kits`).';
+    const racine = n.estRacine
+      ? ` ${kits} Donne au développeur la remise à Agent2Test, qu'il dépose lui-même, le rapport final par critère (\`references/agent-tdd-jira/tracabilite.md\`, § 4) et le projet de commentaire Jira, qu'il publie lui-même (§ 5) : ce skill n'écrit jamais dans Jira.`
+      : '';
+    if (!n.estFeuille) return [`${remise} : pour chaque critère, les preuves de ceux qui le soutiennent ; les écarts remontés et leurs décisions ; l'état de chaque sous-ticket.${racine} ${suite}`];
+    const front = this.couches(n).includes('frontend');
+    const contributions = `sous le titre « Contributions aux kits », ce que le skill racine assemble à la clôture de l'arbre : les commits, avec leur empreinte et leur titre ; les tests et les scénarios qu'ils portent ;${front ? ` les captures de l'écran livré par scénario (\`${this.dossier(n)}captures/\`), avec l'image de l'objectif à laquelle chacune se compare ;` : ''} les données de démonstration, déposées dans \`${this.dossier(n)}demo/\`, et les commandes de lancement`;
+    return [`${remise}, complète à la remise (D3.INV-3) : modifications par slot, avec les commits ; dossier de preuves, scénario par scénario ; rapports du relecteur et de l'agent qualité ; écarts ajoutés au registre des écarts ; boucle de second ordre (observations É6 et É7, commits de rétroaction, entrées proposées) ; capitalisation ; indicateurs et leur calcul (module \`methode\`, § 8) ; et, ${contributions}.${racine} ${suite}`];
   }
 
   role(rel) {
@@ -718,7 +1225,14 @@ export class FabriqueSkillTicket {
     if (rel === 'ticket.toml') return 'le ticket : demande, composition, critères, options';
     if (rel === 'socle/SKILL.md') return `socle back-front ${this.S.socle.version}, hérité en entier`;
     if (rel === 'projet/meso-contrats.md') return 'invariants du projet, dans l\'état où ce skill a été produit';
+    const boite = this.S.boite.fichiers.find((f) => f.path === rel);
+    if (boite || rel === FICHIER_RATTACHEMENT) {
+      const origine = boite ? `${/^specs\/([^/]+)\//.exec(boite.from)?.[1] ?? 'prototype skill-ticket'}${boite.version ? ` ${boite.version}` : ''}${boite.sections ? `, extrait (§ ${boite.sections.join(', § ')})` : ''}${boite.bloc ? `, bloc de code du § ${boite.bloc.section}` : ''} : ` : '';
+      return `${origine}${USAGES_BOITE[rel] ?? ''}`;
+    }
     if (rel.startsWith('references/')) return 'référentiel de la pile : versions cibles et invariants';
+    const roleAgent = Object.keys(ROLES).find((r) => rel.endsWith(`-${r}.md`) && rel.startsWith('agents/'));
+    if (roleAgent && this.S.boite) return `sous-agent ${ROLES[roleAgent].titre} de l'arbre, dans son propre contexte${ROLES[roleAgent].ecrit ? '' : ', en lecture seule'} ; copié dans \`.gemini/agents/\` à l'installation`;
     if (rel.startsWith('agents/')) return 'agent d\'une couche, dans son propre contexte ; copié dans `.gemini/agents/` à l\'installation';
     if (rel.startsWith('commandes/')) return `commande \`/ticket:${/([^/]+)\.toml$/.exec(rel)?.[1]}\` qui lance ce skill ; copiée dans \`.gemini/commands/ticket/\` à l'installation`;
     const m = /^modules\/([^/]+)\//.exec(rel)?.[1];
@@ -726,6 +1240,8 @@ export class FabriqueSkillTicket {
     if (m?.startsWith('option-')) return 'option copiée du référentiel, puis paramétrée pour ce ticket';
     if (m === 'recette') return 'critères à prouver, preuves et commandes';
     if (m === 'sous-tickets') return 'sous-arbre, ordre de résolution et coordination';
+    if (m === 'documents') return 'documents de la clé selon agent-tdd-jira, rattachement des critères, contrôles et ratification';
+    if (m === 'kits') return 'kits dev, test et démo, remise à Agent2Test, assemblage et contrôle';
     if (m === 'methode') return 'sections de la méthode de l\'orchestrateur, mot pour mot';
     if (m === 'invariants') return 'invariants hérités, correspondances, invariants de l\'orchestrateur mot pour mot';
     return m ? `module \`${m}\`` : '';

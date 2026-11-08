@@ -1,6 +1,7 @@
 // Recette du lot 2 : la fabrique et le Monteur produisent un skill par nœud de l'arbre d'essai, chacun
 // avec sa transmission tirée par tools/bundle.mjs (critère P2), reprenant tout ce dont il hérite (P3) ;
-// un invariant omis ou altéré est rejeté (P1).
+// un invariant omis ou altéré est rejeté (P1). Au lot 4, le skill racine porte en plus la boîte à outils
+// de l'arbre : documents, kits, sous-agents de rôle, références et scripts, à leur version épinglée.
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -15,7 +16,7 @@ import { RACINE_DEPOT, chargerReferentiel, lireTexte } from '../outils/referenti
 import { chargerArbre } from '../outils/arbre.mjs';
 import { FabriqueJavaAngularPostgreSQL, FabriqueSkillTicket, SECTIONS_METHODE, nomSkill, phraseActivation, preuvesParametrees, sha256 } from '../outils/fabrique.mjs';
 import { Monteur, generer, verifierHeritage, verifierTransmission } from '../outils/monteur.mjs';
-import { chargerSources, extraireSection, lignesInvariants } from '../outils/sources.mjs';
+import { BOITE, blocDeCode, chargerSources, extraireSection, lignesInvariants, resoudre } from '../outils/sources.mjs';
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const EXEMPLE = join(ICI, '..', 'exemples', 'ABCDE-3620');
@@ -125,17 +126,18 @@ test('P3 : sections de la méthode, socle, référentiels de la pile et invarian
   const references = {
     'ticket-abcde-3620': [], 'ticket-abcde-3620-1': [], 'ticket-abcde-3620-1-1': ['java'], 'ticket-abcde-3620-1-2': ['java'], 'ticket-abcde-3620-2': ['angular'],
   };
+  const boite = (nom) => (nom === 'ticket-abcde-3620' ? BOITE.map((b) => b.path) : []);
   for (const nom of NOMS) {
     const f = fichiersDe(attendue(nom));
     const feuille = references[nom].length > 0;
     for (const s of SECTIONS_METHODE[feuille ? 'feuille' : 'compose']) assert.ok(f.get('modules/methode/SKILL.md').includes(extraireSection(S.orchestrateur.texte, s)), `${nom} § ${s}`);
     assert.equal(f.get('socle/SKILL.md'), S.socle.contenu.replace(/\n*$/, '\n'), `${nom} socle`);
     assert.equal(f.get('projet/meso-contrats.md'), S.projet.contenu.replace(/\n*$/, '\n'), `${nom} projet`);
-    assert.deepStrictEqual([...f.keys()].filter((r) => r.startsWith('references/')), references[nom].map((r) => `references/${r}.md`), nom);
+    assert.deepStrictEqual([...f.keys()].filter((r) => r.startsWith('references/')), [...references[nom].map((r) => `references/${r}.md`), ...boite(nom).filter((p) => p.startsWith('references/'))], nom);
     for (const r of references[nom]) assert.equal(f.get(`references/${r}.md`), S.experts[r].contenu.replace(/\n*$/, '\n'));
     const herites = JSON.parse(f.get('manifest.json')).ticket.herites;
     assert.deepStrictEqual(herites.map((h) => h.path), [
-      'modules/invariants/SKILL.md', 'modules/methode/SKILL.md', 'socle/SKILL.md', ...references[nom].map((r) => `references/${r}.md`), 'projet/meso-contrats.md',
+      'modules/invariants/SKILL.md', 'modules/methode/SKILL.md', 'socle/SKILL.md', ...references[nom].map((r) => `references/${r}.md`), 'projet/meso-contrats.md', ...boite(nom),
     ]);
   }
 });
@@ -233,10 +235,13 @@ test('fabrique abstraite : les crochets de la pile restent à définir par une f
   assert.deepStrictEqual(FabriqueJavaAngularPostgreSQL.referencesRequises(['persistance', 'backend', 'frontend']), ['java', 'angular']);
 });
 
-test('famille de fichiers : agents pour les feuilles, coordination pour les nœuds composés, une commande par nœud', () => {
+test('famille de fichiers : agents de couche pour les feuilles, sous-agents de rôle sur la racine, coordination pour les nœuds composés, une commande par nœud', () => {
   const familles = Object.fromEntries(NOMS.map((nom) => [nom, [...fichiersDe(attendue(nom)).keys()].filter((r) => r.startsWith('agents/') || r.startsWith('commandes/') || r === 'modules/sous-tickets/SKILL.md')]));
   assert.deepStrictEqual(familles, {
-    'ticket-abcde-3620': ['modules/sous-tickets/SKILL.md', 'commandes/ticket/abcde-3620.toml'],
+    'ticket-abcde-3620': [
+      'modules/sous-tickets/SKILL.md', 'agents/ticket-abcde-3620-redacteur.md', 'agents/ticket-abcde-3620-analyste.md',
+      'agents/ticket-abcde-3620-relecteur.md', 'agents/ticket-abcde-3620-qualite.md', 'commandes/ticket/abcde-3620.toml',
+    ],
     'ticket-abcde-3620-1': ['modules/sous-tickets/SKILL.md', 'commandes/ticket/abcde-3620-1.toml'],
     'ticket-abcde-3620-1-1': ['agents/ticket-abcde-3620-1-1-persistance.md', 'commandes/ticket/abcde-3620-1-1.toml'],
     'ticket-abcde-3620-1-2': ['agents/ticket-abcde-3620-1-2-back.md', 'commandes/ticket/abcde-3620-1-2.toml'],
@@ -258,7 +263,7 @@ test('commandes : TOML de Gemini CLI, description et invite qui active le skill 
 
 test('cycle de vie : une session par nœud, ratification de l\'arbre vérifiée, états de la racine', () => {
   const consigne = (nom) => fichiersDe(attendue(nom)).get('SKILL.md');
-  assert.match(consigne('ticket-abcde-3620'), /1\. \*\*Arbre non ratifié\*\*[^\n]*\n2\. \*\*Sous-tickets en cours\*\*[^\n]*\n3\. \*\*Tous les sous-tickets clos\*\*/);
+  assert.match(consigne('ticket-abcde-3620'), /1\. \*\*Documents à rédiger\*\*[^\n]*\n2\. \*\*Arbre non ratifié\*\*[^\n]*\n3\. \*\*Sous-tickets en cours\*\*[^\n]*\n4\. \*\*Tous les sous-tickets clos\*\*/);
   assert.doesNotMatch(consigne('ticket-abcde-3620-1'), /Arbre non ratifié/);
   for (const nom of NOMS.slice(1)) {
     assert.match(consigne(nom), /Vérifie que l'arbre a été ratifié : la ligne `- AAAA-MM-JJ, <nom> : arbre ABCDE-3620 ratifié` figure dans `docs\/demandes\/ABCDE-3620\/retours\.md`/, nom);
@@ -373,6 +378,109 @@ test('le Monteur construit un nœud isolé comme un ticket sans sous-ticket', ()
   assert.deepStrictEqual(verifierHeritage(new Map(fichiers.map((f) => [f.rel, f.contenu]))), []);
   assert.equal(lignesInvariants(fichiers.find((f) => f.rel === 'modules/invariants/SKILL.md').contenu).length, 33);
 });
+
+// ---- Lot 4 : boîte à outils de la racine, documents, kits, sous-agents de rôle ----
+
+test('lot 4 : la racine porte la boîte à outils, chaque fichier identique à sa source à sa version épinglée', () => {
+  const orchestrateur = JSON.parse(lireTexte(join(RACINE_DEPOT, 'specs', 'orchestrateur-c7e', 'manifest.json')));
+  const tdd = JSON.parse(lireTexte(join(RACINE_DEPOT, 'specs', 'agent-tdd-jira', 'manifest.json')));
+  const v = S.boite.versions;
+  assert.equal(v['agent-tdd-jira'], orchestrateur.references.find((r) => r.name === 'agent-tdd-jira').version);
+  assert.equal(v.agent2test, tdd.references.find((r) => r.name === 'agent2test').version);
+  const f = fichiersDe(attendue('ticket-abcde-3620'));
+  const herites = new Map(JSON.parse(f.get('manifest.json')).ticket.herites.map((h) => [h.path, h]));
+  for (const b of S.boite.fichiers) {
+    assert.equal(f.get(b.path), b.contenu.replace(/\n*$/, '\n'), b.path);
+    assert.equal(herites.get(b.path).from, b.from, b.path);
+    assert.equal(herites.get(b.path).sha256, sha256(f.get(b.path)), b.path);
+  }
+  assert.deepStrictEqual(herites.get('references/agent-tdd-jira/binome-agent2test.md').sections, ['3', '4']);
+  assert.deepStrictEqual(herites.get('references/agent2test/remise.md').sections, ['3']);
+  assert.deepStrictEqual(herites.get('outils/controler-criteres.mjs').bloc, { section: '7', langage: 'js' });
+  const usCriteres = resoudre({ from: 'specs/agent-tdd-jira/modules/us-criteres/SKILL.md', version: v['agent-tdd-jira'] });
+  assert.equal(f.get('outils/controler-criteres.mjs'), blocDeCode(usCriteres, '7', 'js'));
+  assert.equal(f.get('outils/verifier-kits.mjs'), lireTexte(join(ICI, '..', 'outils', 'verifier-kits.mjs')));
+  for (const nom of NOMS.slice(1)) assert.ok(![...fichiersDe(attendue(nom)).keys()].some((r) => r.startsWith('outils/') || r.includes('agent-tdd-jira')), nom);
+});
+
+test('lot 4 : rattachement des critères de l\'arbre aux critères d\'acceptation de la clé', () => {
+  const r = JSON.parse(fichiersDe(attendue('ticket-abcde-3620')).get('outils/rattachement.json'));
+  assert.equal(r.format, 'skill-ticket.rattachement/1');
+  assert.deepStrictEqual(r.criteres.map((c) => `${c.ca}=${c.critere}`), [1, 2, 3, 4, 5].map((k) => `ABCDE-3620-CA0${k}=ABCDE-3620:C${k}`));
+  assert.deepStrictEqual(r.criteres.map((c) => c.enonce), chargerArbre(EXEMPLE).racine.criteres.map((c) => c.enonce));
+  assert.deepStrictEqual(Object.fromEntries(r.noeuds.map((n) => [n.reference, `${n.nature} ${n.etiquettes.join(',') || '-'} ${n.criteres.map((c) => `${c.id}=${c.ca.join('+')}`).join(' ')}`])), {
+    'ABCDE-3620-1': 'composé - C1=ABCDE-3620-CA01 C2=ABCDE-3620-CA02 C3=ABCDE-3620-CA03 C4=ABCDE-3620-CA04 C5=ABCDE-3620-CA05',
+    'ABCDE-3620-1.1': 'feuille @back C1=ABCDE-3620-CA04 C2=ABCDE-3620-CA03',
+    'ABCDE-3620-1.2': 'feuille @back C1=ABCDE-3620-CA01 C2=ABCDE-3620-CA02 C3=ABCDE-3620-CA03 C4=ABCDE-3620-CA05',
+    'ABCDE-3620-2': 'feuille @front C1=ABCDE-3620-CA05 C2=ABCDE-3620-CA05',
+  });
+  assert.match(fichiersDe(attendue('ticket-abcde-3620-2')).get('SKILL.md'), /\| C1 \| [^|]+ \| ABCDE-3620:C5 \| ABCDE-3620-CA05 \|/);
+});
+
+test('lot 4 : sous-agents de rôle en lecture seule, sauf le rédacteur ; références lues dans le skill racine installé', () => {
+  const f = fichiersDe(attendue('ticket-abcde-3620'));
+  const agent = (role) => f.get(`agents/ticket-abcde-3620-${role}.md`);
+  const outils = (role) => /^tools:\n((?: {2}- \S+\n)+)/m.exec(agent(role))[1].trim().split('\n').map((l) => l.trim().replace(/^- /, ''));
+  assert.ok(outils('redacteur').includes('write_file'));
+  for (const role of ['analyste', 'relecteur', 'qualite']) assert.ok(!outils(role).includes('write_file') && !outils(role).includes('replace'), role);
+  const references = {
+    redacteur: ['references/agent-tdd-jira/us-criteres.md', 'outils/extraire-jira.mjs', 'modules/documents/SKILL.md'],
+    analyste: ['references/analyse-projet/cartographie.md'],
+    relecteur: ['references/java/revue.md', 'references/angular/revue.md'],
+    qualite: ['references/sonarqube/examen-local.md'],
+  };
+  for (const [role, liste] of Object.entries(references)) {
+    for (const rel of liste) {
+      assert.ok(agent(role).includes(`\`.gemini/skills/ticket-abcde-3620/${rel}\``), `${role} : ${rel}`);
+      assert.ok(f.has(rel), rel);
+    }
+  }
+  assert.match(agent('qualite'), /Tu ne demandes jamais au développeur de coller un jeton/);
+  assert.match(agent('qualite'), /variable d'environnement `SONAR_TOKEN`/);
+  const feuille = fichiersDe(attendue('ticket-abcde-3620-1-1'));
+  for (const role of ['analyste', 'relecteur', 'qualite']) assert.match(feuille.get('SKILL.md'), new RegExp(`sous-agent \`ticket-abcde-3620-${role}\``), role);
+  const couche = feuille.get('agents/ticket-abcde-3620-1-1-persistance.md');
+  assert.ok(couche.includes('`.gemini/skills/ticket-abcde-3620/references/agent-tdd-jira/cycle-tdd.md`'));
+  assert.ok(couche.includes('(`@ABCDE-3620-CA03`, `@ABCDE-3620-CA04`) et l\'étiquette `@back`'));
+  assert.ok(couche.includes('`@Tag("ABCDE-3620-Snn")`'));
+});
+
+test('lot 4 : documents de la clé avant la ratification de l\'arbre, kits à sa clôture', () => {
+  const f = fichiersDe(attendue('ticket-abcde-3620'));
+  assert.ok(f.get('modules/documents/SKILL.md').includes('node .gemini/skills/ticket-abcde-3620/outils/controler-criteres.mjs docs/demandes/ABCDE-3620\n'));
+  assert.ok(f.get('modules/documents/SKILL.md').includes('verifier-documents.mjs docs/demandes/ABCDE-3620 --rattachement .gemini/skills/ticket-abcde-3620/outils/rattachement.json\n'));
+  assert.ok(f.get('modules/kits/SKILL.md').includes('verifier-kits.mjs docs/demandes/ABCDE-3620 --rattachement .gemini/skills/ticket-abcde-3620/outils/rattachement.json --depot\n'));
+  assert.match(f.get('SKILL.md'), /## 6\. Ratification\n\n[^\n]*les documents de la clé, qui se ratifient avec lui/);
+  assert.match(f.get('SKILL.md'), /## 7\. Clôture\n\n[^\n]*\n\nPuis assemble les kits dev, test et démo et la remise à Agent2Test/);
+  assert.match(fichiersDe(attendue('ticket-abcde-3620-2')).get('SKILL.md'), /sous le titre « Contributions aux kits »[^\n]*captures de l'écran livré/);
+});
+
+const boiteAlteree = (v) => [
+  ['script d\'agent-tdd-jira altéré, empreinte du manifeste ajustée', (fs) => {
+    const s = fichier(fs, 'outils/controler-criteres.mjs');
+    s.contenu = s.contenu.replace('process.exit(ecarts.length ? 1 : 0);', 'process.exit(0);');
+    majManifeste(fs, (j) => { j.ticket.herites.find((h) => h.path === 'outils/controler-criteres.mjs').sha256 = sha256(s.contenu); });
+  }, new RegExp(`outils/controler-criteres\\.mjs : différent du bloc js du § 7 de specs/agent-tdd-jira/modules/us-criteres/SKILL\\.md ${v['agent-tdd-jira'].replace(/\./g, '\\.')}, copie altérée`)],
+  ['extrait d\'agent-tdd-jira altéré', (fs) => {
+    const s = fichier(fs, 'references/agent-tdd-jira/binome-agent2test.md');
+    s.contenu = s.contenu.replace('Agent2Test en décide', 'l\'agent en décide');
+  }, /section § 4 de references\/agent-tdd-jira\/binome-agent2test\.md omise ou altérée/],
+  ['script de contrôle des kits retiré du manifeste', (fs) => majManifeste(fs, (j) => {
+    j.ticket.herites = j.ticket.herites.filter((h) => h.path !== 'outils/verifier-kits.mjs');
+  }), /héritage absent du manifeste : outils\/verifier-kits\.mjs/],
+  ['module d\'un skill déclaré à une version que le dépôt n\'a pas', (fs) => majManifeste(fs, (j) => {
+    j.ticket.herites.find((h) => h.path === 'references/agent-tdd-jira/cycle-tdd.md').version = '0.0.1';
+  }), /references\/agent-tdd-jira\/cycle-tdd\.md : source introuvable \(specs\/agent-tdd-jira\/modules\/cycle-tdd\/SKILL\.md en version 0\.0\.1 : le dépôt porte agent-tdd-jira [\d.]+, et n'archive pas ses modules\)/],
+  ['invariant d\'un autre skill cité sans le nom de son skill', (fs) => {
+    const s = fichier(fs, 'modules/documents/SKILL.md');
+    s.contenu = s.contenu.replace('(agent-tdd-jira:D10.INV-4)', '(D10.INV-9)');
+  }, /modules\/documents\/SKILL\.md : D10\.INV-9 cité, défini ni par l'orchestrateur ni par le socle/],
+];
+for (const [nom, modifier, motif] of boiteAlteree(S.boite.versions)) {
+  test(`lot 4 : transmission de la racine rejetée, ${nom}`, () => {
+    attendreEcart(verifierTransmission(retoucher(attendue('ticket-abcde-3620'), modifier)).erreurs, motif);
+  });
+}
 
 // ---- Ligne de commande et installateur ----
 

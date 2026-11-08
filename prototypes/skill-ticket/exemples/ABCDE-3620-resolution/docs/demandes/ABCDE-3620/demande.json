@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "fichier": "ticket.toml",
+    "sha256": "99f8d264ef101abf040d4648830305caa54de9a772ecd8f48eb4f2265ce1d75e",
+    "extraitLe": "2026-11-03T08:30:00.000Z"
+  },
+  "jira": {
+    "variante": null,
+    "cle": "ABCDE-3620",
+    "titrePage": null,
+    "url": null
+  },
+  "resume": "Commande : variante sans les lignes, résumé à la même URI avec la date-heure de la dernière ligne enregistrée, lignes en temps réel",
+  "description": "Dériver de la réponse de GET /api/v1/commandes/{id} une variante sans les lignes et, à la même URI, une variante où les lignes sont remplacées par la date-heure de la dernière ligne enregistrée ; tenir à jour en temps réel la liste des lignes, servie par son URI existante.\nCritères : C1 à C5 du ticket racine.",
+  "commentaires": [],
+  "pieces": [],
+  "limites": [
+    "capture MHTML absente : la demande est reprise du ticket racine (ticket.toml), qualifié avec le développeur",
+    "commentaires Jira non disponibles sans la capture ; les réponses du développeur aux questions de la qualification figurent dans les sources du ticket racine"
+  ],
+  "texteIntegral": "ABCDE-3620. Commande : variante sans les lignes, résumé à la même URI avec la date-heure de la dernière ligne enregistrée, lignes en temps réel.\nIntention : dériver de la réponse de GET /api/v1/commandes/{id} une variante sans les lignes et, à la même URI, une variante où les lignes sont remplacées par la date-heure de la dernière ligne enregistrée ; tenir à jour en temps réel la liste des lignes, servie par son URI existante.\nC1 : Sans paramètre, GET /api/v1/commandes/{id} renvoie CommandeDto, inchangée.\nC2 : Avec vue=resume, la réponse ne contient pas lignes, et contient lignesDernierEnregistrement au format ISO 8601 avec fuseau.\nC3 : Pour une commande sans ligne, lignesDernierEnregistrement vaut null.\nC4 : La date-heure se calcule en une seule requête, sans charger les lignes.\nC5 : La liste des lignes et la date-heure du résumé se mettent à jour en temps réel à l'écran, annoncées sans déplacer le focus."
+}

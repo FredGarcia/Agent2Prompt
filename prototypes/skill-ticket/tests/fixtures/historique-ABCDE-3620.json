@@ -1,0 +1,119 @@
+{
+  "projet": "exemples/ABCDE-3620-resolution",
+  "cle": "ABCDE-3620",
+  "auteur": {
+    "nom": "Développeur d'exemple",
+    "courriel": "dev@exemple.invalid"
+  },
+  "base": "main",
+  "branche": "feature/ABCDE-3620-commande-resume-temps-reel",
+  "commits": [
+    {
+      "branche": "main",
+      "date": "2026-11-02T09:00:00+0100",
+      "titre": "Projet d'exemple : gestion des commandes",
+      "fichiers": [
+        ".gitattributes",
+        "LISEZMOI.md"
+      ]
+    },
+    {
+      "date": "2026-11-03T10:00:00+0100",
+      "sous_ticket": "ABCDE-3620",
+      "titre": "ABCDE-3620 : [É6-C7E] docs(demande): US, critères d'acceptation et scénarios ratifiés",
+      "fichiers": [
+        "docs/demandes/ABCDE-3620/demande.json",
+        "docs/demandes/ABCDE-3620/us.md",
+        "docs/demandes/ABCDE-3620/ABCDE-3620.feature"
+      ]
+    },
+    {
+      "date": "2026-11-03T14:10:00+0100",
+      "sous_ticket": "ABCDE-3620-1.1",
+      "titre": "ABCDE-3620 S04 : [É1-DB] feat(jpa): date-heure maximale des lignes par une requête d'agrégat",
+      "fichiers": [
+        "back/src/main/java/fr/exemple/commande/LigneCommandeRepository.java",
+        "back/src/test/java/fr/exemple/commande/LigneCommandeRepositoryAgregatTest.java"
+      ]
+    },
+    {
+      "date": "2026-11-03T14:40:00+0100",
+      "sous_ticket": "ABCDE-3620-1.1",
+      "titre": "ABCDE-3620 S03 : [É1-DB] test(jpa): agrégat vide pour une commande sans ligne",
+      "fichiers": [
+        "back/src/test/java/fr/exemple/commande/LigneCommandeRepositorySansLigneTest.java"
+      ]
+    },
+    {
+      "date": "2026-11-04T09:20:00+0100",
+      "sous_ticket": "ABCDE-3620-1.2",
+      "titre": "ABCDE-3620 S01 : [É3-API] test(spring): réponse inchangée sans paramètre vue",
+      "fichiers": [
+        "back/src/test/java/fr/exemple/commande/CommandeControllerSansVueTest.java"
+      ]
+    },
+    {
+      "date": "2026-11-04T10:05:00+0100",
+      "sous_ticket": "ABCDE-3620-1.2",
+      "titre": "ABCDE-3620 S02 : [É3-API] feat(spring): variante résumée à la même URI, paramètre vue=resume",
+      "fichiers": [
+        "back/src/main/java/fr/exemple/commande/CommandeResumeDto.java",
+        "back/src/main/java/fr/exemple/commande/CommandeController.java",
+        "back/src/test/java/fr/exemple/commande/CommandeControllerVueResumeTest.java"
+      ]
+    },
+    {
+      "date": "2026-11-04T10:50:00+0100",
+      "sous_ticket": "ABCDE-3620-1.2",
+      "titre": "ABCDE-3620 S03 : [É3-API] test(spring): lignesDernierEnregistrement à null pour une commande sans ligne",
+      "fichiers": [
+        "back/src/test/java/fr/exemple/commande/CommandeControllerSansLigneTest.java"
+      ]
+    },
+    {
+      "date": "2026-11-04T14:30:00+0100",
+      "sous_ticket": "ABCDE-3620-1.2",
+      "titre": "ABCDE-3620 S05 : [É3-API] feat(stomp): événement des lignes après commit, avec la date-heure recalculée",
+      "fichiers": [
+        "back/src/main/java/fr/exemple/commande/LignesCommandePublieur.java",
+        "back/src/test/java/fr/exemple/commande/LignesCommandePublieurTest.java"
+      ]
+    },
+    {
+      "date": "2026-11-04T15:45:00+0100",
+      "sous_ticket": "ABCDE-3620-1.2",
+      "titre": "ABCDE-3620 S07 : [É3-API] feat(spring): en-tête ETag de la liste des lignes, égal à la dernière séquence",
+      "fichiers": [
+        "back/src/main/java/fr/exemple/commande/LignesCommandeEtag.java",
+        "back/src/test/java/fr/exemple/commande/LignesCommandeEtagTest.java"
+      ]
+    },
+    {
+      "date": "2026-11-05T09:30:00+0100",
+      "sous_ticket": "ABCDE-3620-2",
+      "titre": "ABCDE-3620 S05 : [É5-UI] feat(angular): lignes et date-heure tenues à jour par le canal des lignes",
+      "fichiers": [
+        "front/src/app/commande/lignes-commande.store.ts",
+        "front/src/app/commande/lignes-commande.component.ts",
+        "front/src/app/commande/lignes-commande.component.html",
+        "front/src/app/commande/lignes-commande.temps-reel.spec.ts"
+      ]
+    },
+    {
+      "date": "2026-11-05T10:40:00+0100",
+      "sous_ticket": "ABCDE-3620-2",
+      "titre": "ABCDE-3620 S06 : [É5-UI] test(angular): annonce polie des mises à jour, sans déplacer le focus",
+      "fichiers": [
+        "front/src/app/commande/lignes-commande.annonce.spec.ts"
+      ]
+    },
+    {
+      "date": "2026-11-05T11:55:00+0100",
+      "sous_ticket": "ABCDE-3620-2",
+      "titre": "ABCDE-3620 S07 : [É2-UI] test(angular): reprise par l'instantané et son ETag après une coupure",
+      "fichiers": [
+        "front/src/app/commande/lignes-commande.reprise.spec.ts"
+      ]
+    }
+  ]
+}
