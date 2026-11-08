@@ -4,6 +4,19 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Prototypes
 
+### 2026-11-08 : skill de ticket C7E, lot 5
+
+- **Lot 4 validé** par le développeur, choix compris, avec la ratification du plan du lot 5.
+- **Lot 5, champ d'observation** (critère P5) :
+  - `outils/champ.mjs`, livré tel quel dans le skill racine : `deposer`, `verifier`, `etat` ; un champ par arbre, `docs/demandes/<clé>/champ.jsonl`, en ajout seul, au schéma fermé `skill-ticket.observation/1` (action, retour, observation des ordres 1 à 3, écart), chaque ligne chaînée à l'empreinte de la précédente, `champ.tete` gardant la dernière ; un dépôt hors schéma, ou sur un champ altéré, est refusé sans rien écrire ;
+  - déclencheurs décidés par le script : deux corrections au même motif font attendre l'ordre 2, une proposition l'ordre 3 puis la décision du développeur, deux propositions refusées la mise en veille du motif ; un écart sur un critère menace les critères qu'il soutient jusqu'au critère d'acceptation ; des verdicts contraires de deux nœuds sur une même ancre s'inscrivent d'office au registre des écarts du projet (D6.INV-3) ;
+  - skill racine : module `champ`, observateurs d'ordre 2 et 3 sans outil d'écriture, sections § 6 et § 7.2 de la méthode ; rattachement des critères complété de leurs « soutient » ;
+  - consignes : état du champ lu à chaque lancement, ratifications déposées dans le champ (`retours.md` quitte les nouveaux skills), observations d'ordre 1 et actions déposées par les skills et les agents de couche, bilan d'ordre 3 et état final du champ à la clôture de la racine ;
+  - `installer-arbre.mjs liste` : ratifications lues dans le champ, `retours.md` pour les arbres des lots 3 et 4, puis l'état du champ et un champ altéré signalés ;
+  - exemples : champ d'essai `exemples/ABCDE-3620-champ/` (correction répétée, menace jusqu'à CA03, désaccord au registre), champ du projet résolu, qui prouve chaque critère d'acceptation.
+- Choix à valider avec le lot : seuils de deux corrections et de deux refus, états des critères et propagation par un visiteur des critères tirés du rattachement, désaccords inscrits d'office et ancre `contrat` en texte libre, champ hors des commits avant la campagne, observateurs sans outil d'écriture et bilan conditionnel, intégrité du champ, compatibilité avec les arbres du lot 4, ticket sans sous-ticket.
+- Vérifications : recette de 215 tests, dont 36 du lot 5 (rejeu des retours simulés, déclencheurs, propagation et son visiteur, désaccord, veille, ratifications, altérations du champ et dépôts refusés, ligne de commande, génération et installation) ; avec Gemini CLI 0.67.0 réel, cinq skills découverts et neuf agents chargés ; mêmes résultats sous Node 20, 22 et 24 et sur une copie du dépôt en CRLF ; workflow : champs d'observation des projets d'exemple vérifiés et lus par le script du skill racine.
+
 ### 2026-11-08 : skill de ticket C7E, lot 4
 
 - **Lot 3 validé** par le développeur, choix compris.

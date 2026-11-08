@@ -3,7 +3,8 @@
 // se retire en archivant ses transmissions. Avec Gemini CLI réel (variable SKILL_TICKET_GEMINI), les
 // skills sont découverts et les agents chargés : la partie du critère P4 qui se vérifie sans modèle. Au
 // lot 4, les sous-agents de rôle de la racine s'installent avec les agents de couche, et la racine
-// commence par les documents de la clé.
+// commence par les documents de la clé. Au lot 5, les observateurs d'ordre 2 et 3 s'y ajoutent, et l'état
+// des nœuds se lit dans le champ d'observation de l'arbre.
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -22,7 +23,8 @@ const TRANSMISSIONS = join(ICI, '..', 'exemples', 'ABCDE-3620-skills', 'transmis
 const NOMS = ['ticket-abcde-3620', 'ticket-abcde-3620-1', 'ticket-abcde-3620-1-1', 'ticket-abcde-3620-1-2', 'ticket-abcde-3620-2'];
 const AGENTS = [
   'ticket-abcde-3620-1-1-persistance.md', 'ticket-abcde-3620-1-2-back.md', 'ticket-abcde-3620-2-front.md',
-  'ticket-abcde-3620-analyste.md', 'ticket-abcde-3620-qualite.md', 'ticket-abcde-3620-redacteur.md', 'ticket-abcde-3620-relecteur.md',
+  'ticket-abcde-3620-analyste.md', 'ticket-abcde-3620-observateur-2.md', 'ticket-abcde-3620-observateur-3.md', 'ticket-abcde-3620-qualite.md',
+  'ticket-abcde-3620-redacteur.md', 'ticket-abcde-3620-relecteur.md',
 ];
 const COMMANDES = ['abcde-3620-1-1.toml', 'abcde-3620-1-2.toml', 'abcde-3620-1.toml', 'abcde-3620-2.toml', 'abcde-3620.toml'];
 const GEMINI = process.env.SKILL_TICKET_GEMINI;
@@ -39,11 +41,11 @@ const depotGit = () => {
   return ws;
 };
 
-test('installer : cinq skills, sept agents, cinq commandes, un relevé', () => {
+test('installer : cinq skills, neuf agents, cinq commandes, un relevé', () => {
   const ws = temporaire('ws-');
   const r = installer(ws);
   assert.equal(r.status, 0, r.stderr);
-  assert.match(r.stdout, /arbre ABCDE-3620 installé : 5 skills, 7 agents, 5 commandes/);
+  assert.match(r.stdout, /arbre ABCDE-3620 installé : 5 skills, 9 agents, 5 commandes/);
   for (const nom of NOMS) assert.ok(existsSync(join(ws, '.gemini', 'skills', nom, 'integrite.sha256')), nom);
   assert.deepStrictEqual(readdirSync(join(ws, '.gemini', 'agents')).sort(), AGENTS);
   assert.deepStrictEqual(readdirSync(join(ws, '.gemini', 'commands', 'ticket')).sort(), COMMANDES);
@@ -133,11 +135,24 @@ test('dépôt Git, --visible : skills, agents, commandes et relevé apparaissent
   assert.match(statut, /\.gemini\/skills\/ticket-abcde-3620\/SKILL\.md/);
 });
 
-test('liste : état de chaque nœud, des documents de la clé à la clôture', () => {
+/** États des nœuds et ligne du champ, d'après la liste de l'installateur. */
+const lister = (ws) => {
+  const lignes = lancer(['liste', '--workspace', ws]).stdout.trim().split('\n');
+  return {
+    etats: Object.fromEntries(lignes.filter((l) => l.startsWith('  ')).map((l) => /^ {2}(\S+)\s+\S+\s+\S+\s+(.+)$/.exec(l)).map((m) => [m[1], m[2]])),
+    champ: lignes.find((l) => l.startsWith('Champ : ')) ?? null,
+  };
+};
+const dossierDans = (ws) => (...p) => {
+  const d = join(ws, 'docs', 'demandes', 'ABCDE-3620', ...p);
+  mkdirSync(d, { recursive: true });
+  return d;
+};
+
+test('liste : état de chaque nœud, des documents de la clé à la clôture, d\'après le champ de l\'arbre', () => {
   const ws = temporaire('ws-');
   assert.equal(installer(ws).status, 0);
-  const etats = () => Object.fromEntries(lancer(['liste', '--workspace', ws]).stdout.trim().split('\n').slice(1)
-    .map((l) => /^ {2}(\S+)\s+\S+\s+\S+\s+(.+)$/.exec(l)).map((m) => [m[1], m[2]]));
+  const etats = () => lister(ws).etats;
   assert.deepStrictEqual(etats(), {
     'ABCDE-3620': 'documents à rédiger',
     'ABCDE-3620-1': 'en cours',
@@ -145,24 +160,54 @@ test('liste : état de chaque nœud, des documents de la clé à la clôture', (
     'ABCDE-3620-1.2': 'en attente de la ratification de l\'arbre',
     'ABCDE-3620-2': 'en attente de la ratification de l\'arbre',
   });
-  const dossier = (...p) => {
-    const d = join(ws, 'docs', 'demandes', 'ABCDE-3620', ...p);
-    mkdirSync(d, { recursive: true });
-    return d;
-  };
+  assert.equal(lister(ws).champ, null, 'pas de ligne du champ avant le premier dépôt');
+  const dossier = dossierDans(ws);
   writeFileSync(join(dossier(), 'us.md'), '# ABCDE-3620 : US et critères d\'acceptation\n');
   assert.equal(etats()['ABCDE-3620'], 'arbre à ratifier');
-  writeFileSync(join(dossier(), 'retours.md'), '- 2026-11-08, Fred : arbre ABCDE-3620 ratifié\n');
+  // Les dépôts passent par le script du skill racine installé, depuis la racine du projet, comme dans les consignes.
+  const champ = (...args) => spawnSync(process.execPath, [join('.gemini', 'skills', 'ticket-abcde-3620', 'outils', 'champ.mjs'), ...args], { encoding: 'utf8', cwd: ws });
+  const deposer = (...args) => {
+    const r = champ('deposer', 'docs/demandes/ABCDE-3620', ...args);
+    assert.equal(r.status, 0, r.stderr);
+    return r;
+  };
+  const ratifier = (noeud, objet, decision = 'ratifié') => deposer('retour', '--noeud', noeud, '--auteur', 'essai', '--nature', 'ratification', '--objet', objet, '--decision', decision, '--par', 'Fred', '--contenu', decision);
+  ratifier('ABCDE-3620', 'arbre ABCDE-3620');
   assert.equal(etats()['ABCDE-3620-1.1'], 'prêt');
   writeFileSync(join(dossier('ABCDE-3620-1.1'), 'analyse.md'), 'analyse\n');
   assert.equal(etats()['ABCDE-3620-1.1'], 'analysé, à ratifier');
-  writeFileSync(join(dossier('ABCDE-3620-1.1'), 'retours.md'), '- 2026-11-09, Fred : ABCDE-3620-1.1 ratifié\n');
+  ratifier('ABCDE-3620-1.1', 'ABCDE-3620-1.1');
   assert.equal(etats()['ABCDE-3620-1.1'], 'ratifié, en transformation');
+  assert.equal(lister(ws).champ, 'Champ : 2 enregistrements ; critères : 0 prouvé, 0 en écart, 0 menacé ; 0 désaccord ; 0 observation attendue');
+  deposer('observation', '--noeud', 'ABCDE-3620-1.1', '--auteur', 'ticket-abcde-3620-1-1-persistance', '--ordre', '1', '--verdict', 'ecart', '--ancre', 'critere:ABCDE-3620-1.1:C1', '--ecart', 'requête native', '--preuve', 'test:LigneCommandeRepositoryTest.java');
+  assert.equal(lister(ws).champ, 'Champ : 3 enregistrements ; critères : 0 prouvé, 1 en écart, 2 menacés ; 0 désaccord ; 0 observation attendue');
+  assert.match(champ('etat', 'docs/demandes/ABCDE-3620').stdout, /ABCDE-3620:C4 \(ABCDE-3620-CA04\) : menacé par ABCDE-3620-1\.1:C1/);
   writeFileSync(join(dossier('ABCDE-3620-1.1'), 'remise.md'), 'remise\n');
   writeFileSync(join(dossier('ABCDE-3620-1.2'), 'remise.md'), 'remise\n');
   assert.deepStrictEqual([etats()['ABCDE-3620-1.1'], etats()['ABCDE-3620-1'], etats()['ABCDE-3620-2']], ['clos', 'prêt à clore', 'prêt']);
+  ratifier('ABCDE-3620', 'arbre ABCDE-3620', 'non ratifié');
+  assert.equal(etats()['ABCDE-3620'], 'arbre à ratifier', 'la dernière décision fait foi');
+  // Un champ écrit à la main se voit dans la liste.
+  writeFileSync(join(dossier(), 'champ.jsonl'), `${readFileSync(join(dossier(), 'champ.jsonl'), 'utf8')}{"n":5}\n`);
+  assert.match(lister(ws).champ, / ; altéré, \d+ écarts? : node \.gemini\/skills\/ticket-abcde-3620\/outils\/champ\.mjs verifier docs\/demandes\/ABCDE-3620$/);
+  assert.equal(champ('verifier', 'docs/demandes/ABCDE-3620').status, 1);
+});
+
+test('liste : un arbre installé avant le lot 5 garde sa ratification dans retours.md ; une décision du champ l\'emporte', () => {
+  const ws = temporaire('ws-');
+  assert.equal(installer(ws).status, 0);
+  const dossier = dossierDans(ws);
+  writeFileSync(join(dossier(), 'us.md'), '# ABCDE-3620 : US et critères d\'acceptation\n');
+  writeFileSync(join(dossier(), 'retours.md'), '- 2026-11-08, Fred : arbre ABCDE-3620 ratifié\n');
+  assert.equal(lister(ws).etats['ABCDE-3620-1.1'], 'prêt');
+  writeFileSync(join(dossier('ABCDE-3620-1.1'), 'analyse.md'), 'analyse\n');
+  writeFileSync(join(dossier('ABCDE-3620-1.1'), 'retours.md'), '- 2026-11-09, Fred : ABCDE-3620-1.1 ratifié\n');
+  assert.equal(lister(ws).etats['ABCDE-3620-1.1'], 'ratifié, en transformation');
   writeFileSync(join(dossier(), 'retours.md'), '- 2026-11-08, Fred : arbre ABCDE-3620 non ratifié, critères à revoir\n');
-  assert.equal(etats()['ABCDE-3620'], 'arbre à ratifier');
+  assert.equal(lister(ws).etats['ABCDE-3620'], 'arbre à ratifier');
+  const r = spawnSync(process.execPath, [join('.gemini', 'skills', 'ticket-abcde-3620', 'outils', 'champ.mjs'), 'deposer', 'docs/demandes/ABCDE-3620', 'retour', '--noeud', 'ABCDE-3620', '--auteur', 'essai', '--nature', 'ratification', '--objet', 'arbre ABCDE-3620', '--decision', 'ratifié', '--par', 'Fred', '--contenu', 'ratifié'], { encoding: 'utf8', cwd: ws });
+  assert.equal(r.status, 0, r.stderr);
+  assert.equal(lister(ws).etats['ABCDE-3620-1.1'], 'ratifié, en transformation', 'le champ ratifie l\'arbre ; la feuille garde la ratification de retours.md');
 });
 
 test('verifier : fichiers intacts, puis un agent modifié est signalé', () => {
@@ -170,7 +215,7 @@ test('verifier : fichiers intacts, puis un agent modifié est signalé', () => {
   assert.equal(installer(ws).status, 0);
   const ok = lancer(['verifier', 'ABCDE-3620', '--workspace', ws], { env: { PATH: '' } });
   assert.equal(ok.status, 0, ok.stderr);
-  assert.match(ok.stdout, /5 skills, 7 agents et 5 commandes installés et intacts/);
+  assert.match(ok.stdout, /5 skills, 9 agents et 5 commandes installés et intacts/);
   assert.match(ok.stdout, /Gemini CLI introuvable : découverte des skills et des agents non vérifiée/);
   writeFileSync(join(ws, '.gemini', 'agents', 'ticket-abcde-3620-1-1-persistance.md'), 'autre\n');
   const ko = lancer(['verifier', '--workspace', ws], { env: { PATH: '' } });

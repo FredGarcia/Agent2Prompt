@@ -1,4 +1,4 @@
-// Monteur des skills de ticket (prototype « skill de ticket », lots 2 à 4).
+// Monteur des skills de ticket (prototype « skill de ticket », lots 2 à 5).
 //
 // Le Monteur assemble, nœud par nœud, le skill de chaque ticket de l'arbre avec les pièces que lui
 // donne la fabrique de la pile ; il ne choisit rien lui-même. Il écrit chaque skill dans un dossier,
@@ -38,6 +38,7 @@ export class Monteur {
       ...f.sousTickets(n),
       ...f.documents(n),
       ...f.kits(n),
+      ...f.champ(n),
       f.methode(n),
       f.invariants(n),
       ...copies.map((c) => c.fichier),
@@ -95,7 +96,7 @@ export function verifierHeritage(fichiers, { projet } = {}) {
   else if ((t.enfants ?? []).length === 0 && ticket) {
     for (const nom of Fabrique.referencesRequises(couchesDuTicket(ticket))) requis.push(`references/${nom}.md`);
   }
-  if (t.parent === null && (t.genere_par?.lot ?? 0) >= 4) requis.push(...BOITE.map((b) => b.path));
+  if (t.parent === null) requis.push(...BOITE.filter((b) => (b.depuis ?? 4) <= (t.genere_par?.lot ?? 0)).map((b) => b.path));
   for (const p of requis) if (!herites.has(p)) erreurs.push(`héritage absent du manifeste : ${p}`);
 
   for (const h of t.herites) {

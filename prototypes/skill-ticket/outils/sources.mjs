@@ -145,9 +145,9 @@ export const EPINGLES_PROTOTYPE = { 'analyse-projet': '1.0.2', sonarqube: '1.1.0
 export const DOSSIER_OUTILS = 'prototypes/skill-ticket/outils';
 
 /**
- * Boîte à outils du skill racine (lot 4), dans l'ordre de la transmission : un module ou un point
+ * Boîte à outils du skill racine (lots 4 et 5), dans l'ordre de la transmission : un module ou un point
  * d'entrée de skill copié en entier, un extrait (`sections`), un script tiré d'un bloc de code (`bloc`),
- * ou un script du prototype (`outil`).
+ * ou un script du prototype (`outil`) ; `depuis` : le lot qui l'a ajouté, 4 par défaut.
  */
 export const BOITE = [
   { path: 'references/agent-tdd-jira.md', skill: 'agent-tdd-jira' },
@@ -165,6 +165,7 @@ export const BOITE = [
   { path: 'outils/controler-criteres.mjs', skill: 'agent-tdd-jira', module: 'us-criteres', bloc: { section: '7', langage: 'js' } },
   { path: 'outils/verifier-documents.mjs', outil: 'verifier-documents.mjs' },
   { path: 'outils/verifier-kits.mjs', outil: 'verifier-kits.mjs' },
+  { path: 'outils/champ.mjs', outil: 'champ.mjs', depuis: 5 },
 ];
 
 /**

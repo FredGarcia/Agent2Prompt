@@ -1,0 +1,30 @@
+Champ de ABCDE-3620 : 22 enregistrements, chaîne intacte.
+Ratifications :
+  arbre ABCDE-3620 : ratifié (n° 1, 2026-11-03, Développeur d'exemple)
+  ABCDE-3620-1.1 : ratifié (n° 2, 2026-11-03, Développeur d'exemple)
+  ABCDE-3620-1.2 : ratifié (n° 12, 2026-11-04, Développeur d'exemple)
+  ABCDE-3620-2 : ratifié (n° 19, 2026-11-05, Développeur d'exemple)
+Critères :
+  ABCDE-3620:C1 (ABCDE-3620-CA01) : prouvé
+  ABCDE-3620:C2 (ABCDE-3620-CA02) : prouvé
+  ABCDE-3620:C3 (ABCDE-3620-CA03) : prouvé
+  ABCDE-3620:C4 (ABCDE-3620-CA04) : prouvé
+  ABCDE-3620:C5 (ABCDE-3620-CA05) : à prouver
+  ABCDE-3620-1:C1 (ABCDE-3620-CA01) : prouvé
+  ABCDE-3620-1:C2 (ABCDE-3620-CA02) : prouvé
+  ABCDE-3620-1:C3 (ABCDE-3620-CA03) : prouvé
+  ABCDE-3620-1:C4 (ABCDE-3620-CA04) : prouvé
+  ABCDE-3620-1:C5 (ABCDE-3620-CA05) : prouvé
+  ABCDE-3620-1.1:C1 (ABCDE-3620-CA04) : prouvé
+  ABCDE-3620-1.1:C2 (ABCDE-3620-CA03) : prouvé
+  ABCDE-3620-1.2:C1 (ABCDE-3620-CA01) : prouvé
+  ABCDE-3620-1.2:C2 (ABCDE-3620-CA02) : prouvé
+  ABCDE-3620-1.2:C3 (ABCDE-3620-CA03) : prouvé
+  ABCDE-3620-1.2:C4 (ABCDE-3620-CA05) : prouvé
+  ABCDE-3620-2:C1 (ABCDE-3620-CA05) : à prouver
+  ABCDE-3620-2:C2 (ABCDE-3620-CA05) : prouvé
+Désaccords :
+  contrat « canal /topic/v1/commandes/{id}/lignes, lignesDernierEnregistrement en ISO 8601 avec fuseau » : ABCDE-3620-1.2 conforme (n° 18), ABCDE-3620-2 en écart (n° 20) ; écart n° 21 au registre, décision au développeur
+Attentes :
+  aucune
+Veilles : aucune

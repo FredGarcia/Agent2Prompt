@@ -1,13 +1,15 @@
-// Fabrique abstraite de skill-ticket (prototype « skill de ticket », lots 2 à 4).
+// Fabrique abstraite de skill-ticket (prototype « skill de ticket », lots 2 à 5).
 //
 // Une fabrique produit, pour un nœud de l'arbre de tickets, la famille cohérente des fichiers de son
 // skill : la consigne (SKILL.md), le ticket (ticket.toml), les blocs du référentiel copiés puis
 // paramétrés (méso-contrats, options), la recette, la coordination des sous-tickets, les héritages
 // (invariants et sections de la méthode de l'orchestrateur, socle, référentiels de la pile, invariants
-// du projet), les agents et, au lot 5, les observateurs. Au lot 4, le skill racine porte en plus la
-// boîte à outils de l'arbre : les documents de la clé Jira selon agent-tdd-jira, les kits dev, test et
-// démo, les sous-agents de rôle (rédacteur, analyste, relecteur, qualité) et leurs références, copiées
-// des skills du dépôt à leur version épinglée, avec les scripts de contrôle. La consigne suit un patron
+// du projet), les agents et les observateurs. Au lot 4, le skill racine porte en plus la boîte à outils
+// de l'arbre : les documents de la clé Jira selon agent-tdd-jira, les kits dev, test et démo, les
+// sous-agents de rôle (rédacteur, analyste, relecteur, qualité) et leurs références, copiées des skills
+// du dépôt à leur version épinglée, avec les scripts de contrôle. Au lot 5, il porte le champ
+// d'observation de l'arbre et ses observateurs d'ordre 2 et 3 ; chaque nœud y dépose ses actions, les
+// retours du développeur et ses observations, ratifications comprises. La consigne suit un patron
 // de méthode : le même squelette pour tous les nœuds, des crochets selon la nature du nœud et selon la
 // pile. Une fabrique concrète par pile technique fixe ce qui dépend de la pile : référentiels experts,
 // agents, commandes de recette. Le choix des méso-contrats n'est pas le sien : il vient du ticket,
@@ -22,7 +24,7 @@ import { extraireSection } from './sources.mjs';
 
 export const VERSION_SKILL = '1.0.0';
 /** Lot du prototype qui a produit le générateur, inscrit dans chaque skill. */
-export const LOT = 4;
+export const LOT = 5;
 
 /** Format du rattachement des critères de l'arbre aux critères de la clé Jira, lu par les scripts de contrôle. */
 export const FORMAT_RATTACHEMENT = 'skill-ticket.rattachement/1';
@@ -66,12 +68,21 @@ const USAGES_BOITE = {
   'outils/controler-criteres.mjs': 'script de contrôle des US, des critères et des scénarios',
   'outils/verifier-documents.mjs': 'script de contrôle des documents de la clé contre le rattachement de l\'arbre',
   'outils/verifier-kits.mjs': 'script de contrôle des kits dev, test et démo et de la remise à Agent2Test',
-  [FICHIER_RATTACHEMENT]: 'rattachement des critères de l\'arbre aux critères de la clé, pour les scripts de contrôle',
+  'outils/champ.mjs': 'script du champ d\'observation : dépôt, vérification et état',
+  [FICHIER_RATTACHEMENT]: 'rattachement des critères de l\'arbre aux critères de la clé, pour les scripts de contrôle et le champ',
 };
 export const sha256 = (texte) => createHash('sha256').update(texte, 'utf8').digest('hex');
 
-/** Sections de la méthode de l'orchestrateur recopiées dans le module `methode`, selon la nature du nœud. */
-export const SECTIONS_METHODE = { feuille: ['2', '5.1', '5.2', '6', '7.1', '8', '11.5'], compose: ['11.5'] };
+/**
+ * Sections de la méthode de l'orchestrateur recopiées dans le module `methode`, selon la nature du nœud :
+ * la racine y ajoute la boucle de second ordre et le registre des concepts (§ 6, § 7.2), que lisent les
+ * observateurs de l'arbre (lot 5).
+ */
+export const SECTIONS_METHODE = { feuille: ['2', '5.1', '5.2', '6', '7.1', '8', '11.5'], racine: ['6', '7.2', '11.5'], compose: ['11.5'] };
+export const sectionsMethode = (n) => {
+  if (n.estFeuille) return n.estRacine ? ['2', '5.1', '5.2', '6', '7.1', '7.2', '8', '11.5'] : SECTIONS_METHODE.feuille;
+  return n.estRacine ? SECTIONS_METHODE.racine : SECTIONS_METHODE.compose;
+};
 
 /** Nom d'un skill de ticket : « ticket- » suivi de la référence, en minuscules et tirets. */
 export const nomSkill = (reference) => `ticket-${reference.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')}`;
@@ -88,12 +99,12 @@ export const FICHIER_COMMANDE = (reference) => `commandes/ticket/${nomCommande(r
 export const phraseActivation = (nom) => `Active le skill ${nom}. L'étape 0 de sa consigne est faite : ses fichiers sont dans .gemini/skills/${nom}/, vérifiés par integrite.sha256. Lis CONSIGNE.md dans ce dossier et suis-la à partir de l'étape 1.`;
 
 /**
- * Ligne de ratification ajoutée à `retours.md` : `- AAAA-MM-JJ, <nom> : arbre <CLÉ> ratifié` sur la racine,
- * `- AAAA-MM-JJ, <nom> : <référence> ratifié` sur une feuille ; un refus finit par `non ratifié, <motif>`.
- * Sa forme fixe permet de la reconnaître sans interprétation, à l'installateur comme aux autres skills.
+ * Objet d'une ratification déposée dans le champ d'observation (lot 5) : « arbre <CLÉ> » sur la racine
+ * d'un arbre, la référence de la feuille sinon. Sa forme fixe permet de la reconnaître sans
+ * interprétation, à l'installateur comme aux autres skills. Les skills des lots 3 et 4 l'écrivaient dans
+ * `retours.md`, sur une ligne `- AAAA-MM-JJ, <nom> : <objet> ratifié`, que l'installateur lit encore.
  */
 export const objetRatification = (n) => (n.estRacine && !n.estFeuille ? `arbre ${n.reference}` : n.reference);
-export const ligneRatification = (objet) => `- AAAA-MM-JJ, <nom> : ${objet} ratifié`;
 
 /** Couches touchées par un ticket : celles où il porte au moins une option. */
 export const couchesDuTicket = (ticket) => COUCHES.filter((c) => ticket?.[c] && Object.keys(ticket[c]).length > 0);
@@ -505,7 +516,7 @@ export class FabriqueSkillTicket {
         nature: this.nature(x),
         dossier: this.dossier(x),
         etiquettes: this.etiquettesCouches(x),
-        criteres: x.criteres.map((c) => ({ id: c.id, ca: this.caDe(x, c) })),
+        criteres: x.criteres.map((c) => ({ id: c.id, ca: this.caDe(x, c), soutient: c.soutient ?? [] })),
         images: this.imagesObjectif(x),
       })),
     };
@@ -514,6 +525,16 @@ export class FabriqueSkillTicket {
   /** Chemin d'un fichier de la boîte à outils dans le skill racine installé. */
   outil(n, rel) {
     return `.gemini/skills/${nomSkill(this.cle(n))}/${rel}`;
+  }
+
+  /** Commande du champ d'observation de l'arbre, depuis la racine du projet. */
+  commandeChamp(n, commande) {
+    return `node ${this.outil(n, 'outils/champ.mjs')} ${commande} docs/demandes/${this.cle(n)}`;
+  }
+
+  /** Dépôt de la ratification d'un nœud dans le champ, à compléter du nom et de la réponse du développeur. */
+  depotRatification(n) {
+    return `${this.commandeChamp(n, 'deposer')} retour --noeud ${n.reference} --auteur ${nomSkill(n.reference)} --nature ratification --objet "${objetRatification(n)}" --decision ratifié --par "<nom>" --contenu "<sa réponse>"`;
   }
 
   /**
@@ -594,7 +615,7 @@ export class FabriqueSkillTicket {
         '',
         '1. Les statuts passent de « à valider » à « validé », « en attente de Qn » ou « retiré : <raison> », selon sa décision ; la colonne « Scénarios » de `us.md` suit le fichier Gherkin.',
         '2. Les deux contrôles de la section 5 repassent sans écart.',
-        '3. La ligne de ratification s\'ajoute à `retours.md`.',
+        '3. La ratification de l\'arbre se dépose dans le champ d\'observation (module `champ`, section 3).',
         `4. La branche de l'arbre se crée si elle n'existe pas, au format du projet, par défaut \`<type>/${cle}-<slug>\` (D4.INV-1) ; les trois documents s'y commitent, et rien d'autre : \`${cle} : [É6-C7E] docs(demande): US, critères d'acceptation et scénarios ratifiés\` (D4.INV-2). Dans un arbre, les documents se commitent à la ratification, et non avec le premier scénario (cycle-tdd, § 7) : toutes les feuilles partent du même plan.`,
         '',
         'Toute modification ultérieure de `us.md` ou du fichier Gherkin repasse par ce skill et par une nouvelle ratification. Un sous-ticket qui a besoin d\'un critère nouveau le remonte ici.',
@@ -699,14 +720,115 @@ export class FabriqueSkillTicket {
       '',
       'Le script vérifie chaque manifeste, chaque empreinte, les commits dans le dépôt, la couverture des scénarios par les tests, le parcours et les captures, et la remise contre `us.md`, le fichier Gherkin et le kit dev.',
       '',
-      'Les kits ne se commitent pas avant la campagne d\'Agent2Test : le commit remis doit rester la tête de la branche (agent2test, module echange, § 4). Le développeur les commite ensuite, s\'il le souhaite.',
+      'Les kits, comme le champ d\'observation, ne se commitent pas avant la campagne d\'Agent2Test : le commit remis doit rester la tête de la branche (agent2test, module echange, § 4). Le développeur les commite ensuite, s\'il le souhaite.',
+    ])];
+  }
+
+  /**
+   * Champ d'observation de l'arbre (skill racine, lot 5) : ses enregistrements, ses commandes, les ordres
+   * d'observation, les déclencheurs, la propagation des menaces, l'escalade et les désaccords.
+   */
+  champ(n) {
+    if (!n.estRacine) return [];
+    const cle = this.cle(n);
+    const d = `docs/demandes/${cle}`;
+    const c = (commande) => this.commandeChamp(n, commande);
+    const o2 = this.nomRole(n, 'observateur-2');
+    const o3 = this.nomRole(n, 'observateur-3');
+    const feuille = n.feuilles()[0];
+    const exemple = feuille.estRacine ? n.reference : feuille.reference;
+    const agent = feuille.estRacine ? nomSkill(n.reference) : this.nomAgent(feuille, this.couches(feuille)[0]);
+    const critere = feuille.criteres[0] ? `${exemple}:${feuille.criteres[0].id}` : `${exemple}:C1`;
+    return [fichier('modules/champ/SKILL.md', [
+      frontmatter({ name: 'champ', description: `Champ d'observation de l'arbre ${cle} en ajout seul, actions, retours du développeur, observations des ordres 1 à 3 et écarts, avec ses déclencheurs, la propagation des menaces, l'escalade, les désaccords et les observateurs d'ordre 2 et 3.` }),
+      `# Champ d'observation de l'arbre ${cle}`,
+      '',
+      `Chaque niveau de l'arbre dépose ce qu'il fait et ce qu'il observe dans un champ partagé, \`${d}/champ.jsonl\` ; tous le lisent, personne ne le réécrit. Le ticket n'est jamais réécrit par ceux qui l'observent : c'est l'état du champ qui évolue. Un enregistrement par ligne, au schéma fermé \`skill-ticket.observation/1\`, chaque ligne chaînée à l'empreinte de la précédente, \`champ.tete\` gardant la dernière : une ligne réécrite, insérée ou supprimée se voit. Le script \`outils/champ.mjs\` dépose, vérifie et lit ; personne n'écrit le champ à la main.`,
+      '',
+      '## 1. Enregistrements',
+      '',
+      tableau(['Type', 'Ce qu\'il porte', 'Qui le dépose'], [
+        ['`action`', 'une proposition au développeur, avec ses options, ou une réalisation qu\'il peut corriger (scénario présenté, commit, modification annoncée), sur une ancre', 'l\'agent ou le skill qui agit'],
+        ['`retour`', 'un choix du développeur parmi les options d\'une proposition, ou sa décision sur une proposition d\'ordre 2, retenue ou refusée ; une correction, qui vise une action et porte un motif ; une ratification', 'le skill du nœud, qui parle au développeur'],
+        ['`observation`', 'à l\'ordre 1, un verdict, conforme ou écart, sur une ancre ; aux ordres 2 et 3, un verdict sur des enregistrements observés ; toujours avec sa preuve, et son coût s\'il est connu', 'les agents et les skills à l\'ordre 1 ; les observateurs de l\'arbre aux ordres 2 et 3'],
+        ['`ecart`', 'un écart à un invariant, ou un désaccord entre nœuds, inscrit aussi au registre des écarts du projet', 'le skill qui le constate ; `champ.mjs` lui-même pour un désaccord'],
+      ]),
+      '',
+      'Le script pose les champs communs : numéro, date en UTC, empreinte du précédent. Ancres : `noeud`, `critere` (`<référence>:<critère>`), `ca` (critère d\'acceptation de la clé), `scenario`, `fichier`, `commit`, `contrat` (élément d\'un contrat partagé entre nœuds), `option`. Preuves : `test`, `commande`, `commit`, `fichier`, `enregistrements`, `rapport`, avec un extrait facultatif (`--extrait`). Un motif de correction s\'écrit en minuscules et tirets ; deux corrections de même nature portent le même motif, sinon la répétition ne se voit pas.',
+      '',
+      'Un rouge du cycle TDD n\'est pas un écart : le critère reste à prouver. Un écart est un résultat contraire à ce qu\'un critère, une preuve passée ou un contrat attendaient : une régression, une gate en échec, un constat bloquant de revue, un verdict d\'Agent2Test.',
+      '',
+      '## 2. Commandes',
+      '',
+      'Depuis la racine du projet :',
+      '',
+      '```bash',
+      c('etat'),
+      c('verifier'),
+      `${c('deposer')} action --noeud ${exemple} --auteur ${agent} --nature realisation --ancre scenario:${cle}-S01 --resume "<ce qui est fait>"`,
+      `${c('deposer')} retour --noeud ${exemple} --auteur ${nomSkill(exemple)} --nature correction --vise <n de l'action> --motif <motif> --par "<nom>" --contenu "<la correction demandée>"`,
+      `${c('deposer')} observation --noeud ${exemple} --auteur ${agent} --ordre 1 --verdict ecart --ancre critere:${critere} --ecart "<l'écart>" --preuve test:<fichier de test>`,
+      `${c('deposer')} ecart --noeud ${exemple} --auteur ${nomSkill(exemple)} --ancre critere:${critere} --invariant "<invariant concerné>" --constat "<l'écart constaté>"`,
+      '```',
+      '',
+      'Un dépôt refusé n\'écrit rien et dit pourquoi ; un champ altéré refuse tout dépôt, et `verifier` dit où. `deposer` annonce les observations que son enregistrement fait attendre. Le registre des écarts est `docs/c7e/registre-ecarts.md` ; si le fichier d\'invariants du projet en fixe un autre emplacement, chaque commande prend `--registre <chemin>`.',
+      '',
+      '## 3. Ratifications',
+      '',
+      `La ratification se dépose comme un retour de nature ratification, par le skill du nœud, avec le nom et la réponse du développeur : objet \`arbre ${cle}\` sur la racine, la référence de la feuille sur une feuille ; décision \`ratifié\`, ou \`non ratifié\` avec sa raison. La dernière décision sur un objet fait foi ; \`etat\` la montre, et l'installateur la lit.`,
+      '',
+      '```bash',
+      this.depotRatification(n),
+      ...(feuille.estRacine ? [] : [this.depotRatification(feuille)]),
+      '```',
+      '',
+      '## 4. Ordres d\'observation',
+      '',
+      tableau(['Ordre', 'Qui', 'Observe', 'Produit'], [
+        ['1', 'les agents de couche et les skills, d\'après leurs preuves et les rapports des sous-agents de rôle', 'le logiciel et le résultat des actions', 'un verdict conforme ou écart sur une ancre ; la correction d\'un écart est un commit de rétroaction qui cite l\'observation (D6.INV-1)'],
+        ['2', `\`${o2}\``, 'les observations d\'ordre 1 et les retours du développeur', 'une adaptation de la manière de travailler, jamais une action sur le code ; retenue par le développeur, elle devient une entrée `proposed` du registre des concepts du projet, `docs/c7e/concepts.json`, qui cite l\'observation (D6.INV-1, D6.INV-2)'],
+        ['3', `\`${o3}\``, 'l\'ordre 2', 'l\'examen d\'une proposition, fondée ou infondée ; la mise en veille d\'un motif ; le bilan de clôture : quelles propositions ont changé une décision'],
+        ['humain', 'le développeur', 'tout', 'il ratifie, choisit, corrige, retient ou refuse une proposition, décide des écarts ; lui seul promeut une entrée du registre des concepts (D6.INV-2)'],
+      ]),
+      '',
+      'Les observateurs d\'ordre 2 et 3 travaillent chacun dans leur propre contexte ; ils agissent sur la manière d\'observer du niveau qu\'ils observent, jamais sur son objet. La boucle de second ordre et le registre des concepts sont ceux de l\'orchestrateur (module `methode`, § 6 et § 7.2).',
+      '',
+      '## 5. Déclencheurs',
+      '',
+      'Le script décide quand, les observateurs formulent quoi. `etat` liste les observations attendues ; `deposer` les annonce dès qu\'elles naissent.',
+      '',
+      tableau(['Déclencheur', 'Attente', 'Suite'], [
+        ['deux corrections au même motif, dans tout l\'arbre, qu\'aucune observation d\'ordre 2 ne couvre encore', 'ordre 2 sur ce motif', `invoquer \`${o2}\` par l'outil \`invoke_agent\` ; il dépose sa proposition, ou un verdict conforme si aucune manière de travailler n'est en cause`],
+        ['une proposition d\'ordre 2 ni examinée ni décidée', 'ordre 3 sur cette proposition', `invoquer \`${o3}\`, qui la juge fondée ou infondée`],
+        ['une proposition examinée, sans décision', 'décision du développeur', 'la lui présenter avec l\'examen, puis déposer son choix, retenue ou refusée ; retenue, le skill du nœud l\'inscrit au registre des concepts comme entrée `proposed` qui cite l\'observation, commitée à part (orchestrateur, § 6)'],
+        ['deux propositions refusées sur un motif, sans proposition retenue depuis', 'mise en veille du motif', `invoquer \`${o3}\`, qui met le motif en veille : l'ordre 2 ne s'y éveille plus`],
+      ]),
+      '',
+      'Récursion bornée : l\'ordre 3 ne s\'éveille que sur ces attentes et pour le bilan de clôture de la racine.',
+      '',
+      '## 6. Propagation et escalade',
+      '',
+      `Chaque critère de l'arbre prend un état : en écart, si le dernier verdict d'ordre 1 d'un nœud sur ce critère est un écart ; menacé, si un critère qui le soutient est en écart ou menacé, de proche en proche jusqu'au critère d'acceptation de la clé ; prouvé, si un verdict conforme le prouve, ou si tous les critères qui le soutiennent sont prouvés ; à prouver, sinon. Les critères d'acceptation de la clé sont ceux de la racine (\`${FICHIER_RATTACHEMENT}\`).`,
+      '',
+      'Un écart se traite au niveau le plus bas qui le peut : la feuille dont le critère est en écart le corrige à l\'ordre 1, par un commit de rétroaction qui cite l\'observation, puis dépose un verdict conforme ; un nœud composé dont un critère est menacé le voit à son lancement et coordonne ; une répétition de corrections passe à l\'ordre 2, puis à l\'ordre 3 ; un écart à un invariant et un désaccord vont au développeur, par le registre des écarts (D6.INV-3). Un critère encore en écart ou menacé à la remise d\'un nœud se présente au développeur avec ses preuves.',
+      '',
+      '## 7. Désaccords entre nœuds',
+      '',
+      'Deux nœuds dont les derniers verdicts d\'ordre 1 sur une même ancre sont contraires, l\'un conforme, l\'autre écart, sont en désaccord. Le script l\'inscrit d\'office : un enregistrement `ecart` qui cite les deux observations, et une ligne au registre des écarts du projet, décision laissée au développeur. Une nouvelle observation qui départage les nœuds lève le désaccord dans l\'état du champ ; la ligne du registre reste, avec la décision du développeur.',
+      '',
+      '## 8. Ce qui ne se fait pas',
+      '',
+      '- Écrire, réécrire ou supprimer une ligne du champ à la main.',
+      '- Commiter le champ avant la campagne d\'Agent2Test : comme les kits, il reste hors des commits de l\'arbre, pour que le commit remis reste la tête de la branche.',
+      '- Promouvoir, modifier ou retirer une entrée du registre des concepts, ou décider d\'un écart : seul le développeur le fait (D6.INV-2, D6.INV-3).',
+      '- Agir sur le code depuis l\'ordre 2 ou 3 : une adaptation de la méthode n\'est pas une correction du logiciel.',
     ])];
   }
 
   /** Sections de la méthode de l'orchestrateur, mot pour mot. */
   methode(n) {
     const o = this.S.orchestrateur;
-    const sections = SECTIONS_METHODE[n.estFeuille ? 'feuille' : 'compose'];
+    const sections = sectionsMethode(n);
     return fichier('modules/methode/SKILL.md', [
       frontmatter({ name: 'methode', description: `Sections de la méthode de l'orchestrateur C7E ${o.version} dont le skill de ticket ${n.reference} a besoin, recopiées mot pour mot (§ ${sections.join(', § ')}).` }),
       `# Méthode C7E pour ${n.reference}`,
@@ -749,6 +871,7 @@ export class FabriqueSkillTicket {
         ['`docs/demandes/<CLÉ>/`', `\`${this.dossier(n)}\``],
         ['la clé du ticket, qui nomme sa branche et ses commits (D4.INV-1, D4.INV-2)', `la clé Jira du ticket racine, ${racine} : une seule branche pour tout l'arbre${n.estRacine ? '' : `, et le corps de chaque commit cite le sous-ticket ${n.reference}`}`],
         ['le choix du développeur qui active le skill (D2.INV-3)', `le lancement de ce skill par le développeur, dans sa propre session : la commande \`${commandeSkill(n.reference)}\`, ou \`installer-arbre.mjs lancer ${n.reference}\``],
+        ['le registre des écarts et le registre des concepts (D6.INV-1 à D6.INV-3)', `\`docs/c7e/registre-ecarts.md\` et \`docs/c7e/concepts.json\` du projet, alimentés depuis le champ d'observation de l'arbre (module \`champ\` du skill racine) ; l'IA y ajoute, le développeur décide et promeut`],
         ['la qualification et la confirmation de la composition (D10.INV-1, D11)', 'faites avant la génération de ce skill ; si l\'analyse montre que la demande sort des empreintes, ce skill remonte au parent, sans changer de composition (D11.INV-4)'],
         ['un paragraphe de l\'orchestrateur (§ n)', 'le texte recopié dans le module `methode` s\'il y figure ; sinon un renvoi informatif'],
       ]),
@@ -774,7 +897,7 @@ export class FabriqueSkillTicket {
     const o = this.S.orchestrateur;
     return [
       { path: 'modules/invariants/SKILL.md', from: o.from, version: o.version, invariants: o.invariants.length },
-      { path: 'modules/methode/SKILL.md', from: o.from, version: o.version, sections: SECTIONS_METHODE[n.estFeuille ? 'feuille' : 'compose'] },
+      { path: 'modules/methode/SKILL.md', from: o.from, version: o.version, sections: sectionsMethode(n) },
       ...copies.map(({ source, fichier: f }) => ({
         path: f.rel,
         from: source.from,
@@ -842,7 +965,7 @@ export class FabriqueSkillTicket {
         '',
         '## Règles',
         '',
-        `- Aucune modification avant la ratification du skill par le développeur : la ligne \`${ligneRatification(n.reference)}\` dans \`${this.dossier(n)}retours.md\` (D3.INV-1, la fiche étant ce skill).`,
+        `- Aucune modification avant la ratification du skill par le développeur, déposée dans le champ de l'arbre : \`${this.commandeChamp(n, 'etat')}\` montre « ${n.reference} : ratifié » (D3.INV-1, la fiche étant ce skill).`,
         `- Les invariants hérités s'appliquent : \`${ici}modules/invariants/SKILL.md\`, \`${ici}socle/SKILL.md\`, la copie du projet du fichier d'invariants${references.length > 0 ? ` et ${liste(references)}` : ''}.`,
         `- Un slot par commit ; chaque commit commence par \`${cle} : \`, ou \`${cle} Snn : \` pour un scénario, suivi de l'étiquette de son slot (D4.INV-2)${n.estRacine ? '' : `, et son corps cite \`Sous-ticket : ${n.reference}\``} ; tu ne pousses, ne fusionnes, ne rebases ni ne poses de tag (D4.INV-3).`,
         '- Tu ne sors pas de ta couche : un besoin hors de ton périmètre remonte au skill du ticket.',
@@ -851,7 +974,7 @@ export class FabriqueSkillTicket {
         '',
         '- Pour chaque scénario : son critère d\'acceptation, le rouge avec son message d\'échec, le vert, le remaniement, les suites et leurs résultats, les fichiers, le commit (cycle-tdd, § 6).',
         '- Chaque constat cite sa preuve : test, commande et sortie, ou réponse du développeur.',
-        `- Chaque choix du développeur parmi tes propositions, et chaque correction qu'il demande sur tes actions, s'ajoute à \`${this.dossier(n)}retours.md\` : c'est la référence de ton observation.`,
+        `- Dépose dans le champ, avec leur preuve, tes actions que le développeur peut corriger (scénario présenté, commit, modification annoncée) et tes observations d'ordre 1 : \`${this.commandeChamp(n, 'deposer')} action …\` ou \`observation --ordre 1 …\` (module \`champ\` du skill racine). Un rouge du cycle TDD n'est pas un écart : le critère reste à prouver. Les retours du développeur, le skill du ticket les dépose : ils sont la référence de ton observation.`,
       ]);
     });
   }
@@ -972,9 +1095,81 @@ export class FabriqueSkillTicket {
     ];
   }
 
-  /** Observateurs des ordres 1 à 3 : au lot 5 du prototype. */
-  observateurs() {
-    return [];
+  /**
+   * Observateurs d'ordre 2 et 3 de l'arbre, sur le skill racine (lot 5) : chacun dans son propre contexte,
+   * en lecture seule hors du champ, où il dépose ses observations par `champ.mjs`. L'ordre 1 est celui des
+   * agents et des skills des nœuds.
+   */
+  observateurs(n) {
+    if (!n.estRacine) return [];
+    const cle = n.reference;
+    const racine = `.gemini/skills/${nomSkill(cle)}/`;
+    const outils = ['read_file', 'list_directory', 'glob', 'grep_search', 'run_shell_command'];
+    const etat = this.commandeChamp(n, 'etat');
+    const deposer = this.commandeChamp(n, 'deposer');
+    const communs = [
+      `- Tu ne crées, ne modifies ni ne supprimes aucun fichier ; ta seule écriture est le dépôt de tes observations par \`${racine}outils/champ.mjs\`. Tes autres commandes ne font que lire.`,
+      '- Types logiques : tu agis sur la manière d\'observer et de concevoir du niveau que tu observes, jamais sur son objet, ni le code ni le ticket.',
+      '- Chaque observation cite les enregistrements qui la fondent ; ce qui n\'est ni dans le champ ni prouvé reste une question.',
+      '- Ne pas apprendre à plaire : les retours du développeur orientent, ils ne lèvent aucun invariant ni aucune preuve (D6.INV-3).',
+    ];
+    const agent = (ordre, description, lignes) => fichier(`agents/${this.nomRole(n, `observateur-${ordre}`)}.md`, [
+      frontmatter({ name: this.nomRole(n, `observateur-${ordre}`), description, kind: 'local', tools: outils }),
+      ...lignes,
+    ]);
+    return [
+      agent(2, `Observateur d'ordre 2 de l'arbre ${cle}, qui observe les observations d'ordre 1 et les corrections du développeur sur un motif répété, et propose une adaptation de la manière de travailler, jamais une action sur le code.`, [
+        `# Observateur d'ordre 2 de l'arbre ${cle}`,
+        '',
+        `Tu observes la manière dont l'arbre ${cle} travaille, pas le logiciel : les actions des agents, les corrections que le développeur leur apporte et les observations d'ordre 1, déposées dans le champ \`docs/demandes/${cle}/champ.jsonl\`. Le skill d'un nœud t'invoque quand le champ attend une observation d'ordre 2 sur un motif : au moins deux corrections du développeur à ce motif. Ton contexte est le tien ; tu rends ton rapport au skill qui t'invoque.`,
+        '',
+        '## Références',
+        '',
+        `- \`${racine}modules/champ/SKILL.md\` : enregistrements, ordres, déclencheurs ;`,
+        `- \`${racine}modules/methode/SKILL.md\`, § 6 et § 7.2 : boucle de second ordre et registre des concepts de l'orchestrateur.`,
+        '',
+        '## Méthode',
+        '',
+        `1. \`${etat}\` : l'attente d'ordre 2, son motif et ses corrections.`,
+        '2. Relis chaque correction, l\'action qu\'elle vise et les observations d\'ordre 1 du même nœud. Cherche ce que la manière de travailler n\'a pas vu : concept absent, paramètre mal réglé, risque non déduit, convention du projet ignorée (orchestrateur, § 6, étape 3).',
+        '3. Formule une adaptation de la manière de travailler : ce que les agents vérifieront ou proposeront autrement, et à quel moment. Si les corrections ne montrent aucune cause commune de méthode, ton verdict est conforme.',
+        `4. Dépose ton observation : \`${deposer} observation --noeud <nœud de l'attente> --auteur ${this.nomRole(n, 'observateur-2')} --ordre 2 --verdict proposition --motif <motif> --observe <n des corrections et des actions> --preuve enregistrements:<mêmes n> --proposition "<adaptation>"\`, ou \`--verdict conforme\` sans proposition.`,
+        '',
+        '## Règles',
+        '',
+        ...communs,
+        '- Ta proposition ne devient une entrée `proposed` du registre des concepts que si le développeur la retient ; seul le développeur la promeut ensuite (D6.INV-1, D6.INV-2).',
+        '',
+        '## Rapport',
+        '',
+        '- Le numéro de ton observation, la proposition et les enregistrements qui la fondent.',
+      ]),
+      agent(3, `Observateur d'ordre 3 de l'arbre ${cle}, qui examine les propositions de l'ordre 2, met un motif en veille après deux propositions refusées et fait le bilan de clôture, sans rien proposer lui-même.`, [
+        `# Observateur d'ordre 3 de l'arbre ${cle}`,
+        '',
+        `Tu observes l'observateur d'ordre 2 de l'arbre ${cle}. Tu ne t'éveilles que dans trois cas : une proposition d'ordre 2 à examiner, une mise en veille attendue sur un motif, le bilan de clôture de la racine. Ton contexte est le tien ; tu rends ton rapport au skill qui t'invoque.`,
+        '',
+        '## Références',
+        '',
+        `- \`${racine}modules/champ/SKILL.md\` : ordres, déclencheurs, récursion bornée ;`,
+        `- \`${racine}modules/methode/SKILL.md\`, § 6 et § 7.2.`,
+        '',
+        '## Méthode',
+        '',
+        `- **Examen** : la proposition cite-t-elle ses preuves, des corrections qui portent bien son motif et les actions qu'elles visent ? Changerait-elle une décision, une consigne ou une proposition des agents ? Dépose \`${deposer} observation --noeud <nœud> --auteur ${this.nomRole(n, 'observateur-3')} --ordre 3 --verdict fondee --observe <n de la proposition> --preuve enregistrements:<n>\`, ou \`--verdict infondee\` avec la raison dans \`--commentaire\`.`,
+        `- **Veille** : quand \`${etat}\` attend une mise en veille, dépose par la même commande \`--verdict veille --motif <motif> --observe <n des propositions refusées> --preuve enregistrements:<mêmes n>\` : l'ordre 2 ne s'éveille plus sur ce motif.`,
+        '- **Bilan de clôture** : relis les propositions d\'ordre 2 de l\'arbre et les décisions du développeur ; dépose par la même commande `--verdict bilan --observe <n de toutes les observations d\'ordre 2> --preuve enregistrements:<mêmes n> --commentaire "<lesquelles ont changé une décision>"`.',
+        '',
+        '## Règles',
+        '',
+        ...communs,
+        '- Récursion bornée : rien d\'autre ne t\'éveille, et tu ne proposes aucune adaptation toi-même : tu juges l\'ordre 2.',
+        '',
+        '## Rapport',
+        '',
+        '- Le numéro de ton observation, ton verdict et sa raison.',
+      ]),
+    ];
   }
 
   /**
@@ -1045,9 +1240,11 @@ export class FabriqueSkillTicket {
       '',
       ...this.remise(n),
       '',
-      '## 9. Retours du développeur',
+      '## 9. Champ d\'observation',
       '',
-      `La référence de ton observation est le retour du développeur : ses choix parmi les options que tu proposes, et ses corrections sur tes actions. Ajoute chacun à \`${this.dossier(n)}retours.md\`, en ajout seul, avec ce que tu avais proposé ou fait. Une auto-évaluation sans preuve ni retour n'est pas une observation. Les retours orientent le travail ; ils ne lèvent aucun invariant ni aucune preuve.`,
+      `Le champ de l'arbre, \`docs/demandes/${this.cle(n)}/champ.jsonl\`, reçoit en ajout seul ce que fait chaque niveau : les actions que tu proposes ou réalises, les retours du développeur (ses choix parmi tes propositions, ses corrections sur tes actions, ses ratifications) et les observations, chacune avec sa preuve. Dépose chacun par \`${this.commandeChamp(n, 'deposer')} <type> …\`, jamais à la main (module \`champ\` du skill racine). La référence de ton observation est un retour du développeur ou une preuve : une auto-évaluation sans preuve ni retour n'est pas une observation.`,
+      '',
+      `Après chaque correction du développeur, et à chaque lancement, \`${this.commandeChamp(n, 'etat')}\` montre les critères menacés, les désaccords et les observations attendues : invoque l'observateur d'ordre 2 ou d'ordre 3 de l'arbre quand il en attend une, puis présente sa proposition au développeur, qui la retient ou la refuse. Les retours orientent le travail ; ils ne lèvent aucun invariant ni aucune preuve.`,
       '',
       '## 10. Invariants hérités',
       '',
@@ -1067,7 +1264,7 @@ export class FabriqueSkillTicket {
   placeDansArbre(n) {
     const racine = this.racine(n);
     const lignes = [`- Nature : ${this.nature(n)}${n.estFeuille ? ' ; ce skill agit sur le code, par ses agents.' : ' ; ce skill coordonne ses sous-tickets et n\'agit pas sur le code.'}`];
-    if (n.estRacine) lignes.push('- Boîte à outils de l\'arbre : ce skill porte les documents de la clé (module `documents`), les kits (module `kits`), les sous-agents de rôle, rédacteur, analyste, relecteur et qualité, que les skills des nœuds invoquent, et leurs références, copiées des skills du dépôt à leur version épinglée (`references/`, `outils/`).');
+    if (n.estRacine) lignes.push('- Boîte à outils de l\'arbre : ce skill porte les documents de la clé (module `documents`), les kits (module `kits`), le champ d\'observation et ses observateurs d\'ordre 2 et 3 (module `champ`), les sous-agents de rôle, rédacteur, analyste, relecteur et qualité, que les skills des nœuds invoquent, et leurs références, copiées des skills du dépôt à leur version épinglée (`references/`, `outils/`).');
     if (!n.estRacine) {
       const parent = `${n.parent.reference} (skill \`${nomSkill(n.parent.reference)}\`)`;
       lignes.push(n.parent === racine ? `- Parent : ${parent}, le ticket racine ; profondeur ${n.profondeur}.` : `- Parent : ${parent} ; ticket racine : ${racine.reference} ; profondeur ${n.profondeur}.`);
@@ -1091,7 +1288,8 @@ export class FabriqueSkillTicket {
     const etapes = [
       'Vérifie que ce skill est intact : s\'il a été installé par l\'installateur du dépôt Agent2Prompt, `sha256sum -c integrite.sha256` depuis son dossier.',
       'Lis la copie du projet du fichier d\'invariants (`docs/c7e/meso-contrats.md` par défaut) et compare-la à `projet/meso-contrats.md`, l\'état sur lequel ce skill a été produit. La copie du projet fait foi ; si elles diffèrent, dis-le au développeur avant tout le reste. Une valeur `ADAPTER` restée telle se signale, jamais devinée (D8.INV-1).',
-      ...(n.estRacine ? [] : [`Vérifie que l'arbre a été ratifié : la ligne \`${ligneRatification(objetRatification(racine))}\` figure dans \`${this.dossier(racine)}retours.md\`. Sinon, arrête-toi et renvoie le développeur au skill racine, \`${commandeSkill(racine.reference)}\`.`]),
+      `Lis l'état du champ de l'arbre, \`${this.commandeChamp(n, 'etat')}\` : ratifications, critères ${n.estFeuille ? 'de ce ticket' : 'de ce nœud et de ses sous-tickets'} menacés ou en écart, désaccords et observations attendues. Traite d'abord ce qui t'est attribué, au niveau le plus bas qui peut le traiter (module \`champ\` du skill racine, section 6).`,
+      ...(n.estRacine ? [] : [`Vérifie dans cet état que l'arbre a été ratifié : « ${objetRatification(racine)} : ratifié ». Sinon, arrête-toi et renvoie le développeur au skill racine, \`${commandeSkill(racine.reference)}\`.`]),
       n.dependances.length > 0
         ? `Vérifie que ${liste(n.dependances)} ${n.dependances.length > 1 ? 'sont clos' : 'est clos'} : remise écrite et critères prouvés. Sinon, arrête-toi et dis au développeur ce qui manque.`
         : 'Ce ticket ne dépend d\'aucun autre.',
@@ -1121,30 +1319,31 @@ export class FabriqueSkillTicket {
       ...(n.estRacine
         ? [
           `**Documents à rédiger**, sans \`${this.dossier(n)}us.md\` : fais rédiger les documents de la clé par le sous-agent rédacteur, puis passe leurs contrôles sans écart (module \`documents\`, sections 4 et 5) ; ensuite, ratification (section 6).`,
-          `**Arbre non ratifié**, documents écrits, sans la ligne \`${ligneRatification(objetRatification(n))}\` dans \`${this.dossier(n)}retours.md\` : passe à la ratification (section 6).`,
+          `**Arbre non ratifié**, documents écrits, sans « ${objetRatification(n)} : ratifié » dans l'état du champ : passe à la ratification (section 6).`,
         ]
         : []),
-      `**Sous-tickets en cours** : montre l'état de chacun d'après son dossier (\`retours.md\`, \`analyse.md\`, \`remise.md\`), puis le ou les sous-tickets prêts dans l'ordre du module \`sous-tickets\`, avec leur commande, à lancer dans une nouvelle session. Arrête-toi là.`,
+      `**Sous-tickets en cours** : montre l'état de chacun d'après le champ (ratifications, critères menacés ou en écart, désaccords, attentes) et son dossier (\`analyse.md\`, \`remise.md\`), puis le ou les sous-tickets prêts dans l'ordre du module \`sous-tickets\`, avec leur commande, à lancer dans une nouvelle session. Arrête-toi là.`,
       '**Tous les sous-tickets clos**, chacun avec sa `remise.md` : passe à la clôture (section 7).',
     ];
     return [
-      `Ce nœud ne lit ni ne modifie le code, et n'active pas dans sa session le skill d'un sous-ticket : chaque nœud se traite dans sa propre session, lancée par le développeur. À chaque lancement, ce skill reconnaît où en est ${n.estRacine ? 'l\'arbre' : 'son sous-arbre'}, d'après les dossiers sous \`docs/demandes/${this.racine(n).reference}/\` :`,
+      `Ce nœud ne lit ni ne modifie le code, et n'active pas dans sa session le skill d'un sous-ticket : chaque nœud se traite dans sa propre session, lancée par le développeur. À chaque lancement, ce skill reconnaît où en est ${n.estRacine ? 'l\'arbre' : 'son sous-arbre'}, d'après le champ, \`${this.commandeChamp(n, 'etat')}\`, et les dossiers sous \`docs/demandes/${this.racine(n).reference}/\` :`,
       '',
       ...etats.map((e, k) => `${k + 1}. ${e}`),
     ];
   }
 
   ratification(n) {
-    const ligne = `sur une ligne \`${ligneRatification(objetRatification(n))}\`, ou \`… non ratifié, <motif>\`, avec la date et son nom`;
-    const documents = 'les statuts des critères mis à jour et leurs contrôles repassés sans écart ; puis les documents se commitent sur la branche de l\'arbre (module `documents`, section 6)';
+    const depot = `dépose sa décision dans le champ de l'arbre, \`${this.depotRatification(n)}\`, ou \`--decision "non ratifié"\` avec sa raison dans \`--contenu\` (module \`champ\` du skill racine, section 3)`;
+    const documents = 'les statuts des critères mis à jour et leurs contrôles repassés sans écart';
+    const commit = 'puis les documents se commitent sur la branche de l\'arbre (module `documents`, section 6)';
     if (n.estRacine && !n.estFeuille) {
-      return [`Avant toute autre action, présente au développeur l'arbre complet : les sous-tickets et leurs méso-contrats, l'ordre de résolution et les critères, avec la façon dont chaque critère de la racine est soutenu (modules \`sous-tickets\` et \`recette\`), et les documents de la clé, qui se ratifient avec lui (module \`documents\`, section 6). **Point de ratification** : rien ne commence avant sa réponse. Sa décision s'ajoute à \`${this.dossier(n)}retours.md\`, ${ligne}, une fois ${documents}. Elle couvre l'arbre ; chaque feuille se ratifie encore avant sa première action. Une fois l'arbre ratifié, indique le premier sous-ticket prêt et sa commande, à lancer dans une nouvelle session.`];
+      return [`Avant toute autre action, présente au développeur l'arbre complet : les sous-tickets et leurs méso-contrats, l'ordre de résolution et les critères, avec la façon dont chaque critère de la racine est soutenu (modules \`sous-tickets\` et \`recette\`), et les documents de la clé, qui se ratifient avec lui (module \`documents\`, section 6). **Point de ratification** : rien ne commence avant sa réponse. Une fois ${documents}, ${depot} ; ${commit}. Elle couvre l'arbre ; chaque feuille se ratifie encore avant sa première action. Une fois l'arbre ratifié, indique le premier sous-ticket prêt et sa commande, à lancer dans une nouvelle session.`];
     }
     if (!n.estFeuille) return ['Pas de ratification propre : l\'arbre a été ratifié sur le skill racine. Ce nœud coordonne ses sous-tickets.'];
     const presentation = `Présente au développeur ce skill et son analyse : objectif, critères, méso-contrats et options avec leur paramétrage, invariants, configuration, cartographie, stratégie, scénarios et tests déduits, avec la copie de travail de \`ticket.toml\`${n.estRacine ? ', et les documents de la clé, qui se ratifient avec lui (module `documents`, section 6)' : ''}. **Point de ratification** : rien n'est modifié avant sa réponse (D3.INV-1, la fiche étant ce skill).`;
     return [n.estRacine
-      ? `${presentation} Sa décision s'ajoute à \`${this.dossier(n)}retours.md\`, ${ligne}, une fois ${documents}.`
-      : `${presentation} Ajoute sa décision à \`${this.dossier(n)}retours.md\`, ${ligne}.`];
+      ? `${presentation} Une fois ${documents}, ${depot} ; ${commit}.`
+      : `${presentation} Puis ${depot}.`];
   }
 
   transformation(n) {
@@ -1200,7 +1399,12 @@ export class FabriqueSkillTicket {
   cloture(n) {
     return [
       `${n.reference} se clôt quand tous ses sous-tickets sont clos et que chacun de ses critères est prouvé par ceux qui le soutiennent (module \`recette\`). Un critère non prouvé, ou un écart remonté par un sous-ticket, se présente au développeur avec ses preuves ; il ne se tranche pas en silence (D6.INV-3).`,
-      ...(n.estRacine ? ['', 'Puis assemble les kits dev, test et démo et la remise à Agent2Test, et contrôle-les sans écart (module `kits`).'] : []),
+      ...(n.estRacine
+        ? [
+          '',
+          `Si l'ordre 2 a proposé des adaptations, invoque l'observateur d'ordre 3 de l'arbre, \`${this.nomRole(n, 'observateur-3')}\`, pour le bilan de clôture : lesquelles ont changé une décision (module \`champ\`, section 4). Puis assemble les kits dev, test et démo et la remise à Agent2Test, et contrôle-les sans écart (module \`kits\`).`,
+        ]
+        : []),
     ];
   }
 
@@ -1211,7 +1415,7 @@ export class FabriqueSkillTicket {
       ? 'Ce skill étant aussi la racine de l\'arbre, cette remise s\'écrit dans l\'ordre d\'assemblage des kits dev, test et démo et de la remise à Agent2Test (module `kits`, section 5), qui s\'y citent par leur chemin.'
       : 'Les kits dev, test et démo s\'y citent par leur chemin (module `kits`).';
     const racine = n.estRacine
-      ? ` ${kits} Donne au développeur la remise à Agent2Test, qu'il dépose lui-même, le rapport final par critère (\`references/agent-tdd-jira/tracabilite.md\`, § 4) et le projet de commentaire Jira, qu'il publie lui-même (§ 5) : ce skill n'écrit jamais dans Jira.`
+      ? ` ${kits} L'état final du champ, \`${this.commandeChamp(n, 'etat')}\`, s'y reporte : critères prouvés, désaccords et leurs décisions au registre des écarts, propositions d'ordre 2 retenues ou refusées${n.estFeuille ? `, avec le bilan de clôture de l'observateur d'ordre 3 si l'ordre 2 a proposé des adaptations` : ''}. Donne au développeur la remise à Agent2Test, qu'il dépose lui-même, le rapport final par critère (\`references/agent-tdd-jira/tracabilite.md\`, § 4) et le projet de commentaire Jira, qu'il publie lui-même (§ 5) : ce skill n'écrit jamais dans Jira.`
       : '';
     if (!n.estFeuille) return [`${remise} : pour chaque critère, les preuves de ceux qui le soutiennent ; les écarts remontés et leurs décisions ; l'état de chaque sous-ticket.${racine} ${suite}`];
     const front = this.couches(n).includes('frontend');
@@ -1231,8 +1435,10 @@ export class FabriqueSkillTicket {
       return `${origine}${USAGES_BOITE[rel] ?? ''}`;
     }
     if (rel.startsWith('references/')) return 'référentiel de la pile : versions cibles et invariants';
+    const observateur = /-observateur-([23])\.md$/.exec(rel)?.[1];
+    if (observateur && rel.startsWith('agents/')) return `observateur d'ordre ${observateur} de l'arbre, dans son propre contexte, en lecture seule hors du champ ; copié dans \`.gemini/agents/\` à l'installation`;
     const roleAgent = Object.keys(ROLES).find((r) => rel.endsWith(`-${r}.md`) && rel.startsWith('agents/'));
-    if (roleAgent && this.S.boite) return `sous-agent ${ROLES[roleAgent].titre} de l'arbre, dans son propre contexte${ROLES[roleAgent].ecrit ? '' : ', en lecture seule'} ; copié dans \`.gemini/agents/\` à l'installation`;
+    if (roleAgent) return `sous-agent ${ROLES[roleAgent].titre} de l'arbre, dans son propre contexte${ROLES[roleAgent].ecrit ? '' : ', en lecture seule'} ; copié dans \`.gemini/agents/\` à l'installation`;
     if (rel.startsWith('agents/')) return 'agent d\'une couche, dans son propre contexte ; copié dans `.gemini/agents/` à l\'installation';
     if (rel.startsWith('commandes/')) return `commande \`/ticket:${/([^/]+)\.toml$/.exec(rel)?.[1]}\` qui lance ce skill ; copiée dans \`.gemini/commands/ticket/\` à l'installation`;
     const m = /^modules\/([^/]+)\//.exec(rel)?.[1];
@@ -1242,6 +1448,7 @@ export class FabriqueSkillTicket {
     if (m === 'sous-tickets') return 'sous-arbre, ordre de résolution et coordination';
     if (m === 'documents') return 'documents de la clé selon agent-tdd-jira, rattachement des critères, contrôles et ratification';
     if (m === 'kits') return 'kits dev, test et démo, remise à Agent2Test, assemblage et contrôle';
+    if (m === 'champ') return 'champ d\'observation de l\'arbre : enregistrements, commandes, ordres, déclencheurs, propagation, désaccords';
     if (m === 'methode') return 'sections de la méthode de l\'orchestrateur, mot pour mot';
     if (m === 'invariants') return 'invariants hérités, correspondances, invariants de l\'orchestrateur mot pour mot';
     return m ? `module \`${m}\`` : '';

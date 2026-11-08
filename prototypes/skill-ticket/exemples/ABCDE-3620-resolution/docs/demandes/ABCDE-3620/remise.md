@@ -21,6 +21,10 @@ Arbre clos : ABCDE-3620-1 (ABCDE-3620-1.1, ABCDE-3620-1.2) et ABCDE-3620-2, chac
 - Kit démo : `docs/demandes/ABCDE-3620/kits/demo.json`, avec le parcours `docs/demandes/ABCDE-3620/kits/demo/parcours.md`.
 - Remise à Agent2Test : `docs/demandes/ABCDE-3620/kits/remise-agent2test.json`, à déposer par le développeur.
 
+## Champ d'observation
+
+État final de `docs/demandes/ABCDE-3620/champ.jsonl` (`champ.mjs etat`) : 12 enregistrements, chaîne intacte ; l'arbre et ses trois feuilles ratifiés ; les 18 critères de l'arbre prouvés, chaque critère des feuilles par un verdict conforme d'ordre 1 avec sa preuve ; aucun désaccord, rien au registre des écarts ; aucune correction répétée, donc aucune proposition d'ordre 2 ni bilan d'ordre 3. Comme les kits, le champ reste hors des commits de l'arbre.
+
 ## Rapport final
 
 - **Demande** : ABCDE-3620, reprise du ticket racine, capture MHTML absente.

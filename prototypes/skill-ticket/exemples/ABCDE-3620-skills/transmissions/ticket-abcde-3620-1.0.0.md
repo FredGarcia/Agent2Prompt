@@ -59,6 +59,8 @@ Suis `SKILL.md` à partir de sa section 4. Rien n'est modifié avant la ratifica
         "from": "specs/orchestrateur-c7e/SKILL.md",
         "version": "3.5.3",
         "sections": [
+          "6",
+          "7.2",
           "11.5"
         ]
       },
@@ -202,11 +204,16 @@ Suis `SKILL.md` à partir de sa section 4. Rien n'est modifié avant la ratifica
         "path": "outils/verifier-kits.mjs",
         "from": "prototypes/skill-ticket/outils/verifier-kits.mjs",
         "sha256": "01fabc48a92aad381b7fd3610d120aa6488f93a74a733898f9867f4b61b120cd"
+      },
+      {
+        "path": "outils/champ.mjs",
+        "from": "prototypes/skill-ticket/outils/champ.mjs",
+        "sha256": "2d0af567a46c11937784de77452c101113ab33c4b28cd6548db4be4ea8f9eaca"
       }
     ],
     "genere_par": {
       "prototype": "skill-ticket",
-      "lot": 4,
+      "lot": 5,
       "fabrique": "java-angular-postgresql",
       "orchestrateur": "3.5.3"
     }
@@ -245,6 +252,11 @@ Suis `SKILL.md` à partir de sa section 4. Rien n'est modifié avant la ratifica
     {
       "id": "kits",
       "path": "modules/kits/SKILL.md",
+      "status": "active"
+    },
+    {
+      "id": "champ",
+      "path": "modules/champ/SKILL.md",
       "status": "active"
     },
     {
@@ -363,6 +375,11 @@ Suis `SKILL.md` à partir de sa section 4. Rien n'est modifié avant la ratifica
       "status": "active"
     },
     {
+      "id": "outils-champ.mjs",
+      "path": "outils/champ.mjs",
+      "status": "active"
+    },
+    {
       "id": "agents-ticket-abcde-3620-redacteur",
       "path": "agents/ticket-abcde-3620-redacteur.md",
       "status": "active"
@@ -386,6 +403,16 @@ Suis `SKILL.md` à partir de sa section 4. Rien n'est modifié avant la ratifica
       "id": "commandes-ticket-abcde-3620",
       "path": "commandes/ticket/abcde-3620.toml",
       "status": "active"
+    },
+    {
+      "id": "agents-ticket-abcde-3620-observateur-2",
+      "path": "agents/ticket-abcde-3620-observateur-2.md",
+      "status": "active"
+    },
+    {
+      "id": "agents-ticket-abcde-3620-observateur-3",
+      "path": "agents/ticket-abcde-3620-observateur-3.md",
+      "status": "active"
     }
   ]
 }
@@ -400,12 +427,12 @@ version: 1.0.0
 
 # Skill de ticket ABCDE-3620
 
-> Produit par le générateur C7E (prototype « skill de ticket », lot 4), fabrique `java-angular-postgresql`, référentiel des méso-contrats 3.3.0, orchestrateur-c7e 3.5.3. Ce skill remplace la fiche de transformation comme objet ratifié avant toute modification ; il reste identique à sa transmission. Si tu y relèves une ambiguïté ou une contradiction, signale-la au développeur ; ne corrige pas le skill toi-même.
+> Produit par le générateur C7E (prototype « skill de ticket », lot 5), fabrique `java-angular-postgresql`, référentiel des méso-contrats 3.3.0, orchestrateur-c7e 3.5.3. Ce skill remplace la fiche de transformation comme objet ratifié avant toute modification ; il reste identique à sa transmission. Si tu y relèves une ambiguïté ou une contradiction, signale-la au développeur ; ne corrige pas le skill toi-même.
 
 ## 1. Place dans l'arbre
 
 - Nature : racine ; ce skill coordonne ses sous-tickets et n'agit pas sur le code.
-- Boîte à outils de l'arbre : ce skill porte les documents de la clé (module `documents`), les kits (module `kits`), les sous-agents de rôle, rédacteur, analyste, relecteur et qualité, que les skills des nœuds invoquent, et leurs références, copiées des skills du dépôt à leur version épinglée (`references/`, `outils/`).
+- Boîte à outils de l'arbre : ce skill porte les documents de la clé (module `documents`), les kits (module `kits`), le champ d'observation et ses observateurs d'ordre 2 et 3 (module `champ`), les sous-agents de rôle, rédacteur, analyste, relecteur et qualité, que les skills des nœuds invoquent, et leurs références, copiées des skills du dépôt à leur version épinglée (`references/`, `outils/`).
 - Sous-tickets : ABCDE-3620-1 (skill `ticket-abcde-3620-1`), ABCDE-3620-2 (skill `ticket-abcde-3620-2`) ; module `sous-tickets`.
 - Clé Jira : ABCDE-3620, qui nomme la branche et les commits de tout l'arbre. Dossier du ticket : `docs/demandes/ABCDE-3620/`.
 - Session : ce skill travaille dans sa propre session de Gemini CLI, que le développeur lance par la commande `/ticket:abcde-3620` ou par `installer-arbre.mjs lancer ABCDE-3620`.
@@ -434,34 +461,37 @@ Ce nœud ne porte pas d'option : ses sous-tickets les portent.
 
 1. Vérifie que ce skill est intact : s'il a été installé par l'installateur du dépôt Agent2Prompt, `sha256sum -c integrite.sha256` depuis son dossier.
 2. Lis la copie du projet du fichier d'invariants (`docs/c7e/meso-contrats.md` par défaut) et compare-la à `projet/meso-contrats.md`, l'état sur lequel ce skill a été produit. La copie du projet fait foi ; si elles diffèrent, dis-le au développeur avant tout le reste. Une valeur `ADAPTER` restée telle se signale, jamais devinée (D8.INV-1).
-3. Ce ticket ne dépend d'aucun autre.
+3. Lis l'état du champ de l'arbre, `node .gemini/skills/ticket-abcde-3620/outils/champ.mjs etat docs/demandes/ABCDE-3620` : ratifications, critères de ce nœud et de ses sous-tickets menacés ou en écart, désaccords et observations attendues. Traite d'abord ce qui t'est attribué, au niveau le plus bas qui peut le traiter (module `champ` du skill racine, section 6).
+4. Ce ticket ne dépend d'aucun autre.
 
 ## 5. Coordination
 
-Ce nœud ne lit ni ne modifie le code, et n'active pas dans sa session le skill d'un sous-ticket : chaque nœud se traite dans sa propre session, lancée par le développeur. À chaque lancement, ce skill reconnaît où en est l'arbre, d'après les dossiers sous `docs/demandes/ABCDE-3620/` :
+Ce nœud ne lit ni ne modifie le code, et n'active pas dans sa session le skill d'un sous-ticket : chaque nœud se traite dans sa propre session, lancée par le développeur. À chaque lancement, ce skill reconnaît où en est l'arbre, d'après le champ, `node .gemini/skills/ticket-abcde-3620/outils/champ.mjs etat docs/demandes/ABCDE-3620`, et les dossiers sous `docs/demandes/ABCDE-3620/` :
 
 1. **Documents à rédiger**, sans `docs/demandes/ABCDE-3620/us.md` : fais rédiger les documents de la clé par le sous-agent rédacteur, puis passe leurs contrôles sans écart (module `documents`, sections 4 et 5) ; ensuite, ratification (section 6).
-2. **Arbre non ratifié**, documents écrits, sans la ligne `- AAAA-MM-JJ, <nom> : arbre ABCDE-3620 ratifié` dans `docs/demandes/ABCDE-3620/retours.md` : passe à la ratification (section 6).
-3. **Sous-tickets en cours** : montre l'état de chacun d'après son dossier (`retours.md`, `analyse.md`, `remise.md`), puis le ou les sous-tickets prêts dans l'ordre du module `sous-tickets`, avec leur commande, à lancer dans une nouvelle session. Arrête-toi là.
+2. **Arbre non ratifié**, documents écrits, sans « arbre ABCDE-3620 : ratifié » dans l'état du champ : passe à la ratification (section 6).
+3. **Sous-tickets en cours** : montre l'état de chacun d'après le champ (ratifications, critères menacés ou en écart, désaccords, attentes) et son dossier (`analyse.md`, `remise.md`), puis le ou les sous-tickets prêts dans l'ordre du module `sous-tickets`, avec leur commande, à lancer dans une nouvelle session. Arrête-toi là.
 4. **Tous les sous-tickets clos**, chacun avec sa `remise.md` : passe à la clôture (section 7).
 
 ## 6. Ratification
 
-Avant toute autre action, présente au développeur l'arbre complet : les sous-tickets et leurs méso-contrats, l'ordre de résolution et les critères, avec la façon dont chaque critère de la racine est soutenu (modules `sous-tickets` et `recette`), et les documents de la clé, qui se ratifient avec lui (module `documents`, section 6). **Point de ratification** : rien ne commence avant sa réponse. Sa décision s'ajoute à `docs/demandes/ABCDE-3620/retours.md`, sur une ligne `- AAAA-MM-JJ, <nom> : arbre ABCDE-3620 ratifié`, ou `… non ratifié, <motif>`, avec la date et son nom, une fois les statuts des critères mis à jour et leurs contrôles repassés sans écart ; puis les documents se commitent sur la branche de l'arbre (module `documents`, section 6). Elle couvre l'arbre ; chaque feuille se ratifie encore avant sa première action. Une fois l'arbre ratifié, indique le premier sous-ticket prêt et sa commande, à lancer dans une nouvelle session.
+Avant toute autre action, présente au développeur l'arbre complet : les sous-tickets et leurs méso-contrats, l'ordre de résolution et les critères, avec la façon dont chaque critère de la racine est soutenu (modules `sous-tickets` et `recette`), et les documents de la clé, qui se ratifient avec lui (module `documents`, section 6). **Point de ratification** : rien ne commence avant sa réponse. Une fois les statuts des critères mis à jour et leurs contrôles repassés sans écart, dépose sa décision dans le champ de l'arbre, `node .gemini/skills/ticket-abcde-3620/outils/champ.mjs deposer docs/demandes/ABCDE-3620 retour --noeud ABCDE-3620 --auteur ticket-abcde-3620 --nature ratification --objet "arbre ABCDE-3620" --decision ratifié --par "<nom>" --contenu "<sa réponse>"`, ou `--decision "non ratifié"` avec sa raison dans `--contenu` (module `champ` du skill racine, section 3) ; puis les documents se commitent sur la branche de l'arbre (module `documents`, section 6). Elle couvre l'arbre ; chaque feuille se ratifie encore avant sa première action. Une fois l'arbre ratifié, indique le premier sous-ticket prêt et sa commande, à lancer dans une nouvelle session.
 
 ## 7. Clôture
 
 ABCDE-3620 se clôt quand tous ses sous-tickets sont clos et que chacun de ses critères est prouvé par ceux qui le soutiennent (module `recette`). Un critère non prouvé, ou un écart remonté par un sous-ticket, se présente au développeur avec ses preuves ; il ne se tranche pas en silence (D6.INV-3).
 
-Puis assemble les kits dev, test et démo et la remise à Agent2Test, et contrôle-les sans écart (module `kits`).
+Si l'ordre 2 a proposé des adaptations, invoque l'observateur d'ordre 3 de l'arbre, `ticket-abcde-3620-observateur-3`, pour le bilan de clôture : lesquelles ont changé une décision (module `champ`, section 4). Puis assemble les kits dev, test et démo et la remise à Agent2Test, et contrôle-les sans écart (module `kits`).
 
 ## 8. Remise
 
-`docs/demandes/ABCDE-3620/remise.md` : pour chaque critère, les preuves de ceux qui le soutiennent ; les écarts remontés et leurs décisions ; l'état de chaque sous-ticket. Les kits dev, test et démo s'y citent par leur chemin (module `kits`). Donne au développeur la remise à Agent2Test, qu'il dépose lui-même, le rapport final par critère (`references/agent-tdd-jira/tracabilite.md`, § 4) et le projet de commentaire Jira, qu'il publie lui-même (§ 5) : ce skill n'écrit jamais dans Jira. Le ticket est alors clos ; l'installateur peut retirer l'arbre, en archivant ses skills dans le dossier du ticket.
+`docs/demandes/ABCDE-3620/remise.md` : pour chaque critère, les preuves de ceux qui le soutiennent ; les écarts remontés et leurs décisions ; l'état de chaque sous-ticket. Les kits dev, test et démo s'y citent par leur chemin (module `kits`). L'état final du champ, `node .gemini/skills/ticket-abcde-3620/outils/champ.mjs etat docs/demandes/ABCDE-3620`, s'y reporte : critères prouvés, désaccords et leurs décisions au registre des écarts, propositions d'ordre 2 retenues ou refusées. Donne au développeur la remise à Agent2Test, qu'il dépose lui-même, le rapport final par critère (`references/agent-tdd-jira/tracabilite.md`, § 4) et le projet de commentaire Jira, qu'il publie lui-même (§ 5) : ce skill n'écrit jamais dans Jira. Le ticket est alors clos ; l'installateur peut retirer l'arbre, en archivant ses skills dans le dossier du ticket.
 
-## 9. Retours du développeur
+## 9. Champ d'observation
 
-La référence de ton observation est le retour du développeur : ses choix parmi les options que tu proposes, et ses corrections sur tes actions. Ajoute chacun à `docs/demandes/ABCDE-3620/retours.md`, en ajout seul, avec ce que tu avais proposé ou fait. Une auto-évaluation sans preuve ni retour n'est pas une observation. Les retours orientent le travail ; ils ne lèvent aucun invariant ni aucune preuve.
+Le champ de l'arbre, `docs/demandes/ABCDE-3620/champ.jsonl`, reçoit en ajout seul ce que fait chaque niveau : les actions que tu proposes ou réalises, les retours du développeur (ses choix parmi tes propositions, ses corrections sur tes actions, ses ratifications) et les observations, chacune avec sa preuve. Dépose chacun par `node .gemini/skills/ticket-abcde-3620/outils/champ.mjs deposer docs/demandes/ABCDE-3620 <type> …`, jamais à la main (module `champ` du skill racine). La référence de ton observation est un retour du développeur ou une preuve : une auto-évaluation sans preuve ni retour n'est pas une observation.
+
+Après chaque correction du développeur, et à chaque lancement, `node .gemini/skills/ticket-abcde-3620/outils/champ.mjs etat docs/demandes/ABCDE-3620` montre les critères menacés, les désaccords et les observations attendues : invoque l'observateur d'ordre 2 ou d'ordre 3 de l'arbre quand il en attend une, puis présente sa proposition au développeur, qui la retient ou la refuse. Les retours orientent le travail ; ils ne lèvent aucun invariant ni aucune preuve.
 
 ## 10. Invariants hérités
 
@@ -478,8 +508,9 @@ Le module `invariants` liste ce dont ce skill hérite, sans affaiblissement : le
 | `modules/recette/SKILL.md` | critères à prouver, preuves et commandes |
 | `modules/sous-tickets/SKILL.md` | sous-arbre, ordre de résolution et coordination |
 | `modules/documents/SKILL.md` | documents de la clé selon agent-tdd-jira, rattachement des critères, contrôles et ratification |
-| `outils/rattachement.json` | rattachement des critères de l'arbre aux critères de la clé, pour les scripts de contrôle |
+| `outils/rattachement.json` | rattachement des critères de l'arbre aux critères de la clé, pour les scripts de contrôle et le champ |
 | `modules/kits/SKILL.md` | kits dev, test et démo, remise à Agent2Test, assemblage et contrôle |
+| `modules/champ/SKILL.md` | champ d'observation de l'arbre : enregistrements, commandes, ordres, déclencheurs, propagation, désaccords |
 | `modules/methode/SKILL.md` | sections de la méthode de l'orchestrateur, mot pour mot |
 | `modules/invariants/SKILL.md` | invariants hérités, correspondances, invariants de l'orchestrateur mot pour mot |
 | `socle/SKILL.md` | socle back-front 1.1.0, hérité en entier |
@@ -503,11 +534,14 @@ Le module `invariants` liste ce dont ce skill hérite, sans affaiblissement : le
 | `outils/controler-criteres.mjs` | agent-tdd-jira 1.3.4, bloc de code du § 7 : script de contrôle des US, des critères et des scénarios |
 | `outils/verifier-documents.mjs` | prototype skill-ticket : script de contrôle des documents de la clé contre le rattachement de l'arbre |
 | `outils/verifier-kits.mjs` | prototype skill-ticket : script de contrôle des kits dev, test et démo et de la remise à Agent2Test |
+| `outils/champ.mjs` | prototype skill-ticket : script du champ d'observation : dépôt, vérification et état |
 | `agents/ticket-abcde-3620-redacteur.md` | sous-agent rédacteur de l'arbre, dans son propre contexte ; copié dans `.gemini/agents/` à l'installation |
 | `agents/ticket-abcde-3620-analyste.md` | sous-agent analyste de l'arbre, dans son propre contexte, en lecture seule ; copié dans `.gemini/agents/` à l'installation |
 | `agents/ticket-abcde-3620-relecteur.md` | sous-agent relecteur de l'arbre, dans son propre contexte, en lecture seule ; copié dans `.gemini/agents/` à l'installation |
 | `agents/ticket-abcde-3620-qualite.md` | sous-agent qualité de l'arbre, dans son propre contexte, en lecture seule ; copié dans `.gemini/agents/` à l'installation |
 | `commandes/ticket/abcde-3620.toml` | commande `/ticket:abcde-3620` qui lance ce skill ; copiée dans `.gemini/commands/ticket/` à l'installation |
+| `agents/ticket-abcde-3620-observateur-2.md` | observateur d'ordre 2 de l'arbre, dans son propre contexte, en lecture seule hors du champ ; copié dans `.gemini/agents/` à l'installation |
+| `agents/ticket-abcde-3620-observateur-3.md` | observateur d'ordre 3 de l'arbre, dans son propre contexte, en lecture seule hors du champ ; copié dans `.gemini/agents/` à l'installation |
 <<<FIN SKILL.md>>>
 
 <<<FICHIER ticket.toml>>>
@@ -751,7 +785,7 @@ Après la réponse du développeur :
 
 1. Les statuts passent de « à valider » à « validé », « en attente de Qn » ou « retiré : <raison> », selon sa décision ; la colonne « Scénarios » de `us.md` suit le fichier Gherkin.
 2. Les deux contrôles de la section 5 repassent sans écart.
-3. La ligne de ratification s'ajoute à `retours.md`.
+3. La ratification de l'arbre se dépose dans le champ d'observation (module `champ`, section 3).
 4. La branche de l'arbre se crée si elle n'existe pas, au format du projet, par défaut `<type>/ABCDE-3620-<slug>` (D4.INV-1) ; les trois documents s'y commitent, et rien d'autre : `ABCDE-3620 : [É6-C7E] docs(demande): US, critères d'acceptation et scénarios ratifiés` (D4.INV-2). Dans un arbre, les documents se commitent à la ratification, et non avec le premier scénario (cycle-tdd, § 7) : toutes les feuilles partent du même plan.
 
 Toute modification ultérieure de `us.md` ou du fichier Gherkin repasse par ce skill et par une nouvelle ratification. Un sous-ticket qui a besoin d'un critère nouveau le remonte ici.
@@ -799,30 +833,45 @@ Toute modification ultérieure de `us.md` ou du fichier Gherkin repasse par ce s
           "id": "C1",
           "ca": [
             "ABCDE-3620-CA01"
+          ],
+          "soutient": [
+            "ABCDE-3620:C1"
           ]
         },
         {
           "id": "C2",
           "ca": [
             "ABCDE-3620-CA02"
+          ],
+          "soutient": [
+            "ABCDE-3620:C2"
           ]
         },
         {
           "id": "C3",
           "ca": [
             "ABCDE-3620-CA03"
+          ],
+          "soutient": [
+            "ABCDE-3620:C3"
           ]
         },
         {
           "id": "C4",
           "ca": [
             "ABCDE-3620-CA04"
+          ],
+          "soutient": [
+            "ABCDE-3620:C4"
           ]
         },
         {
           "id": "C5",
           "ca": [
             "ABCDE-3620-CA05"
+          ],
+          "soutient": [
+            "ABCDE-3620:C5"
           ]
         }
       ],
@@ -840,12 +889,18 @@ Toute modification ultérieure de `us.md` ou du fichier Gherkin repasse par ce s
           "id": "C1",
           "ca": [
             "ABCDE-3620-CA04"
+          ],
+          "soutient": [
+            "ABCDE-3620-1:C4"
           ]
         },
         {
           "id": "C2",
           "ca": [
             "ABCDE-3620-CA03"
+          ],
+          "soutient": [
+            "ABCDE-3620-1:C3"
           ]
         }
       ],
@@ -863,24 +918,36 @@ Toute modification ultérieure de `us.md` ou du fichier Gherkin repasse par ce s
           "id": "C1",
           "ca": [
             "ABCDE-3620-CA01"
+          ],
+          "soutient": [
+            "ABCDE-3620-1:C1"
           ]
         },
         {
           "id": "C2",
           "ca": [
             "ABCDE-3620-CA02"
+          ],
+          "soutient": [
+            "ABCDE-3620-1:C2"
           ]
         },
         {
           "id": "C3",
           "ca": [
             "ABCDE-3620-CA03"
+          ],
+          "soutient": [
+            "ABCDE-3620-1:C3"
           ]
         },
         {
           "id": "C4",
           "ca": [
             "ABCDE-3620-CA05"
+          ],
+          "soutient": [
+            "ABCDE-3620-1:C5"
           ]
         }
       ],
@@ -898,12 +965,18 @@ Toute modification ultérieure de `us.md` ou du fichier Gherkin repasse par ce s
           "id": "C1",
           "ca": [
             "ABCDE-3620-CA05"
+          ],
+          "soutient": [
+            "ABCDE-3620:C5"
           ]
         },
         {
           "id": "C2",
           "ca": [
             "ABCDE-3620-CA05"
+          ],
+          "soutient": [
+            "ABCDE-3620:C5"
           ]
         }
       ],
@@ -1068,18 +1141,194 @@ node .gemini/skills/ticket-abcde-3620/outils/verifier-kits.mjs docs/demandes/ABC
 
 Le script vérifie chaque manifeste, chaque empreinte, les commits dans le dépôt, la couverture des scénarios par les tests, le parcours et les captures, et la remise contre `us.md`, le fichier Gherkin et le kit dev.
 
-Les kits ne se commitent pas avant la campagne d'Agent2Test : le commit remis doit rester la tête de la branche (agent2test, module echange, § 4). Le développeur les commite ensuite, s'il le souhaite.
+Les kits, comme le champ d'observation, ne se commitent pas avant la campagne d'Agent2Test : le commit remis doit rester la tête de la branche (agent2test, module echange, § 4). Le développeur les commite ensuite, s'il le souhaite.
 <<<FIN modules/kits/SKILL.md>>>
+
+<<<FICHIER modules/champ/SKILL.md>>>
+---
+name: champ
+description: Champ d'observation de l'arbre ABCDE-3620 en ajout seul, actions, retours du développeur, observations des ordres 1 à 3 et écarts, avec ses déclencheurs, la propagation des menaces, l'escalade, les désaccords et les observateurs d'ordre 2 et 3.
+---
+
+# Champ d'observation de l'arbre ABCDE-3620
+
+Chaque niveau de l'arbre dépose ce qu'il fait et ce qu'il observe dans un champ partagé, `docs/demandes/ABCDE-3620/champ.jsonl` ; tous le lisent, personne ne le réécrit. Le ticket n'est jamais réécrit par ceux qui l'observent : c'est l'état du champ qui évolue. Un enregistrement par ligne, au schéma fermé `skill-ticket.observation/1`, chaque ligne chaînée à l'empreinte de la précédente, `champ.tete` gardant la dernière : une ligne réécrite, insérée ou supprimée se voit. Le script `outils/champ.mjs` dépose, vérifie et lit ; personne n'écrit le champ à la main.
+
+## 1. Enregistrements
+
+| Type | Ce qu'il porte | Qui le dépose |
+|---|---|---|
+| `action` | une proposition au développeur, avec ses options, ou une réalisation qu'il peut corriger (scénario présenté, commit, modification annoncée), sur une ancre | l'agent ou le skill qui agit |
+| `retour` | un choix du développeur parmi les options d'une proposition, ou sa décision sur une proposition d'ordre 2, retenue ou refusée ; une correction, qui vise une action et porte un motif ; une ratification | le skill du nœud, qui parle au développeur |
+| `observation` | à l'ordre 1, un verdict, conforme ou écart, sur une ancre ; aux ordres 2 et 3, un verdict sur des enregistrements observés ; toujours avec sa preuve, et son coût s'il est connu | les agents et les skills à l'ordre 1 ; les observateurs de l'arbre aux ordres 2 et 3 |
+| `ecart` | un écart à un invariant, ou un désaccord entre nœuds, inscrit aussi au registre des écarts du projet | le skill qui le constate ; `champ.mjs` lui-même pour un désaccord |
+
+Le script pose les champs communs : numéro, date en UTC, empreinte du précédent. Ancres : `noeud`, `critere` (`<référence>:<critère>`), `ca` (critère d'acceptation de la clé), `scenario`, `fichier`, `commit`, `contrat` (élément d'un contrat partagé entre nœuds), `option`. Preuves : `test`, `commande`, `commit`, `fichier`, `enregistrements`, `rapport`, avec un extrait facultatif (`--extrait`). Un motif de correction s'écrit en minuscules et tirets ; deux corrections de même nature portent le même motif, sinon la répétition ne se voit pas.
+
+Un rouge du cycle TDD n'est pas un écart : le critère reste à prouver. Un écart est un résultat contraire à ce qu'un critère, une preuve passée ou un contrat attendaient : une régression, une gate en échec, un constat bloquant de revue, un verdict d'Agent2Test.
+
+## 2. Commandes
+
+Depuis la racine du projet :
+
+```bash
+node .gemini/skills/ticket-abcde-3620/outils/champ.mjs etat docs/demandes/ABCDE-3620
+node .gemini/skills/ticket-abcde-3620/outils/champ.mjs verifier docs/demandes/ABCDE-3620
+node .gemini/skills/ticket-abcde-3620/outils/champ.mjs deposer docs/demandes/ABCDE-3620 action --noeud ABCDE-3620-1.1 --auteur ticket-abcde-3620-1-1-persistance --nature realisation --ancre scenario:ABCDE-3620-S01 --resume "<ce qui est fait>"
+node .gemini/skills/ticket-abcde-3620/outils/champ.mjs deposer docs/demandes/ABCDE-3620 retour --noeud ABCDE-3620-1.1 --auteur ticket-abcde-3620-1-1 --nature correction --vise <n de l'action> --motif <motif> --par "<nom>" --contenu "<la correction demandée>"
+node .gemini/skills/ticket-abcde-3620/outils/champ.mjs deposer docs/demandes/ABCDE-3620 observation --noeud ABCDE-3620-1.1 --auteur ticket-abcde-3620-1-1-persistance --ordre 1 --verdict ecart --ancre critere:ABCDE-3620-1.1:C1 --ecart "<l'écart>" --preuve test:<fichier de test>
+node .gemini/skills/ticket-abcde-3620/outils/champ.mjs deposer docs/demandes/ABCDE-3620 ecart --noeud ABCDE-3620-1.1 --auteur ticket-abcde-3620-1-1 --ancre critere:ABCDE-3620-1.1:C1 --invariant "<invariant concerné>" --constat "<l'écart constaté>"
+```
+
+Un dépôt refusé n'écrit rien et dit pourquoi ; un champ altéré refuse tout dépôt, et `verifier` dit où. `deposer` annonce les observations que son enregistrement fait attendre. Le registre des écarts est `docs/c7e/registre-ecarts.md` ; si le fichier d'invariants du projet en fixe un autre emplacement, chaque commande prend `--registre <chemin>`.
+
+## 3. Ratifications
+
+La ratification se dépose comme un retour de nature ratification, par le skill du nœud, avec le nom et la réponse du développeur : objet `arbre ABCDE-3620` sur la racine, la référence de la feuille sur une feuille ; décision `ratifié`, ou `non ratifié` avec sa raison. La dernière décision sur un objet fait foi ; `etat` la montre, et l'installateur la lit.
+
+```bash
+node .gemini/skills/ticket-abcde-3620/outils/champ.mjs deposer docs/demandes/ABCDE-3620 retour --noeud ABCDE-3620 --auteur ticket-abcde-3620 --nature ratification --objet "arbre ABCDE-3620" --decision ratifié --par "<nom>" --contenu "<sa réponse>"
+node .gemini/skills/ticket-abcde-3620/outils/champ.mjs deposer docs/demandes/ABCDE-3620 retour --noeud ABCDE-3620-1.1 --auteur ticket-abcde-3620-1-1 --nature ratification --objet "ABCDE-3620-1.1" --decision ratifié --par "<nom>" --contenu "<sa réponse>"
+```
+
+## 4. Ordres d'observation
+
+| Ordre | Qui | Observe | Produit |
+|---|---|---|---|
+| 1 | les agents de couche et les skills, d'après leurs preuves et les rapports des sous-agents de rôle | le logiciel et le résultat des actions | un verdict conforme ou écart sur une ancre ; la correction d'un écart est un commit de rétroaction qui cite l'observation (D6.INV-1) |
+| 2 | `ticket-abcde-3620-observateur-2` | les observations d'ordre 1 et les retours du développeur | une adaptation de la manière de travailler, jamais une action sur le code ; retenue par le développeur, elle devient une entrée `proposed` du registre des concepts du projet, `docs/c7e/concepts.json`, qui cite l'observation (D6.INV-1, D6.INV-2) |
+| 3 | `ticket-abcde-3620-observateur-3` | l'ordre 2 | l'examen d'une proposition, fondée ou infondée ; la mise en veille d'un motif ; le bilan de clôture : quelles propositions ont changé une décision |
+| humain | le développeur | tout | il ratifie, choisit, corrige, retient ou refuse une proposition, décide des écarts ; lui seul promeut une entrée du registre des concepts (D6.INV-2) |
+
+Les observateurs d'ordre 2 et 3 travaillent chacun dans leur propre contexte ; ils agissent sur la manière d'observer du niveau qu'ils observent, jamais sur son objet. La boucle de second ordre et le registre des concepts sont ceux de l'orchestrateur (module `methode`, § 6 et § 7.2).
+
+## 5. Déclencheurs
+
+Le script décide quand, les observateurs formulent quoi. `etat` liste les observations attendues ; `deposer` les annonce dès qu'elles naissent.
+
+| Déclencheur | Attente | Suite |
+|---|---|---|
+| deux corrections au même motif, dans tout l'arbre, qu'aucune observation d'ordre 2 ne couvre encore | ordre 2 sur ce motif | invoquer `ticket-abcde-3620-observateur-2` par l'outil `invoke_agent` ; il dépose sa proposition, ou un verdict conforme si aucune manière de travailler n'est en cause |
+| une proposition d'ordre 2 ni examinée ni décidée | ordre 3 sur cette proposition | invoquer `ticket-abcde-3620-observateur-3`, qui la juge fondée ou infondée |
+| une proposition examinée, sans décision | décision du développeur | la lui présenter avec l'examen, puis déposer son choix, retenue ou refusée ; retenue, le skill du nœud l'inscrit au registre des concepts comme entrée `proposed` qui cite l'observation, commitée à part (orchestrateur, § 6) |
+| deux propositions refusées sur un motif, sans proposition retenue depuis | mise en veille du motif | invoquer `ticket-abcde-3620-observateur-3`, qui met le motif en veille : l'ordre 2 ne s'y éveille plus |
+
+Récursion bornée : l'ordre 3 ne s'éveille que sur ces attentes et pour le bilan de clôture de la racine.
+
+## 6. Propagation et escalade
+
+Chaque critère de l'arbre prend un état : en écart, si le dernier verdict d'ordre 1 d'un nœud sur ce critère est un écart ; menacé, si un critère qui le soutient est en écart ou menacé, de proche en proche jusqu'au critère d'acceptation de la clé ; prouvé, si un verdict conforme le prouve, ou si tous les critères qui le soutiennent sont prouvés ; à prouver, sinon. Les critères d'acceptation de la clé sont ceux de la racine (`outils/rattachement.json`).
+
+Un écart se traite au niveau le plus bas qui le peut : la feuille dont le critère est en écart le corrige à l'ordre 1, par un commit de rétroaction qui cite l'observation, puis dépose un verdict conforme ; un nœud composé dont un critère est menacé le voit à son lancement et coordonne ; une répétition de corrections passe à l'ordre 2, puis à l'ordre 3 ; un écart à un invariant et un désaccord vont au développeur, par le registre des écarts (D6.INV-3). Un critère encore en écart ou menacé à la remise d'un nœud se présente au développeur avec ses preuves.
+
+## 7. Désaccords entre nœuds
+
+Deux nœuds dont les derniers verdicts d'ordre 1 sur une même ancre sont contraires, l'un conforme, l'autre écart, sont en désaccord. Le script l'inscrit d'office : un enregistrement `ecart` qui cite les deux observations, et une ligne au registre des écarts du projet, décision laissée au développeur. Une nouvelle observation qui départage les nœuds lève le désaccord dans l'état du champ ; la ligne du registre reste, avec la décision du développeur.
+
+## 8. Ce qui ne se fait pas
+
+- Écrire, réécrire ou supprimer une ligne du champ à la main.
+- Commiter le champ avant la campagne d'Agent2Test : comme les kits, il reste hors des commits de l'arbre, pour que le commit remis reste la tête de la branche.
+- Promouvoir, modifier ou retirer une entrée du registre des concepts, ou décider d'un écart : seul le développeur le fait (D6.INV-2, D6.INV-3).
+- Agir sur le code depuis l'ordre 2 ou 3 : une adaptation de la méthode n'est pas une correction du logiciel.
+<<<FIN modules/champ/SKILL.md>>>
 
 <<<FICHIER modules/methode/SKILL.md>>>
 ---
 name: methode
-description: Sections de la méthode de l'orchestrateur C7E 3.5.3 dont le skill de ticket ABCDE-3620 a besoin, recopiées mot pour mot (§ 11.5).
+description: Sections de la méthode de l'orchestrateur C7E 3.5.3 dont le skill de ticket ABCDE-3620 a besoin, recopiées mot pour mot (§ 6, § 7.2, § 11.5).
 ---
 
 # Méthode C7E pour ABCDE-3620
 
-Sections recopiées mot pour mot de l'orchestrateur C7E 3.5.3 : § 11.5. La fiche dont elles parlent est ce skill, avec son analyse et sa remise (module `invariants`, correspondances). Un renvoi à un paragraphe absent de ce module est informatif.
+Sections recopiées mot pour mot de l'orchestrateur C7E 3.5.3 : § 6, § 7.2, § 11.5. La fiche dont elles parlent est ce skill, avec son analyse et sa remise (module `invariants`, correspondances). Un renvoi à un paragraphe absent de ce module est informatif.
+
+## 6. Boucle cybernétique de second ordre
+
+1. **Capturer** : en É6 et É7, mesurer l'écart entre l'objectif (d=0) et le résultat (d=3).
+2. **Corriger, au premier ordre** : traduire l'écart en correction du logiciel, au niveau de sa cause (par exemple une latence méso corrigée par un index au niveau micro, en É1) ; commit de rétroaction qui cite son observation (§ 4).
+3. **Questionner, au second ordre** : chercher ce que la méthode n'a pas vu : concept absent, paramètre mal réglé, risque non déduit.
+4. **Proposer** : inscrire l'adaptation comme entrée `proposed` du registre des concepts (§ 7.2), avec l'observation qui la fonde (D6.INV-1).
+5. **Capitaliser** : inscrire l'observation dans la base de connaissances (§ 11.2) : conventions, dépendances, échecs récurrents, stratégies efficaces.
+6. **Configurer le ticket suivant** : pour un ticket, l'IA règle les poids et les paramètres de sa configuration (mode hybride) et les inscrit dans sa fiche ; les valeurs par défaut et la bibliothèque ne changent que par le registre (D6.INV-2).
+
+**Principe de résonance** : *« L'état des sources infinies se transmet à qui entre en résonance avec elles »* ; chaque état émergent peut devenir la source du niveau suivant, et qui le reçoit devient source à son tour. Au premier ordre, une dégradation mesurée au niveau Macro (SLA) se trace jusqu'à sa cause Micro et s'y corrige, sans casser les niveaux intermédiaires. Au second ordre, l'observation capitalisée d'un ticket devient la source des tickets suivants, et le retour de l'Environnement (É7) devient les Éléments (É1) du cycle suivant.
+
+### 7.2 Registre des concepts et second ordre borné
+
+| Statut | Signification | Droits |
+|---|---|---|
+| `validated` | promu par une revue humaine documentée | utilisable sur tout ticket |
+| `experimental` | en cours de mesure | utilisable avec mention dans la fiche, hors chemin critique (criticité « critique » du fichier d'invariants) |
+| `proposed` | soumis par l'IA ou par un humain | inutilisable avant sa promotion |
+
+Promotion `proposed → experimental → validated` par revue humaine documentée : nom du relecteur, date et motif, inscrits dans l'entrée. L'IA ajoute des entrées `proposed` ; elle ne promeut, ne modifie ni ne retire aucune entrée (D6.INV-2). **La capacité de second ordre est bornée par ce registre.**
+
+Registre de départ, `docs/c7e/concepts.json` (§ 11.2). Les quatre concepts du § 2 y sont `validated` par la ratification de cette version de la spécification, revue documentée dans le journal des modifications du dépôt Agent2Prompt :
+
+```json
+{
+  "schemaVersion": 1,
+  "concepts": [
+    {
+      "id": "C_METHODE_001",
+      "name": "Composition récursive imbriquée (CRI)",
+      "version": "1.0.0",
+      "status": "validated",
+      "invariants": ["toute contrainte descend de d=0 à d=3 sans perte", "toute observation remonte de d=3 à d=0 avec sa preuve"],
+      "inputs": { "ticket": "objectif et critères d'acceptation", "architecture": "code réel du projet" },
+      "parameters": { "max_depth": 3, "self_similarity": true },
+      "activation_rules": ["toujours actif"],
+      "operations": ["décliner l'objectif en contrats (d=1)", "décliner les contrats en composants (d=2)", "décliner les composants en atomes (d=3)"],
+      "outputs": { "fiche": "cartographie d'impact par profondeur et par slot" },
+      "evaluation": { "indicateur": "R", "mesure": "dépendances couvertes / dépendances identifiées" },
+      "feedback": { "enabled": true, "adaptation": true }
+    },
+    {
+      "id": "C_CYBERNETIQUE_001",
+      "name": "Cybernétique de second ordre",
+      "version": "1.0.0",
+      "status": "validated",
+      "invariants": ["l'observateur fait partie de la boucle", "aucune adaptation de la méthode sans entrée proposed promue par un humain"],
+      "inputs": { "observations": "écarts mesurés en É6 et É7" },
+      "parameters": { "observer_included": true, "resonance_loop": true },
+      "activation_rules": ["toujours actif"],
+      "operations": ["capturer l'écart", "corriger au premier ordre", "questionner la méthode", "proposer une entrée du registre", "capitaliser"],
+      "outputs": { "fiche": "boucle de second ordre", "registre": "entrées proposed" },
+      "evaluation": { "indicateur": "A", "mesure": "jugement du développeur sur la pertinence de la configuration" },
+      "feedback": { "enabled": true, "adaptation": true }
+    },
+    {
+      "id": "C_AGILE_001",
+      "name": "Ingénierie agile (domaine)",
+      "version": "1.0.0",
+      "status": "validated",
+      "invariants": ["chaque test proposé prouve un critère d'acceptation ou un risque"],
+      "inputs": { "ticket": "US et critères d'acceptation numérotés" },
+      "parameters": { "framework": "Scrum ou Kanban, celui de l'équipe", "granularity": "ticket ou US", "stack_adapters": ["postgres", "liquibase", "spring", "angular"] },
+      "activation_rules": ["toujours actif"],
+      "operations": ["numéroter les critères", "déduire les tests des critères et des risques"],
+      "outputs": { "fiche": "critères, tests déduits, dossier de preuves" },
+      "evaluation": { "indicateur": "Q", "mesure": "conventions respectées et cas limites couverts" },
+      "feedback": { "enabled": true, "adaptation": true }
+    },
+    {
+      "id": "C_PEDAGOGIE_001",
+      "name": "Modélisation pédagogique",
+      "version": "1.0.0",
+      "status": "validated",
+      "invariants": ["chaque décision de la fiche cite sa preuve"],
+      "inputs": { "fiche": "décisions et preuves" },
+      "parameters": { "rigor": 0.95, "format": "synoptique, puis code" },
+      "activation_rules": ["toujours actif"],
+      "operations": ["synthèse d'une page au plus avant le détail", "relier chaque décision à sa preuve"],
+      "outputs": { "fiche": "restitution structurée et auditable" },
+      "evaluation": { "indicateur": "T", "mesure": "décisions prouvées / décisions" },
+      "feedback": { "enabled": true, "adaptation": true }
+    }
+  ]
+}
+```
 
 ### 11.5 Précédence des règles
 
@@ -1121,6 +1370,7 @@ Les invariants de l'orchestrateur parlent de sa fiche de transformation. Dans un
 | `docs/demandes/<CLÉ>/` | `docs/demandes/ABCDE-3620/` |
 | la clé du ticket, qui nomme sa branche et ses commits (D4.INV-1, D4.INV-2) | la clé Jira du ticket racine, ABCDE-3620 : une seule branche pour tout l'arbre |
 | le choix du développeur qui active le skill (D2.INV-3) | le lancement de ce skill par le développeur, dans sa propre session : la commande `/ticket:abcde-3620`, ou `installer-arbre.mjs lancer ABCDE-3620` |
+| le registre des écarts et le registre des concepts (D6.INV-1 à D6.INV-3) | `docs/c7e/registre-ecarts.md` et `docs/c7e/concepts.json` du projet, alimentés depuis le champ d'observation de l'arbre (module `champ` du skill racine) ; l'IA y ajoute, le développeur décide et promeut |
 | la qualification et la confirmation de la composition (D10.INV-1, D11) | faites avant la génération de ce skill ; si l'analyse montre que la demande sort des empreintes, ce skill remonte au parent, sans changer de composition (D11.INV-4) |
 | un paragraphe de l'orchestrateur (§ n) | le texte recopié dans le module `methode` s'il y figure ; sinon un renvoi informatif |
 
@@ -5144,6 +5394,736 @@ const estPrincipal = process.argv[1] && fileURLToPath(import.meta.url).toLowerCa
 if (estPrincipal) process.exitCode = principal(process.argv.slice(2));
 <<<FIN outils/verifier-kits.mjs>>>
 
+<<<FICHIER outils/champ.mjs>>>
+#!/usr/bin/env node
+// Champ d'observation d'un arbre de skills de ticket (prototype « skill de ticket », lot 5, critère P5).
+// Le skill racine en livre une copie, outils/champ.mjs, à côté de rattachement.json.
+//
+// Le champ, docs/demandes/<CLÉ>/champ.jsonl, reçoit en ajout seul ce que fait chaque niveau de l'arbre :
+// les actions des agents, les retours du développeur (choix, corrections, ratifications), les
+// observations des ordres 1, 2 et 3, et les écarts inscrits au registre des écarts du projet. Un
+// enregistrement par ligne, au schéma fermé skill-ticket.observation/1 ; chaque ligne porte l'empreinte
+// de la précédente, et champ.tete le numéro et l'empreinte de la dernière : une ligne réécrite, insérée
+// ou supprimée se voit. Personne n'écrit le champ à la main : ce script dépose, vérifie et lit.
+//
+// Usage :
+//   node champ.mjs deposer <dossier> <type> --noeud <référence> --auteur <nom> [--<champ> <valeur>]... [--date <AAAA-MM-JJTHH:MM:SSZ>]
+//   node champ.mjs verifier <dossier>
+//   node champ.mjs etat <dossier> [--json]
+//   <dossier> : docs/demandes/<CLÉ> ; options communes : --rattachement <rattachement.json>, par défaut à
+//   côté de ce script ; --registre <registre-ecarts.md>, par défaut docs/c7e/registre-ecarts.md du projet.
+//
+// Règles déterministes : deux corrections du développeur au même motif attendent une observation d'ordre
+// 2 ; une proposition d'ordre 2 attend l'examen de l'ordre 3, puis la décision du développeur ; deux
+// propositions refusées sur un motif attendent sa mise en veille par l'ordre 3 ; un écart sur un critère
+// menace, de proche en proche, les critères qu'il soutient (visiteur des critères de l'arbre, construits
+// depuis le rattachement) ; deux nœuds aux verdicts contraires sur une
+// même ancre font un désaccord, inscrit d'office comme écart au registre des écarts (D6.INV-3 de
+// l'orchestrateur). Codes de sortie : 0, 1 au moindre refus ou écart, 2 pour un usage incorrect.
+// Node 20 ou plus récent, modules natifs uniquement.
+
+import { createHash } from 'node:crypto';
+import { appendFileSync, closeSync, existsSync, mkdirSync, openSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { basename, dirname, join, relative, resolve, sep } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+export const FORMAT = 'skill-ticket.observation/1';
+export const FICHIER = 'champ.jsonl';
+export const TETE = 'champ.tete';
+const VERROU = 'champ.verrou';
+
+const TYPES = ['action', 'retour', 'observation', 'ecart'];
+const COMMUNS = ['n', 'date', 'type', 'noeud', 'auteur', 'precedent'];
+const CHAMPS = {
+  action: { requis: ['nature', 'ancre', 'resume'], facultatifs: ['options'] },
+  retour: { requis: ['nature', 'par', 'contenu'], facultatifs: ['vise', 'motif', 'objet', 'decision'] },
+  observation: { requis: ['ordre', 'verdict', 'preuve'], facultatifs: ['ancre', 'observe', 'ecart', 'proposition', 'motif', 'commentaire', 'cout'] },
+  ecart: { requis: ['ancre', 'invariant', 'constat'], facultatifs: ['observe'] },
+};
+const ANCRES = ['noeud', 'critere', 'ca', 'scenario', 'fichier', 'commit', 'contrat', 'option'];
+const PREUVES = ['test', 'commande', 'commit', 'fichier', 'enregistrements', 'rapport'];
+const VERDICTS = { 1: ['conforme', 'ecart'], 2: ['proposition', 'conforme'], 3: ['fondee', 'infondee', 'veille', 'bilan'] };
+const MOTIF = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const DATE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/;
+const INVARIANT_DESACCORD = 'désaccord entre nœuds (D6.INV-3)';
+
+export const sha256 = (texte) => createHash('sha256').update(texte, 'utf8').digest('hex');
+const estObjet = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
+const texte = (v) => typeof v === 'string' && v.trim() !== '';
+const choisir = (o, cles) => Object.fromEntries(cles.filter((k) => o[k] !== undefined).map((k) => [k, o[k]]));
+const lire = (chemin) => readFileSync(chemin, 'utf8').replace(/^﻿/, '').replace(/\r\n/g, '\n');
+const slug = (reference) => reference.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+const cheminSur = (rel) => texte(rel) && !/[\\\0]/.test(rel) && !rel.startsWith('/') && !/^[A-Za-z]:/.test(rel) && rel.split('/').every((s) => s !== '' && s !== '.' && s !== '..');
+
+/** Forme canonique d'un enregistrement : les champs dans l'ordre du schéma, ceux des objets imbriqués aussi. */
+export function canonique(e) {
+  const schema = CHAMPS[e?.type];
+  const cles = schema ? [...COMMUNS, ...schema.requis, ...schema.facultatifs] : COMMUNS;
+  const o = {};
+  for (const k of cles) {
+    if (e[k] === undefined) continue;
+    if (k === 'ancre' && estObjet(e[k])) o[k] = choisir(e[k], ['type', 'ref']);
+    else if (k === 'preuve' && estObjet(e[k])) o[k] = choisir(e[k], ['nature', 'ref', 'extrait']);
+    else if (k === 'cout' && estObjet(e[k])) o[k] = choisir(e[k], ['tokens', 'secondes']);
+    else o[k] = e[k];
+  }
+  return o;
+}
+
+// ---- Contexte de l'arbre : ses nœuds, ses critères, ses critères d'acceptation ----
+
+/** Rattachement de l'arbre, produit par la fabrique dans le skill racine. */
+export function chargerRattachement(chemin = join(dirname(fileURLToPath(import.meta.url)), 'rattachement.json')) {
+  if (!existsSync(chemin)) throw new Error(`rattachement introuvable : ${chemin}`);
+  return JSON.parse(lire(chemin));
+}
+
+/**
+ * Critère de l'arbre, dans le champ (patron Visiteur) : il accepte un visiteur, qui le visite après les
+ * critères qui le soutiennent (`enfants`). Les critères se construisent depuis le rattachement du skill
+ * racine, sans le modèle de l'arbre : le script tourne dans le skill racine installé.
+ */
+export class CritereChamp {
+  constructor({ ref, noeud, ca, soutient = [] }) {
+    Object.assign(this, { ref, noeud, ca, soutient, enfants: [] });
+  }
+
+  accepter(visiteur) {
+    return visiteur.visiterCritere(this);
+  }
+}
+
+/** Contexte des contrôles : nœuds, critères (référence → critère et ses soutiens), critères d'acceptation, observateurs. */
+export function contexteDe(r) {
+  const noeuds = new Map([[r.cle, { reference: r.cle, nature: 'racine', criteres: [] }]]);
+  for (const n of r.noeuds) noeuds.set(n.reference, n);
+  const criteres = new Map(r.criteres.map((c) => [c.critere, new CritereChamp({ ref: c.critere, noeud: r.cle, ca: [c.ca] })]));
+  for (const n of r.noeuds) {
+    for (const c of n.criteres) {
+      const ref = `${n.reference}:${c.id}`;
+      if (!criteres.has(ref)) criteres.set(ref, new CritereChamp({ ref, noeud: n.reference, ca: c.ca ?? [], soutient: c.soutient ?? [] }));
+    }
+  }
+  for (const c of criteres.values()) for (const s of c.soutient) criteres.get(s)?.enfants.push(c.ref);
+  const racine = `ticket-${slug(r.cle)}`;
+  return {
+    cle: r.cle,
+    noeuds,
+    criteres,
+    cas: new Map(r.criteres.map((c) => [c.ca, c.critere])),
+    sousTickets: r.noeuds.some((n) => n.reference !== r.cle),
+    observateurs: { 2: `${racine}-observateur-2`, 3: `${racine}-observateur-3` },
+  };
+}
+
+const estFeuille = (ctx, reference) => ['feuille', 'racine et feuille'].includes(ctx.noeuds.get(reference)?.nature);
+
+/** Clé d'une ancre ; un critère d'acceptation de la clé se confond avec le critère de la racine qui le porte. */
+function cleAncre(ancre, ctx) {
+  if (ancre?.type === 'ca' && ctx.cas.has(ancre.ref)) return `critere:${ctx.cas.get(ancre.ref)}`;
+  return `${ancre?.type}:${ancre?.ref}`;
+}
+const decrireAncre = (a) => ({ critere: `critère ${a.ref}`, ca: `critère d'acceptation ${a.ref}`, contrat: `contrat « ${a.ref} »`, noeud: `nœud ${a.ref}` }[a.type] ?? `${a.type} ${a.ref}`);
+
+// ---- Contrôle d'un enregistrement, contre ceux qui le précèdent ----
+
+function controlerAncre(a, ctx, nom) {
+  if (!estObjet(a)) return [`${nom} : ancre attendue, objet { type, ref }`];
+  const err = [];
+  for (const k of Object.keys(a)) if (!['type', 'ref'].includes(k)) err.push(`${nom} : ancre, champ inconnu ${k}`);
+  if (!ANCRES.includes(a.type)) return [...err, `${nom} : ancre de type ${a.type} inconnu (${ANCRES.join(', ')})`];
+  if (!texte(a.ref)) return [...err, `${nom} : ancre sans référence`];
+  const valide = {
+    noeud: () => ctx.noeuds.has(a.ref),
+    critere: () => ctx.criteres.has(a.ref),
+    ca: () => ctx.cas.has(a.ref),
+    scenario: () => new RegExp(`^${ctx.cle}-S\\d{2,}$`).test(a.ref),
+    fichier: () => cheminSur(a.ref),
+    commit: () => /^[0-9a-f]{7,40}$/.test(a.ref),
+    contrat: () => true,
+    option: () => /^[a-z_]+\.[a-z_]+$/.test(a.ref),
+  }[a.type]();
+  if (!valide) err.push(`${nom} : ancre ${a.type} « ${a.ref} » inconnue de l'arbre ${ctx.cle} ou mal formée`);
+  return err;
+}
+
+const retours = (avant, nature) => avant.filter((x) => x.type === 'retour' && x.nature === nature);
+const propositions = (avant) => avant.filter((x) => x.type === 'observation' && x.ordre === 2 && x.verdict === 'proposition');
+const decisionSur = (avant, n) => avant.find((x) => x.type === 'retour' && x.nature === 'choix' && x.vise === n);
+
+/** Écarts d'un enregistrement au schéma et aux règles du champ, compte tenu des enregistrements précédents. */
+export function controler(e, avant, ctx) {
+  const nom = `n° ${e?.n ?? avant.length + 1}`;
+  if (!estObjet(e)) return [`${nom} : objet attendu`];
+  if (!TYPES.includes(e.type)) return [`${nom} : type ${e.type} inconnu (${TYPES.join(', ')})`];
+  const { requis, facultatifs } = CHAMPS[e.type];
+  const err = [];
+  for (const k of Object.keys(e)) if (![...COMMUNS, ...requis, ...facultatifs].includes(k)) err.push(`${nom} : champ inconnu ${k}`);
+  for (const k of [...COMMUNS, ...requis]) if (!(k in e)) err.push(`${nom} : champ absent ${k}`);
+  if (err.length > 0) return err;
+
+  if (e.n !== avant.length + 1) err.push(`${nom} : numéro ${e.n}, attendu ${avant.length + 1}`);
+  if (!DATE.test(e.date ?? '')) err.push(`${nom} : date ${e.date}, attendu AAAA-MM-JJTHH:MM:SSZ en UTC`);
+  else if (avant.length > 0 && e.date < avant.at(-1).date) err.push(`${nom} : date ${e.date} antérieure à celle du n° ${avant.length}, ${avant.at(-1).date}`);
+  if (!ctx.noeuds.has(e.noeud)) err.push(`${nom} : nœud ${e.noeud} hors de l'arbre ${ctx.cle}`);
+  if (!texte(e.auteur)) err.push(`${nom} : auteur vide`);
+  const cible = (n) => (Number.isInteger(n) && n >= 1 && n < e.n ? avant[n - 1] : undefined);
+  const references = (liste) => {
+    if (!Array.isArray(liste) || liste.length === 0 || liste.some((n) => !cible(n)) || new Set(liste).size !== liste.length) {
+      err.push(`${nom} : observe doit lister des enregistrements antérieurs, distincts`);
+      return [];
+    }
+    return liste.map(cible);
+  };
+  const absents = (...cles) => {
+    for (const k of cles) if (e[k] !== undefined) err.push(`${nom} : champ ${k} sans objet pour ${e.type}${e.nature ? ` ${e.nature}` : ''}${e.ordre ? ` d'ordre ${e.ordre}` : ''}`);
+  };
+
+  if (e.type === 'action') {
+    if (!['proposition', 'realisation'].includes(e.nature)) err.push(`${nom} : nature ${e.nature} inconnue (proposition, realisation)`);
+    err.push(...controlerAncre(e.ancre, ctx, nom));
+    if (!texte(e.resume)) err.push(`${nom} : résumé vide`);
+    if (e.nature === 'proposition' && (!Array.isArray(e.options) || e.options.length === 0 || !e.options.every(texte))) err.push(`${nom} : une proposition liste ses options`);
+    if (e.nature === 'realisation') absents('options');
+  }
+
+  if (e.type === 'retour') {
+    if (!texte(e.par)) err.push(`${nom} : retour sans le nom du développeur (par)`);
+    if (!texte(e.contenu)) err.push(`${nom} : contenu vide`);
+    if (e.nature === 'correction') {
+      const visee = cible(e.vise);
+      if (!visee || visee.type !== 'action') err.push(`${nom} : une correction vise une action antérieure (vise ${e.vise})`);
+      if (!MOTIF.test(e.motif ?? '')) err.push(`${nom} : une correction porte un motif en minuscules et tirets (motif ${e.motif})`);
+      absents('objet', 'decision');
+    } else if (e.nature === 'choix') {
+      const visee = cible(e.vise);
+      absents('motif', 'objet');
+      if (visee?.type === 'action' && visee.nature === 'proposition') {
+        absents('decision');
+        if (!visee.options.includes(e.contenu)) err.push(`${nom} : choix hors des options de la proposition n° ${e.vise}`);
+        if (decisionSur(avant, e.vise)) err.push(`${nom} : la proposition n° ${e.vise} a déjà son choix`);
+      } else if (visee?.type === 'observation' && visee.ordre === 2 && visee.verdict === 'proposition') {
+        if (!['retenue', 'refusée'].includes(e.decision)) err.push(`${nom} : décision sur une proposition d'ordre 2, retenue ou refusée (decision ${e.decision})`);
+        if (decisionSur(avant, e.vise)) err.push(`${nom} : la proposition n° ${e.vise} est déjà décidée`);
+      } else err.push(`${nom} : un choix vise une proposition, action ou observation d'ordre 2 (vise ${e.vise})`);
+    } else if (e.nature === 'ratification') {
+      absents('vise', 'motif');
+      const arbre = `arbre ${ctx.cle}`;
+      const permis = e.noeud === ctx.cle && ctx.sousTickets ? [arbre] : estFeuille(ctx, e.noeud) ? [e.noeud] : [];
+      if (!permis.includes(e.objet)) err.push(`${nom} : ratification de « ${e.objet} » par ${e.noeud} ; attendu ${permis.map((p) => `« ${p} »`).join(' ou ') || 'aucune : ce nœud ne se ratifie pas'}`);
+      if (!['ratifié', 'non ratifié'].includes(e.decision)) err.push(`${nom} : décision ${e.decision}, attendu ratifié ou non ratifié`);
+    } else err.push(`${nom} : nature ${e.nature} inconnue (choix, correction, ratification)`);
+  }
+
+  if (e.type === 'observation') {
+    if (![1, 2, 3].includes(e.ordre)) err.push(`${nom} : ordre ${e.ordre}, attendu 1, 2 ou 3`);
+    else if (!VERDICTS[e.ordre].includes(e.verdict)) err.push(`${nom} : verdict ${e.verdict} inconnu à l'ordre ${e.ordre} (${VERDICTS[e.ordre].join(', ')})`);
+    if (!estObjet(e.preuve) || !PREUVES.includes(e.preuve.nature) || !texte(e.preuve.ref) || Object.keys(e.preuve).some((k) => !['nature', 'ref', 'extrait'].includes(k))) {
+      err.push(`${nom} : preuve attendue, { nature (${PREUVES.join(', ')}), ref, extrait facultatif }`);
+    }
+    if (e.cout !== undefined && (!estObjet(e.cout) || Object.keys(e.cout).length === 0 || Object.entries(e.cout).some(([k, v]) => !['tokens', 'secondes'].includes(k) || typeof v !== 'number' || v < 0))) {
+      err.push(`${nom} : coût attendu, { tokens, secondes }, nombres positifs`);
+    }
+    if (e.ordre === 1) {
+      err.push(...controlerAncre(e.ancre, ctx, nom));
+      absents('observe', 'proposition', 'motif');
+      if (e.verdict === 'ecart' && !texte(e.ecart)) err.push(`${nom} : un verdict ecart décrit l'écart`);
+      if (e.verdict === 'conforme') absents('ecart');
+    } else if (e.ordre === 2 || e.ordre === 3) {
+      absents('ancre');
+      if (e.auteur !== ctx.observateurs[e.ordre]) err.push(`${nom} : une observation d'ordre ${e.ordre} vient de ${ctx.observateurs[e.ordre]}, pas de ${e.auteur}`);
+      const observes = references(e.observe);
+      if (e.ordre === 2) {
+        absents('ecart');
+        if (!MOTIF.test(e.motif ?? '')) err.push(`${nom} : une observation d'ordre 2 porte le motif qu'elle examine`);
+        if (e.verdict === 'proposition') {
+          if (!texte(e.proposition)) err.push(`${nom} : une proposition d'ordre 2 énonce l'adaptation proposée`);
+          const corrections = observes.filter((x) => x.type === 'retour' && x.nature === 'correction' && x.motif === e.motif);
+          if (corrections.length < 2) err.push(`${nom} : une proposition d'ordre 2 cite au moins deux corrections au motif ${e.motif}`);
+        } else absents('proposition');
+      } else {
+        absents('ecart', 'proposition');
+        const examinees = observes.filter((x) => x.type === 'observation' && x.ordre === 2 && x.verdict === 'proposition');
+        if (e.verdict === 'fondee' || e.verdict === 'infondee') {
+          if (examinees.length !== 1) err.push(`${nom} : un examen d'ordre 3 vise une seule proposition d'ordre 2`);
+          else if (avant.some((x) => x.type === 'observation' && x.ordre === 3 && ['fondee', 'infondee'].includes(x.verdict) && x.observe.includes(examinees[0].n))) err.push(`${nom} : la proposition n° ${examinees[0].n} est déjà examinée`);
+        } else if (e.verdict === 'veille') {
+          if (!MOTIF.test(e.motif ?? '')) err.push(`${nom} : une mise en veille porte son motif`);
+          const refusees = examinees.filter((p) => p.motif === e.motif && decisionSur(avant, p.n)?.decision === 'refusée');
+          if (refusees.length < 2) err.push(`${nom} : une mise en veille cite au moins deux propositions refusées au motif ${e.motif}`);
+        } else if (e.verdict === 'bilan') {
+          if (!texte(e.commentaire)) err.push(`${nom} : un bilan d'ordre 3 se rédige dans commentaire`);
+          const toutes = avant.filter((x) => x.type === 'observation' && x.ordre === 2).map((x) => x.n);
+          if (toutes.some((n) => !e.observe?.includes(n))) err.push(`${nom} : un bilan d'ordre 3 cite toutes les observations d'ordre 2`);
+        }
+      }
+    }
+  }
+
+  if (e.type === 'ecart') {
+    err.push(...controlerAncre(e.ancre, ctx, nom));
+    if (!texte(e.invariant)) err.push(`${nom} : invariant concerné vide`);
+    if (!texte(e.constat)) err.push(`${nom} : constat vide`);
+    if (e.observe !== undefined) references(e.observe);
+  }
+  return err;
+}
+
+// ---- Lecture et vérification du champ ----
+
+/** Lignes et enregistrements du champ ; un champ absent est vide. */
+export function lireChamp(dossier) {
+  const chemin = join(dossier, FICHIER);
+  const lignes = existsSync(chemin) ? lire(chemin).split('\n').filter((l) => l !== '') : [];
+  // Une ligne qui n'est pas un objet JSON se lit comme un enregistrement illisible : verifier la signale,
+  // l'état ne la compte pour rien.
+  const enregistrements = lignes.map((l, i) => {
+    try {
+      const e = JSON.parse(l);
+      return estObjet(e) ? e : { n: i + 1, type: 'illisible' };
+    } catch {
+      return { n: i + 1, type: 'illisible' };
+    }
+  });
+  return { lignes, enregistrements };
+}
+
+function lireTete(dossier) {
+  const chemin = join(dossier, TETE);
+  if (!existsSync(chemin)) return null;
+  try {
+    return JSON.parse(lire(chemin));
+  } catch {
+    return { illisible: true };
+  }
+}
+
+/** Désaccords : sur une même ancre, les derniers verdicts d'ordre 1 de deux nœuds sont contraires. */
+export function desaccords(enregistrements, ctx) {
+  const parAncre = new Map();
+  for (const e of enregistrements) {
+    if (e.type !== 'observation' || e.ordre !== 1 || !e.ancre) continue;
+    const cle = cleAncre(e.ancre, ctx);
+    if (!parAncre.has(cle)) parAncre.set(cle, new Map());
+    parAncre.get(cle).set(e.noeud, e);
+  }
+  const res = [];
+  for (const [cle, parNoeud] of parAncre) {
+    const derniers = [...parNoeud.values()];
+    const conformes = derniers.filter((o) => o.verdict === 'conforme');
+    const ecarts = derniers.filter((o) => o.verdict === 'ecart');
+    if (conformes.length > 0 && ecarts.length > 0) {
+      res.push({ cle, ancre: ecarts[0].ancre, conformes, ecarts, ns: [...conformes, ...ecarts].map((o) => o.n).sort((a, b) => a - b) });
+    }
+  }
+  return res;
+}
+const inscrit = (enregistrements, d) => enregistrements.find((x) => x.type === 'ecart' && d.ns.every((n) => x.observe?.includes(n)));
+
+const registreParDefaut = (dossier) => join(resolve(dossier, '..', '..', '..'), 'docs', 'c7e', 'registre-ecarts.md');
+const relatifAuProjet = (dossier, fichier) => relative(resolve(dossier, '..', '..', '..'), resolve(dossier, fichier)).split(sep).join('/');
+
+/** Écarts du champ entier : lecture, schéma, numéros, dates, chaîne d'empreintes, tête, désaccords inscrits. */
+export function verifierChamp(dossier, ctx, { registre = registreParDefaut(dossier) } = {}) {
+  const { lignes, enregistrements } = lireChamp(dossier);
+  const erreurs = [];
+  const avant = [];
+  lignes.forEach((ligne, i) => {
+    const e = enregistrements[i];
+    if (e.type === 'illisible') erreurs.push(`ligne ${i + 1} : JSON illisible`);
+    else {
+      erreurs.push(...controler(e, avant, ctx));
+      if (JSON.stringify(canonique(e)) !== ligne) erreurs.push(`n° ${i + 1} : ligne non canonique, écrite hors de champ.mjs`);
+      const attendu = i === 0 ? null : sha256(lignes[i - 1]);
+      if (e.precedent !== attendu) erreurs.push(`n° ${i + 1} : empreinte du précédent différente ; la ligne ${i} a été réécrite, insérée ou supprimée`);
+    }
+    avant.push(e);
+  });
+  const tete = lireTete(dossier);
+  if (lignes.length > 0) {
+    if (!tete) erreurs.push(`${TETE} absent`);
+    else if (tete.illisible) erreurs.push(`${TETE} illisible`);
+    else if (tete.n !== lignes.length) erreurs.push(`${TETE} annonce le n° ${tete.n}, le champ s'arrête au n° ${lignes.length} : lignes supprimées ou ajoutées hors de champ.mjs`);
+    else if (tete.empreinte !== sha256(lignes.at(-1))) erreurs.push(`${TETE} : la dernière ligne, n° ${lignes.length}, a été réécrite`);
+  } else if (tete) erreurs.push(`${TETE} présent pour un champ vide`);
+  // Chaque désaccord apparu au fil du champ a son écart inscrit, et chaque écart sa ligne au registre.
+  for (let k = 0; k < avant.length; k++) {
+    const e = avant[k];
+    if (e.type !== 'observation' || e.ordre !== 1 || !e.ancre) continue;
+    const d = desaccords(avant.slice(0, k + 1), ctx).find((x) => x.ns.includes(e.n));
+    if (d && !inscrit(avant, d)) erreurs.push(`désaccord sur ${decrireAncre(d.ancre)} (n° ${d.ns.join(', ')}) sans écart inscrit au registre`);
+  }
+  const ecarts = avant.filter((x) => x.type === 'ecart');
+  if (ecarts.length > 0) {
+    const contenu = existsSync(registre) ? lire(registre) : null;
+    if (contenu === null) erreurs.push(`registre des écarts absent : ${registre}`);
+    else for (const x of ecarts) if (!contenu.includes(`${relatifAuProjet(dossier, FICHIER)}, n° ${x.n} |`)) erreurs.push(`écart n° ${x.n} absent du registre des écarts`);
+  }
+  return [...new Set(erreurs)];
+}
+
+// ---- État : ratifications, critères, désaccords, attentes ----
+
+/** Dernière décision de ratification pour chaque objet (« arbre <CLÉ> » ou référence d'une feuille). */
+export function ratifications(enregistrements) {
+  const res = new Map();
+  for (const e of enregistrements) if (e.type === 'retour' && e.nature === 'ratification') res.set(e.objet, e);
+  return res;
+}
+export const estRatifie = (enregistrements, objet) => ratifications(enregistrements).get(objet)?.decision === 'ratifié';
+
+/**
+ * Visiteur des états : un critère est en écart si le dernier verdict d'ordre 1 d'un nœud sur lui est un
+ * écart ; menacé si un critère qui le soutient est en écart ou menacé, de proche en proche jusqu'au critère
+ * d'acceptation ; prouvé par un verdict conforme, ou quand tous ceux qui le soutiennent sont prouvés ; à
+ * prouver sinon. Chaque critère n'est visité qu'une fois, même soutenant plusieurs critères.
+ */
+export class VisiteurEtats {
+  constructor(enregistrements, ctx) {
+    this.ctx = ctx;
+    this.memo = new Map();
+    this.derniers = new Map();
+    for (const e of enregistrements) {
+      if (e.type !== 'observation' || e.ordre !== 1 || !['critere', 'ca'].includes(e.ancre?.type)) continue;
+      const ref = e.ancre.type === 'ca' ? ctx.cas.get(e.ancre.ref) : e.ancre.ref;
+      if (!ref) continue;
+      if (!this.derniers.has(ref)) this.derniers.set(ref, new Map());
+      this.derniers.get(ref).set(e.noeud, e);
+    }
+  }
+
+  visiterCritere(c) {
+    if (this.memo.has(c.ref)) return this.memo.get(c.ref);
+    const propres = [...(this.derniers.get(c.ref)?.values() ?? [])];
+    const ecarts = propres.filter((o) => o.verdict === 'ecart');
+    const enfants = c.enfants.map((ref) => this.ctx.criteres.get(ref).accepter(this));
+    const menaces = enfants.filter((x) => x.etat === 'en écart' || x.etat === 'menacé');
+    let res;
+    if (ecarts.length > 0) res = { etat: 'en écart', observations: ecarts.map((o) => o.n), causes: [] };
+    else if (menaces.length > 0) res = { etat: 'menacé', causes: [...new Set(menaces.flatMap((x) => (x.etat === 'en écart' ? [x.ref] : x.causes)))] };
+    else if (propres.some((o) => o.verdict === 'conforme') || (enfants.length > 0 && enfants.every((x) => x.etat === 'prouvé'))) res = { etat: 'prouvé', causes: [] };
+    else res = { etat: 'à prouver', causes: [] };
+    Object.assign(res, { ref: c.ref, noeud: c.noeud, ca: c.ca });
+    this.memo.set(c.ref, res);
+    return res;
+  }
+}
+
+/** État de chaque critère de l'arbre, dans l'ordre du rattachement : en écart, menacé, prouvé ou à prouver. */
+export function etatsCriteres(enregistrements, ctx) {
+  const visiteur = new VisiteurEtats(enregistrements, ctx);
+  return [...ctx.criteres.values()].map((c) => c.accepter(visiteur));
+}
+
+/** Observations attendues : ordre 2 sur un motif, ordre 3 sur une proposition, décision du développeur, mise en veille. */
+export function attentes(enregistrements, ctx) {
+  const res = [];
+  const corrections = retours(enregistrements, 'correction');
+  const props = propositions(enregistrements);
+  const ordre2 = enregistrements.filter((x) => x.type === 'observation' && x.ordre === 2);
+  const ordre3 = enregistrements.filter((x) => x.type === 'observation' && x.ordre === 3);
+  for (const motif of [...new Set(corrections.map((c) => c.motif))]) {
+    let refusees = [];
+    for (const p of props.filter((x) => x.motif === motif)) {
+      const d = decisionSur(enregistrements, p.n)?.decision;
+      if (d === 'retenue') refusees = [];
+      else if (d === 'refusée') refusees.push(p.n);
+    }
+    if (refusees.length >= 2) {
+      if (!ordre3.some((o) => o.verdict === 'veille' && o.motif === motif)) res.push({ nature: 'veille', motif, propositions: refusees, observateur: ctx.observateurs[3] });
+      continue;
+    }
+    const couvertes = new Set(ordre2.filter((o) => o.motif === motif).flatMap((o) => o.observe));
+    const restantes = corrections.filter((c) => c.motif === motif && !couvertes.has(c.n)).map((c) => c.n);
+    if (restantes.length >= 2) res.push({ nature: 'ordre-2', motif, corrections: restantes, observateur: ctx.observateurs[2] });
+  }
+  for (const p of props) {
+    if (decisionSur(enregistrements, p.n)) continue;
+    const examen = ordre3.find((o) => ['fondee', 'infondee'].includes(o.verdict) && o.observe.includes(p.n));
+    res.push(examen
+      ? { nature: 'developpeur', proposition: p.n, examen: examen.n, verdict: examen.verdict, motif: p.motif }
+      : { nature: 'ordre-3', proposition: p.n, motif: p.motif, observateur: ctx.observateurs[3] });
+  }
+  return res;
+}
+const cleAttente = (a) => JSON.stringify([a.nature, a.motif, a.proposition ?? null, a.corrections ?? a.propositions ?? null]);
+
+/** État du champ : ratifications, critères, désaccords, attentes et veilles. */
+export function etatChamp(enregistrements, ctx) {
+  return {
+    cle: ctx.cle,
+    enregistrements: enregistrements.length,
+    ratifications: [...ratifications(enregistrements).values()].map((e) => ({ objet: e.objet, decision: e.decision, n: e.n, date: e.date, par: e.par })),
+    criteres: etatsCriteres(enregistrements, ctx),
+    desaccords: desaccords(enregistrements, ctx).map((d) => ({ ancre: d.ancre, conformes: d.conformes.map((o) => ({ noeud: o.noeud, n: o.n })), ecarts: d.ecarts.map((o) => ({ noeud: o.noeud, n: o.n, ecart: o.ecart })), inscrit: inscrit(enregistrements, d)?.n ?? null })),
+    attentes: attentes(enregistrements, ctx),
+    veilles: enregistrements.filter((x) => x.type === 'observation' && x.ordre === 3 && x.verdict === 'veille').map((x) => ({ motif: x.motif, n: x.n })),
+  };
+}
+
+const liste = (ns) => ns.join(', ');
+
+/** Texte de l'état, tel que l'affiche `etat`. */
+export function formaterEtat(etat, verification = []) {
+  const lignes = [`Champ de ${etat.cle} : ${etat.enregistrements} enregistrement${etat.enregistrements > 1 ? 's' : ''}, ${verification.length === 0 ? 'chaîne intacte' : `${verification.length} écart${verification.length > 1 ? 's' : ''} à la vérification`}.`];
+  lignes.push('Ratifications :');
+  if (etat.ratifications.length === 0) lignes.push('  aucune');
+  for (const r of etat.ratifications) lignes.push(`  ${r.objet} : ${r.decision} (n° ${r.n}, ${r.date.slice(0, 10)}, ${r.par})`);
+  lignes.push('Critères :');
+  for (const c of etat.criteres) {
+    const ca = c.ca.length > 0 ? ` (${c.ca.join(', ')})` : '';
+    const detail = c.etat === 'en écart'
+      ? `en écart, n° ${liste(c.observations)} ; à traiter par ${c.noeud}${c.noeud === etat.cle ? '' : ', à l\'ordre 1'}`
+      : c.etat === 'menacé' ? `menacé par ${c.causes.join(', ')}` : c.etat;
+    lignes.push(`  ${c.ref}${ca} : ${detail}`);
+  }
+  lignes.push('Désaccords :');
+  if (etat.desaccords.length === 0) lignes.push('  aucun');
+  for (const d of etat.desaccords) {
+    const parts = [...d.conformes.map((o) => `${o.noeud} conforme (n° ${o.n})`), ...d.ecarts.map((o) => `${o.noeud} en écart (n° ${o.n})`)];
+    lignes.push(`  ${decrireAncre(d.ancre)} : ${parts.join(', ')} ; ${d.inscrit ? `écart n° ${d.inscrit} au registre, décision au développeur` : 'à inscrire au registre'}`);
+  }
+  lignes.push('Attentes :');
+  if (etat.attentes.length === 0) lignes.push('  aucune');
+  for (const a of etat.attentes) {
+    if (a.nature === 'ordre-2') lignes.push(`  ordre 2, motif ${a.motif}, corrections n° ${liste(a.corrections)} : invoquer ${a.observateur}`);
+    if (a.nature === 'ordre-3') lignes.push(`  ordre 3, proposition n° ${a.proposition} (motif ${a.motif}) : invoquer ${a.observateur}`);
+    if (a.nature === 'developpeur') lignes.push(`  développeur, proposition n° ${a.proposition} (motif ${a.motif}), examinée au n° ${a.examen}, ${a.verdict === 'fondee' ? 'fondée' : 'infondée'} : retenue ou refusée`);
+    if (a.nature === 'veille') lignes.push(`  veille, motif ${a.motif}, propositions refusées n° ${liste(a.propositions)} : invoquer ${a.observateur}`);
+  }
+  lignes.push(`Veilles : ${etat.veilles.length === 0 ? 'aucune' : etat.veilles.map((v) => `motif ${v.motif} (n° ${v.n})`).join(', ')}`);
+  return lignes.join('\n');
+}
+
+// ---- Dépôt ----
+
+const maintenant = () => new Date().toISOString().replace(/\.\d{3}Z$/, 'Z');
+const attendre = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+
+function verrouiller(dossier) {
+  const chemin = join(dossier, VERROU);
+  for (let k = 0; k < 50; k++) {
+    try {
+      closeSync(openSync(chemin, 'wx'));
+      return () => rmSync(chemin, { force: true });
+    } catch (e) {
+      if (e.code !== 'EEXIST') throw e;
+      attendre(100);
+    }
+  }
+  throw new Error(`champ verrouillé par un autre dépôt ; si aucun dépôt n'est en cours, supprimer ${chemin}`);
+}
+
+const cellule = (t) => String(t).replace(/\|/g, '\\|').replace(/\n+/g, ' ');
+
+function inscrireAuRegistre(registre, dossier, e) {
+  mkdirSync(dirname(registre), { recursive: true });
+  if (!existsSync(registre)) {
+    writeFileSync(registre, '# Registre des écarts\n\n| Date | Ticket | Invariant concerné | Écart constaté | Décision (respecter, ou dérogation validée par) |\n|---|---|---|---|---|\n');
+  }
+  const contenu = lire(registre);
+  const ligne = `| ${e.date.slice(0, 10)} | ${cellule(e.noeud)} | ${cellule(e.invariant)} | ${cellule(`${decrireAncre(e.ancre)} : ${e.constat}`)} ; champ ${relatifAuProjet(dossier, FICHIER)}, n° ${e.n} |  |\n`;
+  writeFileSync(registre, `${contenu.replace(/\n*$/, '\n')}${ligne}`);
+}
+
+/**
+ * Dépose un enregistrement dans le champ : contrôle du champ existant, puis de l'enregistrement, ajout en
+ * fin de fichier avec la chaîne et la tête, et, si l'observation fait naître un désaccord, l'écart inscrit
+ * d'office au registre. Renvoie { erreurs, deposes, attentes } ; rien n'est écrit au moindre écart.
+ */
+export function deposer(dossier, partiel, { contexte, rattachement, registre = registreParDefaut(dossier), date } = {}) {
+  const ctx = contexte ?? contexteDe(chargerRattachement(rattachement));
+  if (basename(resolve(dossier)) !== ctx.cle) return { erreurs: [`le dossier doit être celui de la clé ${ctx.cle} : ${dossier}`], deposes: [], attentes: [] };
+  mkdirSync(dossier, { recursive: true });
+  const liberer = verrouiller(dossier);
+  try {
+    const existant = verifierChamp(dossier, ctx, { registre });
+    if (existant.length > 0) return { erreurs: ['champ altéré, dépôt refusé', ...existant], deposes: [], attentes: [] };
+    const { lignes, enregistrements } = lireChamp(dossier);
+    // Contrôle sur l'enregistrement tel que reçu : un champ hors schéma est refusé, pas écarté en silence.
+    const brut = Object.fromEntries(Object.entries({ ...partiel, n: lignes.length + 1, date: date ?? maintenant(), precedent: lignes.length > 0 ? sha256(lignes.at(-1)) : null }).filter(([, v]) => v !== undefined));
+    const erreurs = controler(brut, enregistrements, ctx);
+    if (erreurs.length > 0) return { erreurs, deposes: [], attentes: [] };
+    const e = canonique(brut);
+    const nouveaux = [e];
+    if (e.type === 'observation' && e.ordre === 1) {
+      const tous = [...enregistrements, e];
+      const d = desaccords(tous, ctx).find((x) => x.ns.includes(e.n));
+      if (d && !inscrit(tous, d)) {
+        const constat = [
+          ...d.conformes.map((o) => `${o.noeud} conforme (n° ${o.n})`),
+          ...d.ecarts.map((o) => `${o.noeud} en écart (n° ${o.n}), ${o.ecart}`),
+        ].join(' ; ');
+        nouveaux.push(canonique({
+          n: e.n + 1, date: e.date, type: 'ecart', noeud: ctx.cle, auteur: 'champ.mjs', precedent: sha256(JSON.stringify(e)),
+          ancre: e.ancre, invariant: INVARIANT_DESACCORD, constat, observe: d.ns,
+        }));
+      }
+    }
+    for (const x of nouveaux) if (x.type === 'ecart') inscrireAuRegistre(registre, dossier, x);
+    for (const x of nouveaux) appendFileSync(join(dossier, FICHIER), `${JSON.stringify(x)}\n`);
+    const dernier = JSON.stringify(nouveaux.at(-1));
+    writeFileSync(join(dossier, TETE), `${JSON.stringify({ format: FORMAT, n: nouveaux.at(-1).n, empreinte: sha256(dernier) })}\n`);
+    const avant = new Set(attentes(enregistrements, ctx).map(cleAttente));
+    const apres = attentes([...enregistrements, ...nouveaux], ctx);
+    return { erreurs: [], deposes: nouveaux, attentes: apres.filter((a) => !avant.has(cleAttente(a))) };
+  } finally {
+    liberer();
+  }
+}
+
+// ---- Ligne de commande ----
+
+const DRAPEAUX = {
+  noeud: 's', auteur: 's', nature: 's', ancre: 'ancre', resume: 's', option: 'liste', par: 's', contenu: 's', vise: 'n', motif: 's',
+  objet: 's', decision: 's', ordre: 'n', verdict: 's', preuve: 'preuve', extrait: 's', observe: 'ns', ecart: 's', proposition: 's',
+  commentaire: 's', tokens: 'n', secondes: 'n', invariant: 's', constat: 's',
+};
+
+const separer = (valeur, quoi) => {
+  const i = valeur.indexOf(':');
+  if (i <= 0) throw new Error(`${quoi} attendu sous la forme <type>:<référence>, reçu « ${valeur} »`);
+  return [valeur.slice(0, i), valeur.slice(i + 1)];
+};
+
+/** Enregistrement d'après les options de la ligne de commande. */
+export function enregistrementDe(type, options) {
+  const e = { type };
+  for (const [cle, valeur] of Object.entries(options)) {
+    const sorte = DRAPEAUX[cle];
+    if (!sorte) throw new Error(`option inconnue : --${cle}`);
+    if (sorte === 's') e[cle] = valeur.at(-1);
+    else if (sorte === 'n') e[cle] = Number(valeur.at(-1));
+    else if (sorte === 'ns') e[cle] = valeur.at(-1).split(/[\s,]+/).filter(Boolean).map(Number);
+    else if (sorte === 'liste') e.options = valeur;
+    else if (sorte === 'ancre') {
+      const [t, ref] = separer(valeur.at(-1), 'ancre');
+      e.ancre = { type: t, ref };
+    } else if (sorte === 'preuve') {
+      const [nature, ref] = separer(valeur.at(-1), 'preuve');
+      e.preuve = { nature, ref };
+    }
+  }
+  if (e.preuve && e.extrait !== undefined) e.preuve.extrait = e.extrait;
+  delete e.extrait;
+  if (e.tokens !== undefined || e.secondes !== undefined) e.cout = choisir({ tokens: e.tokens, secondes: e.secondes }, ['tokens', 'secondes']);
+  delete e.tokens;
+  delete e.secondes;
+  return e;
+}
+
+function analyser(argv) {
+  const positionnels = [];
+  const options = {};
+  for (let i = 0; i < argv.length; i++) {
+    if (argv[i].startsWith('--')) {
+      const cle = argv[i].slice(2);
+      if (cle === 'json') {
+        options.json = ['oui'];
+        continue;
+      }
+      if (i + 1 >= argv.length) throw new Error(`--${cle} sans valeur`);
+      (options[cle] ??= []).push(argv[++i]);
+    } else positionnels.push(argv[i]);
+  }
+  return { positionnels, options };
+}
+
+const USAGE = [
+  'Usage : node champ.mjs deposer <dossier> <type> --noeud <référence> --auteur <nom> [--<champ> <valeur>]... [--date <AAAA-MM-JJTHH:MM:SSZ>]',
+  '        node champ.mjs verifier <dossier>',
+  '        node champ.mjs etat <dossier> [--json]',
+  'Options communes : --rattachement <rattachement.json>, --registre <registre-ecarts.md>',
+].join('\n');
+
+/** Ligne de commande. Renvoie le code de sortie. */
+export function principal(argv, sortie = console.log, erreur = console.error) {
+  let analyse;
+  try {
+    analyse = analyser(argv);
+  } catch (e) {
+    erreur(`${e.message}\n${USAGE}`);
+    return 2;
+  }
+  const { positionnels, options } = analyse;
+  const [commande, dossier, type] = positionnels;
+  const commun = (cle) => {
+    const v = options[cle]?.at(-1);
+    delete options[cle];
+    return v;
+  };
+  const cheminRattachement = commun('rattachement');
+  const registre = commun('registre');
+  const date = commun('date');
+  const json = Boolean(commun('json'));
+  if (!['deposer', 'verifier', 'etat'].includes(commande) || !dossier || (commande === 'deposer') !== Boolean(type) || positionnels.length > (commande === 'deposer' ? 3 : 2)) {
+    erreur(USAGE);
+    return 2;
+  }
+  let ctx;
+  try {
+    ctx = contexteDe(chargerRattachement(cheminRattachement ? resolve(cheminRattachement) : undefined));
+  } catch (e) {
+    erreur(e.message);
+    return 2;
+  }
+  const optionsRegistre = registre ? { registre: resolve(registre) } : {};
+  if (commande === 'verifier' || commande === 'etat') {
+    if (Object.keys(options).length > 0 || date || (json && commande === 'verifier')) {
+      erreur(USAGE);
+      return 2;
+    }
+    const verification = verifierChamp(dossier, ctx, optionsRegistre);
+    if (commande === 'verifier') {
+      if (verification.length > 0) {
+        for (const e of verification) erreur(`ÉCART  ${e}`);
+        erreur(`${verification.length} écart${verification.length > 1 ? 's' : ''}`);
+        return 1;
+      }
+      sortie(`Champ de ${ctx.cle} : ${lireChamp(dossier).lignes.length} enregistrements, schéma ${FORMAT} respecté, chaîne et tête intactes, désaccords inscrits au registre`);
+      return 0;
+    }
+    const etat = etatChamp(lireChamp(dossier).enregistrements, ctx);
+    sortie(json ? JSON.stringify({ ...etat, verification }, null, 2) : formaterEtat(etat, verification));
+    for (const e of verification) erreur(`ÉCART  ${e}`);
+    return verification.length > 0 ? 1 : 0;
+  }
+  let partiel;
+  try {
+    partiel = enregistrementDe(type, options);
+  } catch (e) {
+    erreur(`${e.message}\n${USAGE}`);
+    return 2;
+  }
+  let resultat;
+  try {
+    resultat = deposer(dossier, partiel, { contexte: ctx, ...optionsRegistre, ...(date ? { date } : {}) });
+  } catch (e) {
+    erreur(`REFUS  ${e.message}`);
+    return 1;
+  }
+  if (resultat.erreurs.length > 0) {
+    for (const e of resultat.erreurs) erreur(`REFUS  ${e}`);
+    return 1;
+  }
+  for (const x of resultat.deposes) {
+    sortie(x.type === 'ecart'
+      ? `n° ${x.n} déposé : écart, ${x.invariant}, inscrit au registre des écarts`
+      : `n° ${x.n} déposé : ${x.type}${x.nature ? ` ${x.nature}` : ''}${x.ordre ? ` d'ordre ${x.ordre}, ${x.verdict}` : ''}`);
+  }
+  for (const a of resultat.attentes) {
+    if (a.nature === 'ordre-2') sortie(`attente : ordre 2, motif ${a.motif}, corrections n° ${liste(a.corrections)} ; invoquer ${a.observateur}`);
+    if (a.nature === 'ordre-3') sortie(`attente : ordre 3, proposition n° ${a.proposition} ; invoquer ${a.observateur}`);
+    if (a.nature === 'developpeur') sortie(`attente : décision du développeur sur la proposition n° ${a.proposition}, retenue ou refusée`);
+    if (a.nature === 'veille') sortie(`attente : mise en veille du motif ${a.motif} ; invoquer ${a.observateur}`);
+  }
+  return 0;
+}
+
+const estPrincipal = process.argv[1] && fileURLToPath(import.meta.url).toLowerCase() === resolve(process.argv[1]).toLowerCase();
+if (estPrincipal) process.exitCode = principal(process.argv.slice(2));
+<<<FIN outils/champ.mjs>>>
+
 <<<FICHIER agents/ticket-abcde-3620-redacteur.md>>>
 ---
 name: ticket-abcde-3620-redacteur
@@ -5300,23 +6280,107 @@ Précision du développeur, s'il y en a une : {{args}}
 """
 <<<FIN commandes/ticket/abcde-3620.toml>>>
 
+<<<FICHIER agents/ticket-abcde-3620-observateur-2.md>>>
+---
+name: ticket-abcde-3620-observateur-2
+description: Observateur d'ordre 2 de l'arbre ABCDE-3620, qui observe les observations d'ordre 1 et les corrections du développeur sur un motif répété, et propose une adaptation de la manière de travailler, jamais une action sur le code.
+kind: local
+tools:
+  - read_file
+  - list_directory
+  - glob
+  - grep_search
+  - run_shell_command
+---
+
+# Observateur d'ordre 2 de l'arbre ABCDE-3620
+
+Tu observes la manière dont l'arbre ABCDE-3620 travaille, pas le logiciel : les actions des agents, les corrections que le développeur leur apporte et les observations d'ordre 1, déposées dans le champ `docs/demandes/ABCDE-3620/champ.jsonl`. Le skill d'un nœud t'invoque quand le champ attend une observation d'ordre 2 sur un motif : au moins deux corrections du développeur à ce motif. Ton contexte est le tien ; tu rends ton rapport au skill qui t'invoque.
+
+## Références
+
+- `.gemini/skills/ticket-abcde-3620/modules/champ/SKILL.md` : enregistrements, ordres, déclencheurs ;
+- `.gemini/skills/ticket-abcde-3620/modules/methode/SKILL.md`, § 6 et § 7.2 : boucle de second ordre et registre des concepts de l'orchestrateur.
+
+## Méthode
+
+1. `node .gemini/skills/ticket-abcde-3620/outils/champ.mjs etat docs/demandes/ABCDE-3620` : l'attente d'ordre 2, son motif et ses corrections.
+2. Relis chaque correction, l'action qu'elle vise et les observations d'ordre 1 du même nœud. Cherche ce que la manière de travailler n'a pas vu : concept absent, paramètre mal réglé, risque non déduit, convention du projet ignorée (orchestrateur, § 6, étape 3).
+3. Formule une adaptation de la manière de travailler : ce que les agents vérifieront ou proposeront autrement, et à quel moment. Si les corrections ne montrent aucune cause commune de méthode, ton verdict est conforme.
+4. Dépose ton observation : `node .gemini/skills/ticket-abcde-3620/outils/champ.mjs deposer docs/demandes/ABCDE-3620 observation --noeud <nœud de l'attente> --auteur ticket-abcde-3620-observateur-2 --ordre 2 --verdict proposition --motif <motif> --observe <n des corrections et des actions> --preuve enregistrements:<mêmes n> --proposition "<adaptation>"`, ou `--verdict conforme` sans proposition.
+
+## Règles
+
+- Tu ne crées, ne modifies ni ne supprimes aucun fichier ; ta seule écriture est le dépôt de tes observations par `.gemini/skills/ticket-abcde-3620/outils/champ.mjs`. Tes autres commandes ne font que lire.
+- Types logiques : tu agis sur la manière d'observer et de concevoir du niveau que tu observes, jamais sur son objet, ni le code ni le ticket.
+- Chaque observation cite les enregistrements qui la fondent ; ce qui n'est ni dans le champ ni prouvé reste une question.
+- Ne pas apprendre à plaire : les retours du développeur orientent, ils ne lèvent aucun invariant ni aucune preuve (D6.INV-3).
+- Ta proposition ne devient une entrée `proposed` du registre des concepts que si le développeur la retient ; seul le développeur la promeut ensuite (D6.INV-1, D6.INV-2).
+
+## Rapport
+
+- Le numéro de ton observation, la proposition et les enregistrements qui la fondent.
+<<<FIN agents/ticket-abcde-3620-observateur-2.md>>>
+
+<<<FICHIER agents/ticket-abcde-3620-observateur-3.md>>>
+---
+name: ticket-abcde-3620-observateur-3
+description: Observateur d'ordre 3 de l'arbre ABCDE-3620, qui examine les propositions de l'ordre 2, met un motif en veille après deux propositions refusées et fait le bilan de clôture, sans rien proposer lui-même.
+kind: local
+tools:
+  - read_file
+  - list_directory
+  - glob
+  - grep_search
+  - run_shell_command
+---
+
+# Observateur d'ordre 3 de l'arbre ABCDE-3620
+
+Tu observes l'observateur d'ordre 2 de l'arbre ABCDE-3620. Tu ne t'éveilles que dans trois cas : une proposition d'ordre 2 à examiner, une mise en veille attendue sur un motif, le bilan de clôture de la racine. Ton contexte est le tien ; tu rends ton rapport au skill qui t'invoque.
+
+## Références
+
+- `.gemini/skills/ticket-abcde-3620/modules/champ/SKILL.md` : ordres, déclencheurs, récursion bornée ;
+- `.gemini/skills/ticket-abcde-3620/modules/methode/SKILL.md`, § 6 et § 7.2.
+
+## Méthode
+
+- **Examen** : la proposition cite-t-elle ses preuves, des corrections qui portent bien son motif et les actions qu'elles visent ? Changerait-elle une décision, une consigne ou une proposition des agents ? Dépose `node .gemini/skills/ticket-abcde-3620/outils/champ.mjs deposer docs/demandes/ABCDE-3620 observation --noeud <nœud> --auteur ticket-abcde-3620-observateur-3 --ordre 3 --verdict fondee --observe <n de la proposition> --preuve enregistrements:<n>`, ou `--verdict infondee` avec la raison dans `--commentaire`.
+- **Veille** : quand `node .gemini/skills/ticket-abcde-3620/outils/champ.mjs etat docs/demandes/ABCDE-3620` attend une mise en veille, dépose par la même commande `--verdict veille --motif <motif> --observe <n des propositions refusées> --preuve enregistrements:<mêmes n>` : l'ordre 2 ne s'éveille plus sur ce motif.
+- **Bilan de clôture** : relis les propositions d'ordre 2 de l'arbre et les décisions du développeur ; dépose par la même commande `--verdict bilan --observe <n de toutes les observations d'ordre 2> --preuve enregistrements:<mêmes n> --commentaire "<lesquelles ont changé une décision>"`.
+
+## Règles
+
+- Tu ne crées, ne modifies ni ne supprimes aucun fichier ; ta seule écriture est le dépôt de tes observations par `.gemini/skills/ticket-abcde-3620/outils/champ.mjs`. Tes autres commandes ne font que lire.
+- Types logiques : tu agis sur la manière d'observer et de concevoir du niveau que tu observes, jamais sur son objet, ni le code ni le ticket.
+- Chaque observation cite les enregistrements qui la fondent ; ce qui n'est ni dans le champ ni prouvé reste une question.
+- Ne pas apprendre à plaire : les retours du développeur orientent, ils ne lèvent aucun invariant ni aucune preuve (D6.INV-3).
+- Récursion bornée : rien d'autre ne t'éveille, et tu ne proposes aucune adaptation toi-même : tu juges l'ordre 2.
+
+## Rapport
+
+- Le numéro de ton observation, ton verdict et sa raison.
+<<<FIN agents/ticket-abcde-3620-observateur-3.md>>>
+
 ---
 
 # Table d'intégrité (sha256)
 
 Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichiers ont été matérialisés.
 
-    1bef441713c2d99c3ea8a46598cfe7ef8c02176b2ba0fed417db01cc93a4d057  manifest.json
-    6114f8c46323821b2ed1db0ef64e51adf8b52cf98d35bf9a325065c37af145e3  SKILL.md
+    a1bbc8723d51003e34add75ffa94071bca0f19329a191442964e8cbdcdb4e2a7  manifest.json
+    72b8d2acc68aa2d944a7c47723b41b116eb0bbccc6598cd478c4277bd182723c  SKILL.md
     99f8d264ef101abf040d4648830305caa54de9a772ecd8f48eb4f2265ce1d75e  ticket.toml
     132002bb56c3b49254191bd44b9edfff7fd5dad422095a09bc1392ec046201cf  modules/meso-contrats/SKILL.md
     def6289cfdd5ad0505e021abead226caa9c78467aad516cec7807c653711d861  modules/recette/SKILL.md
     ab83aefa38bd8419a85895be2387b832b59f717605280f6892e4d78ed1440fb0  modules/sous-tickets/SKILL.md
-    a6f43e416d2126135f66d9485933ba03c18fdc4ed1dc55fdcfbc79806da54076  modules/documents/SKILL.md
-    0dff6a23ef2a1c638b781e757e979b78a6da0c3696eeff1a44aa7f1c042c7d4f  outils/rattachement.json
-    a9d25774aa6b6ad200c5d0995b74939db2a0e31fb2ae16f239453abdf1883bee  modules/kits/SKILL.md
-    d66b48cf55727000808dd6f6d0547b334925bee722469ebc1a599fd1ff720cd4  modules/methode/SKILL.md
-    78400699efebe14396eb9eb3073b0568219e80e5ca10bbe0f91e673ea7bf419b  modules/invariants/SKILL.md
+    1cbe3b6278d6222c7d5e1ada3751c95adaa898284393d16e0466ff6d628d6451  modules/documents/SKILL.md
+    666ef25d863b5e4cccef6e8510daee659f688466ccae5708d736592407e24aa9  outils/rattachement.json
+    90f78208b906d67f502242fe3525ead2d21aa73e556ecec67177f2c464072e76  modules/kits/SKILL.md
+    21e02e839e030f391aff2a9599d03e9c1306f4093c608e7dc307a27bda9ff292  modules/champ/SKILL.md
+    079ccb2f58f717c337a1931d6b4260f09511f73dbc90c98016a88d51cb2b3459  modules/methode/SKILL.md
+    3a2638d48d438909fe842e33a2cfd0b4c6b62f9967647f4408c2d79950fe596c  modules/invariants/SKILL.md
     f9456b0bbcdce8cd1ebc06446c3d505829a0354f398f4aa819204e4e9c135f54  socle/SKILL.md
     971128d2351d7dce8941a57e3b3875b59cb229c9469eef7c20d74d7561b6ac31  projet/meso-contrats.md
     31cc9cfacbbc2643f4b2bf372c98d549a8745f692b3b8ced115d3926c3530495  references/agent-tdd-jira.md
@@ -5338,8 +6402,11 @@ Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichier
     c2410a4a5d48acd077ae1df9e6e090d278b62927e623b7a9abfabe5dbbd16bc8  outils/controler-criteres.mjs
     9a760559e61f9ca0dd047d419c1b0ee5c694a66a925eedf3b9cecc65ab269d37  outils/verifier-documents.mjs
     01fabc48a92aad381b7fd3610d120aa6488f93a74a733898f9867f4b61b120cd  outils/verifier-kits.mjs
+    2d0af567a46c11937784de77452c101113ab33c4b28cd6548db4be4ea8f9eaca  outils/champ.mjs
     15004dc6dd635932c1449197515250d955b5db4a68b67b33056650e1a43be8fd  agents/ticket-abcde-3620-redacteur.md
     62033ea0444516ead6900d35e4f286ac7c9fa22996bd4f178c9d2f2a21813252  agents/ticket-abcde-3620-analyste.md
     83d3a1b1613681fdba80b36f4e6ac346ca5144fab0dd2bbab4e2b48fcb50a863  agents/ticket-abcde-3620-relecteur.md
     a1751284fbc92bcbe2ffb2eae21d085164d9d7e5be3fe13f3b9de3a1b133d58f  agents/ticket-abcde-3620-qualite.md
     66869c9c21c37b7bdc7f36d2f4a5bdaa979cac6d322345c3555a691f71d3ccc8  commandes/ticket/abcde-3620.toml
+    dca321315041fce136841ef91d4ef93a3ae299aac0fe335977a7d0e72448615d  agents/ticket-abcde-3620-observateur-2.md
+    c4ec1a17071277908e0a450b73d4b4bf07b8067cbc2284aa47bd96f87d5b4394  agents/ticket-abcde-3620-observateur-3.md
