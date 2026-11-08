@@ -4,8 +4,8 @@ name: Prototype skill de ticket
 # référentiel des méso-contrats. Ce workflow joue la recette du prototype sous Linux et sous Windows,
 # le plan de l'arbre d'essai ABCDE-3620, la génération de ses skills de ticket, la vérification de
 # leurs transmissions attendues, leur installation dans un workspace, le contrôle des documents et des
-# kits du projet d'exemple résolu et celui des champs d'observation des projets d'exemple, par les
-# scripts que livre le skill racine. Le contrat avec Gemini
+# kits du projet d'exemple résolu, celui des champs d'observation et des vues augmentées des projets
+# d'exemple, par les scripts que livre le skill racine. Le contrat avec Gemini
 # CLI 0.67.0 vérifie que ses skills sont découverts et ses agents chargés. Il suit aussi les sources dont
 # héritent les skills de ticket : l'orchestrateur, le socle, les référentiels Java et Angular, les skills
 # de la boîte à outils de la racine (agent-tdd-jira, Agent2Test, analyse-projet, sonarqube), et les
@@ -89,6 +89,16 @@ jobs:
             demande="prototypes/skill-ticket/exemples/$projet/docs/demandes/ABCDE-3620"
             node "$outils/champ.mjs" verifier "$demande"
             node "$outils/champ.mjs" etat "$demande"
+          done
+
+      - name: Vues augmentées des projets d'exemple, à jour d'après le script du skill racine
+        shell: bash
+        run: |
+          outils="$RUNNER_TEMP/skills-de-ticket/ticket-abcde-3620/outils"
+          for projet in ABCDE-3620-champ ABCDE-3620-resolution; do
+            demande="prototypes/skill-ticket/exemples/$projet/docs/demandes/ABCDE-3620"
+            node "$outils/vue.mjs" verifier "$demande"
+            node "$outils/vue.mjs" generer "$demande" --noeud ABCDE-3620-2 > /dev/null
           done
 
       - name: Installation de l'arbre d'essai dans un workspace, puis retrait

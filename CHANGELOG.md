@@ -4,6 +4,19 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Prototypes
 
+### 2026-11-08 : skill de ticket C7E, lot 6
+
+- **Lot 5 validé** par le développeur, choix compris, avec la ratification du plan du lot 6.
+- **Lot 6, vue augmentée** (critère P6) :
+  - `outils/vue.mjs`, livré tel quel dans le skill racine : `generer` écrit `vue.html` et `vue.md` dans le dossier de la clé, `generer --noeud` écrit sur la sortie la vue d'un nœud, `--json` le modèle `skill-ticket.vue/1`, `verifier` dit si les vues écrites sont à jour, périmées, modifiées ou absentes ; un champ altéré ne donne pas de vue ;
+  - ancres du ticket, jamais réécrit (critères d'acceptation de `us.md`, critères des nœuds, scénarios du fichier Gherkin, nœuds), et ancres nées du champ ; pile d'une ancre : ce qui l'atteint, par son ancre ou par ce qu'il vise ou observe ; quatre calques posés sur l'ancre (Décorateur), ordre 1, 2, 3 et humain, sans toucher à son état ; états et marques ; « À traiter » en tête, par gravité ; rangement par un second visiteur des critères ;
+  - page accessible et autonome : calques à afficher ou masquer, filtre par nœud, états écrits, thèmes clair et sombre aux contrastes AA, clavier, lisible sans JavaScript ;
+  - skill racine : module `vue`, rattachement complété des énoncés des critères des nœuds ; consignes : chaque nœud lit sa vue à son lancement, les observateurs d'ordre 2 et 3 la vue entière, la racine la présente à la ratification de l'arbre et à la clôture et la cite dans sa remise ;
+  - `installer-arbre.mjs liste` : chemin de la vue et sa fraîcheur ;
+  - exemples : documents de la clé dans le projet d'essai du champ, vues versionnées à trois moments de l'essai (`vues/champ-n06.md`, `champ-n15.md`, `champ-n21.md`), vues finales de l'essai et du projet résolu ; `tests/vue-scenarios.mjs --ecrire` les réécrit.
+- Choix à valider avec le lot : critère en désaccord, états des scénarios, nœuds concernés par une ancre, vue d'un nœud, commandes de la page, fraîcheur, exemples, compatibilité avec les skills du lot 5.
+- Vérifications : recette de 245 tests, dont 30 du lot 6 (vues versionnées, piles recalculées sans le script et comparées au modèle et à la page, états du champ à chaque dépôt, attentes, menaces et désaccords, Décorateur et Visiteur, vue d'un nœud, structure accessible, vues périmées, modifiées, absentes et champ altéré, ligne de commande, génération) ; avec Gemini CLI 0.67.0 réel, cinq skills découverts et neuf agents chargés ; mêmes résultats sous Node 20, 22 et 24 et sur une copie du dépôt en CRLF ; workflow : vues des projets d'exemple vérifiées par le script du skill racine.
+
 ### 2026-11-08 : skill de ticket C7E, lot 5
 
 - **Lot 4 validé** par le développeur, choix compris, avec la ratification du plan du lot 5.

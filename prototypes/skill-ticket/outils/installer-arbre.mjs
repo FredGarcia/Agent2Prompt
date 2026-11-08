@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Installateur d'un arbre de skills de ticket dans Gemini CLI (prototype « skill de ticket », lots 3 à 5).
+// Installateur d'un arbre de skills de ticket dans Gemini CLI (prototype « skill de ticket », lots 3 à 6).
 //
 // Usage, depuis le dossier où Gemini CLI est lancé (ou avec --workspace <dossier>) :
 //   node <dépôt>/prototypes/skill-ticket/outils/installer-arbre.mjs installer <dossier | transmission.md>... [--visible] [--forcer] [--essai]
@@ -17,7 +17,8 @@
 // nœud : une session par nœud, avec son propre contexte.
 // `liste` montre les arbres installés et l'état de chaque nœud, d'après le champ d'observation de l'arbre
 // (lot 5 ; retours.md pour les arbres des lots 3 et 4) et les dossiers sous docs/demandes/, puis le
-// résumé du champ : critères en écart ou menacés, désaccords, observations attendues.
+// résumé du champ : critères en écart ou menacés, désaccords, observations attendues ; et, depuis le
+// lot 6, le chemin de la vue augmentée et sa fraîcheur.
 // `verifier` contrôle les fichiers installés, puis, si Gemini CLI est là, que ses skills sont découverts
 // et ses agents chargés.
 // `retirer` archive les transmissions dans docs/demandes/<clé>/skills/, puis retire skills, agents,
@@ -35,6 +36,7 @@ import { relire } from '../../../tools/bundle.mjs';
 import { RACINE_DEPOT, lireTexte } from './referentiel.mjs';
 import { phraseActivation } from './fabrique.mjs';
 import { contexteDe, etatChamp, lireChamp, ratifications, verifierChamp } from './champ.mjs';
+import { FICHIERS_VUE, etatVue } from './vue.mjs';
 import { transmissionsDe, verifierTransmission } from './monteur.mjs';
 
 const INSTALLATEUR = join(RACINE_DEPOT, 'tools', 'installer.mjs');
@@ -375,8 +377,9 @@ function champDe(ws, releve) {
   const racine = releve.noeuds.find((n) => n.parent === null);
   const dossier = fichierDans(ws, racine.dossier);
   const enregistrements = lireChamp(dossier).enregistrements;
-  const rattachement = lireOuNull(join(ws, '.gemini', 'skills', racine.nom, 'outils', 'rattachement.json'));
-  return { racine, dossier, enregistrements, contexte: rattachement ? contexteDe(JSON.parse(rattachement.toString('utf8'))) : null };
+  const brut = lireOuNull(join(ws, '.gemini', 'skills', racine.nom, 'outils', 'rattachement.json'));
+  const rattachement = brut ? JSON.parse(brut.toString('utf8')) : null;
+  return { racine, dossier, enregistrements, rattachement, contexte: rattachement ? contexteDe(rattachement) : null };
 }
 
 /** État d'un nœud : remise, ratification (champ, ou retours.md avant le lot 5), analyse, dépendances. */
@@ -425,13 +428,27 @@ export function liste(o) {
     const commande = (n) => r.commandes.find((c) => c.skill === n.nom)?.commande ?? '—';
     const largeurs = [Math.max(...r.noeuds.map((n) => n.reference.length)), Math.max(...r.noeuds.map((n) => n.nature.length)), Math.max(...r.noeuds.map((n) => commande(n).length))];
     for (const { noeud, etat } of etats) lignes.push(`  ${noeud.reference.padEnd(largeurs[0])}  ${noeud.nature.padEnd(largeurs[1])}  ${commande(noeud).padEnd(largeurs[2])}  ${etat}`);
-    const { racine, dossier, enregistrements, contexte } = champDe(o.workspace, r);
+    const { racine, dossier, enregistrements, rattachement, contexte } = champDe(o.workspace, r);
+    const cheminDemande = racine.dossier.replace(/\/+$/, '');
     if (enregistrements.length > 0 && contexte) {
       const e = etatChamp(enregistrements, contexte);
       const compte = (etat) => e.criteres.filter((c) => c.etat === etat).length;
       const ecarts = verifierChamp(dossier, contexte);
       const altere = ecarts.length > 0 ? ` ; altéré, ${pluriel(ecarts.length, 'écart')} : node .gemini/skills/${racine.nom}/outils/champ.mjs verifier ${racine.dossier.replace(/\/+$/, '')}` : '';
       lignes.push(`Champ : ${pluriel(e.enregistrements, 'enregistrement')} ; critères : ${pluriel(compte('prouvé'), 'prouvé')}, ${compte('en écart')} en écart, ${pluriel(compte('menacé'), 'menacé')} ; ${pluriel(e.desaccords.length, 'désaccord')} ; ${pluriel(e.attentes.length, 'observation attendue', 'observations attendues')}${altere}`);
+    }
+    // Vue augmentée (lot 6) : son chemin et sa fraîcheur, dès qu'un champ ou une vue existe.
+    const vueEcrite = FICHIERS_VUE.some((f) => existsSync(join(dossier, f)));
+    if (contexte && existsSync(join(o.workspace, '.gemini', 'skills', racine.nom, 'outils', 'vue.mjs')) && (enregistrements.length > 0 || vueEcrite)) {
+      const v = etatVue(dossier, { rattachement });
+      const generer = `node .gemini/skills/${racine.nom}/outils/vue.mjs generer ${cheminDemande}`;
+      const suite = {
+        'à jour': `à jour, tirée du champ au n° ${v.champ}`,
+        absente: `absente : ${generer}`,
+        périmée: `périmée, tirée du champ au n° ${v.depuis}, champ au n° ${v.champ} : ${generer}`,
+        modifiée: `modifiée à la main : ${generer}`,
+      }[v.etat];
+      if (suite) lignes.push(`Vue : ${cheminDemande}/vue.html, ${suite}`);
     }
   }
   return lignes;

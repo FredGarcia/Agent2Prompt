@@ -141,6 +141,7 @@ const lister = (ws) => {
   return {
     etats: Object.fromEntries(lignes.filter((l) => l.startsWith('  ')).map((l) => /^ {2}(\S+)\s+\S+\s+\S+\s+(.+)$/.exec(l)).map((m) => [m[1], m[2]])),
     champ: lignes.find((l) => l.startsWith('Champ : ')) ?? null,
+    vue: lignes.find((l) => l.startsWith('Vue : ')) ?? null,
   };
 };
 const dossierDans = (ws) => (...p) => {
@@ -161,6 +162,7 @@ test('liste : état de chaque nœud, des documents de la clé à la clôture, d\
     'ABCDE-3620-2': 'en attente de la ratification de l\'arbre',
   });
   assert.equal(lister(ws).champ, null, 'pas de ligne du champ avant le premier dépôt');
+  assert.equal(lister(ws).vue, null, 'ni de la vue');
   const dossier = dossierDans(ws);
   writeFileSync(join(dossier(), 'us.md'), '# ABCDE-3620 : US et critères d\'acceptation\n');
   assert.equal(etats()['ABCDE-3620'], 'arbre à ratifier');
@@ -174,13 +176,23 @@ test('liste : état de chaque nœud, des documents de la clé à la clôture, d\
   const ratifier = (noeud, objet, decision = 'ratifié') => deposer('retour', '--noeud', noeud, '--auteur', 'essai', '--nature', 'ratification', '--objet', objet, '--decision', decision, '--par', 'Fred', '--contenu', decision);
   ratifier('ABCDE-3620', 'arbre ABCDE-3620');
   assert.equal(etats()['ABCDE-3620-1.1'], 'prêt');
+  const generer = 'node .gemini/skills/ticket-abcde-3620/outils/vue.mjs generer docs/demandes/ABCDE-3620';
+  assert.equal(lister(ws).vue, `Vue : docs/demandes/ABCDE-3620/vue.html, absente : ${generer}`);
   writeFileSync(join(dossier('ABCDE-3620-1.1'), 'analyse.md'), 'analyse\n');
   assert.equal(etats()['ABCDE-3620-1.1'], 'analysé, à ratifier');
   ratifier('ABCDE-3620-1.1', 'ABCDE-3620-1.1');
   assert.equal(etats()['ABCDE-3620-1.1'], 'ratifié, en transformation');
   assert.equal(lister(ws).champ, 'Champ : 2 enregistrements ; critères : 0 prouvé, 0 en écart, 0 menacé ; 0 désaccord ; 0 observation attendue');
+  // La vue se génère par le script du skill racine installé, comme dans les consignes.
+  const vue = (...args) => spawnSync(process.execPath, [join('.gemini', 'skills', 'ticket-abcde-3620', 'outils', 'vue.mjs'), ...args], { encoding: 'utf8', cwd: ws });
+  const g = vue('generer', 'docs/demandes/ABCDE-3620');
+  assert.equal(g.status, 0, g.stderr);
+  assert.equal(lister(ws).vue, 'Vue : docs/demandes/ABCDE-3620/vue.html, à jour, tirée du champ au n° 2');
+  assert.match(vue('generer', 'docs/demandes/ABCDE-3620', '--noeud', 'ABCDE-3620-1.1').stdout, /^# Vue augmentée de ABCDE-3620-1\.1, dans l'arbre ABCDE-3620\n[\s\S]*- ABCDE-3620-1\.1 : ratifié \(n° 2, /);
   deposer('observation', '--noeud', 'ABCDE-3620-1.1', '--auteur', 'ticket-abcde-3620-1-1-persistance', '--ordre', '1', '--verdict', 'ecart', '--ancre', 'critere:ABCDE-3620-1.1:C1', '--ecart', 'requête native', '--preuve', 'test:LigneCommandeRepositoryTest.java');
   assert.equal(lister(ws).champ, 'Champ : 3 enregistrements ; critères : 0 prouvé, 1 en écart, 2 menacés ; 0 désaccord ; 0 observation attendue');
+  assert.equal(lister(ws).vue, `Vue : docs/demandes/ABCDE-3620/vue.html, périmée, tirée du champ au n° 2, champ au n° 3 : ${generer}`);
+  assert.equal(vue('verifier', 'docs/demandes/ABCDE-3620').status, 1);
   assert.match(champ('etat', 'docs/demandes/ABCDE-3620').stdout, /ABCDE-3620:C4 \(ABCDE-3620-CA04\) : menacé par ABCDE-3620-1\.1:C1/);
   writeFileSync(join(dossier('ABCDE-3620-1.1'), 'remise.md'), 'remise\n');
   writeFileSync(join(dossier('ABCDE-3620-1.2'), 'remise.md'), 'remise\n');
@@ -190,6 +202,8 @@ test('liste : état de chaque nœud, des documents de la clé à la clôture, d\
   // Un champ écrit à la main se voit dans la liste.
   writeFileSync(join(dossier(), 'champ.jsonl'), `${readFileSync(join(dossier(), 'champ.jsonl'), 'utf8')}{"n":5}\n`);
   assert.match(lister(ws).champ, / ; altéré, \d+ écarts? : node \.gemini\/skills\/ticket-abcde-3620\/outils\/champ\.mjs verifier docs\/demandes\/ABCDE-3620$/);
+  assert.equal(lister(ws).vue, null, 'un champ altéré ne donne pas de vue : la ligne du champ dit où');
+  assert.match(vue('generer', 'docs/demandes/ABCDE-3620').stderr, /REFUS {2}champ altéré, vue non générée/);
   assert.equal(champ('verifier', 'docs/demandes/ABCDE-3620').status, 1);
 });
 
