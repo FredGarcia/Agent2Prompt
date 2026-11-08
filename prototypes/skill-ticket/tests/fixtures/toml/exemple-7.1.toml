@@ -1,0 +1,66 @@
+[ticket]
+reference = "ABCDE-3512"
+referentiel = "3.3.0"
+meso_contrat = "M01"
+meso_contrat_confirme = true
+titre = "Charger les données au clic plutôt qu'à l'ouverture de l'écran"
+
+# Demande : la combinaison des possibilités de modification que le ticket implique,
+# établie à son ouverture (qualification, D11). Les possibilités que le ticket
+# n'évoque pas restent inconnues : aucune ne changerait le méso-contrat ni ses options.
+[ticket.demande]
+intention = { reponse = "Charger les données au clic plutôt qu'à l'ouverture de l'écran", source = "ticket : titre" }
+maquette = { reponse = "oui", precision = "maquettes/ecran-cible.png et maquettes/parcours-cible.png", source = "ticket : pièces jointes" }
+table = { reponse = "inconnu" }
+colonne = { reponse = "oui", precision = "mode_chargement, AUTO ou CLIC, dans la table donnee", source = "ticket : description" }
+index = { reponse = "inconnu" }
+contrainte = { reponse = "inconnu" }
+lecture = { reponse = "oui", precision = "données paginées", source = "ticket : critères d'acceptation" }
+ecriture = { reponse = "inconnu" }
+endpoint_nouveau = { reponse = "non", source = "développeur : question 1" }
+endpoint_modifie = { reponse = "oui", precision = "GET /api/v1/donnees, paginé", source = "développeur : question 1" }
+variante_representation = { reponse = "non", precision = "réponse paginée, sans variante", source = "développeur : question 1" }
+temps_reel = { reponse = "non", precision = "chargement au clic, sans mise à jour poussée", source = "ticket : titre" }
+regle = { reponse = "oui", precision = "seul un utilisateur habilité obtient les données", source = "ticket : critères d'acceptation" }
+service = { reponse = "oui", precision = "fournir les données à la demande", source = "ticket : description" }
+ecran_nouveau = { reponse = "inconnu" }
+ecran_modifie = { reponse = "oui", precision = "bouton « Charger les données »", source = "ticket : critères d'acceptation" }
+formulaire = { reponse = "inconnu" }
+comportement = { reponse = "oui", precision = "chargement au clic, et non dans ngOnInit", source = "ticket : titre" }
+navigation = { reponse = "inconnu" }
+
+[[ticket.persistance.schema]]
+changement = "colonne"
+table = "donnee"
+description = "Colonne mode_chargement, AUTO ou CLIC, avec une valeur par défaut pour les lignes existantes."
+
+[[ticket.persistance.crud]]
+entite = "Donnee"
+table = "donnee"
+operations = ["read"]
+
+[[ticket.backend.endpoints]]
+methode = "GET"
+chemin = "/api/v1/donnees"
+reponse = "page de DonneeDto"
+erreurs = [400, 401, 403]
+
+[[ticket.backend.fonctionnalites]]
+nom = "Fournir les données à la demande, paginées"
+
+[[ticket.backend.regles]]
+id = "ABCDE-3512-R1"
+enonce = "Seul un utilisateur habilité obtient les données ; sinon 403."
+
+[[ticket.frontend.elements_graphiques]]
+nom = "Bouton « Charger les données »"
+etats = ["repos", "chargement", "erreur", "chargé"]
+image_objectif = "docs/demandes/ABCDE-3512/maquettes/ecran-cible.png"
+analyse_image = ["structure", "composants", "textes", "etats", "accessibilite"]
+
+[[ticket.frontend.fonctionnalites]]
+nom = "Charger au clic, et non dans ngOnInit"
+declencheur = "click"
+image_objectif = "docs/demandes/ABCDE-3512/maquettes/parcours-cible.png"
+image_actuelle = "docs/demandes/ABCDE-3512/maquettes/ecran-actuel.png"
+analyse_image = ["structure", "etats"]

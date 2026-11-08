@@ -1,0 +1,4 @@
+{
+  "description": "Orchestrateur C7E : activer le skill et traiter le ticket donné",
+  "prompt": "Active le skill orchestrateur-c7e pour la suite de la session.\nFichier d'invariants du projet :\n@{docs/c7e/meso-contrats.md}\nRéférentiel des méso-contrats du projet :\n@{docs/c7e/referentiel-meso-contrats.toml}\nCommence par qualifier le ticket : modèle générique de la demande, questions,\nméso-contrat à confirmer avant tout le reste.\nTicket, et méso-contrats imposés s'ils sont précisés, le principal d'abord : {{args}}\n"
+}

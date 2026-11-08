@@ -1,0 +1,110 @@
+{
+  "ticket": {
+    "reference": "ABCDE-3620",
+    "referentiel": "3.3.0",
+    "meso_contrat": "M04",
+    "meso_contrat_confirme": true,
+    "titre": "Commande : variante sans les lignes, résumé à la même URI avec la date-heure de la dernière ligne enregistrée, lignes en temps réel",
+    "demande": {
+      "intention": {
+        "reponse": "Dériver de la réponse de GET /api/v1/commandes/{id} une variante sans les lignes et, à la même URI, une variante où les lignes sont remplacées par la date-heure de la dernière ligne enregistrée ; tenir à jour en temps réel la liste des lignes, servie par son URI existante",
+        "source": "ticket : description"
+      },
+      "maquette": {
+        "reponse": "non",
+        "source": "ticket : pièces jointes"
+      },
+      "table": {
+        "reponse": "inconnu"
+      },
+      "colonne": {
+        "reponse": "non",
+        "precision": "ligne_commande.enregistree_le existe déjà",
+        "source": "développeur : question 3"
+      },
+      "index": {
+        "reponse": "inconnu"
+      },
+      "contrainte": {
+        "reponse": "inconnu"
+      },
+      "lecture": {
+        "reponse": "oui",
+        "precision": "date-heure maximale des lignes d'une commande, sans charger les lignes",
+        "source": "ticket : description"
+      },
+      "ecriture": {
+        "reponse": "inconnu"
+      },
+      "endpoint_nouveau": {
+        "reponse": "non",
+        "source": "développeur : question 2"
+      },
+      "endpoint_modifie": {
+        "reponse": "oui",
+        "precision": "GET /api/v1/commandes/{id}, paramètre vue facultatif ; GET /api/v1/commandes/{id}/lignes, en-tête ETag",
+        "source": "développeur : question 1 ; ticket : description"
+      },
+      "variante_representation": {
+        "reponse": "oui",
+        "precision": "champ lignes, une liste de records",
+        "source": "ticket : description"
+      },
+      "temps_reel": {
+        "reponse": "oui",
+        "precision": "liste des lignes, et date-heure du résumé",
+        "source": "ticket : description"
+      },
+      "regle": {
+        "reponse": "non",
+        "source": "développeur : question 5"
+      },
+      "service": {
+        "reponse": "non",
+        "source": "développeur : question 5"
+      },
+      "ecran_nouveau": {
+        "reponse": "non",
+        "source": "développeur : question 4"
+      },
+      "ecran_modifie": {
+        "reponse": "oui",
+        "precision": "liste des lignes et date-heure du dernier enregistrement, annoncées à leur mise à jour",
+        "source": "développeur : question 4"
+      },
+      "formulaire": {
+        "reponse": "inconnu"
+      },
+      "comportement": {
+        "reponse": "oui",
+        "precision": "abonnement au canal des lignes, instantané, application des événements",
+        "source": "développeur : question 4"
+      },
+      "navigation": {
+        "reponse": "inconnu"
+      }
+    },
+    "criteres": [
+      {
+        "id": "C1",
+        "enonce": "Sans paramètre, GET /api/v1/commandes/{id} renvoie CommandeDto, inchangée."
+      },
+      {
+        "id": "C2",
+        "enonce": "Avec vue=resume, la réponse ne contient pas lignes, et contient lignesDernierEnregistrement au format ISO 8601 avec fuseau."
+      },
+      {
+        "id": "C3",
+        "enonce": "Pour une commande sans ligne, lignesDernierEnregistrement vaut null."
+      },
+      {
+        "id": "C4",
+        "enonce": "La date-heure se calcule en une seule requête, sans charger les lignes."
+      },
+      {
+        "id": "C5",
+        "enonce": "La liste des lignes et la date-heure du résumé se mettent à jour en temps réel à l'écran, annoncées sans déplacer le focus."
+      }
+    ]
+  }
+}

@@ -2,6 +2,19 @@
 
 Les détails de chaque version figurent dans le journal de révision du `SKILL.md` de la spécification concernée. Ce fichier en donne la vue d'ensemble, dans l'ordre chronologique inverse.
 
+## Prototypes
+
+### 2026-11-08 : skill de ticket C7E, lot 1
+
+- **Prototype** `prototypes/skill-ticket/`, hors de `specs/` : chaque ticket résolu par un skill de ticket et ses agents, assemblés depuis le référentiel des méso-contrats sur le modèle fractal et récursif C7E. Décisions ratifiées : assemblage depuis le référentiel, skill de ticket à la place de la fiche de transformation, sous-tickets sur n niveaux avec un plafond réglable (3), un seul parent, exécution par l'installateur dans Gemini CLI, retours humains comme référence de l'observation, fabrique abstraite de skill-ticket par pile technique, ratification de l'arbre puis de chaque feuille.
+- **Lot 1, modèle et vérification** :
+  - `outils/arbre.mjs` : Composite `NoeudTicket` sur n niveaux, vérificateur (règles du référentiel sur chaque nœud, règles A1 à A9 de la décomposition), ordre de résolution, commandes `verifier` et `plan` ;
+  - `outils/referentiel.mjs` : règle de choix (principal et compléments) et règles de validation du modèle, lues dans le module referentiel de l'orchestrateur ou dans un fichier de projet ;
+  - `outils/toml.mjs` : lecteur TOML sans dépendance, comparé aux lectures de `tomllib` ;
+  - arbre d'essai `exemples/ABCDE-3620/` : cinq nœuds sur trois niveaux (M04, M04, M02, M04, M03), dont une dépendance entre branches.
+- Vérifications : recette de 90 tests (lecteur TOML, règle de choix sur seize demandes types, six écarts du critère P1 et seize écarts de décomposition rejetés, ligne de commande) ; workflow `prototype-skill-ticket.yml` sous Linux et Windows.
+- Écart relevé : l'exemple du § 7.2 du module referentiel laisse `regle` et `service` inconnus alors qu'ils changeraient la composition ; non corrigé, signalé.
+
 ## Socle et experts back-front
 
 ### 2026-11-07 : explication-hote-ia 1.1.0

@@ -1,0 +1,611 @@
+{
+  "meta": {
+    "version": "3.3.0",
+    "domaine": "Software Factory & Architecture",
+    "description": "Taxonomie des méso-contrats structurant les évolutions logicielles de la stack (PostgreSQL, Java, Angular), avec les options au choix de chaque couche.",
+    "valeurs": {
+      "impact": [
+        "requis",
+        "optionnel",
+        "aucun"
+      ],
+      "complexite": [
+        "Faible",
+        "Moyenne",
+        "Élevée"
+      ],
+      "couches": [
+        "persistance",
+        "backend",
+        "frontend"
+      ]
+    }
+  },
+  "modele_demande": {
+    "valeurs": [
+      "oui",
+      "non",
+      "inconnu"
+    ],
+    "choix": [
+      "un méso-contrat porte une possibilité à oui si la couche de celle-ci n'y est pas à l'impact aucun et si son option figure parmi les options permises de cette couche",
+      "un méso-contrat peut être principal si chacune de ses couches à l'impact requis a une possibilité à oui qu'il porte, et si toutes ses possibilités requises (possibilites_requises) sont à oui",
+      "le principal est, parmi ceux-là, celui qui porte le plus de possibilités à oui ; à égalité, une question les départage",
+      "les possibilités à oui que le principal ne porte pas reçoivent des compléments : le plus petit nombre de méso-contrats qui les portent toutes, chacun avec ses possibilités requises à oui et au moins une de ces possibilités",
+      "entre deux ensembles de compléments de même taille, on préfère celui dont chaque complément a, pour chacune de ses couches à l'impact requis, une possibilité restante qu'il porte ; à égalité encore, une question les départage",
+      "une possibilité qu'aucun méso-contrat ne porte, ou un ticket sans principal possible, est signalé, sans catégorie inventée"
+    ],
+    "intention": {
+      "question": "Quel changement le demandeur attend-il, en une phrase ?"
+    },
+    "maquette": {
+      "question": "Une maquette ou une capture PNG montre-t-elle l'objectif ?",
+      "couche": "frontend",
+      "note": "L'image s'analyse avec l'option front qu'elle illustre (analyse_image)."
+    },
+    "possibilites": [
+      {
+        "id": "table",
+        "couche": "persistance",
+        "modification": "Créer une table",
+        "option": "schema",
+        "reperes": [
+          "changelog Liquibase"
+        ]
+      },
+      {
+        "id": "colonne",
+        "couche": "persistance",
+        "modification": "Ajouter ou modifier une colonne",
+        "option": "schema",
+        "reperes": [
+          "changelog Liquibase",
+          "entité JPA"
+        ]
+      },
+      {
+        "id": "index",
+        "couche": "persistance",
+        "modification": "Ajouter ou modifier un index, pour la performance d'une requête",
+        "option": "schema",
+        "reperes": [
+          "changelog Liquibase",
+          "plan d'exécution"
+        ]
+      },
+      {
+        "id": "contrainte",
+        "couche": "persistance",
+        "modification": "Ajouter ou modifier une contrainte : clé, unicité, NOT NULL",
+        "option": "schema",
+        "reperes": [
+          "changelog Liquibase"
+        ]
+      },
+      {
+        "id": "lecture",
+        "couche": "persistance",
+        "modification": "Lire les données d'une entité : filtre, tri, pagination, projection ou agrégat",
+        "option": "crud",
+        "reperes": [
+          "repository Spring Data",
+          "requête",
+          "projection ou requête d'agrégat"
+        ]
+      },
+      {
+        "id": "ecriture",
+        "couche": "persistance",
+        "modification": "Créer, modifier ou supprimer les données d'une entité",
+        "option": "crud",
+        "reperes": [
+          "repository Spring Data",
+          "transaction"
+        ]
+      },
+      {
+        "id": "endpoint_nouveau",
+        "couche": "backend",
+        "modification": "Ajouter un endpoint",
+        "option": "endpoints",
+        "reperes": [
+          "contrat OpenAPI",
+          "contrôleur REST"
+        ]
+      },
+      {
+        "id": "endpoint_modifie",
+        "couche": "backend",
+        "modification": "Modifier le contrat d'un endpoint : paramètres, réponse, erreurs",
+        "option": "endpoints",
+        "reperes": [
+          "contrat OpenAPI",
+          "contrôleur REST",
+          "DTO"
+        ]
+      },
+      {
+        "id": "variante_representation",
+        "couche": "backend",
+        "modification": "Ajouter une variante de représentation d'une opération existante : un champ liste ou record retiré, ou remplacé par la date-heure de son dernier enregistrement",
+        "option": "representations",
+        "reperes": [
+          "contrat OpenAPI",
+          "contrôleur REST",
+          "DTO ou record de réponse"
+        ]
+      },
+      {
+        "id": "temps_reel",
+        "couche": "backend",
+        "modification": "Tenir le front à jour en temps réel des changements d'une ressource, par un canal WebSocket STOMP (socle, SC7)",
+        "option": "evenements",
+        "reperes": [
+          "contrat AsyncAPI",
+          "configuration STOMP",
+          "écouteur après commit"
+        ]
+      },
+      {
+        "id": "regle",
+        "couche": "backend",
+        "modification": "Ajouter ou modifier une règle métier ou une habilitation",
+        "option": "regles",
+        "reperes": [
+          "service du domaine",
+          "sécurité des méthodes"
+        ]
+      },
+      {
+        "id": "service",
+        "couche": "backend",
+        "modification": "Ajouter ou modifier un cas d'usage côté serveur",
+        "option": "fonctionnalites",
+        "reperes": [
+          "service applicatif"
+        ]
+      },
+      {
+        "id": "ecran_nouveau",
+        "couche": "frontend",
+        "modification": "Créer un écran ou un composant",
+        "option": "elements_graphiques",
+        "reperes": [
+          "composant Angular",
+          "routes"
+        ]
+      },
+      {
+        "id": "ecran_modifie",
+        "couche": "frontend",
+        "modification": "Modifier un composant : mise en page, libellés, états visuels",
+        "option": "elements_graphiques",
+        "reperes": [
+          "gabarit et styles du composant"
+        ]
+      },
+      {
+        "id": "formulaire",
+        "couche": "frontend",
+        "modification": "Ajouter ou modifier un formulaire ou ses validations",
+        "option": "fonctionnalites",
+        "reperes": [
+          "formulaire réactif",
+          "validateurs"
+        ]
+      },
+      {
+        "id": "comportement",
+        "couche": "frontend",
+        "modification": "Modifier un comportement : déclencheur, état local, appel d'API",
+        "option": "fonctionnalites",
+        "reperes": [
+          "signals",
+          "service HTTP"
+        ]
+      },
+      {
+        "id": "navigation",
+        "couche": "frontend",
+        "modification": "Ajouter ou modifier une navigation ou une route",
+        "option": "fonctionnalites",
+        "reperes": [
+          "routes",
+          "gardes"
+        ]
+      }
+    ]
+  },
+  "options": {
+    "persistance": {
+      "schema": {
+        "nom": "Évolution de schéma",
+        "slot": "É1",
+        "description": "Tables, colonnes, index et contraintes, par changesets Liquibase.",
+        "changements": [
+          "table",
+          "colonne",
+          "index",
+          "contrainte"
+        ],
+        "preuves": [
+          "migration jouée, annulée, rejouée (update-testing-rollback)",
+          "un changeset par fichier, avec son rollback"
+        ]
+      },
+      "crud": {
+        "nom": "Contrat CRUD",
+        "slot": "É1",
+        "description": "Opérations retenues, par entité, parmi create, read, update et delete.",
+        "operations": [
+          "create",
+          "read",
+          "update",
+          "delete"
+        ],
+        "suppression": [
+          "logique",
+          "physique"
+        ],
+        "preuves": [
+          "un test d'intégration du dépôt par opération retenue",
+          "create : contraintes NOT NULL et valeurs par défaut vérifiées",
+          "read : index pour chaque filtre ou tri, pagination { content, page }",
+          "update : règle de concurrence explicite (verrouillage optimiste ou dernier écrivain)",
+          "delete : mode de suppression et effet sur les clés étrangères vérifiés"
+        ]
+      }
+    },
+    "backend": {
+      "regles": {
+        "nom": "Règles métier",
+        "slot": "É4",
+        "description": "Règles de gestion et invariants du domaine, appliqués par un service.",
+        "preuves": [
+          "un test unitaire par règle : cas nominal, cas limite, violation",
+          "violation rendue en 422, avec un code métier (RFC 9457)"
+        ]
+      },
+      "fonctionnalites": {
+        "nom": "Fonctionnalités",
+        "slot": "É4",
+        "description": "Cas d'usage orchestrés par la couche application.",
+        "preuves": [
+          "un test d'intégration par cas d'usage"
+        ]
+      },
+      "endpoints": {
+        "nom": "Endpoints",
+        "slot": "É3",
+        "description": "Opérations REST, décrites dans le contrat OpenAPI avant tout code.",
+        "methodes": [
+          "GET",
+          "POST",
+          "PUT",
+          "PATCH",
+          "DELETE"
+        ],
+        "preuves": [
+          "contrat OpenAPI 3.1 validé avant le code",
+          "un test de contrat par opération",
+          "erreurs RFC 9457 : 400, 401, 403, 404, 409 ou 422 selon le cas"
+        ]
+      },
+      "representations": {
+        "nom": "Variantes de représentation",
+        "slot": "É3",
+        "description": "Variantes du type de réponse d'une opération existante. À l'analyse (d=0),\nl'IA repère depuis l'URI l'opération du contrat OpenAPI et son contrôleur, le\ntype de réponse, le champ liste ou record visé, l'URI existante qui sert ce\nchamp s'il y en a une, l'entité qui le porte et la colonne de date-heure de\nson enregistrement ; elle l'écrit dans ticket.toml.\nVariante sans champ : le type de réponse sans ce champ. Variante résumée : à\nla même URI, le champ remplacé par la date-heure de son dernier enregistrement,\nle maximum des dates des éléments pour une liste, la date du record pour un\nrecord, calculée en base sans charger les éléments.\n",
+        "variantes": [
+          "sans_champ",
+          "resume"
+        ],
+        "preuves": [
+          "repérage depuis l'URI écrit dans ticket.toml : opération, contrôleur, type de réponse, champ, URI existante du champ, entité et colonne de date-heure",
+          "contrat OpenAPI : un schéma par variante et le mécanisme de sélection décrit, validés avant le code",
+          "un test de contrat par variante : le champ retiré est absent de la réponse, et non pas null",
+          "sans sélection, la réponse actuelle reste identique, vérifiée par un test de non-régression (sauf remplacement)",
+          "date-heure du dernier enregistrement au format Instant du socle, ISO 8601 avec fuseau ; null documenté au contrat et testé pour une liste vide",
+          "date-heure calculée en base par une seule requête, sans charger les éléments, vérifiée par un compteur de requêtes dans le test",
+          "negociation_contenu : 406 pour un type de média non servi",
+          "remplacement : version d'API non publiée, vérifiée par la comparaison du contrat avec sa version précédente"
+        ],
+        "parametres": {
+          "selection": [
+            "parametre_vue",
+            "negociation_contenu",
+            "remplacement"
+          ],
+          "exposition_sans_champ": [
+            "base",
+            "meme_uri",
+            "uri_propre"
+          ]
+        },
+        "notes": {
+          "parametre_vue": "Paramètre de requête facultatif (par exemple ?vue=resume) ; sans lui, la réponse actuelle est inchangée.",
+          "negociation_contenu": "Type de média dédié dans l'en-tête Accept ; sans lui, la réponse actuelle est inchangée ; 406 pour un type non servi.",
+          "remplacement": "La réponse actuelle devient la variante résumée : retrait d'un champ, donc changement cassant (socle, SC1.INV-2), seulement pour une opération dont la version d'API n'est pas publiée.",
+          "base": "La variante sans champ n'a pas d'opération à elle : elle sert de base à la variante résumée.",
+          "meme_uri": "La variante sans champ se sélectionne aussi à la même URI, par le même mécanisme, avec une valeur de plus.",
+          "uri_propre": "La variante sans champ a sa propre opération, ajoutée au contrat (option endpoints)."
+        }
+      },
+      "evenements": {
+        "nom": "Événements temps réel",
+        "slot": "É3",
+        "description": "Changements d'une ressource diffusés au front par WebSocket STOMP, selon le\nsocle (SC7) : canal au contrat AsyncAPI, enveloppe CloudEvents avec sa\nséquence, publication après commit, instantané REST dont l'ETag est la\ndernière séquence, reprise après déconnexion, abonnement autorisé comme la\nlecture REST. Pour une variante résumée, chaque événement de la liste porte\naussi la date-heure de son dernier enregistrement après le changement : le\nrésumé se tient à jour sans recharger la liste, suppressions comprises.\n",
+        "preuves": [
+          "canal et types d'événements au contrat AsyncAPI, validé avant le code (SC7.INV-1)",
+          "enveloppe CloudEvents validée contre le contrat : time avec fuseau, sequence, traceparent (SC7.INV-2)",
+          "transaction annulée : aucun événement reçu (SC7.INV-3)",
+          "instantané REST avec ETag égal à la dernière séquence ; déconnexion, doublon et trou simulés côté client (SC7.INV-4)",
+          "abonnement refusé sans droit de lecture, par une trame ERROR qui porte un Problem Details 403 ; aucun jeton dans l'URL (SC7.INV-5)",
+          "mise à jour annoncée par une région aria-live polite, sans déplacer le focus (SC7.INV-6)",
+          "relais : deux instances du back, un événement publié par l'une est reçu par un client connecté à l'autre"
+        ],
+        "parametres": {
+          "mecanisme": [
+            "websocket_stomp"
+          ],
+          "courtier": [
+            "simple",
+            "relais"
+          ]
+        },
+        "notes": {
+          "websocket_stomp": "Seul mécanisme du socle 1.1.0 ; SSE et messages entre services restent réservés (SC7).",
+          "simple": "Courtier en mémoire du back, pour une seule instance.",
+          "relais": "Relais vers un courtier STOMP externe, dès deux instances ; le fichier d'invariants du projet le nomme."
+        }
+      }
+    },
+    "frontend": {
+      "elements_graphiques": {
+        "nom": "Éléments graphiques",
+        "slot": "É5",
+        "description": "Composants, mise en page et états visuels (repos, chargement, vide, erreur).",
+        "preuves": [
+          "un test de composant par état visuel",
+          "contrôle d'accessibilité WCAG 2.2 AA"
+        ]
+      },
+      "fonctionnalites": {
+        "nom": "Fonctionnalités",
+        "slot": "É2",
+        "description": "Comportements : déclencheurs, état local en signals, appels d'API, navigation.",
+        "preuves": [
+          "un test de composant ou de service par comportement",
+          "un test de bout en bout du parcours"
+        ]
+      },
+      "analyse_image": {
+        "nom": "Analyse d'une image de l'objectif",
+        "applicable_a": [
+          "elements_graphiques",
+          "fonctionnalites"
+        ],
+        "formats": [
+          "png"
+        ],
+        "extractions": [
+          "structure",
+          "composants",
+          "textes",
+          "etats",
+          "couleurs",
+          "accessibilite"
+        ],
+        "sortie": "docs/demandes/{reference}/analyse-image.md",
+        "description": "Pour toute option front qui désigne une image PNG de l'objectif, l'IA l'analyse\navant la fiche de transformation : inventaire des extractions demandées,\ncorrespondance de chaque élément avec une option du ticket, éléments sans\ncorrespondance posés en questions, écarts avec l'écran actuel si sa capture est\nfournie. L'analyse se valide avec la fiche. Tailles et couleurs lues sur une\nimage sont des estimations, à confirmer avec le système de design.\n",
+        "preuves": [
+          "analyse validée par le développeur avec la fiche",
+          "capture de l'écran livré comparée à l'image de l'objectif"
+        ]
+      }
+    }
+  },
+  "meso_contrats": [
+    {
+      "id": "M01",
+      "code": "EVOL_PARADIGME_PULL",
+      "nom": "Transition eager vers lazy (pilotée par l'intention)",
+      "description": "Tickets impliquant une modification verticale complète : schéma (Liquibase, PostgreSQL), puis API (Java), puis IHM (Angular, à la demande).",
+      "complexite_moyenne": "Élevée",
+      "empreinte_technique": {
+        "persistance": {
+          "impact": "requis",
+          "technologies": [
+            "Liquibase",
+            "PostgreSQL"
+          ],
+          "options": [
+            "schema",
+            "crud"
+          ]
+        },
+        "backend": {
+          "impact": "requis",
+          "technologies": [
+            "Java",
+            "API REST"
+          ],
+          "options": [
+            "endpoints",
+            "fonctionnalites",
+            "regles"
+          ]
+        },
+        "frontend": {
+          "impact": "requis",
+          "technologies": [
+            "Angular"
+          ],
+          "style": "État et événements",
+          "options": [
+            "elements_graphiques",
+            "fonctionnalites"
+          ]
+        }
+      }
+    },
+    {
+      "id": "M02",
+      "code": "OPTIMISATION_DONNEES",
+      "nom": "Optimisation de requêtage et indexation de la base de données",
+      "description": "Tickets axés sur les performances de stockage, la création d'index ou la restructuration de tables, sans rupture d'API.",
+      "complexite_moyenne": "Moyenne",
+      "empreinte_technique": {
+        "persistance": {
+          "impact": "requis",
+          "technologies": [
+            "Liquibase",
+            "PostgreSQL"
+          ],
+          "options": [
+            "schema",
+            "crud"
+          ]
+        },
+        "backend": {
+          "impact": "optionnel",
+          "technologies": [
+            "Java"
+          ],
+          "options": [
+            "fonctionnalites"
+          ]
+        },
+        "frontend": {
+          "impact": "aucun",
+          "technologies": [],
+          "options": []
+        }
+      }
+    },
+    {
+      "id": "M03",
+      "code": "REFONTE_UI_COMPOSANT",
+      "nom": "Évolution ergonomique du front-end",
+      "description": "Tickets modifiant l'expérience utilisateur ou l'état local de l'IHM, sans impact sur le schéma de persistance.",
+      "complexite_moyenne": "Faible",
+      "empreinte_technique": {
+        "persistance": {
+          "impact": "aucun",
+          "technologies": [],
+          "options": []
+        },
+        "backend": {
+          "impact": "aucun",
+          "technologies": [],
+          "options": []
+        },
+        "frontend": {
+          "impact": "requis",
+          "technologies": [
+            "Angular"
+          ],
+          "style": "Composants et signals",
+          "options": [
+            "elements_graphiques",
+            "fonctionnalites"
+          ]
+        }
+      }
+    },
+    {
+      "id": "M04",
+      "code": "VARIANTE_REPRESENTATION",
+      "nom": "Variante de représentation d'une ressource",
+      "description": "Tickets qui, depuis l'URI d'une opération existante, dérivent de son type de réponse une variante sans un champ liste ou record, et, à la même URI, une variante où ce champ est remplacé par la date-heure de son dernier enregistrement ; le champ, servi par son URI existante, et la date-heure peuvent être tenus à jour en temps réel. Le front et la base ne sont touchés que si la demande l'exige.",
+      "complexite_moyenne": "Moyenne",
+      "possibilites_requises": [
+        "variante_representation"
+      ],
+      "empreinte_technique": {
+        "persistance": {
+          "impact": "optionnel",
+          "technologies": [
+            "PostgreSQL",
+            "Liquibase"
+          ],
+          "options": [
+            "crud",
+            "schema"
+          ]
+        },
+        "backend": {
+          "impact": "requis",
+          "technologies": [
+            "Java",
+            "API REST",
+            "WebSocket STOMP"
+          ],
+          "options": [
+            "representations",
+            "endpoints",
+            "evenements"
+          ]
+        },
+        "frontend": {
+          "impact": "optionnel",
+          "technologies": [
+            "Angular"
+          ],
+          "style": "Types et appels d'API",
+          "options": [
+            "fonctionnalites",
+            "elements_graphiques"
+          ]
+        }
+      }
+    }
+  ],
+  "meso_contrats_transverses": [
+    {
+      "id": "T01",
+      "code": "SOCLE_BACK_FRONT",
+      "nom": "Socle back-front",
+      "s_applique_si": [
+        "backend",
+        "frontend"
+      ],
+      "exigences": "Contrat OpenAPI, erreurs RFC 9457, formats, pagination, sécurité OAuth 2.1 et OIDC, traçabilité W3C ; événements temps réel (contrat AsyncAPI, WebSocket STOMP, CloudEvents) dès qu'un canal est touché."
+    },
+    {
+      "id": "T02",
+      "code": "ACCESSIBILITE",
+      "nom": "Accessibilité",
+      "s_applique_si": [
+        "frontend"
+      ],
+      "exigences": "RGAA 4.1 et WCAG 2.2 niveau AA."
+    },
+    {
+      "id": "T03",
+      "code": "MIGRATION_SURE",
+      "nom": "Migration de base sûre",
+      "s_applique_si": [
+        "persistance"
+      ],
+      "exigences": "Un changeset par fichier, un rollback par changeset, migration jouée, annulée et rejouée avant livraison."
+    }
+  ],
+  "validation": {
+    "regles": [
+      "le ticket nomme son méso-contrat principal (meso_contrat) et, s'il en a, ses compléments (complements), tous du catalogue, et la version du référentiel qu'il suit",
+      "la section demande répond à l'intention et à chaque possibilité du modèle générique, et cite la source de chaque réponse autre qu'inconnu",
+      "la composition, principal et compléments, respecte la règle de choix du modèle générique, appliquée aux possibilités à oui",
+      "aucune possibilité ne reste inconnue si sa réponse pouvait changer la composition",
+      "aucune option n'est choisie tant que la composition n'est pas confirmée (meso_contrat_confirme)",
+      "chaque option choisie est rattachée à un méso-contrat de la composition (meso_contrat de l'option, le principal par défaut) et figure parmi les options permises de sa couche dans ce méso-contrat ; aucune n'est rattachée à un méso-contrat sur une couche où il est à l'impact aucun",
+      "chaque couche à l'impact requis du principal porte au moins une option qui lui est rattachée ; chaque complément porte au moins une option qui lui est rattachée",
+      "les opérations CRUD sont prises parmi create, read, update et delete ; delete impose un mode de suppression",
+      "la méthode d'un endpoint est prise parmi les méthodes du catalogue",
+      "chaque paramètre d'une option choisie prend une valeur de son catalogue (parametres)",
+      "le mécanisme de sélection remplacement n'est choisi que pour une opération dont la version d'API n'est pas publiée (version_publiee = false)",
+      "une option evenements nomme son canal, ses types d'événements et son instantané REST",
+      "analyse_image n'apparaît qu'avec image_objectif, en PNG, et ses extractions sont prises dans le catalogue",
+      "les méso-contrats transverses des couches touchées s'appliquent d'office"
+    ]
+  }
+}

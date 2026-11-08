@@ -1,0 +1,86 @@
+# Feuille de ABCDE-3620-1 : la vue résumée, l'en-tête ETag et le canal des lignes. Elle lit l'agrégat
+# de ABCDE-3620-1.1, dont elle dépend.
+
+[ticket]
+reference = "ABCDE-3620-1.2"
+parent = "ABCDE-3620-1"
+depend_de = ["ABCDE-3620-1.1"]
+referentiel = "3.3.0"
+meso_contrat = "M04"
+meso_contrat_confirme = true
+titre = "API : vue résumée à la même URI, ETag de la liste des lignes, canal STOMP des lignes"
+
+[ticket.demande]
+intention = { reponse = "Exposer la variante résumée à la même URI et publier les changements des lignes", source = "décomposition de ABCDE-3620-1" }
+maquette = { reponse = "non", source = "parent : ABCDE-3620" }
+table = { reponse = "non", source = "décomposition de ABCDE-3620-1" }
+colonne = { reponse = "non", source = "parent : ABCDE-3620" }
+index = { reponse = "non", precision = "porté par ABCDE-3620-1.1", source = "décomposition de ABCDE-3620-1" }
+contrainte = { reponse = "non", source = "décomposition de ABCDE-3620-1" }
+lecture = { reponse = "non", precision = "porté par ABCDE-3620-1.1", source = "décomposition de ABCDE-3620-1" }
+ecriture = { reponse = "non", source = "décomposition de ABCDE-3620-1" }
+endpoint_nouveau = { reponse = "non", source = "parent : ABCDE-3620" }
+endpoint_modifie = { reponse = "oui", precision = "GET /api/v1/commandes/{id}, paramètre vue ; GET /api/v1/commandes/{id}/lignes, en-tête ETag", source = "décomposition de ABCDE-3620-1" }
+variante_representation = { reponse = "oui", precision = "champ lignes, une liste de records", source = "décomposition de ABCDE-3620-1" }
+temps_reel = { reponse = "oui", precision = "canal des lignes, date-heure recalculée dans chaque événement", source = "décomposition de ABCDE-3620-1" }
+regle = { reponse = "non", source = "parent : ABCDE-3620" }
+service = { reponse = "non", source = "parent : ABCDE-3620" }
+ecran_nouveau = { reponse = "non", source = "parent : ABCDE-3620" }
+ecran_modifie = { reponse = "non", source = "parent : ABCDE-3620-1" }
+formulaire = { reponse = "non", source = "parent : ABCDE-3620-1" }
+comportement = { reponse = "non", source = "parent : ABCDE-3620-1" }
+navigation = { reponse = "non", source = "parent : ABCDE-3620-1" }
+
+[[ticket.criteres]]
+id = "C1"
+enonce = "Sans paramètre vue, la réponse de GET /api/v1/commandes/{id} reste CommandeDto, identique."
+soutient = ["ABCDE-3620-1:C1"]
+
+[[ticket.criteres]]
+id = "C2"
+enonce = "Avec vue=resume, la réponse est un CommandeResumeDto sans lignes, avec lignesDernierEnregistrement en ISO 8601 avec fuseau."
+soutient = ["ABCDE-3620-1:C2"]
+
+[[ticket.criteres]]
+id = "C3"
+enonce = "Avec vue=resume, une commande sans ligne donne lignesDernierEnregistrement à null, documenté au contrat."
+soutient = ["ABCDE-3620-1:C3"]
+
+[[ticket.criteres]]
+id = "C4"
+enonce = "Chaque changement des lignes publie, après commit, un événement CloudEvents qui porte la date-heure recalculée."
+soutient = ["ABCDE-3620-1:C5"]
+
+[[ticket.backend.representations]]
+operation = "GET /api/v1/commandes/{id}"
+version_publiee = true
+controleur = "CommandeController#lire"
+type_reponse = "CommandeDto"
+champ = { nom = "lignes", nature = "liste", type = "List<LigneCommandeDto>", uri = "GET /api/v1/commandes/{id}/lignes" }
+entite = "LigneCommande"
+colonne_date = "ligne_commande.enregistree_le"
+selection = "parametre_vue"
+exposition_sans_champ = "base"
+variante_sans_champ = { type = "CommandeSansLignesDto" }
+variante_resume = { type = "CommandeResumeDto", vue = "resume", champ_date = "lignesDernierEnregistrement", vide = "null" }
+
+[[ticket.backend.endpoints]]
+methode = "GET"
+chemin = "/api/v1/commandes/{id}"
+parametres = ["vue, facultatif : resume"]
+reponse = "CommandeDto sans paramètre, inchangée ; CommandeResumeDto avec vue=resume"
+erreurs = [400, 401, 403, 404]
+
+[[ticket.backend.endpoints]]
+methode = "GET"
+chemin = "/api/v1/commandes/{id}/lignes"
+reponse = "page de LigneCommandeDto, inchangée, avec l'en-tête ETag égal à la dernière séquence du canal"
+erreurs = [400, 401, 403, 404]
+
+[[ticket.backend.evenements]]
+mecanisme = "websocket_stomp"
+courtier = "relais"
+canal = "/topic/v1/commandes/{id}/lignes"
+types = ["ligne-commande.creee.v1", "ligne-commande.modifiee.v1", "ligne-commande.supprimee.v1"]
+instantane = "GET /api/v1/commandes/{id}/lignes"
+donnees = "la ligne (son identifiant seul pour une suppression), et lignesDernierEnregistrement après le changement"
