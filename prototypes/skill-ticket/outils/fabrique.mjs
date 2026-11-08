@@ -1,4 +1,4 @@
-// Fabrique abstraite de skill-ticket (prototype « skill de ticket », lot 2).
+// Fabrique abstraite de skill-ticket (prototype « skill de ticket », lots 2 et 3).
 //
 // Une fabrique produit, pour un nœud de l'arbre de tickets, la famille cohérente des fichiers de son
 // skill : la consigne (SKILL.md), le ticket (ticket.toml), les blocs du référentiel copiés puis
@@ -17,6 +17,8 @@ import { decrireArbre, ordreDeResolution } from './arbre.mjs';
 import { extraireSection } from './sources.mjs';
 
 export const VERSION_SKILL = '1.0.0';
+/** Lot du prototype qui a produit le générateur, inscrit dans chaque skill. */
+export const LOT = 3;
 export const sha256 = (texte) => createHash('sha256').update(texte, 'utf8').digest('hex');
 
 /** Sections de la méthode de l'orchestrateur recopiées dans le module `methode`, selon la nature du nœud. */
@@ -24,6 +26,25 @@ export const SECTIONS_METHODE = { feuille: ['2', '5.1', '5.2', '6', '7.1', '8', 
 
 /** Nom d'un skill de ticket : « ticket- » suivi de la référence, en minuscules et tirets. */
 export const nomSkill = (reference) => `ticket-${reference.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')}`;
+
+/** Commande Gemini CLI d'un nœud : `/ticket:<référence en minuscules et tirets>`, et son fichier dans le skill. */
+export const nomCommande = (reference) => nomSkill(reference).replace(/^ticket-/, '');
+export const commandeSkill = (reference) => `/ticket:${nomCommande(reference)}`;
+export const FICHIER_COMMANDE = (reference) => `commandes/ticket/${nomCommande(reference)}.toml`;
+
+/**
+ * Phrase qui active un skill de ticket installé par l'installateur, reprise par sa commande et par le
+ * lancement de Gemini CLI. Ni guillemet, ni caractère qu'une invite de commandes interpréterait.
+ */
+export const phraseActivation = (nom) => `Active le skill ${nom}. L'étape 0 de sa consigne est faite : ses fichiers sont dans .gemini/skills/${nom}/, vérifiés par integrite.sha256. Lis CONSIGNE.md dans ce dossier et suis-la à partir de l'étape 1.`;
+
+/**
+ * Ligne de ratification ajoutée à `retours.md` : `- AAAA-MM-JJ, <nom> : arbre <CLÉ> ratifié` sur la racine,
+ * `- AAAA-MM-JJ, <nom> : <référence> ratifié` sur une feuille ; un refus finit par `non ratifié, <motif>`.
+ * Sa forme fixe permet de la reconnaître sans interprétation, à l'installateur comme aux autres skills.
+ */
+export const objetRatification = (n) => (n.estRacine && !n.estFeuille ? `arbre ${n.reference}` : n.reference);
+export const ligneRatification = (objet) => `- AAAA-MM-JJ, <nom> : ${objet} ratifié`;
 
 /** Couches touchées par un ticket : celles où il porte au moins une option. */
 export const couchesDuTicket = (ticket) => COUCHES.filter((c) => ticket?.[c] && Object.keys(ticket[c]).length > 0);
@@ -345,14 +366,14 @@ export class FabriqueSkillTicket {
       '',
       '## Ordre de résolution',
       '',
-      ...ordre.map(({ noeud, action }, k) => `${k + 1}. ${noeud.reference} : ${action}${noeud === n ? '' : `, skill \`${nomSkill(noeud.reference)}\``}`),
+      ...ordre.map(({ noeud, action }, k) => `${k + 1}. ${noeud.reference} : ${action}, commande \`${commandeSkill(noeud.reference)}\`${noeud === n ? ' (ce skill)' : ''}`),
       '',
       ...(externes.length > 0 ? ['Préalables extérieurs à ce sous-arbre :', '', ...externes.map(({ noeud, dependance }) => `- ${noeud.reference} attend la clôture de ${dependance.reference}`), ''] : []),
       '## Coordination',
       '',
-      '1. Active chaque sous-ticket dans cet ordre, par son skill ; une feuille se ratifie avant sa première action.',
-      '2. Un sous-ticket ne commence qu\'après la clôture des tickets dont il dépend : leur `remise.md` est écrite et leurs critères sont prouvés.',
-      `3. ${n.reference} se clôt quand tous ses sous-tickets sont clos et que chacun de ses critères est prouvé par ceux qui le soutiennent (module \`recette\`).`,
+      '1. Chaque nœud se traite dans sa propre session de Gemini CLI, avec son propre contexte, que le développeur lance dans cet ordre : la commande du nœud dans une nouvelle session, ou `installer-arbre.mjs lancer <référence>`. Ce skill n\'active pas celui d\'un sous-ticket dans sa propre session.',
+      '2. Un sous-ticket est prêt quand les tickets dont il dépend sont clos : leur `remise.md` est écrite et leurs critères sont prouvés. Une feuille se ratifie encore avant sa première action.',
+      `3. ${n.reference} se clôt quand tous ses sous-tickets sont clos et que chacun de ses critères est prouvé par ceux qui le soutiennent (module \`recette\`) ; le développeur relance alors ce skill pour la clôture.`,
       '4. Un écart d\'un sous-ticket qui menace un critère de ce nœud remonte jusqu\'ici, avec sa preuve ; il s\'inscrit au registre des écarts et ne se tranche pas en silence (D6.INV-3).',
       '5. Une demande qui sort des empreintes d\'un sous-ticket remonte de même : ce nœud la porte à son parent, ou au développeur s\'il est la racine (D11.INV-4).',
     ])];
@@ -400,7 +421,7 @@ export class FabriqueSkillTicket {
         ['la fiche complète à la remise (D3.INV-3)', `\`${this.dossier(n)}remise.md\` ; le skill reste identique à sa transmission`],
         ['`docs/demandes/<CLÉ>/`', `\`${this.dossier(n)}\``],
         ['la clé du ticket, qui nomme sa branche et ses commits (D4.INV-1, D4.INV-2)', `la clé Jira du ticket racine, ${racine} : une seule branche pour tout l'arbre${n.estRacine ? '' : `, et le corps de chaque commit cite le sous-ticket ${n.reference}`}`],
-        ['le choix du développeur qui active le skill (D2.INV-3)', n.estRacine ? 'l\'activation de ce skill par le développeur' : 'l\'activation de ce skill par le développeur, ou par le skill de son parent dans l\'ordre de l\'arbre que le développeur a ratifié'],
+        ['le choix du développeur qui active le skill (D2.INV-3)', `le lancement de ce skill par le développeur, dans sa propre session : la commande \`${commandeSkill(n.reference)}\`, ou \`installer-arbre.mjs lancer ${n.reference}\``],
         ['la qualification et la confirmation de la composition (D10.INV-1, D11)', 'faites avant la génération de ce skill ; si l\'analyse montre que la demande sort des empreintes, ce skill remonte au parent, sans changer de composition (D11.INV-4)'],
         ['un paragraphe de l\'orchestrateur (§ n)', 'le texte recopié dans le module `methode` s\'il y figure ; sinon un renvoi informatif'],
       ]),
@@ -427,15 +448,25 @@ export class FabriqueSkillTicket {
     ];
   }
 
-  /** Un agent par couche touchée par une feuille ; un nœud composé coordonne sans agent. */
+  /** Nom de l'agent d'une couche d'une feuille. */
+  nomAgent(n, couche) {
+    return `${nomSkill(n.reference)}-${this.agentDeCouche(couche).suffixe}`;
+  }
+
+  /**
+   * Un agent par couche touchée par une feuille ; un nœud composé coordonne sans agent. L'installateur
+   * copie chaque agent dans `.gemini/agents/` : son contexte est séparé de celui de la session, d'où les
+   * chemins complets vers les fichiers du skill installé.
+   */
   agents(n) {
     if (!n.estFeuille) return [];
     const nom = nomSkill(n.reference);
+    const ici = `.gemini/skills/${nom}/`;
     const racine = this.racine(n).reference;
     return this.couches(n).map((couche) => {
       const a = this.agentDeCouche(couche);
       const groupes = this.optionsGroupees(n).filter((g) => g.couche === couche);
-      const references = this.experts([couche]).map((e) => `\`${e.path}\``);
+      const references = this.experts([couche]).map((e) => `\`${ici}${e.path}\``);
       return fichier(`agents/${nom}-${a.suffixe}.md`, [
         frontmatter({
           name: `${nom}-${a.suffixe}`,
@@ -445,16 +476,16 @@ export class FabriqueSkillTicket {
         }),
         `# Agent ${a.titre} de ${n.reference}`,
         '',
-        `Tu réalises, pour le ticket ${n.reference}, la couche ${couche} : ${a.technologies}. Ton contexte est le tien : le skill te confie ce périmètre, tu lui rends ton rapport.`,
+        `Tu réalises, pour le ticket ${n.reference}, la couche ${couche} : ${a.technologies}. Ton contexte est le tien : le skill \`${nom}\`, installé dans \`${ici}\`, te confie ce périmètre, et tu lui rends ton rapport. Commence par lire \`${ici}SKILL.md\` et \`${ici}ticket.toml\`.`,
         '',
         '## Périmètre',
         '',
-        ...groupes.map((g) => `- option \`${couche}.${g.option}\`, slots ${g.slots.slots}, étiquettes ${g.slots.etiquettes} : module \`modules/option-${couche}-${g.option}/SKILL.md\``),
+        ...groupes.map((g) => `- option \`${couche}.${g.option}\`, slots ${g.slots.slots}, étiquettes ${g.slots.etiquettes} : \`${ici}modules/option-${couche}-${g.option}/SKILL.md\``),
         '',
         '## Règles',
         '',
-        '- Aucune modification avant la ratification du skill par le développeur (D3.INV-1, la fiche étant ce skill).',
-        `- Les invariants hérités s'appliquent : \`modules/invariants/SKILL.md\`, \`socle/SKILL.md\`, la copie du projet du fichier d'invariants${references.length > 0 ? ` et ${liste(references)}` : ''}.`,
+        `- Aucune modification avant la ratification du skill par le développeur : la ligne \`${ligneRatification(n.reference)}\` dans \`${this.dossier(n)}retours.md\` (D3.INV-1, la fiche étant ce skill).`,
+        `- Les invariants hérités s'appliquent : \`${ici}modules/invariants/SKILL.md\`, \`${ici}socle/SKILL.md\`, la copie du projet du fichier d'invariants${references.length > 0 ? ` et ${liste(references)}` : ''}.`,
         `- Un slot par commit ; chaque commit commence par \`${racine} : \` suivi de l'étiquette de son slot (D4.INV-2)${n.estRacine ? '' : `, et son corps cite \`Sous-ticket : ${n.reference}\``} ; tu ne pousses, ne fusionnes, ne rebases ni ne poses de tag (D4.INV-3).`,
         '- Tu ne sors pas de ta couche : un besoin hors de ton périmètre remonte au skill du ticket.',
         '',
@@ -466,9 +497,24 @@ export class FabriqueSkillTicket {
     });
   }
 
-  /** Observateurs des ordres 1 à 3 : au lot 4 du prototype. */
+  /** Observateurs des ordres 1 à 3 : au lot 5 du prototype. */
   observateurs() {
     return [];
+  }
+
+  /**
+   * Commande Gemini CLI qui lance ce skill dans une session : l'installateur la copie dans
+   * `.gemini/commands/ticket/`, elle devient `/ticket:<nœud>`.
+   */
+  commandes(n) {
+    const quoi = n.estFeuille ? 'démarrage, analyse, ratification, transformation et remise' : n.estRacine ? 'présentation et ratification de l\'arbre, suivi, puis clôture' : 'suivi des sous-tickets, puis clôture';
+    return [fichier(FICHIER_COMMANDE(n.reference), [
+      `description = ${JSON.stringify(`Skill de ticket ${n.reference}, ${this.nature(n)} (${quoi}), dans cette session`)}`,
+      'prompt = """',
+      phraseActivation(nomSkill(n.reference)),
+      'Précision du développeur, s\'il y en a une : {{args}}',
+      '"""',
+    ])];
   }
 
   // ---- Consigne : patron de méthode ----
@@ -488,7 +534,7 @@ export class FabriqueSkillTicket {
       frontmatter({ name: nom, description: this.description(n), version: VERSION_SKILL }),
       `# Skill de ticket ${n.reference}`,
       '',
-      `> Produit par le générateur C7E (prototype « skill de ticket », lot 2), fabrique \`${this.nom}\`, référentiel des méso-contrats ${this.R.version}, orchestrateur-c7e ${o.version}. Ce skill remplace la fiche de transformation comme objet ratifié avant toute modification ; il reste identique à sa transmission. Si tu y relèves une ambiguïté ou une contradiction, signale-la au développeur ; ne corrige pas le skill toi-même.`,
+      `> Produit par le générateur C7E (prototype « skill de ticket », lot ${LOT}), fabrique \`${this.nom}\`, référentiel des méso-contrats ${this.R.version}, orchestrateur-c7e ${o.version}. Ce skill remplace la fiche de transformation comme objet ratifié avant toute modification ; il reste identique à sa transmission. Si tu y relèves une ambiguïté ou une contradiction, signale-la au développeur ; ne corrige pas le skill toi-même.`,
       '',
       '## 1. Place dans l\'arbre',
       '',
@@ -548,6 +594,7 @@ export class FabriqueSkillTicket {
     if (!n.estFeuille) lignes.push(`- Sous-tickets : ${n.enfants.map((e) => `${e.reference} (skill \`${nomSkill(e.reference)}\`)`).join(', ')} ; module \`sous-tickets\`.`);
     if (n.dependances.length > 0) lignes.push(`- Dépend de : ${n.dependances.map((d) => `${d} (skill \`${nomSkill(d)}\`)`).join(', ')} ; rien ne commence avant ${accord(n.dependances.length, 'sa', 'leur')} clôture.`);
     lignes.push(`- Clé Jira : ${racine.reference}, qui nomme la branche et les commits de tout l'arbre. Dossier du ticket : \`${this.dossier(n)}\`.`);
+    lignes.push(`- Session : ce skill travaille dans sa propre session de Gemini CLI, que le développeur lance par la commande \`${commandeSkill(n.reference)}\` ou par \`installer-arbre.mjs lancer ${n.reference}\`.`);
     return lignes;
   }
 
@@ -559,13 +606,16 @@ export class FabriqueSkillTicket {
   }
 
   demarrage(n) {
-    return [
-      '1. Vérifie que ce skill est intact : s\'il a été installé par l\'installateur du dépôt Agent2Prompt, `sha256sum -c integrite.sha256` depuis son dossier.',
-      '2. Lis la copie du projet du fichier d\'invariants (`docs/c7e/meso-contrats.md` par défaut) et compare-la à `projet/meso-contrats.md`, l\'état sur lequel ce skill a été produit. La copie du projet fait foi ; si elles diffèrent, dis-le au développeur avant tout le reste. Une valeur `ADAPTER` restée telle se signale, jamais devinée (D8.INV-1).',
+    const racine = this.racine(n);
+    const etapes = [
+      'Vérifie que ce skill est intact : s\'il a été installé par l\'installateur du dépôt Agent2Prompt, `sha256sum -c integrite.sha256` depuis son dossier.',
+      'Lis la copie du projet du fichier d\'invariants (`docs/c7e/meso-contrats.md` par défaut) et compare-la à `projet/meso-contrats.md`, l\'état sur lequel ce skill a été produit. La copie du projet fait foi ; si elles diffèrent, dis-le au développeur avant tout le reste. Une valeur `ADAPTER` restée telle se signale, jamais devinée (D8.INV-1).',
+      ...(n.estRacine ? [] : [`Vérifie que l'arbre a été ratifié : la ligne \`${ligneRatification(objetRatification(racine))}\` figure dans \`${this.dossier(racine)}retours.md\`. Sinon, arrête-toi et renvoie le développeur au skill racine, \`${commandeSkill(racine.reference)}\`.`]),
       n.dependances.length > 0
-        ? `3. Vérifie que ${liste(n.dependances)} ${n.dependances.length > 1 ? 'sont clos' : 'est clos'} : remise écrite et critères prouvés. Sinon, arrête-toi et dis au développeur ce qui manque.`
-        : '3. Ce ticket ne dépend d\'aucun autre.',
+        ? `Vérifie que ${liste(n.dependances)} ${n.dependances.length > 1 ? 'sont clos' : 'est clos'} : remise écrite et critères prouvés. Sinon, arrête-toi et dis au développeur ce qui manque.`
+        : 'Ce ticket ne dépend d\'aucun autre.',
     ];
+    return etapes.map((e, k) => `${k + 1}. ${e}`);
   }
 
   analyse(n) {
@@ -583,17 +633,24 @@ export class FabriqueSkillTicket {
   }
 
   coordination(n) {
+    const etats = [
+      ...(n.estRacine ? [`**Arbre non ratifié**, sans la ligne \`${ligneRatification(objetRatification(n))}\` dans \`${this.dossier(n)}retours.md\` : passe à la ratification (section 6).`] : []),
+      `**Sous-tickets en cours** : montre l'état de chacun d'après son dossier (\`retours.md\`, \`analyse.md\`, \`remise.md\`), puis le ou les sous-tickets prêts dans l'ordre du module \`sous-tickets\`, avec leur commande, à lancer dans une nouvelle session. Arrête-toi là.`,
+      '**Tous les sous-tickets clos**, chacun avec sa `remise.md` : passe à la clôture (section 7).',
+    ];
     return [
-      `Ce nœud ne lit ni ne modifie le code : il active ses sous-tickets dans l'ordre du module \`sous-tickets\` et suit leurs dossiers, sous \`docs/demandes/${this.racine(n).reference}/\`.`,
+      `Ce nœud ne lit ni ne modifie le code, et n'active pas dans sa session le skill d'un sous-ticket : chaque nœud se traite dans sa propre session, lancée par le développeur. À chaque lancement, ce skill reconnaît où en est ${n.estRacine ? 'l\'arbre' : 'son sous-arbre'}, d'après les dossiers sous \`docs/demandes/${this.racine(n).reference}/\` :`,
+      '',
+      ...etats.map((e, k) => `${k + 1}. ${e}`),
     ];
   }
 
   ratification(n) {
     if (n.estRacine && !n.estFeuille) {
-      return [`Avant toute autre action, présente au développeur l'arbre complet : les sous-tickets et leurs méso-contrats, l'ordre de résolution et les critères, avec la façon dont chaque critère de la racine est soutenu (modules \`sous-tickets\` et \`recette\`). **Point de ratification** : rien ne commence avant sa réponse. Ajoute sa décision, avec son nom et la date, à \`${this.dossier(n)}retours.md\`. Elle couvre l'arbre ; chaque feuille se ratifie encore avant sa première action.`];
+      return [`Avant toute autre action, présente au développeur l'arbre complet : les sous-tickets et leurs méso-contrats, l'ordre de résolution et les critères, avec la façon dont chaque critère de la racine est soutenu (modules \`sous-tickets\` et \`recette\`). **Point de ratification** : rien ne commence avant sa réponse. Ajoute sa décision à \`${this.dossier(n)}retours.md\`, sur une ligne \`${ligneRatification(objetRatification(n))}\`, ou \`… non ratifié, <motif>\`, avec la date et son nom. Elle couvre l'arbre ; chaque feuille se ratifie encore avant sa première action. Une fois l'arbre ratifié, indique le premier sous-ticket prêt et sa commande, à lancer dans une nouvelle session.`];
     }
     if (!n.estFeuille) return ['Pas de ratification propre : l\'arbre a été ratifié sur le skill racine. Ce nœud coordonne ses sous-tickets.'];
-    return [`Présente au développeur ce skill et son analyse : objectif, critères, méso-contrats et options avec leur paramétrage, invariants, configuration, cartographie, stratégie et tests déduits, avec la copie de travail de \`ticket.toml\`. **Point de ratification** : rien n'est modifié avant sa réponse (D3.INV-1, la fiche étant ce skill). Ajoute sa décision, avec son nom et la date, à \`${this.dossier(n)}retours.md\`.`];
+    return [`Présente au développeur ce skill et son analyse : objectif, critères, méso-contrats et options avec leur paramétrage, invariants, configuration, cartographie, stratégie et tests déduits, avec la copie de travail de \`ticket.toml\`. **Point de ratification** : rien n'est modifié avant sa réponse (D3.INV-1, la fiche étant ce skill). Ajoute sa décision à \`${this.dossier(n)}retours.md\`, sur une ligne \`${ligneRatification(objetRatification(n))}\`, ou \`… non ratifié, <motif>\`, avec la date et son nom.`];
   }
 
   transformation(n) {
@@ -638,7 +695,9 @@ export class FabriqueSkillTicket {
     return [
       ...etapes.map((e, k) => `${k + 1}. ${e}`),
       '',
-      `Chaque commit porte un seul slot et commence par \`${racine} : [É<n>-<DOMAINE>] \` (D4.INV-2)${n.estRacine ? '' : `, son corps cite \`Sous-ticket : ${n.reference}\``} ; l'IA ne pousse, ne fusionne, ne rebase ni ne pose de tag (D4.INV-3). Les agents réalisent les options de leur couche (dossier \`agents/\`), chacun dans son propre contexte.`,
+      `Chaque commit porte un seul slot et commence par \`${racine} : [É<n>-<DOMAINE>] \` (D4.INV-2)${n.estRacine ? '' : `, son corps cite \`Sous-ticket : ${n.reference}\``} ; l'IA ne pousse, ne fusionne, ne rebase ni ne pose de tag (D4.INV-3).`,
+      '',
+      `Les options de chaque couche se confient à son agent, par l'outil \`invoke_agent\` : ${liste(this.couches(n).map((c) => `\`${this.nomAgent(n, c)}\` (${c})`))}. Chaque agent travaille dans son propre contexte et rend son rapport ; ce skill garde la ratification, la recette et la remise.`,
     ];
   }
 
@@ -648,8 +707,9 @@ export class FabriqueSkillTicket {
 
   remise(n) {
     const remise = `\`${this.dossier(n)}remise.md\``;
-    if (!n.estFeuille) return [`${remise} : pour chaque critère, les preuves de ceux qui le soutiennent ; les écarts remontés et leurs décisions ; l'état de chaque sous-ticket.`];
-    return [`${remise}, complète à la remise (D3.INV-3) : modifications par slot, avec les commits ; dossier de preuves ; écarts ajoutés au registre des écarts ; boucle de second ordre (observations É6 et É7, commits de rétroaction, entrées proposées) ; capitalisation ; indicateurs et leur calcul (module \`methode\`, § 8).`];
+    const suite = n.estRacine ? 'Le ticket est alors clos ; l\'installateur peut retirer l\'arbre, en archivant ses skills dans le dossier du ticket.' : `Puis renvoie le développeur au skill de ${n.parent.reference}, \`${commandeSkill(n.parent.reference)}\`, dans une nouvelle session : il indique la suite.`;
+    if (!n.estFeuille) return [`${remise} : pour chaque critère, les preuves de ceux qui le soutiennent ; les écarts remontés et leurs décisions ; l'état de chaque sous-ticket. ${suite}`];
+    return [`${remise}, complète à la remise (D3.INV-3) : modifications par slot, avec les commits ; dossier de preuves ; écarts ajoutés au registre des écarts ; boucle de second ordre (observations É6 et É7, commits de rétroaction, entrées proposées) ; capitalisation ; indicateurs et leur calcul (module \`methode\`, § 8). ${suite}`];
   }
 
   role(rel) {
@@ -659,7 +719,8 @@ export class FabriqueSkillTicket {
     if (rel === 'socle/SKILL.md') return `socle back-front ${this.S.socle.version}, hérité en entier`;
     if (rel === 'projet/meso-contrats.md') return 'invariants du projet, dans l\'état où ce skill a été produit';
     if (rel.startsWith('references/')) return 'référentiel de la pile : versions cibles et invariants';
-    if (rel.startsWith('agents/')) return 'agent d\'une couche, dans son propre contexte';
+    if (rel.startsWith('agents/')) return 'agent d\'une couche, dans son propre contexte ; copié dans `.gemini/agents/` à l\'installation';
+    if (rel.startsWith('commandes/')) return `commande \`/ticket:${/([^/]+)\.toml$/.exec(rel)?.[1]}\` qui lance ce skill ; copiée dans \`.gemini/commands/ticket/\` à l'installation`;
     const m = /^modules\/([^/]+)\//.exec(rel)?.[1];
     if (m === 'meso-contrats') return 'méso-contrats de la composition et transverses, copiés du référentiel';
     if (m?.startsWith('option-')) return 'option copiée du référentiel, puis paramétrée pour ce ticket';
@@ -688,7 +749,7 @@ export class FabriqueSkillTicket {
       '',
       '## Étape 0 : matérialiser le skill',
       '',
-      `Si le développeur a installé le skill avec l'installateur du dépôt Agent2Prompt (\`tools/installer.mjs\`), cette étape est faite : vérifie seulement les fichiers avec \`sha256sum -c integrite.sha256\`, depuis le dossier du skill, puis passe à l'étape 1. Sinon, crée le dossier \`.gemini/skills/${nom}/\`, puis, pour chaque bloc, le fichier de ce chemin avec le contenu exact compris entre les deux lignes délimitrices, qui n'en font pas partie ; ne reformule rien. Vérifie ensuite chaque fichier contre la table d'intégrité en fin de texte.`,
+      `Si le développeur a installé le skill avec l'installateur du dépôt Agent2Prompt (\`tools/installer.mjs\`, ou \`installer-arbre.mjs\` pour tout l'arbre), cette étape est faite : vérifie seulement les fichiers avec \`sha256sum -c integrite.sha256\`, depuis le dossier du skill, puis passe à l'étape 1. Sinon, crée le dossier \`.gemini/skills/${nom}/\`, puis, pour chaque bloc, le fichier de ce chemin avec le contenu exact compris entre les deux lignes délimitrices, qui n'en font pas partie ; ne reformule rien. Vérifie ensuite chaque fichier contre la table d'intégrité en fin de texte.`,
       '',
       '## Étape 1 : lecture',
       '',
@@ -722,7 +783,7 @@ export class FabriqueSkillTicket {
         referentiel: this.R.version,
         dossier: this.dossier(n),
         herites,
-        genere_par: { prototype: 'skill-ticket', lot: 2, fabrique: this.nom, orchestrateur: this.S.orchestrateur.version },
+        genere_par: { prototype: 'skill-ticket', lot: LOT, fabrique: this.nom, orchestrateur: this.S.orchestrateur.version },
       },
       modules: corps.map((f) => ({ id: id(f.rel), path: f.rel, status: 'active' })),
     };

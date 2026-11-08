@@ -12,7 +12,7 @@ Ce texte contient le skill complet d'un ticket, produit par le générateur C7E.
 
 ## Étape 0 : matérialiser le skill
 
-Si le développeur a installé le skill avec l'installateur du dépôt Agent2Prompt (`tools/installer.mjs`), cette étape est faite : vérifie seulement les fichiers avec `sha256sum -c integrite.sha256`, depuis le dossier du skill, puis passe à l'étape 1. Sinon, crée le dossier `.gemini/skills/ticket-abcde-3620/`, puis, pour chaque bloc, le fichier de ce chemin avec le contenu exact compris entre les deux lignes délimitrices, qui n'en font pas partie ; ne reformule rien. Vérifie ensuite chaque fichier contre la table d'intégrité en fin de texte.
+Si le développeur a installé le skill avec l'installateur du dépôt Agent2Prompt (`tools/installer.mjs`, ou `installer-arbre.mjs` pour tout l'arbre), cette étape est faite : vérifie seulement les fichiers avec `sha256sum -c integrite.sha256`, depuis le dossier du skill, puis passe à l'étape 1. Sinon, crée le dossier `.gemini/skills/ticket-abcde-3620/`, puis, pour chaque bloc, le fichier de ce chemin avec le contenu exact compris entre les deux lignes délimitrices, qui n'en font pas partie ; ne reformule rien. Vérifie ensuite chaque fichier contre la table d'intégrité en fin de texte.
 
 ## Étape 1 : lecture
 
@@ -76,7 +76,7 @@ Suis `SKILL.md` à partir de sa section 4. Rien n'est modifié avant la ratifica
     ],
     "genere_par": {
       "prototype": "skill-ticket",
-      "lot": 2,
+      "lot": 3,
       "fabrique": "java-angular-postgresql",
       "orchestrateur": "3.5.3"
     }
@@ -121,6 +121,11 @@ Suis `SKILL.md` à partir de sa section 4. Rien n'est modifié avant la ratifica
       "id": "projet-meso-contrats",
       "path": "projet/meso-contrats.md",
       "status": "active"
+    },
+    {
+      "id": "commandes-ticket-abcde-3620",
+      "path": "commandes/ticket/abcde-3620.toml",
+      "status": "active"
     }
   ]
 }
@@ -135,13 +140,14 @@ version: 1.0.0
 
 # Skill de ticket ABCDE-3620
 
-> Produit par le générateur C7E (prototype « skill de ticket », lot 2), fabrique `java-angular-postgresql`, référentiel des méso-contrats 3.3.0, orchestrateur-c7e 3.5.3. Ce skill remplace la fiche de transformation comme objet ratifié avant toute modification ; il reste identique à sa transmission. Si tu y relèves une ambiguïté ou une contradiction, signale-la au développeur ; ne corrige pas le skill toi-même.
+> Produit par le générateur C7E (prototype « skill de ticket », lot 3), fabrique `java-angular-postgresql`, référentiel des méso-contrats 3.3.0, orchestrateur-c7e 3.5.3. Ce skill remplace la fiche de transformation comme objet ratifié avant toute modification ; il reste identique à sa transmission. Si tu y relèves une ambiguïté ou une contradiction, signale-la au développeur ; ne corrige pas le skill toi-même.
 
 ## 1. Place dans l'arbre
 
 - Nature : racine ; ce skill coordonne ses sous-tickets et n'agit pas sur le code.
 - Sous-tickets : ABCDE-3620-1 (skill `ticket-abcde-3620-1`), ABCDE-3620-2 (skill `ticket-abcde-3620-2`) ; module `sous-tickets`.
 - Clé Jira : ABCDE-3620, qui nomme la branche et les commits de tout l'arbre. Dossier du ticket : `docs/demandes/ABCDE-3620/`.
+- Session : ce skill travaille dans sa propre session de Gemini CLI, que le développeur lance par la commande `/ticket:abcde-3620` ou par `installer-arbre.mjs lancer ABCDE-3620`.
 
 ## 2. Objectif et critères
 
@@ -171,11 +177,15 @@ Ce nœud ne porte pas d'option : ses sous-tickets les portent.
 
 ## 5. Coordination
 
-Ce nœud ne lit ni ne modifie le code : il active ses sous-tickets dans l'ordre du module `sous-tickets` et suit leurs dossiers, sous `docs/demandes/ABCDE-3620/`.
+Ce nœud ne lit ni ne modifie le code, et n'active pas dans sa session le skill d'un sous-ticket : chaque nœud se traite dans sa propre session, lancée par le développeur. À chaque lancement, ce skill reconnaît où en est l'arbre, d'après les dossiers sous `docs/demandes/ABCDE-3620/` :
+
+1. **Arbre non ratifié**, sans la ligne `- AAAA-MM-JJ, <nom> : arbre ABCDE-3620 ratifié` dans `docs/demandes/ABCDE-3620/retours.md` : passe à la ratification (section 6).
+2. **Sous-tickets en cours** : montre l'état de chacun d'après son dossier (`retours.md`, `analyse.md`, `remise.md`), puis le ou les sous-tickets prêts dans l'ordre du module `sous-tickets`, avec leur commande, à lancer dans une nouvelle session. Arrête-toi là.
+3. **Tous les sous-tickets clos**, chacun avec sa `remise.md` : passe à la clôture (section 7).
 
 ## 6. Ratification
 
-Avant toute autre action, présente au développeur l'arbre complet : les sous-tickets et leurs méso-contrats, l'ordre de résolution et les critères, avec la façon dont chaque critère de la racine est soutenu (modules `sous-tickets` et `recette`). **Point de ratification** : rien ne commence avant sa réponse. Ajoute sa décision, avec son nom et la date, à `docs/demandes/ABCDE-3620/retours.md`. Elle couvre l'arbre ; chaque feuille se ratifie encore avant sa première action.
+Avant toute autre action, présente au développeur l'arbre complet : les sous-tickets et leurs méso-contrats, l'ordre de résolution et les critères, avec la façon dont chaque critère de la racine est soutenu (modules `sous-tickets` et `recette`). **Point de ratification** : rien ne commence avant sa réponse. Ajoute sa décision à `docs/demandes/ABCDE-3620/retours.md`, sur une ligne `- AAAA-MM-JJ, <nom> : arbre ABCDE-3620 ratifié`, ou `… non ratifié, <motif>`, avec la date et son nom. Elle couvre l'arbre ; chaque feuille se ratifie encore avant sa première action. Une fois l'arbre ratifié, indique le premier sous-ticket prêt et sa commande, à lancer dans une nouvelle session.
 
 ## 7. Clôture
 
@@ -183,7 +193,7 @@ ABCDE-3620 se clôt quand tous ses sous-tickets sont clos et que chacun de ses c
 
 ## 8. Remise
 
-`docs/demandes/ABCDE-3620/remise.md` : pour chaque critère, les preuves de ceux qui le soutiennent ; les écarts remontés et leurs décisions ; l'état de chaque sous-ticket.
+`docs/demandes/ABCDE-3620/remise.md` : pour chaque critère, les preuves de ceux qui le soutiennent ; les écarts remontés et leurs décisions ; l'état de chaque sous-ticket. Le ticket est alors clos ; l'installateur peut retirer l'arbre, en archivant ses skills dans le dossier du ticket.
 
 ## 9. Retours du développeur
 
@@ -207,6 +217,7 @@ Le module `invariants` liste ce dont ce skill hérite, sans affaiblissement : le
 | `modules/invariants/SKILL.md` | invariants hérités, correspondances, invariants de l'orchestrateur mot pour mot |
 | `socle/SKILL.md` | socle back-front 1.1.0, hérité en entier |
 | `projet/meso-contrats.md` | invariants du projet, dans l'état où ce skill a été produit |
+| `commandes/ticket/abcde-3620.toml` | commande `/ticket:abcde-3620` qui lance ce skill ; copiée dans `.gemini/commands/ticket/` à l'installation |
 <<<FIN SKILL.md>>>
 
 <<<FICHIER ticket.toml>>>
@@ -350,17 +361,17 @@ ABCDE-3620 · M04 · 5 critères
 
 ## Ordre de résolution
 
-1. ABCDE-3620-1.1 : résoudre, skill `ticket-abcde-3620-1-1`
-2. ABCDE-3620-1.2 : résoudre, skill `ticket-abcde-3620-1-2`
-3. ABCDE-3620-1 : clore, skill `ticket-abcde-3620-1`
-4. ABCDE-3620-2 : résoudre, skill `ticket-abcde-3620-2`
-5. ABCDE-3620 : clore
+1. ABCDE-3620-1.1 : résoudre, commande `/ticket:abcde-3620-1-1`
+2. ABCDE-3620-1.2 : résoudre, commande `/ticket:abcde-3620-1-2`
+3. ABCDE-3620-1 : clore, commande `/ticket:abcde-3620-1`
+4. ABCDE-3620-2 : résoudre, commande `/ticket:abcde-3620-2`
+5. ABCDE-3620 : clore, commande `/ticket:abcde-3620` (ce skill)
 
 ## Coordination
 
-1. Active chaque sous-ticket dans cet ordre, par son skill ; une feuille se ratifie avant sa première action.
-2. Un sous-ticket ne commence qu'après la clôture des tickets dont il dépend : leur `remise.md` est écrite et leurs critères sont prouvés.
-3. ABCDE-3620 se clôt quand tous ses sous-tickets sont clos et que chacun de ses critères est prouvé par ceux qui le soutiennent (module `recette`).
+1. Chaque nœud se traite dans sa propre session de Gemini CLI, avec son propre contexte, que le développeur lance dans cet ordre : la commande du nœud dans une nouvelle session, ou `installer-arbre.mjs lancer <référence>`. Ce skill n'active pas celui d'un sous-ticket dans sa propre session.
+2. Un sous-ticket est prêt quand les tickets dont il dépend sont clos : leur `remise.md` est écrite et leurs critères sont prouvés. Une feuille se ratifie encore avant sa première action.
+3. ABCDE-3620 se clôt quand tous ses sous-tickets sont clos et que chacun de ses critères est prouvé par ceux qui le soutiennent (module `recette`) ; le développeur relance alors ce skill pour la clôture.
 4. Un écart d'un sous-ticket qui menace un critère de ce nœud remonte jusqu'ici, avec sa preuve ; il s'inscrit au registre des écarts et ne se tranche pas en silence (D6.INV-3).
 5. Une demande qui sort des empreintes d'un sous-ticket remonte de même : ce nœud la porte à son parent, ou au développeur s'il est la racine (D11.INV-4).
 <<<FIN modules/sous-tickets/SKILL.md>>>
@@ -413,7 +424,7 @@ Les invariants de l'orchestrateur parlent de sa fiche de transformation. Dans un
 | la fiche complète à la remise (D3.INV-3) | `docs/demandes/ABCDE-3620/remise.md` ; le skill reste identique à sa transmission |
 | `docs/demandes/<CLÉ>/` | `docs/demandes/ABCDE-3620/` |
 | la clé du ticket, qui nomme sa branche et ses commits (D4.INV-1, D4.INV-2) | la clé Jira du ticket racine, ABCDE-3620 : une seule branche pour tout l'arbre |
-| le choix du développeur qui active le skill (D2.INV-3) | l'activation de ce skill par le développeur |
+| le choix du développeur qui active le skill (D2.INV-3) | le lancement de ce skill par le développeur, dans sa propre session : la commande `/ticket:abcde-3620`, ou `installer-arbre.mjs lancer ABCDE-3620` |
 | la qualification et la confirmation de la composition (D10.INV-1, D11) | faites avant la génération de ce skill ; si l'analyse montre que la demande sort des empreintes, ce skill remonte au parent, sans changer de composition (D11.INV-4) |
 | un paragraphe de l'orchestrateur (§ n) | le texte recopié dans le module `methode` s'il y figure ; sinon un renvoi informatif |
 
@@ -956,19 +967,28 @@ Fichier `docs/c7e/registre-ecarts.md` ⚠️ ADAPTER (emplacement), créé à l'
 ```
 <<<FIN projet/meso-contrats.md>>>
 
+<<<FICHIER commandes/ticket/abcde-3620.toml>>>
+description = "Skill de ticket ABCDE-3620, racine (présentation et ratification de l'arbre, suivi, puis clôture), dans cette session"
+prompt = """
+Active le skill ticket-abcde-3620. L'étape 0 de sa consigne est faite : ses fichiers sont dans .gemini/skills/ticket-abcde-3620/, vérifiés par integrite.sha256. Lis CONSIGNE.md dans ce dossier et suis-la à partir de l'étape 1.
+Précision du développeur, s'il y en a une : {{args}}
+"""
+<<<FIN commandes/ticket/abcde-3620.toml>>>
+
 ---
 
 # Table d'intégrité (sha256)
 
 Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichiers ont été matérialisés.
 
-    e68b6452d6b63f1ce9729e2d02663dfd969984fffb052ba1e425d3151c9519bb  manifest.json
-    33ffe8c39e90cb4f35feee36b769773d898223457497d17c7e4167861a5227bf  SKILL.md
+    a908b34bba669af1cc58291f288a8d0e8594235a17fa73cce00efd9f52e73735  manifest.json
+    d0354c1ce4ed079928e6c3317ae3885495cba2bba8ef133581bee174f757266a  SKILL.md
     99f8d264ef101abf040d4648830305caa54de9a772ecd8f48eb4f2265ce1d75e  ticket.toml
     132002bb56c3b49254191bd44b9edfff7fd5dad422095a09bc1392ec046201cf  modules/meso-contrats/SKILL.md
     4858a0f8004ef82be15e0ed5f645392a9005297e764da791ab62fb6edc0230a1  modules/recette/SKILL.md
-    e8ffb46ca174c780cf0cfd878d749f210dc3c35e8eafb5950c0bc5e46573cfd9  modules/sous-tickets/SKILL.md
+    ab83aefa38bd8419a85895be2387b832b59f717605280f6892e4d78ed1440fb0  modules/sous-tickets/SKILL.md
     d66b48cf55727000808dd6f6d0547b334925bee722469ebc1a599fd1ff720cd4  modules/methode/SKILL.md
-    589c5c3c8b0c440d2a17cf3ded3bf604900f46d8e30121730bfa206a49173c01  modules/invariants/SKILL.md
+    82afae09894dfc860f0bfe74073b7ea1b85250c3c6603e746760452240c06a34  modules/invariants/SKILL.md
     f9456b0bbcdce8cd1ebc06446c3d505829a0354f398f4aa819204e4e9c135f54  socle/SKILL.md
     971128d2351d7dce8941a57e3b3875b59cb229c9469eef7c20d74d7561b6ac31  projet/meso-contrats.md
+    3504da878f2396e739346eec565bcc3e48ab534a27ecae5736548f4faba5f679  commandes/ticket/abcde-3620.toml

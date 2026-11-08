@@ -4,6 +4,15 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Prototypes
 
+### 2026-11-08 : skill de ticket C7E, lot 3
+
+- **Plan ratifié après le lot 2** (décisions 10 à 14 du README du prototype) : documents d'agent-tdd-jira rédigés par le skill racine, sous-agents de rôle tirés des skills du dépôt, kits dev, test et démo, Agent2Test tel quel et Agent2Dev hors du prototype ; un lot « documents et kits » prend la place 4, l'observation passe au lot 5, la vue augmentée au lot 6, la recette et le bilan au lot 7 ; critères P8 et P9.
+- **Lot 3, installation dans Gemini CLI** :
+  - `outils/installer-arbre.mjs` : `installer` (transmissions vérifiées, arbre complet, skills par `tools/installer.mjs`, agents dans `.gemini/agents/`, commandes dans `.gemini/commands/ticket/`, relevé dans `.gemini/skill-ticket/<clé>/`, masquage à Git), `liste` (état de chaque nœud), `verifier` (fichiers intacts, puis découverte des skills et chargement des agents par Gemini CLI), `lancer` (Gemini CLI en mode interactif sur la phrase d'activation du nœud), `retirer` (transmissions archivées dans `docs/demandes/<clé>/skills/`) ;
+  - skills de ticket : une commande par nœud (`commandes/ticket/<nœud>.toml`, `/ticket:<nœud>`), une session par nœud, ratification de l'arbre vérifiée au démarrage de chaque sous-ticket, états de la racine et des nœuds composés, ratification consignée sur une ligne de forme fixe, agents appelés par `invoke_agent` avec les chemins du skill installé ; transmissions attendues régénérées.
+- Choix à valider avec le lot : session par nœud, ligne de ratification, commandes dans les transmissions, archivage au retrait, version 1.0.0 maintenue, contrat épinglé à Gemini CLI 0.67.0.
+- Vérifications : recette de 139 tests, dont 15 du lot 3 (installation dans un dossier et dans un dépôt Git, masquage, idempotence, refus, liste des états, lancement par un faux Gemini CLI, retrait et archivage, et, avec Gemini CLI 0.67.0 réel, skills découverts, agents chargés, dossier non fiable signalé) ; mêmes résultats sur une copie du dépôt toute en CRLF et sous Node 20 ; workflow : installation de l'arbre d'essai et job `contrat-gemini` sous Linux et Windows. Le critère P4 attend sa vérification sur le poste du développeur.
+
 ### 2026-11-08 : skill de ticket C7E, lot 2
 
 - **Lot 2, fabrique et Monteur** : un skill de ticket par nœud de l'arbre, avec sa transmission tirée par `tools/bundle.mjs`.
