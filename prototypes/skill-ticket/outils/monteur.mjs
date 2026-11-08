@@ -1,4 +1,4 @@
-// Monteur des skills de ticket (prototype « skill de ticket », lot 2).
+// Monteur des skills de ticket (prototype « skill de ticket », lots 2 et 3).
 //
 // Le Monteur assemble, nœud par nœud, le skill de chaque ticket de l'arbre avec les pièces que lui
 // donne la fabrique de la pile ; il ne choisit rien lui-même. Il écrit chaque skill dans un dossier,
@@ -40,6 +40,7 @@ export class Monteur {
       f.invariants(n),
       ...copies.map((c) => c.fichier),
       ...f.agents(n),
+      ...f.commandes(n),
       ...f.observateurs(n),
     ];
     const manifeste = f.manifeste(n, corps, f.provenance(n, copies));

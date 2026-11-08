@@ -13,7 +13,7 @@ import { relire } from '../../../tools/bundle.mjs';
 import { lireToml } from '../outils/toml.mjs';
 import { RACINE_DEPOT, chargerReferentiel, lireTexte } from '../outils/referentiel.mjs';
 import { chargerArbre } from '../outils/arbre.mjs';
-import { FabriqueJavaAngularPostgreSQL, FabriqueSkillTicket, SECTIONS_METHODE, nomSkill, preuvesParametrees, sha256 } from '../outils/fabrique.mjs';
+import { FabriqueJavaAngularPostgreSQL, FabriqueSkillTicket, SECTIONS_METHODE, nomSkill, phraseActivation, preuvesParametrees, sha256 } from '../outils/fabrique.mjs';
 import { Monteur, generer, verifierHeritage, verifierTransmission } from '../outils/monteur.mjs';
 import { chargerSources, extraireSection, lignesInvariants } from '../outils/sources.mjs';
 
@@ -233,15 +233,39 @@ test('fabrique abstraite : les crochets de la pile restent à définir par une f
   assert.deepStrictEqual(FabriqueJavaAngularPostgreSQL.referencesRequises(['persistance', 'backend', 'frontend']), ['java', 'angular']);
 });
 
-test('famille de fichiers : agents pour les feuilles, coordination pour les nœuds composés', () => {
-  const familles = Object.fromEntries(NOMS.map((nom) => [nom, [...fichiersDe(attendue(nom)).keys()].filter((r) => r.startsWith('agents/') || r === 'modules/sous-tickets/SKILL.md')]));
+test('famille de fichiers : agents pour les feuilles, coordination pour les nœuds composés, une commande par nœud', () => {
+  const familles = Object.fromEntries(NOMS.map((nom) => [nom, [...fichiersDe(attendue(nom)).keys()].filter((r) => r.startsWith('agents/') || r.startsWith('commandes/') || r === 'modules/sous-tickets/SKILL.md')]));
   assert.deepStrictEqual(familles, {
-    'ticket-abcde-3620': ['modules/sous-tickets/SKILL.md'],
-    'ticket-abcde-3620-1': ['modules/sous-tickets/SKILL.md'],
-    'ticket-abcde-3620-1-1': ['agents/ticket-abcde-3620-1-1-persistance.md'],
-    'ticket-abcde-3620-1-2': ['agents/ticket-abcde-3620-1-2-back.md'],
-    'ticket-abcde-3620-2': ['agents/ticket-abcde-3620-2-front.md'],
+    'ticket-abcde-3620': ['modules/sous-tickets/SKILL.md', 'commandes/ticket/abcde-3620.toml'],
+    'ticket-abcde-3620-1': ['modules/sous-tickets/SKILL.md', 'commandes/ticket/abcde-3620-1.toml'],
+    'ticket-abcde-3620-1-1': ['agents/ticket-abcde-3620-1-1-persistance.md', 'commandes/ticket/abcde-3620-1-1.toml'],
+    'ticket-abcde-3620-1-2': ['agents/ticket-abcde-3620-1-2-back.md', 'commandes/ticket/abcde-3620-1-2.toml'],
+    'ticket-abcde-3620-2': ['agents/ticket-abcde-3620-2-front.md', 'commandes/ticket/abcde-3620-2.toml'],
   });
+});
+
+test('commandes : TOML de Gemini CLI, description et invite qui active le skill du nœud', () => {
+  for (const nom of NOMS) {
+    const court = nom.replace(/^ticket-/, '');
+    const commande = lireToml(fichiersDe(attendue(nom)).get(`commandes/ticket/${court}.toml`), court);
+    assert.deepStrictEqual(Object.keys(commande), ['description', 'prompt']);
+    assert.match(commande.description, /^Skill de ticket ABCDE-3620/);
+    assert.ok(commande.prompt.startsWith(`${phraseActivation(nom)}\n`), nom);
+    assert.match(commande.prompt, /\{\{args\}\}/);
+    assert.doesNotMatch(phraseActivation(nom), /["%!^&|<>`]/);
+  }
+});
+
+test('cycle de vie : une session par nœud, ratification de l\'arbre vérifiée, états de la racine', () => {
+  const consigne = (nom) => fichiersDe(attendue(nom)).get('SKILL.md');
+  assert.match(consigne('ticket-abcde-3620'), /1\. \*\*Arbre non ratifié\*\*[^\n]*\n2\. \*\*Sous-tickets en cours\*\*[^\n]*\n3\. \*\*Tous les sous-tickets clos\*\*/);
+  assert.doesNotMatch(consigne('ticket-abcde-3620-1'), /Arbre non ratifié/);
+  for (const nom of NOMS.slice(1)) {
+    assert.match(consigne(nom), /Vérifie que l'arbre a été ratifié : la ligne `- AAAA-MM-JJ, <nom> : arbre ABCDE-3620 ratifié` figure dans `docs\/demandes\/ABCDE-3620\/retours\.md`/, nom);
+  }
+  assert.match(consigne('ticket-abcde-3620-1-2'), /Puis renvoie le développeur au skill de ABCDE-3620-1, `\/ticket:abcde-3620-1`, dans une nouvelle session/);
+  assert.match(consigne('ticket-abcde-3620-1-2'), /par l'outil `invoke_agent` : `ticket-abcde-3620-1-2-back` \(backend\)/);
+  assert.match(fichiersDe(attendue('ticket-abcde-3620-1-2')).get('agents/ticket-abcde-3620-1-2-back.md'), /`\.gemini\/skills\/ticket-abcde-3620-1-2\/modules\/option-backend-representations\/SKILL\.md`/);
 });
 
 test('patron de méthode : même squelette de consigne pour tous les nœuds', () => {

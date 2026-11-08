@@ -2,9 +2,11 @@ name: Prototype skill de ticket
 
 # Prototype de l'orchestrateur C7E : un ticket résolu par des skills de ticket, assemblés depuis le
 # référentiel des méso-contrats. Ce workflow joue la recette du prototype sous Linux et sous Windows,
-# le plan de l'arbre d'essai ABCDE-3620, la génération de ses skills de ticket et la vérification de
-# leurs transmissions attendues. Il suit aussi les sources dont héritent les skills de ticket :
-# l'orchestrateur, le socle, les référentiels Java et Angular, et les outils de transmission.
+# le plan de l'arbre d'essai ABCDE-3620, la génération de ses skills de ticket, la vérification de
+# leurs transmissions attendues et leur installation dans un workspace. Le contrat avec Gemini CLI
+# 0.67.0 vérifie que ses skills sont découverts et ses agents chargés. Il suit aussi les sources dont
+# héritent les skills de ticket : l'orchestrateur, le socle, les référentiels Java et Angular, et les
+# outils de transmission et d'installation.
 
 on:
   pull_request:
@@ -58,3 +60,42 @@ jobs:
 
       - name: Vérification des transmissions attendues
         run: node prototypes/skill-ticket/outils/generer.mjs verifier prototypes/skill-ticket/exemples/ABCDE-3620-skills/transmissions
+
+      - name: Installation de l'arbre d'essai dans un workspace, puis retrait
+        shell: bash
+        run: |
+          ws="$RUNNER_TEMP/workspace-arbre"
+          mkdir -p "$ws"
+          outil=prototypes/skill-ticket/outils/installer-arbre.mjs
+          node "$outil" installer prototypes/skill-ticket/exemples/ABCDE-3620-skills/transmissions --workspace "$ws"
+          node "$outil" liste --workspace "$ws"
+          node "$outil" lancer ABCDE-3620 --essai --workspace "$ws"
+          node "$outil" retirer ABCDE-3620 --workspace "$ws"
+
+  contrat-gemini:
+    name: contrat Gemini CLI 0.67.0 (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: Gemini CLI 0.67.0, installé à part
+        run: npm install --prefix "${{ runner.temp }}/gemini" --no-audit --no-fund @google/gemini-cli@0.67.0
+
+      - name: Skills découverts et agents chargés par Gemini CLI (Linux)
+        if: runner.os != 'Windows'
+        env:
+          SKILL_TICKET_GEMINI: ${{ runner.temp }}/gemini/node_modules/.bin/gemini
+        run: node --test prototypes/skill-ticket/tests/installation.test.mjs
+
+      - name: Skills découverts et agents chargés par Gemini CLI (Windows)
+        if: runner.os == 'Windows'
+        env:
+          SKILL_TICKET_GEMINI: ${{ runner.temp }}\gemini\node_modules\.bin\gemini.cmd
+        run: node --test prototypes/skill-ticket/tests/installation.test.mjs
