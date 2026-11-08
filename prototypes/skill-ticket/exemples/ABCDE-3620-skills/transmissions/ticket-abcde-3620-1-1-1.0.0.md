@@ -85,7 +85,7 @@ Suis `SKILL.md` à partir de sa section 4. Rien n'est modifié avant la ratifica
     ],
     "genere_par": {
       "prototype": "skill-ticket",
-      "lot": 4,
+      "lot": 5,
       "fabrique": "java-angular-postgresql",
       "orchestrateur": "3.5.3"
     }
@@ -159,7 +159,7 @@ version: 1.0.0
 
 # Skill de ticket ABCDE-3620-1.1
 
-> Produit par le générateur C7E (prototype « skill de ticket », lot 4), fabrique `java-angular-postgresql`, référentiel des méso-contrats 3.3.0, orchestrateur-c7e 3.5.3. Ce skill remplace la fiche de transformation comme objet ratifié avant toute modification ; il reste identique à sa transmission. Si tu y relèves une ambiguïté ou une contradiction, signale-la au développeur ; ne corrige pas le skill toi-même.
+> Produit par le générateur C7E (prototype « skill de ticket », lot 5), fabrique `java-angular-postgresql`, référentiel des méso-contrats 3.3.0, orchestrateur-c7e 3.5.3. Ce skill remplace la fiche de transformation comme objet ratifié avant toute modification ; il reste identique à sa transmission. Si tu y relèves une ambiguïté ou une contradiction, signale-la au développeur ; ne corrige pas le skill toi-même.
 
 ## 1. Place dans l'arbre
 
@@ -191,8 +191,9 @@ Composition confirmée : M02 (module `meso-contrats`). Méso-contrats transverse
 
 1. Vérifie que ce skill est intact : s'il a été installé par l'installateur du dépôt Agent2Prompt, `sha256sum -c integrite.sha256` depuis son dossier.
 2. Lis la copie du projet du fichier d'invariants (`docs/c7e/meso-contrats.md` par défaut) et compare-la à `projet/meso-contrats.md`, l'état sur lequel ce skill a été produit. La copie du projet fait foi ; si elles diffèrent, dis-le au développeur avant tout le reste. Une valeur `ADAPTER` restée telle se signale, jamais devinée (D8.INV-1).
-3. Vérifie que l'arbre a été ratifié : la ligne `- AAAA-MM-JJ, <nom> : arbre ABCDE-3620 ratifié` figure dans `docs/demandes/ABCDE-3620/retours.md`. Sinon, arrête-toi et renvoie le développeur au skill racine, `/ticket:abcde-3620`.
-4. Ce ticket ne dépend d'aucun autre.
+3. Lis l'état du champ de l'arbre, `node .gemini/skills/ticket-abcde-3620/outils/champ.mjs etat docs/demandes/ABCDE-3620` : ratifications, critères de ce ticket menacés ou en écart, désaccords et observations attendues. Traite d'abord ce qui t'est attribué, au niveau le plus bas qui peut le traiter (module `champ` du skill racine, section 6).
+4. Vérifie dans cet état que l'arbre a été ratifié : « arbre ABCDE-3620 : ratifié ». Sinon, arrête-toi et renvoie le développeur au skill racine, `/ticket:abcde-3620`.
+5. Ce ticket ne dépend d'aucun autre.
 
 ## 5. Analyse (d=0), avant toute modification
 
@@ -206,7 +207,7 @@ Composition confirmée : M02 (module `meso-contrats`). Méso-contrats transverse
 
 ## 6. Ratification
 
-Présente au développeur ce skill et son analyse : objectif, critères, méso-contrats et options avec leur paramétrage, invariants, configuration, cartographie, stratégie, scénarios et tests déduits, avec la copie de travail de `ticket.toml`. **Point de ratification** : rien n'est modifié avant sa réponse (D3.INV-1, la fiche étant ce skill). Ajoute sa décision à `docs/demandes/ABCDE-3620/ABCDE-3620-1.1/retours.md`, sur une ligne `- AAAA-MM-JJ, <nom> : ABCDE-3620-1.1 ratifié`, ou `… non ratifié, <motif>`, avec la date et son nom.
+Présente au développeur ce skill et son analyse : objectif, critères, méso-contrats et options avec leur paramétrage, invariants, configuration, cartographie, stratégie, scénarios et tests déduits, avec la copie de travail de `ticket.toml`. **Point de ratification** : rien n'est modifié avant sa réponse (D3.INV-1, la fiche étant ce skill). Puis dépose sa décision dans le champ de l'arbre, `node .gemini/skills/ticket-abcde-3620/outils/champ.mjs deposer docs/demandes/ABCDE-3620 retour --noeud ABCDE-3620-1.1 --auteur ticket-abcde-3620-1-1 --nature ratification --objet "ABCDE-3620-1.1" --decision ratifié --par "<nom>" --contenu "<sa réponse>"`, ou `--decision "non ratifié"` avec sa raison dans `--contenu` (module `champ` du skill racine, section 3).
 
 ## 7. Transformation, après la ratification
 
@@ -230,9 +231,11 @@ Avant É6, le sous-agent `ticket-abcde-3620-relecteur` relit les commits de ce t
 
 `docs/demandes/ABCDE-3620/ABCDE-3620-1.1/remise.md`, complète à la remise (D3.INV-3) : modifications par slot, avec les commits ; dossier de preuves, scénario par scénario ; rapports du relecteur et de l'agent qualité ; écarts ajoutés au registre des écarts ; boucle de second ordre (observations É6 et É7, commits de rétroaction, entrées proposées) ; capitalisation ; indicateurs et leur calcul (module `methode`, § 8) ; et, sous le titre « Contributions aux kits », ce que le skill racine assemble à la clôture de l'arbre : les commits, avec leur empreinte et leur titre ; les tests et les scénarios qu'ils portent ; les données de démonstration, déposées dans `docs/demandes/ABCDE-3620/ABCDE-3620-1.1/demo/`, et les commandes de lancement. Puis renvoie le développeur au skill de ABCDE-3620-1, `/ticket:abcde-3620-1`, dans une nouvelle session : il indique la suite.
 
-## 9. Retours du développeur
+## 9. Champ d'observation
 
-La référence de ton observation est le retour du développeur : ses choix parmi les options que tu proposes, et ses corrections sur tes actions. Ajoute chacun à `docs/demandes/ABCDE-3620/ABCDE-3620-1.1/retours.md`, en ajout seul, avec ce que tu avais proposé ou fait. Une auto-évaluation sans preuve ni retour n'est pas une observation. Les retours orientent le travail ; ils ne lèvent aucun invariant ni aucune preuve.
+Le champ de l'arbre, `docs/demandes/ABCDE-3620/champ.jsonl`, reçoit en ajout seul ce que fait chaque niveau : les actions que tu proposes ou réalises, les retours du développeur (ses choix parmi tes propositions, ses corrections sur tes actions, ses ratifications) et les observations, chacune avec sa preuve. Dépose chacun par `node .gemini/skills/ticket-abcde-3620/outils/champ.mjs deposer docs/demandes/ABCDE-3620 <type> …`, jamais à la main (module `champ` du skill racine). La référence de ton observation est un retour du développeur ou une preuve : une auto-évaluation sans preuve ni retour n'est pas une observation.
+
+Après chaque correction du développeur, et à chaque lancement, `node .gemini/skills/ticket-abcde-3620/outils/champ.mjs etat docs/demandes/ABCDE-3620` montre les critères menacés, les désaccords et les observations attendues : invoque l'observateur d'ordre 2 ou d'ordre 3 de l'arbre quand il en attend une, puis présente sa proposition au développeur, qui la retient ou la refuse. Les retours orientent le travail ; ils ne lèvent aucun invariant ni aucune preuve.
 
 ## 10. Invariants hérités
 
@@ -577,6 +580,7 @@ Les invariants de l'orchestrateur parlent de sa fiche de transformation. Dans un
 | `docs/demandes/<CLÉ>/` | `docs/demandes/ABCDE-3620/ABCDE-3620-1.1/` |
 | la clé du ticket, qui nomme sa branche et ses commits (D4.INV-1, D4.INV-2) | la clé Jira du ticket racine, ABCDE-3620 : une seule branche pour tout l'arbre, et le corps de chaque commit cite le sous-ticket ABCDE-3620-1.1 |
 | le choix du développeur qui active le skill (D2.INV-3) | le lancement de ce skill par le développeur, dans sa propre session : la commande `/ticket:abcde-3620-1-1`, ou `installer-arbre.mjs lancer ABCDE-3620-1.1` |
+| le registre des écarts et le registre des concepts (D6.INV-1 à D6.INV-3) | `docs/c7e/registre-ecarts.md` et `docs/c7e/concepts.json` du projet, alimentés depuis le champ d'observation de l'arbre (module `champ` du skill racine) ; l'IA y ajoute, le développeur décide et promeut |
 | la qualification et la confirmation de la composition (D10.INV-1, D11) | faites avant la génération de ce skill ; si l'analyse montre que la demande sort des empreintes, ce skill remonte au parent, sans changer de composition (D11.INV-4) |
 | un paragraphe de l'orchestrateur (§ n) | le texte recopié dans le module `methode` s'il y figure ; sinon un renvoi informatif |
 
@@ -1361,7 +1365,7 @@ Tu réalises un à un les scénarios de `docs/demandes/ABCDE-3620/ABCDE-3620.fea
 
 ## Règles
 
-- Aucune modification avant la ratification du skill par le développeur : la ligne `- AAAA-MM-JJ, <nom> : ABCDE-3620-1.1 ratifié` dans `docs/demandes/ABCDE-3620/ABCDE-3620-1.1/retours.md` (D3.INV-1, la fiche étant ce skill).
+- Aucune modification avant la ratification du skill par le développeur, déposée dans le champ de l'arbre : `node .gemini/skills/ticket-abcde-3620/outils/champ.mjs etat docs/demandes/ABCDE-3620` montre « ABCDE-3620-1.1 : ratifié » (D3.INV-1, la fiche étant ce skill).
 - Les invariants hérités s'appliquent : `.gemini/skills/ticket-abcde-3620-1-1/modules/invariants/SKILL.md`, `.gemini/skills/ticket-abcde-3620-1-1/socle/SKILL.md`, la copie du projet du fichier d'invariants et `.gemini/skills/ticket-abcde-3620-1-1/references/java.md`.
 - Un slot par commit ; chaque commit commence par `ABCDE-3620 : `, ou `ABCDE-3620 Snn : ` pour un scénario, suivi de l'étiquette de son slot (D4.INV-2), et son corps cite `Sous-ticket : ABCDE-3620-1.1` ; tu ne pousses, ne fusionnes, ne rebases ni ne poses de tag (D4.INV-3).
 - Tu ne sors pas de ta couche : un besoin hors de ton périmètre remonte au skill du ticket.
@@ -1370,7 +1374,7 @@ Tu réalises un à un les scénarios de `docs/demandes/ABCDE-3620/ABCDE-3620.fea
 
 - Pour chaque scénario : son critère d'acceptation, le rouge avec son message d'échec, le vert, le remaniement, les suites et leurs résultats, les fichiers, le commit (cycle-tdd, § 6).
 - Chaque constat cite sa preuve : test, commande et sortie, ou réponse du développeur.
-- Chaque choix du développeur parmi tes propositions, et chaque correction qu'il demande sur tes actions, s'ajoute à `docs/demandes/ABCDE-3620/ABCDE-3620-1.1/retours.md` : c'est la référence de ton observation.
+- Dépose dans le champ, avec leur preuve, tes actions que le développeur peut corriger (scénario présenté, commit, modification annoncée) et tes observations d'ordre 1 : `node .gemini/skills/ticket-abcde-3620/outils/champ.mjs deposer docs/demandes/ABCDE-3620 action …` ou `observation --ordre 1 …` (module `champ` du skill racine). Un rouge du cycle TDD n'est pas un écart : le critère reste à prouver. Les retours du développeur, le skill du ticket les dépose : ils sont la référence de ton observation.
 <<<FIN agents/ticket-abcde-3620-1-1-persistance.md>>>
 
 <<<FICHIER commandes/ticket/abcde-3620-1-1.toml>>>
@@ -1387,16 +1391,16 @@ Précision du développeur, s'il y en a une : {{args}}
 
 Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichiers ont été matérialisés.
 
-    20a4d9ab3925a39d0caae6bb57889983646d7911a8d50a9b6e53a9ff05352cdd  manifest.json
-    fcb83d13703842ad470d5accd90122c09de200d936e81a9b1e2dcf290b16819b  SKILL.md
+    2b8ffe3b213c22d251cbbc6afa606257246d97ecccc39eef82c94e703ff06c54  manifest.json
+    bd23c36d00f117a34fc15dfaabd0361980f7ed6abbd30d46046e2fadf1442f13  SKILL.md
     3dd01b85794d05f8856234f53a76e7b679e4717c900d7994d4ec5a966db7751f  ticket.toml
     427b91753721d9837d87a6ac8929c11124df6101bf959918468043b9dd6f88de  modules/meso-contrats/SKILL.md
     86a98a76275998dda7eb1918ba14623af7f6ee89f13b9a960b937180b3766307  modules/option-persistance-crud/SKILL.md
     ce14f42b61bb11269228e02aa7b2faffbbbf087a906cf10e1b875ca3f8415b89  modules/recette/SKILL.md
     ed8cc63e18f4ceaf67ff3506aee5040633778ddb761469c9284af832bb1682c2  modules/methode/SKILL.md
-    851f676c33a47bfb52d3d52dd86a8d3f07fd64dba6072574d637a396e57fc4b9  modules/invariants/SKILL.md
+    48488ea9919b31b649f8b31f3881ee2f980abc4d644bdf51999ddc159c52d4b0  modules/invariants/SKILL.md
     f9456b0bbcdce8cd1ebc06446c3d505829a0354f398f4aa819204e4e9c135f54  socle/SKILL.md
     4bb52253c4504f4a804460442b1711a9caab8e364528171f2afb9ba7d5acfccf  references/java.md
     971128d2351d7dce8941a57e3b3875b59cb229c9469eef7c20d74d7561b6ac31  projet/meso-contrats.md
-    268768de405da3b43e994357a9bd60955e57c59d2a6d33e7a3dfcf6e8b148e58  agents/ticket-abcde-3620-1-1-persistance.md
+    99297d09f7b3f541ef2cc5fd65def23f58d7672d7373b14672e9ca25b19c86e9  agents/ticket-abcde-3620-1-1-persistance.md
     63771089b249fa23c49e660dae061c01c724a87254872af62d7e0bac1f059a83  commandes/ticket/abcde-3620-1-1.toml

@@ -1,7 +1,8 @@
 // Recette du lot 2 : la fabrique et le Monteur produisent un skill par nœud de l'arbre d'essai, chacun
 // avec sa transmission tirée par tools/bundle.mjs (critère P2), reprenant tout ce dont il hérite (P3) ;
 // un invariant omis ou altéré est rejeté (P1). Au lot 4, le skill racine porte en plus la boîte à outils
-// de l'arbre : documents, kits, sous-agents de rôle, références et scripts, à leur version épinglée.
+// de l'arbre : documents, kits, sous-agents de rôle, références et scripts, à leur version épinglée ; au
+// lot 5, le champ d'observation et ses observateurs d'ordre 2 et 3.
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -14,7 +15,7 @@ import { relire } from '../../../tools/bundle.mjs';
 import { lireToml } from '../outils/toml.mjs';
 import { RACINE_DEPOT, chargerReferentiel, lireTexte } from '../outils/referentiel.mjs';
 import { chargerArbre } from '../outils/arbre.mjs';
-import { FabriqueJavaAngularPostgreSQL, FabriqueSkillTicket, SECTIONS_METHODE, nomSkill, phraseActivation, preuvesParametrees, sha256 } from '../outils/fabrique.mjs';
+import { FabriqueJavaAngularPostgreSQL, FabriqueSkillTicket, SECTIONS_METHODE, nomSkill, phraseActivation, preuvesParametrees, sectionsMethode, sha256 } from '../outils/fabrique.mjs';
 import { Monteur, generer, verifierHeritage, verifierTransmission } from '../outils/monteur.mjs';
 import { BOITE, blocDeCode, chargerSources, extraireSection, lignesInvariants, resoudre } from '../outils/sources.mjs';
 
@@ -130,7 +131,9 @@ test('P3 : sections de la méthode, socle, référentiels de la pile et invarian
   for (const nom of NOMS) {
     const f = fichiersDe(attendue(nom));
     const feuille = references[nom].length > 0;
-    for (const s of SECTIONS_METHODE[feuille ? 'feuille' : 'compose']) assert.ok(f.get('modules/methode/SKILL.md').includes(extraireSection(S.orchestrateur.texte, s)), `${nom} § ${s}`);
+    const sections = nom === 'ticket-abcde-3620' ? SECTIONS_METHODE.racine : SECTIONS_METHODE[feuille ? 'feuille' : 'compose'];
+    for (const s of sections) assert.ok(f.get('modules/methode/SKILL.md').includes(extraireSection(S.orchestrateur.texte, s)), `${nom} § ${s}`);
+    assert.deepStrictEqual(JSON.parse(f.get('manifest.json')).ticket.herites.find((h) => h.path === 'modules/methode/SKILL.md').sections, sections, nom);
     assert.equal(f.get('socle/SKILL.md'), S.socle.contenu.replace(/\n*$/, '\n'), `${nom} socle`);
     assert.equal(f.get('projet/meso-contrats.md'), S.projet.contenu.replace(/\n*$/, '\n'), `${nom} projet`);
     assert.deepStrictEqual([...f.keys()].filter((r) => r.startsWith('references/')), [...references[nom].map((r) => `references/${r}.md`), ...boite(nom).filter((p) => p.startsWith('references/'))], nom);
@@ -235,12 +238,13 @@ test('fabrique abstraite : les crochets de la pile restent à définir par une f
   assert.deepStrictEqual(FabriqueJavaAngularPostgreSQL.referencesRequises(['persistance', 'backend', 'frontend']), ['java', 'angular']);
 });
 
-test('famille de fichiers : agents de couche pour les feuilles, sous-agents de rôle sur la racine, coordination pour les nœuds composés, une commande par nœud', () => {
+test('famille de fichiers : agents de couche pour les feuilles, sous-agents de rôle et observateurs sur la racine, coordination pour les nœuds composés, une commande par nœud', () => {
   const familles = Object.fromEntries(NOMS.map((nom) => [nom, [...fichiersDe(attendue(nom)).keys()].filter((r) => r.startsWith('agents/') || r.startsWith('commandes/') || r === 'modules/sous-tickets/SKILL.md')]));
   assert.deepStrictEqual(familles, {
     'ticket-abcde-3620': [
       'modules/sous-tickets/SKILL.md', 'agents/ticket-abcde-3620-redacteur.md', 'agents/ticket-abcde-3620-analyste.md',
       'agents/ticket-abcde-3620-relecteur.md', 'agents/ticket-abcde-3620-qualite.md', 'commandes/ticket/abcde-3620.toml',
+      'agents/ticket-abcde-3620-observateur-2.md', 'agents/ticket-abcde-3620-observateur-3.md',
     ],
     'ticket-abcde-3620-1': ['modules/sous-tickets/SKILL.md', 'commandes/ticket/abcde-3620-1.toml'],
     'ticket-abcde-3620-1-1': ['agents/ticket-abcde-3620-1-1-persistance.md', 'commandes/ticket/abcde-3620-1-1.toml'],
@@ -264,9 +268,13 @@ test('commandes : TOML de Gemini CLI, description et invite qui active le skill 
 test('cycle de vie : une session par nœud, ratification de l\'arbre vérifiée, états de la racine', () => {
   const consigne = (nom) => fichiersDe(attendue(nom)).get('SKILL.md');
   assert.match(consigne('ticket-abcde-3620'), /1\. \*\*Documents à rédiger\*\*[^\n]*\n2\. \*\*Arbre non ratifié\*\*[^\n]*\n3\. \*\*Sous-tickets en cours\*\*[^\n]*\n4\. \*\*Tous les sous-tickets clos\*\*/);
+  assert.match(consigne('ticket-abcde-3620'), /2\. \*\*Arbre non ratifié\*\*, documents écrits, sans « arbre ABCDE-3620 : ratifié » dans l'état du champ/);
   assert.doesNotMatch(consigne('ticket-abcde-3620-1'), /Arbre non ratifié/);
+  for (const nom of NOMS) {
+    assert.match(consigne(nom), /\n3\. Lis l'état du champ de l'arbre, `node \.gemini\/skills\/ticket-abcde-3620\/outils\/champ\.mjs etat docs\/demandes\/ABCDE-3620` : ratifications, critères de ce (nœud et de ses sous-tickets|ticket) menacés ou en écart/, nom);
+  }
   for (const nom of NOMS.slice(1)) {
-    assert.match(consigne(nom), /Vérifie que l'arbre a été ratifié : la ligne `- AAAA-MM-JJ, <nom> : arbre ABCDE-3620 ratifié` figure dans `docs\/demandes\/ABCDE-3620\/retours\.md`/, nom);
+    assert.match(consigne(nom), /\n4\. Vérifie dans cet état que l'arbre a été ratifié : « arbre ABCDE-3620 : ratifié »\. Sinon, arrête-toi et renvoie le développeur au skill racine, `\/ticket:abcde-3620`\./, nom);
   }
   assert.match(consigne('ticket-abcde-3620-1-2'), /Puis renvoie le développeur au skill de ABCDE-3620-1, `\/ticket:abcde-3620-1`, dans une nouvelle session/);
   assert.match(consigne('ticket-abcde-3620-1-2'), /par l'outil `invoke_agent` : `ticket-abcde-3620-1-2-back` \(backend\)/);
@@ -275,7 +283,7 @@ test('cycle de vie : une session par nœud, ratification de l\'arbre vérifiée,
 
 test('patron de méthode : même squelette de consigne pour tous les nœuds', () => {
   const titres = (nom) => fichiersDe(attendue(nom)).get('SKILL.md').split('\n').filter((l) => l.startsWith('## ')).map((l) => l.replace(/^## \d+\. /, ''));
-  const commun = ['Place dans l\'arbre', 'Objectif et critères', 'Méso-contrats et options', 'Au démarrage', 'Ratification', 'Remise', 'Retours du développeur', 'Invariants hérités', 'Fichiers'];
+  const commun = ['Place dans l\'arbre', 'Objectif et critères', 'Méso-contrats et options', 'Au démarrage', 'Ratification', 'Remise', 'Champ d\'observation', 'Invariants hérités', 'Fichiers'];
   for (const nom of NOMS) {
     const t = titres(nom);
     assert.equal(t.length, 11, nom);
@@ -451,7 +459,7 @@ test('lot 4 : documents de la clé avant la ratification de l\'arbre, kits à sa
   assert.ok(f.get('modules/documents/SKILL.md').includes('verifier-documents.mjs docs/demandes/ABCDE-3620 --rattachement .gemini/skills/ticket-abcde-3620/outils/rattachement.json\n'));
   assert.ok(f.get('modules/kits/SKILL.md').includes('verifier-kits.mjs docs/demandes/ABCDE-3620 --rattachement .gemini/skills/ticket-abcde-3620/outils/rattachement.json --depot\n'));
   assert.match(f.get('SKILL.md'), /## 6\. Ratification\n\n[^\n]*les documents de la clé, qui se ratifient avec lui/);
-  assert.match(f.get('SKILL.md'), /## 7\. Clôture\n\n[^\n]*\n\nPuis assemble les kits dev, test et démo et la remise à Agent2Test/);
+  assert.match(f.get('SKILL.md'), /## 7\. Clôture\n\n[^\n]*\n\n[^\n]*Puis assemble les kits dev, test et démo et la remise à Agent2Test/);
   assert.match(fichiersDe(attendue('ticket-abcde-3620-2')).get('SKILL.md'), /sous le titre « Contributions aux kits »[^\n]*captures de l'écran livré/);
 });
 
@@ -481,6 +489,82 @@ for (const [nom, modifier, motif] of boiteAlteree(S.boite.versions)) {
     attendreEcart(verifierTransmission(retoucher(attendue('ticket-abcde-3620'), modifier)).erreurs, motif);
   });
 }
+
+// ---- Lot 5 : champ d'observation, observateurs d'ordre 2 et 3 ----
+
+test('lot 5 : la racine porte le champ d\'observation, son script identique à sa source, et ses observateurs', () => {
+  const f = fichiersDe(attendue('ticket-abcde-3620'));
+  assert.equal(f.get('outils/champ.mjs'), lireTexte(join(ICI, '..', 'outils', 'champ.mjs')));
+  assert.deepStrictEqual(JSON.parse(f.get('manifest.json')).ticket.herites.find((h) => h.path === 'outils/champ.mjs'), { path: 'outils/champ.mjs', from: 'prototypes/skill-ticket/outils/champ.mjs', sha256: sha256(f.get('outils/champ.mjs')) });
+  const module = f.get('modules/champ/SKILL.md');
+  assert.deepStrictEqual(module.split('\n').filter((l) => l.startsWith('## ')), [
+    '## 1. Enregistrements', '## 2. Commandes', '## 3. Ratifications', '## 4. Ordres d\'observation', '## 5. Déclencheurs', '## 6. Propagation et escalade', '## 7. Désaccords entre nœuds', '## 8. Ce qui ne se fait pas',
+  ]);
+  assert.ok(module.includes('node .gemini/skills/ticket-abcde-3620/outils/champ.mjs etat docs/demandes/ABCDE-3620\n'));
+  assert.match(module, /Un rouge du cycle TDD n'est pas un écart/);
+  const agent = (ordre) => f.get(`agents/ticket-abcde-3620-observateur-${ordre}.md`);
+  const outils = (ordre) => /^tools:\n((?: {2}- \S+\n)+)/m.exec(agent(ordre))[1].trim().split('\n').map((l) => l.trim().replace(/^- /, ''));
+  for (const ordre of [2, 3]) {
+    assert.deepStrictEqual(outils(ordre), ['read_file', 'list_directory', 'glob', 'grep_search', 'run_shell_command'], `ordre ${ordre}`);
+    assert.match(agent(ordre), /ta seule écriture est le dépôt de tes observations par `\.gemini\/skills\/ticket-abcde-3620\/outils\/champ\.mjs`/);
+    assert.match(agent(ordre), new RegExp(`--auteur ticket-abcde-3620-observateur-${ordre} --ordre ${ordre} `));
+    // Chaque dépôt décrit porte sa preuve : le schéma la requiert pour toute observation.
+    for (const ligne of agent(ordre).split('\n').filter((l) => l.includes('--verdict'))) assert.match(ligne, /--preuve enregistrements:/, ligne);
+  }
+  assert.match(agent(2), /jamais une action sur le code/);
+  assert.match(agent(3), /Récursion bornée/);
+  // Les nœuds lisent le champ dans le skill racine ; aucun ne garde le fichier de retours du lot 3.
+  for (const nom of NOMS) {
+    const fs = fichiersDe(attendue(nom));
+    assert.match(fs.get('SKILL.md'), /## 9\. Champ d'observation\n\nLe champ de l'arbre, `docs\/demandes\/ABCDE-3620\/champ\.jsonl`, reçoit en ajout seul/, nom);
+    assert.ok(![...fs.values()].some((c) => c.includes('retours.md')), `${nom} : retours.md cité`);
+  }
+  for (const nom of NOMS.slice(1)) assert.ok(!fichiersDe(attendue(nom)).has('modules/champ/SKILL.md'), nom);
+});
+
+test('lot 5 : le rattachement dit quel critère du parent chaque critère soutient ; les ratifications se déposent dans le champ', () => {
+  const r = JSON.parse(fichiersDe(attendue('ticket-abcde-3620')).get('outils/rattachement.json'));
+  assert.deepStrictEqual(Object.fromEntries(r.noeuds.map((n) => [n.reference, n.criteres.map((c) => `${c.id}>${c.soutient.join('+')}`).join(' ')])), {
+    'ABCDE-3620-1': 'C1>ABCDE-3620:C1 C2>ABCDE-3620:C2 C3>ABCDE-3620:C3 C4>ABCDE-3620:C4 C5>ABCDE-3620:C5',
+    'ABCDE-3620-1.1': 'C1>ABCDE-3620-1:C4 C2>ABCDE-3620-1:C3',
+    'ABCDE-3620-1.2': 'C1>ABCDE-3620-1:C1 C2>ABCDE-3620-1:C2 C3>ABCDE-3620-1:C3 C4>ABCDE-3620-1:C5',
+    'ABCDE-3620-2': 'C1>ABCDE-3620:C5 C2>ABCDE-3620:C5',
+  });
+  const depot = (nom, noeud, objet) => `node .gemini/skills/ticket-abcde-3620/outils/champ.mjs deposer docs/demandes/ABCDE-3620 retour --noeud ${noeud} --auteur ${nom} --nature ratification --objet "${objet}" --decision ratifié --par "<nom>" --contenu "<sa réponse>"`;
+  assert.ok(fichiersDe(attendue('ticket-abcde-3620')).get('SKILL.md').includes(depot('ticket-abcde-3620', 'ABCDE-3620', 'arbre ABCDE-3620')));
+  for (const [nom, ref] of [['ticket-abcde-3620-1-1', 'ABCDE-3620-1.1'], ['ticket-abcde-3620-1-2', 'ABCDE-3620-1.2'], ['ticket-abcde-3620-2', 'ABCDE-3620-2']]) {
+    assert.ok(fichiersDe(attendue(nom)).get('SKILL.md').includes(depot(nom, ref, ref)), nom);
+  }
+  assert.doesNotMatch(fichiersDe(attendue('ticket-abcde-3620-1')).get('SKILL.md'), /--nature ratification/);
+});
+
+test('lot 5 : un skill racine produit au lot 4 reste vérifiable sans le script du champ ; au lot 5, le script est requis', () => {
+  const sansChamp = (lot) => (fs) => {
+    fs.splice(fs.findIndex((x) => x.rel === 'outils/champ.mjs'), 1);
+    majManifeste(fs, (j) => {
+      j.ticket.genere_par.lot = lot;
+      j.ticket.herites = j.ticket.herites.filter((h) => h.path !== 'outils/champ.mjs');
+    });
+  };
+  assert.deepStrictEqual(verifierTransmission(retoucher(attendue('ticket-abcde-3620'), sansChamp(4))).erreurs, []);
+  attendreEcart(verifierTransmission(retoucher(attendue('ticket-abcde-3620'), sansChamp(5))).erreurs, /héritage absent du manifeste : outils\/champ\.mjs/);
+});
+
+test('lot 5 : un ticket sans sous-ticket porte le champ et ses observateurs ; il se ratifie sous sa référence', () => {
+  const dossier = temporaire('arbre-seul-');
+  const texte = lireTexte(join(EXEMPLE, 'ABCDE-3620-1.1.toml')).replace(/^parent = .*\n/m, '').replace(/^soutient = .*\n/gm, '').replaceAll('ABCDE-3620-1.1', 'ABCDE-3621');
+  writeFileSync(join(dossier, 'ABCDE-3621.toml'), texte);
+  const { erreurs, skills } = generer({ arbre: dossier, sortie: temporaire('skills-seul-') });
+  assert.deepStrictEqual(erreurs, []);
+  assert.deepStrictEqual(skills.map((s) => s.nom), ['ticket-abcde-3621']);
+  const f = new Map(skills[0].fichiers.map((x) => [x.rel, x.contenu]));
+  const herites = JSON.parse(f.get('manifest.json')).ticket.herites;
+  const arbre = chargerArbre(dossier);
+  assert.deepStrictEqual(herites.find((h) => h.path === 'modules/methode/SKILL.md').sections, sectionsMethode(arbre.racine));
+  assert.deepStrictEqual(sectionsMethode(arbre.racine), ['2', '5.1', '5.2', '6', '7.1', '7.2', '8', '11.5']);
+  for (const rel of ['modules/champ/SKILL.md', 'outils/champ.mjs', 'agents/ticket-abcde-3621-observateur-2.md', 'agents/ticket-abcde-3621-observateur-3.md', 'agents/ticket-abcde-3621-persistance.md']) assert.ok(f.has(rel), rel);
+  assert.ok(f.get('SKILL.md').includes('--noeud ABCDE-3621 --auteur ticket-abcde-3621 --nature ratification --objet "ABCDE-3621" --decision ratifié'));
+});
 
 // ---- Ligne de commande et installateur ----
 
