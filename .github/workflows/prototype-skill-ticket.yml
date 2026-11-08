@@ -1,0 +1,43 @@
+name: Prototype skill de ticket
+
+# Prototype de l'orchestrateur C7E : un ticket résolu par des skills de ticket, assemblés depuis le
+# référentiel des méso-contrats. Ce workflow joue la recette du prototype sous Linux et sous Windows,
+# puis le plan de l'arbre d'essai ABCDE-3620. Il suit aussi le module referentiel de l'orchestrateur,
+# dont le prototype lit le modèle.
+
+on:
+  pull_request:
+    paths:
+      - 'prototypes/skill-ticket/**'
+      - 'specs/orchestrateur-c7e/modules/referentiel/**'
+      - '.github/workflows/prototype-skill-ticket.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'prototypes/skill-ticket/**'
+      - 'specs/orchestrateur-c7e/modules/referentiel/**'
+      - '.github/workflows/prototype-skill-ticket.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  recette:
+    name: recette (${{ matrix.os }}, Node ${{ matrix.node }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node: [22, 24]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Recette du prototype
+        run: node --test "prototypes/skill-ticket/tests/*.test.mjs"
+
+      - name: Plan de l'arbre d'essai
+        run: node prototypes/skill-ticket/outils/arbre.mjs plan prototypes/skill-ticket/exemples/ABCDE-3620

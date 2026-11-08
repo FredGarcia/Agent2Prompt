@@ -1,0 +1,136 @@
+{
+  "ticket": {
+    "reference": "ABCDE-3620-2",
+    "parent": "ABCDE-3620",
+    "depend_de": [
+      "ABCDE-3620-1.2"
+    ],
+    "referentiel": "3.3.0",
+    "meso_contrat": "M03",
+    "meso_contrat_confirme": true,
+    "titre": "Front : liste des lignes et date-heure du résumé tenues à jour en temps réel, annoncées sans déplacer le focus",
+    "demande": {
+      "intention": {
+        "reponse": "Afficher la liste des lignes et la date-heure du résumé, tenues à jour par le canal des lignes",
+        "source": "décomposition de ABCDE-3620"
+      },
+      "maquette": {
+        "reponse": "non",
+        "source": "parent : ABCDE-3620"
+      },
+      "table": {
+        "reponse": "non",
+        "precision": "porté par ABCDE-3620-1",
+        "source": "décomposition de ABCDE-3620"
+      },
+      "colonne": {
+        "reponse": "non",
+        "source": "parent : ABCDE-3620"
+      },
+      "index": {
+        "reponse": "non",
+        "precision": "porté par ABCDE-3620-1",
+        "source": "décomposition de ABCDE-3620"
+      },
+      "contrainte": {
+        "reponse": "non",
+        "precision": "porté par ABCDE-3620-1",
+        "source": "décomposition de ABCDE-3620"
+      },
+      "lecture": {
+        "reponse": "non",
+        "precision": "porté par ABCDE-3620-1",
+        "source": "décomposition de ABCDE-3620"
+      },
+      "ecriture": {
+        "reponse": "non",
+        "precision": "porté par ABCDE-3620-1",
+        "source": "décomposition de ABCDE-3620"
+      },
+      "endpoint_nouveau": {
+        "reponse": "non",
+        "source": "parent : ABCDE-3620"
+      },
+      "endpoint_modifie": {
+        "reponse": "non",
+        "precision": "porté par ABCDE-3620-1",
+        "source": "décomposition de ABCDE-3620"
+      },
+      "variante_representation": {
+        "reponse": "non",
+        "precision": "porté par ABCDE-3620-1",
+        "source": "décomposition de ABCDE-3620"
+      },
+      "temps_reel": {
+        "reponse": "non",
+        "precision": "publication portée par ABCDE-3620-1 ; ce ticket la consomme",
+        "source": "décomposition de ABCDE-3620"
+      },
+      "regle": {
+        "reponse": "non",
+        "source": "parent : ABCDE-3620"
+      },
+      "service": {
+        "reponse": "non",
+        "source": "parent : ABCDE-3620"
+      },
+      "ecran_nouveau": {
+        "reponse": "non",
+        "source": "parent : ABCDE-3620"
+      },
+      "ecran_modifie": {
+        "reponse": "oui",
+        "precision": "liste des lignes et date-heure du résumé",
+        "source": "décomposition de ABCDE-3620"
+      },
+      "formulaire": {
+        "reponse": "non",
+        "source": "décomposition de ABCDE-3620"
+      },
+      "comportement": {
+        "reponse": "oui",
+        "precision": "abonnement au canal, instantané, application des événements dans l'ordre des séquences",
+        "source": "décomposition de ABCDE-3620"
+      },
+      "navigation": {
+        "reponse": "non",
+        "source": "décomposition de ABCDE-3620"
+      }
+    },
+    "criteres": [
+      {
+        "id": "C1",
+        "enonce": "La liste des lignes et la date-heure du résumé se mettent à jour à l'écran sans rechargement ; après une coupure, l'écran reprend par l'instantané et son ETag.",
+        "soutient": [
+          "ABCDE-3620:C5"
+        ]
+      },
+      {
+        "id": "C2",
+        "enonce": "Chaque mise à jour est annoncée par une région aria-live polite, sans déplacer le focus.",
+        "soutient": [
+          "ABCDE-3620:C5"
+        ]
+      }
+    ],
+    "frontend": {
+      "fonctionnalites": [
+        {
+          "nom": "Tenir à jour la liste des lignes et le résumé : abonnement, puis instantané, puis événements dans l'ordre des séquences",
+          "declencheur": "ouverture du détail de la commande"
+        }
+      ],
+      "elements_graphiques": [
+        {
+          "nom": "Liste des lignes et date-heure du dernier enregistrement",
+          "etats": [
+            "chargement",
+            "à jour",
+            "reconnexion",
+            "erreur"
+          ]
+        }
+      ]
+    }
+  }
+}

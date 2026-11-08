@@ -1,0 +1,55 @@
+# Sous-ticket back de ABCDE-3620, nœud composé : l'agrégat en base (ABCDE-3620-1.1) et l'API (ABCDE-3620-1.2).
+
+[ticket]
+reference = "ABCDE-3620-1"
+parent = "ABCDE-3620"
+referentiel = "3.3.0"
+meso_contrat = "M04"
+meso_contrat_confirme = true
+titre = "Back : variante sans les lignes, résumé avec la date-heure de la dernière ligne, événements des lignes"
+
+[ticket.demande]
+intention = { reponse = "Servir la variante résumée de la commande et publier les changements de ses lignes", source = "parent : ABCDE-3620" }
+maquette = { reponse = "non", source = "parent : ABCDE-3620" }
+table = { reponse = "inconnu" }
+colonne = { reponse = "non", source = "parent : ABCDE-3620" }
+index = { reponse = "inconnu" }
+contrainte = { reponse = "inconnu" }
+lecture = { reponse = "oui", precision = "agrégat de la date-heure des lignes", source = "décomposition de ABCDE-3620" }
+ecriture = { reponse = "inconnu" }
+endpoint_nouveau = { reponse = "non", source = "parent : ABCDE-3620" }
+endpoint_modifie = { reponse = "oui", precision = "vue résumée et en-tête ETag", source = "décomposition de ABCDE-3620" }
+variante_representation = { reponse = "oui", precision = "champ lignes", source = "décomposition de ABCDE-3620" }
+temps_reel = { reponse = "oui", precision = "publication des changements des lignes", source = "décomposition de ABCDE-3620" }
+regle = { reponse = "non", source = "parent : ABCDE-3620" }
+service = { reponse = "non", source = "parent : ABCDE-3620" }
+ecran_nouveau = { reponse = "non", source = "parent : ABCDE-3620" }
+ecran_modifie = { reponse = "non", precision = "porté par ABCDE-3620-2", source = "décomposition de ABCDE-3620" }
+formulaire = { reponse = "non", precision = "porté par ABCDE-3620-2", source = "décomposition de ABCDE-3620" }
+comportement = { reponse = "non", precision = "porté par ABCDE-3620-2", source = "décomposition de ABCDE-3620" }
+navigation = { reponse = "non", precision = "porté par ABCDE-3620-2", source = "décomposition de ABCDE-3620" }
+
+[[ticket.criteres]]
+id = "C1"
+enonce = "Sans paramètre, la réponse de GET /api/v1/commandes/{id} est identique à celle d'avant le ticket."
+soutient = ["ABCDE-3620:C1"]
+
+[[ticket.criteres]]
+id = "C2"
+enonce = "Avec vue=resume, la réponse est un CommandeResumeDto sans lignes, avec lignesDernierEnregistrement."
+soutient = ["ABCDE-3620:C2"]
+
+[[ticket.criteres]]
+id = "C3"
+enonce = "Pour une commande sans ligne, lignesDernierEnregistrement vaut null, documenté au contrat."
+soutient = ["ABCDE-3620:C3"]
+
+[[ticket.criteres]]
+id = "C4"
+enonce = "La date-heure du résumé se calcule en une seule requête, sans charger les lignes."
+soutient = ["ABCDE-3620:C4"]
+
+[[ticket.criteres]]
+id = "C5"
+enonce = "Chaque changement des lignes publie, après commit, un événement qui porte la date-heure recalculée."
+soutient = ["ABCDE-3620:C5"]

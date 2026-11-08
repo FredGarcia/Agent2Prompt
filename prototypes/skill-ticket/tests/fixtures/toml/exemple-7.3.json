@@ -1,0 +1,28 @@
+{
+  "ticket": {
+    "reference": "ABCDE-3655",
+    "referentiel": "3.3.0",
+    "meso_contrat": "M04",
+    "complements": [
+      "M01"
+    ],
+    "meso_contrat_confirme": true,
+    "titre": "Commande : variante sans les lignes, résumé réservé au rôle COMMERCIAL, lignes en temps réel",
+    "demande": {
+      "regle": {
+        "reponse": "oui",
+        "precision": "résumé réservé au rôle COMMERCIAL, sinon 403",
+        "source": "ticket : critères d'acceptation"
+      }
+    },
+    "backend": {
+      "regles": [
+        {
+          "meso_contrat": "M01",
+          "id": "ABCDE-3655-R1",
+          "enonce": "Seul un utilisateur du rôle COMMERCIAL obtient la vue resume de GET /api/v1/commandes/{id} ; sinon 403."
+        }
+      ]
+    }
+  }
+}

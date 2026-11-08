@@ -1,0 +1,46 @@
+# Feuille de ABCDE-3620-1 : l'agrégat de la date-heure des lignes, en base.
+
+[ticket]
+reference = "ABCDE-3620-1.1"
+parent = "ABCDE-3620-1"
+referentiel = "3.3.0"
+meso_contrat = "M02"
+meso_contrat_confirme = true
+titre = "Base : date-heure de la dernière ligne enregistrée d'une commande, par une requête d'agrégat"
+
+[ticket.demande]
+intention = { reponse = "Lire la date-heure maximale des lignes d'une commande sans charger les lignes", source = "décomposition de ABCDE-3620-1" }
+maquette = { reponse = "non", source = "parent : ABCDE-3620" }
+table = { reponse = "non", source = "décomposition de ABCDE-3620-1" }
+colonne = { reponse = "non", precision = "ligne_commande.enregistree_le existe déjà", source = "parent : ABCDE-3620" }
+index = { reponse = "inconnu" }
+contrainte = { reponse = "non", source = "décomposition de ABCDE-3620-1" }
+lecture = { reponse = "oui", precision = "max(enregistree_le) par commande", source = "décomposition de ABCDE-3620-1" }
+ecriture = { reponse = "non", source = "décomposition de ABCDE-3620-1" }
+endpoint_nouveau = { reponse = "non", source = "parent : ABCDE-3620" }
+endpoint_modifie = { reponse = "non", precision = "porté par ABCDE-3620-1.2", source = "décomposition de ABCDE-3620-1" }
+variante_representation = { reponse = "non", precision = "porté par ABCDE-3620-1.2", source = "décomposition de ABCDE-3620-1" }
+temps_reel = { reponse = "non", precision = "porté par ABCDE-3620-1.2", source = "décomposition de ABCDE-3620-1" }
+regle = { reponse = "non", source = "parent : ABCDE-3620" }
+service = { reponse = "non", source = "parent : ABCDE-3620" }
+ecran_nouveau = { reponse = "non", source = "parent : ABCDE-3620" }
+ecran_modifie = { reponse = "non", source = "parent : ABCDE-3620-1" }
+formulaire = { reponse = "non", source = "parent : ABCDE-3620-1" }
+comportement = { reponse = "non", source = "parent : ABCDE-3620-1" }
+navigation = { reponse = "non", source = "parent : ABCDE-3620-1" }
+
+[[ticket.criteres]]
+id = "C1"
+enonce = "La date-heure maximale des lignes d'une commande se lit en une seule requête, sans charger les lignes."
+soutient = ["ABCDE-3620-1:C4"]
+
+[[ticket.criteres]]
+id = "C2"
+enonce = "Pour une commande sans ligne, l'agrégat renvoie null."
+soutient = ["ABCDE-3620-1:C3"]
+
+[[ticket.persistance.crud]]
+entite = "LigneCommande"
+table = "ligne_commande"
+operations = ["read"]
+lecture = "max(enregistree_le) des lignes d'une commande, par une requête d'agrégat"
