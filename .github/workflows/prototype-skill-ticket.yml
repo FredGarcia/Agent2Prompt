@@ -5,7 +5,8 @@ name: Prototype skill de ticket
 # le plan de l'arbre d'essai ABCDE-3620, la génération de ses skills de ticket, la vérification de
 # leurs transmissions attendues, leur installation dans un workspace, le contrôle des documents et des
 # kits du projet d'exemple résolu, celui des champs d'observation et des vues augmentées des projets
-# d'exemple, par les scripts que livre le skill racine. Le contrat avec Gemini
+# d'exemple, par les scripts que livre le skill racine ; le second arbre, ABCDE-3512, et la mesure du
+# contexte des deux arbres, comparée au point d'entrée de l'orchestrateur. Le contrat avec Gemini
 # CLI 0.67.0 vérifie que ses skills sont découverts et ses agents chargés. Il suit aussi les sources dont
 # héritent les skills de ticket : l'orchestrateur, le socle, les référentiels Java et Angular, les skills
 # de la boîte à outils de la racine (agent-tdd-jira, Agent2Test, analyse-projet, sonarqube), et les
@@ -99,6 +100,23 @@ jobs:
             demande="prototypes/skill-ticket/exemples/$projet/docs/demandes/ABCDE-3620"
             node "$outils/vue.mjs" verifier "$demande"
             node "$outils/vue.mjs" generer "$demande" --noeud ABCDE-3620-2 > /dev/null
+          done
+
+      - name: Second arbre, ABCDE-3512 (un seul ticket) ; plan et transmission attendue
+        run: |
+          node prototypes/skill-ticket/outils/arbre.mjs plan prototypes/skill-ticket/exemples/ABCDE-3512
+          node prototypes/skill-ticket/outils/generer.mjs verifier prototypes/skill-ticket/exemples/ABCDE-3512-skills/transmissions
+
+      - name: Mesure du contexte des deux arbres, rapports versionnés à jour
+        shell: bash
+        run: |
+          outil=prototypes/skill-ticket/outils/mesurer-contexte.mjs
+          exemples=prototypes/skill-ticket/exemples
+          node "$outil" mesurer "$exemples/ABCDE-3620-skills/transmissions" --projet "$exemples/ABCDE-3620-resolution" --sortie "$RUNNER_TEMP/ABCDE-3620.md"
+          node "$outil" mesurer "$exemples/ABCDE-3512-skills/transmissions" --sortie "$RUNNER_TEMP/ABCDE-3512.md"
+          for cle in ABCDE-3620 ABCDE-3512; do
+            diff --strip-trailing-cr "$exemples/contexte/$cle.md" "$RUNNER_TEMP/$cle.md"
+            sed -n '/^## Feuilles/,/^## Relectures/p' "$RUNNER_TEMP/$cle.md"
           done
 
       - name: Installation de l'arbre d'essai dans un workspace, puis retrait

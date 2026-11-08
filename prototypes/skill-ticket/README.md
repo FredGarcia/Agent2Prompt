@@ -1,6 +1,6 @@
 # Prototype : skill de ticket C7E
 
-**Statut** : lots 1 à 6 livrés : modèle et vérification de l'arbre, fabrique et Monteur des skills de ticket, installation de l'arbre dans Gemini CLI, documents de la clé Jira, sous-agents de rôle et kits dev, test et démo, champ d'observation de l'arbre et ses observateurs d'ordre 2 et 3, puis vue augmentée de l'arbre ; les choix du lot 6 attendent la validation du développeur. Le lot 7, recette et bilan, suit, validé par le développeur. Rien ici n'est encore une spécification versionnée : le prototype reste hors de `specs/` jusqu'à son bilan, après quoi il entrera dans l'orchestrateur C7E, probablement en version majeure, ou dans une spécification de générateur à part.
+**Statut** : prototype terminé, bilan rendu (`BILAN.md`). Les lots 1 à 7 sont livrés : modèle et vérification de l'arbre, fabrique et Monteur des skills de ticket, installation de l'arbre dans Gemini CLI, documents de la clé Jira, sous-agents de rôle et kits dev, test et démo, champ d'observation de l'arbre et ses observateurs d'ordre 2 et 3, vue augmentée, puis recette de bout en bout, mesure du contexte et bilan ; les choix du lot 7 attendent la validation du développeur. Rien ici n'est une spécification versionnée : le prototype reste hors de `specs/`, et aucune spécification n'a été modifiée. Le bilan propose deux voies d'intégration, une version majeure de l'orchestrateur C7E ou une spécification de générateur à part, à décider par le développeur.
 
 ## Objet
 
@@ -43,6 +43,14 @@ Ratifié ensuite, le même jour, après le lot 5 (plan du lot 6, tel que propos�
 22. **Second visiteur des critères**, qui range la vue par critère d'acceptation, chaque critère suivi de ceux qui le soutiennent et des scénarios qui le prouvent ; formats `vue.html` pour le développeur (autonome, accessible, lisible sans JavaScript), `vue.md` pour les agents, `--json` pour les outils ; même champ et mêmes documents, même vue.
 23. **Script `outils/vue.mjs`** dans la boîte à outils de la racine, `generer [--noeud]` et `verifier` ; un champ altéré ne donne pas de vue ; la vue n'est pas commitée. Chaque nœud lit sa vue à son lancement, les observateurs d'ordre 2 et 3 la vue entière ; la racine la présente au développeur à la ratification de l'arbre et à la clôture, et la cite dans sa remise ; `liste` dit si elle est à jour.
 24. **Recette P6** : vues de l'essai à plusieurs moments et du projet résolu, identiques aux vues versionnées ; piles recalculées et états du champ comparés à la vue ; altérations ; structure accessible vérifiée sans dépendance.
+
+Ratifié ensuite, le même jour, après le lot 6 (plan du lot 7, tel que proposé ; « Oui aux 2 », tenu aussi pour la validation des choix du lot 6) :
+
+25. **Mesure du contexte** : `outils/mesurer-contexte.mjs`, outil du prototype, hors de la boîte à outils de la racine ; pour chaque feuille, chaque contexte qui travaille pour elle (session de son skill, agents de couche, sous-agents de rôle que sa consigne nomme), à deux bornes, à l'activation et au plus, en caractères et en tokens estimés à un pour quatre caractères jusqu'à une mesure réelle ; le point d'entrée de l'orchestrateur mesuré de la même façon, pour le même ticket ; rapport versionné.
+26. **Second arbre** : ABCDE-3512, le ticket fil rouge de l'orchestrateur (M01, trois couches, images de l'objectif, un seul ticket), complété des critères qu'exige le prototype, rédigés pour lui et à relire par le développeur ; généré, installé et mesuré.
+27. **Mesure réelle facultative**, sur le poste : `gemini -p … -o json`, lecture de `stats`, calibrage du rapport entre caractères et tokens ; la clé n'est jamais demandée ni affichée.
+28. **Recette de bout en bout** dans un seul workspace : génération, installation, résolution simulée (documents, champ, vue, kits, historique Git), contrôles par les scripts du skill racine installé, `liste` à « clos » partout et vue à jour, retrait, transmissions archivées vérifiées ; tableau des critères P1 à P9 et de leurs preuves, P4 et la mesure réelle marqués « protocole sur le poste » ; recette P7 : mesure déterministe, rapport versionné, chaque fichier compté existant et cité, second arbre généré et vérifié.
+29. **Bilan** `BILAN.md` : critères, mesures, décision 8 revue à la lumière de P7, limites, écarts ; proposition d'intégration à décider par le développeur, (a) orchestrateur-c7e 4.0.0, où le skill de ticket remplace la fiche, ou (b) spécification de générateur à part, qui dépend de l'orchestrateur 3.x, avec les invariants candidats et les points ouverts ; prototype clos, aucune spécification modifiée par ce lot.
 
 ## Arbre d'essai : ABCDE-3620 sur trois niveaux
 
@@ -343,7 +351,7 @@ La vue s'ouvre sur ce qui est à traiter, par gravité : désaccords, écarts, m
 
 La recette compare ces vues à celles qu'elle regénère, octet pour octet ; recalcule les piles sans le script, à plusieurs dépôts de l'essai, et les compare au modèle comme à la page, ancre par ancre et calque par calque ; compare l'état de chaque critère à celui du champ, à chaque dépôt ; vérifie la vue d'un nœud, le Décorateur et le Visiteur ; relève une vue périmée, modifiée à la main ou absente et un champ altéré ; vérifie la structure accessible de la page sans dépendance : langue, titre, un seul titre de premier niveau et aucun niveau sauté, libellés des commandes, liens internes, aucune ressource extérieure, états écrits. `node tests/vue-scenarios.mjs --ecrire` réécrit les vues versionnées après un changement voulu du rendu.
 
-### Choix du lot 6, à valider
+### Choix du lot 6, validés le 8 novembre 2026
 
 1. **Critère en désaccord** : il garde l'état que lui donne le champ ; le désaccord s'y ajoute en marque et le met en tête de « À traiter ». Les autres ancres prennent l'état « en désaccord ».
 2. **Scénario** : réalisé dès une réalisation ou un verdict conforme ; à reprendre quand sa dernière action a été corrigée, jusqu'à une nouvelle réalisation.
@@ -353,6 +361,59 @@ La recette compare ces vues à celles qu'elle regénère, octet pour octet ; rec
 6. **Fraîcheur** : `verifier` regénère et compare ; « périmée » quand la vue écrite vient d'un champ plus court, « modifiée » sinon, à la main ou d'après d'autres documents.
 7. **Exemples** : les documents de la clé du projet résolu copiés dans le projet d'essai ; vues des trois moments versionnées en Markdown, vues finales en HTML et en Markdown.
 8. **Compatibilité** : un skill racine du lot 5 reste vérifiable sans le script de la vue ; un rattachement sans énoncés des critères des nœuds donne une vue sans ces énoncés.
+
+## Recette, mesure du contexte et bilan (lot 7)
+
+Le lot 7 clôt le prototype (décisions 25 à 29) : il mesure le contexte que charge chaque feuille, essaie un second arbre, joue la recette de bout en bout et rend le bilan, `BILAN.md`, avec le tableau des critères P1 à P9 et la proposition d'intégration.
+
+### Mesure du contexte
+
+`outils/mesurer-contexte.mjs`, outil du prototype que les skills générés ne portent pas, mesure sans modèle ce que charge chaque contexte d'un arbre : la session du skill de chaque nœud, chaque agent de couche, chaque sous-agent de rôle que sa consigne nomme, et les deux observateurs de l'arbre. À l'activation, ce que Gemini CLI charge de lui-même : noms et descriptions des skills et des agents installés, puis le corps du skill activé ou de l'agent invoqué. Au plus, en plus, ce que la consigne fait lire pour résoudre le ticket : modules et fichiers cités, copie du projet du fichier d'invariants, documents de la clé, vue du nœud ; jamais ce qu'elle fait écrire, ni le champ, qu'elle lit par la vue, ni le code d'un script, qui se lance. Le point d'entrée de l'orchestrateur se mesure de la même façon, selon l'ordre de lecture qu'écrit son `SKILL.md`, pour le même ticket. Le rapport compare chaque feuille à l'orchestrateur, puis donne le plus grand contexte de l'arbre, la somme de tous ses contextes et les fichiers relus d'un contexte à l'autre.
+
+Rapports versionnés : `exemples/contexte/ABCDE-3620.md`, sur le projet d'exemple résolu, et `exemples/contexte/ABCDE-3512.md`. En bref : aucun contexte ne charge plus de 53 % du point d'entrée de l'orchestrateur, au plus ; la session d'une feuille en charge 38 à 40 % (53 % pour un ticket sans sous-ticket), 18 à 26 % à son activation ; l'arbre entier lit en tout cinq fois (ABCDE-3620) et trois fois (ABCDE-3512) ce que lit l'orchestrateur, dont près de la moitié en relectures. Le bilan en tire la revue de la décision 8.
+
+### Second arbre : ABCDE-3512
+
+`exemples/ABCDE-3512/ABCDE-3512.toml` reprend mot pour mot le ticket fil rouge du § 7.1 du module `referentiel` de l'orchestrateur : M01, trois couches, images de l'objectif, un seul ticket. Le prototype exigeant des critères, six y sont ajoutés, rédigés pour lui et à relire par le développeur. L'arbre se vérifie (un ticket, profondeur 0), se génère en un skill, racine et feuille à la fois, dont la transmission est versionnée dans `exemples/ABCDE-3512-skills/transmissions/`, s'installe avec ses neuf agents et sa commande, et se mesure. Sans arbre à ratifier, le ticket se ratifie une fois, sous sa référence, après son analyse : le champ refuse une ratification « arbre ABCDE-3512 ».
+
+### Recette de bout en bout
+
+Dans un seul workspace, la copie du projet d'exemple résolu, son historique Git reconstruit : l'arbre ABCDE-3620 se génère à l'identique de ses transmissions versionnées et s'installe ; les contrôles des consignes, lancés tels que les consignes installées les écrivent, avec les scripts du skill racine, passent sur la résolution : documents de la clé, kits et historique (`--depot`), champ, vue, et la vue de chaque feuille, où rien n'est à traiter ; `liste` montre chaque nœud clos, le champ, dont les 18 critères sont prouvés, et la vue à jour ; le retrait archive les transmissions, qui se vérifient et se mesurent comme les versionnées ; aucun fichier suivi par Git n'a changé, de l'installation au retrait. ABCDE-3512 suit le même chemin, de la vérification de l'arbre à sa vue, en passant par sa ratification. Le modèle n'y joue aucun rôle : P4, la rédaction des documents et l'invocation des observateurs s'essaient sur le poste.
+
+### Mesure réelle sur le poste
+
+La mesure statique estime les tokens à un pour quatre caractères ; une mesure réelle la recale, sur le poste du développeur, avec Gemini CLI 0.67.0 et sa clé, déjà configurée, jamais demandée ni affichée. Dans un workspace d'essai de confiance où l'arbre ABCDE-3620 est installé (recette P4, étapes 1 et 2) :
+
+1. Session de base, qui n'active aucun skill : `gemini --approval-mode plan -p "Réponds seulement : prêt." -o json > base.json`. Sans interface, Gemini CLI refuse par défaut l'activation d'un skill (règle `activate_skill` de sa politique d'écriture, en mode non interactif).
+2. Session d'activation, qui active le skill d'une feuille et s'arrête, avec une politique qui n'autorise que l'activation, dans un fichier `calibrage.toml` hors du dépôt :
+
+   ```toml
+   [[rule]]
+   toolName = "activate_skill"
+   decision = "allow"
+   priority = 100
+   ```
+
+   puis `gemini --approval-mode plan --policy calibrage.toml -p "Active le skill ticket-abcde-3620-1-1, puis réponds seulement : activé." -o json > activation.json`.
+3. `node <dépôt>/prototypes/skill-ticket/outils/mesurer-contexte.mjs calibrer base.json activation.json --caracteres 12566`, où 12 566 est la taille du corps du skill activé, que donne le rapport (ligne « corps du skill, à son activation » de sa session).
+
+`calibrer` lit les statistiques des deux sorties (`stats.models`, tokens d'entrée et requêtes), attend une requête pour la base et deux pour l'activation, et donne le nombre de caractères par token du skill, à comparer à quatre. Si Gemini CLI demande une confirmation, ou si le skill fait plus que s'activer, les requêtes ne sont plus celles attendues : `calibrer` le relève et ne conclut pas. Le protocole n'a pas encore été joué : il est vérifié sur deux sorties d'essai de la forme de celles de Gemini CLI 0.67.0 (`tests/fixtures/gemini/`). Les sorties ne contiennent que la réponse et les statistiques ; aucune clé n'y figure.
+
+### Recette P7
+
+`tests/contexte.test.mjs` regénère les deux rapports et les compare aux rapports versionnés, octet pour octet ; vérifie que chaque fichier compté existe dans l'arbre ou dans le projet, a la taille comptée et se trouve cité par la consigne qui le fait lire, et qu'aucun fichier écrit par un nœud, ni le champ, ni un script n'est compté ; mesure l'orchestrateur selon l'ordre de lecture qu'elle relit dans son `SKILL.md` ; recalcule, pour chaque nœud et pour l'arbre, les rapports, les sommes, le plus grand contexte et les relectures ; vérifie le calibrage sur les sorties d'essai, et la ligne de commande. `tests/bout-en-bout.test.mjs` joue la recette de bout en bout sur les deux arbres ; `tests/bilan.test.mjs` vérifie ce qu'avance le bilan : chaque test cité en preuve existe sous ce titre, chaque ligne de mesure recopiée est celle d'un rapport, chaque fichier cité existe.
+
+### Choix du lot 7, à valider
+
+1. **Périmètre de la mesure** : tous les nœuds, pas seulement les feuilles ; chaque feuille comparée à l'orchestrateur (P7), et en plus la racine et les nœuds composés, les observateurs, mesurés une fois pour l'arbre, la somme de l'arbre entier et ses relectures.
+2. **Ce qui compte comme lu** : les modules et les fichiers que citent les sections 2 à 10 d'une consigne de skill, sans la place dans l'arbre ni la table des fichiers, ou tout le corps d'un agent ; la copie du projet du fichier d'invariants, même citée sans son chemin, et la copie du skill, que la consigne fait comparer ; un seul niveau de citations ; un script se lance et ne compte pas, sauf la vue du nœud, sa seule sortie lue en entier ; une lecture partielle (« § 2 à § 6 ») compte le fichier entier ; un chemin qui vaut pour chaque sous-ticket compte chacun.
+3. **Sous-agents d'un nœud** : ceux que sa consigne nomme, par leur nom d'agent ou comme « sous-agent rédacteur » ; les agents de couche d'une feuille sont les siens ; les observateurs, appelés sur attente du champ, restent hors des sommes par nœud.
+4. **Orchestrateur** : son ordre de lecture, au premier lancement puis à chaque ticket ; le référentiel du projet pris au modèle du module `referentiel` ; les référentiels Java et Angular comptés entiers quand le ticket touche leur couche ; sans copie du fichier d'invariants dans le projet, son modèle.
+5. **Rapports versionnés** dans `exemples/contexte/`, le projet nommé tel qu'il est donné, en séparateurs `/` : même rapport sous Windows ; ils se régénèrent comme les transmissions attendues quand une source change.
+6. **Calibrage** par différence entre une session de base et une session d'activation ; vérifié sur deux sorties d'essai, pas encore sur une session réelle.
+7. **Second arbre** : critères d'ABCDE-3512 rédigés pour le prototype, à relire ; transmission versionnée comme celles d'ABCDE-3620.
+8. **Recette de bout en bout** : les commandes des consignes installées, telles qu'elles sont écrites, depuis la racine du projet ; les valeurs qu'elles laissent au modèle (`<nom>`, `<sa réponse>`) données par la recette.
+9. **Bilan** : recommandation de la voie (a), à décider par le développeur ; invariants candidats à numéroter à l'intégration ; `BILAN.md` vérifié par sa recette.
 
 ## Commandes
 
@@ -369,6 +430,8 @@ node prototypes/skill-ticket/outils/verifier-kits.mjs <projet>/docs/demandes/<cl
 node prototypes/skill-ticket/outils/champ.mjs etat|verifier <projet>/docs/demandes/<clé> --rattachement <dossier>/ticket-<clé>/outils/rattachement.json
 node prototypes/skill-ticket/outils/champ.mjs deposer <projet>/docs/demandes/<clé> <type> --noeud <référence> --auteur <nom> … --rattachement <dossier>/ticket-<clé>/outils/rattachement.json
 node prototypes/skill-ticket/outils/vue.mjs generer|verifier <projet>/docs/demandes/<clé> [--noeud <référence>] [--json] --rattachement <dossier>/ticket-<clé>/outils/rattachement.json
+node prototypes/skill-ticket/outils/mesurer-contexte.mjs mesurer <dossier>/transmissions [--projet <projet>] [--json] [--sortie <rapport.md>]
+node prototypes/skill-ticket/outils/mesurer-contexte.mjs calibrer <base.json> <activation.json> --caracteres <n>
 node --test "prototypes/skill-ticket/tests/*.test.mjs"
 ```
 
@@ -382,7 +445,14 @@ Les transmissions attendues changent dès que change une source dont héritent l
 node prototypes/skill-ticket/outils/generer.mjs generer prototypes/skill-ticket/exemples/ABCDE-3620 --sortie prototypes/skill-ticket/exemples/ABCDE-3620-skills
 ```
 
-(seules les transmissions y sont versionnées).
+(seules les transmissions y sont versionnées), de même que celle du second arbre, en remplaçant `ABCDE-3620` par `ABCDE-3512`. Les rapports de mesure du contexte changent avec elles, ou avec l'orchestrateur, et se régénèrent par
+
+```bash
+node prototypes/skill-ticket/outils/mesurer-contexte.mjs mesurer prototypes/skill-ticket/exemples/ABCDE-3620-skills/transmissions --projet prototypes/skill-ticket/exemples/ABCDE-3620-resolution --sortie prototypes/skill-ticket/exemples/contexte/ABCDE-3620.md
+node prototypes/skill-ticket/outils/mesurer-contexte.mjs mesurer prototypes/skill-ticket/exemples/ABCDE-3512-skills/transmissions --sortie prototypes/skill-ticket/exemples/contexte/ABCDE-3512.md
+```
+
+Si les nombres des rapports changent, ceux que recopie `BILAN.md` se mettent à jour avec eux : sa recette le signale.
 
 ## Architecture et patrons
 
@@ -401,7 +471,7 @@ node prototypes/skill-ticket/outils/generer.mjs generer prototypes/skill-ticket/
 | actions enregistrées, corrections humaines qui les visent | Commande | 5, livré |
 | vue augmentée : calques posés sur les ancres du ticket, sans toucher à leur état | Décorateur | 6, livré |
 
-`outils/toml.mjs` lit le sous-ensemble de TOML 1.0 du référentiel et des tickets, sans dépendance ; sa recette le compare aux lectures de `tomllib` (Python), versionnées dans `tests/fixtures/toml/` et `tests/attendus/`. `outils/sources.mjs` lit les sources de l'héritage à leur version épinglée, archives comprises, fins de ligne normalisées ; `outils/fabrique.mjs` porte les fabriques, `outils/monteur.mjs` le Monteur et le contrôle de l'héritage, `outils/generer.mjs` la ligne de commande du générateur, `outils/installer-arbre.mjs` l'installation, le lancement et le retrait d'un arbre dans Gemini CLI, `outils/verifier-documents.mjs` et `outils/verifier-kits.mjs` les contrôles des documents et des kits, `outils/champ.mjs` le champ d'observation, `outils/vue.mjs` la vue augmentée, livrés tels quels dans le skill racine.
+`outils/toml.mjs` lit le sous-ensemble de TOML 1.0 du référentiel et des tickets, sans dépendance ; sa recette le compare aux lectures de `tomllib` (Python), versionnées dans `tests/fixtures/toml/` et `tests/attendus/`. `outils/sources.mjs` lit les sources de l'héritage à leur version épinglée, archives comprises, fins de ligne normalisées ; `outils/fabrique.mjs` porte les fabriques, `outils/monteur.mjs` le Monteur et le contrôle de l'héritage, `outils/generer.mjs` la ligne de commande du générateur, `outils/installer-arbre.mjs` l'installation, le lancement et le retrait d'un arbre dans Gemini CLI, `outils/verifier-documents.mjs` et `outils/verifier-kits.mjs` les contrôles des documents et des kits, `outils/champ.mjs` le champ d'observation, `outils/vue.mjs` la vue augmentée, livrés tels quels dans le skill racine ; `outils/mesurer-contexte.mjs`, outil du prototype seul, la mesure du contexte.
 
 ## Lots et critères d'acceptation
 
@@ -412,8 +482,8 @@ node prototypes/skill-ticket/outils/generer.mjs generer prototypes/skill-ticket/
 | 3 | installation de l'arbre dans Gemini CLI, activation vérifiée sur le poste du développeur | P4 | livré |
 | 4 | documents d'agent-tdd-jira, sous-agents de rôle, kits dev, test et démo | P8, P9 | livré |
 | 5 | champ d'observation, retours humains simulés, observateurs d'ordre 2 et 3, escalade, propagation | P5 | livré |
-| 6 | vue augmentée générée depuis le champ | P6 | livré, choix à valider |
-| 7 | recette, mesure du contexte, bilan | P7 | à venir |
+| 6 | vue augmentée générée depuis le champ | P6 | livré |
+| 7 | recette de bout en bout, mesure du contexte, second arbre, bilan | P7 | livré, choix à valider |
 
 - **P1** : l'arbre d'essai passe le vérificateur ; sont rejetés : deux parents, un cycle de dépendances, une dépendance vers un ancêtre, une profondeur au-delà du plafond, une possibilité du parent portée par aucun sous-ticket, une option hors de la composition, un invariant omis (lot 2).
 - **P2** : chaque skill produit se relit à l'identique depuis sa transmission ; la même entrée redonne les mêmes fichiers ; l'assemblage ne consomme aucun token.
@@ -427,4 +497,4 @@ node prototypes/skill-ticket/outils/generer.mjs generer prototypes/skill-ticket/
 
 ## Écart relevé dans le référentiel
 
-En codant la règle « aucune possibilité ne reste inconnue si sa réponse pouvait changer la composition », le prototype constate que l'exemple du § 7.2 du module `referentiel` (orchestrateur-c7e 3.5.3) laisse `regle` et `service` à `inconnu`, alors qu'un `oui` ajouterait un complément à M04. Le référentiel n'est pas modifié ; l'arbre d'essai répond à ces deux possibilités, et un test documente l'écart.
+En codant la règle « aucune possibilité ne reste inconnue si sa réponse pouvait changer la composition », le prototype constate que l'exemple du § 7.2 du module `referentiel` (orchestrateur-c7e 3.5.3) laisse `regle` et `service` à `inconnu`, alors qu'un `oui` ajouterait un complément à M04. Le référentiel n'est pas modifié ; l'arbre d'essai répond à ces deux possibilités, et un test documente l'écart. Les écarts trouvés par la suite, dont l'absence de critères dans le ticket du § 7.1, sont relevés dans `BILAN.md`.

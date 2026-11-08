@@ -342,7 +342,7 @@ export function decrireArbre(arbre) {
 function bilan(arbre, R, profondeurMax) {
   const relies = arbre.noeuds.filter((n) => n.relie);
   const profondeur = Math.max(0, ...relies.map((n) => n.profondeur));
-  return `Arbre ${arbre.racine.reference} conforme : ${relies.length} tickets, profondeur ${profondeur} (plafond ${profondeurMax}), référentiel ${R.version}`;
+  return `Arbre ${arbre.racine.reference} conforme : ${relies.length} ticket${relies.length > 1 ? 's' : ''}, profondeur ${profondeur} (plafond ${profondeurMax}), référentiel ${R.version}`;
 }
 
 /** Ligne de commande. Renvoie le code de sortie ; écrit par `sortie` et `erreur`. */
@@ -382,7 +382,9 @@ export function principal(argv, sortie = console.log, erreur = console.error) {
     sortie('');
     sortie(`Méso-contrats transverses : ${R.transverses(couchesTouchees(arbre, R)).join(', ') || 'aucun'}`);
     const feuilles = arbre.racine.feuilles().map((f) => f.reference);
-    sortie(`Ratification : l'arbre, sur le skill parent ${arbre.racine.reference} ; puis chaque feuille avant sa première action (${feuilles.join(', ')}).`);
+    sortie(arbre.racine.estFeuille
+      ? `Ratification : le skill ${arbre.racine.reference}, ticket sans sous-ticket, avant sa première action.`
+      : `Ratification : l'arbre, sur le skill parent ${arbre.racine.reference} ; puis chaque feuille avant sa première action (${feuilles.join(', ')}).`);
   }
   return 0;
 }

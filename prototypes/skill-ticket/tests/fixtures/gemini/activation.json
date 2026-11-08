@@ -1,0 +1,14 @@
+{
+  "session_id": "00000000-0000-4000-8000-000000000002",
+  "response": "Skill activé.",
+  "stats": {
+    "models": {
+      "gemini-2.5-pro": {
+        "api": { "totalRequests": 2, "totalErrors": 0, "totalLatencyMs": 5300 },
+        "tokens": { "input": 24080, "prompt": 24080, "candidates": 31, "total": 24230, "cached": 8960, "thoughts": 119, "tool": 0 }
+      }
+    },
+    "tools": { "totalCalls": 1, "totalSuccess": 1, "totalFail": 0, "totalDurationMs": 12, "byName": { "activate_skill": { "count": 1, "success": 1, "fail": 0, "durationMs": 12 } } },
+    "files": { "totalLinesAdded": 0, "totalLinesRemoved": 0 }
+  }
+}
