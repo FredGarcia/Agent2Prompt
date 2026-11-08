@@ -4,6 +4,20 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Prototypes
 
+### 2026-11-08 : skill de ticket C7E, lot 7, bilan
+
+- **Lot 6 validé** par le développeur, choix compris, avec la ratification du plan du lot 7.
+- **Lot 7, recette, mesure du contexte et bilan** (critère P7) ; le prototype est terminé :
+  - `outils/mesurer-contexte.mjs`, outil du prototype : pour chaque nœud d'un arbre, chaque contexte (session du skill, agents de couche, sous-agents de rôle que sa consigne nomme) et les observateurs de l'arbre, à deux bornes, à l'activation et au plus, en caractères et en tokens estimés ; le point d'entrée de l'orchestrateur mesuré de même, selon son ordre de lecture ; chaque feuille comparée à lui ; plus grand contexte, somme et relectures de l'arbre ; `calibrer` recale l'estimation sur deux sorties `-o json` de Gemini CLI ;
+  - rapports versionnés, `exemples/contexte/ABCDE-3620.md` et `ABCDE-3512.md` : aucun contexte au-delà de 53 % du point d'entrée de l'orchestrateur, au plus ; la session d'une feuille à 38 à 40 % (53 % pour un ticket seul) ; l'arbre entier lit cinq fois (ABCDE-3620) et trois fois (ABCDE-3512) ce que lit l'orchestrateur, dont près de la moitié en relectures ;
+  - second arbre, ABCDE-3512, le ticket fil rouge du § 7.1 du module `referentiel`, un seul ticket, complété de six critères rédigés pour le prototype, à relire ; sa transmission versionnée ; `arbre.mjs plan` dit la ratification d'un ticket sans sous-ticket ;
+  - recette de bout en bout dans un seul workspace : génération, installation dans le projet résolu à l'historique reconstruit, contrôles par les commandes des consignes installées, `liste` à « clos » partout et vue à jour, retrait, transmissions archivées vérifiées et mesurées ; même chemin pour ABCDE-3512, jusqu'à sa ratification et sa vue ;
+  - `BILAN.md` : critères P1 à P9 et leurs preuves, P4 et la mesure réelle en protocole sur le poste ; mesures ; décision 8 revue (contexte séparé par agent et ordre 3 gardés, trois pistes contre les relectures) ; limites ; écarts relevés ; intégration à décider par le développeur, recommandation d'un orchestrateur-c7e 4.0.0 où le skill de ticket remplace la fiche, avec dix invariants candidats et les points ouverts ;
+  - protocole de la mesure réelle sur le poste, avec une politique de Gemini CLI qui n'autorise que l'activation d'un skill ; la clé n'est jamais demandée ni affichée.
+- Choix à valider avec le lot : périmètre de la mesure, ce qui compte comme lu, sous-agents d'un nœud, mesure de l'orchestrateur, rapports versionnés, calibrage, second arbre, recette de bout en bout, recommandation du bilan.
+- Aucune spécification modifiée.
+- Vérifications : recette de 265 tests, dont 20 du lot 7 (rapports versionnés, fichiers comptés existants, de la taille comptée et cités, ordre de lecture de l'orchestrateur, comparaisons et relectures, citations, calibrage, ligne de commande, bout en bout sur les deux arbres, preuves du bilan) ; workflow : second arbre vérifié, rapports de mesure à jour.
+
 ### 2026-11-08 : skill de ticket C7E, lot 6
 
 - **Lot 5 validé** par le développeur, choix compris, avec la ratification du plan du lot 6.
