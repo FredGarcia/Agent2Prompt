@@ -5,13 +5,13 @@ name: Recette du générateur de skills de ticket
 # le plan de l'arbre d'essai ABCDE-3620, la génération de ses skills de ticket, la vérification de
 # leurs transmissions attendues, leur installation dans un workspace, le contrôle des documents et des
 # kits du projet d'exemple résolu, celui des champs d'observation et des vues augmentées des projets
-# d'exemple, par les scripts que livre le skill racine ; le second arbre, ABCDE-3512, et la mesure du
-# contexte des deux arbres, comparée au point d'entrée de l'orchestrateur. Le contrat avec Gemini
-# CLI 0.67.0 vérifie que ses skills sont découverts et ses agents chargés. Il suit aussi les sources dont
-# héritent les skills de ticket : l'orchestrateur, le socle, les référentiels Java et Angular, les skills
-# de la boîte à outils de la racine (agent-tdd-jira, Agent2Test, analyse-projet, sonarqube), et les
-# outils de transmission et d'installation. La structure de la spécification elle-même est vérifiée,
-# avec toutes les autres, par tools/verifier.mjs.
+# d'exemple, par les scripts que livre le skill racine, avec la comparaison des invariants du projet par
+# chaque nœud ; le second arbre, ABCDE-3512, et la mesure du contexte des deux arbres, comparée au point
+# d'entrée de l'orchestrateur. Le contrat avec Gemini CLI 0.67.0 vérifie que ses skills sont découverts
+# et ses agents chargés. Il suit aussi les sources dont héritent les skills de ticket : l'orchestrateur,
+# le socle, les référentiels Java et Angular, les skills de la boîte à outils de la racine (agent-tdd-jira,
+# Agent2Test, analyse-projet, sonarqube), et les outils de transmission et d'installation. La structure
+# de la spécification elle-même est vérifiée, avec toutes les autres, par tools/verifier.mjs.
 
 on:
   pull_request:
@@ -120,7 +120,7 @@ jobs:
             sed -n '/^## Feuilles/,/^## Relectures/p' "$RUNNER_TEMP/$cle.md"
           done
 
-      - name: Installation de l'arbre d'essai dans un workspace, puis retrait
+      - name: Installation de l'arbre d'essai dans un workspace, invariants du projet comparés par chaque nœud, puis retrait
         shell: bash
         run: |
           ws="$RUNNER_TEMP/workspace-arbre"
@@ -128,6 +128,11 @@ jobs:
           outil=specs/generateur-skill-ticket/outils/installer-arbre.mjs
           node "$outil" installer specs/generateur-skill-ticket/exemples/ABCDE-3620-skills/transmissions --workspace "$ws"
           node "$outil" liste --workspace "$ws"
+          mkdir -p "$ws/docs/c7e"
+          cp "$ws/.gemini/skills/ticket-abcde-3620/projet/meso-contrats.md" "$ws/docs/c7e/meso-contrats.md"
+          for skill in ticket-abcde-3620 ticket-abcde-3620-1 ticket-abcde-3620-1-1 ticket-abcde-3620-1-2 ticket-abcde-3620-2; do
+            (cd "$ws" && node .gemini/skills/ticket-abcde-3620/outils/invariants.mjs comparer "$skill")
+          done
           node "$outil" lancer ABCDE-3620 --essai --workspace "$ws"
           node "$outil" retirer ABCDE-3620 --workspace "$ws"
 

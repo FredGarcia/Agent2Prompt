@@ -39,6 +39,7 @@ export class Monteur {
       ...f.documents(n),
       ...f.kits(n),
       ...f.champ(n),
+      ...f.champDepot(n),
       ...f.vue(n),
       f.methode(n),
       f.invariants(n),
@@ -97,10 +98,9 @@ export function verifierHeritage(fichiers, { projet } = {}) {
   else if ((t.enfants ?? []).length === 0 && ticket) {
     for (const nom of Fabrique.referencesRequises(couchesDuTicket(ticket))) requis.push(`references/${nom}.md`);
   }
-  // Un skill produit par le générateur publié exige toute la boîte à outils ; un skill produit par le
+  // Un skill produit par le générateur exige la boîte à outils de sa version ; un skill produit par le
   // prototype, celle de son lot.
-  const lot = t.genere_par?.generateur ? Infinity : (t.genere_par?.lot ?? 0);
-  if (t.parent === null) requis.push(...BOITE.filter((b) => (b.depuis ?? 4) <= lot).map((b) => b.path));
+  if (t.parent === null) requis.push(...BOITE.filter((b) => exigeDans(b, t.genere_par)).map((b) => b.path));
   for (const p of requis) if (!herites.has(p)) erreurs.push(`héritage absent du manifeste : ${p}`);
 
   for (const h of t.herites) {
@@ -186,6 +186,24 @@ export function verifierTransmission(texte, options = {}) {
   if (!entete.includes(`skill ${manifeste.name} ${manifeste.version},`)) erreurs.push('en-tête : nom ou version différents de ceux du manifeste');
   erreurs.push(...verifierHeritage(contenus, options));
   return { nom: manifeste.name, version: manifeste.version, fichiers: fichiers.length, erreurs: [...new Set(erreurs)] };
+}
+
+/** Ordre de deux versions X.Y.Z : négatif, nul ou positif. */
+const comparerVersions = (a, b) => {
+  const [x, y] = [a, b].map((v) => String(v).split('.').map(Number));
+  for (let k = 0; k < 3; k++) if ((x[k] ?? 0) !== (y[k] ?? 0)) return (x[k] ?? 0) - (y[k] ?? 0);
+  return 0;
+};
+
+/**
+ * Un fichier de la boîte à outils est-il exigé du skill racine que décrit `genere_par` ? Ajouté par un lot du
+ * prototype (nombre) : exigé d'un skill du générateur, ou du prototype à partir de ce lot. Ajouté par une
+ * version du générateur (chaîne) : exigé d'un skill de cette version ou d'une suivante.
+ */
+export function exigeDans(b, genereePar = {}) {
+  const depuis = b.depuis ?? 4;
+  if (typeof depuis === 'string') return Boolean(genereePar?.generateur) && comparerVersions(genereePar.version, depuis) >= 0;
+  return Boolean(genereePar?.generateur) || depuis <= (genereePar?.lot ?? 0);
 }
 
 /** Un dossier se remplace seulement s'il contient un skill de ticket produit par le générateur, ou par le prototype dont il est issu. */

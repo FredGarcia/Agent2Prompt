@@ -4,7 +4,8 @@
 // pour octet, celui qui est versionné ; chaque fichier compté existe, a la taille comptée, et la consigne
 // qui le fait lire le cite ; l'orchestrateur se mesure selon son propre ordre de lecture. Le calibrage par
 // une mesure réelle se vérifie sur deux sorties d'essai de Gemini CLI ; la mesure réelle elle-même se fait
-// sur le poste du développeur, avec sa clé.
+// sur le poste du développeur, avec sa clé. En 1.0.1, les relectures visées par le bilan ont disparu, et la
+// somme de chaque arbre a baissé d'au moins 10 % depuis le lot 7, dont les rapports sont figés.
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -207,6 +208,37 @@ test('P7 : chaque feuille est comparée au point d\'entrée de l\'orchestrateur,
       [m.noeuds.length, a.feuilles.length, tous.length, total, plusGrand, { plus_grand: ratio(plusGrand, o.au_plus.caracteres), total: ratio(total, o.au_plus.caracteres) }],
       a.cle,
     );
+  }
+});
+
+// ---- 1.0.1 : les relectures visées par le bilan ----
+
+/** Somme des contextes d'un arbre, en tokens, d'après son rapport du lot 7, figé. */
+function sommeDuLot7(cle) {
+  const m = /^\| somme des \d+ contextes [^|]+ \| (\d{1,3}(?: \d{3})*) tokens, \d+ % \|$/m.exec(lireTexte(join(EXEMPLES, 'contexte', 'lot-7', `${cle}.md`)));
+  assert.ok(m, `${cle} : somme absente du rapport du lot 7`);
+  return Number(m[1].replace(/ /g, ''));
+}
+
+test('1.0.1 : relectures visées par le bilan disparues ; la somme lue par chaque arbre baisse d\'au moins 10 % depuis le lot 7', () => {
+  assert.deepStrictEqual(ARBRES.map((a) => sommeDuLot7(a.cle)), [311138, 179881], 'rapports du lot 7 : figés');
+  for (const a of ARBRES) {
+    const m = MESURES.get(a.cle);
+    const tous = contextesDe(m);
+    const racine = `session du skill ticket-${a.cle.toLowerCase()}`;
+    const lecteurs = (module) => tous.filter((c) => c.au_plus.fichiers.some((e) => e.id === `ticket-${a.cle.toLowerCase()}/modules/${module}/SKILL.md`)).map((c) => c.nom);
+    for (const c of tous) {
+      const lus = c.au_plus.fichiers.map((e) => e.id);
+      // Le fichier d'invariants se compare par empreinte : seule sa copie du projet se lit.
+      assert.deepStrictEqual(lus.filter((id) => id.endsWith('/projet/meso-contrats.md')), [], `${c.nom} lit la copie du fichier d'invariants que porte un skill`);
+      // Un agent de couche porte sa part de la consigne : il ne relit pas celle de son nœud.
+      if (c.nature === 'agent') assert.deepStrictEqual(lus.filter((id) => /^[^/]+\/SKILL\.md$/.test(id)), [], `${c.nom} relit la consigne de son nœud`);
+    }
+    // Le module champ entier, à la racine et aux observateurs ; son extrait de dépôt, aux autres nœuds et aux agents de couche.
+    assert.deepStrictEqual(lecteurs('champ'), tous.filter((c) => c.nom === racine || c.nature === 'observateur').map((c) => c.nom), a.cle);
+    assert.deepStrictEqual(lecteurs('champ-depot'), tous.filter((c) => (c.nature === 'session' && c.nom !== racine) || c.nature === 'agent').map((c) => c.nom), a.cle);
+    const avant = sommeDuLot7(a.cle);
+    assert.ok(m.arbre.total.tokens <= avant * 0.9, `${a.cle} : ${m.arbre.total.tokens} tokens, contre ${avant} au lot 7, soit moins de 10 % de baisse`);
   }
 });
 

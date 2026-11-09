@@ -8,6 +8,7 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 - **Lot 7 validé** par le développeur, choix compris ; les six critères d'ABCDE-3512 relus et acceptés.
 - **Voie d'intégration (b)** choisie : une spécification de générateur à part, qui dépend de l'orchestrateur 3.x sans le modifier, nommée `generateur-skill-ticket`, ses sources lues dans un clone du dépôt ; plan d'intégration en cinq lots ratifié, les lots 1 et 2 livrés ensemble.
+- **Lot 3 de l'intégration** ratifié : les corrections relevées par le bilan, publiées en `generateur-skill-ticket` 1.0.1 (section « Socle et experts back-front »).
 - Le prototype est devenu la spécification `generateur-skill-ticket` 1.0.0 (section « Socle et experts back-front ») : ses outils, sa recette, ses exemples, son bilan et l'histoire de sa conception (`PROTOTYPE.md`) sont dans `specs/generateur-skill-ticket/` ; `prototypes/skill-ticket/` garde un renvoi. Le bilan reste figé à la fin du lot 7, ses tableaux sur les rapports du lot 7, figés eux aussi.
 
 ### 2026-11-08 : skill de ticket C7E, lot 7, bilan
@@ -94,6 +95,18 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 - Écart relevé : l'exemple du § 7.2 du module referentiel laisse `regle` et `service` inconnus alors qu'ils changeraient la composition ; non corrigé, signalé.
 
 ## Socle et experts back-front
+
+### 2026-11-09 : generateur-skill-ticket 1.0.1
+
+- **generateur-skill-ticket 1.0.1** : correctif, lot 3 de l'intégration, les corrections relevées par le bilan du prototype ; aucune dimension ni aucun invariant modifié, aucune autre spécification touchée.
+  - Fichier d'invariants comparé par empreinte : nouveau script `outils/invariants.mjs`, livré dans le skill racine ; au démarrage, chaque nœud compare la copie du projet à l'état sur lequel son skill a été produit, sans lire la copie du skill, puis ne lit que la copie du projet, qui fait foi ; sections qui diffèrent, copie absente ou altérée et valeurs ADAPTER restées sont signalées. Un skill racine exige le script depuis la 1.0.1 ; un skill produit en 1.0.0, ou par le prototype, reste vérifiable sans lui.
+  - Chaque agent de couche porte sa part de la consigne, objectif, critères et composition, au lieu de relire celle de son nœud.
+  - Module court `champ-depot` du skill racine pour les nœuds et les agents de couche : ce qu'ils déposent dans le champ et la suite qu'ils donnent à ses attentes ; le module `champ` entier reste à la racine et aux observateurs.
+  - Le rédacteur est invoqué par son nom d'agent, comme les autres sous-agents de rôle.
+  - P4 précisé pour un ticket sans sous-ticket, avec la variante du protocole sur le poste pour ABCDE-3512.
+  - Mesure : les relectures visées par le bilan ont disparu des rapports ; somme des contextes de 311 138 à 275 231 tokens pour ABCDE-3620 (−11,5 %), de 179 881 à 158 705 pour ABCDE-3512 (−11,8 %) ; plus grand contexte de 50 à 44 % et de 53 à 47 % du point d'entrée de l'orchestrateur. Le bilan estimait environ 14 % : l'extrait de dépôt compte 5 000 caractères plutôt que 2 000, et chaque agent de couche lit désormais les méso-contrats de son nœud.
+  - Lecture partielle du socle et des référentiels : hors de ce correctif.
+- Vérifications : recette de 283 tests, dont 13 de la 1.0.1 (script des invariants, consignes et agents, extrait de dépôt du champ, rédacteur, exigence par version, réduction des relectures, comparaison de bout en bout dans le workspace d'ABCDE-3512) ; `tools/verifier.mjs`.
 
 ### 2026-11-09 : generateur-skill-ticket 1.0.0
 
