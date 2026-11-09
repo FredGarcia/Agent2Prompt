@@ -1,0 +1,28 @@
+{
+  "name": "generateur-skill-ticket",
+  "version": "1.0.0",
+  "specSchema": 1,
+  "language": "fr",
+  "description": "Générateur de skills de ticket C7E : décompose un ticket en arbre de sous-tickets, produit pour chaque nœud un skill assemblé depuis le référentiel des méso-contrats, l'installe et le lance dans Gemini CLI ; chaque skill s'observe dans un champ partagé, et chaque niveau voit le ticket augmenté.",
+  "entry": "SKILL.md",
+  "references": [
+    { "name": "orchestrateur-c7e", "version": "3.5.3" },
+    { "name": "socle-back-front", "version": "1.1.0" },
+    { "name": "java", "version": "1.1.1" },
+    { "name": "angular", "version": "1.0.1" },
+    { "name": "agent-tdd-jira", "version": "1.3.4" },
+    { "name": "agent2test", "version": "1.3.1" },
+    { "name": "analyse-projet", "version": "1.0.2" },
+    { "name": "sonarqube", "version": "1.1.0" }
+  ],
+  "modules": [
+    { "id": "arbre", "path": "modules/arbre/SKILL.md", "dimensions": ["D1"], "status": "active" },
+    { "id": "assemblage", "path": "modules/assemblage/SKILL.md", "dimensions": ["D2"], "status": "active" },
+    { "id": "installation", "path": "modules/installation/SKILL.md", "dimensions": ["D3"], "status": "active" },
+    { "id": "documents-kits", "path": "modules/documents-kits/SKILL.md", "dimensions": ["D4"], "status": "active" },
+    { "id": "champ", "path": "modules/champ/SKILL.md", "dimensions": ["D5"], "status": "active" },
+    { "id": "vue", "path": "modules/vue/SKILL.md", "dimensions": ["D6"], "status": "active" },
+    { "id": "mesure", "path": "modules/mesure/SKILL.md", "dimensions": ["D7"], "status": "active" }
+  ],
+  "extensionPoints": ["E1", "E2", "E3"]
+}
