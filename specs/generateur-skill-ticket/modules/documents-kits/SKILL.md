@@ -20,10 +20,18 @@ Le skill racine porte la boîte à outils de l'arbre : les documents de la clé 
 | `references/java/revue.md`, `references/angular/revue.md` | java et angular, modules `revue` | relecteur |
 | `references/sonarqube.md`, `references/sonarqube/examen-local.md` | sonarqube, point d'entrée et module `examen-local` | qualité |
 | `outils/extraire-jira.mjs`, `outils/controler-criteres.mjs` | agent-tdd-jira, blocs de code de `ingestion-jira` § 3 et `us-criteres` § 7, à l'identique | extraction d'une capture MHTML, contrôle des US et des scénarios |
-| `outils/verifier-documents.mjs`, `outils/verifier-kits.mjs`, `outils/champ.mjs`, `outils/vue.mjs` | le générateur, tels quels | contrôles des documents et des kits, champ d'observation, vue augmentée |
+| `outils/verifier-documents.mjs`, `outils/verifier-kits.mjs`, `outils/champ.mjs`, `outils/vue.mjs`, `outils/invariants.mjs` | le générateur, tels quels | contrôles des documents et des kits, champ d'observation, vue augmentée, comparaison du fichier d'invariants du projet à l'état de production de chaque skill |
 | `outils/rattachement.json` | produit par la fabrique, `skill-ticket.rattachement/1` | critères de l'arbre rattachés aux critères de la clé, soutiens, énoncés, couches, images de l'objectif |
 
-Chaque fichier de la boîte est identique à sa source à sa version épinglée, sous le contrôle de l'héritage (module `assemblage`, H3 et H4) ; un invariant d'un autre skill se cite avec son nom, `agent-tdd-jira:D10.INV-1`.
+Chaque fichier de la boîte est identique à sa source à sa version épinglée, sous le contrôle de l'héritage (module `assemblage`, H3 et H4) ; un invariant d'un autre skill se cite avec son nom, `agent-tdd-jira:D10.INV-1`. Un skill racine exige la boîte de sa version : le script des invariants depuis la 1.0.1.
+
+Au démarrage, chaque nœud compare la copie du projet du fichier d'invariants à l'état sur lequel son skill a été produit, sans lire la copie du skill :
+
+```bash
+node .gemini/skills/ticket-<clé>/outils/invariants.mjs comparer <skill du nœud> [--projet docs/c7e/meso-contrats.md]
+```
+
+Copies identiques : code 0. Copie du projet absente, copie du skill altérée, ou copies différentes, avec les sections qui diffèrent et leurs lignes : code 1. Les sections où restent des valeurs ADAPTER sont signalées dans tous les cas. La copie du projet fait foi, et seule elle se lit ; absente, la copie du skill en tient lieu.
 
 ## 2. Sous-agents de rôle
 
@@ -74,4 +82,4 @@ Avec `--depot`, le contrôle se fait aussi dans le dépôt : branche, commits, l
 |---|---|
 | D4.INV-1 | `tests/documents-kits.test.mjs` : « P8 : les documents de l'exemple passent controler-criteres et verifier-documents, livrés par le skill racine » ; « P8 : écart relevé » ; « P8 : une image de l'objectif d'une feuille doit figurer parmi les pièces de demande.json » ; `tests/generer.test.mjs` : « lot 4 : rattachement des critères de l'arbre aux critères d'acceptation de la clé » ; `tests/bout-en-bout.test.mjs` : « les contrôles des consignes passent sur la résolution, avec les scripts du skill racine installé » |
 | D4.INV-2 | `tests/documents-kits.test.mjs` : « P9 : les kits de l'exemple sont complets et vérifiés, et la remise est conforme » ; « P9 : l'historique se reconstruit à l'identique, et le kit dev s'y vérifie avec --depot » ; « P9 : écart relevé » ; « P9 : chaque image de l'objectif a sa capture de l'écran livré, comparée » ; « P9 : prévision de jouabilité selon les règles du module plan d'Agent2Test » |
-| D4.INV-3 | `tests/generer.test.mjs` : « lot 4 : la racine porte la boîte à outils, chaque fichier identique à sa source à sa version épinglée » ; « lot 4 : sous-agents de rôle en lecture seule, sauf le rédacteur ; références lues dans le skill racine installé » ; « lot 4 : transmission de la racine rejetée » |
+| D4.INV-3 | `tests/generer.test.mjs` : « lot 4 : la racine porte la boîte à outils, chaque fichier identique à sa source à sa version épinglée » ; « lot 4 : sous-agents de rôle en lecture seule, sauf le rédacteur ; références lues dans le skill racine installé » ; « lot 4 : transmission de la racine rejetée » ; « 1.0.1 : la racine fait rédiger les documents de la clé par le sous-agent rédacteur, nommé comme son agent » ; « 1.0.1 : un skill racine produit en 1.0.0 reste vérifiable sans le script des invariants ; en 1.0.1, le script est requis » ; `tests/invariants.test.mjs` : « invariants : copies identiques, code 0 ; seule la copie du projet est à lire, et les valeurs ADAPTER restées sont signalées » ; « invariants : une copie du projet en fins de ligne CRLF reste identique » ; « invariants : copie du projet différente, code 1, avec les sections qui diffèrent et leurs lignes » ; « invariants : copie du projet absente, code 1, avec la copie du skill qui en tient lieu » ; « invariants : copie du skill altérée, code 1, avant toute comparaison » ; « invariants : ligne de commande, depuis la racine du projet ; codes de sortie » ; `tests/bout-en-bout.test.mjs` : « 1.0.1 : dans le workspace d'ABCDE-3512, la comparaison des invariants de la consigne dit la copie du projet absente, identique, puis différente » |

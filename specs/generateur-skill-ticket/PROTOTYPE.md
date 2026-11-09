@@ -58,6 +58,10 @@ Ratifié ensuite, le même jour, après le lot 7 (« 1 : ok, 2 : validé », pui
 31. **Voie d'intégration (b)** : une spécification de générateur à part, `generateur-skill-ticket`, qui dépend de l'orchestrateur 3.x à versions épinglées ; l'orchestrateur n'est pas modifié. Le générateur lit les sources dont héritent les skills de ticket dans un clone du dépôt, à leurs versions épinglées, comme le prototype.
 32. **Plan d'intégration** : 1, la spécification ; 2, les outils, les exemples et la recette du prototype dans la spécification, avec la CI (lots 1 et 2 livrés ensemble : la consigne de la 1.0.0 cite ses outils par leur chemin) ; 3, les corrections relevées par le bilan (trois pistes contre les relectures, rédacteur nommé comme les autres sous-agents, P4 précisé pour un ticket sans sous-ticket) ; 4, la recette sur le poste du développeur (P4, rédaction des documents, observateurs, mesure réelle) ; 5, la clôture du prototype.
 
+Ratifié le 9 novembre 2026, après la fusion de la 1.0.0 (« Oui d'accord ») :
+
+33. **Lot 3 de l'intégration, generateur-skill-ticket 1.0.1**, un correctif : le fichier d'invariants comparé par empreinte, avec un script de la boîte à outils, la copie du projet seule lue ; chaque agent de couche avec sa part de la consigne ; un module court `champ-depot` pour les nœuds et les agents de couche, le module `champ` entier pour la racine et les observateurs ; le rédacteur nommé comme son agent ; P4 précisé pour un ticket sans sous-ticket, avec la variante du protocole sur le poste pour ABCDE-3512. Recette : relectures visées disparues des rapports, somme de chaque arbre en baisse d'au moins 10 % depuis le lot 7, plafond de D7.INV-1 tenu. La lecture partielle du socle et des référentiels reste hors du lot.
+
 ## Arbre d'essai : ABCDE-3620 sur trois niveaux
 
 Le ticket ABCDE-3620 du référentiel (module `referentiel` de l'orchestrateur, § 7.2), décomposé en `exemples/ABCDE-3620/` :

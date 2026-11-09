@@ -5,7 +5,8 @@
 // montre chaque nœud clos, le champ et la vue à jour ; le retrait archive les transmissions, qui se
 // vérifient et se mesurent comme les versionnées, sans qu'aucun fichier suivi par Git n'ait changé. Le
 // second arbre, ABCDE-3512, un seul ticket, se vérifie, se génère à l'identique, s'installe, se ratifie sous
-// sa référence, et sa vue se génère. Ce que fait le modèle dans Gemini CLI s'essaie sur le poste (P4).
+// sa référence, et sa vue se génère ; en 1.0.1, la comparaison des invariants s'y lance telle que la consigne
+// l'écrit. Ce que fait le modèle dans Gemini CLI s'essaie sur le poste (P4).
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -189,5 +190,30 @@ test('second arbre : ABCDE-3512, un seul ticket, se vérifie, se génère à l\'
   const vue = readFileSync(join(dossier, 'vue.md'), 'utf8');
   for (let k = 1; k <= 6; k++) assert.match(vue, new RegExp(`### ABCDE-3512-CA0${k} · ABCDE-3512:C${k} — à prouver\\n\\n> \\S`), `C${k}`);
   assert.match(vue, /- ABCDE-3512 : ratifié \(n° 1, \d{4}-\d{2}-\d{2}, Fred\)/);
+  assert.equal(suivisModifies(ws), '');
+});
+
+test('1.0.1 : dans le workspace d\'ABCDE-3512, la comparaison des invariants de la consigne dit la copie du projet absente, identique, puis différente', () => {
+  const ws = temporaire('ws-3512-invariants-');
+  git(ws, 'init', '-q');
+  const r = installateur(['installer', VERSIONNEES('ABCDE-3512'), '--workspace', ws]);
+  assert.equal(r.status, 0, r.stderr);
+  const texte = consignes(ws, 'ticket-abcde-3512');
+  const comparer = () => commandeDesConsignes(ws, texte, 'node .gemini/skills/ticket-abcde-3512/outils/invariants.mjs comparer ticket-abcde-3512');
+  const absente = comparer();
+  assert.equal(absente.status, 1);
+  assert.match(absente.stderr, /^copie du projet absente : docs\/c7e\/meso-contrats\.md ; signale-le au développeur, et lis à sa place \.gemini[\\/]skills[\\/]ticket-abcde-3512[\\/]projet[\\/]meso-contrats\.md, l'état sur lequel ticket-abcde-3512 a été produit\n$/);
+  // Le développeur installe le modèle de l'orchestrateur, dans l'état sur lequel le skill a été produit.
+  mkdirSync(join(ws, 'docs', 'c7e'), { recursive: true });
+  const modele = readFileSync(join(ws, '.gemini', 'skills', 'ticket-abcde-3512', 'projet', 'meso-contrats.md'), 'utf8');
+  writeFileSync(join(ws, 'docs', 'c7e', 'meso-contrats.md'), modele);
+  const identique = comparer();
+  assert.equal(identique.status, 0, identique.stderr);
+  assert.match(identique.stdout, /^invariants du projet identiques à ceux sur lesquels ticket-abcde-3512 a été produit \(sha256 [0-9a-f]{12}\) : lis docs\/c7e\/meso-contrats\.md, qui fait foi\nvaleurs ADAPTER restées dans docs\/c7e\/meso-contrats\.md, à signaler, jamais devinées : /);
+  // Puis il y ajoute un invariant transverse propre au projet.
+  writeFileSync(join(ws, 'docs', 'c7e', 'meso-contrats.md'), modele.replace(/\n## 6\. /, '\n- Toute table porte une clé technique.\n\n## 6. '));
+  const differente = comparer();
+  assert.equal(differente.status, 1);
+  assert.match(differente.stderr, /^invariants du projet différents de ceux sur lesquels ticket-abcde-3512 a été produit : docs\/c7e\/meso-contrats\.md fait foi ; 1 section diffère, à dire au développeur avant tout le reste\n {2}§ 5\. Invariants transverses[^\n]* : modifiée\n {4}\+ - Toute table porte une clé technique\.\n/);
   assert.equal(suivisModifies(ws), '');
 });

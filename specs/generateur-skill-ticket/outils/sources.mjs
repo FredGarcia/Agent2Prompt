@@ -150,7 +150,8 @@ export const DOSSIER_OUTILS = `${GENERATEUR}/outils`;
 /**
  * Boîte à outils du skill racine (lots 4 et 5), dans l'ordre de la transmission : un module ou un point
  * d'entrée de skill copié en entier, un extrait (`sections`), un script tiré d'un bloc de code (`bloc`),
- * ou un script du générateur (`outil`) ; `depuis` : le lot qui l'a ajouté, 4 par défaut.
+ * ou un script du générateur (`outil`) ; `depuis` : le lot du prototype qui l'a ajouté, 4 par défaut, ou la
+ * version du générateur qui l'a ajouté, en chaîne.
  */
 export const BOITE = [
   { path: 'references/agent-tdd-jira.md', skill: 'agent-tdd-jira' },
@@ -170,6 +171,7 @@ export const BOITE = [
   { path: 'outils/verifier-kits.mjs', outil: 'verifier-kits.mjs' },
   { path: 'outils/champ.mjs', outil: 'champ.mjs', depuis: 5 },
   { path: 'outils/vue.mjs', outil: 'vue.mjs', depuis: 6 },
+  { path: 'outils/invariants.mjs', outil: 'invariants.mjs', depuis: '1.0.1' },
 ];
 
 /**

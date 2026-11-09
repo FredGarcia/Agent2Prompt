@@ -228,11 +228,16 @@ Suis `SKILL.md` à partir de sa section 4. Rien n'est modifié avant la ratifica
         "path": "outils/vue.mjs",
         "from": "specs/generateur-skill-ticket/outils/vue.mjs",
         "sha256": "1d77807ab1947fe4ae2315337725c3c728cc9dfbbb3a1fff28c453edb655c9d5"
+      },
+      {
+        "path": "outils/invariants.mjs",
+        "from": "specs/generateur-skill-ticket/outils/invariants.mjs",
+        "sha256": "724a65763146e9ec2fc606dd796d4a802c765951f3e60e59069d38e7b8816437"
       }
     ],
     "genere_par": {
       "generateur": "generateur-skill-ticket",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "fabrique": "java-angular-postgresql",
       "orchestrateur": "3.5.3"
     }
@@ -306,6 +311,11 @@ Suis `SKILL.md` à partir de sa section 4. Rien n'est modifié avant la ratifica
     {
       "id": "champ",
       "path": "modules/champ/SKILL.md",
+      "status": "active"
+    },
+    {
+      "id": "champ-depot",
+      "path": "modules/champ-depot/SKILL.md",
       "status": "active"
     },
     {
@@ -449,6 +459,11 @@ Suis `SKILL.md` à partir de sa section 4. Rien n'est modifié avant la ratifica
       "status": "active"
     },
     {
+      "id": "outils-invariants.mjs",
+      "path": "outils/invariants.mjs",
+      "status": "active"
+    },
+    {
       "id": "agents-ticket-abcde-3512-persistance",
       "path": "agents/ticket-abcde-3512-persistance.md",
       "status": "active"
@@ -511,7 +526,7 @@ version: 1.0.0
 
 # Skill de ticket ABCDE-3512
 
-> Produit par generateur-skill-ticket 1.0.0, fabrique `java-angular-postgresql`, référentiel des méso-contrats 3.3.0, orchestrateur-c7e 3.5.3. Ce skill remplace la fiche de transformation comme objet ratifié avant toute modification ; il reste identique à sa transmission. Si tu y relèves une ambiguïté ou une contradiction, signale-la au développeur ; ne corrige pas le skill toi-même.
+> Produit par generateur-skill-ticket 1.0.1, fabrique `java-angular-postgresql`, référentiel des méso-contrats 3.3.0, orchestrateur-c7e 3.5.3. Ce skill remplace la fiche de transformation comme objet ratifié avant toute modification ; il reste identique à sa transmission. Si tu y relèves une ambiguïté ou une contradiction, signale-la au développeur ; ne corrige pas le skill toi-même.
 
 ## 1. Place dans l'arbre
 
@@ -552,13 +567,13 @@ Composition confirmée : M01 (module `meso-contrats`). Méso-contrats transverse
 ## 4. Au démarrage
 
 1. Vérifie que ce skill est intact : s'il a été installé par l'installateur du dépôt Agent2Prompt, `sha256sum -c integrite.sha256` depuis son dossier.
-2. Lis la copie du projet du fichier d'invariants (`docs/c7e/meso-contrats.md` par défaut) et compare-la à `projet/meso-contrats.md`, l'état sur lequel ce skill a été produit. La copie du projet fait foi ; si elles diffèrent, dis-le au développeur avant tout le reste. Une valeur `ADAPTER` restée telle se signale, jamais devinée (D8.INV-1).
+2. Compare la copie du projet du fichier d'invariants (`docs/c7e/meso-contrats.md` par défaut) à l'état sur lequel ce skill a été produit, par empreinte, sans lire la copie que porte le skill : `node .gemini/skills/ticket-abcde-3512/outils/invariants.mjs comparer ticket-abcde-3512`. Puis lis la copie du projet : elle fait foi. Si le script la dit différente, il donne les sections qui diffèrent : dis-le au développeur avant tout le reste. S'il la dit absente, lis à sa place la copie qu'il désigne, et signale l'absence. Une valeur `ADAPTER` restée telle se signale, jamais devinée (D8.INV-1).
 3. Lis ta vue augmentée, `node .gemini/skills/ticket-abcde-3512/outils/vue.mjs generer docs/demandes/ABCDE-3512 --noeud ABCDE-3512` : la vue entière de l'arbre, critères, scénarios et nœud, avec ce que chaque niveau y a déposé, les ratifications, et ce qui est à traiter : critères menacés ou en écart, désaccords, observations attendues. Traite d'abord ce qui t'est attribué, au niveau le plus bas qui peut le traiter (modules `vue` et `champ` du skill racine). Un champ altéré ne donne pas de vue : arrête-toi et montre au développeur ce que dit `node .gemini/skills/ticket-abcde-3512/outils/champ.mjs verifier docs/demandes/ABCDE-3512`.
 4. Ce ticket ne dépend d'aucun autre.
 
 ## 5. Analyse (d=0), avant toute modification
 
-1. Fais rédiger les documents de la clé ABCDE-3512 par le sous-agent rédacteur, puis passe leurs contrôles sans écart (module `documents`, sections 4 et 5) : ils se ratifient avec ce skill.
+1. Fais rédiger les documents de la clé ABCDE-3512 par le sous-agent `ticket-abcde-3512-redacteur`, puis passe leurs contrôles sans écart (module `documents`, sections 4 et 5) : ils se ratifient avec ce skill.
 2. Écris la copie de travail de `ticket.toml` dans `docs/demandes/ABCDE-3512/ticket.toml`. Tu ne la complètes que de ce que demandent les options (repérage, valeurs relevées) ; sa demande, sa composition et ses options ne changent pas.
 3. Fais cartographier l'architecture réelle par le sous-agent `ticket-abcde-3512-analyste`, en lecture seule, par l'outil `invoke_agent`, avec la référence de ce ticket et ses couches : code, contrat, migrations, tests existants, conventions du projet. Vérifie ses constats ; le disque fait foi.
 4. Cartographie l'impact : dépendances explicites et détectées, autres consommateurs. Si la demande sort des empreintes de la composition, arrête-toi et remonte-la au ticket parent, ou au développeur pour la racine, sans changer de composition (D11.INV-4).
@@ -626,6 +641,7 @@ Le module `invariants` liste ce dont ce skill hérite, sans affaiblissement : le
 | `outils/rattachement.json` | rattachement des critères de l'arbre aux critères de la clé, pour les scripts de contrôle, le champ et la vue |
 | `modules/kits/SKILL.md` | kits dev, test et démo, remise à Agent2Test, assemblage et contrôle |
 | `modules/champ/SKILL.md` | champ d'observation de l'arbre : enregistrements, commandes, ordres, déclencheurs, propagation, désaccords |
+| `modules/champ-depot/SKILL.md` | dépôts dans le champ, pour les nœuds et les agents de couche, et suite donnée aux attentes du champ |
 | `modules/vue/SKILL.md` | vue augmentée de l'arbre : ancres, piles, calques, états, commandes, lecteurs |
 | `modules/methode/SKILL.md` | sections de la méthode de l'orchestrateur, mot pour mot |
 | `modules/invariants/SKILL.md` | invariants hérités, correspondances, invariants de l'orchestrateur mot pour mot |
@@ -654,6 +670,7 @@ Le module `invariants` liste ce dont ce skill hérite, sans affaiblissement : le
 | `outils/verifier-kits.mjs` | generateur-skill-ticket : script de contrôle des kits dev, test et démo et de la remise à Agent2Test |
 | `outils/champ.mjs` | generateur-skill-ticket : script du champ d'observation : dépôt, vérification et état |
 | `outils/vue.mjs` | generateur-skill-ticket : script de la vue augmentée : calques et états de chaque ancre, d'après le champ |
+| `outils/invariants.mjs` | generateur-skill-ticket : script qui compare le fichier d'invariants du projet à l'état de production d'un skill, par empreinte, sans lire sa copie |
 | `agents/ticket-abcde-3512-persistance.md` | agent d'une couche, dans son propre contexte ; copié dans `.gemini/agents/` à l'installation |
 | `agents/ticket-abcde-3512-back.md` | agent d'une couche, dans son propre contexte ; copié dans `.gemini/agents/` à l'installation |
 | `agents/ticket-abcde-3512-front.md` | agent d'une couche, dans son propre contexte ; copié dans `.gemini/agents/` à l'installation |
@@ -1180,7 +1197,7 @@ Ce ticket n'a pas de sous-ticket.
 
 `outils/rattachement.json` porte ces tableaux et les images de l'objectif des feuilles, pour les scripts de contrôle.
 
-## 4. Rédaction, par le sous-agent rédacteur
+## 4. Rédaction, par le sous-agent `ticket-abcde-3512-redacteur`
 
 1. Demande au développeur s'il fournit la capture MHTML du ticket, et son chemin ; sinon, le rédacteur part du ticket racine.
 2. Confie la rédaction au sous-agent `ticket-abcde-3512-redacteur`, par l'outil `invoke_agent`, avec ce chemin s'il y en a un. Il écrit les trois documents dans son propre contexte, et seulement eux, puis rend son rapport.
@@ -1564,6 +1581,59 @@ Deux nœuds dont les derniers verdicts d'ordre 1 sur une même ancre sont contra
 - Promouvoir, modifier ou retirer une entrée du registre des concepts, ou décider d'un écart : seul le développeur le fait (D6.INV-2, D6.INV-3).
 - Agir sur le code depuis l'ordre 2 ou 3 : une adaptation de la méthode n'est pas une correction du logiciel.
 <<<FIN modules/champ/SKILL.md>>>
+
+<<<FICHIER modules/champ-depot/SKILL.md>>>
+---
+name: champ-depot
+description: Dépôts dans le champ d'observation de l'arbre ABCDE-3512 pour les nœuds et les agents de couche, actions, retours du développeur, observations d'ordre 1, écarts et ratifications, et la suite à donner aux attentes du champ.
+---
+
+# Déposer dans le champ de l'arbre ABCDE-3512
+
+Le champ de l'arbre, `docs/demandes/ABCDE-3512/champ.jsonl`, reçoit en ajout seul ce que fait et observe chaque niveau ; seul `champ.mjs` l'écrit. Ce module dit ce que déposent les nœuds et les agents de couche. Le module `champ`, que lisent la racine et les observateurs, dit le reste : ordres 2 et 3, déclencheurs, propagation des menaces, désaccords.
+
+## 1. Ce que tu déposes
+
+| Type | Ce qu'il porte | Qui le dépose |
+|---|---|---|
+| `action` | une proposition au développeur, avec ses options, ou une réalisation qu'il peut corriger : scénario présenté, commit, modification annoncée | l'agent ou le skill qui agit |
+| `retour` | le choix du développeur parmi les options d'une proposition, ou sa décision sur une proposition d'ordre 2 ; sa correction, qui vise une action et porte un motif ; sa ratification | le skill du nœud, au nom du développeur |
+| `observation`, ordre 1 | un verdict, conforme ou écart, sur une ancre, avec sa preuve, et son coût s'il est connu | les agents de couche et les skills |
+| `ecart` | un écart à un invariant, inscrit aussi au registre des écarts du projet | le skill qui le constate |
+
+Ancres : `noeud`, `critere` (`<référence>:<critère>`), `ca` (critère d'acceptation de la clé), `scenario`, `fichier`, `commit`, `contrat`, `option`. Preuves : `test`, `commande`, `commit`, `fichier`, `enregistrements`, `rapport`.
+
+## 2. Commandes
+
+Depuis la racine du projet :
+
+```bash
+node .gemini/skills/ticket-abcde-3512/outils/champ.mjs etat docs/demandes/ABCDE-3512
+node .gemini/skills/ticket-abcde-3512/outils/champ.mjs deposer docs/demandes/ABCDE-3512 action --noeud ABCDE-3512 --auteur ticket-abcde-3512 --nature realisation --ancre scenario:ABCDE-3512-S01 --resume "<ce qui est fait>"
+node .gemini/skills/ticket-abcde-3512/outils/champ.mjs deposer docs/demandes/ABCDE-3512 retour --noeud ABCDE-3512 --auteur ticket-abcde-3512 --nature correction --vise <n de l'action> --motif <motif> --par "<nom>" --contenu "<la correction demandée>"
+node .gemini/skills/ticket-abcde-3512/outils/champ.mjs deposer docs/demandes/ABCDE-3512 observation --noeud ABCDE-3512 --auteur ticket-abcde-3512 --ordre 1 --verdict ecart --ancre critere:ABCDE-3512:C1 --ecart "<l'écart>" --preuve test:<fichier de test>
+node .gemini/skills/ticket-abcde-3512/outils/champ.mjs deposer docs/demandes/ABCDE-3512 ecart --noeud ABCDE-3512 --auteur ticket-abcde-3512 --ancre critere:ABCDE-3512:C1 --invariant "<invariant concerné>" --constat "<l'écart constaté>"
+node .gemini/skills/ticket-abcde-3512/outils/champ.mjs deposer docs/demandes/ABCDE-3512 retour --noeud ABCDE-3512 --auteur ticket-abcde-3512 --nature ratification --objet "ABCDE-3512" --decision ratifié --par "<nom>" --contenu "<sa réponse>"
+```
+
+## 3. Règles
+
+- Toute observation porte sa preuve ; sa référence est un retour du développeur ou une preuve, jamais une auto-évaluation.
+- Une correction vise une action antérieure, par son numéro, et porte un motif, en minuscules et tirets, que choisit le skill qui la dépose : deux corrections au même motif, dans tout l'arbre, font attendre l'ordre 2.
+- Un rouge du cycle TDD n'est pas un écart : le critère reste à prouver.
+- Un dépôt refusé n'écrit rien et dit pourquoi ; un champ altéré refuse tout dépôt : montre au développeur ce que dit `node .gemini/skills/ticket-abcde-3512/outils/champ.mjs verifier docs/demandes/ABCDE-3512`.
+- Le champ ne s'écrit jamais à la main, et ne se commite pas avant la campagne d'Agent2Test.
+- Les ordres 2 et 3 appartiennent aux observateurs de l'arbre : ni un nœud ni un agent de couche n'y observe.
+
+## 4. Attentes du champ
+
+Ta vue augmentée (module `vue`) montre ce qui est attendu sur tes ancres ; le skill du nœud y donne suite, au niveau le plus bas qui le peut :
+
+- une observation d'ordre 2 attendue sur un motif : invoque `ticket-abcde-3512-observateur-2` par l'outil `invoke_agent` ;
+- une observation d'ordre 3 attendue sur une proposition : invoque `ticket-abcde-3512-observateur-3` ;
+- une décision attendue du développeur : présente-lui la proposition avec son examen, puis dépose son choix, `node .gemini/skills/ticket-abcde-3512/outils/champ.mjs deposer docs/demandes/ABCDE-3512 retour --noeud ABCDE-3512 --auteur ticket-abcde-3512 --nature choix --vise <n de la proposition> --decision retenue --par "<nom>" --contenu "<sa réponse>"`, ou `--decision refusée` ; retenue, inscris-la au registre des concepts du projet comme entrée `proposed` qui cite l'observation, commitée à part ;
+- un critère en écart : corrige-le à l'ordre 1, par un commit de rétroaction qui cite l'observation, puis dépose un verdict conforme ; un critère menacé ou un désaccord : montre-le au développeur, qui décide.
+<<<FIN modules/champ-depot/SKILL.md>>>
 
 <<<FICHIER modules/vue/SKILL.md>>>
 ---
@@ -7932,6 +8002,140 @@ const estPrincipal = process.argv[1] && fileURLToPath(import.meta.url).toLowerCa
 if (estPrincipal) process.exitCode = principal(process.argv.slice(2));
 <<<FIN outils/vue.mjs>>>
 
+<<<FICHIER outils/invariants.mjs>>>
+#!/usr/bin/env node
+// Comparaison du fichier d'invariants du projet à l'état sur lequel un skill de ticket a été produit
+// (generateur-skill-ticket, D4, depuis 1.0.1). Le skill racine en livre une copie, outils/invariants.mjs :
+// chaque nœud compare ainsi la copie du projet à la sienne par empreinte, sans lire la copie du skill ; la
+// copie du projet fait foi, et seule elle se lit.
+//
+// Usage, depuis la racine du projet :
+//   node .gemini/skills/ticket-<clé>/outils/invariants.mjs comparer <skill> [--projet <chemin>] [--skills <dossier>]
+//
+// <skill> : le nom du skill du nœud. Sa copie est <skills>/<skill>/projet/meso-contrats.md, dont son
+// manifeste déclare l'empreinte ; la copie du projet est docs/c7e/meso-contrats.md par défaut. Sortie :
+// copies identiques ; ou copie du projet absente, avec la copie qui en tient lieu ; ou copie du skill
+// altérée ; ou copies différentes, avec les sections qui diffèrent et leurs lignes ; puis les valeurs
+// ADAPTER restées dans la copie du projet. Code 0 : copies identiques ; 1 : tout autre cas ; 2 : usage
+// incorrect. Node 20 ou plus récent, modules natifs, fins de ligne CRLF admises.
+
+import { createHash } from 'node:crypto';
+import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+export const COPIE_SKILL = 'projet/meso-contrats.md';
+export const COPIE_PROJET = 'docs/c7e/meso-contrats.md';
+const USAGE = 'Usage : invariants.mjs comparer <skill> [--projet <chemin>] [--skills <dossier>]';
+const MAX_LIGNES = 40;
+
+const normaliser = (texte) => texte.replace(/\r\n/g, '\n');
+export const empreinte = (texte) => createHash('sha256').update(normaliser(texte), 'utf8').digest('hex');
+
+/** Sections d'un fichier d'invariants, par titre de niveau 2 ; ce qui précède le premier titre est l'en-tête. */
+export function sections(texte) {
+  const res = [];
+  let courante = { titre: 'en-tête', lignes: [] };
+  for (const ligne of normaliser(texte).split('\n')) {
+    if (/^## /.test(ligne)) {
+      res.push(courante);
+      courante = { titre: ligne.slice(3).trim(), lignes: [] };
+    } else {
+      courante.lignes.push(ligne);
+    }
+  }
+  res.push(courante);
+  return res.filter((s) => s.titre !== 'en-tête' || s.lignes.some((l) => l.trim() !== ''));
+}
+
+/** Différences entre deux fichiers d'invariants, section par section : ajoutée, retirée, ou modifiée avec ses lignes. */
+export function differences(projet, skill) {
+  const avant = new Map(sections(skill).map((s) => [s.titre, s.lignes]));
+  const apres = new Map(sections(projet).map((s) => [s.titre, s.lignes]));
+  const res = [];
+  for (const [titre, lignes] of apres) {
+    if (!avant.has(titre)) res.push({ titre, nature: 'ajoutée', plus: lignes.filter((l) => l.trim() !== ''), moins: [] });
+    else if (avant.get(titre).join('\n') !== lignes.join('\n')) {
+      const anciennes = new Set(avant.get(titre));
+      const nouvelles = new Set(lignes);
+      res.push({ titre, nature: 'modifiée', plus: lignes.filter((l) => l.trim() !== '' && !anciennes.has(l)), moins: avant.get(titre).filter((l) => l.trim() !== '' && !nouvelles.has(l)) });
+    }
+  }
+  for (const [titre, lignes] of avant) if (!apres.has(titre)) res.push({ titre, nature: 'retirée', plus: [], moins: lignes.filter((l) => l.trim() !== '') });
+  return res;
+}
+
+/** Sections de la copie du projet où restent des valeurs ADAPTER, à signaler au développeur (D8.INV-1). */
+export function adapter(texte) {
+  return sections(texte).filter((s) => s.lignes.some((l) => l.includes('ADAPTER')) || s.titre.includes('ADAPTER')).map((s) => s.titre);
+}
+
+/**
+ * Compare la copie du projet à celle du skill. Résultat : { code, lignes } ; code 0 si les deux copies sont
+ * identiques, 1 sinon.
+ */
+export function comparer({ skill, projet = COPIE_PROJET, skills = join('.gemini', 'skills') }) {
+  const dossier = join(skills, skill);
+  const cheminSkill = join(dossier, ...COPIE_SKILL.split('/'));
+  const cheminManifeste = join(dossier, 'manifest.json');
+  if (!existsSync(cheminManifeste) || !existsSync(cheminSkill)) {
+    return { code: 1, lignes: [`skill ${skill} introuvable dans ${skills} : ni ${cheminManifeste} ni ${cheminSkill} à lire`] };
+  }
+  const manifeste = JSON.parse(readFileSync(cheminManifeste, 'utf8'));
+  const declaree = (manifeste.ticket?.herites ?? []).find((h) => h.path === COPIE_SKILL)?.sha256;
+  const copieSkill = readFileSync(cheminSkill, 'utf8');
+  if (!declaree || empreinte(copieSkill) !== declaree) {
+    return { code: 1, lignes: [`copie du skill altérée : ${cheminSkill} n'a plus l'empreinte que déclare le manifeste de ${skill} ; vérifie le skill (sha256sum -c integrite.sha256) avant tout le reste`] };
+  }
+  if (!existsSync(projet)) {
+    return { code: 1, lignes: [`copie du projet absente : ${projet} ; signale-le au développeur, et lis à sa place ${cheminSkill}, l'état sur lequel ${skill} a été produit`] };
+  }
+  const copieProjet = readFileSync(projet, 'utf8');
+  const lignes = [];
+  let code = 0;
+  if (empreinte(copieProjet) === declaree) {
+    lignes.push(`invariants du projet identiques à ceux sur lesquels ${skill} a été produit (sha256 ${declaree.slice(0, 12)}) : lis ${projet}, qui fait foi`);
+  } else {
+    code = 1;
+    const ecarts = differences(copieProjet, copieSkill);
+    lignes.push(`invariants du projet différents de ceux sur lesquels ${skill} a été produit : ${projet} fait foi ; ${ecarts.length} section${ecarts.length > 1 ? 's' : ''} diffère${ecarts.length > 1 ? 'nt' : ''}, à dire au développeur avant tout le reste`);
+    for (const e of ecarts) {
+      lignes.push(`  § ${e.titre} : ${e.nature}`);
+      const detail = [...e.plus.map((l) => `    + ${l}`), ...e.moins.map((l) => `    - ${l}`)];
+      lignes.push(...detail.slice(0, MAX_LIGNES));
+      if (detail.length > MAX_LIGNES) lignes.push(`    … et ${detail.length - MAX_LIGNES} autres lignes`);
+    }
+  }
+  const restes = adapter(copieProjet);
+  if (restes.length > 0) lignes.push(`valeurs ADAPTER restées dans ${projet}, à signaler, jamais devinées : ${restes.map((t) => `§ ${t}`).join(' ; ')}`);
+  return { code, lignes };
+}
+
+/** Ligne de commande. Renvoie le code de sortie ; écrit par `sortie` et `erreur`. */
+export function principal(argv, sortie = console.log, erreur = console.error) {
+  const [commande, ...reste] = argv;
+  const options = { positions: [] };
+  for (let k = 0; k < reste.length; k++) {
+    const a = reste[k];
+    if (!a.startsWith('--')) options.positions.push(a);
+    else if (['--projet', '--skills'].includes(a) && reste[k + 1] !== undefined) options[a.slice(2)] = reste[++k];
+    else {
+      erreur(`option inconnue ou sans valeur : ${a}\n${USAGE}`);
+      return 2;
+    }
+  }
+  if (commande !== 'comparer' || options.positions.length !== 1) {
+    erreur(USAGE);
+    return 2;
+  }
+  const { code, lignes } = comparer({ skill: options.positions[0], projet: options.projet, skills: options.skills });
+  for (const l of lignes) (code === 0 ? sortie : erreur)(l);
+  return code;
+}
+
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) process.exitCode = principal(process.argv.slice(2));
+<<<FIN outils/invariants.mjs>>>
+
 <<<FICHIER agents/ticket-abcde-3512-persistance.md>>>
 ---
 name: ticket-abcde-3512-persistance
@@ -7949,7 +8153,24 @@ tools:
 
 # Agent persistance de ABCDE-3512
 
-Tu réalises, pour le ticket ABCDE-3512, la couche persistance : PostgreSQL et Liquibase. Ton contexte est le tien : le skill `ticket-abcde-3512`, installé dans `.gemini/skills/ticket-abcde-3512/`, te confie ce périmètre, et tu lui rends ton rapport. Commence par lire `.gemini/skills/ticket-abcde-3512/SKILL.md` et `.gemini/skills/ticket-abcde-3512/ticket.toml`.
+Tu réalises, pour le ticket ABCDE-3512, la couche persistance : PostgreSQL et Liquibase. Ton contexte est le tien : le skill `ticket-abcde-3512`, installé dans `.gemini/skills/ticket-abcde-3512/`, te confie ce périmètre, et tu lui rends ton rapport. Ce qui te concerne de sa consigne est ci-dessous ; le ticket entier est dans `.gemini/skills/ticket-abcde-3512/ticket.toml`.
+
+## Objectif et critères
+
+Charger les données au clic plutôt qu'à l'ouverture de l'écran.
+
+Intention : Charger les données au clic plutôt qu'à l'ouverture de l'écran.
+
+| Critère | Énoncé | Critère d'acceptation |
+|---|---|---|
+| C1 | À l'ouverture de l'écran, aucune donnée n'est chargée : GET /api/v1/donnees n'est plus appelé dans ngOnInit. | ABCDE-3512-CA01 |
+| C2 | Un clic sur le bouton « Charger les données » appelle GET /api/v1/donnees et affiche la première page des données. | ABCDE-3512-CA02 |
+| C3 | Le bouton « Charger les données » présente les états repos, chargement, erreur et chargé, conformes à l'image de l'objectif. | ABCDE-3512-CA03 |
+| C4 | GET /api/v1/donnees renvoie une page de DonneeDto ; une demande de page invalide donne 400. | ABCDE-3512-CA04 |
+| C5 | Seul un utilisateur habilité obtient les données ; sinon 403 (ABCDE-3512-R1). | ABCDE-3512-CA05 |
+| C6 | La table donnee porte la colonne mode_chargement, AUTO ou CLIC, avec une valeur par défaut pour les lignes existantes, par un changeset réversible. | ABCDE-3512-CA06 |
+
+Composition confirmée : M01, dont les contrats sont dans `.gemini/skills/ticket-abcde-3512/modules/meso-contrats/SKILL.md`. Méso-contrats transverses : T01 socle back-front, T02 accessibilité, T03 migration de base sûre.
 
 ## Périmètre
 
@@ -7975,7 +8196,7 @@ Tu réalises un à un les scénarios de `docs/demandes/ABCDE-3512/ABCDE-3512.fea
 
 - Pour chaque scénario : son critère d'acceptation, le rouge avec son message d'échec, le vert, le remaniement, les suites et leurs résultats, les fichiers, le commit (cycle-tdd, § 6).
 - Chaque constat cite sa preuve : test, commande et sortie, ou réponse du développeur.
-- Dépose dans le champ, avec leur preuve, tes actions que le développeur peut corriger (scénario présenté, commit, modification annoncée) et tes observations d'ordre 1 : `node .gemini/skills/ticket-abcde-3512/outils/champ.mjs deposer docs/demandes/ABCDE-3512 action …` ou `observation --ordre 1 …` (module `champ` du skill racine). Un rouge du cycle TDD n'est pas un écart : le critère reste à prouver. Les retours du développeur, le skill du ticket les dépose : ils sont la référence de ton observation.
+- Dépose dans le champ, avec leur preuve, tes actions que le développeur peut corriger (scénario présenté, commit, modification annoncée) et tes observations d'ordre 1 : `node .gemini/skills/ticket-abcde-3512/outils/champ.mjs deposer docs/demandes/ABCDE-3512 action …` ou `observation --ordre 1 …` (module `champ-depot` du skill racine). Un rouge du cycle TDD n'est pas un écart : le critère reste à prouver. Les retours du développeur, le skill du ticket les dépose : ils sont la référence de ton observation.
 <<<FIN agents/ticket-abcde-3512-persistance.md>>>
 
 <<<FICHIER agents/ticket-abcde-3512-back.md>>>
@@ -7995,7 +8216,24 @@ tools:
 
 # Agent back de ABCDE-3512
 
-Tu réalises, pour le ticket ABCDE-3512, la couche backend : Java 21 et Spring Boot 3.5. Ton contexte est le tien : le skill `ticket-abcde-3512`, installé dans `.gemini/skills/ticket-abcde-3512/`, te confie ce périmètre, et tu lui rends ton rapport. Commence par lire `.gemini/skills/ticket-abcde-3512/SKILL.md` et `.gemini/skills/ticket-abcde-3512/ticket.toml`.
+Tu réalises, pour le ticket ABCDE-3512, la couche backend : Java 21 et Spring Boot 3.5. Ton contexte est le tien : le skill `ticket-abcde-3512`, installé dans `.gemini/skills/ticket-abcde-3512/`, te confie ce périmètre, et tu lui rends ton rapport. Ce qui te concerne de sa consigne est ci-dessous ; le ticket entier est dans `.gemini/skills/ticket-abcde-3512/ticket.toml`.
+
+## Objectif et critères
+
+Charger les données au clic plutôt qu'à l'ouverture de l'écran.
+
+Intention : Charger les données au clic plutôt qu'à l'ouverture de l'écran.
+
+| Critère | Énoncé | Critère d'acceptation |
+|---|---|---|
+| C1 | À l'ouverture de l'écran, aucune donnée n'est chargée : GET /api/v1/donnees n'est plus appelé dans ngOnInit. | ABCDE-3512-CA01 |
+| C2 | Un clic sur le bouton « Charger les données » appelle GET /api/v1/donnees et affiche la première page des données. | ABCDE-3512-CA02 |
+| C3 | Le bouton « Charger les données » présente les états repos, chargement, erreur et chargé, conformes à l'image de l'objectif. | ABCDE-3512-CA03 |
+| C4 | GET /api/v1/donnees renvoie une page de DonneeDto ; une demande de page invalide donne 400. | ABCDE-3512-CA04 |
+| C5 | Seul un utilisateur habilité obtient les données ; sinon 403 (ABCDE-3512-R1). | ABCDE-3512-CA05 |
+| C6 | La table donnee porte la colonne mode_chargement, AUTO ou CLIC, avec une valeur par défaut pour les lignes existantes, par un changeset réversible. | ABCDE-3512-CA06 |
+
+Composition confirmée : M01, dont les contrats sont dans `.gemini/skills/ticket-abcde-3512/modules/meso-contrats/SKILL.md`. Méso-contrats transverses : T01 socle back-front, T02 accessibilité, T03 migration de base sûre.
 
 ## Périmètre
 
@@ -8022,7 +8260,7 @@ Tu réalises un à un les scénarios de `docs/demandes/ABCDE-3512/ABCDE-3512.fea
 
 - Pour chaque scénario : son critère d'acceptation, le rouge avec son message d'échec, le vert, le remaniement, les suites et leurs résultats, les fichiers, le commit (cycle-tdd, § 6).
 - Chaque constat cite sa preuve : test, commande et sortie, ou réponse du développeur.
-- Dépose dans le champ, avec leur preuve, tes actions que le développeur peut corriger (scénario présenté, commit, modification annoncée) et tes observations d'ordre 1 : `node .gemini/skills/ticket-abcde-3512/outils/champ.mjs deposer docs/demandes/ABCDE-3512 action …` ou `observation --ordre 1 …` (module `champ` du skill racine). Un rouge du cycle TDD n'est pas un écart : le critère reste à prouver. Les retours du développeur, le skill du ticket les dépose : ils sont la référence de ton observation.
+- Dépose dans le champ, avec leur preuve, tes actions que le développeur peut corriger (scénario présenté, commit, modification annoncée) et tes observations d'ordre 1 : `node .gemini/skills/ticket-abcde-3512/outils/champ.mjs deposer docs/demandes/ABCDE-3512 action …` ou `observation --ordre 1 …` (module `champ-depot` du skill racine). Un rouge du cycle TDD n'est pas un écart : le critère reste à prouver. Les retours du développeur, le skill du ticket les dépose : ils sont la référence de ton observation.
 <<<FIN agents/ticket-abcde-3512-back.md>>>
 
 <<<FICHIER agents/ticket-abcde-3512-front.md>>>
@@ -8042,7 +8280,24 @@ tools:
 
 # Agent front de ABCDE-3512
 
-Tu réalises, pour le ticket ABCDE-3512, la couche frontend : Angular 20. Ton contexte est le tien : le skill `ticket-abcde-3512`, installé dans `.gemini/skills/ticket-abcde-3512/`, te confie ce périmètre, et tu lui rends ton rapport. Commence par lire `.gemini/skills/ticket-abcde-3512/SKILL.md` et `.gemini/skills/ticket-abcde-3512/ticket.toml`.
+Tu réalises, pour le ticket ABCDE-3512, la couche frontend : Angular 20. Ton contexte est le tien : le skill `ticket-abcde-3512`, installé dans `.gemini/skills/ticket-abcde-3512/`, te confie ce périmètre, et tu lui rends ton rapport. Ce qui te concerne de sa consigne est ci-dessous ; le ticket entier est dans `.gemini/skills/ticket-abcde-3512/ticket.toml`.
+
+## Objectif et critères
+
+Charger les données au clic plutôt qu'à l'ouverture de l'écran.
+
+Intention : Charger les données au clic plutôt qu'à l'ouverture de l'écran.
+
+| Critère | Énoncé | Critère d'acceptation |
+|---|---|---|
+| C1 | À l'ouverture de l'écran, aucune donnée n'est chargée : GET /api/v1/donnees n'est plus appelé dans ngOnInit. | ABCDE-3512-CA01 |
+| C2 | Un clic sur le bouton « Charger les données » appelle GET /api/v1/donnees et affiche la première page des données. | ABCDE-3512-CA02 |
+| C3 | Le bouton « Charger les données » présente les états repos, chargement, erreur et chargé, conformes à l'image de l'objectif. | ABCDE-3512-CA03 |
+| C4 | GET /api/v1/donnees renvoie une page de DonneeDto ; une demande de page invalide donne 400. | ABCDE-3512-CA04 |
+| C5 | Seul un utilisateur habilité obtient les données ; sinon 403 (ABCDE-3512-R1). | ABCDE-3512-CA05 |
+| C6 | La table donnee porte la colonne mode_chargement, AUTO ou CLIC, avec une valeur par défaut pour les lignes existantes, par un changeset réversible. | ABCDE-3512-CA06 |
+
+Composition confirmée : M01, dont les contrats sont dans `.gemini/skills/ticket-abcde-3512/modules/meso-contrats/SKILL.md`. Méso-contrats transverses : T01 socle back-front, T02 accessibilité, T03 migration de base sûre.
 
 ## Périmètre
 
@@ -8069,7 +8324,7 @@ Tu réalises un à un les scénarios de `docs/demandes/ABCDE-3512/ABCDE-3512.fea
 
 - Pour chaque scénario : son critère d'acceptation, le rouge avec son message d'échec, le vert, le remaniement, les suites et leurs résultats, les fichiers, le commit (cycle-tdd, § 6).
 - Chaque constat cite sa preuve : test, commande et sortie, ou réponse du développeur.
-- Dépose dans le champ, avec leur preuve, tes actions que le développeur peut corriger (scénario présenté, commit, modification annoncée) et tes observations d'ordre 1 : `node .gemini/skills/ticket-abcde-3512/outils/champ.mjs deposer docs/demandes/ABCDE-3512 action …` ou `observation --ordre 1 …` (module `champ` du skill racine). Un rouge du cycle TDD n'est pas un écart : le critère reste à prouver. Les retours du développeur, le skill du ticket les dépose : ils sont la référence de ton observation.
+- Dépose dans le champ, avec leur preuve, tes actions que le développeur peut corriger (scénario présenté, commit, modification annoncée) et tes observations d'ordre 1 : `node .gemini/skills/ticket-abcde-3512/outils/champ.mjs deposer docs/demandes/ABCDE-3512 action …` ou `observation --ordre 1 …` (module `champ-depot` du skill racine). Un rouge du cycle TDD n'est pas un écart : le critère reste à prouver. Les retours du développeur, le skill du ticket les dépose : ils sont la référence de ton observation.
 <<<FIN agents/ticket-abcde-3512-front.md>>>
 
 <<<FICHIER agents/ticket-abcde-3512-redacteur.md>>>
@@ -8321,8 +8576,8 @@ Lis d'abord la vue entière de l'arbre, `node .gemini/skills/ticket-abcde-3512/o
 
 Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichiers ont été matérialisés.
 
-    90d342c258ae2555ba979c416ad46d4f88ff52c98fef7574d8a89018d1152551  manifest.json
-    18f1cf5c3e89dacca3545d098272303563de971b1aa72d6871071a86f1c93414  SKILL.md
+    eeabee33dad9bbc69649aaf4b50f604c9c078e7e1502cc8c25a0c00bc68e925a  manifest.json
+    358842699e0664f5aa45c6e113f15dbd8108bb2d935181ce666b1eeedf1ad483  SKILL.md
     7a6a452a94a9da17762e361f2cc5786f4cc8f5758f46aaf139cb1d4b75d779e6  ticket.toml
     ce951fe7a03b3fd6647efe36561f87ab4543d7e5099967afcf303072cb3d77cd  modules/meso-contrats/SKILL.md
     c61356a0950ba6abfaffc1a04cedb652fa78cf73df8891cd319d64012e154a69  modules/option-persistance-schema/SKILL.md
@@ -8333,10 +8588,11 @@ Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichier
     559e99c86f557181a983cf11907b4044f0e9099318e841c44008eebc8742c421  modules/option-frontend-elements_graphiques/SKILL.md
     eadb45d7e346538e497d5808f89211624f2191b917ae66d7b7b7273531135198  modules/option-frontend-fonctionnalites/SKILL.md
     01ceb03924eea81820f3a7f79e625c90bba86552cf9a1af08f861273947863fb  modules/recette/SKILL.md
-    a7f0982aa076114c3a880ddd42ff4dbb1856e15b978c067f00188203708b82b5  modules/documents/SKILL.md
+    19db9481c1202e49c00aea4f302d831ccf5f639bcfb6d7181881ca69890425ad  modules/documents/SKILL.md
     6201aff204519f9f3d1fede185dae45c86e0219837d93a28575baa39252d1ee4  outils/rattachement.json
     85e09f53094736cb517002180a516fc66df9c954bc2c0c8b17eb3d359b546af0  modules/kits/SKILL.md
     f7de880ba006f18417cd898e3494bb2800dd9a290463ea840d933b3a977c4f7e  modules/champ/SKILL.md
+    719a3172164c5f91ee4d9d3b710b2e6efa204bb0f9534d9a7e95469b896fd70d  modules/champ-depot/SKILL.md
     631c8bce8352636564d26f1c8e0de5389460f2f4fb22dc933eb01ce11a771158  modules/vue/SKILL.md
     31b220bdd3e22534ce475addb006c8a769b5d968b5881a2bea2bd12666f3a0f9  modules/methode/SKILL.md
     ab85085f5d48c70268361fcc162a6572c8b84e172bb4d85dee28a44aa66d4044  modules/invariants/SKILL.md
@@ -8365,9 +8621,10 @@ Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichier
     c2794d70b0c63fee8d62bfba1b7ccfb59cd0f99cc92b9f60918f83c7642cacd3  outils/verifier-kits.mjs
     6a8432370146559f705ce84e6954e8c1f452891a1f33a6191ae27977aba231df  outils/champ.mjs
     1d77807ab1947fe4ae2315337725c3c728cc9dfbbb3a1fff28c453edb655c9d5  outils/vue.mjs
-    a6dc8b8575f568ec933067b2a3444cd04d4e60d20a747c4d2a331b900e877c56  agents/ticket-abcde-3512-persistance.md
-    925d6afffca2b3d4596fcc2d363525810def934e83652db9f4088779627badb9  agents/ticket-abcde-3512-back.md
-    80de3d64be82506e1e50204484e7e61b82a9347c65798d711dd528b049cf676e  agents/ticket-abcde-3512-front.md
+    724a65763146e9ec2fc606dd796d4a802c765951f3e60e59069d38e7b8816437  outils/invariants.mjs
+    9cdd757be73c152235f1b586ab17b2c96df1cee3dd798b94d3a3623271fad37b  agents/ticket-abcde-3512-persistance.md
+    42296d91755a89d0b218b1aeaeaecaf99b8bf8d5bb53afc15a4375f87b7fdae7  agents/ticket-abcde-3512-back.md
+    81a9f31038fd41d301861beeb445ebfdbda681d45b753383511583d8c8dcaf8b  agents/ticket-abcde-3512-front.md
     eeb4db25577441d10d5c85166f4ef87c19d9159a407115342a8ec9ff350b77c8  agents/ticket-abcde-3512-redacteur.md
     870f564d032489eae485ea018bd98893ebda3bdc8460e6614d28ce40b0d2d2b7  agents/ticket-abcde-3512-analyste.md
     79ebfe084b466d5b1c922dc487da421c0eb12458f0ea6aae1d749737e9ac8c8f  agents/ticket-abcde-3512-relecteur.md

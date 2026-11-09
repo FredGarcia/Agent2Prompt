@@ -2,7 +2,8 @@
 // avec sa transmission tirée par tools/bundle.mjs (critère P2), reprenant tout ce dont il hérite (P3) ;
 // un invariant omis ou altéré est rejeté (P1). Au lot 4, le skill racine porte en plus la boîte à outils
 // de l'arbre : documents, kits, sous-agents de rôle, références et scripts, à leur version épinglée ; au
-// lot 5, le champ d'observation et ses observateurs d'ordre 2 et 3.
+// lot 5, le champ d'observation et ses observateurs d'ordre 2 et 3. En 1.0.1, le script des invariants,
+// l'extrait de dépôt du module champ, et des agents de couche qui portent leur part de la consigne.
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -18,6 +19,7 @@ import { chargerArbre } from '../outils/arbre.mjs';
 import { FabriqueJavaAngularPostgreSQL, FabriqueSkillTicket, SECTIONS_METHODE, nomSkill, phraseActivation, preuvesParametrees, sectionsMethode, sha256 } from '../outils/fabrique.mjs';
 import { Monteur, generer, verifierHeritage, verifierTransmission } from '../outils/monteur.mjs';
 import { BOITE, blocDeCode, chargerSources, extraireSection, lignesInvariants, resoudre } from '../outils/sources.mjs';
+import { SECTIONS_LUES, citations, texteLu } from '../outils/mesurer-contexte.mjs';
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const EXEMPLE = join(ICI, '..', 'exemples', 'ABCDE-3620');
@@ -646,6 +648,89 @@ test('lot 6 : un skill racine produit au lot 5 reste vérifiable sans le script 
   };
   assert.deepStrictEqual(verifierTransmission(retoucher(attendue('ticket-abcde-3620'), sansVue(5))).erreurs, []);
   attendreEcart(verifierTransmission(retoucher(attendue('ticket-abcde-3620'), sansVue(6))).erreurs, /héritage absent du manifeste : outils\/vue\.mjs/);
+});
+
+// ---- 1.0.1 : les corrections relevées par le bilan ----
+
+const ABCDE_3512 = () => lireTexte(join(ICI, '..', 'exemples', 'ABCDE-3512-skills', 'transmissions', 'ticket-abcde-3512-1.0.0.md'));
+const modulesDuSkillRacine = (texte) => citations(texte).filter((c) => c.type === 'module' && c.racine).map((c) => c.nom);
+
+test('1.0.1 : chaque nœud compare le fichier d\'invariants du projet par empreinte, avec le script du skill racine, et ne lit que la copie du projet', () => {
+  const racine = fichiersDe(attendue('ticket-abcde-3620'));
+  assert.equal(racine.get('outils/invariants.mjs'), lireTexte(join(ICI, '..', 'outils', 'invariants.mjs')));
+  assert.deepStrictEqual(JSON.parse(racine.get('manifest.json')).ticket.herites.find((h) => h.path === 'outils/invariants.mjs'), { path: 'outils/invariants.mjs', from: 'specs/generateur-skill-ticket/outils/invariants.mjs', sha256: sha256(racine.get('outils/invariants.mjs')) });
+  for (const nom of NOMS) {
+    const f = fichiersDe(attendue(nom));
+    const consigne = f.get('SKILL.md');
+    assert.ok(extraireSection(consigne, '4').includes(`à l'état sur lequel ce skill a été produit, par empreinte, sans lire la copie que porte le skill : \`node .gemini/skills/ticket-abcde-3620/outils/invariants.mjs comparer ${nom}\`. Puis lis la copie du projet : elle fait foi.`), nom);
+    // La copie du skill reste dans le skill, sous le contrôle de l'héritage ; aucune consigne ne la fait lire.
+    assert.ok(JSON.parse(f.get('manifest.json')).ticket.herites.some((h) => h.path === 'projet/meso-contrats.md'), nom);
+    assert.doesNotMatch(texteLu(consigne, SECTIONS_LUES), /projet\/meso-contrats\.md/, nom);
+    for (const [rel, texte] of f) if (rel.startsWith('agents/')) assert.doesNotMatch(texte, /projet\/meso-contrats\.md/, `${nom} : ${rel}`);
+  }
+});
+
+test('1.0.1 : chaque agent de couche porte sa part de la consigne, objectif, critères et composition, sans relire celle de son nœud', () => {
+  const feuilles = [...NOMS.slice(2).map((nom) => [nom, fichiersDe(attendue(nom))]), ['ticket-abcde-3512', fichiersDe(ABCDE_3512())]];
+  for (const [nom, f] of feuilles) {
+    const objectif = extraireSection(f.get('SKILL.md'), '2').split('\n').slice(1).join('\n').trim();
+    const agents = [...f].filter(([rel]) => /^agents\/.+-(persistance|back|front)\.md$/.test(rel));
+    assert.ok(agents.length > 0, nom);
+    for (const [rel, agent] of agents) {
+      assert.ok(agent.includes(`Ce qui te concerne de sa consigne est ci-dessous ; le ticket entier est dans \`.gemini/skills/${nom}/ticket.toml\`.\n\n## Objectif et critères\n\n${objectif}\n\nComposition confirmée : `), `${nom} : ${rel}`);
+      assert.ok(agent.includes(`dont les contrats sont dans \`.gemini/skills/${nom}/modules/meso-contrats/SKILL.md\``), `${nom} : ${rel}`);
+      assert.doesNotMatch(agent, /Commence par lire|`[^`]*\/SKILL\.md` et `|skills\/[^/`]+\/SKILL\.md`/, `${nom} : ${rel} relit la consigne de son nœud`);
+    }
+  }
+});
+
+test('1.0.1 : le module champ-depot pour les nœuds et les agents de couche, le module champ entier pour la racine et les observateurs', () => {
+  for (const [texte, prefixe] of [[attendue('ticket-abcde-3620'), 'ticket-abcde-3620'], [ABCDE_3512(), 'ticket-abcde-3512']]) {
+    const f = fichiersDe(texte);
+    const depot = f.get('modules/champ-depot/SKILL.md');
+    assert.deepStrictEqual(depot.split('\n').filter((l) => l.startsWith('## ')), ['## 1. Ce que tu déposes', '## 2. Commandes', '## 3. Règles', '## 4. Attentes du champ'], prefixe);
+    assert.match(depot, /^name: champ-depot$/m);
+    assert.match(depot, /Les ordres 2 et 3 appartiennent aux observateurs de l'arbre : ni un nœud ni un agent de couche n'y observe\./);
+    assert.match(depot, new RegExp(`invoque \`${prefixe}-observateur-2\` par l'outil \`invoke_agent\``));
+    for (const ligne of depot.split('\n').filter((l) => l.includes('champ.mjs deposer'))) assert.doesNotMatch(ligne, /--ordre [23]/, ligne);
+    for (const ordre of [2, 3]) assert.ok(f.get(`agents/${prefixe}-observateur-${ordre}.md`).includes(`\`.gemini/skills/${prefixe}/modules/champ/SKILL.md\``), `observateur ${ordre}`);
+  }
+  // La racine lit le module champ ; les autres nœuds et les agents de couche, le module champ-depot.
+  assert.deepStrictEqual([...new Set(modulesDuSkillRacine(texteLu(fichiersDe(attendue('ticket-abcde-3620')).get('SKILL.md'), SECTIONS_LUES)))].sort(), ['champ', 'vue']);
+  assert.deepStrictEqual([...new Set(modulesDuSkillRacine(texteLu(fichiersDe(ABCDE_3512()).get('SKILL.md'), SECTIONS_LUES)))].sort(), ['champ', 'vue']);
+  for (const nom of NOMS.slice(1)) {
+    const f = fichiersDe(attendue(nom));
+    assert.deepStrictEqual([...new Set(modulesDuSkillRacine(texteLu(f.get('SKILL.md'), SECTIONS_LUES)))].sort(), ['champ-depot', 'vue'], nom);
+    for (const [rel, agent] of [...f].filter(([r]) => r.startsWith('agents/'))) assert.deepStrictEqual(modulesDuSkillRacine(texteLu(agent)), ['champ-depot'], `${nom} : ${rel}`);
+  }
+  for (const [rel, agent] of [...fichiersDe(ABCDE_3512())].filter(([r]) => /^agents\/.+-(persistance|back|front)\.md$/.test(r))) assert.deepStrictEqual(modulesDuSkillRacine(texteLu(agent)), ['champ-depot'], rel);
+});
+
+test('1.0.1 : la racine fait rédiger les documents de la clé par le sous-agent rédacteur, nommé comme son agent', () => {
+  for (const [texte, prefixe] of [[attendue('ticket-abcde-3620'), 'ticket-abcde-3620'], [ABCDE_3512(), 'ticket-abcde-3512']]) {
+    const f = fichiersDe(texte);
+    const redacteur = `${prefixe}-redacteur`;
+    assert.match(f.get(`agents/${redacteur}.md`), new RegExp(`^name: ${redacteur}$`, 'm'));
+    assert.ok(f.get('SKILL.md').includes(`par le sous-agent \`${redacteur}\`, puis passe leurs contrôles sans écart`), prefixe);
+    assert.match(f.get('modules/documents/SKILL.md'), new RegExp(`^## 4\\. Rédaction, par le sous-agent \`${redacteur}\`$`, 'm'), prefixe);
+    // Seule la table des fichiers, que la consigne ne fait pas lire, le décrit encore par son rôle.
+    assert.doesNotMatch(texteLu(f.get('SKILL.md'), SECTIONS_LUES), /sous-agent rédacteur/, prefixe);
+  }
+});
+
+test('1.0.1 : un skill racine produit en 1.0.0 reste vérifiable sans le script des invariants ; en 1.0.1, le script est requis', () => {
+  const sansInvariants = (genere) => (fs) => {
+    fs.splice(fs.findIndex((x) => x.rel === 'outils/invariants.mjs'), 1);
+    majManifeste(fs, (j) => {
+      j.ticket.genere_par = genere(j.ticket.genere_par);
+      j.ticket.herites = j.ticket.herites.filter((h) => h.path !== 'outils/invariants.mjs');
+    });
+  };
+  const version = (v) => (g) => ({ ...g, version: v });
+  assert.deepStrictEqual(verifierTransmission(retoucher(attendue('ticket-abcde-3620'), sansInvariants(version('1.0.0')))).erreurs, []);
+  // Produit par le prototype, au lot 7, il ne l'exigeait pas non plus.
+  assert.deepStrictEqual(verifierTransmission(retoucher(attendue('ticket-abcde-3620'), sansInvariants((g) => ({ prototype: 'skill-ticket', lot: 7, fabrique: g.fabrique, orchestrateur: g.orchestrateur })))).erreurs, []);
+  for (const v of ['1.0.1', '1.1.0', '2.0.0']) attendreEcart(verifierTransmission(retoucher(attendue('ticket-abcde-3620'), sansInvariants(version(v)))).erreurs, /héritage absent du manifeste : outils\/invariants\.mjs/);
 });
 
 // ---- Ligne de commande et installateur ----

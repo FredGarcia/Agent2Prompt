@@ -1,6 +1,6 @@
 {
   "name": "generateur-skill-ticket",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "specSchema": 1,
   "language": "fr",
   "description": "Générateur de skills de ticket C7E : décompose un ticket en arbre de sous-tickets, produit pour chaque nœud un skill assemblé depuis le référentiel des méso-contrats, l'installe et le lance dans Gemini CLI ; chaque skill s'observe dans un champ partagé, et chaque niveau voit le ticket augmenté.",
@@ -24,5 +24,8 @@
     { "id": "vue", "path": "modules/vue/SKILL.md", "dimensions": ["D6"], "status": "active" },
     { "id": "mesure", "path": "modules/mesure/SKILL.md", "dimensions": ["D7"], "status": "active" }
   ],
-  "extensionPoints": ["E1", "E2", "E3"]
+  "extensionPoints": ["E1", "E2", "E3"],
+  "previousVersions": [
+    { "version": "1.0.0", "file": "archives/SKILL-v1.0.0.md" }
+  ]
 }

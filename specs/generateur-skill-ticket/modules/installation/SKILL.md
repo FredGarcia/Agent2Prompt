@@ -51,6 +51,8 @@ La présentation de l'arbre et l'attente de la ratification demandent un modèle
 5. `installer-arbre.mjs liste` : racine en cours, ABCDE-3620-1.1 prêt.
 6. `installer-arbre.mjs retirer ABCDE-3620 --sans-archive` pour finir.
 
+Variante d'un ticket sans sous-ticket, avec ABCDE-3512 : `installer <dépôt>/specs/generateur-skill-ticket/exemples/ABCDE-3512-skills/transmissions`, puis `lancer ABCDE-3512`. Attendu : le skill fait rédiger les documents de la clé ; il analyse ensuite le ticket en lecture seule, puis présente le ticket, son méso-contrat M01, ses six critères et son analyse, et attend la ratification avant toute modification ; ratifié, il la dépose sous la référence ABCDE-3512, et `liste` le montre « ratifié, en transformation ».
+
 ## 5. Recette
 
 | Invariant | Preuves |

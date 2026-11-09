@@ -20,7 +20,7 @@ Pour chaque nœud : la session de son skill, chaque agent de couche, chaque sous
 
 Ce qui compte comme lu : les modules et les fichiers que citent les sections 2 à 10 d'une consigne de skill, ou tout le corps d'un agent ; un seul niveau de citations ; une lecture partielle compte le fichier entier ; un chemin qui vaut pour chaque sous-ticket compte chacun. Le point d'entrée de l'orchestrateur se mesure de la même façon, selon l'ordre de lecture qu'écrit son `SKILL.md`, pour le même ticket (D7.INV-2). Tailles en caractères, tokens estimés à un pour quatre caractères.
 
-Le rapport compare chaque feuille à l'orchestrateur, à chaque borne, puis donne le plus grand contexte de l'arbre, la somme de tous ses contextes, et les fichiers relus d'un contexte à l'autre. Rapports versionnés : `exemples/contexte/ABCDE-3620.md`, sur le projet d'exemple résolu, et `exemples/contexte/ABCDE-3512.md` ; ceux du lot 7 du prototype, que recopie le bilan, sont figés dans `exemples/contexte/lot-7/`.
+Le rapport compare chaque feuille à l'orchestrateur, à chaque borne, puis donne le plus grand contexte de l'arbre, la somme de tous ses contextes, et les fichiers relus d'un contexte à l'autre. Depuis la 1.0.1, la copie du fichier d'invariants que porte un skill ne se lit plus, un agent de couche ne relit plus la consigne de son nœud, et le module `champ` entier ne se lit qu'à la racine et par les observateurs : la somme de chaque arbre d'exemple a baissé d'au moins 10 % par rapport au lot 7. Rapports versionnés : `exemples/contexte/ABCDE-3620.md`, sur le projet d'exemple résolu, et `exemples/contexte/ABCDE-3512.md` ; ceux du lot 7 du prototype, que recopie le bilan, sont figés dans `exemples/contexte/lot-7/`.
 
 ## 2. Commandes
 
@@ -54,5 +54,5 @@ La mesure statique estime les tokens ; une mesure réelle la recale, sur le post
 
 | Invariant | Preuves |
 |---|---|
-| D7.INV-1 | `tests/contexte.test.mjs` : « le rapport regénéré est le rapport versionné, octet pour octet » ; « P7 : chaque feuille est comparée au point d'entrée de l'orchestrateur, à chaque borne ; l'arbre entier aussi » ; « calibrage : tokens du skill tirés de deux sorties -o json de Gemini CLI, et caractères par token » |
+| D7.INV-1 | `tests/contexte.test.mjs` : « le rapport regénéré est le rapport versionné, octet pour octet » ; « P7 : chaque feuille est comparée au point d'entrée de l'orchestrateur, à chaque borne ; l'arbre entier aussi » ; « calibrage : tokens du skill tirés de deux sorties -o json de Gemini CLI, et caractères par token » ; « 1.0.1 : relectures visées par le bilan disparues ; la somme lue par chaque arbre baisse d'au moins 10 % depuis le lot 7 » |
 | D7.INV-2 | `tests/contexte.test.mjs` : « chaque fichier compté existe, a la taille comptée, et la consigne qui le fait lire le cite » ; « P7 : le point d'entrée de l'orchestrateur se mesure selon son propre ordre de lecture » ; « citations : modules, chemins, fichier d'invariants cité sans son chemin, vue d'un nœud ; ni script, ni dossier, ni chemin absolu » ; « sections lues : ni la place dans l'arbre ni la table des fichiers d'une consigne ; tout le corps d'un agent » |
