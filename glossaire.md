@@ -28,6 +28,7 @@ La colonne « Repris dans » cite les modules de la spécification qui reprennen
 | [`angular`](#angular-101) | 1.0.1 | 8 | 2 | 30 |
 | [`capture-sprint-jira`](#capture-sprint-jira-122) | 1.2.2 | 9 | 2 | 39 |
 | [`explication-hote-ia`](#explication-hote-ia-110) | 1.1.0 | 10 | 2 | 37 |
+| [`generateur-skill-ticket`](#generateur-skill-ticket-100) | 1.0.0 | 7 | 0 | 24 |
 | [`java`](#java-111) | 1.1.1 | 7 | 1 | 29 |
 | [`orchestrateur-c7e`](#orchestrateur-c7e-353) | 3.5.3 | 10 | 1 | 33 |
 | [`skill4appli`](#skill4appli-111) | 1.1.1 | 9 | 3 | 34 |
@@ -123,7 +124,7 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D10.INV-1** | chaque US porte un identifiant stable `<CLÉ>-USnn` et chaque critère d'acceptation un identifiant stable `<CLÉ>-CAnn`, attribués une fois pour toutes et jamais renumérotés ; un critère appartient à une seule US. | `us-criteres`, `orchestrateur-c7e` |
+| **D10.INV-1** | chaque US porte un identifiant stable `<CLÉ>-USnn` et chaque critère d'acceptation un identifiant stable `<CLÉ>-CAnn`, attribués une fois pour toutes et jamais renumérotés ; un critère appartient à une seule US. | `us-criteres`, `generateur-skill-ticket/assemblage`, `generateur-skill-ticket/documents-kits`, `orchestrateur-c7e` |
 | **D10.INV-2** | chaque US et chaque critère d'acceptation cite sa provenance (champ du ticket, passage de la description, commentaire avec auteur et date) ; ce que le ticket n'énonce pas est marqué « proposé » et n'est utilisé qu'après validation à V2. | `us-criteres`, `analyse-demande` |
 | **D10.INV-3** | chaque critère d'acceptation énonce un résultat observable et vérifiable ; un critère ambigu, invérifiable ou contredit par un commentaire devient une question, jamais une interprétation de l'agent. | `us-criteres` |
 | **D10.INV-4** | chaque exigence de la demande est rattachée à au moins un critère d'acceptation, ou à une question. | `us-criteres`, `analyse-demande` |
@@ -985,6 +986,69 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 | **D12.INV-4** | hors du dossier du skill, rien ne s'écrit sans la demande du développeur : le sous-agent et les commandes s'installent par une commande qu'il lance ou qu'il approuve, une commande de retrait les supprime, et, avec `gemini skills uninstall`, rien ne reste. | `agent`, `diffusion` |
 | **D12.INV-5** | le dépôt où le skill est maintenu se nomme comme son origine et le lieu de sa vérification, jamais comme une étape ; le contrat de version, les règles et la recette du skill sont écrits dans le skill. | `recette`, `diffusion` |
 
+## generateur-skill-ticket 1.0.0
+
+Générateur de skills de ticket C7E : décompose un ticket en arbre de sous-tickets, produit pour chaque nœud un skill assemblé depuis le référentiel des méso-contrats, l'installe et le lance dans Gemini CLI ; chaque skill s'observe dans un champ partagé, et chaque niveau voit le ticket augmenté. Point d'entrée : [`specs/generateur-skill-ticket/SKILL.md`](specs/generateur-skill-ticket/SKILL.md).
+
+### D1 : Arbre de tickets (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D1.INV-1** | un sous-ticket n'a qu'un seul parent ; l'arbre a une seule racine, à laquelle chaque nœud se relie sans cycle de parenté ; sa profondeur ne dépasse pas le plafond, 3 par défaut, réglable dans le référentiel ou par `--profondeur-max`. | `arbre` |
+| **D1.INV-2** | une dépendance vise un ticket de l'arbre, ni lui-même, ni un ancêtre, ni un descendant ; les dépendances ne forment aucun cycle, ni entre elles, ni avec les clôtures ; l'ordre de résolution place chaque ticket après ceux dont il dépend, et chaque nœud composé après ses sous-tickets. | `arbre` |
+| **D1.INV-3** | chaque nœud passe les règles de validation du référentiel (demande complète et sourcée, aucune inconnue qui changerait la composition, composition conforme à la règle de choix, options permises par sa composition) ; chaque possibilité à oui d'un nœud composé est portée par au moins un de ses sous-tickets, aucun sous-ticket ne met à oui une possibilité absente de son parent, et un nœud composé ne porte pas d'option. | `arbre` |
+| **D1.INV-4** | chaque critère d'un sous-ticket soutient un critère de son parent direct, la racine n'en soutient aucun, et chaque critère d'un nœud composé est soutenu par au moins un critère de ses sous-tickets. | `arbre` |
+
+### D2 : Assemblage et transmission des skills de ticket (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D2.INV-1** | un skill de ticket s'assemble depuis les blocs ratifiés du référentiel et les sources du dépôt, copiés puis paramétrés ; le modèle n'écrit que la partie propre au ticket, dans les tickets de l'arbre ; l'assemblage est du code, sans token consommé, et un arbre non conforme ne donne aucun skill. | `arbre`, `assemblage` |
+| **D2.INV-2** | chaque skill reprend mot pour mot les invariants de l'orchestrateur et les sections de méthode qu'il déclare, et à l'identique chaque copie dont il hérite, à sa version épinglée ; un invariant omis ou affaibli arrête la génération de tout l'arbre. | `assemblage` |
+| **D2.INV-3** | un skill se relit à l'identique depuis sa transmission, table d'intégrité comprise ; la même entrée redonne les mêmes fichiers, octet pour octet, sans rien tirer au hasard ni dater, quelles que soient les fins de ligne. | `assemblage` |
+| **D2.INV-4** | chaque skill cite le générateur et sa version, sa fabrique et l'orchestrateur dont il est issu ; le Monteur ne remplace qu'un dossier qui contient déjà un skill de ticket généré. | `assemblage` |
+
+### D3 : Installation et cycle de vie dans Gemini CLI (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D3.INV-1** | un arbre ne s'installe que complet, chaque transmission vérifiée ; rien n'est écrit au moindre écart ; un fichier modifié depuis l'installation, ou que l'installateur n'a pas écrit, n'est remplacé qu'avec `--forcer`. | `installation` |
+| **D3.INV-2** | tout ce que l'installation écrit est relevé et masqué à Git, sauf `--visible` ; le retrait archive les transmissions dans le dossier du ticket et ne laisse rien de l'arbre dans `.gemini` ; ni l'installation ni le retrait ne modifient un fichier suivi par Git. | `installation` |
+| **D3.INV-3** | chaque nœud se traite dans sa propre session de Gemini CLI ; l'arbre se ratifie sur sa racine, puis chaque feuille avant sa première action, et un ticket sans sous-ticket une seule fois, sous sa référence ; aucun nœud ne modifie le projet avant sa ratification, le skill tenant lieu de fiche (orchestrateur-c7e:D3.INV-1). | `arbre`, `installation` |
+| **D3.INV-4** | le lancement ouvre Gemini CLI en mode interactif sur la phrase qui active le skill du nœud, sans contourner la confiance du dossier ni approuver à la place du développeur ; Gemini CLI 0.67.0 découvre les skills de l'arbre et charge ses agents sans erreur. | `installation` |
+
+### D4 : Documents de la clé, sous-agents de rôle et kits (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D4.INV-1** | les documents de la clé, `demande.json`, `us.md` et le fichier Gherkin, passent `controler-criteres.mjs` d'agent-tdd-jira et `verifier-documents.mjs` sans écart ; chaque critère de la racine y devient un critère `<CLÉ>-CAnn`, mot pour mot, et chaque critère d'un sous-ticket s'y rattache par ses soutiens et se prouve par au moins un scénario, de sa couche pour une feuille. | `documents-kits` |
+| **D4.INV-2** | chaque kit, dev, test et démo, est un manifeste fermé, complet, chaque fichier cité avec son empreinte ; la remise suit le schéma fermé `agent2test.remise/1` ; avec le dépôt, la branche et les commits du kit dev s'y retrouvent. | `documents-kits` |
+| **D4.INV-3** | la boîte à outils de l'arbre est sur la racine seule, chaque fichier identique à sa source à sa version épinglée ; chaque sous-agent de rôle travaille dans son propre contexte, l'analyste, le relecteur et la qualité sans outil d'écriture, le rédacteur n'écrivant que dans le dossier de la clé. | `documents-kits` |
+
+### D5 : Champ d'observation (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D5.INV-1** | un champ par arbre, en ajout seul, au schéma fermé `skill-ticket.observation/1` ; chaque enregistrement porte son numéro, sa date en UTC, jamais antérieure à la précédente, et l'empreinte du précédent ; `champ.mjs` est seul à l'écrire, et un champ altéré refuse tout dépôt. | `champ` |
+| **D5.INV-2** | toute observation porte sa preuve ; une correction vise une action antérieure et porte un motif ; seul l'observateur de l'arbre observe à l'ordre 2, et il propose une adaptation de la méthode, jamais une action sur le code. | `champ` |
+| **D5.INV-3** | deux corrections au même motif dans l'arbre font attendre une proposition d'ordre 2, qui attend l'examen de l'ordre 3, puis la décision du développeur ; deux propositions refusées sur un motif le mettent en veille ; l'ordre d'observation ne dépasse pas 3, le développeur au-dessus. | `champ` |
+| **D5.INV-4** | un écart sur un critère menace, de proche en proche, les critères qu'il soutient, jusqu'au critère d'acceptation de la clé ; des verdicts contraires de deux nœuds sur une même ancre forment un désaccord, que le script inscrit au champ et au registre des écarts du projet, décision au développeur. | `champ` |
+
+### D6 : Vue augmentée (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D6.INV-1** | la vue se tire du champ et des documents de la clé, sans les réécrire, et ne s'écrit ni ne se corrige à la main ; mêmes champ et documents, même vue, octet pour octet, quelles que soient les fins de ligne ; un champ altéré ne donne pas de vue. | `vue` |
+| **D6.INV-2** | chaque ancre porte exactement ce qui l'atteint, et son état est celui que lui donne le champ ; les calques se posent sur l'ancre sans toucher à son état. | `vue` |
+| **D6.INV-3** | la page `vue.html` est autonome, sans réseau ni ressource extérieure, lisible au clavier et sans JavaScript, à la structure accessible : langue, titre, niveaux de titre sans saut, commandes libellées, états écrits en toutes lettres. | `vue` |
+
+### D7 : Contexte chargé (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D7.INV-1** | chaque session de nœud et chaque agent a son propre contexte ; la mesure du contexte de chaque arbre d'exemple, à l'activation et au plus, est déterministe et versionnée, et aucun de ses contextes n'y dépasse, au plus, le point d'entrée de l'orchestrateur pour le même ticket. | `mesure` |
+| **D7.INV-2** | chaque fichier compté existe, a la taille comptée, et la consigne qui le fait lire le cite ; ce qu'un nœud écrit, le champ et le code des scripts ne se comptent pas ; le point d'entrée de l'orchestrateur se mesure selon son propre ordre de lecture. | `mesure` |
+
 ## java 1.1.1
 
 Expert Java 21, Spring Boot 3.5 et PostgreSQL : produire et relire du code conforme à des invariants vérifiables. Point d'entrée : [`specs/java/SKILL.md`](specs/java/SKILL.md).
@@ -1080,7 +1144,7 @@ Orchestrateur fractal C7E : résolution d'un ticket full-stack comme transformat
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D3.INV-1** | aucune modification du code, du schéma ni de la configuration du projet avant que le développeur ait validé la fiche : objectif, critères, invariants, configuration, cartographie d'impact, stratégie et tests déduits. | `meso-contrats`, `referentiel` |
+| **D3.INV-1** | aucune modification du code, du schéma ni de la configuration du projet avant que le développeur ait validé la fiche : objectif, critères, invariants, configuration, cartographie d'impact, stratégie et tests déduits. | `meso-contrats`, `referentiel`, `generateur-skill-ticket`, `generateur-skill-ticket/installation` |
 | **D3.INV-2** | les contrats de niveau d=1, schéma exposé (É1) et contrat OpenAPI (É3), sont validés avant toute implémentation de niveau d=2 ou d=3. | `meso-contrats` |
 | **D3.INV-3** | à la remise, la fiche est complète (modifications, dossier de preuves, écarts, boucle, capitalisation, indicateurs) et rangée à son emplacement. | `meso-contrats` |
 

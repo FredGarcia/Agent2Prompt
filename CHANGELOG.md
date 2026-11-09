@@ -4,6 +4,12 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Prototypes
 
+### 2026-11-09 : skill de ticket C7E, intégré
+
+- **Lot 7 validé** par le développeur, choix compris ; les six critères d'ABCDE-3512 relus et acceptés.
+- **Voie d'intégration (b)** choisie : une spécification de générateur à part, qui dépend de l'orchestrateur 3.x sans le modifier, nommée `generateur-skill-ticket`, ses sources lues dans un clone du dépôt ; plan d'intégration en cinq lots ratifié, les lots 1 et 2 livrés ensemble.
+- Le prototype est devenu la spécification `generateur-skill-ticket` 1.0.0 (section « Socle et experts back-front ») : ses outils, sa recette, ses exemples, son bilan et l'histoire de sa conception (`PROTOTYPE.md`) sont dans `specs/generateur-skill-ticket/` ; `prototypes/skill-ticket/` garde un renvoi. Le bilan reste figé à la fin du lot 7, ses tableaux sur les rapports du lot 7, figés eux aussi.
+
 ### 2026-11-08 : skill de ticket C7E, lot 7, bilan
 
 - **Lot 6 validé** par le développeur, choix compris, avec la ratification du plan du lot 7.
@@ -88,6 +94,16 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 - Écart relevé : l'exemple du § 7.2 du module referentiel laisse `regle` et `service` inconnus alors qu'ils changeraient la composition ; non corrigé, signalé.
 
 ## Socle et experts back-front
+
+### 2026-11-09 : generateur-skill-ticket 1.0.0
+
+- **generateur-skill-ticket 1.0.0** : première version, issue du prototype « skill de ticket » (lots 1 à 7), selon la voie (b) choisie par le développeur : une spécification à part, qui dépend de l'orchestrateur C7E sans le modifier, le skill de ticket tenant lieu de fiche de transformation.
+  - Point d'entrée : déroulé du générateur (qualifier, décomposer, vérifier l'arbre, présenter le plan, générer, installer, lancer la racine), outils, cycle 7E, registre des dimensions D1 à D7, toutes actives, 24 invariants, points d'extension E1 à E3 (fabriques par pile, exécuteur, formats propres au générateur).
+  - Modules `arbre`, `assemblage`, `installation`, `documents-kits`, `champ`, `vue` et `mesure`, chacun avec la recette de ses invariants : les tests qui les prouvent, cités sous leur titre.
+  - Références : orchestrateur-c7e 3.5.3, socle-back-front 1.1.0, java 1.1.1, angular 1.0.1, agent-tdd-jira 1.3.4, agent2test 1.3.1, analyse-projet 1.0.2, sonarqube 1.1.0, aux versions qu'épinglent les sources des skills de ticket.
+  - Outils, recette et exemples du prototype dans `specs/generateur-skill-ticket/`, non transmis : le générateur se lance depuis un clone du dépôt, où il lit ses sources à leurs versions épinglées. Chaque skill de ticket cite désormais le générateur et sa version ; un skill produit par le prototype reste vérifiable, et le bloc d'exclusion Git qu'écrivait le prototype est reconnu puis remplacé.
+  - Mode d'emploi : `docs/generateur-skill-ticket/mode-emploi.md`. Workflow `recette-generateur-skill-ticket.yml`, à la place de celui du prototype.
+- Vérifications : recette de 270 tests, dont 4 pour la spécification (recette de chaque invariant, outils cités, références) et 1 pour la provenance des skills ; `tools/verifier.mjs` : 15 spécifications, transmissions fidèles.
 
 ### 2026-11-07 : explication-hote-ia 1.1.0
 
