@@ -26,7 +26,7 @@ Mesure statique et déterministe (generateur-skill-ticket, critère P7), produit
 
 | Feuille | Session, activation | Session, au plus | Plus grand contexte | Somme des contextes |
 |---|---|---|---|---|
-| ABCDE-3512 | 6 105 tokens, 27 % | 28 726 tokens, 47 % | 28 726 tokens, 47 % | 141 809 tokens, 230 % |
+| ABCDE-3512 | 6 431 tokens, 28 % | 29 111 tokens, 47 % | 29 111 tokens, 47 % | 142 193 tokens, 231 % |
 
 Les pourcentages rapportent chaque taille à celle du point d'entrée de l'orchestrateur, à la même borne pour l'activation, au plus pour le reste. La somme réunit les contextes qui travaillent pour la feuille : sa session, ses agents de couche, ses sous-agents de rôle.
 
@@ -34,14 +34,14 @@ Les pourcentages rapportent chaque taille à celle du point d'entrée de l'orche
 
 | Mesure | Au plus |
 |---|---|
-| plus grand contexte de l'arbre, session du skill ticket-abcde-3512 | 28 726 tokens, 47 % |
-| somme des 10 contextes du nœud et des observateurs | 158 787 tokens, 258 % |
+| plus grand contexte de l'arbre, session du skill ticket-abcde-3512 | 29 111 tokens, 47 % |
+| somme des 10 contextes du nœud et des observateurs | 159 172 tokens, 258 % |
 
 Aucun contexte de l'arbre ne charge plus que le pourcentage du plus grand ; la somme dit ce que l'arbre lit en tout, quand chaque contexte relit ce qu'il lui faut, au plus.
 
 ## Relectures
 
-Sur la somme des contextes de l'arbre, 70 681 tokens (45 %) viennent de fichiers lus dans plusieurs contextes ; lus une seule fois chacun, les fichiers de l'arbre feraient 88 107 tokens, 143 % du point d'entrée de l'orchestrateur.
+Sur la somme des contextes de l'arbre, 70 681 tokens (44 %) viennent de fichiers lus dans plusieurs contextes ; lus une seule fois chacun, les fichiers de l'arbre feraient 88 491 tokens, 144 % du point d'entrée de l'orchestrateur.
 
 | Fichier | Contextes qui le lisent | Relu, au plus |
 |---|---|---|
@@ -75,7 +75,7 @@ Invoqués par le skill d'un nœud quand le champ attend une observation d'ordre 
 
 | Contexte | À l'activation | Au plus |
 |---|---|---|
-| session du skill ticket-abcde-3512 | 24 418 car., 6 105 tokens | 114 903 car., 28 726 tokens |
+| session du skill ticket-abcde-3512 | 25 721 car., 6 431 tokens | 116 441 car., 29 111 tokens |
 | agent ticket-abcde-3512-persistance | 4 694 car., 1 174 tokens | 85 199 car., 21 300 tokens |
 | agent ticket-abcde-3512-back | 4 835 car., 1 209 tokens | 85 667 car., 21 417 tokens |
 | agent ticket-abcde-3512-front | 5 201 car., 1 301 tokens | 87 353 car., 21 839 tokens |
@@ -87,14 +87,14 @@ Invoqués par le skill d'un nœud quand le champ attend une observation d'ordre 
 Lu par session du skill ticket-abcde-3512 :
 
 - `noms et descriptions du skill et des agents installés` : 2 304 car., chargés au démarrage de Gemini CLI
-- `ticket-abcde-3512/SKILL.md` : 22 114 car., corps du skill, à son activation
+- `ticket-abcde-3512/SKILL.md` : 23 417 car., corps du skill, à son activation
 - `ticket-abcde-3512/modules/meso-contrats/SKILL.md` : 1 742 car., module `meso-contrats`
 - `ticket-abcde-3512/modules/vue/SKILL.md` : 5 270 car., modules `vue` et `champ` du skill racine
 - `ticket-abcde-3512/modules/champ/SKILL.md` : 9 601 car., modules `vue` et `champ` du skill racine
 - `ticket-abcde-3512/modules/documents/SKILL.md` : 7 167 car., module `documents`
 - `ticket-abcde-3512/modules/methode/SKILL.md` : 13 859 car., module `methode`
 - `ticket-abcde-3512/modules/recette/SKILL.md` : 4 368 car., module `recette`
-- `ticket-abcde-3512/modules/kits/SKILL.md` : 7 595 car., module `kits`
+- `ticket-abcde-3512/modules/kits/SKILL.md` : 7 830 car., module `kits`
 - `ticket-abcde-3512/modules/invariants/SKILL.md` : 11 497 car., module `invariants`
 - `projet/docs/c7e/meso-contrats.md` : 15 638 car., `docs/c7e/meso-contrats.md`
 - `ticket-abcde-3512/ticket.toml` : 4 718 car., `ticket.toml`

@@ -198,7 +198,7 @@ Suis `SKILL.md` à partir de sa section 4. Rien n'est modifié avant la ratifica
       {
         "path": "outils/verifier-documents.mjs",
         "from": "specs/generateur-skill-ticket/outils/verifier-documents.mjs",
-        "sha256": "f4c7075f213cfafac771140537be28205c2337ae1be1c259e446eace23762825"
+        "sha256": "c360f5b58f1594813cd9ff8f723342e74633dfdf4e982244946d05fe8a337135"
       },
       {
         "path": "outils/verifier-kits.mjs",
@@ -223,12 +223,12 @@ Suis `SKILL.md` à partir de sa section 4. Rien n'est modifié avant la ratifica
       {
         "path": "outils/apprentissage.mjs",
         "from": "specs/generateur-skill-ticket/outils/apprentissage.mjs",
-        "sha256": "e883cc2241f629088ff6a89895dbd459e3d8f0910b1192e17336541ccc681f75"
+        "sha256": "738866e64ed488a7f6bf0d6a3a5a26a28e4eb65354c71596c13eb464f36cb0f5"
       }
     ],
     "genere_par": {
       "generateur": "generateur-skill-ticket",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "fabrique": "java-angular-postgresql",
       "orchestrateur": "3.5.3"
     }
@@ -467,7 +467,7 @@ version: 1.0.0
 
 # Skill de ticket ABCDE-3620
 
-> Produit par generateur-skill-ticket 1.1.0, fabrique `java-angular-postgresql`, référentiel des méso-contrats 3.3.0, orchestrateur-c7e 3.5.3. Ce skill remplace la fiche de transformation comme objet ratifié avant toute modification ; il reste identique à sa transmission. Si tu y relèves une ambiguïté ou une contradiction, signale-la au développeur ; ne corrige pas le skill toi-même.
+> Produit par generateur-skill-ticket 1.1.1, fabrique `java-angular-postgresql`, référentiel des méso-contrats 3.3.0, orchestrateur-c7e 3.5.3. Ce skill remplace la fiche de transformation comme objet ratifié avant toute modification ; il reste identique à sa transmission. Si tu y relèves une ambiguïté ou une contradiction, signale-la au développeur ; ne corrige pas le skill toi-même.
 
 ## 1. Place dans l'arbre
 
@@ -523,7 +523,9 @@ ABCDE-3620 se clôt quand tous ses sous-tickets sont clos et que chacun de ses c
 
 Si l'ordre 2 a proposé des adaptations, invoque l'observateur d'ordre 3 de l'arbre, `ticket-abcde-3620-observateur-3`, pour le bilan de clôture : lesquelles ont changé une décision (module `champ`, section 4). Génère la vue augmentée de l'arbre, `node .gemini/skills/ticket-abcde-3620/outils/vue.mjs generer docs/demandes/ABCDE-3620`, et invite le développeur à ouvrir `docs/demandes/ABCDE-3620/vue.html` dans son navigateur : chaque critère d'acceptation avec ses preuves, les désaccords et les décisions. Puis assemble les kits dev, test et démo et la remise à Agent2Test, et contrôle-les sans écart (module `kits`).
 
-Enfin, l'apprentissage du ticket (D8 du générateur) : `node .gemini/skills/ticket-abcde-3620/outils/apprentissage.mjs clore ABCDE-3620` verse au registre du projet la remontée des preuves, tirée du champ et de ce que le relevé porte déjà, chaque entrée à sa profondeur CRI ; puis `node .gemini/skills/ticket-abcde-3620/outils/apprentissage.mjs registre proposer` dit les motifs relevés dans deux tickets. Présente chaque proposition au développeur ; dépose sa décision, `node .gemini/skills/ticket-abcde-3620/outils/apprentissage.mjs registre decider <n> --decision retenue|refusee --par <nom> --raison <texte>`. Rien n'entre dans le référentiel ni dans les consignes sans sa décision, et c'est lui qui le fait (D6.INV-2).
+Enfin, l'apprentissage du ticket (D8 du générateur), une fois les kits contrôlés sans écart et la campagne d'Agent2Test ouverte, ou le développeur ayant dit qu'il n'en ouvre pas : `node .gemini/skills/ticket-abcde-3620/outils/apprentissage.mjs clore ABCDE-3620` verse au registre du projet la remontée des preuves, tirée du champ et de ce que le relevé porte déjà, chaque entrée à sa profondeur CRI ; puis `node .gemini/skills/ticket-abcde-3620/outils/apprentissage.mjs registre proposer` dit les motifs relevés dans deux tickets. Présente chaque proposition au développeur ; dépose sa décision, `node .gemini/skills/ticket-abcde-3620/outils/apprentissage.mjs registre decider <n> --decision retenue|refusee --par <nom> --raison <texte>`. Rien n'entre dans le référentiel ni dans les consignes sans sa décision, et c'est lui qui le fait (D6.INV-2).
+
+Cet ordre tient au registre, `docs/c7e/registre-apprentissage.jsonl`, suivi dès qu'un ticket l'a versionné : modifié avant l'ouverture de la campagne, il rendrait la remise périmée (agent2test, module echange, § 4). Comme les kits et le champ, le relevé du ticket, `docs/demandes/ABCDE-3620/releve.json` et sa vue `releve.md`, et le registre se commitent après la campagne, par le développeur, avec le dossier du ticket ; ce skill ne les commite pas.
 
 ## 8. Remise
 
@@ -1203,7 +1205,7 @@ node .gemini/skills/ticket-abcde-3620/outils/verifier-kits.mjs docs/demandes/ABC
 
 Le script vérifie chaque manifeste, chaque empreinte, les commits dans le dépôt, la couverture des scénarios par les tests, le parcours et les captures, et la remise contre `us.md`, le fichier Gherkin et le kit dev.
 
-Les kits, comme le champ d'observation, ne se commitent pas avant la campagne d'Agent2Test : le commit remis doit rester la tête de la branche (agent2test, module echange, § 4). Le développeur les commite ensuite, s'il le souhaite.
+Les kits, comme le champ d'observation, ne se commitent pas avant la campagne d'Agent2Test : le commit remis doit rester la tête de la branche (agent2test, module echange, § 4). Le développeur les commite ensuite, s'il le souhaite. Le contrôle précède aussi la clôture d'apprentissage, qui ne vient qu'après l'ouverture de la campagne : le relevé du ticket et le registre du projet qu'elle écrit se versionnent ensuite, par le développeur, avec le dossier du ticket.
 <<<FIN modules/kits/SKILL.md>>>
 
 <<<FICHIER modules/champ/SKILL.md>>>
@@ -5067,8 +5069,9 @@ process.exit(ecarts.length ? 1 : 0);
 // porte, parmi ses pièces, chaque image de l'objectif des feuilles ; chaque critère de la racine est repris
 // mot pour mot sous son identifiant <CLÉ>-CAnn ; chaque critère d'un sous-ticket se rattache à un critère
 // <CLÉ>-CAnn illustré par au moins un scénario, et, pour une feuille, par un scénario qui porte l'étiquette
-// de sa couche. Rien n'est modifié. Code de sortie 1 au moindre écart. Node 20 ou plus récent, modules
-// natifs uniquement.
+// de sa couche ; chaque scénario que déclare l'arbre (1.1.0) est dans le fichier Gherkin, sous son titre,
+// avec ses critères et, s'il dit ses couches (1.1.1), avec leurs étiquettes. Rien n'est modifié. Code de
+// sortie 1 au moindre écart. Node 20 ou plus récent, modules natifs uniquement.
 
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
@@ -5203,6 +5206,8 @@ export function controlerDocuments(dossier, rattachement, controleur) {
     }
     if (lu.titre.trim() !== d.titre.trim()) ecarts.push(`${d.id} : titre « ${lu.titre.trim()} », attendu « ${d.titre} »`);
     for (const ca of d.ca) if (!lu.etiquettes.includes(`@${ca}`)) ecarts.push(`${d.id} : n'éprouve pas ${ca}, que l'arbre lui attribue`);
+    // Depuis la 1.1.1 : l'étiquette de chaque couche que le scénario touche, selon l'arbre.
+    for (const e of d.etiquettes ?? []) if (!lu.etiquettes.includes(e)) ecarts.push(`${d.id} : ne porte pas ${e}, l'étiquette d'une couche qu'il touche selon l'arbre (${(d.couches ?? []).join(', ')})`);
   }
   return {
     ecarts,
@@ -7489,7 +7494,10 @@ export function entreesDuChamp(enregistrements) {
   return res;
 }
 
-/** Commits de la branche qui portent une ligne « Tâche » : [{ sha, tache, scenario, theme }]. */
+/**
+ * Commits de la branche qui portent une ligne « Tâche » : [{ sha, tache, scenario, theme, slot }]. Le slot
+ * (É1 à É7) est celui de l'étiquette `[É<n>-<DOMAINE>]` du titre ; null si le titre n'en porte pas.
+ */
 export function commitsDeLaBranche(projet, branche = 'HEAD') {
   let sortie;
   try {
@@ -7499,12 +7507,27 @@ export function commitsDeLaBranche(projet, branche = 'HEAD') {
   }
   return sortie.split('\x1e').map((b) => b.trim()).filter(Boolean).map((b) => {
     const [sha, corps = ''] = b.split('\x00');
-    const ligne = (nom) => corps.replace(/\r\n/g, '\n').split('\n').map((l) => l.trim()).find((l) => l.startsWith(`${nom} : `))?.slice(nom.length + 3);
-    return { sha, tache: ligne('Tâche'), scenario: ligne('Scénario') ?? null, theme: ligne('Thème') };
+    const lignes = corps.replace(/\r\n/g, '\n').split('\n').map((l) => l.trim());
+    const ligne = (nom) => lignes.find((l) => l.startsWith(`${nom} : `))?.slice(nom.length + 3);
+    return { sha, tache: ligne('Tâche'), scenario: ligne('Scénario') ?? null, theme: ligne('Thème'), slot: /\[(É\d)-[^\]]*\]/.exec(lignes[0] ?? '')?.[1] ?? null };
   }).filter((c) => c.tache);
 }
 
-/** Écarts entre le plan des commits ratifié et la branche (niveau micro). */
+/**
+ * Le commit est-il du ticket `cle` ? Sa tâche est la clé, une référence qui la prolonge, ou un nœud ou une
+ * tâche du plan que décrit le rattachement. La branche porte aussi l'historique d'avant elle, avec les
+ * commits d'autres tickets : ils ne sont ni dans le plan, ni hors du plan de celui-ci (1.1.1).
+ */
+export function duTicket(cle, rattachement = null) {
+  const references = new Set([cle, rattachement?.cle, ...(rattachement?.noeuds ?? []).map((x) => x.reference), ...(rattachement?.plan ?? []).map((p) => p.tache)].filter(Boolean));
+  return (c) => references.has(c.tache) || String(c.tache).startsWith(`${cle}-`);
+}
+
+/**
+ * Écarts entre le plan des commits ratifié et la branche (niveau micro). Un commit planifié peut se
+ * réaliser en plusieurs commits, un par slot (orchestrateur, D4.INV-2) : seuls deux commits ou plus sur
+ * le même slot en font un écart (1.1.1).
+ */
 export function entreesDuPlan(plan, commits) {
   const res = [];
   const cle = (x) => `${x.tache}|${x.scenario ?? '-'}|${x.theme}`;
@@ -7518,7 +7541,14 @@ export function entreesDuPlan(plan, commits) {
     const faits = parCle.get(cle(p)) ?? [];
     const ici = `${p.tache}:${p.commit} (${p.theme}${p.scenario ? `, ${p.scenario}` : ''})`;
     if (faits.length === 0) res.push({ profondeur: 'micro', nature: 'commit-planifie-absent', motif: `commit-absent-${p.theme}`, cible: 'generateur', sens: 'remontee', resume: `${ici} : aucun commit sur la branche`, preuve: { type: 'arbre', ref: `${p.tache}:${p.commit}` } });
-    if (faits.length > 1) res.push({ profondeur: 'micro', nature: 'commit-planifie-multiple', motif: `commit-multiple-${p.theme}`, cible: 'generateur', sens: 'remontee', resume: `${ici} : réalisé en ${faits.length} commits`, preuve: { type: 'commit', ref: faits.map((f) => f.sha.slice(0, 12)).join(', ') } });
+    const parSlot = new Map();
+    for (const f of faits) {
+      if (!parSlot.has(f.slot ?? null)) parSlot.set(f.slot ?? null, []);
+      parSlot.get(f.slot ?? null).push(f);
+    }
+    for (const [slot, memes] of parSlot) {
+      if (memes.length > 1) res.push({ profondeur: 'micro', nature: 'commit-planifie-multiple', motif: `commit-multiple-${p.theme}`, cible: 'generateur', sens: 'remontee', resume: `${ici} : ${memes.length} commits ${slot ? `sur le même slot, ${slot}` : 'sans slot dans leur titre'}`, preuve: { type: 'commit', ref: memes.map((f) => f.sha.slice(0, 12)).join(', ') } });
+    }
   }
   for (const c of commits) {
     if (!planifies.has(cle(c))) res.push({ profondeur: 'micro', nature: 'commit-hors-plan', motif: `commit-hors-plan-${c.theme ?? 'sans-theme'}`, cible: 'generateur', sens: 'remontee', resume: `${c.tache} : commit hors du plan (${c.theme ?? 'sans thème'}${c.scenario ? `, ${c.scenario}` : ''})`, preuve: { type: 'commit', ref: c.sha.slice(0, 12) } });
@@ -7572,7 +7602,7 @@ export function clore(cle, { demandes = DEMANDES, registre = REGISTRE, rattachem
   if (rattachement?.plan) {
     const commits = commitsDeLaBranche(projet, branche);
     if (commits === null) return { erreurs: [`branche ${branche} illisible dans ${projet}`] };
-    remontee.push(...entreesDuPlan(rattachement.plan, commits));
+    remontee.push(...entreesDuPlan(rattachement.plan, commits.filter(duTicket(cle, rattachement))));
   }
   const ajout = noter(cle, remontee, { demandes, date });
   if (ajout.erreurs.length > 0) return ajout;
@@ -8012,15 +8042,15 @@ Lis d'abord la vue entière de l'arbre, `node .gemini/skills/ticket-abcde-3620/o
 
 Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichiers ont été matérialisés.
 
-    41b8b0676200f1aab4283c28fd4509183b220cb3d72a7bf600a09f08ac53aa8c  manifest.json
-    4f45f23875afc14d28f3e1dbe16ff2855964177b774262ca8550bdcad3cc898f  SKILL.md
+    6925e61d11aa30569c44055d3aed8f5830877136e2052283fb1efe99ef422693  manifest.json
+    6d03f5497e2961864f91ff4a02d596177f8e1534a0ab5437b4e955857bc86c15  SKILL.md
     99f8d264ef101abf040d4648830305caa54de9a772ecd8f48eb4f2265ce1d75e  ticket.toml
     132002bb56c3b49254191bd44b9edfff7fd5dad422095a09bc1392ec046201cf  modules/meso-contrats/SKILL.md
     def6289cfdd5ad0505e021abead226caa9c78467aad516cec7807c653711d861  modules/recette/SKILL.md
     ab83aefa38bd8419a85895be2387b832b59f717605280f6892e4d78ed1440fb0  modules/sous-tickets/SKILL.md
     a6733dd83d0ca9bdc1f4ff0b4ffec734b4e95495e3ac18689e6b4a40e960ffd7  modules/documents/SKILL.md
     26dc378513af3e5a513b2f23d834d8df71379e0f2a37e52781773d0435d93705  outils/rattachement.json
-    c0ff99d362fb296800da72e602fd84f6709c7297471c55241f53e851d0f5ef93  modules/kits/SKILL.md
+    e60f23bcc65a5ed1e90a3992852da00e3e62932ff54968e1be597ab3dcefbc19  modules/kits/SKILL.md
     21e02e839e030f391aff2a9599d03e9c1306f4093c608e7dc307a27bda9ff292  modules/champ/SKILL.md
     1bdef467c565c8b22e5101f6ec617fd547e5b6b0aba5b91c8d066f0f74e13a5b  modules/champ-depot/SKILL.md
     d46b66472c772ba6c0f7f148eb42807d94d8dfb6668951e9f19711ba759ee324  modules/vue/SKILL.md
@@ -8045,12 +8075,12 @@ Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichier
     996465b1319a0fe5e1096bd354077af8d3d358a4d75dddb73e6350c5c9c027b7  references/sonarqube/examen-local.md
     7b9806cfda2b1fbe83c7f1faca170992ceb9d52b0bfde1bbbefbf6fbf238d63f  outils/extraire-jira.mjs
     c2410a4a5d48acd077ae1df9e6e090d278b62927e623b7a9abfabe5dbbd16bc8  outils/controler-criteres.mjs
-    f4c7075f213cfafac771140537be28205c2337ae1be1c259e446eace23762825  outils/verifier-documents.mjs
+    c360f5b58f1594813cd9ff8f723342e74633dfdf4e982244946d05fe8a337135  outils/verifier-documents.mjs
     f69b3d1f3d323f206f3afe96621bf6ead188469248b73e7311f2bd2bd123da2d  outils/verifier-kits.mjs
     6a8432370146559f705ce84e6954e8c1f452891a1f33a6191ae27977aba231df  outils/champ.mjs
     1d77807ab1947fe4ae2315337725c3c728cc9dfbbb3a1fff28c453edb655c9d5  outils/vue.mjs
     724a65763146e9ec2fc606dd796d4a802c765951f3e60e59069d38e7b8816437  outils/invariants.mjs
-    e883cc2241f629088ff6a89895dbd459e3d8f0910b1192e17336541ccc681f75  outils/apprentissage.mjs
+    738866e64ed488a7f6bf0d6a3a5a26a28e4eb65354c71596c13eb464f36cb0f5  outils/apprentissage.mjs
     15004dc6dd635932c1449197515250d955b5db4a68b67b33056650e1a43be8fd  agents/ticket-abcde-3620-redacteur.md
     c31814f2e51e76276d2da41b3d570f5c916c92eb15fb13d350fc4ad0ba923b91  agents/ticket-abcde-3620-analyste.md
     c69532a865e7829a1290203ab6459bd5c8185b47c66bf9a449f153add94eb59d  agents/ticket-abcde-3620-relecteur.md

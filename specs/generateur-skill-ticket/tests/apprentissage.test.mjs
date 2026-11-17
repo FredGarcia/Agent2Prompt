@@ -114,13 +114,46 @@ test('D8 : la clôture relève les écarts entre le plan des commits et la branc
     ['micro', 'commit-planifie-absent', 'commit-absent-persistance', 'arbre'],
     ['micro', 'commit-hors-plan', 'commit-hors-plan-libelles', 'commit'],
   ]);
-  assert.match(ecarts[0].resume, /ABCDE-3620-1\.1:K1 \(persistance, ABCDE-3620-S02\) : réalisé en 2 commits/);
+  assert.match(ecarts[0].resume, /ABCDE-3620-1\.1:K1 \(persistance, ABCDE-3620-S02\) : 2 commits sur le même slot, É1/);
   // Par la clôture, avec le rattachement du skill racine.
   const o = projet();
   const r = clore('ABCDE-3620', { demandes: o.demandes, registre: o.registre, rattachement: { plan }, projet: d, date: D1 });
   assert.deepStrictEqual(r.erreurs, []);
   assert.equal(r.releve.entrees.filter((e) => e.profondeur === 'micro').length, 3);
   assert.match(clore('ABCDE-3700', { demandes: o.demandes, registre: o.registre, rattachement: { plan }, projet: mkdtempSync(join(tmpdir(), 'vide-')), date: D1 }).erreurs[0], /branche HEAD illisible/);
+});
+
+test('1.1.1 : la clôture ne relève que les commits du ticket ; un commit planifié réalisé sur plusieurs slots n\'est pas un écart', () => {
+  const plan = [
+    { tache: 'ABCDE-3620-1.2', commit: 'K1', theme: 'backend', scenario: 'ABCDE-3620-S01' },
+    { tache: 'ABCDE-3620-1.2', commit: 'K2', theme: 'backend', scenario: 'ABCDE-3620-S02' },
+  ];
+  const d = depot([
+    // L'historique d'avant la branche : deux tickets antérieurs, chacun avec ses lignes.
+    ['ABCDE-3512 S01 : [É5-UI] feat(liste): filtre', 'Tâche : ABCDE-3512', 'Scénario : ABCDE-3512-S01', 'Thème : frontend'],
+    ['ABCDE-3410 : [É3-API] fix(api): code retour', 'Tâche : ABCDE-3410-2', 'Thème : backend'],
+    // La branche du ticket : K1 sur deux slots, É1 puis É3 ; K2 deux fois sur le même slot, É3.
+    ['ABCDE-3620 S01 : [É1-DATA] feat(depot): requête inchangée', 'Tâche : ABCDE-3620-1.2', 'Scénario : ABCDE-3620-S01', 'Thème : backend'],
+    ['ABCDE-3620 S01 : [É3-API] test(api): réponse inchangée', 'Tâche : ABCDE-3620-1.2', 'Scénario : ABCDE-3620-S01', 'Thème : backend'],
+    ['ABCDE-3620 S02 : [É3-API] feat(api): vue résumée', 'Tâche : ABCDE-3620-1.2', 'Scénario : ABCDE-3620-S02', 'Thème : backend'],
+    ['ABCDE-3620 S02 : [É3-API] fix(api): vue résumée', 'Tâche : ABCDE-3620-1.2', 'Scénario : ABCDE-3620-S02', 'Thème : backend'],
+    // Une tâche du ticket, sans commit planifié de ce thème : hors du plan.
+    ['ABCDE-3620 : [É5-UI] style(lignes): libellés', 'Tâche : ABCDE-3620-2', 'Thème : libelles'],
+  ]);
+  assert.deepStrictEqual(commitsDeLaBranche(d).map((c) => c.slot), ['É5', 'É3', 'É1', 'É3', 'É3', 'É3', 'É5']);
+  const o = projet();
+  const rattachement = { cle: 'ABCDE-3620', noeuds: [{ reference: 'ABCDE-3620-1.2' }, { reference: 'ABCDE-3620-2' }], plan };
+  const r = clore('ABCDE-3620', { demandes: o.demandes, registre: o.registre, rattachement, projet: d, date: D1 });
+  assert.deepStrictEqual(r.erreurs, []);
+  const micro = r.releve.entrees.filter((e) => e.profondeur === 'micro');
+  assert.deepStrictEqual(micro.map((e) => [e.nature, e.motif]), [
+    ['commit-planifie-multiple', 'commit-multiple-backend'],
+    ['commit-hors-plan', 'commit-hors-plan-libelles'],
+  ]);
+  assert.match(micro[0].resume, /^ABCDE-3620-1\.2:K2 \(backend, ABCDE-3620-S02\) : 2 commits sur le même slot, É3$/);
+  assert.doesNotMatch(micro.map((e) => `${e.resume} ${e.preuve.ref}`).join('\n'), /ABCDE-3512|ABCDE-3410/, 'les commits des tickets antérieurs ne sont pas de ce ticket');
+  // Sans slot dans le titre, deux commits d'un même commit planifié restent un écart.
+  assert.match(entreesDuPlan(plan.slice(0, 1), [1, 2].map((k) => ({ sha: `${k}`.repeat(40), tache: 'ABCDE-3620-1.2', scenario: 'ABCDE-3620-S01', theme: 'backend', slot: null })))[0].resume, /: 2 commits sans slot dans leur titre$/);
 });
 
 test('D8 : un relevé clos est versé au registre et ne reçoit plus rien', () => {

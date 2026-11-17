@@ -22,6 +22,7 @@
 import { createHash } from 'node:crypto';
 import { COUCHES, decrireComposition } from './referentiel.mjs';
 import { decrireArbre, ordreDeResolution } from './arbre.mjs';
+import { REGISTRE as REGISTRE_APPRENTISSAGE } from './apprentissage.mjs';
 import { commitsDe, scenariosDe } from './commits.mjs';
 import { extraireSection } from './sources.mjs';
 
@@ -525,7 +526,13 @@ export class FabriqueSkillTicket {
       })),
       ...(this.aUnPlan(n)
         ? {
-          scenarios: scenariosDe(racine).map((x) => ({ id: `${cle}-${x.id}`, titre: x.titre, ca: (x.prouve ?? []).map((c) => identifiantCa(cle, racine.criteres.findIndex((y) => y.id === c) + 1)) })),
+          // Depuis la 1.1.1, un scénario qui dit ses couches porte aussi leurs étiquettes, que vérifie verifier-documents.
+          scenarios: scenariosDe(racine).map((x) => ({
+            id: `${cle}-${x.id}`,
+            titre: x.titre,
+            ca: (x.prouve ?? []).map((c) => identifiantCa(cle, racine.criteres.findIndex((y) => y.id === c) + 1)),
+            ...(Array.isArray(x.couches) ? { couches: x.couches, etiquettes: [...new Set(x.couches.map((c) => ETIQUETTES_COUCHES[c]))] } : {}),
+          })),
           plan: racine.feuilles().flatMap((t) => commitsDe(t).map((c) => ({ tache: t.reference, commit: c.id, theme: c.theme, scenario: c.scenario ? `${cle}-${c.scenario}` : null }))),
         }
         : {}),
@@ -554,7 +561,7 @@ export class FabriqueSkillTicket {
     return [
       tableau(['Commit', 'Thème', 'Scénario', 'Résumé'], commits.map((c) => [c.id, c.theme, c.scenario ? `${cle}-${c.scenario} : ${titres.get(c.scenario)}` : 'sans scénario', c.resume])),
       '',
-      'Le plan est ratifié avec l\'arbre : un commit par scénario et par thème, dans cet ordre. Un commit planifié peut se réaliser en plusieurs commits, un par slot (D4.INV-2), qui portent les mêmes lignes ; un commit hors du plan, ou un commit planifié laissé de côté, se dit au développeur et se relève à la clôture (module `apprentissage` du générateur).',
+      'Le plan est ratifié avec l\'arbre : un commit par scénario et par thème, dans cet ordre. Un commit planifié peut se réaliser en plusieurs commits, un par slot (D4.INV-2), qui portent les mêmes lignes ; un commit hors du plan, un commit planifié laissé de côté, ou deux commits sur un même slot, se disent au développeur, et la clôture de la racine les relève dans l\'apprentissage du ticket.',
     ];
   }
 
@@ -637,9 +644,11 @@ export class FabriqueSkillTicket {
         '',
         ...(r.scenarios
           ? [
-            `Les scénarios de l'US sont ceux que l'arbre déclare, et que son plan de commits réalise : le fichier Gherkin les reprend tous, sous ces identifiants et ces titres, chacun avec les critères d'acceptation qu'il éprouve. Un scénario de plus se propose (\`@propose\`) et se ratifie avec l'arbre.`,
+            `Les scénarios de l'US sont ceux que l'arbre déclare, et que son plan de commits réalise : le fichier Gherkin les reprend tous, sous ces identifiants et ces titres, chacun avec les critères d'acceptation qu'il éprouve${r.scenarios.some((x) => x.etiquettes) ? ' et les étiquettes des couches qu\'il touche, quand l\'arbre les dit' : ''}. Un scénario de plus se propose (\`@propose\`) et se ratifie avec l'arbre.`,
             '',
-            tableau(['Scénario', 'Titre', 'Critères d\'acceptation'], r.scenarios.map((x) => [`\`@${x.id}\``, x.titre, x.ca.map((a) => `\`@${a}\``).join(', ')])),
+            r.scenarios.some((x) => x.etiquettes)
+              ? tableau(['Scénario', 'Titre', 'Critères d\'acceptation', 'Couches'], r.scenarios.map((x) => [`\`@${x.id}\``, x.titre, x.ca.map((a) => `\`@${a}\``).join(', '), x.etiquettes ? x.etiquettes.map((e) => `\`${e}\``).join(', ') : '—']))
+              : tableau(['Scénario', 'Titre', 'Critères d\'acceptation'], r.scenarios.map((x) => [`\`@${x.id}\``, x.titre, x.ca.map((a) => `\`@${a}\``).join(', ')])),
             '',
           ]
           : []),
@@ -789,7 +798,7 @@ export class FabriqueSkillTicket {
       '',
       'Le script vérifie chaque manifeste, chaque empreinte, les commits dans le dépôt, la couverture des scénarios par les tests, le parcours et les captures, et la remise contre `us.md`, le fichier Gherkin et le kit dev.',
       '',
-      'Les kits, comme le champ d\'observation, ne se commitent pas avant la campagne d\'Agent2Test : le commit remis doit rester la tête de la branche (agent2test, module echange, § 4). Le développeur les commite ensuite, s\'il le souhaite.',
+      'Les kits, comme le champ d\'observation, ne se commitent pas avant la campagne d\'Agent2Test : le commit remis doit rester la tête de la branche (agent2test, module echange, § 4). Le développeur les commite ensuite, s\'il le souhaite. Le contrôle précède aussi la clôture d\'apprentissage, qui ne vient qu\'après l\'ouverture de la campagne : le relevé du ticket et le registre du projet qu\'elle écrit se versionnent ensuite, par le développeur, avec le dossier du ticket.',
     ])];
   }
 
@@ -1634,9 +1643,23 @@ export class FabriqueSkillTicket {
           '',
           `Si l'ordre 2 a proposé des adaptations, invoque l'observateur d'ordre 3 de l'arbre, \`${this.nomRole(n, 'observateur-3')}\`, pour le bilan de clôture : lesquelles ont changé une décision (module \`champ\`, section 4). ${this.vueAuDeveloppeur(n, 'chaque critère d\'acceptation avec ses preuves, les désaccords et les décisions')} Puis assemble les kits dev, test et démo et la remise à Agent2Test, et contrôle-les sans écart (module \`kits\`).`,
           '',
-          `Enfin, l'apprentissage du ticket (D8 du générateur) : \`${this.commandeApprentissage(n, `clore ${this.cle(n)}`)}\` verse au registre du projet la remontée des preuves, tirée du champ et ${this.aUnPlan(n) ? 'des écarts entre le plan des commits et la branche' : 'de ce que le relevé porte déjà'}, chaque entrée à sa profondeur CRI ; puis \`${this.commandeApprentissage(n, 'registre proposer')}\` dit les motifs relevés dans deux tickets. Présente chaque proposition au développeur ; dépose sa décision, \`${this.commandeApprentissage(n, 'registre decider <n> --decision retenue|refusee --par <nom> --raison <texte>')}\`. Rien n'entre dans le référentiel ni dans les consignes sans sa décision, et c'est lui qui le fait (D6.INV-2).`,
+          ...this.apprentissageDeCloture(n),
         ]
         : []),
+    ];
+  }
+
+  /**
+   * Apprentissage du ticket à la clôture de la racine (D8 du générateur, depuis 1.1.0) : dans la clôture
+   * d'un nœud composé, dans la remise d'un ticket sans sous-ticket (depuis 1.1.1). Il suit le contrôle des
+   * kits et l'ouverture de la campagne d'Agent2Test, et ce qu'il écrit se commite après elle.
+   */
+  apprentissageDeCloture(n) {
+    const cle = this.cle(n);
+    return [
+      `Enfin, l'apprentissage du ticket (D8 du générateur), une fois les kits contrôlés sans écart et la campagne d'Agent2Test ouverte, ou le développeur ayant dit qu'il n'en ouvre pas : \`${this.commandeApprentissage(n, `clore ${cle}`)}\` verse au registre du projet la remontée des preuves, tirée du champ et ${this.aUnPlan(n) ? 'des écarts entre le plan des commits et la branche' : 'de ce que le relevé porte déjà'}, chaque entrée à sa profondeur CRI ; puis \`${this.commandeApprentissage(n, 'registre proposer')}\` dit les motifs relevés dans deux tickets. Présente chaque proposition au développeur ; dépose sa décision, \`${this.commandeApprentissage(n, 'registre decider <n> --decision retenue|refusee --par <nom> --raison <texte>')}\`. Rien n'entre dans le référentiel ni dans les consignes sans sa décision, et c'est lui qui le fait (D6.INV-2).`,
+      '',
+      `Cet ordre tient au registre, \`${REGISTRE_APPRENTISSAGE}\`, suivi dès qu'un ticket l'a versionné : modifié avant l'ouverture de la campagne, il rendrait la remise périmée (agent2test, module echange, § 4). Comme les kits et le champ, le relevé du ticket, \`docs/demandes/${cle}/releve.json\` et sa vue \`releve.md\`, et le registre se commitent après la campagne, par le développeur, avec le dossier du ticket ; ce skill ne les commite pas.`,
     ];
   }
 
@@ -1652,7 +1675,10 @@ export class FabriqueSkillTicket {
     if (!n.estFeuille) return [`${remise} : pour chaque critère, les preuves de ceux qui le soutiennent ; les écarts remontés et leurs décisions ; l'état de chaque sous-ticket.${racine} ${suite}`];
     const front = this.couches(n).includes('frontend');
     const contributions = `sous le titre « Contributions aux kits », ce que le skill racine assemble à la clôture de l'arbre : les commits, avec leur empreinte et leur titre ; les tests et les scénarios qu'ils portent ;${front ? ` les captures de l'écran livré par scénario (\`${this.dossier(n)}captures/\`), avec l'image de l'objectif à laquelle chacune se compare ;` : ''} les données de démonstration, déposées dans \`${this.dossier(n)}demo/\`, et les commandes de lancement`;
-    return [`${remise}, complète à la remise (D3.INV-3) : modifications par slot, avec les commits ; dossier de preuves, scénario par scénario ; rapports du relecteur et de l'agent qualité ; écarts ajoutés au registre des écarts ; boucle de second ordre (observations É6 et É7, commits de rétroaction, entrées proposées) ; capitalisation ; indicateurs et leur calcul (module \`methode\`, § 8) ; et, ${contributions}.${racine} ${suite}`];
+    const contenu = `${remise}, complète à la remise (D3.INV-3) : modifications par slot, avec les commits ; dossier de preuves, scénario par scénario ; rapports du relecteur et de l'agent qualité ; écarts ajoutés au registre des écarts ; boucle de second ordre (observations É6 et É7, commits de rétroaction, entrées proposées) ; capitalisation ; indicateurs et leur calcul (module \`methode\`, § 8) ; et, ${contributions}.${racine}`;
+    // Un ticket sans sous-ticket se clôt dans sa remise : son apprentissage s'y verse aussi (1.1.1).
+    if (n.estRacine) return [contenu, '', ...this.apprentissageDeCloture(n), '', suite];
+    return [`${contenu} ${suite}`];
   }
 
   role(rel) {

@@ -139,7 +139,10 @@ export function entreesDuChamp(enregistrements) {
   return res;
 }
 
-/** Commits de la branche qui portent une ligne « Tâche » : [{ sha, tache, scenario, theme }]. */
+/**
+ * Commits de la branche qui portent une ligne « Tâche » : [{ sha, tache, scenario, theme, slot }]. Le slot
+ * (É1 à É7) est celui de l'étiquette `[É<n>-<DOMAINE>]` du titre ; null si le titre n'en porte pas.
+ */
 export function commitsDeLaBranche(projet, branche = 'HEAD') {
   let sortie;
   try {
@@ -149,12 +152,27 @@ export function commitsDeLaBranche(projet, branche = 'HEAD') {
   }
   return sortie.split('\x1e').map((b) => b.trim()).filter(Boolean).map((b) => {
     const [sha, corps = ''] = b.split('\x00');
-    const ligne = (nom) => corps.replace(/\r\n/g, '\n').split('\n').map((l) => l.trim()).find((l) => l.startsWith(`${nom} : `))?.slice(nom.length + 3);
-    return { sha, tache: ligne('Tâche'), scenario: ligne('Scénario') ?? null, theme: ligne('Thème') };
+    const lignes = corps.replace(/\r\n/g, '\n').split('\n').map((l) => l.trim());
+    const ligne = (nom) => lignes.find((l) => l.startsWith(`${nom} : `))?.slice(nom.length + 3);
+    return { sha, tache: ligne('Tâche'), scenario: ligne('Scénario') ?? null, theme: ligne('Thème'), slot: /\[(É\d)-[^\]]*\]/.exec(lignes[0] ?? '')?.[1] ?? null };
   }).filter((c) => c.tache);
 }
 
-/** Écarts entre le plan des commits ratifié et la branche (niveau micro). */
+/**
+ * Le commit est-il du ticket `cle` ? Sa tâche est la clé, une référence qui la prolonge, ou un nœud ou une
+ * tâche du plan que décrit le rattachement. La branche porte aussi l'historique d'avant elle, avec les
+ * commits d'autres tickets : ils ne sont ni dans le plan, ni hors du plan de celui-ci (1.1.1).
+ */
+export function duTicket(cle, rattachement = null) {
+  const references = new Set([cle, rattachement?.cle, ...(rattachement?.noeuds ?? []).map((x) => x.reference), ...(rattachement?.plan ?? []).map((p) => p.tache)].filter(Boolean));
+  return (c) => references.has(c.tache) || String(c.tache).startsWith(`${cle}-`);
+}
+
+/**
+ * Écarts entre le plan des commits ratifié et la branche (niveau micro). Un commit planifié peut se
+ * réaliser en plusieurs commits, un par slot (orchestrateur, D4.INV-2) : seuls deux commits ou plus sur
+ * le même slot en font un écart (1.1.1).
+ */
 export function entreesDuPlan(plan, commits) {
   const res = [];
   const cle = (x) => `${x.tache}|${x.scenario ?? '-'}|${x.theme}`;
@@ -168,7 +186,14 @@ export function entreesDuPlan(plan, commits) {
     const faits = parCle.get(cle(p)) ?? [];
     const ici = `${p.tache}:${p.commit} (${p.theme}${p.scenario ? `, ${p.scenario}` : ''})`;
     if (faits.length === 0) res.push({ profondeur: 'micro', nature: 'commit-planifie-absent', motif: `commit-absent-${p.theme}`, cible: 'generateur', sens: 'remontee', resume: `${ici} : aucun commit sur la branche`, preuve: { type: 'arbre', ref: `${p.tache}:${p.commit}` } });
-    if (faits.length > 1) res.push({ profondeur: 'micro', nature: 'commit-planifie-multiple', motif: `commit-multiple-${p.theme}`, cible: 'generateur', sens: 'remontee', resume: `${ici} : réalisé en ${faits.length} commits`, preuve: { type: 'commit', ref: faits.map((f) => f.sha.slice(0, 12)).join(', ') } });
+    const parSlot = new Map();
+    for (const f of faits) {
+      if (!parSlot.has(f.slot ?? null)) parSlot.set(f.slot ?? null, []);
+      parSlot.get(f.slot ?? null).push(f);
+    }
+    for (const [slot, memes] of parSlot) {
+      if (memes.length > 1) res.push({ profondeur: 'micro', nature: 'commit-planifie-multiple', motif: `commit-multiple-${p.theme}`, cible: 'generateur', sens: 'remontee', resume: `${ici} : ${memes.length} commits ${slot ? `sur le même slot, ${slot}` : 'sans slot dans leur titre'}`, preuve: { type: 'commit', ref: memes.map((f) => f.sha.slice(0, 12)).join(', ') } });
+    }
   }
   for (const c of commits) {
     if (!planifies.has(cle(c))) res.push({ profondeur: 'micro', nature: 'commit-hors-plan', motif: `commit-hors-plan-${c.theme ?? 'sans-theme'}`, cible: 'generateur', sens: 'remontee', resume: `${c.tache} : commit hors du plan (${c.theme ?? 'sans thème'}${c.scenario ? `, ${c.scenario}` : ''})`, preuve: { type: 'commit', ref: c.sha.slice(0, 12) } });
@@ -222,7 +247,7 @@ export function clore(cle, { demandes = DEMANDES, registre = REGISTRE, rattachem
   if (rattachement?.plan) {
     const commits = commitsDeLaBranche(projet, branche);
     if (commits === null) return { erreurs: [`branche ${branche} illisible dans ${projet}`] };
-    remontee.push(...entreesDuPlan(rattachement.plan, commits));
+    remontee.push(...entreesDuPlan(rattachement.plan, commits.filter(duTicket(cle, rattachement))));
   }
   const ajout = noter(cle, remontee, { demandes, date });
   if (ajout.erreurs.length > 0) return ajout;

@@ -42,16 +42,17 @@ Vérifié avec Gemini CLI 0.67.0, sans modèle : lancé dans le workspace de con
 
 ## 4. Recette P4 sur le poste du développeur
 
-La présentation de l'arbre et l'attente de la ratification demandent un modèle : elles se vérifient dans Gemini CLI, sur le poste. Dans un workspace d'essai, dossier vide ou dépôt Git de test, marqué de confiance :
+La présentation de l'arbre et l'attente de la ratification demandent un modèle : elles s'éprouvent dans Gemini CLI, sur le poste, à chaque ticket réel, avec l'arbre qu'il a produit. Les arbres d'exemple restent des tests de non-régression de la recette automatique (D8.INV-4) : le protocole ne s'y règle pas. Depuis le projet du ticket, marqué de confiance, aux étapes 5 et 6 du déroulé (`SKILL.md`, section 3) :
 
-1. `node <dépôt>/specs/generateur-skill-ticket/outils/installer-arbre.mjs installer <dépôt>/specs/generateur-skill-ticket/exemples/ABCDE-3620-skills/transmissions`
-2. `node <dépôt>/specs/generateur-skill-ticket/outils/installer-arbre.mjs verifier ABCDE-3620` : skills découverts et activés, agents chargés sans erreur.
-3. `node <dépôt>/specs/generateur-skill-ticket/outils/installer-arbre.mjs lancer ABCDE-3620` ; Gemini CLI demande d'autoriser le skill à sa première activation. Attendu : le skill racine signale l'absence de `docs/c7e/meso-contrats.md`, normale dans un workspace d'essai, fait rédiger les documents de la clé, puis présente l'arbre, les méso-contrats, l'ordre de résolution, les critères et la façon dont chacun est soutenu, et attend la ratification, sans modifier le projet.
-4. Ratifier : le skill dépose la ratification dans `docs/demandes/ABCDE-3620/champ.jsonl` et indique ABCDE-3620-1.1 avec sa commande.
-5. `installer-arbre.mjs liste` : racine en cours, ABCDE-3620-1.1 prêt.
-6. `installer-arbre.mjs retirer ABCDE-3620 --sans-archive` pour finir.
+1. `node <dépôt>/specs/generateur-skill-ticket/outils/installer-arbre.mjs installer <travail>/transmissions`, où `<travail>` est le dossier de sortie de la génération.
+2. `node <dépôt>/specs/generateur-skill-ticket/outils/installer-arbre.mjs verifier <clé>` : skills découverts et activés, agents chargés sans erreur.
+3. `node <dépôt>/specs/generateur-skill-ticket/outils/installer-arbre.mjs lancer <clé>` ; Gemini CLI demande d'autoriser le skill à sa première activation. Attendu : le skill racine compare le fichier d'invariants du projet à celui de sa production et dit s'il est absent ou différent, fait rédiger les documents de la clé, puis présente l'arbre, les méso-contrats, l'ordre de résolution, les critères et la façon dont chacun est soutenu, et attend la ratification, sans modifier le projet.
+4. Ratifier : le skill dépose la ratification dans `docs/demandes/<clé>/champ.jsonl` et indique la première tâche prête, avec sa commande.
+5. `installer-arbre.mjs liste` : racine en cours, première tâche prête.
 
-Variante d'un ticket sans sous-ticket, avec ABCDE-3512 : `installer <dépôt>/specs/generateur-skill-ticket/exemples/ABCDE-3512-skills/transmissions`, puis `lancer ABCDE-3512`. Attendu : le skill fait rédiger les documents de la clé ; il analyse ensuite le ticket en lecture seule, puis présente le ticket, son méso-contrat M01, ses six critères et son analyse, et attend la ratification avant toute modification ; ratifié, il la dépose sous la référence ABCDE-3512, et `liste` le montre « ratifié, en transformation ».
+Pour un ticket sans sous-ticket, attendu à l'étape 3 : le skill fait rédiger les documents de la clé ; il analyse ensuite le ticket en lecture seule, puis présente le ticket, son méso-contrat, ses critères et son analyse, et attend la ratification avant toute modification ; ratifié, il la dépose sous la référence du ticket, et `liste` le montre « ratifié, en transformation ».
+
+Un écart à l'attendu, une présentation incomplète ou une action avant la ratification, se note dans le relevé du ticket, à sa profondeur, cible `generateur`, avec sa preuve : `node <dépôt>/specs/generateur-skill-ticket/outils/apprentissage.mjs noter <clé> …` (module `apprentissage`). L'arbre reste installé, et le ticket se résout. Un essai sans ticket, dans un workspace jetable, se termine par `retirer <clé> --sans-archive`.
 
 ## 5. Recette
 

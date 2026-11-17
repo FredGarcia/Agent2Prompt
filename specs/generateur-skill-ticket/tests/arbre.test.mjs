@@ -13,7 +13,7 @@ import { lireToml } from '../outils/toml.mjs';
 import { chargerReferentiel, lireTexte } from '../outils/referentiel.mjs';
 import { chargerArbre, construireArbre, decrireArbre, ordreDeResolution, verifierArbre } from '../outils/arbre.mjs';
 import { aUnPlan, criteresRacineSoutenus, proposerCommits, scenariosDeLaTache, verifierPlan } from '../outils/commits.mjs';
-import { arbreAvecPlan, PLAN, SCENARIOS } from './plan-commits.mjs';
+import { arbreAvecPlan, PLAN, SCENARIOS, scenariosToml } from './plan-commits.mjs';
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const EXEMPLE = join(ICI, '..', 'exemples', 'ABCDE-3620');
@@ -164,6 +164,14 @@ const ecartsDuPlan = [
   ['scénario hors des critères de la tâche', (p) => { p.plan['ABCDE-3620-2'].push(['K2', 'frontend', 'S01', 'x']); }, /le scénario S01 n'éprouve aucun critère de la racine que soutient ABCDE-3620-2/],
   ['deux commits pour un scénario et un thème', (p) => { p.plan['ABCDE-3620-2'].push(['K2', 'frontend', 'S04', 'x']); }, /un seul commit par scénario et par thème \(S04, frontend\)/],
   ['scénario réalisé par aucun commit', (p) => { p.plan['ABCDE-3620-1.2'] = p.plan['ABCDE-3620-1.2'].filter((c) => c[2] !== 'S01'); }, /ABCDE-3620:S01 : aucun commit planifié ne le réalise/],
+  // 1.1.1 : ce que rien ne lirait, et les couches des scénarios.
+  ['scénarios déclarés hors de la racine', (p) => { p.ajouts = { 'ABCDE-3620-2': scenariosToml([['S09', 'Annonce vocale', ['C1']]]) }; }, /ABCDE-3620-2 : seule la racine déclare les scénarios de l'US \(\[\[ticket\.scenarios\]\]\) ; ceux-ci ne seraient pas lus/],
+  ['thèmes sur un nœud composé', (p) => { p.champs = { 'ABCDE-3620-1': 'themes = ["api"]' }; }, /ABCDE-3620-1 : nœud composé ; ses tâches portent les thèmes \(themes\), pas lui/],
+  ['thèmes mal formés', (p) => { p.champs = { 'ABCDE-3620-2': 'themes = ["Écran"]' }; }, /ABCDE-3620-2 : themes, une liste non vide de thèmes en minuscules et tirets/],
+  ['couches vides', (p) => { p.scenarios[0][3] = []; }, /S01 : couches, une liste non vide parmi persistance, backend, frontend/],
+  ['couche inconnue', (p) => { p.scenarios[0][3] = ['back']; }, /S01 : couche « back » hors de persistance, backend, frontend/],
+  ['couche en double', (p) => { p.scenarios[0][3] = ['backend', 'backend']; }, /S01 : couche en double/],
+  ['commit d\'une couche que son scénario ne touche pas', (p) => { p.scenarios[3][3] = ['frontend']; }, /ABCDE-3620-1\.2:K4 : thème backend, une couche que le scénario S04 ne touche pas \(couches : frontend\)/],
 ];
 for (const [nom, retouche, motif] of ecartsDuPlan) {
   test(`arbre des commits · écart rejeté : ${nom}`, () => attendreEcart(verifierArbre(avecPlan((p) => { retouche(p); return p; }), R), motif));
@@ -190,6 +198,42 @@ test('arbre des commits : proposer croise les scénarios de chaque tâche et ses
   }
   assert.deepStrictEqual(verifierArbre(chargerArbre(dossier), R), []);
   assert.equal(lancer('proposer', EXEMPLE).status, 1);
+});
+
+// Le second arbre, un seul ticket qui touche les trois couches, copié avec les scénarios de son US.
+const SCENARIOS_3512 = [
+  ['S01', 'Ouverture de l\'écran sans chargement', ['C1'], ['frontend']],
+  ['S02', 'Chargement au clic de la première page', ['C2', 'C4'], ['backend', 'frontend']],
+  ['S03', 'États du bouton « Charger les données »', ['C3'], ['frontend']],
+  ['S04', 'Données refusées sans habilitation', ['C5'], ['backend']],
+  ['S05', 'Colonne mode_chargement et son changeset', ['C6'], ['persistance']],
+];
+const arbre3512 = (scenarios) => {
+  const dossier = mkdtempSync(join(tmpdir(), 'plan-3512-'));
+  cpSync(join(ICI, '..', 'exemples', 'ABCDE-3512'), dossier, { recursive: true });
+  appendFileSync(join(dossier, 'ABCDE-3512.toml'), scenariosToml(scenarios));
+  return dossier;
+};
+
+test('1.1.1 : un scénario qui dit ses couches ne se croise qu\'avec les thèmes de ces couches', () => {
+  const couches = (t) => [...new Set(R.instancesOptions(t.ticket).map((o) => o.couche))];
+  const propose = (scenarios) => {
+    const arbre = chargerArbre(arbre3512(scenarios));
+    return proposerCommits(arbre.racine, arbre.racine, couches).map((c) => `${c.id}:${c.theme}:${c.scenario ?? '-'}`);
+  };
+  // Sans couches, chaque scénario se croise avec chaque thème : 1 + 3 × 5 commits.
+  assert.equal(propose(SCENARIOS_3512.map(([id, titre, prouve]) => [id, titre, prouve])).length, 16);
+  // Avec leurs couches : le commit du schéma, puis chaque scénario sur ses seules couches.
+  assert.deepStrictEqual(propose(SCENARIOS_3512), ['K1:schema:-', 'K2:persistance:S05', 'K3:backend:S02', 'K4:backend:S04', 'K5:frontend:S01', 'K6:frontend:S02', 'K7:frontend:S03']);
+  // Un thème de couche qu'aucun scénario ne touche garde un commit à décrire ; un thème qui n'est pas une couche se croise avec tous.
+  const sansPersistance = SCENARIOS_3512.map(([id, titre, prouve, c]) => [id, titre, prouve, id === 'S05' ? ['backend'] : c]);
+  assert.deepStrictEqual(propose(sansPersistance).slice(0, 2), ['K1:schema:-', 'K2:persistance:-']);
+  // Recopiée telle quelle, la proposition donne un arbre conforme, que la vérification ne réduit pas.
+  const dossier = arbre3512(SCENARIOS_3512);
+  const r = lancer('proposer', dossier);
+  assert.equal(r.status, 0, r.stderr);
+  appendFileSync(join(dossier, 'ABCDE-3512.toml'), `\n${r.stdout.split('\n').slice(1).join('\n')}`);
+  assert.deepStrictEqual(verifierArbre(chargerArbre(dossier), R), []);
 });
 
 test("arbre des commits : un arbre sans scénario ni commit garde le plan d'avant la 1.1.0", () => {
