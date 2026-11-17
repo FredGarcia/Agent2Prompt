@@ -23,7 +23,9 @@
  * 3. une table d'intégrité sha256 au format `sha256sum -c`.
  *
  * Il vérifie ensuite l'aller-retour : le texte, relu comme le ferait l'IA, doit
- * redonner exactement chaque fichier. Les archives ne sont pas transmises.
+ * redonner exactement chaque fichier. Les archives ne sont pas transmises. Les
+ * fichiers se lisent en fins de ligne Unix : une extraction en CRLF donne la même
+ * transmission.
  *
  * Le module exporte aussi `assembler` (le texte, sans rien écrire), `sourcePartagee`
  * (le fichier d'un partage à sa version épinglée) et `relire`
@@ -42,7 +44,9 @@ const FIN = '<<<FIN';
 const RACINE = dirname(dirname(fileURLToPath(import.meta.url)));
 
 export const sha256 = (texte) => createHash('sha256').update(texte, 'utf8').digest('hex');
-const lire = (chemin) => readFileSync(chemin, 'utf8');
+// Fins de ligne : une extraction Windows (core.autocrlf) écrit des CRLF ; le dépôt stocke des LF. Les
+// fichiers se lisent donc en LF, pour que la transmission et ses empreintes ne dépendent pas de l'extraction.
+const lire = (chemin) => readFileSync(chemin, 'utf8').replace(/\r\n/g, '\n');
 
 /** Version déclarée dans le frontmatter YAML d'un fichier Markdown (`version: x.y.z`). */
 function versionDeclaree(texte) {

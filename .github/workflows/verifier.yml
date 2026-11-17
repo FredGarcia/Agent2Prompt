@@ -22,3 +22,11 @@ jobs:
           node-version: ${{ matrix.node }}
       - name: Spécifications, transmissions, README et glossaire
         run: node tools/verifier.mjs
+      # Une extraction Windows (core.autocrlf) écrit des CRLF : le vérificateur doit donner le même résultat.
+      # Elle se fait dans un worktree à part, sans toucher à l'extraction du dépôt ni à sa configuration.
+      - name: Même vérification sur une extraction en fins de ligne CRLF
+        run: |
+          git -c core.autocrlf=true worktree add --quiet --detach "$RUNNER_TEMP/crlf" HEAD
+          cd "$RUNNER_TEMP/crlf"
+          grep -q $'\r' specs/orchestrateur-c7e/SKILL.md
+          node tools/verifier.mjs

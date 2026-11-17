@@ -37,6 +37,8 @@
  * - `glossaire.md` est exactement celui que génère `tools/glossaire.mjs`.
  *
  * Le contenu des archives (`archives/`) n'est pas vérifié : elles sont figées.
+ * Les fichiers se lisent en fins de ligne Unix : une extraction en CRLF, comme celle de
+ * Git sous Windows, donne le même résultat.
  * Code de sortie 1 si une erreur est trouvée. Node 20 ou plus récent, modules natifs.
  */
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
@@ -48,7 +50,8 @@ import { CHEMIN_GLOSSAIRE, genererGlossaire } from './glossaire.mjs';
 const racine = dirname(dirname(fileURLToPath(import.meta.url)));
 const dossierSpecs = join(racine, 'specs');
 const erreurs = [];
-const lire = (chemin) => readFileSync(chemin, 'utf8');
+// Fins de ligne : une extraction Windows (core.autocrlf) écrit des CRLF, que le dépôt stocke en LF ; tout se lit en LF.
+const lire = (chemin) => readFileSync(chemin, 'utf8').replace(/\r\n/g, '\n');
 const rel = (chemin) => relative(racine, chemin);
 const echapper = (texte) => texte.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const parNumero = (a, b) => Number(a.slice(1)) - Number(b.slice(1));

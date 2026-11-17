@@ -751,6 +751,12 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Outils
 
+### 2026-11-17 : vérificateur en fins de ligne CRLF
+
+- `tools/verifier.mjs`, `tools/bundle.mjs` et `tools/glossaire.mjs` lisent les fichiers en fins de ligne Unix, comme l'installateur. Sur une extraction en CRLF, celle de Git sous Windows avec `core.autocrlf`, le vérificateur relevait 104 erreurs pour les 15 spécifications : frontmatters illisibles, versions épinglées introuvables, invariants partagés non importés, transmissions dites infidèles, glossaire dit périmé. Il passe désormais, et `bundle.mjs` y redonne les mêmes transmissions. Rien ne change sur une extraction en LF : aucune transmission, aucun glossaire n'est modifié.
+- `.github/workflows/verifier.yml` : la même vérification sur une extraction en CRLF, faite dans un worktree à part, sans toucher à l'extraction du dépôt ; sans la correction, elle échoue.
+- Défaut relevé par la revérification de generateur-skill-ticket 1.1.0, antérieur à elle ; corrigé à part du correctif 1.1.1.
+
 ### 2026-11-01 : installateur des skills dans Gemini CLI
 
 - Ajout de `tools/installer.mjs` : il installe un skill du dépôt dans Gemini CLI à partir de sa transmission et fait l'étape 0 de la consigne sans IA. Node 20 ou plus récent, modules natifs, git pour le masquage.

@@ -19,7 +19,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const racine = dirname(dirname(fileURLToPath(import.meta.url)));
 export const CHEMIN_GLOSSAIRE = join(racine, 'glossaire.md');
-const lire = (chemin) => readFileSync(chemin, 'utf8');
+// Fins de ligne : une extraction Windows (core.autocrlf) écrit des CRLF ; tout se lit en LF, comme le dépôt les stocke.
+const lire = (chemin) => readFileSync(chemin, 'utf8').replace(/\r\n/g, '\n');
 
 const DEFINITION = /^- \*\*((?:D|SC)\d+\.INV-\d+)\*\* : (.+)$/gm;
 const cellules = (ligne) => ligne.replace(/^\||\|$/g, '').split('|').map((c) => c.trim());
