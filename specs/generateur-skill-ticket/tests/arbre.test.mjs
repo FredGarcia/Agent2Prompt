@@ -1,16 +1,19 @@
 // Recette du lot 1 : l'arbre d'essai ABCDE-3620 est conforme, son plan est le bon, et chaque écart
-// introduit volontairement est rejeté (critère P1 du prototype, et règles de la décomposition).
+// introduit volontairement est rejeté (critère P1 du prototype, et règles de la décomposition). En 1.1.0,
+// l'arbre des commits : scénarios de l'US, commits de chaque tâche, proposition et règles (P10).
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { cpSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { appendFileSync, cpSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { lireToml } from '../outils/toml.mjs';
 import { chargerReferentiel, lireTexte } from '../outils/referentiel.mjs';
 import { chargerArbre, construireArbre, decrireArbre, ordreDeResolution, verifierArbre } from '../outils/arbre.mjs';
+import { aUnPlan, criteresRacineSoutenus, proposerCommits, scenariosDeLaTache, verifierPlan } from '../outils/commits.mjs';
+import { arbreAvecPlan, PLAN, SCENARIOS } from './plan-commits.mjs';
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const EXEMPLE = join(ICI, '..', 'exemples', 'ABCDE-3620');
@@ -126,4 +129,72 @@ test('ligne de commande : arbre non conforme, code 1 ; usage incorrect, code 2',
   }
   assert.equal(lancer('construire', EXEMPLE).status, 2);
   assert.equal(lancer('verifier', EXEMPLE, '--inconnue').status, 2);
+});
+
+// ---- 1.1.0 : arbre des commits ----
+
+const avecPlan = (retouche = (p) => p) => {
+  const base = { scenarios: structuredClone(SCENARIOS), plan: structuredClone(PLAN) };
+  return chargerArbre(arbreAvecPlan(retouche(base) ?? base));
+};
+
+test('arbre des commits : plan conforme, chaque scénario réalisé par un commit de sa tâche', () => {
+  const arbre = avecPlan();
+  assert.deepStrictEqual(verifierArbre(arbre, R), []);
+  assert.deepStrictEqual([...criteresRacineSoutenus(arbre.parReference.get('ABCDE-3620-1.1'))].sort(), ['C3', 'C4']);
+  assert.deepStrictEqual(scenariosDeLaTache(arbre.parReference.get('ABCDE-3620-2'), arbre.racine).map((s) => s.id), ['S04']);
+  const p = lancer('plan', arbreAvecPlan());
+  assert.equal(p.status, 0, p.stderr);
+  assert.match(p.stdout, /Plan des commits de la branche :\n {3}1\. ABCDE-3620-1\.1:K1 {2}persistance · S02 {2}Agrégat de la date-heure de la dernière ligne\n/);
+  assert.match(p.stdout, / {3}7\. ABCDE-3620-2:K1 {2}frontend · S04 {2}Liste et résumé à jour en temps réel, annoncés\n\nMéso-contrats transverses/);
+});
+
+const ecartsDuPlan = [
+  ['commits sans scénario déclaré', (p) => { p.scenarios = []; }, /la racine ne déclare aucun scénario/],
+  ['identifiant de scénario', (p) => { p.scenarios[0][0] = 'X1'; }, /identifiant de scénario attendu sous la forme Snn/],
+  ['scénario en double', (p) => { p.scenarios[1][0] = 'S01'; }, /S01 : scénario en double/],
+  ['scénario sans critère', (p) => { p.scenarios[0][2] = []; }, /S01 : n'éprouve aucun critère de la racine/],
+  ['critère absent de la racine', (p) => { p.scenarios[0][2] = ['C9']; }, /S01 : éprouve C9, critère absent de la racine/],
+  ['critère éprouvé par aucun scénario', (p) => { p.scenarios[2][2] = ['C2']; }, /ABCDE-3620:C3 : aucun scénario ne l'éprouve/],
+  ['tâche sans commit', (p) => { delete p.plan['ABCDE-3620-2']; }, /ABCDE-3620-2 : tâche sans commit planifié/],
+  ['nœud composé avec des commits', (p) => { p.plan['ABCDE-3620-1'] = [['K1', 'backend', 'S01', 'x']]; }, /ABCDE-3620-1 : nœud composé ; ses tâches portent les commits/],
+  ['identifiant de commit', (p) => { p.plan['ABCDE-3620-2'][0][0] = 'C1'; }, /identifiant de commit attendu sous la forme Kn/],
+  ['thème absent ou mal formé', (p) => { p.plan['ABCDE-3620-2'][0][1] = 'Front End'; }, /un thème, et un seul, en minuscules et tirets/],
+  ['scénario non déclaré', (p) => { p.plan['ABCDE-3620-2'][0][2] = 'S09'; }, /scénario S09 non déclaré par la racine/],
+  ['scénario hors des critères de la tâche', (p) => { p.plan['ABCDE-3620-2'].push(['K2', 'frontend', 'S01', 'x']); }, /le scénario S01 n'éprouve aucun critère de la racine que soutient ABCDE-3620-2/],
+  ['deux commits pour un scénario et un thème', (p) => { p.plan['ABCDE-3620-2'].push(['K2', 'frontend', 'S04', 'x']); }, /un seul commit par scénario et par thème \(S04, frontend\)/],
+  ['scénario réalisé par aucun commit', (p) => { p.plan['ABCDE-3620-1.2'] = p.plan['ABCDE-3620-1.2'].filter((c) => c[2] !== 'S01'); }, /ABCDE-3620:S01 : aucun commit planifié ne le réalise/],
+];
+for (const [nom, retouche, motif] of ecartsDuPlan) {
+  test(`arbre des commits · écart rejeté : ${nom}`, () => attendreEcart(verifierArbre(avecPlan((p) => { retouche(p); return p; }), R), motif));
+}
+
+test('arbre des commits : proposer croise les scénarios de chaque tâche et ses thèmes', () => {
+  const dossier = arbreAvecPlan({ plan: {} });
+  const r = lancer('proposer', dossier);
+  assert.equal(r.status, 0, r.stderr);
+  assert.match(r.stdout, /^# ABCDE-3620-1\.1 \(ABCDE-3620-1\.1\.toml\)\n\[\[ticket\.commits\]\]\nid = "K1"\ntheme = "persistance"\nscenario = "S02"\n/);
+  assert.match(r.stdout, /# ABCDE-3620-2 \(ABCDE-3620-2\.toml\)\n\[\[ticket\.commits\]\]\nid = "K1"\ntheme = "frontend"\nscenario = "S04"\nresume = "Lignes et résumé tenus à jour en temps réel, frontend"\n/);
+  const arbre = chargerArbre(dossier);
+  const couches = (t) => [...new Set(R.instancesOptions(t.ticket).map((o) => o.couche))];
+  assert.deepStrictEqual(proposerCommits(arbre.parReference.get('ABCDE-3620-1.2'), arbre.racine, couches).map((c) => `${c.id}:${c.theme}:${c.scenario}`), ['K1:backend:S01', 'K2:backend:S02', 'K3:backend:S03', 'K4:backend:S04']);
+  // Des thèmes déclarés, et une évolution de schéma qui a son commit technique.
+  const t = arbre.parReference.get('ABCDE-3620-1.1');
+  t.ticket.themes = ['requete', 'test-depot'];
+  t.ticket.persistance.schema = [{ changement: 'index', table: 'ligne_commande' }];
+  assert.deepStrictEqual(proposerCommits(t, arbre.racine, couches).map((c) => `${c.id}:${c.theme}:${c.scenario ?? '-'}`), ['K1:schema:-', 'K2:requete:S02', 'K3:requete:S03', 'K4:test-depot:S02', 'K5:test-depot:S03']);
+  // Recopiée telle quelle, la proposition donne un arbre conforme.
+  for (const bloc of r.stdout.split(/^# /m).filter(Boolean)) {
+    const [entete, ...corps] = bloc.split('\n');
+    appendFileSync(join(dossier, /\((.+)\)/.exec(entete)[1]), `\n${corps.join('\n')}`);
+  }
+  assert.deepStrictEqual(verifierArbre(chargerArbre(dossier), R), []);
+  assert.equal(lancer('proposer', EXEMPLE).status, 1);
+});
+
+test("arbre des commits : un arbre sans scénario ni commit garde le plan d'avant la 1.1.0", () => {
+  const arbre = chargerArbre(EXEMPLE);
+  assert.equal(aUnPlan(arbre), false);
+  assert.deepStrictEqual(verifierPlan(arbre), []);
+  assert.doesNotMatch(lancer('plan', EXEMPLE).stdout, /Plan des commits/);
 });

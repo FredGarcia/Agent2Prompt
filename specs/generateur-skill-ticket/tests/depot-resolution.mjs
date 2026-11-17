@@ -11,8 +11,14 @@ const ICI = dirname(fileURLToPath(import.meta.url));
 export const HISTORIQUE = JSON.parse(readFileSync(join(ICI, 'fixtures', 'historique-ABCDE-3620.json'), 'utf8'));
 export const PROJET = join(ICI, '..', ...HISTORIQUE.projet.split('/'));
 
-/** Message d'un commit de l'historique : le titre, puis, pour un sous-ticket, la ligne qui le cite. */
-export const messageDe = (c, cle = HISTORIQUE.cle) => (c.sous_ticket && c.sous_ticket !== cle ? `${c.titre}\n\nSous-ticket : ${c.sous_ticket}\n` : `${c.titre}\n`);
+/**
+ * Message d'un commit de l'historique : le titre, puis, pour un sous-ticket, la ligne qui le cite ; un
+ * corps donné (`corps`) la remplace, pour les essais des lignes de la 1.1.0.
+ */
+export const messageDe = (c, cle = HISTORIQUE.cle) => {
+  if (c.corps !== undefined) return `${c.titre}\n\n${c.corps}\n`;
+  return c.sous_ticket && c.sous_ticket !== cle ? `${c.titre}\n\nSous-ticket : ${c.sous_ticket}\n` : `${c.titre}\n`;
+};
 
 /**
  * Construit le dépôt dans `cible` (dossier vide) à partir des fichiers de `source`, commit par commit ;

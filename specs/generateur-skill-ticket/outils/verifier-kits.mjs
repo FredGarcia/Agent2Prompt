@@ -229,7 +229,12 @@ export function controlerKits(dossier, rattachement, { projet = resolve(dossier,
           }
           const [premiere, ...corps] = message.replace(/\r\n/g, '\n').trimEnd().split('\n');
           if (premiere !== c.titre) ecarts.push(`kit dev : commit ${c.sha.slice(0, 7)}, titre différent dans le dépôt`);
-          if (c.sous_ticket !== cle && !corps.some((l) => l.trim() === `Sous-ticket : ${c.sous_ticket}`)) ecarts.push(`kit dev : commit ${c.sha.slice(0, 7)} sans la ligne « Sous-ticket : ${c.sous_ticket} »`);
+          const lignes = corps.map((l) => l.trim());
+          if (c.sous_ticket !== cle && !lignes.includes(`Tâche : ${c.sous_ticket}`) && !lignes.includes(`Sous-ticket : ${c.sous_ticket}`)) ecarts.push(`kit dev : commit ${c.sha.slice(0, 7)} sans la ligne « Tâche : ${c.sous_ticket} » (« Sous-ticket : ${c.sous_ticket} » avant la 1.1.0)`);
+          // Depuis la 1.1.0 : la ligne « Scénario » d'un commit est celle de son titre.
+          const scenario = lignes.find((l) => l.startsWith('Scénario : '))?.slice('Scénario : '.length);
+          const duTitre = new RegExp(`^${cle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} (S\\d{2,}) : `).exec(premiere)?.[1];
+          if (scenario !== undefined && scenario !== `${cle}-${duTitre}`) ecarts.push(`kit dev : commit ${c.sha.slice(0, 7)}, ligne « Scénario : ${scenario} » différente du scénario de son titre (${duTitre ? `${cle}-${duTitre}` : 'aucun'})`);
           if (pointe && git(projet, 'merge-base', '--is-ancestor', c.sha, pointe) === null) ecarts.push(`kit dev : commit ${c.sha.slice(0, 7)} hors de la branche ${dev.branche}`);
           if (i > 0 && SHA1.test(commits[i - 1].sha ?? '') && git(projet, 'merge-base', '--is-ancestor', commits[i - 1].sha, c.sha) === null) ecarts.push(`kit dev : commit ${c.sha.slice(0, 7)} listé après ${commits[i - 1].sha.slice(0, 7)}, qu'il ne suit pas dans l'historique`);
         });

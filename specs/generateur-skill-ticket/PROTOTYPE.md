@@ -62,6 +62,11 @@ Ratifié le 9 novembre 2026, après la fusion de la 1.0.0 (« Oui d'accord ») :
 
 33. **Lot 3 de l'intégration, generateur-skill-ticket 1.0.1**, un correctif : le fichier d'invariants comparé par empreinte, avec un script de la boîte à outils, la copie du projet seule lue ; chaque agent de couche avec sa part de la consigne ; un module court `champ-depot` pour les nœuds et les agents de couche, le module `champ` entier pour la racine et les observateurs ; le rédacteur nommé comme son agent ; P4 précisé pour un ticket sans sous-ticket, avec la variante du protocole sur le poste pour ABCDE-3512. Recette : relectures visées disparues des rapports, somme de chaque arbre en baisse d'au moins 10 % depuis le lot 7, plafond de D7.INV-1 tenu. La lecture partielle du socle et des référentiels reste hors du lot.
 
+Ratifié le 17 novembre 2026, avant la recette sur le poste :
+
+34. **Apprentissage permanent plutôt que recette sur des exemples** : pour éviter que le générateur ne s'ajuste à des exemples, chaque ticket réel est une recette et un cycle d'apprentissage, dans l'esprit de la composition récursive imbriquée (CRI) de la méthode C7E ; ce qu'il apprend se classe en quatre profondeurs, macro, méso-contrats, méso-composants, micro. Registre à deux niveaux : les écarts au référentiel dans le projet, les écarts aux consignes du générateur portés au dépôt Agent2Prompt.
+35. **Arbre des commits** : un ticket, une US, une branche, plusieurs commits ; les tâches sont les sous-tickets, une session chacune ; leurs commits, un par scénario et par thème de modification, autant que nécessaire selon cette heuristique ; le découpage est proposé par le système, puis ratifié. Publié avec la décision 34 en generateur-skill-ticket 1.1.0.
+
 ## Arbre d'essai : ABCDE-3620 sur trois niveaux
 
 Le ticket ABCDE-3620 du référentiel (module `referentiel` de l'orchestrateur, § 7.2), décomposé en `exemples/ABCDE-3620/` :

@@ -22,6 +22,7 @@
 import { createHash } from 'node:crypto';
 import { COUCHES, decrireComposition } from './referentiel.mjs';
 import { decrireArbre, ordreDeResolution } from './arbre.mjs';
+import { commitsDe, scenariosDe } from './commits.mjs';
 import { extraireSection } from './sources.mjs';
 
 export const VERSION_SKILL = '1.0.0';
@@ -71,6 +72,7 @@ const USAGES_BOITE = {
   'outils/champ.mjs': 'script du champ d\'observation : dépôt, vérification et état',
   'outils/vue.mjs': 'script de la vue augmentée : calques et états de chaque ancre, d\'après le champ',
   'outils/invariants.mjs': 'script qui compare le fichier d\'invariants du projet à l\'état de production d\'un skill, par empreinte, sans lire sa copie',
+  'outils/apprentissage.mjs': 'apprentissage permanent du générateur (D8) : relevé du ticket, versé à sa clôture au registre du projet, récurrences proposées au développeur',
   [FICHIER_RATTACHEMENT]: 'rattachement des critères de l\'arbre aux critères de la clé, pour les scripts de contrôle, le champ et la vue',
 };
 export const sha256 = (texte) => createHash('sha256').update(texte, 'utf8').digest('hex');
@@ -521,7 +523,39 @@ export class FabriqueSkillTicket {
         criteres: x.criteres.map((c) => ({ id: c.id, enonce: c.enonce, ca: this.caDe(x, c), soutient: c.soutient ?? [] })),
         images: this.imagesObjectif(x),
       })),
+      ...(this.aUnPlan(n)
+        ? {
+          scenarios: scenariosDe(racine).map((x) => ({ id: `${cle}-${x.id}`, titre: x.titre, ca: (x.prouve ?? []).map((c) => identifiantCa(cle, racine.criteres.findIndex((y) => y.id === c) + 1)) })),
+          plan: racine.feuilles().flatMap((t) => commitsDe(t).map((c) => ({ tache: t.reference, commit: c.id, theme: c.theme, scenario: c.scenario ? `${cle}-${c.scenario}` : null }))),
+        }
+        : {}),
     };
+  }
+
+  /** L'arbre de ce nœud a-t-il un plan de commits (1.1.0) ? */
+  aUnPlan(n) {
+    const racine = this.racine(n);
+    return scenariosDe(racine).length > 0 || [racine, ...racine.descendants()].some((x) => commitsDe(x).length > 0);
+  }
+
+  /** Lignes que porte le corps de chaque commit d'une tâche. */
+  lignesCommit(n) {
+    const cle = this.cle(n);
+    if (this.aUnPlan(n)) return `son corps porte les lignes \`Tâche : ${n.reference}\`, \`Scénario : ${cle}-Snn\` pour un commit de scénario, et \`Thème : <thème>\`, celles de son commit planifié`;
+    return n.estRacine ? '' : `son corps porte la ligne \`Tâche : ${n.reference}\``;
+  }
+
+  /** Plan des commits d'une tâche, en tableau ; vide pour un arbre d'avant la 1.1.0. */
+  planDesCommits(n) {
+    const commits = commitsDe(n);
+    if (commits.length === 0) return [];
+    const cle = this.cle(n);
+    const titres = new Map(scenariosDe(this.racine(n)).map((x) => [x.id, x.titre]));
+    return [
+      tableau(['Commit', 'Thème', 'Scénario', 'Résumé'], commits.map((c) => [c.id, c.theme, c.scenario ? `${cle}-${c.scenario} : ${titres.get(c.scenario)}` : 'sans scénario', c.resume])),
+      '',
+      'Le plan est ratifié avec l\'arbre : un commit par scénario et par thème, dans cet ordre. Un commit planifié peut se réaliser en plusieurs commits, un par slot (D4.INV-2), qui portent les mêmes lignes ; un commit hors du plan, ou un commit planifié laissé de côté, se dit au développeur et se relève à la clôture (module `apprentissage` du générateur).',
+    ];
   }
 
   /** Chemin d'un fichier de la boîte à outils dans le skill racine installé. */
@@ -542,6 +576,11 @@ export class FabriqueSkillTicket {
   /** Commande du champ d'observation de l'arbre, depuis la racine du projet. */
   commandeChamp(n, commande) {
     return `node ${this.outil(n, 'outils/champ.mjs')} ${commande} docs/demandes/${this.cle(n)}`;
+  }
+
+  /** Commande de l'apprentissage permanent (D8), depuis la racine du projet. */
+  commandeApprentissage(n, commande) {
+    return `node ${this.outil(n, 'outils/apprentissage.mjs')} ${commande}`;
   }
 
   /** Commande de la vue augmentée de l'arbre, depuis la racine du projet ; avec `noeud`, la vue de ce nœud, sur la sortie. */
@@ -596,6 +635,14 @@ export class FabriqueSkillTicket {
         '',
         `Les identifiants ne se renumérotent jamais (agent-tdd-jira:D10.INV-1). Un critère proposé par le rédacteur prend le numéro suivant, avec l'origine « proposé », et se ratifie avec l'arbre. Si \`controler-criteres.mjs\` juge non vérifiable l'énoncé d'un critère de la racine, le rédacteur ne le reformule pas : l'écart remonte au développeur, qui corrige le ticket racine, puis l'arbre se régénère.`,
         '',
+        ...(r.scenarios
+          ? [
+            `Les scénarios de l'US sont ceux que l'arbre déclare, et que son plan de commits réalise : le fichier Gherkin les reprend tous, sous ces identifiants et ces titres, chacun avec les critères d'acceptation qu'il éprouve. Un scénario de plus se propose (\`@propose\`) et se ratifie avec l'arbre.`,
+            '',
+            tableau(['Scénario', 'Titre', 'Critères d\'acceptation'], r.scenarios.map((x) => [`\`@${x.id}\``, x.titre, x.ca.map((a) => `\`@${a}\``).join(', ')])),
+            '',
+          ]
+          : []),
         '## 3. Critères des sous-tickets',
         '',
         'Chaque critère d\'un sous-ticket se rattache, par la chaîne de ses « soutient », à des critères d\'acceptation de la clé. Il se prouve par leurs scénarios ; pour une feuille, par ceux qui portent aussi l\'étiquette d\'une de ses couches. Chacun a donc au moins un tel scénario.',
@@ -676,7 +723,7 @@ export class FabriqueSkillTicket {
         fichiers: fichiersExemple,
       }),
       '',
-      `- \`commits\` : chaque commit de l'arbre, un slot chacun (D4.INV-2). \`sous_ticket\` vaut ${cle} pour un commit de la racine, les documents ; sinon la feuille qui l'a produit, citée par la ligne \`Sous-ticket : <référence>\` du corps du commit. Chaque feuille a au moins un commit ; le dernier est la tête de la branche.`,
+      `- \`commits\` : chaque commit de l'arbre, un slot chacun (D4.INV-2). \`sous_ticket\` vaut ${cle} pour un commit de la racine, les documents ; sinon la feuille qui l'a produit, citée par la ligne \`Tâche : <référence>\` du corps du commit (\`Sous-ticket : <référence>\` pour un arbre produit avant la 1.1.0). Chaque feuille a au moins un commit ; le dernier est la tête de la branche.`,
       '- `remises` : le `remise.md` de chaque nœud, racine comprise ; chacun figure dans `fichiers`.',
       '- `remise_agent2test` : le chemin de la remise (section 4), qui ne figure pas dans `fichiers` : elle se rédige après ce manifeste.',
       '',
@@ -1034,7 +1081,7 @@ export class FabriqueSkillTicket {
         ['la validation de la fiche (D3.INV-1)', 'la ratification de ce skill et de son analyse (section 6 de `SKILL.md`)'],
         ['la fiche complète à la remise (D3.INV-3)', `\`${this.dossier(n)}remise.md\` ; le skill reste identique à sa transmission`],
         ['`docs/demandes/<CLÉ>/`', `\`${this.dossier(n)}\``],
-        ['la clé du ticket, qui nomme sa branche et ses commits (D4.INV-1, D4.INV-2)', `la clé Jira du ticket racine, ${racine} : une seule branche pour tout l'arbre${n.estRacine ? '' : `, et le corps de chaque commit cite le sous-ticket ${n.reference}`}`],
+        ['la clé du ticket, qui nomme sa branche et ses commits (D4.INV-1, D4.INV-2)', `la clé Jira du ticket racine, ${racine} : une seule branche pour tout l'arbre${n.estRacine ? '' : `, et le corps de chaque commit cite la tâche ${n.reference}`}`],
         ['le choix du développeur qui active le skill (D2.INV-3)', `le lancement de ce skill par le développeur, dans sa propre session : la commande \`${commandeSkill(n.reference)}\`, ou \`installer-arbre.mjs lancer ${n.reference}\``],
         ['le registre des écarts et le registre des concepts (D6.INV-1 à D6.INV-3)', `\`docs/c7e/registre-ecarts.md\` et \`docs/c7e/concepts.json\` du projet, alimentés depuis le champ d'observation de l'arbre (module \`${this.moduleChamp(n)}\` du skill racine) ; l'IA y ajoute, le développeur décide et promeut`],
         ['la qualification et la confirmation de la composition (D10.INV-1, D11)', 'faites avant la génération de ce skill ; si l\'analyse montre que la demande sort des empreintes, ce skill remonte au parent, sans changer de composition (D11.INV-4)'],
@@ -1133,16 +1180,17 @@ export class FabriqueSkillTicket {
         '',
         `- le test s'écrit d'abord, étiqueté avec son scénario (${couche === 'frontend' ? `\`describe('${cle}-Snn : …')\`` : `\`@Tag("${cle}-Snn")\``}), et échoue pour la raison attendue avant tout code de production (agent-tdd-jira:D5.INV-1) ;`,
         '- le code minimal le fait passer, la suite du module reste verte, puis le remaniement applique les invariants du référentiel, sans changer le comportement (agent-tdd-jira:D5.INV-2, agent-tdd-jira:D5.INV-3) ;',
-        `- chaque scénario se présente au skill du ticket, qui le fait accepter au développeur (V4), avant le suivant ; puis il se commite, un slot par commit : \`${cle} Snn : [É<n>-<DOMAINE>] <type>(<portée>): <description>\`${n.estRacine ? '' : `, le corps citant \`Sous-ticket : ${n.reference}\``}${couche === 'frontend' ? ' ;' : '.'}`,
+        `- chaque scénario se présente au skill du ticket, qui le fait accepter au développeur (V4), avant le suivant ; puis il se commite, un slot par commit : \`${cle} Snn : [É<n>-<DOMAINE>] <type>(<portée>): <description>\`${this.lignesCommit(n) ? `, ${this.lignesCommit(n)}` : ''}${couche === 'frontend' ? ' ;' : '.'}`,
         ...(couche === 'frontend'
           ? [`- pour chaque scénario réalisé, une capture de l'écran livré, \`${this.dossier(n)}captures/${cle}-Snn.png\`, prise avec l'outil de bout en bout du projet s'il en a un, sinon demandée au développeur ; elle se compare à l'image de l'objectif ${images.length > 0 ? `(${liste(images.map((i) => `\`${i}\``))}, analysée dans \`${this.dossier(n)}analyse-image.md\`)` : 'quand le ticket en désigne une'}, et les écarts vont dans ton rapport.`]
           : []),
         '',
+        ...(this.planDesCommits(n).length > 0 ? ['## Commits planifiés de la tâche', '', ...this.planDesCommits(n), ''] : []),
         '## Règles',
         '',
         `- Aucune modification avant la ratification du skill par le développeur, déposée dans le champ de l'arbre : \`${this.commandeChamp(n, 'etat')}\` montre « ${n.reference} : ratifié » (D3.INV-1, la fiche étant ce skill).`,
         `- Les invariants hérités s'appliquent : \`${ici}modules/invariants/SKILL.md\`, \`${ici}socle/SKILL.md\`, la copie du projet du fichier d'invariants${references.length > 0 ? ` et ${liste(references)}` : ''}.`,
-        `- Un slot par commit ; chaque commit commence par \`${cle} : \`, ou \`${cle} Snn : \` pour un scénario, suivi de l'étiquette de son slot (D4.INV-2)${n.estRacine ? '' : `, et son corps cite \`Sous-ticket : ${n.reference}\``} ; tu ne pousses, ne fusionnes, ne rebases ni ne poses de tag (D4.INV-3).`,
+        `- Un slot par commit ; chaque commit commence par \`${cle} : \`, ou \`${cle} Snn : \` pour un scénario, suivi de l'étiquette de son slot (D4.INV-2)${this.lignesCommit(n) ? ` ; ${this.lignesCommit(n)}` : ''} ; tu ne pousses, ne fusionnes, ne rebases ni ne poses de tag (D4.INV-3).`,
         '- Tu ne sors pas de ta couche : un besoin hors de ton périmètre remonte au skill du ticket.',
         '',
         '## Rapport',
@@ -1201,7 +1249,7 @@ export class FabriqueSkillTicket {
         '- Le résumé V2 (us-criteres, § 6) et, si une capture MHTML a été extraite, le résumé de l\'extraction (ingestion-jira, § 6).',
         '- Les questions, chacune avec les critères qu\'elle concerne.',
       ]),
-      agent('analyste', `Analyste en lecture seule de l'arbre ${cle}, qui cartographie la partie du projet que touche un sous-ticket, selon analyse-projet ${v['analyse-projet']}, et rend sa cartographie au skill de la feuille.`, lecture, [
+      agent('analyste', `Analyste en lecture seule de l'arbre ${cle}, qui cartographie la partie du projet que touche une tâche, selon analyse-projet ${v['analyse-projet']}, et rend sa cartographie au skill de la feuille.`, lecture, [
         `# Analyste de l'arbre ${cle}`,
         '',
         `Tu cartographies, pour une feuille de l'arbre ${cle}, la partie du projet qu'elle touche, avec la méthode d'analyse-projet ${v['analyse-projet']}, en lecture seule. Ton contexte est le tien : le skill de la feuille qui t'invoque te donne sa référence et ses couches, et reçoit ta cartographie, qu'il écrit dans son \`analyse.md\`.`,
@@ -1228,7 +1276,7 @@ export class FabriqueSkillTicket {
       agent('relecteur', `Relecteur de l'arbre ${cle}, qui relit les commits d'une feuille en mode revue du référentiel de leur couche, java ${v.java} ou angular ${v.angular}, et rend son rapport au skill de la feuille.`, lecture, [
         `# Relecteur de l'arbre ${cle}`,
         '',
-        `Tu relis, pour une feuille de l'arbre ${cle}, les commits de sa couche, avec le mode revue du référentiel de cette couche : java ${v.java} pour la persistance et le back, angular ${v.angular} pour le front. Ton contexte est le tien : le skill de la feuille qui t'invoque te donne sa référence, la couche et ses commits (\`git log --grep "Sous-ticket : <référence>"\`), et reçoit ton rapport.`,
+        `Tu relis, pour une feuille de l'arbre ${cle}, les commits de sa couche, avec le mode revue du référentiel de cette couche : java ${v.java} pour la persistance et le back, angular ${v.angular} pour le front. Ton contexte est le tien : le skill de la feuille qui t'invoque te donne sa référence, la couche et ses commits (\`git log --grep "Tâche : <référence>"\`, ou \`--grep "Sous-ticket : <référence>"\` pour un arbre produit avant la 1.1.0), et reçoit ton rapport.`,
         '',
         '## Références',
         '',
@@ -1371,7 +1419,7 @@ export class FabriqueSkillTicket {
   description(n) {
     const m = this.R.mesoContrats.get(n.composition.principal);
     const place = n.estRacine ? (n.estFeuille ? 'ticket sans sous-ticket' : 'racine de son arbre') : `${this.nature(n)} de ${n.parent.reference}`;
-    const role = n.estFeuille ? `résoudre ce ${n.estRacine ? 'ticket' : 'sous-ticket'}` : n.estRacine ? 'rédiger les documents de la clé, présenter l\'arbre et le faire ratifier, coordonner ses sous-tickets puis assembler les kits' : 'coordonner ses sous-tickets';
+    const role = n.estFeuille ? (n.estRacine ? 'résoudre ce ticket' : 'réaliser cette tâche') : n.estRacine ? 'rédiger les documents de la clé, présenter l\'arbre et le faire ratifier, coordonner ses sous-tickets puis assembler les kits' : 'coordonner ses sous-tickets';
     const deps = n.dependances.length > 0 ? `, après la clôture de ${liste(n.dependances)}` : '';
     return sansDeuxPoints(`Skill de ticket ${n.reference}, ${place} (${decrireComposition(n.composition)}, ${m.nom.toLowerCase()}), produit par le générateur C7E. À activer pour ${role}${deps} ; rien ne se modifie avant sa ratification.`);
   }
@@ -1569,7 +1617,8 @@ export class FabriqueSkillTicket {
     return [
       ...etapes.map((e, k) => `${k + 1}. ${e}`),
       '',
-      `Chaque commit porte un seul slot et commence par \`${racine} : [É<n>-<DOMAINE>] \`, ou \`${racine} Snn : [É<n>-<DOMAINE>] \` pour le commit d'un scénario (D4.INV-2)${n.estRacine ? '' : `, son corps cite \`Sous-ticket : ${n.reference}\``} ; l'IA ne pousse, ne fusionne, ne rebase ni ne pose de tag (D4.INV-3).`,
+      ...(this.planDesCommits(n).length > 0 ? [`**Plan des commits de la tâche**, sur la branche de ${racine} :`, '', ...this.planDesCommits(n), ''] : []),
+      `Chaque commit porte un seul slot et commence par \`${racine} : [É<n>-<DOMAINE>] \`, ou \`${racine} Snn : [É<n>-<DOMAINE>] \` pour le commit d'un scénario (D4.INV-2)${this.lignesCommit(n) ? ` ; ${this.lignesCommit(n)}` : ''} ; l'IA ne pousse, ne fusionne, ne rebase ni ne pose de tag (D4.INV-3).`,
       '',
       `Les options de chaque couche se confient à son agent, par l'outil \`invoke_agent\` : ${liste(this.couches(n).map((c) => `\`${this.nomAgent(n, c)}\` (${c})`))}. Chaque agent réalise ses scénarios un à un en cycle TDD (agent-tdd-jira, module \`cycle-tdd\`), dans son propre contexte, et te présente chacun : fais-le accepter au développeur (V4) avant le commit et avant le scénario suivant. Ce skill garde la ratification, la recette et la remise.`,
       '',
@@ -1584,6 +1633,8 @@ export class FabriqueSkillTicket {
         ? [
           '',
           `Si l'ordre 2 a proposé des adaptations, invoque l'observateur d'ordre 3 de l'arbre, \`${this.nomRole(n, 'observateur-3')}\`, pour le bilan de clôture : lesquelles ont changé une décision (module \`champ\`, section 4). ${this.vueAuDeveloppeur(n, 'chaque critère d\'acceptation avec ses preuves, les désaccords et les décisions')} Puis assemble les kits dev, test et démo et la remise à Agent2Test, et contrôle-les sans écart (module \`kits\`).`,
+          '',
+          `Enfin, l'apprentissage du ticket (D8 du générateur) : \`${this.commandeApprentissage(n, `clore ${this.cle(n)}`)}\` verse au registre du projet la remontée des preuves, tirée du champ et ${this.aUnPlan(n) ? 'des écarts entre le plan des commits et la branche' : 'de ce que le relevé porte déjà'}, chaque entrée à sa profondeur CRI ; puis \`${this.commandeApprentissage(n, 'registre proposer')}\` dit les motifs relevés dans deux tickets. Présente chaque proposition au développeur ; dépose sa décision, \`${this.commandeApprentissage(n, 'registre decider <n> --decision retenue|refusee --par <nom> --raison <texte>')}\`. Rien n'entre dans le référentiel ni dans les consignes sans sa décision, et c'est lui qui le fait (D6.INV-2).`,
         ]
         : []),
     ];

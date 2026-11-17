@@ -172,6 +172,7 @@ export const BOITE = [
   { path: 'outils/champ.mjs', outil: 'champ.mjs', depuis: 5 },
   { path: 'outils/vue.mjs', outil: 'vue.mjs', depuis: 6 },
   { path: 'outils/invariants.mjs', outil: 'invariants.mjs', depuis: '1.0.1' },
+  { path: 'outils/apprentissage.mjs', outil: 'apprentissage.mjs', depuis: '1.1.0' },
 ];
 
 /**

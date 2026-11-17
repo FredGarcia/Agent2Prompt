@@ -28,7 +28,7 @@ Suis `SKILL.md` à partir de sa section 4. Rien n'est modifié avant la ratifica
   "version": "1.0.0",
   "specSchema": 1,
   "language": "fr",
-  "description": "Skill de ticket ABCDE-3620-1.2, feuille de ABCDE-3620-1 (M04, variante de représentation d'une ressource), produit par le générateur C7E. À activer pour résoudre ce sous-ticket, après la clôture de ABCDE-3620-1.1 ; rien ne se modifie avant sa ratification.",
+  "description": "Skill de ticket ABCDE-3620-1.2, feuille de ABCDE-3620-1 (M04, variante de représentation d'une ressource), produit par le générateur C7E. À activer pour réaliser cette tâche, après la clôture de ABCDE-3620-1.1 ; rien ne se modifie avant sa ratification.",
   "entry": "SKILL.md",
   "ticket": {
     "reference": "ABCDE-3620-1.2",
@@ -87,7 +87,7 @@ Suis `SKILL.md` à partir de sa section 4. Rien n'est modifié avant la ratifica
     ],
     "genere_par": {
       "generateur": "generateur-skill-ticket",
-      "version": "1.0.1",
+      "version": "1.1.0",
       "fabrique": "java-angular-postgresql",
       "orchestrateur": "3.5.3"
     }
@@ -165,13 +165,13 @@ Suis `SKILL.md` à partir de sa section 4. Rien n'est modifié avant la ratifica
 <<<FICHIER SKILL.md>>>
 ---
 name: ticket-abcde-3620-1-2
-description: Skill de ticket ABCDE-3620-1.2, feuille de ABCDE-3620-1 (M04, variante de représentation d'une ressource), produit par le générateur C7E. À activer pour résoudre ce sous-ticket, après la clôture de ABCDE-3620-1.1 ; rien ne se modifie avant sa ratification.
+description: Skill de ticket ABCDE-3620-1.2, feuille de ABCDE-3620-1 (M04, variante de représentation d'une ressource), produit par le générateur C7E. À activer pour réaliser cette tâche, après la clôture de ABCDE-3620-1.1 ; rien ne se modifie avant sa ratification.
 version: 1.0.0
 ---
 
 # Skill de ticket ABCDE-3620-1.2
 
-> Produit par generateur-skill-ticket 1.0.1, fabrique `java-angular-postgresql`, référentiel des méso-contrats 3.3.0, orchestrateur-c7e 3.5.3. Ce skill remplace la fiche de transformation comme objet ratifié avant toute modification ; il reste identique à sa transmission. Si tu y relèves une ambiguïté ou une contradiction, signale-la au développeur ; ne corrige pas le skill toi-même.
+> Produit par generateur-skill-ticket 1.1.0, fabrique `java-angular-postgresql`, référentiel des méso-contrats 3.3.0, orchestrateur-c7e 3.5.3. Ce skill remplace la fiche de transformation comme objet ratifié avant toute modification ; il reste identique à sa transmission. Si tu y relèves une ambiguïté ou une contradiction, signale-la au développeur ; ne corrige pas le skill toi-même.
 
 ## 1. Place dans l'arbre
 
@@ -238,7 +238,7 @@ Présente au développeur ce skill et son analyse : objectif, critères, méso-c
 8. **É6, Évolutif** (contrôle de l'évolution : tests déduits, mesures, dossier de preuves) : exécuter tous les tests déduits et les gates (module `methode`, § 5.1), mesurer, produire le dossier de preuves (module `recette`).
 9. **É7, Environnement** (livraison dans l'environnement, validation métier, mesures en usage, capitalisation) : remettre `remise.md` au développeur (section 8) ; la validation métier, la livraison et la mesure en usage appartiennent à l'équipe, l'IA ne publie rien (D4.INV-3) ; capitaliser et clore par une rétrospective de second ordre (module `methode`, § 6).
 
-Chaque commit porte un seul slot et commence par `ABCDE-3620 : [É<n>-<DOMAINE>] `, ou `ABCDE-3620 Snn : [É<n>-<DOMAINE>] ` pour le commit d'un scénario (D4.INV-2), son corps cite `Sous-ticket : ABCDE-3620-1.2` ; l'IA ne pousse, ne fusionne, ne rebase ni ne pose de tag (D4.INV-3).
+Chaque commit porte un seul slot et commence par `ABCDE-3620 : [É<n>-<DOMAINE>] `, ou `ABCDE-3620 Snn : [É<n>-<DOMAINE>] ` pour le commit d'un scénario (D4.INV-2) ; son corps porte la ligne `Tâche : ABCDE-3620-1.2` ; l'IA ne pousse, ne fusionne, ne rebase ni ne pose de tag (D4.INV-3).
 
 Les options de chaque couche se confient à son agent, par l'outil `invoke_agent` : `ticket-abcde-3620-1-2-back` (backend). Chaque agent réalise ses scénarios un à un en cycle TDD (agent-tdd-jira, module `cycle-tdd`), dans son propre contexte, et te présente chacun : fais-le accepter au développeur (V4) avant le commit et avant le scénario suivant. Ce skill garde la ratification, la recette et la remise.
 
@@ -780,7 +780,7 @@ Les invariants de l'orchestrateur parlent de sa fiche de transformation. Dans un
 | la validation de la fiche (D3.INV-1) | la ratification de ce skill et de son analyse (section 6 de `SKILL.md`) |
 | la fiche complète à la remise (D3.INV-3) | `docs/demandes/ABCDE-3620/ABCDE-3620-1.2/remise.md` ; le skill reste identique à sa transmission |
 | `docs/demandes/<CLÉ>/` | `docs/demandes/ABCDE-3620/ABCDE-3620-1.2/` |
-| la clé du ticket, qui nomme sa branche et ses commits (D4.INV-1, D4.INV-2) | la clé Jira du ticket racine, ABCDE-3620 : une seule branche pour tout l'arbre, et le corps de chaque commit cite le sous-ticket ABCDE-3620-1.2 |
+| la clé du ticket, qui nomme sa branche et ses commits (D4.INV-1, D4.INV-2) | la clé Jira du ticket racine, ABCDE-3620 : une seule branche pour tout l'arbre, et le corps de chaque commit cite la tâche ABCDE-3620-1.2 |
 | le choix du développeur qui active le skill (D2.INV-3) | le lancement de ce skill par le développeur, dans sa propre session : la commande `/ticket:abcde-3620-1-2`, ou `installer-arbre.mjs lancer ABCDE-3620-1.2` |
 | le registre des écarts et le registre des concepts (D6.INV-1 à D6.INV-3) | `docs/c7e/registre-ecarts.md` et `docs/c7e/concepts.json` du projet, alimentés depuis le champ d'observation de l'arbre (module `champ-depot` du skill racine) ; l'IA y ajoute, le développeur décide et promeut |
 | la qualification et la confirmation de la composition (D10.INV-1, D11) | faites avant la génération de ce skill ; si l'analyse montre que la demande sort des empreintes, ce skill remonte au parent, sans changer de composition (D11.INV-4) |
@@ -1580,13 +1580,13 @@ Tu réalises un à un les scénarios de `docs/demandes/ABCDE-3620/ABCDE-3620.fea
 
 - le test s'écrit d'abord, étiqueté avec son scénario (`@Tag("ABCDE-3620-Snn")`), et échoue pour la raison attendue avant tout code de production (agent-tdd-jira:D5.INV-1) ;
 - le code minimal le fait passer, la suite du module reste verte, puis le remaniement applique les invariants du référentiel, sans changer le comportement (agent-tdd-jira:D5.INV-2, agent-tdd-jira:D5.INV-3) ;
-- chaque scénario se présente au skill du ticket, qui le fait accepter au développeur (V4), avant le suivant ; puis il se commite, un slot par commit : `ABCDE-3620 Snn : [É<n>-<DOMAINE>] <type>(<portée>): <description>`, le corps citant `Sous-ticket : ABCDE-3620-1.2`.
+- chaque scénario se présente au skill du ticket, qui le fait accepter au développeur (V4), avant le suivant ; puis il se commite, un slot par commit : `ABCDE-3620 Snn : [É<n>-<DOMAINE>] <type>(<portée>): <description>`, son corps porte la ligne `Tâche : ABCDE-3620-1.2`.
 
 ## Règles
 
 - Aucune modification avant la ratification du skill par le développeur, déposée dans le champ de l'arbre : `node .gemini/skills/ticket-abcde-3620/outils/champ.mjs etat docs/demandes/ABCDE-3620` montre « ABCDE-3620-1.2 : ratifié » (D3.INV-1, la fiche étant ce skill).
 - Les invariants hérités s'appliquent : `.gemini/skills/ticket-abcde-3620-1-2/modules/invariants/SKILL.md`, `.gemini/skills/ticket-abcde-3620-1-2/socle/SKILL.md`, la copie du projet du fichier d'invariants et `.gemini/skills/ticket-abcde-3620-1-2/references/java.md`.
-- Un slot par commit ; chaque commit commence par `ABCDE-3620 : `, ou `ABCDE-3620 Snn : ` pour un scénario, suivi de l'étiquette de son slot (D4.INV-2), et son corps cite `Sous-ticket : ABCDE-3620-1.2` ; tu ne pousses, ne fusionnes, ne rebases ni ne poses de tag (D4.INV-3).
+- Un slot par commit ; chaque commit commence par `ABCDE-3620 : `, ou `ABCDE-3620 Snn : ` pour un scénario, suivi de l'étiquette de son slot (D4.INV-2) ; son corps porte la ligne `Tâche : ABCDE-3620-1.2` ; tu ne pousses, ne fusionnes, ne rebases ni ne poses de tag (D4.INV-3).
 - Tu ne sors pas de ta couche : un besoin hors de ton périmètre remonte au skill du ticket.
 
 ## Rapport
@@ -1610,8 +1610,8 @@ Précision du développeur, s'il y en a une : {{args}}
 
 Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichiers ont été matérialisés.
 
-    d15e6eea14b85c3a68853baac21f4b88b68a5e69e12e8e87cd374e05908edd9c  manifest.json
-    ea59179852289db18cff5ecf78eb205bf29bb21ef29c4ffefde2c384f5dcd95d  SKILL.md
+    95aae5dd4ad5f833c8be09e52d493226418f8624c7e2e45cf1cae8597dbe764f  manifest.json
+    a09d3dd77aa1de9096c619d09a763ef435d127003c2ce92a617bcd7f328f8869  SKILL.md
     e24620fbd65e7bc734919478c2c0b2102dfb7b72dc3627cb6526feb01db37928  ticket.toml
     23e7fe61f9baacfa3d7d42fe655ddd8f1f631b600b3a8a05a7316ed22055052b  modules/meso-contrats/SKILL.md
     b90ce5e911d8aeb8a06e3e135a7c2569691f790d4000ca08d3b3eb0e1849aa85  modules/option-backend-endpoints/SKILL.md
@@ -1619,9 +1619,9 @@ Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichier
     e4c1f30c7ea44c234a35cd11867513ba0926d07809f3c9fe81e214450e7ab7c2  modules/option-backend-evenements/SKILL.md
     abd533d2067fa4922d013df84edeb76541931c9492f7767c779597f72b4099d7  modules/recette/SKILL.md
     b433041c0ccbdeba65e1e01eb1a199a189d3d04ce34d388d0ed5747f0bd11532  modules/methode/SKILL.md
-    30a2504f59e509cdc29698fc236994f0cde1a8aca2b7bf327616fea2d7cfc87c  modules/invariants/SKILL.md
+    aa84c01dbddf75fdace95f2ecd1d8dea4c29b279b12d5c73fd2d00d0e1293e52  modules/invariants/SKILL.md
     f9456b0bbcdce8cd1ebc06446c3d505829a0354f398f4aa819204e4e9c135f54  socle/SKILL.md
     4bb52253c4504f4a804460442b1711a9caab8e364528171f2afb9ba7d5acfccf  references/java.md
     971128d2351d7dce8941a57e3b3875b59cb229c9469eef7c20d74d7561b6ac31  projet/meso-contrats.md
-    5d31c9fcedcd56aeb28d298ce3581486b2a14cf7dfd553628861697c3191517a  agents/ticket-abcde-3620-1-2-back.md
+    11a982fe404b53ea3113cb3b581472c4c1029be5f96931836c06fe993ce2cee2  agents/ticket-abcde-3620-1-2-back.md
     c26f5c1a2f7608202ab1de2646477c2f594f9ca56f3851c0bb4a9b982dac1078  commandes/ticket/abcde-3620-1-2.toml

@@ -28,9 +28,9 @@ Mesure statique et déterministe (generateur-skill-ticket, critère P7), produit
 
 | Feuille | Session, activation | Session, au plus | Plus grand contexte | Somme des contextes |
 |---|---|---|---|---|
-| ABCDE-3620-1.1 | 4 072 tokens, 18 % | 18 752 tokens, 30 % | 21 028 tokens, 34 % | 61 201 tokens, 98 % |
-| ABCDE-3620-1.2 | 4 317 tokens, 19 % | 20 159 tokens, 32 % | 23 400 tokens, 37 % | 65 456 tokens, 104 % |
-| ABCDE-3620-2 | 4 218 tokens, 19 % | 19 198 tokens, 31 % | 21 566 tokens, 34 % | 62 404 tokens, 100 % |
+| ABCDE-3620-1.1 | 4 070 tokens, 18 % | 18 748 tokens, 30 % | 21 028 tokens, 34 % | 61 215 tokens, 98 % |
+| ABCDE-3620-1.2 | 4 314 tokens, 19 % | 20 155 tokens, 32 % | 23 400 tokens, 37 % | 65 470 tokens, 104 % |
+| ABCDE-3620-2 | 4 216 tokens, 19 % | 19 194 tokens, 31 % | 21 566 tokens, 34 % | 62 418 tokens, 100 % |
 
 Les pourcentages rapportent chaque taille à celle du point d'entrée de l'orchestrateur, à la même borne pour l'activation, au plus pour le reste. La somme réunit les contextes qui travaillent pour la feuille : sa session, ses agents de couche, ses sous-agents de rôle.
 
@@ -38,14 +38,14 @@ Les pourcentages rapportent chaque taille à celle du point d'entrée de l'orche
 
 | Mesure | Au plus |
 |---|---|
-| plus grand contexte de l'arbre, session du skill ticket-abcde-3620 | 27 256 tokens, 44 % |
-| somme des 20 contextes des 5 nœuds et des observateurs | 275 231 tokens, 439 % |
+| plus grand contexte de l'arbre, session du skill ticket-abcde-3620 | 27 499 tokens, 44 % |
+| somme des 20 contextes des 5 nœuds et des observateurs | 275 511 tokens, 439 % |
 
 Aucun contexte de l'arbre ne charge plus que le pourcentage du plus grand ; la somme dit ce que l'arbre lit en tout, quand chaque contexte relit ce qu'il lui faut, au plus.
 
 ## Relectures
 
-Sur la somme des contextes de l'arbre, 131 646 tokens (48 %) viennent de fichiers lus dans plusieurs contextes ; lus une seule fois chacun, les fichiers de l'arbre feraient 143 585 tokens, 229 % du point d'entrée de l'orchestrateur.
+Sur la somme des contextes de l'arbre, 131 664 tokens (48 %) viennent de fichiers lus dans plusieurs contextes ; lus une seule fois chacun, les fichiers de l'arbre feraient 143 848 tokens, 229 % du point d'entrée de l'orchestrateur.
 
 | Fichier | Contextes qui le lisent | Relu, au plus |
 |---|---|---|
@@ -60,15 +60,15 @@ Sur la somme des contextes de l'arbre, 131 646 tokens (48 %) viennent de fichier
 | `projet/docs/demandes/ABCDE-3620/ABCDE-3620.feature` | 6 | 4 353 tokens |
 | `ticket-abcde-3620/references/agent-tdd-jira/cycle-tdd.md` | 3 | 3 680 tokens |
 | `ticket-abcde-3620-2/references/angular.md` | 2 | 3 479 tokens |
-| `noms et descriptions des 5 skills et des agents installés` | 5 | 3 472 tokens |
+| `noms et descriptions des 5 skills et des agents installés` | 5 | 3 458 tokens |
 | `ticket-abcde-3620/modules/methode/SKILL.md` | 3 | 3 442 tokens |
 | `ticket-abcde-3620-1-1/references/java.md` | 2 | 3 433 tokens |
 | `ticket-abcde-3620-1-2/references/java.md` | 2 | 3 433 tokens |
 | `ticket-abcde-3620/references/analyse-projet/cartographie.md` | 3 | 3 279 tokens |
 | `ticket-abcde-3620-1-2/ticket.toml` | 4 | 3 241 tokens |
-| `ticket-abcde-3620-1-1/modules/invariants/SKILL.md` | 2 | 2 781 tokens |
-| `ticket-abcde-3620-1-2/modules/invariants/SKILL.md` | 2 | 2 781 tokens |
-| `ticket-abcde-3620-2/modules/invariants/SKILL.md` | 2 | 2 778 tokens |
+| `ticket-abcde-3620-1-1/modules/invariants/SKILL.md` | 2 | 2 779 tokens |
+| `ticket-abcde-3620-1-2/modules/invariants/SKILL.md` | 2 | 2 779 tokens |
+| `ticket-abcde-3620-2/modules/invariants/SKILL.md` | 2 | 2 777 tokens |
 | `ticket-abcde-3620/references/java/revue.md` | 3 | 2 517 tokens |
 | `ticket-abcde-3620-2/ticket.toml` | 4 | 2 333 tokens |
 | `ticket-abcde-3620/references/angular/revue.md` | 3 | 2 016 tokens |
@@ -76,7 +76,7 @@ Sur la somme des contextes de l'arbre, 131 646 tokens (48 %) viennent de fichier
 | `ticket-abcde-3620-1-1/ticket.toml` | 4 | 1 815 tokens |
 | `ticket-abcde-3620/agents/ticket-abcde-3620-analyste.md` | 3 | 945 tokens |
 | `ticket-abcde-3620/agents/ticket-abcde-3620-qualite.md` | 3 | 905 tokens |
-| `ticket-abcde-3620/agents/ticket-abcde-3620-relecteur.md` | 3 | 821 tokens |
+| `ticket-abcde-3620/agents/ticket-abcde-3620-relecteur.md` | 3 | 857 tokens |
 | `ticket-abcde-3620-1-2/modules/meso-contrats/SKILL.md` | 2 | 448 tokens |
 | `ticket-abcde-3620-2/modules/meso-contrats/SKILL.md` | 2 | 363 tokens |
 | `ticket-abcde-3620-1-1/modules/meso-contrats/SKILL.md` | 2 | 327 tokens |
@@ -87,8 +87,8 @@ Ils coordonnent leurs sous-tickets, ratifient et, pour la racine, font rédiger 
 
 | Nœud | Session, au plus | Somme des contextes |
 |---|---|---|
-| ABCDE-3620, racine | 27 256 tokens, 44 % | 53 253 tokens, 85 % |
-| ABCDE-3620-1, composé | 15 501 tokens, 25 % | 15 501 tokens, 25 % |
+| ABCDE-3620, racine | 27 499 tokens, 44 % | 53 496 tokens, 85 % |
+| ABCDE-3620-1, composé | 15 496 tokens, 25 % | 15 496 tokens, 25 % |
 
 ## Observateurs de l'arbre, sur attente
 
@@ -105,20 +105,20 @@ Invoqués par le skill d'un nœud quand le champ attend une observation d'ordre 
 
 | Contexte | À l'activation | Au plus |
 |---|---|---|
-| session du skill ticket-abcde-3620 | 20 042 car., 5 011 tokens | 109 023 car., 27 256 tokens |
+| session du skill ticket-abcde-3620 | 20 953 car., 5 239 tokens | 109 995 car., 27 499 tokens |
 | sous-agent ticket-abcde-3620-redacteur | 2 831 car., 708 tokens | 103 988 car., 25 997 tokens |
 
 Lu par session du skill ticket-abcde-3620 :
 
-- `noms et descriptions des 5 skills et des agents installés` : 3 472 car., chargés au démarrage de Gemini CLI
-- `ticket-abcde-3620/SKILL.md` : 16 570 car., corps du skill, à son activation
+- `noms et descriptions des 5 skills et des agents installés` : 3 458 car., chargés au démarrage de Gemini CLI
+- `ticket-abcde-3620/SKILL.md` : 17 495 car., corps du skill, à son activation
 - `ticket-abcde-3620/modules/meso-contrats/SKILL.md` : 2 047 car., module `meso-contrats`
 - `ticket-abcde-3620/modules/vue/SKILL.md` : 5 274 car., modules `vue` et `champ` du skill racine
 - `ticket-abcde-3620/modules/champ/SKILL.md` : 9 925 car., modules `vue` et `champ` du skill racine
 - `ticket-abcde-3620/modules/documents/SKILL.md` : 7 917 car., module `documents`
 - `ticket-abcde-3620/modules/sous-tickets/SKILL.md` : 2 116 car., module `sous-tickets`
 - `ticket-abcde-3620/modules/recette/SKILL.md` : 1 584 car., modules `sous-tickets` et `recette`
-- `ticket-abcde-3620/modules/kits/SKILL.md` : 7 403 car., module `kits`
+- `ticket-abcde-3620/modules/kits/SKILL.md` : 7 464 car., module `kits`
 - `ticket-abcde-3620/modules/invariants/SKILL.md` : 11 203 car., module `invariants`
 - `ticket-abcde-3620/modules/methode/SKILL.md` : 6 883 car., module `methode`
 - `projet/docs/c7e/meso-contrats.md` : 15 638 car., `docs/c7e/meso-contrats.md`
@@ -145,18 +145,18 @@ Lu par sous-agent ticket-abcde-3620-redacteur :
 
 | Contexte | À l'activation | Au plus |
 |---|---|---|
-| session du skill ticket-abcde-3620-1 | 11 978 car., 2 995 tokens | 62 003 car., 15 501 tokens |
+| session du skill ticket-abcde-3620-1 | 11 964 car., 2 991 tokens | 61 983 car., 15 496 tokens |
 
 Lu par session du skill ticket-abcde-3620-1 :
 
-- `noms et descriptions des 5 skills et des agents installés` : 3 472 car., chargés au démarrage de Gemini CLI
+- `noms et descriptions des 5 skills et des agents installés` : 3 458 car., chargés au démarrage de Gemini CLI
 - `ticket-abcde-3620-1/SKILL.md` : 8 506 car., corps du skill, à son activation
 - `ticket-abcde-3620-1/modules/meso-contrats/SKILL.md` : 1 967 car., module `meso-contrats`
 - `ticket-abcde-3620/modules/vue/SKILL.md` : 5 274 car., modules `vue` et `champ-depot` du skill racine
 - `ticket-abcde-3620/modules/champ-depot/SKILL.md` : 5 051 car., modules `vue` et `champ-depot` du skill racine
 - `ticket-abcde-3620-1/modules/sous-tickets/SKILL.md` : 1 920 car., module `sous-tickets`
 - `ticket-abcde-3620-1/modules/recette/SKILL.md` : 1 718 car., module `recette`
-- `ticket-abcde-3620-1/modules/invariants/SKILL.md` : 10 961 car., module `invariants`
+- `ticket-abcde-3620-1/modules/invariants/SKILL.md` : 10 955 car., module `invariants`
 - `ticket-abcde-3620-1/modules/methode/SKILL.md` : 913 car., module `methode`
 - `projet/docs/c7e/meso-contrats.md` : 15 638 car., `docs/c7e/meso-contrats.md`
 - `vue du nœud ABCDE-3620-1` : 6 583 car., vue.mjs generer docs/demandes/ABCDE-3620 --noeud ABCDE-3620-1
@@ -165,22 +165,22 @@ Lu par session du skill ticket-abcde-3620-1 :
 
 | Contexte | À l'activation | Au plus |
 |---|---|---|
-| session du skill ticket-abcde-3620-1-1 | 16 288 car., 4 072 tokens | 75 007 car., 18 752 tokens |
-| agent ticket-abcde-3620-1-1-persistance | 4 051 car., 1 013 tokens | 84 110 car., 21 028 tokens |
+| session du skill ticket-abcde-3620-1-1 | 16 279 car., 4 070 tokens | 74 992 car., 18 748 tokens |
+| agent ticket-abcde-3620-1-1-persistance | 4 056 car., 1 014 tokens | 84 109 car., 21 028 tokens |
 | sous-agent ticket-abcde-3620-analyste | 1 890 car., 473 tokens | 20 894 car., 5 224 tokens |
-| sous-agent ticket-abcde-3620-relecteur | 1 642 car., 411 tokens | 24 437 car., 6 110 tokens |
+| sous-agent ticket-abcde-3620-relecteur | 1 714 car., 429 tokens | 24 509 car., 6 128 tokens |
 | sous-agent ticket-abcde-3620-qualite | 1 809 car., 453 tokens | 40 356 car., 10 089 tokens |
 
 Lu par session du skill ticket-abcde-3620-1-1 :
 
-- `noms et descriptions des 5 skills et des agents installés` : 3 472 car., chargés au démarrage de Gemini CLI
-- `ticket-abcde-3620-1-1/SKILL.md` : 12 816 car., corps du skill, à son activation
+- `noms et descriptions des 5 skills et des agents installés` : 3 458 car., chargés au démarrage de Gemini CLI
+- `ticket-abcde-3620-1-1/SKILL.md` : 12 821 car., corps du skill, à son activation
 - `ticket-abcde-3620-1-1/modules/meso-contrats/SKILL.md` : 1 306 car., module `meso-contrats`
 - `ticket-abcde-3620/modules/vue/SKILL.md` : 5 274 car., modules `vue` et `champ-depot` du skill racine
 - `ticket-abcde-3620/modules/champ-depot/SKILL.md` : 5 051 car., modules `vue` et `champ-depot` du skill racine
 - `ticket-abcde-3620-1-1/modules/methode/SKILL.md` : 9 494 car., module `methode`
 - `ticket-abcde-3620-1-1/modules/recette/SKILL.md` : 2 539 car., module `recette`
-- `ticket-abcde-3620-1-1/modules/invariants/SKILL.md` : 11 121 car., module `invariants`
+- `ticket-abcde-3620-1-1/modules/invariants/SKILL.md` : 11 115 car., module `invariants`
 - `projet/docs/c7e/meso-contrats.md` : 15 638 car., `docs/c7e/meso-contrats.md`
 - `ticket-abcde-3620-1-1/ticket.toml` : 2 419 car., `ticket.toml`
 - `projet/docs/demandes/ABCDE-3620/ABCDE-3620.feature` : 3 482 car., `docs/demandes/ABCDE-3620/ABCDE-3620.feature`
@@ -188,14 +188,14 @@ Lu par session du skill ticket-abcde-3620-1-1 :
 
 Lu par agent ticket-abcde-3620-1-1-persistance :
 
-- `ticket-abcde-3620-1-1/agents/ticket-abcde-3620-1-1-persistance.md` : 4 051 car., corps de l'agent, à son invocation
+- `ticket-abcde-3620-1-1/agents/ticket-abcde-3620-1-1-persistance.md` : 4 056 car., corps de l'agent, à son invocation
 - `ticket-abcde-3620/modules/champ-depot/SKILL.md` : 5 051 car., module `champ-depot` du skill racine
 - `ticket-abcde-3620-1-1/ticket.toml` : 2 419 car., `.gemini/skills/ticket-abcde-3620-1-1/ticket.toml`
 - `ticket-abcde-3620-1-1/modules/meso-contrats/SKILL.md` : 1 306 car., `.gemini/skills/ticket-abcde-3620-1-1/modules/meso-contrats/SKILL.md`
 - `ticket-abcde-3620-1-1/modules/option-persistance-crud/SKILL.md` : 1 363 car., `.gemini/skills/ticket-abcde-3620-1-1/modules/option-persistance-crud/SKILL.md`
 - `projet/docs/demandes/ABCDE-3620/ABCDE-3620.feature` : 3 482 car., `docs/demandes/ABCDE-3620/ABCDE-3620.feature`
 - `ticket-abcde-3620/references/agent-tdd-jira/cycle-tdd.md` : 7 359 car., `.gemini/skills/ticket-abcde-3620/references/agent-tdd-jira/cycle-tdd.md`
-- `ticket-abcde-3620-1-1/modules/invariants/SKILL.md` : 11 121 car., `.gemini/skills/ticket-abcde-3620-1-1/modules/invariants/SKILL.md`
+- `ticket-abcde-3620-1-1/modules/invariants/SKILL.md` : 11 115 car., `.gemini/skills/ticket-abcde-3620-1-1/modules/invariants/SKILL.md`
 - `ticket-abcde-3620-1-1/socle/SKILL.md` : 18 589 car., `.gemini/skills/ticket-abcde-3620-1-1/socle/SKILL.md`
 - `ticket-abcde-3620-1-1/references/java.md` : 13 731 car., `.gemini/skills/ticket-abcde-3620-1-1/references/java.md`
 - `projet/docs/c7e/meso-contrats.md` : 15 638 car., copie du projet du fichier d'invariants
@@ -209,7 +209,7 @@ Lu par sous-agent ticket-abcde-3620-analyste :
 
 Lu par sous-agent ticket-abcde-3620-relecteur :
 
-- `ticket-abcde-3620/agents/ticket-abcde-3620-relecteur.md` : 1 642 car., corps de l'agent, à son invocation
+- `ticket-abcde-3620/agents/ticket-abcde-3620-relecteur.md` : 1 714 car., corps de l'agent, à son invocation
 - `ticket-abcde-3620/references/java/revue.md` : 5 033 car., `.gemini/skills/ticket-abcde-3620/references/java/revue.md`
 - `ticket-abcde-3620/references/angular/revue.md` : 4 031 car., `.gemini/skills/ticket-abcde-3620/references/angular/revue.md`
 - `ticket-abcde-3620-1-1/references/java.md` : 13 731 car., `references/java.md`
@@ -224,22 +224,22 @@ Lu par sous-agent ticket-abcde-3620-qualite :
 
 | Contexte | À l'activation | Au plus |
 |---|---|---|
-| session du skill ticket-abcde-3620-1-2 | 17 265 car., 4 317 tokens | 80 633 car., 20 159 tokens |
-| agent ticket-abcde-3620-1-2-back | 4 743 car., 1 186 tokens | 93 600 car., 23 400 tokens |
+| session du skill ticket-abcde-3620-1-2 | 17 256 car., 4 314 tokens | 80 618 car., 20 155 tokens |
+| agent ticket-abcde-3620-1-2-back | 4 748 car., 1 187 tokens | 93 599 car., 23 400 tokens |
 | sous-agent ticket-abcde-3620-analyste | 1 890 car., 473 tokens | 22 796 car., 5 699 tokens |
-| sous-agent ticket-abcde-3620-relecteur | 1 642 car., 411 tokens | 24 437 car., 6 110 tokens |
+| sous-agent ticket-abcde-3620-relecteur | 1 714 car., 429 tokens | 24 509 car., 6 128 tokens |
 | sous-agent ticket-abcde-3620-qualite | 1 809 car., 453 tokens | 40 356 car., 10 089 tokens |
 
 Lu par session du skill ticket-abcde-3620-1-2 :
 
-- `noms et descriptions des 5 skills et des agents installés` : 3 472 car., chargés au démarrage de Gemini CLI
-- `ticket-abcde-3620-1-2/SKILL.md` : 13 793 car., corps du skill, à son activation
+- `noms et descriptions des 5 skills et des agents installés` : 3 458 car., chargés au démarrage de Gemini CLI
+- `ticket-abcde-3620-1-2/SKILL.md` : 13 798 car., corps du skill, à son activation
 - `ticket-abcde-3620-1-2/modules/meso-contrats/SKILL.md` : 1 791 car., module `meso-contrats`
 - `ticket-abcde-3620/modules/vue/SKILL.md` : 5 274 car., modules `vue` et `champ-depot` du skill racine
 - `ticket-abcde-3620/modules/champ-depot/SKILL.md` : 5 051 car., modules `vue` et `champ-depot` du skill racine
 - `ticket-abcde-3620-1-2/modules/methode/SKILL.md` : 9 494 car., module `methode`
 - `ticket-abcde-3620-1-2/modules/recette/SKILL.md` : 3 231 car., module `recette`
-- `ticket-abcde-3620-1-2/modules/invariants/SKILL.md` : 11 121 car., module `invariants`
+- `ticket-abcde-3620-1-2/modules/invariants/SKILL.md` : 11 115 car., module `invariants`
 - `projet/docs/c7e/meso-contrats.md` : 15 638 car., `docs/c7e/meso-contrats.md`
 - `ticket-abcde-3620-1-2/ticket.toml` : 4 321 car., `ticket.toml`
 - `projet/docs/demandes/ABCDE-3620/ABCDE-3620.feature` : 3 482 car., `docs/demandes/ABCDE-3620/ABCDE-3620.feature`
@@ -247,7 +247,7 @@ Lu par session du skill ticket-abcde-3620-1-2 :
 
 Lu par agent ticket-abcde-3620-1-2-back :
 
-- `ticket-abcde-3620-1-2/agents/ticket-abcde-3620-1-2-back.md` : 4 743 car., corps de l'agent, à son invocation
+- `ticket-abcde-3620-1-2/agents/ticket-abcde-3620-1-2-back.md` : 4 748 car., corps de l'agent, à son invocation
 - `ticket-abcde-3620/modules/champ-depot/SKILL.md` : 5 051 car., module `champ-depot` du skill racine
 - `ticket-abcde-3620-1-2/ticket.toml` : 4 321 car., `.gemini/skills/ticket-abcde-3620-1-2/ticket.toml`
 - `ticket-abcde-3620-1-2/modules/meso-contrats/SKILL.md` : 1 791 car., `.gemini/skills/ticket-abcde-3620-1-2/modules/meso-contrats/SKILL.md`
@@ -256,7 +256,7 @@ Lu par agent ticket-abcde-3620-1-2-back :
 - `ticket-abcde-3620-1-2/modules/option-backend-evenements/SKILL.md` : 2 596 car., `.gemini/skills/ticket-abcde-3620-1-2/modules/option-backend-evenements/SKILL.md`
 - `projet/docs/demandes/ABCDE-3620/ABCDE-3620.feature` : 3 482 car., `docs/demandes/ABCDE-3620/ABCDE-3620.feature`
 - `ticket-abcde-3620/references/agent-tdd-jira/cycle-tdd.md` : 7 359 car., `.gemini/skills/ticket-abcde-3620/references/agent-tdd-jira/cycle-tdd.md`
-- `ticket-abcde-3620-1-2/modules/invariants/SKILL.md` : 11 121 car., `.gemini/skills/ticket-abcde-3620-1-2/modules/invariants/SKILL.md`
+- `ticket-abcde-3620-1-2/modules/invariants/SKILL.md` : 11 115 car., `.gemini/skills/ticket-abcde-3620-1-2/modules/invariants/SKILL.md`
 - `ticket-abcde-3620-1-2/socle/SKILL.md` : 18 589 car., `.gemini/skills/ticket-abcde-3620-1-2/socle/SKILL.md`
 - `ticket-abcde-3620-1-2/references/java.md` : 13 731 car., `.gemini/skills/ticket-abcde-3620-1-2/references/java.md`
 - `projet/docs/c7e/meso-contrats.md` : 15 638 car., copie du projet du fichier d'invariants
@@ -270,7 +270,7 @@ Lu par sous-agent ticket-abcde-3620-analyste :
 
 Lu par sous-agent ticket-abcde-3620-relecteur :
 
-- `ticket-abcde-3620/agents/ticket-abcde-3620-relecteur.md` : 1 642 car., corps de l'agent, à son invocation
+- `ticket-abcde-3620/agents/ticket-abcde-3620-relecteur.md` : 1 714 car., corps de l'agent, à son invocation
 - `ticket-abcde-3620/references/java/revue.md` : 5 033 car., `.gemini/skills/ticket-abcde-3620/references/java/revue.md`
 - `ticket-abcde-3620/references/angular/revue.md` : 4 031 car., `.gemini/skills/ticket-abcde-3620/references/angular/revue.md`
 - `ticket-abcde-3620-1-2/references/java.md` : 13 731 car., `references/java.md`
@@ -285,22 +285,22 @@ Lu par sous-agent ticket-abcde-3620-qualite :
 
 | Contexte | À l'activation | Au plus |
 |---|---|---|
-| session du skill ticket-abcde-3620-2 | 16 870 car., 4 218 tokens | 76 790 car., 19 198 tokens |
-| agent ticket-abcde-3620-2-front | 4 663 car., 1 166 tokens | 86 263 car., 21 566 tokens |
+| session du skill ticket-abcde-3620-2 | 16 861 car., 4 216 tokens | 76 775 car., 19 194 tokens |
+| agent ticket-abcde-3620-2-front | 4 668 car., 1 167 tokens | 86 262 car., 21 566 tokens |
 | sous-agent ticket-abcde-3620-analyste | 1 890 car., 473 tokens | 21 585 car., 5 397 tokens |
-| sous-agent ticket-abcde-3620-relecteur | 1 642 car., 411 tokens | 24 621 car., 6 156 tokens |
+| sous-agent ticket-abcde-3620-relecteur | 1 714 car., 429 tokens | 24 693 car., 6 174 tokens |
 | sous-agent ticket-abcde-3620-qualite | 1 809 car., 453 tokens | 40 356 car., 10 089 tokens |
 
 Lu par session du skill ticket-abcde-3620-2 :
 
-- `noms et descriptions des 5 skills et des agents installés` : 3 472 car., chargés au démarrage de Gemini CLI
-- `ticket-abcde-3620-2/SKILL.md` : 13 398 car., corps du skill, à son activation
+- `noms et descriptions des 5 skills et des agents installés` : 3 458 car., chargés au démarrage de Gemini CLI
+- `ticket-abcde-3620-2/SKILL.md` : 13 403 car., corps du skill, à son activation
 - `ticket-abcde-3620-2/modules/meso-contrats/SKILL.md` : 1 450 car., module `meso-contrats`
 - `ticket-abcde-3620/modules/vue/SKILL.md` : 5 274 car., modules `vue` et `champ-depot` du skill racine
 - `ticket-abcde-3620/modules/champ-depot/SKILL.md` : 5 051 car., modules `vue` et `champ-depot` du skill racine
 - `ticket-abcde-3620-2/modules/methode/SKILL.md` : 9 490 car., module `methode`
 - `ticket-abcde-3620-2/modules/recette/SKILL.md` : 2 657 car., module `recette`
-- `ticket-abcde-3620-2/modules/invariants/SKILL.md` : 11 111 car., module `invariants`
+- `ticket-abcde-3620-2/modules/invariants/SKILL.md` : 11 105 car., module `invariants`
 - `projet/docs/c7e/meso-contrats.md` : 15 638 car., `docs/c7e/meso-contrats.md`
 - `ticket-abcde-3620-2/ticket.toml` : 3 110 car., `ticket.toml`
 - `projet/docs/demandes/ABCDE-3620/ABCDE-3620.feature` : 3 482 car., `docs/demandes/ABCDE-3620/ABCDE-3620.feature`
@@ -308,7 +308,7 @@ Lu par session du skill ticket-abcde-3620-2 :
 
 Lu par agent ticket-abcde-3620-2-front :
 
-- `ticket-abcde-3620-2/agents/ticket-abcde-3620-2-front.md` : 4 663 car., corps de l'agent, à son invocation
+- `ticket-abcde-3620-2/agents/ticket-abcde-3620-2-front.md` : 4 668 car., corps de l'agent, à son invocation
 - `ticket-abcde-3620/modules/champ-depot/SKILL.md` : 5 051 car., module `champ-depot` du skill racine
 - `ticket-abcde-3620-2/ticket.toml` : 3 110 car., `.gemini/skills/ticket-abcde-3620-2/ticket.toml`
 - `ticket-abcde-3620-2/modules/meso-contrats/SKILL.md` : 1 450 car., `.gemini/skills/ticket-abcde-3620-2/modules/meso-contrats/SKILL.md`
@@ -316,7 +316,7 @@ Lu par agent ticket-abcde-3620-2-front :
 - `ticket-abcde-3620-2/modules/option-frontend-fonctionnalites/SKILL.md` : 992 car., `.gemini/skills/ticket-abcde-3620-2/modules/option-frontend-fonctionnalites/SKILL.md`
 - `projet/docs/demandes/ABCDE-3620/ABCDE-3620.feature` : 3 482 car., `docs/demandes/ABCDE-3620/ABCDE-3620.feature`
 - `ticket-abcde-3620/references/agent-tdd-jira/cycle-tdd.md` : 7 359 car., `.gemini/skills/ticket-abcde-3620/references/agent-tdd-jira/cycle-tdd.md`
-- `ticket-abcde-3620-2/modules/invariants/SKILL.md` : 11 111 car., `.gemini/skills/ticket-abcde-3620-2/modules/invariants/SKILL.md`
+- `ticket-abcde-3620-2/modules/invariants/SKILL.md` : 11 105 car., `.gemini/skills/ticket-abcde-3620-2/modules/invariants/SKILL.md`
 - `ticket-abcde-3620-2/socle/SKILL.md` : 18 589 car., `.gemini/skills/ticket-abcde-3620-2/socle/SKILL.md`
 - `ticket-abcde-3620-2/references/angular.md` : 13 915 car., `.gemini/skills/ticket-abcde-3620-2/references/angular.md`
 - `projet/docs/c7e/meso-contrats.md` : 15 638 car., copie du projet du fichier d'invariants
@@ -330,7 +330,7 @@ Lu par sous-agent ticket-abcde-3620-analyste :
 
 Lu par sous-agent ticket-abcde-3620-relecteur :
 
-- `ticket-abcde-3620/agents/ticket-abcde-3620-relecteur.md` : 1 642 car., corps de l'agent, à son invocation
+- `ticket-abcde-3620/agents/ticket-abcde-3620-relecteur.md` : 1 714 car., corps de l'agent, à son invocation
 - `ticket-abcde-3620/references/java/revue.md` : 5 033 car., `.gemini/skills/ticket-abcde-3620/references/java/revue.md`
 - `ticket-abcde-3620/references/angular/revue.md` : 4 031 car., `.gemini/skills/ticket-abcde-3620/references/angular/revue.md`
 - `ticket-abcde-3620-2/references/angular.md` : 13 915 car., `references/angular.md`

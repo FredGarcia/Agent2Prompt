@@ -96,6 +96,14 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-11-17 : generateur-skill-ticket 1.1.0
+
+- **generateur-skill-ticket 1.1.0** : évolution mineure, ratifiée par le développeur, en remplacement de la recette sur des scénarios d'exemple : chaque ticket réel devient une recette et un cycle d'apprentissage.
+  - Arbre des commits : l'arbre suit la composition récursive imbriquée (CRI) de la méthode C7E, ticket et US au niveau macro, composition au niveau des méso-contrats, tâches au niveau des méso-composants, commits au niveau micro. La racine déclare les scénarios de l'US ; chaque tâche porte ses commits planifiés, un par scénario et par thème, proposés par `arbre.mjs proposer` et ratifiés avec l'arbre ; nouvel invariant D1.INV-5. Les commits portent les lignes `Tâche`, `Scénario` et `Thème` ; la ligne `Sous-ticket` reste admise pour un arbre produit avant. Le rattachement porte les scénarios et le plan ; le fichier Gherkin reprend les scénarios déclarés, contrôlés par `verifier-documents.mjs`.
+  - Apprentissage permanent, nouvelle dimension D8 et module `apprentissage` : relevé de chaque ticket classé par profondeur CRI, chaque entrée avec sa preuve ; descente notée à la qualification, remontée tirée à la clôture du champ et des écarts entre le plan des commits et la branche ; registre du projet en ajout seul et chaîné ; un motif relevé dans deux tickets devient une proposition, retenue ou refusée par le développeur seul, et deux refus le mettent en veille ; tendance par ticket. Script `apprentissage.mjs` dans la boîte à outils de la racine, exigé depuis la 1.1.0.
+  - Critères P10 et P11 ; les arbres d'exemple restent des tests de non-régression, figés (D8.INV-4).
+- Vérifications : recette de 316 tests, dont 33 de la 1.1.0 ; `tools/verifier.mjs`.
+
 ### 2026-11-09 : generateur-skill-ticket 1.0.1
 
 - **generateur-skill-ticket 1.0.1** : correctif, lot 3 de l'intégration, les corrections relevées par le bilan du prototype ; aucune dimension ni aucun invariant modifié, aucune autre spécification touchée.
