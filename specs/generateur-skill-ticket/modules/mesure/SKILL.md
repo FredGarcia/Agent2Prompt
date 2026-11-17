@@ -33,10 +33,10 @@ Les rapports des exemples changent avec les transmissions attendues, ou avec l'o
 
 ## 3. Mesure réelle sur le poste
 
-La mesure statique estime les tokens ; une mesure réelle la recale, sur le poste du développeur, avec Gemini CLI 0.67.0 et sa clé, déjà configurée, jamais demandée ni affichée. Dans un workspace d'essai de confiance où l'arbre ABCDE-3620 est installé :
+La mesure statique estime les tokens ; une mesure réelle la recale, sur le poste du développeur, avec Gemini CLI 0.67.0 et sa clé, déjà configurée, jamais demandée ni affichée. Elle se fait sur l'arbre du ticket en cours, installé dans son projet de confiance, et non sur un arbre d'exemple : chaque ticket la recale. Choisis une feuille de l'arbre ; `<skill>` est le nom de son skill, `ticket-` suivi de sa référence en minuscules, les points devenus des tirets. Les fichiers de la mesure s'écrivent dans `<travail>`, le dossier de sortie de la génération, hors du projet :
 
-1. Session de base, qui n'active aucun skill : `gemini --approval-mode plan -p "Réponds seulement : prêt." -o json > base.json`. Sans interface, Gemini CLI refuse par défaut l'activation d'un skill.
-2. Session d'activation, avec une politique qui n'autorise que l'activation, dans un fichier `calibrage.toml` hors du dépôt :
+1. Session de base, qui n'active aucun skill : `gemini --approval-mode plan -p "Réponds seulement : prêt." -o json > <travail>/base.json`. Sans interface, Gemini CLI refuse par défaut l'activation d'un skill.
+2. Session d'activation, avec une politique qui n'autorise que l'activation, dans un fichier `<travail>/calibrage.toml` :
 
    ```toml
    [[rule]]
@@ -45,10 +45,10 @@ La mesure statique estime les tokens ; une mesure réelle la recale, sur le post
    priority = 100
    ```
 
-   puis `gemini --approval-mode plan --policy calibrage.toml -p "Active le skill ticket-abcde-3620-1-1, puis réponds seulement : activé." -o json > activation.json`.
-3. `node <dépôt>/specs/generateur-skill-ticket/outils/mesurer-contexte.mjs calibrer base.json activation.json --caracteres 12566`, où 12 566 est la taille du corps du skill activé, que donne le rapport.
+   puis `gemini --approval-mode plan --policy <travail>/calibrage.toml -p "Active le skill <skill>, puis réponds seulement : activé." -o json > <travail>/activation.json`.
+3. `node <dépôt>/specs/generateur-skill-ticket/outils/mesurer-contexte.mjs calibrer <travail>/base.json <travail>/activation.json --caracteres <taille>`, où `<taille>` est la taille du corps du skill activé, que donne la ligne « `<skill>/SKILL.md` : … car., corps du skill, à son activation » du rapport de l'arbre, `mesurer <travail>/transmissions`.
 
-`calibrer` lit les statistiques des deux sorties, attend une requête pour la base et deux pour l'activation, et donne le nombre de caractères par token du skill, à comparer à quatre ; si les requêtes ne sont pas celles attendues, il le relève et ne conclut pas. Les sorties ne contiennent que la réponse et les statistiques ; aucune clé n'y figure.
+`calibrer` lit les statistiques des deux sorties, attend une requête pour la base et deux pour l'activation, et donne le nombre de caractères par token du skill, à comparer à quatre ; si les requêtes ne sont pas celles attendues, il le relève et ne conclut pas. Un écart notable à quatre se note dans le relevé du ticket, cible `generateur`, la commande pour preuve (module `apprentissage`). Les sorties ne contiennent que la réponse et les statistiques ; aucune clé n'y figure.
 
 ## 4. Recette
 

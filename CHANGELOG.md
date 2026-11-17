@@ -96,6 +96,19 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-11-17 : generateur-skill-ticket 1.1.1
+
+- **generateur-skill-ticket 1.1.1** : correctif, ce qu'a relevé la revérification de la 1.1.0, ratifié par le développeur ; aucune dimension ajoutée, aucune autre spécification touchée.
+  - Clôture d'un ticket sans sous-ticket : son skill verse aussi l'apprentissage du ticket au registre, dans sa remise, comme la racine d'un arbre dans sa clôture.
+  - Ordre de la clôture : l'apprentissage vient après le contrôle des kits et l'ouverture de la campagne d'Agent2Test, car le registre, suivi par Git, rendrait la remise périmée ; le développeur versionne ensuite le relevé et le registre, avec le dossier du ticket.
+  - `apprentissage.mjs clore` ne compte que les commits du ticket, et non ceux des tickets antérieurs que porte l'historique de la branche ; un commit planifié réalisé sur plusieurs slots n'est plus un écart, seuls deux commits sur le même slot en font un.
+  - Couches des scénarios : un scénario peut dire les couches qu'il touche, `couches`. `arbre.mjs proposer` ne le croise qu'avec les thèmes de ces couches (pour ABCDE-3512, sept commits proposés au lieu de seize), la vérification refuse un commit d'une autre couche, le rattachement porte leurs étiquettes et `verifier-documents.mjs` les contrôle dans le fichier Gherkin.
+  - Des scénarios hors de la racine, et des thèmes sur un nœud composé ou mal formés, sont refusés au lieu d'être ignorés. D1.INV-5 est remplacé par un invariant plus fort, qui ajoute ces règles sans en retirer aucune.
+  - La consigne d'une tâche ne renvoie plus à un module absent de l'arbre.
+  - Les protocoles sur le poste, P4 de l'installation et la mesure réelle, portent sur le ticket en cours, la taille du skill lue dans le rapport de son arbre ; plus aucun arbre d'exemple ni taille recopiée.
+  - Mesure : somme des contextes de 275 511 à 275 715 tokens pour ABCDE-3620, de 158 787 à 159 172 pour ABCDE-3512, toujours plus de 10 % sous le lot 7.
+- Vérifications : recette de 328 tests, dont 12 de la 1.1.1 ; `tools/verifier.mjs`.
+
 ### 2026-11-17 : generateur-skill-ticket 1.1.0
 
 - **generateur-skill-ticket 1.1.0** : évolution mineure, ratifiée par le développeur, en remplacement de la recette sur des scénarios d'exemple : chaque ticket réel devient une recette et un cycle d'apprentissage.

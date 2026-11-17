@@ -763,6 +763,9 @@ test('1.1.0 : la consigne et les agents d\'une tâche portent son plan de commit
   assert.match(agent, /\n## Commits planifiés de la tâche\n\n\| Commit \| Thème \| Scénario \| Résumé \|\n/);
   assert.equal(agent.split(lignes).length - 1, 2, 'au commit de chaque scénario et dans les règles');
   assert.doesNotMatch(consigne + agent, /Sous-ticket : /);
+  // 1.1.1 : la consigne d'une tâche ne renvoie à aucun module que l'arbre n'a pas.
+  assert.ok(transformation.includes('se disent au développeur, et la clôture de la racine les relève dans l\'apprentissage du ticket.'));
+  assert.doesNotMatch(consigne + agent, /module `apprentissage`/);
   // Sans plan, un arbre d'avant la 1.1.0 : la seule ligne « Tâche », et aucun plan.
   const sansPlan = fichiersDe(attendue('ticket-abcde-3620-1-2'));
   assert.ok(sansPlan.get('SKILL.md').includes('son corps porte la ligne `Tâche : ABCDE-3620-1.2`'));
@@ -812,6 +815,47 @@ test('1.1.0 : la clôture de la racine verse l\'apprentissage au registre et pr�
     assert.match(texte, /Rien n'entre dans le référentiel ni dans les consignes sans sa décision, et c'est lui qui le fait \(D6\.INV-2\)\./);
   }
   for (const nom of NOMS.slice(1)) assert.doesNotMatch(fichiersDe(attendue(nom)).get('SKILL.md'), /apprentissage\.mjs/, nom);
+});
+
+// ---- 1.1.1 : correctif ----
+
+test('1.1.1 : un scénario qui dit ses couches les porte au rattachement, avec leurs étiquettes, et dans la table du module documents', () => {
+  const sortie = temporaire('skills-couches-');
+  const scenarios = SCENARIOS.map(([id, titre, prouve]) => [id, titre, prouve, { S02: ['persistance', 'backend'], S04: ['backend', 'frontend'] }[id]]);
+  assert.deepStrictEqual(generer({ arbre: arbreAvecPlan({ scenarios }), sortie }).erreurs, []);
+  const racine = fichiersDe(lireTexte(join(sortie, 'transmissions', 'ticket-abcde-3620-1.0.0.md')));
+  const r = JSON.parse(racine.get('outils/rattachement.json'));
+  assert.deepStrictEqual(r.scenarios.map((x) => [x.id, x.couches, x.etiquettes]), [
+    ['ABCDE-3620-S01', undefined, undefined],
+    ['ABCDE-3620-S02', ['persistance', 'backend'], ['@back']],
+    ['ABCDE-3620-S03', undefined, undefined],
+    ['ABCDE-3620-S04', ['backend', 'frontend'], ['@back', '@front']],
+  ]);
+  const documents = racine.get('modules/documents/SKILL.md');
+  assert.match(documents, /chacun avec les critères d'acceptation qu'il éprouve et les étiquettes des couches qu'il touche, quand l'arbre les dit\./);
+  assert.ok(documents.includes('| `@ABCDE-3620-S04` | Lignes et résumé tenus à jour en temps réel | `@ABCDE-3620-CA05` | `@back`, `@front` |'));
+  assert.ok(documents.includes('| `@ABCDE-3620-S01` | Sans paramètre, la commande est servie inchangée | `@ABCDE-3620-CA01` | — |'));
+  // Sans couches, ni colonne ni étiquettes : le rattachement de la 1.1.0.
+  assert.doesNotMatch(avecPlan()('ticket-abcde-3620').get('modules/documents/SKILL.md'), /\| Couches \|/);
+});
+
+test('1.1.1 : un ticket sans sous-ticket verse aussi son apprentissage à sa clôture, après la campagne d\'Agent2Test, et ne le commite pas', () => {
+  const unSeul = fichiersDe(lireTexte(join(ICI, '..', 'exemples', 'ABCDE-3512-skills', 'transmissions', 'ticket-abcde-3512-1.0.0.md'))).get('SKILL.md');
+  const remise = extraireSection(unSeul, '8');
+  const outil = 'node .gemini/skills/ticket-abcde-3512/outils/apprentissage.mjs';
+  for (const commande of ['clore ABCDE-3512', 'registre proposer', 'registre decider <n> --decision retenue|refusee --par <nom> --raison <texte>']) assert.ok(remise.includes(`\`${outil} ${commande}\``), commande);
+  assert.equal(unSeul.split('apprentissage.mjs clore').length - 1, 1, 'une seule clôture d\'apprentissage');
+  // Dans l'ordre : la remise à Agent2Test, l'apprentissage, puis le ticket clos.
+  const ou = (motif) => remise.search(motif);
+  assert.ok(ou(/Donne au développeur la remise à Agent2Test/) < ou(/Enfin, l'apprentissage du ticket/));
+  assert.ok(ou(/Enfin, l'apprentissage du ticket/) < ou(/Le ticket est alors clos/));
+  // Dans un ticket seul comme à la racine d'un arbre : après le contrôle des kits et l'ouverture de la campagne,
+  // qu'un registre suivi et modifié rendrait périmée ; relevé et registre se commitent ensuite, par le développeur.
+  for (const texte of [remise, extraireSection(fichiersDe(attendue('ticket-abcde-3620')).get('SKILL.md'), '7')]) {
+    assert.match(texte, /une fois les kits contrôlés sans écart et la campagne d'Agent2Test ouverte, ou le développeur ayant dit qu'il n'en ouvre pas/);
+    assert.match(texte, /modifié avant l'ouverture de la campagne, il rendrait la remise périmée \(agent2test, module echange, § 4\)/);
+    assert.match(texte, /se commitent après la campagne, par le développeur, avec le dossier du ticket ; ce skill ne les commite pas\./);
+  }
 });
 
 // ---- Ligne de commande et installateur ----

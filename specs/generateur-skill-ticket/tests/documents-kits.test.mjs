@@ -3,7 +3,7 @@
 // remise suit le format fermé agent2test.remise/1 (P9). Les contrôles se font avec les copies que livre le
 // skill racine, sur le projet d'exemple résolu, puis sur des altérations de ce projet ; l'historique Git du
 // kit dev se reconstruit à l'identique dans un dépôt temporaire. En 1.1.0, les scénarios déclarés par
-// l'arbre et les lignes « Tâche » et « Scénario » des commits.
+// l'arbre et les lignes « Tâche » et « Scénario » des commits ; en 1.1.1, les étiquettes de leurs couches.
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -116,6 +116,10 @@ test('P8 : chaque scénario que déclare l\'arbre est dans le fichier Gherkin, s
   assert.deepStrictEqual(controlerDocuments(dossier, declares((x) => { x.push({ id: 'ABCDE-3620-S09', titre: 'Absent', ca: ['ABCDE-3620-CA01'] }); }), CONTROLEUR).ecarts, ['ABCDE-3620-S09 déclaré par l\'arbre, absent du fichier Gherkin']);
   assert.deepStrictEqual(controlerDocuments(dossier, declares((x) => { x[0].titre = 'Un autre titre'; }), CONTROLEUR).ecarts, ["ABCDE-3620-S01 : titre « Sans paramètre, la réponse reste celle d'avant le ticket », attendu « Un autre titre »"]);
   assert.deepStrictEqual(controlerDocuments(dossier, declares((x) => { x[1].ca.push('ABCDE-3620-CA02'); }), CONTROLEUR).ecarts, ['ABCDE-3620-S05 : n\'éprouve pas ABCDE-3620-CA02, que l\'arbre lui attribue']);
+  // 1.1.1 : un scénario qui dit ses couches porte l'étiquette de chacune.
+  const couches = (k, c, e) => (x) => Object.assign(x[k], { couches: c, etiquettes: e });
+  assert.deepStrictEqual(controlerDocuments(dossier, declares(couches(1, ['backend', 'frontend'], ['@back', '@front'])), CONTROLEUR).ecarts, []);
+  assert.deepStrictEqual(controlerDocuments(dossier, declares(couches(0, ['persistance', 'frontend'], ['@back', '@front'])), CONTROLEUR).ecarts, ['ABCDE-3620-S01 : ne porte pas @front, l\'étiquette d\'une couche qu\'il touche selon l\'arbre (persistance, frontend)']);
 });
 
 test('P8 : une image de l\'objectif d\'une feuille doit figurer parmi les pièces de demande.json', () => {

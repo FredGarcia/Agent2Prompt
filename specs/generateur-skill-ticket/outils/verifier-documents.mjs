@@ -12,8 +12,9 @@
 // porte, parmi ses pièces, chaque image de l'objectif des feuilles ; chaque critère de la racine est repris
 // mot pour mot sous son identifiant <CLÉ>-CAnn ; chaque critère d'un sous-ticket se rattache à un critère
 // <CLÉ>-CAnn illustré par au moins un scénario, et, pour une feuille, par un scénario qui porte l'étiquette
-// de sa couche. Rien n'est modifié. Code de sortie 1 au moindre écart. Node 20 ou plus récent, modules
-// natifs uniquement.
+// de sa couche ; chaque scénario que déclare l'arbre (1.1.0) est dans le fichier Gherkin, sous son titre,
+// avec ses critères et, s'il dit ses couches (1.1.1), avec leurs étiquettes. Rien n'est modifié. Code de
+// sortie 1 au moindre écart. Node 20 ou plus récent, modules natifs uniquement.
 
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
@@ -148,6 +149,8 @@ export function controlerDocuments(dossier, rattachement, controleur) {
     }
     if (lu.titre.trim() !== d.titre.trim()) ecarts.push(`${d.id} : titre « ${lu.titre.trim()} », attendu « ${d.titre} »`);
     for (const ca of d.ca) if (!lu.etiquettes.includes(`@${ca}`)) ecarts.push(`${d.id} : n'éprouve pas ${ca}, que l'arbre lui attribue`);
+    // Depuis la 1.1.1 : l'étiquette de chaque couche que le scénario touche, selon l'arbre.
+    for (const e of d.etiquettes ?? []) if (!lu.etiquettes.includes(e)) ecarts.push(`${d.id} : ne porte pas ${e}, l'étiquette d'une couche qu'il touche selon l'arbre (${(d.couches ?? []).join(', ')})`);
   }
   return {
     ecarts,

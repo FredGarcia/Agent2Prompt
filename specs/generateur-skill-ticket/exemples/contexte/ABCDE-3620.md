@@ -38,14 +38,14 @@ Les pourcentages rapportent chaque taille à celle du point d'entrée de l'orche
 
 | Mesure | Au plus |
 |---|---|
-| plus grand contexte de l'arbre, session du skill ticket-abcde-3620 | 27 499 tokens, 44 % |
-| somme des 20 contextes des 5 nœuds et des observateurs | 275 511 tokens, 439 % |
+| plus grand contexte de l'arbre, session du skill ticket-abcde-3620 | 27 702 tokens, 44 % |
+| somme des 20 contextes des 5 nœuds et des observateurs | 275 715 tokens, 440 % |
 
 Aucun contexte de l'arbre ne charge plus que le pourcentage du plus grand ; la somme dit ce que l'arbre lit en tout, quand chaque contexte relit ce qu'il lui faut, au plus.
 
 ## Relectures
 
-Sur la somme des contextes de l'arbre, 131 664 tokens (48 %) viennent de fichiers lus dans plusieurs contextes ; lus une seule fois chacun, les fichiers de l'arbre feraient 143 848 tokens, 229 % du point d'entrée de l'orchestrateur.
+Sur la somme des contextes de l'arbre, 131 664 tokens (48 %) viennent de fichiers lus dans plusieurs contextes ; lus une seule fois chacun, les fichiers de l'arbre feraient 144 051 tokens, 230 % du point d'entrée de l'orchestrateur.
 
 | Fichier | Contextes qui le lisent | Relu, au plus |
 |---|---|---|
@@ -87,7 +87,7 @@ Ils coordonnent leurs sous-tickets, ratifient et, pour la racine, font rédiger 
 
 | Nœud | Session, au plus | Somme des contextes |
 |---|---|---|
-| ABCDE-3620, racine | 27 499 tokens, 44 % | 53 496 tokens, 85 % |
+| ABCDE-3620, racine | 27 702 tokens, 44 % | 53 699 tokens, 86 % |
 | ABCDE-3620-1, composé | 15 496 tokens, 25 % | 15 496 tokens, 25 % |
 
 ## Observateurs de l'arbre, sur attente
@@ -105,20 +105,20 @@ Invoqués par le skill d'un nœud quand le champ attend une observation d'ordre 
 
 | Contexte | À l'activation | Au plus |
 |---|---|---|
-| session du skill ticket-abcde-3620 | 20 953 car., 5 239 tokens | 109 995 car., 27 499 tokens |
+| session du skill ticket-abcde-3620 | 21 531 car., 5 383 tokens | 110 808 car., 27 702 tokens |
 | sous-agent ticket-abcde-3620-redacteur | 2 831 car., 708 tokens | 103 988 car., 25 997 tokens |
 
 Lu par session du skill ticket-abcde-3620 :
 
 - `noms et descriptions des 5 skills et des agents installés` : 3 458 car., chargés au démarrage de Gemini CLI
-- `ticket-abcde-3620/SKILL.md` : 17 495 car., corps du skill, à son activation
+- `ticket-abcde-3620/SKILL.md` : 18 073 car., corps du skill, à son activation
 - `ticket-abcde-3620/modules/meso-contrats/SKILL.md` : 2 047 car., module `meso-contrats`
 - `ticket-abcde-3620/modules/vue/SKILL.md` : 5 274 car., modules `vue` et `champ` du skill racine
 - `ticket-abcde-3620/modules/champ/SKILL.md` : 9 925 car., modules `vue` et `champ` du skill racine
 - `ticket-abcde-3620/modules/documents/SKILL.md` : 7 917 car., module `documents`
 - `ticket-abcde-3620/modules/sous-tickets/SKILL.md` : 2 116 car., module `sous-tickets`
 - `ticket-abcde-3620/modules/recette/SKILL.md` : 1 584 car., modules `sous-tickets` et `recette`
-- `ticket-abcde-3620/modules/kits/SKILL.md` : 7 464 car., module `kits`
+- `ticket-abcde-3620/modules/kits/SKILL.md` : 7 699 car., module `kits`
 - `ticket-abcde-3620/modules/invariants/SKILL.md` : 11 203 car., module `invariants`
 - `ticket-abcde-3620/modules/methode/SKILL.md` : 6 883 car., module `methode`
 - `projet/docs/c7e/meso-contrats.md` : 15 638 car., `docs/c7e/meso-contrats.md`

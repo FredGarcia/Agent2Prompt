@@ -11,7 +11,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { lireTexte } from '../outils/referentiel.mjs';
-import { chargerSources } from '../outils/sources.mjs';
+import { chargerSources, extraireSection } from '../outils/sources.mjs';
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const SPEC = join(ICI, '..');
@@ -70,6 +70,17 @@ test('spécification : les outils que citent la consigne et les modules existent
   assert.ok(outils.size >= 5, [...outils].join(', '));
   for (const nom of outils) assert.ok(existsSync(join(SPEC, 'outils', nom)), `outils/${nom}`);
   for (const [, chemin] of textes.matchAll(/`((?:exemples|tests)\/[^`\s]+)`/g)) assert.ok(existsSync(join(SPEC, ...chemin.split('/'))), chemin);
+});
+
+test('1.1.1 : les protocoles sur le poste portent sur le ticket en cours, sans arbre d\'exemple ni taille recopiée', () => {
+  const module = (id) => texteDe(MANIFESTE.modules.find((m) => m.id === id));
+  const protocoles = { installation: extraireSection(module('installation'), '4'), mesure: extraireSection(module('mesure'), '3') };
+  for (const [id, texte] of Object.entries(protocoles)) {
+    assert.match(texte, /ticket (réel|en cours)/, `${id} : sur le ticket réel`);
+    assert.doesNotMatch(texte, /exemples\/|ABCDE-|abcde-/, `${id} : aucun arbre d'exemple`);
+    assert.doesNotMatch(texte, /--caracteres \d/, `${id} : la taille se lit dans le rapport de l'arbre`);
+    assert.match(texte, /relevé du ticket/, `${id} : un écart se note dans le relevé`);
+  }
 });
 
 test('spécification : les skills référencés sont ceux dont héritent les skills de ticket, aux versions qu\'épinglent leurs sources', () => {
