@@ -36,13 +36,13 @@ function recette(texte) {
   return lignes;
 }
 
-test('spécification : version du point d\'entrée, de son titre et du manifeste ; sept dimensions actives, un module chacune', () => {
+test('spécification : version du point d\'entrée, de son titre et du manifeste ; huit dimensions actives, un module chacune', () => {
   assert.equal(MANIFESTE.name, 'generateur-skill-ticket');
   assert.match(ENTREE, new RegExp(`^version: ${MANIFESTE.version.replace(/\./g, '\\.')}$`, 'm'));
   assert.match(ENTREE, new RegExp(`^# Générateur de skills de ticket C7E, version ${MANIFESTE.version.replace(/\./g, '\\.')}$`, 'm'));
-  assert.deepStrictEqual(MANIFESTE.modules.map((m) => m.dimensions.join()), ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7']);
+  assert.deepStrictEqual(MANIFESTE.modules.map((m) => m.dimensions.join()), ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8']);
   assert.ok(MANIFESTE.modules.every((m) => m.status === 'active'));
-  assert.equal(DEFINITIONS.length, 24);
+  assert.equal(DEFINITIONS.length, 29);
 });
 
 test('spécification : chaque invariant a sa ligne de recette dans le module de sa dimension, et chaque test cité existe sous ce titre', () => {

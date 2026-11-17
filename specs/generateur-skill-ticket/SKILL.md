@@ -1,12 +1,12 @@
 ---
 name: generateur-skill-ticket
-description: Générateur de skills de ticket C7E, qui fait résoudre un ticket par un arbre de skills produits pour lui. Il décompose le ticket en sous-tickets, assemble pour chaque nœud un skill depuis le référentiel des méso-contrats de l'orchestrateur C7E, l'installe et le lance dans Gemini CLI, nœud par nœud ; chaque skill s'observe dans un champ partagé et voit le ticket augmenté. À utiliser depuis un clone du dépôt Agent2Prompt.
-version: 1.0.1
+description: Générateur de skills de ticket C7E, qui fait résoudre un ticket par un arbre de skills produits pour lui. Il décompose le ticket en sous-tickets, assemble pour chaque nœud un skill depuis le référentiel des méso-contrats de l'orchestrateur C7E, l'installe et le lance dans Gemini CLI, nœud par nœud ; chaque skill s'observe dans un champ partagé et voit le ticket augmenté ; chaque ticket entraîne le générateur, qui s'observe lui-même et propose ses évolutions au développeur. À utiliser depuis un clone du dépôt Agent2Prompt.
+version: 1.1.0
 ---
 
-# Générateur de skills de ticket C7E, version 1.0.1
+# Générateur de skills de ticket C7E, version 1.1.0
 
-Ce document est le point d'entrée du générateur. Un ticket n'y est plus résolu directement par l'orchestrateur C7E : il l'est par un **arbre de skills de ticket**, un par nœud, produits pour lui sur le même modèle fractal et récursif. Le générateur fait qualifier et décomposer le ticket, vérifie l'arbre, assemble chaque skill depuis les blocs ratifiés du référentiel des méso-contrats, l'installe dans Gemini CLI et le lance ; ensuite, chaque nœud se résout dans sa propre session, par son skill et ses agents. Chaque skill s'observe par rapport aux retours du développeur, ses choix et ses corrections, dans un champ d'observation partagé, et chaque niveau voit le ticket augmenté des observations des autres. Les règles détaillées sont dans `modules/`.
+Ce document est le point d'entrée du générateur. Un ticket n'y est plus résolu directement par l'orchestrateur C7E : il l'est par un **arbre de skills de ticket**, un par nœud, produits pour lui sur le même modèle fractal et récursif. Le générateur fait qualifier et décomposer le ticket, vérifie l'arbre, assemble chaque skill depuis les blocs ratifiés du référentiel des méso-contrats, l'installe dans Gemini CLI et le lance ; ensuite, chaque nœud se résout dans sa propre session, par son skill et ses agents. Chaque skill s'observe par rapport aux retours du développeur, ses choix et ses corrections, dans un champ d'observation partagé, et chaque niveau voit le ticket augmenté des observations des autres. L'arbre suit la composition récursive imbriquée (CRI) de la méthode C7E : le ticket et son US au niveau macro, la composition au niveau des méso-contrats, les tâches au niveau des méso-composants, les commits de la branche au niveau micro ; le besoin y descend, les preuves y remontent. Chaque ticket est aussi une recette et un cycle d'apprentissage : le générateur s'observe lui-même, classe ce qu'il apprend par profondeur, et propose ses évolutions au développeur, qui seul les promeut. Les règles détaillées sont dans `modules/`.
 
 Le générateur dépend de l'orchestrateur C7E, à une version épinglée, et ne le modifie pas. Le skill de ticket tient lieu de fiche de transformation : le module `invariants` de chaque skill fait correspondre chaque invariant de l'orchestrateur qui parle de la fiche à ce qui le tient dans le skill. Le générateur est issu d'un prototype en sept lots ; l'histoire de sa conception est dans `PROTOTYPE.md`, son bilan dans `BILAN.md`, à côté de ce document dans le dépôt, non transmis.
 
@@ -14,7 +14,7 @@ Le générateur dépend de l'orchestrateur C7E, à une version épinglée, et ne
 
 1. Ce document, en entier.
 2. `manifest.json` : modules, et versions des skills du dépôt dont héritent les skills de ticket.
-3. Les modules, dans l'ordre du déroulé : `arbre`, `assemblage`, `installation` ; pour suivre un arbre installé, `documents-kits`, `champ` et `vue` ; `mesure` pour mesurer le contexte d'un arbre.
+3. Les modules, dans l'ordre du déroulé : `arbre`, `assemblage`, `installation` ; pour suivre un arbre installé, `documents-kits`, `champ` et `vue` ; `mesure` pour mesurer le contexte d'un arbre ; `apprentissage` pour qualifier un ticket et clore un arbre.
 4. Dans le clone du dépôt, pour qualifier un ticket : les modules `qualification` et `referentiel` de l'orchestrateur, `<dépôt>/specs/orchestrateur-c7e/modules/qualification/SKILL.md` et `<dépôt>/specs/orchestrateur-c7e/modules/referentiel/SKILL.md`.
 
 ## 2. Ce que fait le générateur
@@ -30,12 +30,13 @@ flowchart LR
   G --> I["installer-arbre.mjs<br/>installer, verifier"]
   I --> L["lancer la racine<br/>documents, ratification"]
   L --> N["chaque nœud<br/>dans sa session"]
-  N --> R["retirer<br/>transmissions archivées"]
+  N --> C["clore<br/>apprentissage versé<br/>au registre"]
+  C --> R["retirer<br/>transmissions archivées"]
 ```
 
 Le partage du travail est strict :
 
-- **Ce que le modèle écrit** : la partie propre au ticket, dans les tickets de l'arbre. La demande, avec ses dix-sept possibilités et leurs sources, qui fixe la composition par la règle de choix du référentiel ; l'objectif et les critères de chaque nœud, et ce que chaque critère soutient chez le parent ; les options des feuilles, prises aux catalogues du référentiel (D1.INV-3, D2.INV-1).
+- **Ce que le modèle écrit** : la partie propre au ticket, dans les tickets de l'arbre. La demande, avec ses dix-sept possibilités et leurs sources, qui fixe la composition par la règle de choix du référentiel ; l'objectif et les critères de chaque nœud, et ce que chaque critère soutient chez le parent ; les options des feuilles, prises aux catalogues du référentiel ; les scénarios de l'US et le plan des commits de chaque tâche, que `arbre.mjs proposer` lui propose (D1.INV-3, D1.INV-5, D2.INV-1).
 - **Ce que les outils assemblent** : tout le reste. Méso-contrats et options copiés du référentiel puis paramétrés, sections de méthode et invariants de l'orchestrateur mot pour mot, socle et référentiels de la pile, boîte à outils de l'arbre, agents, commandes : du code sur des fichiers, déterministe, sans token consommé (D2.INV-1 à D2.INV-3).
 
 Les outils se lancent depuis le clone du dépôt Agent2Prompt du développeur, `<dépôt>`, avec Node 20 ou plus récent, sans dépendance : `node <dépôt>/specs/generateur-skill-ticket/outils/<outil>.mjs`. Ils lisent les sources dont héritent les skills de ticket dans ce clone, à leurs versions épinglées, archives comprises. La transmission du générateur porte sa consigne et ses modules ; ses outils, sa recette et ses exemples restent dans le dépôt.
@@ -44,13 +45,13 @@ Les outils se lancent depuis le clone du dépôt Agent2Prompt du développeur, `
 
 Prérequis : le chemin du clone, `<dépôt>`, que tu demandes au développeur s'il n'est pas connu ; le projet, dossier où Gemini CLI 0.67.0 est lancé, que le développeur a marqué de confiance ; la clé du ticket racine, `<clé>`. Si le projet a sa copie du fichier d'invariants, `docs/c7e/meso-contrats.md`, ou son référentiel, `docs/c7e/referentiel-meso-contrats.toml`, les commandes les prennent par `--invariants-projet` et `--referentiel`.
 
-1. **Qualifier** le ticket racine selon le module `qualification` de l'orchestrateur : demande complète et sourcée, composition donnée par la règle de choix du référentiel, critères vérifiables. Une possibilité dont la réponse changerait la composition ne reste pas `inconnu` : demande au développeur.
-2. **Décomposer**, quand la demande touche plusieurs couches ou fonctionnalités qu'un seul skill traiterait mal : un fichier TOML par nœud dans `docs/demandes/<clé>/arbre/`, au format du module `arbre`. Chaque sous-ticket se qualifie comme la racine ; chacun de ses critères soutient un critère de son parent direct ; les options vont sur les feuilles seulement. Un ticket simple reste un seul nœud, racine et feuille.
-3. **Vérifier** : `node <dépôt>/specs/generateur-skill-ticket/outils/arbre.mjs verifier docs/demandes/<clé>/arbre`, jusqu'à zéro écart ; chaque écart dit la règle et le nœud. Puis `arbre.mjs plan` sur le même dossier : présente au développeur l'arbre, les méso-contrats, l'ordre de résolution et les critères, et corrige l'arbre s'il le demande.
-4. **Générer**, quand il le demande : `node <dépôt>/specs/generateur-skill-ticket/outils/generer.mjs generer docs/demandes/<clé>/arbre --sortie <travail>`, où `<travail>` est un dossier de travail hors du projet. Rien n'est écrit au moindre écart, et aucun skill de l'arbre n'est écrit si l'un d'eux omet ou affaiblit un invariant (D2.INV-2).
+1. **Qualifier** le ticket racine selon le module `qualification` de l'orchestrateur : demande complète et sourcée, composition donnée par la règle de choix du référentiel, critères vérifiables. Une possibilité dont la réponse changerait la composition ne reste pas `inconnu` : demande au développeur. Chaque écart au référentiel que tu rencontres, possibilité qu'il n'a pas, catégorie dont le nom ne dit pas l'intention, partie du ticket sans couche ni méso-contrat, se note dans le relevé du ticket, à sa profondeur et avec sa preuve : `node <dépôt>/specs/generateur-skill-ticket/outils/apprentissage.mjs noter <clé> …` (module `apprentissage`).
+2. **Décomposer**, quand la demande touche plusieurs couches ou fonctionnalités qu'un seul skill traiterait mal : un fichier TOML par nœud dans `docs/demandes/<clé>/arbre/`, au format du module `arbre`. Chaque sous-ticket se qualifie comme la racine ; chacun de ses critères soutient un critère de son parent direct ; les options vont sur les feuilles seulement. Un ticket simple reste un seul nœud, racine et feuille. La racine déclare les scénarios de l'US ; `arbre.mjs proposer` propose ensuite les commits de chaque tâche, un par scénario et par thème, que tu recopies et ajustes (module `arbre`, section 4).
+3. **Vérifier** : `node <dépôt>/specs/generateur-skill-ticket/outils/arbre.mjs verifier docs/demandes/<clé>/arbre`, jusqu'à zéro écart ; chaque écart dit la règle et le nœud. Puis `arbre.mjs plan` sur le même dossier : présente au développeur l'arbre, les méso-contrats, l'ordre de résolution, les critères et le plan des commits, et corrige l'arbre s'il le demande ; un nœud refusé en chemin se note dans le relevé.
+4. **Générer**, quand il le demande : `node <dépôt>/specs/generateur-skill-ticket/outils/generer.mjs generer docs/demandes/<clé>/arbre --sortie <travail>`, où `<travail>` est un dossier de travail hors du projet. Rien n'est écrit au moindre écart, et aucun skill de l'arbre n'est écrit si l'un d'eux omet ou affaiblit un invariant (D2.INV-2). Mesure ensuite l'arbre (module `mesure`) et note son coût : `apprentissage.mjs qualifier <clé> --cout <pourcentage> --preuve commande:<commande>`.
 5. **Installer**, depuis le projet : `node <dépôt>/specs/generateur-skill-ticket/outils/installer-arbre.mjs installer <travail>/transmissions`, puis `verifier <clé>` : skills découverts, agents chargés. Tout est masqué à Git (D3.INV-2).
 6. **Lancer** la racine : `installer-arbre.mjs lancer <clé>`, ou la commande `/ticket:<clé en minuscules>` dans Gemini CLI. Le skill racine prend la suite : il fait rédiger les documents de la clé, présente l'arbre avec eux, et attend la ratification du développeur, qu'il dépose dans le champ d'observation (D3.INV-3). Il indique ensuite le prochain nœud prêt et sa commande ; chaque nœud se lance dans sa propre session.
-7. **Suivre et clore** : `installer-arbre.mjs liste` donne l'état de chaque nœud, du champ et de la vue. À la clôture de la racine, kits et remise faits, `installer-arbre.mjs retirer <clé>` archive les transmissions dans `docs/demandes/<clé>/skills/` et retire l'arbre.
+7. **Suivre et clore** : `installer-arbre.mjs liste` donne l'état de chaque nœud, du champ et de la vue. À la clôture de la racine, kits et remise faits, le skill racine verse l'apprentissage du ticket au registre du projet et présente au développeur les propositions qu'il en tire (module `apprentissage`) ; puis `installer-arbre.mjs retirer <clé>` archive les transmissions dans `docs/demandes/<clé>/skills/` et retire l'arbre.
 
 Le générateur ne corrige jamais un skill de ticket à la main : une correction passe par l'arbre, puis par une nouvelle génération. Il n'active lui-même aucun skill de ticket : la ratification et la résolution appartiennent aux skills de l'arbre, sous le regard du développeur.
 
@@ -58,7 +59,7 @@ Le générateur ne corrige jamais un skill de ticket à la main : une correction
 
 | Outil | Commandes | Module |
 |---|---|---|
-| `arbre.mjs` | `verifier <arbre>`, `plan <arbre>` | `arbre` |
+| `arbre.mjs` | `verifier <arbre>`, `plan <arbre>`, `proposer <arbre>` | `arbre` |
 | `generer.mjs` | `generer <arbre> --sortie <dossier>`, `verifier <transmissions>` | `assemblage` |
 | `installer-arbre.mjs` | `installer`, `liste`, `verifier`, `lancer`, `retirer` | `installation` |
 | `verifier-documents.mjs`, `verifier-kits.mjs` | contrôles des documents de la clé et des kits ; livrés dans le skill racine | `documents-kits` |
@@ -66,6 +67,7 @@ Le générateur ne corrige jamais un skill de ticket à la main : une correction
 | `invariants.mjs` | `comparer <skill>` ; livré dans le skill racine | `documents-kits` |
 | `vue.mjs` | `generer [--noeud] [--json]`, `verifier` ; livré dans le skill racine | `vue` |
 | `mesurer-contexte.mjs` | `mesurer <transmissions>`, `calibrer` | `mesure` |
+| `apprentissage.mjs` | `noter`, `qualifier`, `clore`, `registre` ; livré dans le skill racine | `apprentissage` |
 
 Options communes : `--referentiel <chemin>` lit le référentiel d'un projet au lieu du modèle de l'orchestrateur ; `--profondeur-max <n>` change le plafond de profondeur ; `--invariants-projet <chemin>` donne la copie du projet du fichier d'invariants. Code de sortie 1 au moindre écart, 2 pour un usage incorrect. Sous Windows, les mêmes commandes passent dans PowerShell ; une extraction en fins de ligne CRLF donne les mêmes skills, octet pour octet.
 
@@ -78,14 +80,14 @@ Options communes : `--referentiel <chemin>` lit le référentiel d'un projet au 
 | Engendrent | les soutiens entre critères, les dépendances entre tickets, les héritages de chaque skill | `arbre`, `assemblage` |
 | État | l'état de chaque nœud, l'état de chaque critère dans le champ d'observation | `installation`, `champ` |
 | Expression | les transmissions des skills, les documents de la clé, les kits, la vue augmentée | `assemblage`, `documents-kits`, `vue` |
-| Évolutif | les observations d'ordre 2 et 3, le registre des concepts, les versions du générateur, la mesure du contexte | `champ`, `mesure` |
+| Évolutif | les observations d'ordre 2 et 3, le registre des concepts, l'apprentissage de chaque ticket et ses propositions, les versions du générateur, la mesure du contexte | `champ`, `apprentissage`, `mesure` |
 | Environnement | Gemini CLI, le développeur qui ratifie et corrige, Agent2Test qui reçoit la remise | `installation`, `documents-kits` |
 
 Clause de second ordre : un niveau agit sur la manière d'observer du niveau inférieur, jamais sur son objet. L'ordre 2 propose une adaptation de la méthode, jamais une action sur le code ; toute observation remonte avec sa preuve ; la référence d'une auto-observation est un retour du développeur ou une preuve, jamais l'auto-évaluation seule ; toute adaptation durable passe par le développeur (D5.INV-2, D5.INV-3).
 
 ## 6. Registre des dimensions
 
-| ID | Dimension | Introduite | Statut 1.0.0 | Dépend de | Module |
+| ID | Dimension | Introduite | Statut 1.1.0 | Dépend de | Module |
 |---|---|---|---|---|---|
 | D1 | Arbre de tickets | 1.0 | active | orchestrateur-c7e | `arbre` |
 | D2 | Assemblage et transmission des skills de ticket | 1.0 | active | D1 | `assemblage` |
@@ -94,6 +96,7 @@ Clause de second ordre : un niveau agit sur la manière d'observer du niveau inf
 | D5 | Champ d'observation | 1.0 | active | D3 | `champ` |
 | D6 | Vue augmentée | 1.0 | active | D4, D5 | `vue` |
 | D7 | Contexte chargé | 1.0 | active | D2 | `mesure` |
+| D8 | Apprentissage permanent | 1.1 | active | D1, D5 | `apprentissage` |
 
 ## 7. Contrat de version et points d'extension
 
@@ -103,20 +106,20 @@ Points d'extension, actifs dès 1.0.0 :
 
 - **E1** : fabriques par pile. La fabrique abstraite produit la famille de fichiers d'un nœud et laisse à une fabrique concrète les crochets de la pile : référentiels, agents de couche, commandes de test. La 1.0.0 n'a que la fabrique `java-angular-postgresql` ; une autre pile s'ajoute par une fabrique concrète, sans toucher au Monteur. La fabrique abstraite seule ne produit rien.
 - **E2** : exécuteur. La 1.0.0 lance chaque nœud dans Gemini CLI 0.67.0 ; la place d'un autre exécuteur, le binôme Agent2Dev et Agent2Test ou n8n, est réservée : l'installateur n'en accepte aucun autre.
-- **E3** : formats propres au générateur. Le champ (`skill-ticket.observation/1`), la vue (`skill-ticket.vue/1`), les kits (`skill-ticket.kit/1`), le rattachement des critères (`skill-ticket.rattachement/1`), le relevé d'installation (`skill-ticket.installation/1`) et la mesure du contexte (`skill-ticket.contexte/1`) sont des formats versionnés, fermés pour ceux qu'on dépose ; ils sont prêts à devenir un socle d'observation partagé, inclus et épinglé comme le socle back-front.
+- **E3** : formats propres au générateur. Le champ (`skill-ticket.observation/1`), la vue (`skill-ticket.vue/1`), les kits (`skill-ticket.kit/1`), le rattachement des critères (`skill-ticket.rattachement/1`), le relevé d'installation (`skill-ticket.installation/1`), la mesure du contexte (`skill-ticket.contexte/1`), le relevé d'apprentissage (`generateur.releve/1`) et le registre d'apprentissage (`generateur.apprentissage/1`) sont des formats versionnés, fermés pour ceux qu'on dépose ; ils sont prêts à devenir un socle d'observation partagé, inclus et épinglé comme le socle back-front.
 
 ## 8. Règles globales
 
 - **L'orchestrateur ne change pas** : le générateur ne modifie aucune spécification du dépôt. Dans le projet, il n'écrit que les tickets de l'arbre, `docs/demandes/<clé>/arbre/` ; l'installateur y ajoute ce qu'il masque à Git, et les skills de l'arbre ce que leur consigne leur fait écrire.
 - **Un skill de ticket est immuable** : il reste identique à sa transmission. Une ambiguïté ou une contradiction dans un skill se signale au développeur ; la correction passe par l'arbre et une nouvelle génération.
-- **Le développeur décide** : il valide l'arbre avant la génération, ratifie l'arbre et chaque feuille dans les skills, retient ou refuse chaque proposition d'ordre 2, tranche chaque désaccord. Aucune approbation automatique, aucun dossier rendu de confiance à sa place (D3.INV-4).
+- **Le développeur décide** : il valide l'arbre avant la génération, ratifie l'arbre et chaque feuille dans les skills, retient ou refuse chaque proposition d'ordre 2 et chaque proposition d'apprentissage, tranche chaque désaccord, et promeut lui-même ce qu'il retient dans le référentiel ou les consignes. Aucune approbation automatique, aucun dossier rendu de confiance à sa place (D3.INV-4).
 - **Sécurité** : aucun jeton, aucune clé n'est demandé au développeur ni affiché, consigné, versionné ou passé en argument ; le jeton SonarQube passe par la seule variable `SONAR_TOKEN`, et rien ne s'écrit vers SonarQube sans sa validation explicite ; la clé de Gemini CLI reste celle de son installation.
 - **Git** : les skills de l'arbre commitent sur une seule branche, celle de la clé racine ; aucun d'eux ne pousse, ne fusionne, ne rebase ni ne pose d'étiquette.
 - **Langue** : consignes, documents de la clé et remises en français.
 
 ## 9. Critères d'acceptation
 
-La recette du générateur, `node --test "specs/generateur-skill-ticket/tests/*.test.mjs"` depuis la racine du dépôt (Node 22 ou plus récent), les vérifie sur deux arbres d'exemple, ABCDE-3620 sur trois niveaux et ABCDE-3512 en un seul ticket :
+La recette du générateur, `node --test "specs/generateur-skill-ticket/tests/*.test.mjs"` depuis la racine du dépôt (Node 22 ou plus récent), les vérifie sur deux arbres d'exemple, ABCDE-3620 sur trois niveaux et ABCDE-3512 en un seul ticket, figés comme tests de non-régression ; le générateur ne s'y règle pas, il apprend de chaque ticket réel (P11) :
 
 - **P1** : un arbre conforme passe le vérificateur ; deux parents, un cycle, une dépendance vers un ancêtre, une profondeur au-delà du plafond, une possibilité du parent portée par aucun sous-ticket, une option hors de la composition et un invariant omis sont rejetés.
 - **P2** : chaque skill se relit à l'identique depuis sa transmission, et la même entrée redonne les mêmes fichiers ; l'assemblage ne consomme aucun token.
@@ -127,6 +130,8 @@ La recette du générateur, `node --test "specs/generateur-skill-ticket/tests/*.
 - **P7** : le contexte chargé pour résoudre une feuille est mesuré et comparé à celui du point d'entrée de l'orchestrateur ; la mesure réelle se fait sur le poste (module `mesure`).
 - **P8** : les documents de la clé passent `controler-criteres.mjs` d'agent-tdd-jira sans écart ; chaque critère d'un sous-ticket se rattache à un critère `<CLÉ>-CAnn` et à au moins un scénario.
 - **P9** : chaque kit est complet et vérifiable ; la remise est conforme au schéma fermé `agent2test.remise/1`.
+- **P10** : l'arbre est le plan des commits de la branche : chaque scénario de l'US est réalisé par un commit planifié d'une tâche qui en soutient les critères, chaque commit porte un thème et au plus un scénario, et ses lignes `Tâche`, `Scénario` et `Thème` le relient au plan.
+- **P11** : chaque ticket alimente l'apprentissage : la descente et la remontée se relèvent par profondeur, chaque entrée avec sa preuve ; un motif relevé dans deux tickets devient une proposition, que le développeur seul retient ou refuse.
 
 Chaque module donne, pour chacun de ses invariants, les tests qui le prouvent.
 
@@ -138,6 +143,7 @@ Chaque module donne, pour chacun de ses invariants, les tests qui le prouvent.
 - **D1.INV-2** : une dépendance vise un ticket de l'arbre, ni lui-même, ni un ancêtre, ni un descendant ; les dépendances ne forment aucun cycle, ni entre elles, ni avec les clôtures ; l'ordre de résolution place chaque ticket après ceux dont il dépend, et chaque nœud composé après ses sous-tickets.
 - **D1.INV-3** : chaque nœud passe les règles de validation du référentiel (demande complète et sourcée, aucune inconnue qui changerait la composition, composition conforme à la règle de choix, options permises par sa composition) ; chaque possibilité à oui d'un nœud composé est portée par au moins un de ses sous-tickets, aucun sous-ticket ne met à oui une possibilité absente de son parent, et un nœud composé ne porte pas d'option.
 - **D1.INV-4** : chaque critère d'un sous-ticket soutient un critère de son parent direct, la racine n'en soutient aucun, et chaque critère d'un nœud composé est soutenu par au moins un critère de ses sous-tickets.
+- **D1.INV-5** : dès qu'une tâche a un plan de commits, la racine déclare les scénarios de l'US, chaque critère de la racine éprouvé par au moins un ; chaque tâche a au moins un commit planifié, chacun avec un thème et au plus un scénario, déclaré et qui éprouve un critère que la tâche soutient, un seul par scénario et par thème ; chaque scénario est réalisé par au moins un commit planifié.
 
 **D2 : assemblage et transmission**
 
@@ -177,7 +183,16 @@ Chaque module donne, pour chacun de ses invariants, les tests qui le prouvent.
 - **D7.INV-1** : chaque session de nœud et chaque agent a son propre contexte ; la mesure du contexte de chaque arbre d'exemple, à l'activation et au plus, est déterministe et versionnée, et aucun de ses contextes n'y dépasse, au plus, le point d'entrée de l'orchestrateur pour le même ticket.
 - **D7.INV-2** : chaque fichier compté existe, a la taille comptée, et la consigne qui le fait lire le cite ; ce qu'un nœud écrit, le champ et le code des scripts ne se comptent pas ; le point d'entrée de l'orchestrateur se mesure selon son propre ordre de lecture.
 
+**D8 : apprentissage permanent**
+
+- **D8.INV-1** : chaque entrée du relevé d'un ticket porte sa profondeur CRI, macro, méso-contrats, méso-composants ou micro, sa nature, son motif, sa cible, son sens et sa preuve ; une entrée sans profondeur ou sans preuve est refusée, et rien n'est écrit.
+- **D8.INV-2** : rien n'entre dans le référentiel ni dans les consignes sans la décision explicite du développeur : le script ne modifie que le relevé et le registre ; un motif relevé dans deux tickets devient une proposition, retenue ou refusée par le développeur seul, et deux refus le mettent en veille.
+- **D8.INV-3** : le registre d'apprentissage du projet est en ajout seul, chaque ligne numérotée et chaînée à l'empreinte de la précédente ; un relevé versé au registre est clos ; un registre altéré se signale, sans versement ni proposition.
+- **D8.INV-4** : les arbres d'exemple sont des tests de non-régression, figés ; aucun ne se modifie pour qu'un relevé ou une recette passe.
+
 ## 11. Journal de révision
+
+**1.1.0** (2026-11-17) : évolution mineure, l'arbre des commits et l'apprentissage permanent, ratifiés par le développeur. L'arbre suit la composition récursive imbriquée de la méthode C7E : la racine déclare les scénarios de l'US, chaque tâche porte ses commits planifiés, un par scénario et par thème, proposés par `arbre.mjs proposer` et ratifiés avec l'arbre (D1.INV-5) ; les commits portent les lignes `Tâche`, `Scénario` et `Thème`, la ligne `Sous-ticket` restant admise pour un arbre produit avant. Nouvelle dimension D8 et module `apprentissage` : relevé de chaque ticket classé par profondeur CRI, versé à la clôture au registre du projet, récurrences proposées au développeur, veille, tendance ; script `apprentissage.mjs` dans la boîte à outils de la racine. Critères P10 et P11. Les arbres d'exemple restent des tests de non-régression, figés. Archive : `archives/SKILL-v1.0.1.md`.
 
 **1.0.1** (2026-11-09) : correctif, les corrections relevées par le bilan du prototype. Chaque nœud compare le fichier d'invariants du projet à l'état de sa production par empreinte, avec le nouveau script `invariants.mjs` de la boîte à outils de la racine, et ne lit plus que la copie du projet ; chaque agent de couche porte sa part de la consigne au lieu de relire celle du nœud ; les nœuds et les agents de couche lisent le module court `champ-depot` du skill racine, le module `champ` entier restant à la racine et aux observateurs ; le rédacteur est invoqué par son nom d'agent ; P4 précisé pour un ticket sans sous-ticket. La somme des contextes de chaque arbre d'exemple baisse d'au moins 10 % par rapport au lot 7 du prototype. Aucune dimension ni aucun invariant modifié. Archive : `archives/SKILL-v1.0.0.md`.
 

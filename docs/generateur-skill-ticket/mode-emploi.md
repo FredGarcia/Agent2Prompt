@@ -1,6 +1,6 @@
 # Mode d'emploi : le générateur de skills de ticket
 
-Ce mode d'emploi fait résoudre un ticket par un arbre de skills de ticket, avec le générateur [`generateur-skill-ticket`](../../specs/generateur-skill-ticket/SKILL.md) 1.0.1. Le ticket est qualifié et décomposé avec l'IA du développeur ; les outils du générateur, lancés depuis un clone d'Agent2Prompt, vérifient l'arbre, assemblent un skill par nœud depuis le référentiel des méso-contrats de l'orchestrateur C7E, l'installent et le lancent dans Gemini CLI. Ensuite, chaque nœud se résout dans sa propre session, par son skill et ses agents, et chaque niveau voit le ticket augmenté des observations des autres. L'orchestrateur n'est pas modifié : le skill de ticket tient lieu de fiche de transformation.
+Ce mode d'emploi fait résoudre un ticket par un arbre de skills de ticket, avec le générateur [`generateur-skill-ticket`](../../specs/generateur-skill-ticket/SKILL.md) 1.1.0. Le ticket est qualifié et décomposé avec l'IA du développeur ; les outils du générateur, lancés depuis un clone d'Agent2Prompt, vérifient l'arbre, assemblent un skill par nœud depuis le référentiel des méso-contrats de l'orchestrateur C7E, l'installent et le lancent dans Gemini CLI. Ensuite, chaque nœud se résout dans sa propre session, par son skill et ses agents, et chaque niveau voit le ticket augmenté des observations des autres. L'orchestrateur n'est pas modifié : le skill de ticket tient lieu de fiche de transformation.
 
 ```mermaid
 flowchart LR
@@ -26,12 +26,12 @@ flowchart LR
 node <dépôt>/tools/installer.mjs generateur-skill-ticket
 ```
 
-Le générateur s'installe comme les autres skills, dans `.gemini/skills/generateur-skill-ticket/`, masqué à Git : il ne remplace aucun skill ni aucun agent déjà installé. Sa transmission porte sa consigne et ses modules ; ses outils restent dans le clone, où ils lisent les sources dont héritent les skills de ticket, à leurs versions épinglées. Sans Gemini CLI, la transmission seule suffit : [`transmissions/generateur-skill-ticket-1.0.1.md`](../../transmissions/generateur-skill-ticket-1.0.1.md).
+Le générateur s'installe comme les autres skills, dans `.gemini/skills/generateur-skill-ticket/`, masqué à Git : il ne remplace aucun skill ni aucun agent déjà installé. Sa transmission porte sa consigne et ses modules ; ses outils restent dans le clone, où ils lisent les sources dont héritent les skills de ticket, à leurs versions épinglées. Sans Gemini CLI, la transmission seule suffit : [`transmissions/generateur-skill-ticket-1.1.0.md`](../../transmissions/generateur-skill-ticket-1.1.0.md).
 
 ## 3. Faire résoudre un ticket
 
-1. Activer le générateur et lui donner le chemin du clone et la demande. L'IA qualifie le ticket racine avec le module `qualification` de l'orchestrateur, puis le décompose s'il le faut : un fichier TOML par nœud, dans `docs/demandes/<clé>/arbre/`.
-2. Vérifier l'arbre et lire le plan : `node <dépôt>/specs/generateur-skill-ticket/outils/arbre.mjs verifier docs/demandes/<clé>/arbre`, puis `plan`. Faire corriger l'arbre jusqu'à ce qu'il convienne.
+1. Activer le générateur et lui donner le chemin du clone et la demande. L'IA qualifie le ticket racine avec le module `qualification` de l'orchestrateur, puis le décompose s'il le faut : un fichier TOML par nœud, dans `docs/demandes/<clé>/arbre/`. L'arbre est aussi le plan des commits de la branche : la racine déclare les scénarios de l'US, et `arbre.mjs proposer` propose pour chaque tâche un commit par scénario et par thème. Chaque écart au référentiel rencontré en chemin se note dans le relevé d'apprentissage du ticket.
+2. Vérifier l'arbre et lire le plan : `node <dépôt>/specs/generateur-skill-ticket/outils/arbre.mjs verifier docs/demandes/<clé>/arbre`, puis `plan`, qui liste aussi les commits planifiés. Faire corriger l'arbre, et le plan, jusqu'à ce qu'ils conviennent.
 3. Générer : `node <dépôt>/specs/generateur-skill-ticket/outils/generer.mjs generer docs/demandes/<clé>/arbre --sortie <travail>`, `<travail>` hors du projet. Aucun token n'est consommé.
 4. Installer et vérifier : `node <dépôt>/specs/generateur-skill-ticket/outils/installer-arbre.mjs installer <travail>/transmissions`, puis `verifier <clé>`.
 5. Lancer la racine : `installer-arbre.mjs lancer <clé>`. Elle fait rédiger les documents de la clé, présente l'arbre avec eux et attend la ratification, puis indique le prochain nœud prêt et sa commande, à lancer dans une nouvelle session.
@@ -42,9 +42,9 @@ Le générateur s'installe comme les autres skills, dans `.gemini/skills/generat
 - `docs/demandes/<clé>/vue.html` : la vue augmentée, pour le développeur, régénérée par `node .gemini/skills/ticket-<clé>/outils/vue.mjs generer docs/demandes/<clé>`. Elle s'ouvre sur ce qui est à traiter, par gravité.
 - Les corrections et les choix du développeur se déposent dans le champ par les skills ; deux corrections au même motif font proposer une adaptation de la méthode à l'observateur d'ordre 2, examinée par celui d'ordre 3, puis retenue ou refusée par le développeur.
 
-## 5. Clore et retirer
+## 5. Clore, apprendre et retirer
 
-À la clôture de la racine, kits et remise à Agent2Test faits : `installer-arbre.mjs retirer <clé>` archive les transmissions dans `docs/demandes/<clé>/skills/`, où elles se versionnent avec le ticket, et retire skills, agents, commandes et relevé. Rien de l'arbre ne reste dans `.gemini`.
+À la clôture de la racine, kits et remise à Agent2Test faits, le skill racine verse l'apprentissage du ticket au registre du projet, `docs/c7e/registre-apprentissage.jsonl` : ce qui a été relevé à la qualification, et ce que le champ et la branche font remonter, chaque entrée à sa profondeur CRI (macro, méso-contrats, méso-composants, micro). Un motif relevé dans deux tickets devient une proposition : tu la retiens ou la refuses, et c'est toi qui écris ce que tu retiens dans le référentiel ; deux refus le mettent en veille. `node .gemini/skills/ticket-<clé>/outils/apprentissage.mjs registre tendance` montre, ticket après ticket, si le système apprend ou dérive ; `registre propositions --cible generateur` donne en Markdown les évolutions du générateur à porter au dépôt Agent2Prompt. Puis `installer-arbre.mjs retirer <clé>` archive les transmissions dans `docs/demandes/<clé>/skills/`, où elles se versionnent avec le ticket, et retire skills, agents, commandes et relevé. Rien de l'arbre ne reste dans `.gemini`.
 
 ## 6. Recette et essais sur le poste
 

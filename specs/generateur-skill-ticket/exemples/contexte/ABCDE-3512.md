@@ -26,7 +26,7 @@ Mesure statique et déterministe (generateur-skill-ticket, critère P7), produit
 
 | Feuille | Session, activation | Session, au plus | Plus grand contexte | Somme des contextes |
 |---|---|---|---|---|
-| ABCDE-3512 | 6 056 tokens, 27 % | 28 662 tokens, 47 % | 28 662 tokens, 47 % | 141 727 tokens, 230 % |
+| ABCDE-3512 | 6 105 tokens, 27 % | 28 726 tokens, 47 % | 28 726 tokens, 47 % | 141 809 tokens, 230 % |
 
 Les pourcentages rapportent chaque taille à celle du point d'entrée de l'orchestrateur, à la même borne pour l'activation, au plus pour le reste. La somme réunit les contextes qui travaillent pour la feuille : sa session, ses agents de couche, ses sous-agents de rôle.
 
@@ -34,14 +34,14 @@ Les pourcentages rapportent chaque taille à celle du point d'entrée de l'orche
 
 | Mesure | Au plus |
 |---|---|
-| plus grand contexte de l'arbre, session du skill ticket-abcde-3512 | 28 662 tokens, 47 % |
-| somme des 10 contextes du nœud et des observateurs | 158 705 tokens, 258 % |
+| plus grand contexte de l'arbre, session du skill ticket-abcde-3512 | 28 726 tokens, 47 % |
+| somme des 10 contextes du nœud et des observateurs | 158 787 tokens, 258 % |
 
 Aucun contexte de l'arbre ne charge plus que le pourcentage du plus grand ; la somme dit ce que l'arbre lit en tout, quand chaque contexte relit ce qu'il lui faut, au plus.
 
 ## Relectures
 
-Sur la somme des contextes de l'arbre, 70 681 tokens (45 %) viennent de fichiers lus dans plusieurs contextes ; lus une seule fois chacun, les fichiers de l'arbre feraient 88 025 tokens, 143 % du point d'entrée de l'orchestrateur.
+Sur la somme des contextes de l'arbre, 70 681 tokens (45 %) viennent de fichiers lus dans plusieurs contextes ; lus une seule fois chacun, les fichiers de l'arbre feraient 88 107 tokens, 143 % du point d'entrée de l'orchestrateur.
 
 | Fichier | Contextes qui le lisent | Relu, au plus |
 |---|---|---|
@@ -75,26 +75,26 @@ Invoqués par le skill d'un nœud quand le champ attend une observation d'ordre 
 
 | Contexte | À l'activation | Au plus |
 |---|---|---|
-| session du skill ticket-abcde-3512 | 24 222 car., 6 056 tokens | 114 646 car., 28 662 tokens |
+| session du skill ticket-abcde-3512 | 24 418 car., 6 105 tokens | 114 903 car., 28 726 tokens |
 | agent ticket-abcde-3512-persistance | 4 694 car., 1 174 tokens | 85 199 car., 21 300 tokens |
 | agent ticket-abcde-3512-back | 4 835 car., 1 209 tokens | 85 667 car., 21 417 tokens |
 | agent ticket-abcde-3512-front | 5 201 car., 1 301 tokens | 87 353 car., 21 839 tokens |
 | sous-agent ticket-abcde-3512-redacteur | 2 831 car., 708 tokens | 92 139 car., 23 035 tokens |
 | sous-agent ticket-abcde-3512-analyste | 1 890 car., 473 tokens | 23 193 car., 5 799 tokens |
-| sous-agent ticket-abcde-3512-relecteur | 1 642 car., 411 tokens | 38 352 car., 9 588 tokens |
+| sous-agent ticket-abcde-3512-relecteur | 1 714 car., 429 tokens | 38 424 car., 9 606 tokens |
 | sous-agent ticket-abcde-3512-qualite | 1 809 car., 453 tokens | 40 356 car., 10 089 tokens |
 
 Lu par session du skill ticket-abcde-3512 :
 
-- `noms et descriptions du skill et des agents installés` : 2 309 car., chargés au démarrage de Gemini CLI
-- `ticket-abcde-3512/SKILL.md` : 21 913 car., corps du skill, à son activation
+- `noms et descriptions du skill et des agents installés` : 2 304 car., chargés au démarrage de Gemini CLI
+- `ticket-abcde-3512/SKILL.md` : 22 114 car., corps du skill, à son activation
 - `ticket-abcde-3512/modules/meso-contrats/SKILL.md` : 1 742 car., module `meso-contrats`
 - `ticket-abcde-3512/modules/vue/SKILL.md` : 5 270 car., modules `vue` et `champ` du skill racine
 - `ticket-abcde-3512/modules/champ/SKILL.md` : 9 601 car., modules `vue` et `champ` du skill racine
 - `ticket-abcde-3512/modules/documents/SKILL.md` : 7 167 car., module `documents`
 - `ticket-abcde-3512/modules/methode/SKILL.md` : 13 859 car., module `methode`
 - `ticket-abcde-3512/modules/recette/SKILL.md` : 4 368 car., module `recette`
-- `ticket-abcde-3512/modules/kits/SKILL.md` : 7 534 car., module `kits`
+- `ticket-abcde-3512/modules/kits/SKILL.md` : 7 595 car., module `kits`
 - `ticket-abcde-3512/modules/invariants/SKILL.md` : 11 497 car., module `invariants`
 - `projet/docs/c7e/meso-contrats.md` : 15 638 car., `docs/c7e/meso-contrats.md`
 - `ticket-abcde-3512/ticket.toml` : 4 718 car., `ticket.toml`
@@ -164,7 +164,7 @@ Lu par sous-agent ticket-abcde-3512-analyste :
 
 Lu par sous-agent ticket-abcde-3512-relecteur :
 
-- `ticket-abcde-3512/agents/ticket-abcde-3512-relecteur.md` : 1 642 car., corps de l'agent, à son invocation
+- `ticket-abcde-3512/agents/ticket-abcde-3512-relecteur.md` : 1 714 car., corps de l'agent, à son invocation
 - `ticket-abcde-3512/references/java/revue.md` : 5 033 car., `.gemini/skills/ticket-abcde-3512/references/java/revue.md`
 - `ticket-abcde-3512/references/angular/revue.md` : 4 031 car., `.gemini/skills/ticket-abcde-3512/references/angular/revue.md`
 - `ticket-abcde-3512/references/java.md` : 13 731 car., `references/java.md`

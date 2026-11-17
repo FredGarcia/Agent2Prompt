@@ -10,6 +10,11 @@
 // Usage :
 //   node specs/generateur-skill-ticket/outils/arbre.mjs verifier <dossier> [--referentiel <chemin>] [--profondeur-max <n>]
 //   node specs/generateur-skill-ticket/outils/arbre.mjs plan <dossier> [--referentiel <chemin>] [--profondeur-max <n>]
+//   node specs/generateur-skill-ticket/outils/arbre.mjs proposer <dossier> [--referentiel <chemin>]
+//
+// Depuis la 1.1.0, l'arbre est aussi le plan des commits de la branche du ticket (outils/commits.mjs) :
+// le plan les liste dans l'ordre ; proposer donne, pour chaque tâche, les commits que le système
+// propose, un par scénario et par thème, à recopier puis à faire ratifier avec l'arbre.
 //
 // Sans --referentiel, le modèle vient du module referentiel de l'orchestrateur du dépôt. Rien n'est
 // écrit : l'outil lit l'arbre et rend son verdict, code de sortie 1 au moindre écart.
@@ -19,6 +24,7 @@ import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ErreurToml, lireToml } from './toml.mjs';
 import { chargerReferentiel, COUCHES, decrireComposition, lireTexte } from './referentiel.mjs';
+import { aUnPlan, commitsEnToml, decrirePlan, proposerCommits, verifierPlan } from './commits.mjs';
 
 const comparerReferences = (a, b) => a.localeCompare(b, 'fr', { numeric: true });
 
@@ -321,6 +327,9 @@ export function verifierArbre(arbre, R, { profondeurMax = R.profondeurMax } = {}
     const { reste } = ordreDeResolution(arbre);
     if (reste.length > 0) erreurs.push(`cycle entre dépendances et clôtures : ${reste.join(', ')}`);
   }
+
+  // Arbre des commits (1.1.0) : scénarios de l'US, commits de chaque tâche.
+  erreurs.push(...verifierPlan(arbre));
   return erreurs;
 }
 
@@ -345,6 +354,28 @@ function bilan(arbre, R, profondeurMax) {
   return `Arbre ${arbre.racine.reference} conforme : ${relies.length} ticket${relies.length > 1 ? 's' : ''}, profondeur ${profondeur} (plafond ${profondeurMax}), référentiel ${R.version}`;
 }
 
+/**
+ * Commits proposés pour chaque tâche, en TOML. L'arbre doit être relié et sa racine déclarer ses
+ * scénarios ; le reste de la vérification attend que les commits soient recopiés.
+ */
+function proposer(arbre, R, sortie, erreur) {
+  if (!arbre.racine || arbre.erreurs.length > 0) {
+    for (const e of arbre.erreurs) erreur(`ÉCHEC  ${e}`);
+    if (!arbre.racine) erreur('ÉCHEC  arbre sans racine');
+    return 1;
+  }
+  if (!(arbre.racine.ticket.scenarios ?? []).length) {
+    erreur(`ÉCHEC  ${arbre.racine.reference} : la racine ne déclare aucun scénario ([[ticket.scenarios]]) ; rien à croiser`);
+    return 1;
+  }
+  const couchesDe = (t) => [...new Set(R.instancesOptions(t.ticket).map((o) => o.couche))];
+  for (const t of arbre.racine.feuilles()) {
+    sortie(`# ${t.reference} (${t.fichier})`);
+    for (const l of commitsEnToml(proposerCommits(t, arbre.racine, couchesDe))) sortie(l);
+  }
+  return 0;
+}
+
 /** Ligne de commande. Renvoie le code de sortie ; écrit par `sortie` et `erreur`. */
 export function principal(argv, sortie = console.log, erreur = console.error) {
   const [commande, dossier, ...reste] = argv;
@@ -357,13 +388,14 @@ export function principal(argv, sortie = console.log, erreur = console.error) {
       return 2;
     }
   }
-  if (!['verifier', 'plan'].includes(commande) || !dossier || (options.profondeurMax !== undefined && !(options.profondeurMax >= 0))) {
-    erreur('Usage : arbre.mjs verifier|plan <dossier> [--referentiel <chemin>] [--profondeur-max <n>]');
+  if (!['verifier', 'plan', 'proposer'].includes(commande) || !dossier || (options.profondeurMax !== undefined && !(options.profondeurMax >= 0))) {
+    erreur('Usage : arbre.mjs verifier|plan|proposer <dossier> [--referentiel <chemin>] [--profondeur-max <n>]');
     return 2;
   }
   const R = chargerReferentiel(options.referentiel);
   const profondeurMax = options.profondeurMax ?? R.profondeurMax;
   const arbre = chargerArbre(dossier);
+  if (commande === 'proposer') return proposer(arbre, R, sortie, erreur);
   const erreurs = verifierArbre(arbre, R, { profondeurMax });
   if (erreurs.length > 0) {
     for (const e of erreurs) erreur(`ÉCHEC  ${e}`);
@@ -380,6 +412,11 @@ export function principal(argv, sortie = console.log, erreur = console.error) {
     const largeur = Math.max(...ordre.map(({ noeud }) => noeud.reference.length));
     ordre.forEach(({ noeud, action }, k) => sortie(`  ${String(k + 1).padStart(2)}. ${noeud.reference.padEnd(largeur)}  ${action}`));
     sortie('');
+    if (aUnPlan(arbre)) {
+      sortie('Plan des commits de la branche :');
+      for (const l of decrirePlan(arbre, ordre)) sortie(l);
+      sortie('');
+    }
     sortie(`Méso-contrats transverses : ${R.transverses(couchesTouchees(arbre, R)).join(', ') || 'aucun'}`);
     const feuilles = arbre.racine.feuilles().map((f) => f.reference);
     sortie(arbre.racine.estFeuille

@@ -3,7 +3,8 @@
 // un invariant omis ou altéré est rejeté (P1). Au lot 4, le skill racine porte en plus la boîte à outils
 // de l'arbre : documents, kits, sous-agents de rôle, références et scripts, à leur version épinglée ; au
 // lot 5, le champ d'observation et ses observateurs d'ordre 2 et 3. En 1.0.1, le script des invariants,
-// l'extrait de dépôt du module champ, et des agents de couche qui portent leur part de la consigne.
+// l'extrait de dépôt du module champ, et des agents de couche qui portent leur part de la consigne. En
+// 1.1.0, le plan des commits dans les consignes et le rattachement, et l'apprentissage à la clôture.
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -20,6 +21,7 @@ import { FabriqueJavaAngularPostgreSQL, FabriqueSkillTicket, SECTIONS_METHODE, n
 import { Monteur, generer, verifierHeritage, verifierTransmission } from '../outils/monteur.mjs';
 import { BOITE, blocDeCode, chargerSources, extraireSection, lignesInvariants, resoudre } from '../outils/sources.mjs';
 import { SECTIONS_LUES, citations, texteLu } from '../outils/mesurer-contexte.mjs';
+import { arbreAvecPlan, PLAN, SCENARIOS } from './plan-commits.mjs';
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const EXEMPLE = join(ICI, '..', 'exemples', 'ABCDE-3620');
@@ -731,6 +733,85 @@ test('1.0.1 : un skill racine produit en 1.0.0 reste vérifiable sans le script 
   // Produit par le prototype, au lot 7, il ne l'exigeait pas non plus.
   assert.deepStrictEqual(verifierTransmission(retoucher(attendue('ticket-abcde-3620'), sansInvariants((g) => ({ prototype: 'skill-ticket', lot: 7, fabrique: g.fabrique, orchestrateur: g.orchestrateur })))).erreurs, []);
   for (const v of ['1.0.1', '1.1.0', '2.0.0']) attendreEcart(verifierTransmission(retoucher(attendue('ticket-abcde-3620'), sansInvariants(version(v)))).erreurs, /héritage absent du manifeste : outils\/invariants\.mjs/);
+});
+
+// ---- 1.1.0 : arbre des commits et apprentissage permanent ----
+
+let generationAvecPlan;
+const avecPlan = () => {
+  if (!generationAvecPlan) {
+    const sortie = temporaire('skills-plan-');
+    const r = generer({ arbre: arbreAvecPlan(), sortie });
+    assert.deepStrictEqual(r.erreurs, []);
+    generationAvecPlan = (nom) => fichiersDe(lireTexte(join(sortie, 'transmissions', `${nom}-1.0.0.md`)));
+  }
+  return generationAvecPlan;
+};
+
+test('1.1.0 : la consigne et les agents d\'une tâche portent son plan de commits et les lignes Tâche, Scénario et Thème', () => {
+  const f = avecPlan()('ticket-abcde-3620-1-2');
+  const consigne = f.get('SKILL.md');
+  const transformation = extraireSection(consigne, '7');
+  assert.match(transformation, /\*\*Plan des commits de la tâche\*\*, sur la branche de ABCDE-3620 :\n\n\| Commit \| Thème \| Scénario \| Résumé \|\n/);
+  for (const [id, theme, scenario, resume] of PLAN['ABCDE-3620-1.2']) {
+    const titre = SCENARIOS.find((x) => x[0] === scenario)[1];
+    assert.ok(transformation.includes(`| ${id} | ${theme} | ABCDE-3620-${scenario} : ${titre} | ${resume} |`), id);
+  }
+  const lignes = 'son corps porte les lignes `Tâche : ABCDE-3620-1.2`, `Scénario : ABCDE-3620-Snn` pour un commit de scénario, et `Thème : <thème>`, celles de son commit planifié';
+  assert.ok(transformation.includes(lignes));
+  const agent = f.get('agents/ticket-abcde-3620-1-2-back.md');
+  assert.match(agent, /\n## Commits planifiés de la tâche\n\n\| Commit \| Thème \| Scénario \| Résumé \|\n/);
+  assert.equal(agent.split(lignes).length - 1, 2, 'au commit de chaque scénario et dans les règles');
+  assert.doesNotMatch(consigne + agent, /Sous-ticket : /);
+  // Sans plan, un arbre d'avant la 1.1.0 : la seule ligne « Tâche », et aucun plan.
+  const sansPlan = fichiersDe(attendue('ticket-abcde-3620-1-2'));
+  assert.ok(sansPlan.get('SKILL.md').includes('son corps porte la ligne `Tâche : ABCDE-3620-1.2`'));
+  assert.doesNotMatch(sansPlan.get('SKILL.md') + sansPlan.get('agents/ticket-abcde-3620-1-2-back.md'), /Plan des commits|Commits planifiés|Sous-ticket : /);
+});
+
+test('1.1.0 : le rattachement porte les scénarios déclarés et le plan ; le module documents les impose au rédacteur', () => {
+  const racine = avecPlan()('ticket-abcde-3620');
+  const r = JSON.parse(racine.get('outils/rattachement.json'));
+  assert.deepStrictEqual(r.scenarios, [
+    { id: 'ABCDE-3620-S01', titre: SCENARIOS[0][1], ca: ['ABCDE-3620-CA01'] },
+    { id: 'ABCDE-3620-S02', titre: SCENARIOS[1][1], ca: ['ABCDE-3620-CA02', 'ABCDE-3620-CA04'] },
+    { id: 'ABCDE-3620-S03', titre: SCENARIOS[2][1], ca: ['ABCDE-3620-CA03'] },
+    { id: 'ABCDE-3620-S04', titre: SCENARIOS[3][1], ca: ['ABCDE-3620-CA05'] },
+  ]);
+  assert.equal(r.plan.length, 7);
+  assert.deepStrictEqual(r.plan[0], { tache: 'ABCDE-3620-1.1', commit: 'K1', theme: 'persistance', scenario: 'ABCDE-3620-S02' });
+  const documents = racine.get('modules/documents/SKILL.md');
+  assert.match(documents, /Les scénarios de l'US sont ceux que l'arbre déclare, et que son plan de commits réalise/);
+  assert.ok(documents.includes('| `@ABCDE-3620-S02` | Vue résumée : sans les lignes, avec la date-heure de la dernière | `@ABCDE-3620-CA02`, `@ABCDE-3620-CA04` |'));
+  const sansPlan = JSON.parse(fichiersDe(attendue('ticket-abcde-3620')).get('outils/rattachement.json'));
+  assert.equal(sansPlan.scenarios, undefined);
+  assert.equal(sansPlan.plan, undefined);
+});
+
+test('1.1.0 : un skill racine produit en 1.0.1 reste vérifiable sans le script d\'apprentissage ; en 1.1.0, le script est requis', () => {
+  const sans = (version) => (fs) => {
+    fs.splice(fs.findIndex((x) => x.rel === 'outils/apprentissage.mjs'), 1);
+    majManifeste(fs, (j) => {
+      j.ticket.genere_par = { ...j.ticket.genere_par, version };
+      j.ticket.herites = j.ticket.herites.filter((h) => h.path !== 'outils/apprentissage.mjs');
+    });
+  };
+  assert.ok(fichiersDe(attendue('ticket-abcde-3620')).has('outils/apprentissage.mjs'));
+  assert.deepStrictEqual(verifierTransmission(retoucher(attendue('ticket-abcde-3620'), sans('1.0.1'))).erreurs, []);
+  for (const v of ['1.1.0', '1.2.0']) attendreEcart(verifierTransmission(retoucher(attendue('ticket-abcde-3620'), sans(v))).erreurs, /héritage absent du manifeste : outils\/apprentissage\.mjs/);
+});
+
+test('1.1.0 : la clôture de la racine verse l\'apprentissage au registre et présente les propositions au développeur', () => {
+  const cloture = (f) => extraireSection(f.get('SKILL.md'), '7');
+  const outil = 'node .gemini/skills/ticket-abcde-3620/outils/apprentissage.mjs';
+  for (const [f, origine] of [[avecPlan()('ticket-abcde-3620'), 'des écarts entre le plan des commits et la branche'], [fichiersDe(attendue('ticket-abcde-3620')), 'de ce que le relevé porte déjà']]) {
+    const texte = cloture(f);
+    assert.ok(texte.includes(`\`${outil} clore ABCDE-3620\` verse au registre du projet la remontée des preuves, tirée du champ et ${origine}, chaque entrée à sa profondeur CRI`), origine);
+    assert.ok(texte.includes(`\`${outil} registre proposer\``));
+    assert.ok(texte.includes(`\`${outil} registre decider <n> --decision retenue|refusee --par <nom> --raison <texte>\``));
+    assert.match(texte, /Rien n'entre dans le référentiel ni dans les consignes sans sa décision, et c'est lui qui le fait \(D6\.INV-2\)\./);
+  }
+  for (const nom of NOMS.slice(1)) assert.doesNotMatch(fichiersDe(attendue(nom)).get('SKILL.md'), /apprentissage\.mjs/, nom);
 });
 
 // ---- Ligne de commande et installateur ----

@@ -2,7 +2,8 @@
 // rattachement de l'arbre (critère P8) ; les kits dev, test et démo sont complets et vérifiables, et la
 // remise suit le format fermé agent2test.remise/1 (P9). Les contrôles se font avec les copies que livre le
 // skill racine, sur le projet d'exemple résolu, puis sur des altérations de ce projet ; l'historique Git du
-// kit dev se reconstruit à l'identique dans un dépôt temporaire.
+// kit dev se reconstruit à l'identique dans un dépôt temporaire. En 1.1.0, les scénarios déclarés par
+// l'arbre et les lignes « Tâche » et « Scénario » des commits.
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -100,6 +101,23 @@ for (const [nom, retouches, motif] of documentsAlteres) {
   });
 }
 
+test('P8 : chaque scénario que déclare l\'arbre est dans le fichier Gherkin, sous son titre et avec ses critères', () => {
+  const dossier = join(PROJET, ...DOSSIER);
+  const declares = (modifier = () => {}) => rattachementAvec((r) => {
+    r.scenarios = [
+      { id: 'ABCDE-3620-S01', titre: "Sans paramètre, la réponse reste celle d'avant le ticket", ca: ['ABCDE-3620-CA01'] },
+      { id: 'ABCDE-3620-S05', titre: "Une ligne ajoutée apparaît à l'écran et met à jour la date-heure", ca: ['ABCDE-3620-CA05'] },
+    ];
+    modifier(r.scenarios);
+  });
+  const conforme = controlerDocuments(dossier, declares(), CONTROLEUR);
+  assert.deepStrictEqual(conforme.ecarts, []);
+  assert.match(conforme.bilan, /7 scénarios, dont les 2 que déclare l'arbre$/);
+  assert.deepStrictEqual(controlerDocuments(dossier, declares((x) => { x.push({ id: 'ABCDE-3620-S09', titre: 'Absent', ca: ['ABCDE-3620-CA01'] }); }), CONTROLEUR).ecarts, ['ABCDE-3620-S09 déclaré par l\'arbre, absent du fichier Gherkin']);
+  assert.deepStrictEqual(controlerDocuments(dossier, declares((x) => { x[0].titre = 'Un autre titre'; }), CONTROLEUR).ecarts, ["ABCDE-3620-S01 : titre « Sans paramètre, la réponse reste celle d'avant le ticket », attendu « Un autre titre »"]);
+  assert.deepStrictEqual(controlerDocuments(dossier, declares((x) => { x[1].ca.push('ABCDE-3620-CA02'); }), CONTROLEUR).ecarts, ['ABCDE-3620-S05 : n\'éprouve pas ABCDE-3620-CA02, que l\'arbre lui attribue']);
+});
+
 test('P8 : une image de l\'objectif d\'une feuille doit figurer parmi les pièces de demande.json', () => {
   const image = `docs/demandes/${CLE}/ABCDE-3620-2/objectif-01.png`;
   const avecImage = rattachementAvec((r) => { r.noeuds.find((n) => n.reference === 'ABCDE-3620-2').images = [image]; });
@@ -142,7 +160,7 @@ test('P9 : l\'historique se reconstruit à l\'identique, et le kit dev s\'y vér
   attendreEcart(controlerKits(dossier, RATTACHEMENT, { depot: true }).ecarts, /fichier suivi modifié depuis le dernier commit, back\/src\/main\/java\/fr\/exemple\/commande\/LignesCommandeEtag\.java/);
 });
 
-test('P9 : avec --depot, un commit de feuille sans la ligne « Sous-ticket » est relevé', () => {
+test('P9 : avec --depot, un commit de tâche sans la ligne « Tâche » est relevé', () => {
   const { projet, dossier } = copie();
   const historique = structuredClone(HISTORIQUE);
   historique.commits.at(-1).sous_ticket = CLE; // message sans la ligne du sous-ticket
@@ -152,7 +170,34 @@ test('P9 : avec --depot, un commit de feuille sans la ligne « Sous-ticket » es
   const remise = join(projet, ...kit('remise-agent2test').split('/'));
   writeFileSync(remise, json((d) => { d.commit = empreintes.at(-1); })(readFileSync(remise, 'utf8')));
   const { ecarts } = controlerKits(dossier, RATTACHEMENT, { depot: true });
-  assert.deepStrictEqual(ecarts, [`kit dev : commit ${empreintes.at(-1).slice(0, 7)} sans la ligne « Sous-ticket : ABCDE-3620-2 »`]);
+  assert.deepStrictEqual(ecarts, [`kit dev : commit ${empreintes.at(-1).slice(0, 7)} sans la ligne « Tâche : ABCDE-3620-2 » (« Sous-ticket : ABCDE-3620-2 » avant la 1.1.0)`]);
+});
+
+/** Dépôt de l'exemple dont on réécrit le corps des commits ; le kit dev et la remise suivent les empreintes. */
+function depotAvecCorps(corps) {
+  const { projet, dossier } = copie();
+  const historique = structuredClone(HISTORIQUE);
+  historique.commits.forEach((c, i) => { const x = corps(c, i); if (x !== undefined) c.corps = x; });
+  const empreintes = construireDepot(projet, { historique });
+  const chemin = join(projet, ...kit('dev').split('/'));
+  writeFileSync(chemin, json((d) => { d.commits.forEach((c, i) => { c.sha = empreintes[i + 1]; }); })(readFileSync(chemin, 'utf8')));
+  const remise = join(projet, ...kit('remise-agent2test').split('/'));
+  writeFileSync(remise, json((d) => { d.commit = empreintes.at(-1); })(readFileSync(remise, 'utf8')));
+  return { dossier, empreintes, historique };
+}
+
+test('P9 : avec --depot, la ligne « Tâche » vaut celle d\'avant la 1.1.0, et la ligne « Scénario » est celle du titre', () => {
+  const tache = (c) => (c.sous_ticket === CLE ? undefined : `Tâche : ${c.sous_ticket}`);
+  const avecTache = depotAvecCorps(tache);
+  assert.ok(avecTache.historique.commits.some((c) => /^Tâche : ABCDE-3620-/.test(c.corps ?? '')), 'les corps citent la tâche');
+  assert.deepStrictEqual(controlerKits(avecTache.dossier, RATTACHEMENT, { depot: true }).ecarts, []);
+  const k = HISTORIQUE.commits.findIndex((c) => / S\d{2} : /.test(c.titre) && c.sous_ticket !== CLE);
+  const s = / (S\d{2}) : /.exec(HISTORIQUE.commits[k].titre)[1];
+  const autre = s === 'S01' ? 'S02' : 'S01';
+  const faux = depotAvecCorps((c, i) => (i === k ? `${tache(c)}\nScénario : ${CLE}-${autre}\nThème : persistance` : tache(c)));
+  assert.deepStrictEqual(controlerKits(faux.dossier, RATTACHEMENT, { depot: true }).ecarts, [`kit dev : commit ${faux.empreintes[k].slice(0, 7)}, ligne « Scénario : ${CLE}-${autre} » différente du scénario de son titre (${CLE}-${s})`]);
+  const juste = depotAvecCorps((c, i) => (i === k ? `${tache(c)}\nScénario : ${CLE}-${s}\nThème : persistance` : tache(c)));
+  assert.deepStrictEqual(controlerKits(juste.dossier, RATTACHEMENT, { depot: true }).ecarts, []);
 });
 
 const kitsAlteres = [

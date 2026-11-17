@@ -139,9 +139,19 @@ export function controlerDocuments(dossier, rattachement, controleur) {
       else rattaches++;
     }
   }
+  // Depuis la 1.1.0 : les scénarios que déclare l'arbre, et que réalise son plan de commits.
+  for (const d of rattachement.scenarios ?? []) {
+    const lu = scenarios.find((x) => x.id === d.id);
+    if (!lu) {
+      ecarts.push(`${d.id} déclaré par l'arbre, absent du fichier Gherkin`);
+      continue;
+    }
+    if (lu.titre.trim() !== d.titre.trim()) ecarts.push(`${d.id} : titre « ${lu.titre.trim()} », attendu « ${d.titre} »`);
+    for (const ca of d.ca) if (!lu.etiquettes.includes(`@${ca}`)) ecarts.push(`${d.id} : n'éprouve pas ${ca}, que l'arbre lui attribue`);
+  }
   return {
     ecarts,
-    bilan: `${cle} : documents conformes ; controler-criteres sans écart ; ${rattachement.criteres.length} critères repris ; ${rattaches} critères de sous-tickets rattachés et illustrés ; ${scenarios.length} scénarios`,
+    bilan: `${cle} : documents conformes ; controler-criteres sans écart ; ${rattachement.criteres.length} critères repris ; ${rattaches} critères de sous-tickets rattachés et illustrés ; ${scenarios.length} scénarios${rattachement.scenarios ? `, dont les ${rattachement.scenarios.length} que déclare l'arbre` : ''}`,
   };
 }
 
