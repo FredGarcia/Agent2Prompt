@@ -1,12 +1,14 @@
-// Contrat avec Gemini CLI : ce que son propre code fait d'une installation par tools/installer.mjs.
-// Lancé par .github/workflows/recette-installer.yml, à côté du paquet @google/gemini-cli-core à la version
-// épinglée : node contrat-gemini.mjs <racine du dépôt>. Découverte des skills (nom, description, modules
-// non pris pour des skills) et lecture de chacun de leurs fichiers par l'outil de Gemini CLI.
+// Contrat avec Gemini CLI : ce que son propre code fait d'une installation par tools/installer.mjs, puis
+// par l'installateur de la racine du dépôt, installer.mjs. Lancé par .github/workflows/recette-installer.yml,
+// à côté du paquet @google/gemini-cli-core à la version épinglée : node contrat-gemini.mjs <racine du dépôt>.
+// Découverte des skills (nom, description, modules non pris pour des skills), lecture de chacun de leurs
+// fichiers par l'outil de Gemini CLI, chargement des sous-agents copiés par installer.mjs, et historique du
+// dépôt caché par son .geminiignore.
 import { execFileSync } from 'node:child_process';
 import { appendFileSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, relative } from 'node:path';
-import { FileDiscoveryService, loadSkillsFromDir } from '@google/gemini-cli-core';
+import { FileDiscoveryService, loadAgentsFromDirectory, loadSkillsFromDir } from '@google/gemini-cli-core';
 
 const depot = process.argv[2];
 const base = mkdtempSync(join(tmpdir(), 'contrat-'));
@@ -72,6 +74,36 @@ for (const [portee, dossier] of [
     constat(s.name === nom && s.description === description && refuses.length === 0, `${portee} : ${s.name}, nom et description lus tels quels, ${lecture}`);
   }
 }
+// L'installateur de la racine, au niveau utilisateur d'un autre dossier personnel : tous les skills, puis les
+// sous-agents et les commandes de leurs modules, que Gemini CLI doit charger sans erreur.
+const home2 = join(base, 'home2');
+mkdirSync(home2, { recursive: true });
+execFileSync(process.execPath, [join(depot, 'installer.mjs')], { cwd: base, env: { ...env, GEMINI_CLI_HOME: home2 }, encoding: 'utf8' });
+const skills2 = await loadSkillsFromDir(join(home2, '.gemini', 'skills'));
+const dossiers2 = readdirSync(join(home2, '.gemini', 'skills')).filter((n) => !n.startsWith('.'));
+constat(skills2.length === dossiers2.length && dossiers2.length > 0, `installer.mjs : ${dossiers2.length} skills, chacun découvert une fois`);
+const { agents, errors } = await loadAgentsFromDirectory(join(home2, '.gemini', 'agents'));
+constat(errors.length === 0, `installer.mjs : sous-agents chargés sans erreur${errors.length > 0 ? ` (${errors.map((e) => e.message).join(' ; ')})` : ''}`);
+const attendus = readdirSync(join(home2, '.gemini', 'agents')).filter((f) => f.endsWith('.md')).map((f) => f.slice(0, -3)).sort();
+constat(JSON.stringify(agents.map((a) => a.name).sort()) === JSON.stringify(attendus), `installer.mjs : un sous-agent par fichier copié (${attendus.join(', ')})`);
+for (const a of agents.sort((x, y) => x.name.localeCompare(y.name))) {
+  const outils = a.toolConfig?.tools ?? [];
+  constat(a.kind === 'local' && outils.length > 0, `installer.mjs : ${a.name}, sous-agent local, outils ${outils.join(', ')}`);
+}
+const commandes = join(home2, '.gemini', 'commands');
+const tomls = fichiers(commandes).filter((f) => f.endsWith('.toml'));
+constat(tomls.length > 0 && tomls.every((f) => /^prompt\s*=/m.test(readFileSync(f, 'utf8'))), `installer.mjs : ${tomls.length} commandes, chacune avec son prompt`);
+
+// Le dépôt lui-même : son .geminiignore cache à Gemini CLI l'historique figé, et lui seul.
+const fdsDepot = new FileDiscoveryService(depot);
+const listes = new Set(readFileSync(join(depot, '.geminiignore'), 'utf8').split(/\r?\n/).filter((l) => l.startsWith('transmissions/')));
+const transmissions = readdirSync(join(depot, 'transmissions')).map((f) => `transmissions/${f}`);
+const malCaches = transmissions.filter((rel) => fdsDepot.shouldIgnoreFile(join(depot, rel)) !== listes.has(rel));
+constat(listes.size > 0 && malCaches.length === 0, `dépôt : ${listes.size} anciennes transmissions cachées, les ${transmissions.length - listes.size} autres lisibles${malCaches.length > 0 ? ` ; écarts : ${malCaches.join(', ')}` : ''}`);
+const archives = readdirSync(join(depot, 'specs')).flatMap((d) => (statSync(join(depot, 'specs', d)).isDirectory() && readdirSync(join(depot, 'specs', d)).includes('archives') ? fichiers(join(depot, 'specs', d, 'archives')) : []));
+constat(archives.length > 0 && archives.every((f) => fdsDepot.shouldIgnoreFile(f)), `dépôt : ${archives.length} archives cachées`);
+constat(!fdsDepot.shouldIgnoreFile(join(depot, 'specs', 'orchestrateur-c7e', 'SKILL.md')) && !fdsDepot.shouldIgnoreFile(join(depot, 'installer.mjs')), 'dépôt : spécifications courantes et installateur lisibles');
+
 rmSync(base, { recursive: true, force: true });
 console.log(ecarts === 0 ? '\nContrat tenu.' : `\n${ecarts} écart(s).`);
 process.exitCode = ecarts === 0 ? 0 : 1;

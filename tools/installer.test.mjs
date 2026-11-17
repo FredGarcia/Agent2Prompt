@@ -42,11 +42,29 @@ function fichiersDe(dossier, prefixe = '') {
     .sort();
 }
 
-/** Le dossier contient exactement la transmission, sa consigne et une table d'intégrité juste. */
+/**
+ * Fichiers que le skill tire de ses modules : les chemins de la table `attendu` de sa commande d'extraction,
+ * chacun pris à son bloc `<!-- fichier : chemin -->`, comme le fait sa propre commande.
+ */
+function tires(attendue) {
+  const empreintes = new Map();
+  const blocs = new Map();
+  for (const f of attendue.fichiers.filter((x) => x.rel.endsWith('.md'))) {
+    for (const [, corps] of f.contenu.matchAll(/const attendu = \{([^}]*)\}/g)) for (const [, rel, h] of corps.matchAll(/'([^']+)': '([0-9a-f]{64})'/g)) empreintes.set(rel, h);
+    for (const [, rel, corps] of f.contenu.matchAll(/^<!-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) blocs.set(rel, `${corps}\n`);
+  }
+  return [...empreintes].map(([rel, h]) => {
+    assert.equal(sha256(blocs.get(rel) ?? ''), h, `${rel} : empreinte de la table d'extraction`);
+    return { rel, contenu: blocs.get(rel) };
+  });
+}
+
+/** Le dossier contient exactement la transmission, sa consigne, les fichiers tirés des modules et une table d'intégrité juste. */
 function verifierInstallation(dossier, nom, attendue = transmission(nom)) {
-  const attendus = [...attendue.fichiers.map((f) => f.rel), 'CONSIGNE.md', 'integrite.sha256'].sort();
+  const extraits = tires(attendue);
+  const attendus = [...attendue.fichiers.map((f) => f.rel), 'CONSIGNE.md', 'integrite.sha256', ...extraits.map((f) => f.rel)].sort();
   assert.deepEqual(fichiersDe(dossier), attendus, `${nom} : fichiers installés`);
-  for (const f of attendue.fichiers) assert.equal(readFileSync(join(dossier, ...f.rel.split('/')), 'utf8'), f.contenu, `${nom} : ${f.rel}`);
+  for (const f of [...attendue.fichiers, ...extraits]) assert.equal(readFileSync(join(dossier, ...f.rel.split('/')), 'utf8'), f.contenu, `${nom} : ${f.rel}`);
   assert.equal(readFileSync(join(dossier, 'CONSIGNE.md'), 'utf8'), attendue.entete, `${nom} : consigne`);
   const table = readFileSync(join(dossier, 'integrite.sha256'), 'utf8');
   const lignes = attendus.filter((rel) => rel !== 'integrite.sha256').map((rel) => `${sha256(readFileSync(join(dossier, ...rel.split('/'))))}  ${rel}`);
@@ -318,6 +336,26 @@ test("transmission altérée ou chemin hors du dossier : refus, rien n'est écri
   assert.match(r.erreur, /chemin refusé, "\.\.\/piege\.md"/);
   assert.equal(existsSync(join(ws, '.gemini')), false);
   assert.equal(existsSync(join(ws, 'piege.md')), false);
+});
+
+test("fichiers tirés des modules : installés avec le skill ; un bloc qui n'a pas l'empreinte de sa table est refusé", (t) => {
+  const b = bac(t);
+  const ws = b.depot();
+  let r = b.lancer(ws, 'skill4appli');
+  assert.equal(r.code, 0, r.erreur);
+  assert.match(r.sortie, /3 fichiers tirés des modules/);
+  verifierInstallation(join(ws, '.gemini', 'skills', 'skill4appli'), 'skill4appli');
+  // Un bloc changé dans une transmission par ailleurs cohérente : refus, rien n'est écrit.
+  const texte = lf(readFileSync(cheminTransmission('skill4appli'), 'utf8'));
+  const module = relire(texte).fichiers.find((f) => f.contenu.includes('<!-- fichier : scripts/app_db.mjs -->'));
+  const change = module.contenu.replace(/(<!-- fichier : scripts\/app_db\.mjs -->\n\x60{3}[a-z]*\n)/, '$1// ligne ajoutée\n');
+  const alteree = join(b.base, 'skill4appli-alteree.md');
+  writeFileSync(alteree, texte.replace(module.contenu, () => change).replace(sha256(module.contenu), sha256(change)));
+  const autre = b.depot('autre');
+  r = b.lancer(autre, alteree);
+  assert.equal(r.code, 1);
+  assert.match(r.erreur, /scripts\/app_db\.mjs, tiré des modules, n'a pas l'empreinte de sa table/);
+  assert.equal(existsSync(join(autre, '.gemini')), false);
 });
 
 test("--essai n'écrit rien", (t) => {

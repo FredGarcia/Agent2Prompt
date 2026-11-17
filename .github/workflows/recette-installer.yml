@@ -1,12 +1,17 @@
 name: Recette de l'installateur
 
-# tools/installer.mjs installe un skill dans Gemini CLI à partir de sa transmission. Sa recette tourne
-# sous Linux et sous Windows. Le job « contrat » confronte une installation au code de Gemini CLI
-# lui-même, à une version épinglée : découverte des skills et lecture de chacun de leurs fichiers.
+# tools/installer.mjs installe un skill dans Gemini CLI à partir de sa transmission ; installer.mjs, à la
+# racine du dépôt, installe ou met à jour tous les skills et les agents de leurs modules. Leurs recettes
+# tournent sous Linux et sous Windows. Le job « contrat » confronte leurs installations au code de Gemini
+# CLI lui-même, à une version épinglée : découverte des skills, lecture de chacun de leurs fichiers,
+# chargement des sous-agents, et historique du dépôt caché par son .geminiignore.
 
 on:
   pull_request:
     paths:
+      - 'installer.mjs'
+      - 'installer.cmd'
+      - '.geminiignore'
       - 'tools/**'
       - 'transmissions/**'
       - '.github/scripts/contrat-gemini.mjs'
@@ -14,6 +19,9 @@ on:
   push:
     branches: [main]
     paths:
+      - 'installer.mjs'
+      - 'installer.cmd'
+      - '.geminiignore'
       - 'tools/**'
       - 'transmissions/**'
       - '.github/scripts/contrat-gemini.mjs'
@@ -36,8 +44,8 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: ${{ matrix.node }}
-      - name: Recette de tools/installer.mjs
-        run: node --test tools/installer.test.mjs
+      - name: Recette de tools/installer.mjs et de installer.mjs
+        run: node --test tools/installer.test.mjs tools/installer-racine.test.mjs
 
   contrat:
     name: contrat avec Gemini CLI (@google/gemini-cli-core 0.66.0)
@@ -55,6 +63,6 @@ jobs:
           npm init -y > /dev/null
           npm install --no-audit --no-fund --ignore-scripts @google/gemini-cli-core@0.66.0
           cp "$GITHUB_WORKSPACE/.github/scripts/contrat-gemini.mjs" .
-      - name: Installer tous les skills, puis les relire avec le code de Gemini CLI
+      - name: Installer tous les skills et les agents, puis les relire et les charger avec le code de Gemini CLI
         shell: bash
         run: node "$RUNNER_TEMP/gemini/contrat-gemini.mjs" "$GITHUB_WORKSPACE"
