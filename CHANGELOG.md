@@ -446,7 +446,7 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
     - aligné sur les référentiels : DTO en `record`, nommage d'Angular 20, `exhaustMap` contre le double clic, accessibilité ;
     - Liquibase : `runOnChange` n'est pas un rollback ; trois changesets pour un rattrapage ; `CREATE INDEX CONCURRENTLY` hors transaction ;
     - registre des écarts dans un fichier distinct, le fichier d'invariants n'étant jamais modifié par l'IA ; accents rétablis.
-  - **Lancement** : fichier de contexte de l'IA locale avec les imports `@` de Gemini CLI (`GEMINI.md`, ou `README.md` nommé dans `context.fileName`) et de Claude Code, y compris dans la disposition du kit.
+  - **Lancement** : fichier de contexte de l'IA locale avec les imports `@` de Gemini CLI (`GEMINI.md`, ou `README.md` nommé dans `context.fileName`) et d'un autre outil qui charge son propre fichier de contexte, y compris dans la disposition du kit.
 - Vérifié :
   - les six exemples de commits et l'exemple de branche passent les hooks `pre-commit` et `commit-msg` du kit 1.0.1, rejoués dans un dépôt de demande `ABCDE-3512` ;
   - `docs/c7e/` et `docs/demandes/` y sont acceptés, `.skills/` refusé ;
@@ -750,6 +750,18 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
   - la publication, dans ce dépôt public, d'un argumentaire destiné à un client, sans nom de client ni de mission.
 
 ## Outils
+
+### 2026-11-17 : installateur de la racine, historique caché à Gemini CLI
+
+- **`installer.mjs`**, à la racine du dépôt, avec **`installer.cmd`** (ASCII, pour CMD) : installe ou met à jour dans Gemini CLI tous les skills installables et les agents qu'ils portent, au niveau utilisateur par défaut (`~/.gemini/`), ou d'un projet (`--workspace`).
+  - Skills : chacun depuis sa transmission courante, comme `tools/installer.mjs`. Un skill intact se met à jour en place, et les fichiers ajoutés depuis son installation restent ; une mise à jour interrompue se reprend.
+  - Agents et commandes : `capteur-sprint`, `explicateur-hote` et ses commandes `/hote:*`, `memoire-appli`, copiés dans `agents/` et `commands/`. La copie s'adapte à Gemini CLI, comme le demandent leurs modules : outils nommés comme Gemini CLI dans l'en-tête, description entre guillemets, chemin du skill installé ; le fichier du skill ne change pas. Leurs empreintes sont tenues dans `agent2prompt/installation.json`.
+  - Changements locaux : un skill, un agent ou une commande changé depuis son installation reste tel quel ; sa nouvelle version est déposée dans `agent2prompt/a-fusionner/`, avec ses écarts, et `--fusionne <nom>` en fait la base une fois la fusion faite. `--forcer` remplace, après une sauvegarde dans `agent2prompt/sauvegardes/`.
+  - `--liste`, `--retirer` (ce qui est intact ; les fichiers ajoutés restent), `--essai`. Au niveau d'un projet, tout est masqué à Git.
+- **`tools/installer.mjs`** : un skill installé porte aussi les fichiers qu'il tire de ses modules, ceux de la table `attendu` de sa commande d'extraction, contrôlés par leur empreinte (capture-sprint-jira, explication-hote-ia, skill4appli, sonarqube) ; ses fonctions servent à l'installateur de la racine.
+- **`.geminiignore`** à la racine : Gemini CLI ne lit plus l'historique figé, les archives des versions publiées et les quinze anciennes transmissions qui citent un autre hôte d'IA. Elles restent telles que publiées. Une ligne de ce journal, la seule à le citer, est reformulée.
+- **`tools/verifier.mjs`** : les noms d'un autre hôte d'IA et de son éditeur ne figurent dans aucun fichier suivi hors de cet historique, et `.geminiignore` ne cache aucune version courante.
+- Vérifications : recette de `tools/installer.mjs` (18 tests) et de `installer.mjs` (14 tests) sous Linux et Windows ; contrat avec `@google/gemini-cli-core` 0.66.0 : skills découverts et lisibles, trois sous-agents chargés sans erreur, avec les outils de Gemini CLI, et, dans le dépôt, l'historique caché par `.geminiignore` sans qu'aucune version courante le soit.
 
 ### 2026-11-17 : vérificateur en fins de ligne CRLF
 

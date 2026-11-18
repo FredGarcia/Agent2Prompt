@@ -23,9 +23,11 @@
  * 1. relit la transmission comme le ferait l'IA (`relire`, de `tools/bundle.mjs`), fins de ligne CRLF
  *    comprises, et vérifie chaque fichier contre la table d'intégrité avant d'écrire quoi que ce soit ;
  * 2. écrit dans `.gemini/skills/<nom>/` les fichiers transmis, la consigne de la transmission
- *    (`CONSIGNE.md`) et la table d'intégrité de l'installation (`integrite.sha256`, format
- *    `sha256sum -c`). Une version installée est remplacée d'un bloc ; si des fichiers y ont été
- *    modifiés, supprimés ou ajoutés depuis, le script refuse, sauf `--forcer` ;
+ *    (`CONSIGNE.md`), les fichiers que le skill tire de ses modules dans son propre dossier (chaque
+ *    chemin de la table `attendu` de sa commande d'extraction, pris au bloc `<!-- fichier : chemin -->`
+ *    qui le porte et contrôlé par son empreinte) et la table d'intégrité de l'installation
+ *    (`integrite.sha256`, format `sha256sum -c`). Une version installée est remplacée d'un bloc ; si des
+ *    fichiers y ont été modifiés, supprimés ou ajoutés depuis, le script refuse, sauf `--forcer` ;
  * 3. dans un dépôt Git, masque le skill à `git status` par l'exclusion locale (`info/exclude`) et le
  *    garde lisible par Gemini CLI par des négations dans `.geminiignore`, lui-même exclu. Sans elles,
  *    l'outil de lecture de Gemini CLI refuse les fichiers qu'exclut `.git/info/exclude` : le skill ne
@@ -33,7 +35,8 @@
  *
  * Il refuse les spécifications de systèmes à construire, que leur consigne matérialise dans `spec/`
  * de leur propre projet, et n'installe `analyse-projet` qu'au niveau utilisateur.
- * Node 20 ou plus récent, modules natifs, et git pour le masquage.
+ * Node 20 ou plus récent, modules natifs, et git pour le masquage. Ses fonctions servent aussi à
+ * l'installateur de la racine du dépôt (`installer.mjs`), qui installe tous les skills et leurs agents.
  */
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -168,6 +171,46 @@ function lireTransmission(chemin) {
   return { nom, version, entete, fichiers, systeme };
 }
 
+/**
+ * Fichiers que le skill tire de ses modules dans son propre dossier : chaque chemin que déclare la table
+ * `attendu` de sa commande d'extraction, pris au bloc `<!-- fichier : chemin -->` qui le porte, à
+ * l'identique, et contrôlé par son empreinte. Les autres blocs annotés, comme un modèle de fichier du
+ * projet, ne sont pas tirés.
+ */
+function fichiersTires(t) {
+  const ici = `${t.nom} ${t.version}`;
+  const attendu = new Map();
+  const blocs = new Map();
+  for (const f of t.fichiers) {
+    if (!f.rel.endsWith('.md')) continue;
+    for (const table of f.contenu.matchAll(/const attendu = \{([^}]*)\}/g)) {
+      for (const [, rel, empreinte] of table[1].matchAll(/'([^']+)': '([0-9a-f]{64})'/g)) {
+        if (attendu.has(rel) && attendu.get(rel) !== empreinte) throw new Erreur(`${ici} : deux empreintes pour ${rel}, tiré des modules`);
+        attendu.set(rel, empreinte);
+      }
+    }
+    for (const [, rel, corps] of f.contenu.matchAll(/^<!-- fichier : (\S+) -->\n```[a-z]*\n([\s\S]*?)\n```\n/gm)) {
+      blocs.set(rel, [...(blocs.get(rel) ?? []), `${corps}\n`]);
+    }
+  }
+  const transmis = new Set(t.fichiers.map((f) => f.rel));
+  return [...attendu].map(([rel, empreinte]) => {
+    if (!cheminSur(rel) || rel === CONSIGNE || rel === INTEGRITE || transmis.has(rel)) throw new Erreur(`${ici} : ${rel}, tiré des modules, chemin refusé`);
+    const trouves = blocs.get(rel) ?? [];
+    if (trouves.length !== 1) throw new Erreur(`${ici} : ${rel} ${trouves.length === 0 ? 'absent des' : 'en double dans les'} blocs annotés des modules`);
+    if (sha256(trouves[0]) !== empreinte) throw new Erreur(`${ici} : ${rel}, tiré des modules, n'a pas l'empreinte de sa table`);
+    return [rel, trouves[0]];
+  });
+}
+
+/** Contenu de l'installation d'un skill : fichiers transmis, consigne, fichiers tirés des modules. */
+function contenusAttendus(t) {
+  return [...t.fichiers.map((f) => [f.rel, f.contenu]), [CONSIGNE, t.entete], ...fichiersTires(t)];
+}
+
+/** Table d'intégrité d'une installation, au format `sha256sum -c`. */
+const tableDe = (contenus) => contenus.map(([rel, contenu]) => `${sha256(contenu)}  ${rel}\n`).join('');
+
 function estSysteme(chemin) {
   try {
     return lireTransmission(chemin).systeme;
@@ -197,18 +240,31 @@ function etatInstalle(dossier) {
   }
   const presents = new Set(listerFichiers(dossier));
   const changes = [];
+  const supprimes = [];
+  const modifies = [];
+  const ajoutes = [];
   for (const [rel, empreinte] of attendus) {
-    if (!presents.has(rel)) changes.push(`${rel} (supprimé)`);
-    else if (sha256(readFileSync(join(dossier, ...rel.split('/')))) !== empreinte) changes.push(`${rel} (modifié)`);
+    if (!presents.has(rel)) {
+      changes.push(`${rel} (supprimé)`);
+      supprimes.push(rel);
+    } else if (sha256(readFileSync(join(dossier, ...rel.split('/')))) !== empreinte) {
+      changes.push(`${rel} (modifié)`);
+      modifies.push(rel);
+    }
   }
-  for (const rel of presents) if (rel !== INTEGRITE && !attendus.has(rel)) changes.push(`${rel} (ajouté)`);
+  for (const rel of presents) {
+    if (rel !== INTEGRITE && !attendus.has(rel)) {
+      changes.push(`${rel} (ajouté)`);
+      ajoutes.push(rel);
+    }
+  }
   let version;
   try {
     version = JSON.parse(readFileSync(join(dossier, 'manifest.json'), 'utf8')).version;
   } catch {
     version = undefined;
   }
-  return { gere: true, version, changes, table };
+  return { gere: true, version, changes, table, attendus, supprimes, modifies, ajoutes };
 }
 
 /** Skills installés par cet outil dans un dossier de skills. */
@@ -413,8 +469,9 @@ function installer(cible, options) {
   const base = options.utilisateur ? dossierUtilisateur() : join(options.workspace, '.gemini', 'skills');
   const dossier = join(base, t.nom);
   const affiche = options.utilisateur ? dossier : `.gemini/skills/${t.nom}/`;
-  const contenus = [...t.fichiers.map((f) => [f.rel, f.contenu]), [CONSIGNE, t.entete]];
-  const table = contenus.map(([rel, contenu]) => `${sha256(contenu)}  ${rel}\n`).join('');
+  const contenus = contenusAttendus(t);
+  const tires = contenus.length - t.fichiers.length - 1;
+  const table = tableDe(contenus);
   const rapport = [];
 
   const etat = etatInstalle(dossier);
@@ -444,7 +501,8 @@ function installer(cible, options) {
     }
     basculer(nouveau, dossier, base, t.nom);
     const avant = etat?.gere && etat.version ? `, remplace ${etat.version}` : '';
-    rapport.push(`${t.nom} ${t.version} installé dans ${affiche}${avant} : ${pluriel(t.fichiers.length, 'fichier')} vérifiés, ${CONSIGNE}, ${INTEGRITE}`);
+    const tiresTexte = tires > 0 ? `, ${pluriel(tires, 'fichier')} tiré${tires > 1 ? 's' : ''} des modules` : '';
+    rapport.push(`${t.nom} ${t.version} installé dans ${affiche}${avant} : ${pluriel(t.fichiers.length, 'fichier')} vérifiés${tiresTexte}, ${CONSIGNE}, ${INTEGRITE}`);
   }
 
   if (!options.utilisateur) {
@@ -632,5 +690,39 @@ function main() {
   if (ecartes.length > 0) console.log(`\nNon installés : ${ecartes.join(', ')}.`);
   if (echecs > 0) process.exit(1);
 }
+
+export {
+  Erreur,
+  CONSIGNE,
+  INTEGRITE,
+  SUPPRIMER,
+  UTILISATEUR_SEUL,
+  sha256,
+  lireTexte,
+  enPosix,
+  pluriel,
+  cheminSur,
+  listerFichiers,
+  comparerVersions,
+  skillsDuDepot,
+  trouverTransmission,
+  lireTransmission,
+  fichiersTires,
+  contenusAttendus,
+  tableDe,
+  estSysteme,
+  dossierUtilisateur,
+  vraiChemin,
+  etatInstalle,
+  skillsInstalles,
+  nettoyerTemporaires,
+  git,
+  depotGit,
+  separerBloc,
+  avecBloc,
+  mettreAJourMasquage,
+  renommer,
+  basculer,
+};
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) main();

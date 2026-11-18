@@ -91,6 +91,9 @@ Ces documents ne sont pas des spécifications : le vérificateur ne les contrôl
 ```
 Agent2Prompt/
 ├── README.md
+├── installer.mjs                installation ou mise à jour de tous les skills et agents dans Gemini CLI
+├── installer.cmd                le même, pour CMD sous Windows
+├── .geminiignore                historique figé que Gemini CLI ne lit pas
 ├── EVOLUTION.md                 principe d'évolution des structures
 ├── CHANGELOG.md                 historique de toutes les versions
 ├── glossaire.md                 détail de tous les invariants, généré
@@ -109,6 +112,7 @@ Agent2Prompt/
 │   ├── glossaire.mjs            génération de glossaire.md
 │   ├── installer.mjs            installation d'un skill dans Gemini CLI, depuis sa transmission
 │   ├── installer.test.mjs       recette de l'installateur
+│   ├── installer-racine.test.mjs   recette de installer.mjs, à la racine
 │   └── verifier.mjs             vérification structurelle de toutes les spécifications
 └── docs/
     ├── presentation-valeur-ia/  présentation « L'IA, un investissement mesurable », en Markdown et en PowerPoint
@@ -125,7 +129,29 @@ Coller le contenu du fichier de `transmissions/` dans l'IA du développeur. Aucu
 2. chaque fichier de la spécification entre `<<<FICHIER chemin>>>` et `<<<FIN chemin>>>` ;
 3. une table sha256 pour vérifier la reconstruction (`sha256sum -c`, depuis le dossier où les fichiers ont été matérialisés).
 
-Pour Gemini CLI, l'installateur fait cette reconstruction sans IA et la vérifie : section suivante.
+Pour Gemini CLI, l'installateur fait cette reconstruction sans IA et la vérifie : sections suivantes.
+
+## Installer ou mettre à jour tous les skills et agents
+
+`installer.mjs`, à la racine du dépôt, installe ou met à jour dans Gemini CLI tous les skills installables et les agents qu'ils portent, au niveau utilisateur : `~/.gemini/`, ou `$GEMINI_CLI_HOME/.gemini/`, pour tous les projets. Depuis n'importe quel dossier, avec un clone à jour :
+
+```bash
+git -C ~/dev/Agent2Prompt pull
+node ~/dev/Agent2Prompt/installer.mjs              # installer ou mettre à jour tout
+node ~/dev/Agent2Prompt/installer.mjs --liste      # état de chaque skill, agent et commande
+node ~/dev/Agent2Prompt/installer.mjs --retirer    # retirer ce qui est intact
+```
+
+Sous Windows, dans CMD : `C:\dev\Agent2Prompt\installer.cmd`, avec les mêmes options. `--workspace <dossier>` installe au niveau d'un projet plutôt qu'au niveau utilisateur, masqué à Git ; `--essai` montre ce qui serait fait, sans rien écrire.
+
+- **Skills** : chaque skill installable, depuis sa transmission courante, comme le fait `tools/installer.mjs` (section suivante) : fichiers transmis, consigne, fichiers que le skill tire de ses modules, table d'intégrité. Les systèmes à construire ne s'installent pas.
+- **Agents et commandes** : ceux que portent les skills installés, `capteur-sprint`, `explicateur-hote` avec ses commandes `/hote:explique`, `/hote:carte` et `/hote:pourquoi`, et `memoire-appli`, copiés dans `~/.gemini/agents/` et `~/.gemini/commands/`. Comme le demandent leurs modules, seule la copie s'adapte à Gemini CLI : outils nommés comme Gemini CLI dans l'en-tête, chemin du skill installé. Le fichier du skill ne change pas.
+- **Mise à jour** : un skill intact est mis à jour en place, et les fichiers ajoutés depuis son installation, comme `node_modules`, restent. Un skill, un agent ou une commande changé depuis son installation reste tel quel : sa nouvelle version est déposée dans `~/.gemini/agent2prompt/a-fusionner/`, avec la liste des écarts. Une fois la fusion faite à la main, `--fusionne <nom>` en fait la base de l'installation. `--forcer` prend la nouvelle version telle quelle, après avoir sauvegardé les changements locaux dans `~/.gemini/agent2prompt/sauvegardes/`.
+- **État** : l'empreinte de chaque copie installée est tenue dans `~/.gemini/agent2prompt/installation.json`, que Gemini CLI ne lit pas.
+
+Ensuite, dans les sessions ouvertes de Gemini CLI : `/skills reload`, `/agents reload` et `/commands reload`. L'installateur dit ce qui reste à faire, comme `npm ci` pour les dépendances de `capture-sprint-jira`, et donne le chemin du clone qu'attend `generateur-skill-ticket`.
+
+Gemini CLI ne lit pas l'historique figé du dépôt : `.geminiignore` lui cache les archives des versions publiées et les anciennes transmissions qui citent un autre hôte d'IA. Elles restent telles que publiées, et `tools/verifier.mjs` refuse ce nom partout ailleurs.
 
 ## Installer un skill dans Gemini CLI
 
@@ -141,7 +167,7 @@ node ~/dev/Agent2Prompt/tools/installer.mjs --retirer java
 
 Sous Windows : `node C:\dev\Agent2Prompt\tools\installer.mjs orchestrateur-c7e`. Un fichier de transmission s'installe aussi seul : `node tools/installer.mjs chemin/vers/java-1.1.1.md`. `--essai` montre ce qui serait fait, sans rien écrire.
 
-Le dossier du skill reçoit les fichiers transmis, la consigne de la transmission (`CONSIGNE.md`) et la table d'intégrité de l'installation (`integrite.sha256`, que vérifie `sha256sum -c integrite.sha256`). Une nouvelle version remplace l'ancienne d'un bloc. L'installateur refuse si des fichiers ont changé depuis l'installation, sauf `--forcer`, et ne touche pas à un dossier qu'il n'a pas installé.
+Le dossier du skill reçoit les fichiers transmis, la consigne de la transmission (`CONSIGNE.md`), les fichiers que le skill tire de ses modules (ceux de la table `attendu` de sa commande d'extraction, contrôlés par leur empreinte) et la table d'intégrité de l'installation (`integrite.sha256`, que vérifie `sha256sum -c integrite.sha256`). Une nouvelle version remplace l'ancienne d'un bloc. L'installateur refuse si des fichiers ont changé depuis l'installation, sauf `--forcer`, et ne touche pas à un dossier qu'il n'a pas installé.
 
 Dans un dépôt Git, il masque le skill à `git status` sans le rendre illisible pour Gemini CLI :
 
@@ -156,7 +182,7 @@ Ensuite, dans Gemini CLI : `/skills reload`, puis `/skills list`. L'installateur
 
 `explication-hote-ia` se diffuse aussi seul, sans ce dépôt : `gemini skills install` l'installe depuis son dossier ou un fichier `.skill`, et son mode d'emploi, [`specs/explication-hote-ia/MODE-EMPLOI.md`](specs/explication-hote-ia/MODE-EMPLOI.md), joint au skill, donne chaque étape.
 
-La recette de l'installateur tourne sous Linux et sous Windows (`.github/workflows/recette-installer.yml`). Le même workflow confronte une installation au code de Gemini CLI lui-même (`@google/gemini-cli-core`, version épinglée) : chaque skill est découvert une fois, avec son nom et sa description, et chacun de ses fichiers est lisible.
+Les recettes des deux installateurs tournent sous Linux et sous Windows (`.github/workflows/recette-installer.yml`). Le même workflow confronte leurs installations au code de Gemini CLI lui-même (`@google/gemini-cli-core`, version épinglée) : chaque skill est découvert une fois, avec son nom et sa description, chacun de ses fichiers est lisible, et chaque sous-agent copié par `installer.mjs` se charge sans erreur. Il vérifie aussi, avec le même code, que `.geminiignore` cache au dépôt son historique figé et rien d'autre.
 
 ## Générer une transmission
 
@@ -167,7 +193,7 @@ node tools/bundle.mjs specs/tension-dashboard-gitlab-agent
 node tools/bundle.mjs specs/java
 ```
 
-`verifier.mjs` contrôle les manifestes, les versions, les modules et le registre des dimensions, les fichiers partagés épinglés, les archives, les points d'extension, les blocs de code et les invariants (chaque invariant défini est repris dans un module, chaque invariant cité est défini, y compris celui d'un autre skill, cité sous la forme `java:D4.INV-2`). Il échoue aussi si la transmission de la version courante d'une spécification ne redonne plus exactement ses fichiers, si ce README n'affiche plus les versions courantes, ou si `glossaire.md` ne correspond plus exactement aux spécifications. Il tourne à chaque pull request et à chaque push sur `main` (`.github/workflows/verifier.yml`), aussi sur une extraction en fins de ligne CRLF, comme celle de Git sous Windows : le vérificateur, `bundle.mjs` et `glossaire.mjs` lisent les fichiers en fins de ligne Unix, et donnent le même résultat. La recette de `skill4appli`, dont la spécification contient le code, tourne aussi sous Linux et sous Windows quand ses fichiers changent (`.github/workflows/recette-skill4appli.yml`) : la transmission y est matérialisée comme par l'IA du développeur, puis ses fichiers extraits et testés. Il en va de même pour `capture-sprint-jira` (`.github/workflows/recette-capture-sprint-jira.yml`), dont la recette installe sa dépendance par `npm ci` et pilote le Chrome des images GitHub contre un faux Jira local. De même pour `explication-hote-ia` (`.github/workflows/recette-explication-hote-ia.yml`) ; un second travail y confronte les repères du skill au Gemini CLI réel, à une version épinglée et sous Node 26.13.0, sans qu'aucun appel ne quitte le poste : l'hôte tourne contre une fausse API locale qui garde ses requêtes, un proxy témoin note et refuse toute autre sortie, et `strace` relève chaque connexion (`.github/scripts/reperes-hote.mjs`). `bundle.mjs` lit `manifest.json`, insère les fichiers partagés à leur version épinglée, la courante ou une archivée de leur source, écrit `transmissions/<nom>-<version>.md` et échoue si une version épinglée n'est ni courante ni archivée ou si le texte ne redonne pas exactement chaque fichier. Les scripts de `tools/` demandent Node 20 ou plus récent et n'utilisent que les modules natifs de Node, sans `npm install` ; l'installateur appelle aussi `git` pour le masquage.
+`verifier.mjs` contrôle les manifestes, les versions, les modules et le registre des dimensions, les fichiers partagés épinglés, les archives, les points d'extension, les blocs de code et les invariants (chaque invariant défini est repris dans un module, chaque invariant cité est défini, y compris celui d'un autre skill, cité sous la forme `java:D4.INV-2`). Il échoue aussi si la transmission de la version courante d'une spécification ne redonne plus exactement ses fichiers, si ce README n'affiche plus les versions courantes, ou si `glossaire.md` ne correspond plus exactement aux spécifications. Il vérifie aussi que les noms d'un autre hôte d'IA et de son éditeur ne figurent que dans l'historique que `.geminiignore` cache à Gemini CLI, et que ce fichier ne cache aucune version courante. Il tourne à chaque pull request et à chaque push sur `main` (`.github/workflows/verifier.yml`), aussi sur une extraction en fins de ligne CRLF, comme celle de Git sous Windows : le vérificateur, `bundle.mjs` et `glossaire.mjs` lisent les fichiers en fins de ligne Unix, et donnent le même résultat. La recette de `skill4appli`, dont la spécification contient le code, tourne aussi sous Linux et sous Windows quand ses fichiers changent (`.github/workflows/recette-skill4appli.yml`) : la transmission y est matérialisée comme par l'IA du développeur, puis ses fichiers extraits et testés. Il en va de même pour `capture-sprint-jira` (`.github/workflows/recette-capture-sprint-jira.yml`), dont la recette installe sa dépendance par `npm ci` et pilote le Chrome des images GitHub contre un faux Jira local. De même pour `explication-hote-ia` (`.github/workflows/recette-explication-hote-ia.yml`) ; un second travail y confronte les repères du skill au Gemini CLI réel, à une version épinglée et sous Node 26.13.0, sans qu'aucun appel ne quitte le poste : l'hôte tourne contre une fausse API locale qui garde ses requêtes, un proxy témoin note et refuse toute autre sortie, et `strace` relève chaque connexion (`.github/scripts/reperes-hote.mjs`). `bundle.mjs` lit `manifest.json`, insère les fichiers partagés à leur version épinglée, la courante ou une archivée de leur source, écrit `transmissions/<nom>-<version>.md` et échoue si une version épinglée n'est ni courante ni archivée ou si le texte ne redonne pas exactement chaque fichier. Les scripts de `tools/` demandent Node 20 ou plus récent et n'utilisent que les modules natifs de Node, sans `npm install` ; l'installateur appelle aussi `git` pour le masquage.
 
 ## Faire évoluer une spécification
 

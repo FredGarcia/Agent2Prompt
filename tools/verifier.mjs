@@ -34,13 +34,18 @@
  * - `README.md` affiche chaque spécification à sa version courante, avec sa transmission,
  *   et son schéma ne montre aucune version périmée ; ses liens vers `specs/` et
  *   `transmissions/` aboutissent ;
- * - `glossaire.md` est exactement celui que génère `tools/glossaire.mjs`.
+ * - `glossaire.md` est exactement celui que génère `tools/glossaire.mjs` ;
+ * - les noms d'un autre hôte d'IA et de son éditeur ne figurent dans aucun fichier suivi, hors de
+ *   l'historique figé que `.geminiignore` cache à Gemini CLI : archives des versions publiées et
+ *   anciennes transmissions ; et `.geminiignore` ne cache rien d'autre, aucune version courante.
  *
  * Le contenu des archives (`archives/`) n'est pas vérifié : elles sont figées.
  * Les fichiers se lisent en fins de ligne Unix : une extraction en CRLF, comme celle de
  * Git sous Windows, donne le même résultat.
  * Code de sortie 1 si une erreur est trouvée. Node 20 ou plus récent, modules natifs.
  */
+import { Buffer } from 'node:buffer';
+import { execFileSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -325,6 +330,57 @@ function verifierReadme(specs) {
   return erreurs.length === avant;
 }
 
+// ---------------------------------------------------------------------------
+// Historique caché à Gemini CLI, et noms d'un autre hôte d'IA
+// ---------------------------------------------------------------------------
+
+// Noms d'un autre hôte d'IA et de son éditeur, écrits en base64 pour que ce fichier ne les porte pas.
+const NOMS_HISTORIQUES = ['Y2xhdWRl', 'YW50aHJvcGlj'].map((b) => Buffer.from(b, 'base64').toString('utf8'));
+const MOTIF_NOMS = new RegExp(NOMS_HISTORIQUES.join('|'), 'i');
+const TEXTE = /\.(md|mjs|cjs|js|ts|json|toml|ya?ml|cmd|bat|sh|txt|html|css|feature|java|py|csv|xml|properties|sql)$|(^|\/)\.[a-z]+ignore$/i;
+
+/** Fichiers suivis du dépôt (posix), ou à défaut ceux du disque, hors de .git et de node_modules. */
+function fichiersDuDepot() {
+  try {
+    return execFileSync('git', ['-C', racine, 'ls-files', '-z'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).split('\0').filter(Boolean);
+  } catch {
+    const tous = [];
+    const parcourir = (dossier) => {
+      for (const e of readdirSync(dossier, { withFileTypes: true })) {
+        if (e.name === '.git' || e.name === 'node_modules') continue;
+        if (e.isDirectory()) parcourir(join(dossier, e.name));
+        else tous.push(rel(join(dossier, e.name)).split('\\').join('/'));
+      }
+    };
+    parcourir(racine);
+    return tous;
+  }
+}
+
+/** Motifs de `.geminiignore` : un dossier dont un segment peut valoir `*`, ou un fichier exact. */
+function verifierHistoriqueCache(versionsCourantes) {
+  const chemin = join(racine, '.geminiignore');
+  const motifs = existsSync(chemin) ? lire(chemin).split('\n').map((l) => l.trim()).filter((l) => l && !l.startsWith('#')) : [];
+  const regles = [];
+  for (const motif of motifs) {
+    const transmission = /^transmissions\/([a-z0-9-]+)-(\d+\.\d+\.\d+)\.md$/.exec(motif);
+    if (motif === 'specs/*/archives/') regles.push(/^specs\/[^/]+\/archives\//);
+    else if (transmission) {
+      if (!existsSync(join(racine, motif))) erreurs.push(`.geminiignore : ${motif}, fichier absent`);
+      else if (versionsCourantes.get(transmission[1]) === transmission[2]) erreurs.push(`.geminiignore : ${motif} est la transmission courante de ${transmission[1]}, que Gemini CLI doit pouvoir lire`);
+      regles.push(new RegExp(`^${echapper(motif)}$`));
+    } else erreurs.push(`.geminiignore : motif ${motif}, hors de l'historique (specs/*/archives/ ou une ancienne transmission)`);
+  }
+  const cache = (fichier) => regles.some((r) => r.test(fichier));
+  for (const fichier of fichiersDuDepot()) {
+    if (!TEXTE.test(fichier) || cache(fichier) || !existsSync(join(racine, fichier))) continue;
+    const lignes = lire(join(racine, fichier)).split('\n');
+    const i = lignes.findIndex((l) => MOTIF_NOMS.test(l));
+    if (i >= 0) erreurs.push(`${fichier}, ligne ${i + 1} : « ${MOTIF_NOMS.exec(lignes[i])[0]} », nom d'un autre hôte d'IA ou de son éditeur, hors de l'historique que .geminiignore cache à Gemini CLI`);
+  }
+  return motifs.length;
+}
+
 const specs = [];
 for (const nom of readdirSync(dossierSpecs).sort()) {
   const dossier = join(dossierSpecs, nom);
@@ -339,10 +395,24 @@ let glossaireAJour = false;
 if (!existsSync(CHEMIN_GLOSSAIRE)) erreurs.push('glossaire.md : absent, lancer node tools/glossaire.mjs');
 else if (lire(CHEMIN_GLOSSAIRE) !== genererGlossaire()) erreurs.push("glossaire.md : n'est plus à jour, lancer node tools/glossaire.mjs");
 else glossaireAJour = true;
+const avantHistorique = erreurs.length;
+const versionsCourantes = new Map(
+  readdirSync(dossierSpecs)
+    .filter((nom) => existsSync(join(dossierSpecs, nom, 'manifest.json')))
+    .map((nom) => {
+      try {
+        return [nom, JSON.parse(lire(join(dossierSpecs, nom, 'manifest.json'))).version];
+      } catch {
+        return [nom, undefined];
+      }
+    }),
+);
+const motifsCaches = verifierHistoriqueCache(versionsCourantes);
 
 for (const { bilan } of specs) console.log(`ok  ${bilan}`);
 if (readmeAJour) console.log('ok  README.md à jour');
 if (glossaireAJour) console.log('ok  glossaire.md à jour');
+if (erreurs.length === avantHistorique) console.log(`ok  historique caché à Gemini CLI (${motifsCaches} motifs de .geminiignore), aucun nom d'un autre hôte d'IA ailleurs`);
 const uniques = [...new Set(erreurs)];
 for (const message of uniques) console.error(`ERREUR  ${message}`);
 if (uniques.length > 0) process.exit(1);

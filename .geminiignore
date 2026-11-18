@@ -1,0 +1,19 @@
+# Historique figé, que Gemini CLI ne lit pas : les archives des versions publiées, et les anciennes
+# transmissions qui citent un autre hôte d'IA. Elles restent dans le dépôt telles que publiées
+# (EVOLUTION.md) ; tools/verifier.mjs refuse toute mention de cet hôte ou de son éditeur ailleurs.
+specs/*/archives/
+transmissions/agent2dev-1.0.0.md
+transmissions/agent2dev-1.1.0.md
+transmissions/capture-sprint-jira-1.0.0.md
+transmissions/capture-sprint-jira-1.0.1.md
+transmissions/capture-sprint-jira-1.1.0.md
+transmissions/capture-sprint-jira-1.2.0.md
+transmissions/capture-sprint-jira-1.2.1.md
+transmissions/orchestrateur-c7e-3.1.0.md
+transmissions/orchestrateur-c7e-3.2.0.md
+transmissions/orchestrateur-c7e-3.2.1.md
+transmissions/orchestrateur-c7e-3.3.0.md
+transmissions/orchestrateur-c7e-3.4.0.md
+transmissions/orchestrateur-c7e-3.5.0.md
+transmissions/skill4appli-1.0.0.md
+transmissions/skill4appli-1.1.0.md
