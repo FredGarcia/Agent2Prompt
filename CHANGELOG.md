@@ -96,6 +96,14 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-11-20 : scenario-playwright 1.1.1
+
+- **scenario-playwright 1.1.1**, correctif. La recette passait par intermittence dans la CI : sous Node 24, un premier lancement du navigateur lent dépassait les délais courts de R5, R6, R8 et R11, ou ceux des preuves d'un échec. Ce fut le cas sur `main` après la fusion de 1.0.0, et sur la pull request de 1.1.0.
+  - Preuves d'un échec, capture et instantané ARIA : 10 s au plus, au lieu de 5 et 3 ; la durée d'une étape en échec s'arrête à l'échec, sans le temps de ses preuves.
+  - Recette : les délais courts ne portent plus que sur les étapes dont ils sont l'objet ; R5 prend le délai par défaut, 10 s ; le contrôle des preuves de R6 dit ce qu'il a trouvé.
+  - Workflow `recette-scenario-playwright.yml` : une recette en échec laisse son dossier temporaire en artefact, sans les profils du navigateur, pour examiner l'échec sans le reproduire.
+  - Aucune dimension ni aucun invariant modifié ; les défauts que relèvent R5, R6, R8 et R11 rejoués, chacun relevé comme en 1.1.0.
+
 ### 2026-11-20 : scenario-playwright 1.1.0
 
 - **scenario-playwright 1.1.0**, à la demande du développeur : « les scénarios pourraient aussi être récupérés depuis une page Jira ». Choix ratifiés : deux sources, un lecteur ; la description et les champs de texte, les commentaires sur demande, la provenance de chaque scénario ; des mots-clés en anglais ou en français ; la comparaison au réimport et le remplacement sur demande seulement ; une version 1.1.0 en une seule pull request.

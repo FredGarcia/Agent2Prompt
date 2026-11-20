@@ -82,7 +82,7 @@ Une étape qui crée, modifie ou supprime des données porte `mutation` : sa lig
 
 <!-- fichier : scripts/moteur.mjs -->
 ```javascript
-// scenario-playwright 1.1.0 : moteur des étapes, jeu d'actions fermé.
+// scenario-playwright 1.1.1 : moteur des étapes, jeu d'actions fermé.
 //
 // Chaque étape agit comme une personne devant l'écran, sur une cible résolue côté utilisateur (D4).
 // Aucune étape n'exécute de code dans la page (D5.INV-1) ; les attentes portent sur un état, dans un
@@ -276,6 +276,7 @@ export async function jouerScenario(contexte, { scenario, jeux, resultats, journ
       seau = r;
       const delaiMs = (e.delai ?? (e.action === 'main' ? DELAI_MAIN_DEFAUT : delai)) * 1000;
       const debut = Date.now();
+      let fin = null;
       surEvenement({ type: 'etape', jeu: jeu.numero, etape: r });
       try {
         if (e.mutation) {
@@ -293,9 +294,11 @@ export async function jouerScenario(contexte, { scenario, jeux, resultats, journ
         resultat.statut = 'echec';
         if (e.action === 'verifier') echecVerifier = true;
         else arret = `l'étape ${i + 1} a échoué`;
+        // La durée de l'étape s'arrête à l'échec : les preuves de l'échec n'y entrent pas.
+        fin = Date.now();
         await preuvesEchec(page, resultats, prefixe, r);
       }
-      r.duree_ms = Date.now() - debut;
+      r.duree_ms = (fin ?? Date.now()) - debut;
       // Le seau reste celui de cette étape jusqu'au début de la suivante : un message tardif lui revient.
       surEvenement({ type: 'fin-etape', jeu: jeu.numero, etape: r });
     }
@@ -310,12 +313,12 @@ async function preuvesEchec(page, resultats, prefixe, r) {
     if (!r.capture) {
       const rel = `captures/${prefixe}-${r.action}-echec.png`;
       mkdirSync(join(resultats, 'captures'), { recursive: true });
-      await page.screenshot({ path: join(resultats, rel), timeout: 5000 });
+      await page.screenshot({ path: join(resultats, rel), timeout: 10_000 });
       r.capture = rel;
     }
   } catch { /* page fermée ou figée : pas de capture */ }
   try {
-    const arbre = await page.locator('body').ariaSnapshot({ timeout: 3000 });
+    const arbre = await page.locator('body').ariaSnapshot({ timeout: 10_000 });
     const rel = `aria/${prefixe}-${r.action}.yml`;
     mkdirSync(join(resultats, 'aria'), { recursive: true });
     writeFileSync(join(resultats, rel), `${arbre}\n`);

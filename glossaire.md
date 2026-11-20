@@ -31,7 +31,7 @@ La colonne « Repris dans » cite les modules de la spécification qui reprennen
 | [`generateur-skill-ticket`](#generateur-skill-ticket-111) | 1.1.1 | 8 | 0 | 29 |
 | [`java`](#java-111) | 1.1.1 | 7 | 1 | 29 |
 | [`orchestrateur-c7e`](#orchestrateur-c7e-353) | 3.5.3 | 10 | 1 | 33 |
-| [`scenario-playwright`](#scenario-playwright-110) | 1.1.0 | 11 | 5 | 41 |
+| [`scenario-playwright`](#scenario-playwright-111) | 1.1.1 | 11 | 5 | 41 |
 | [`skill4appli`](#skill4appli-111) | 1.1.1 | 9 | 3 | 34 |
 | [`socle-back-front`](#socle-back-front-110) | 1.1.0 | 7 | 0 | 21 |
 | [`sonarqube`](#sonarqube-110) | 1.1.0 | 8 | 2 | 34 |
@@ -1223,7 +1223,7 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 | **D11.INV-5** | les possibilités du modèle se fondent sur l'analyse de l'application : à l'installation, l'IA propose celles qui s'appliquent, avec leurs repères, celles à retirer et celles qui manquent, rattachées à une couche et à une option ; le développeur seul les écrit dans le référentiel. | `qualification` |
 | **D11.INV-6** | chaque complément se justifie par au moins une possibilité à `oui` que le principal ne porte pas ; les compléments sont en plus petit nombre possible, et la qualification nomme pour chacun les possibilités qui le justifient ; un ticket que le principal porte en entier n'a aucun complément. | `qualification` |
 
-## scenario-playwright 1.1.0
+## scenario-playwright 1.1.1
 
 Scénarios côté utilisateur joués dans le Chrome du poste par Playwright : texte de départ inspiré de Gherkin, en français ou en anglais, écrit par le développeur ou importé sans IA d'une demande Jira (page enregistrée en MHTML ou adresse ouverte dans le navigateur du poste, connexion à la main ; Jira Cloud et Data Center ; description et champs de texte, commentaires sur demande ; provenance, étiquettes, comparaison et remplacement sur demande au réimport) ; traduction en scénario TOML exécutable par l'IA, sur un squelette produit sans IA, ratifiée par le développeur et contrôlée sans IA (empreinte, structure, lignes, marques, variables) ; jeu fermé de treize actions commun avec le navigateur d'Agent2Test, cibles par rôle et nom accessible, aucun code exécuté dans la page, attentes bornées, aucune étape rejouée ; origines gardées, mutations hors du poste sur autorisation explicite, connexion à la main dans un profil dédié ; rapport JSON et Markdown avec captures, instantanés ARIA et erreurs relevées ; désignation d'une cible à la souris ; agent pilote-scenario et commandes /scenario:importer, /scenario:traduire, /scenario:jouer et /scenario:designer. Point d'entrée : [`specs/scenario-playwright/SKILL.md`](specs/scenario-playwright/SKILL.md).
 

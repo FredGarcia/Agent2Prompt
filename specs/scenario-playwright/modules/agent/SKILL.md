@@ -76,7 +76,7 @@ Dans Gemini CLI, depuis un clone du dépôt Agent2Prompt, `node installer.mjs` i
 ```markdown
 ---
 name: pilote-scenario
-description: Pilote de scénarios côté utilisateur (skill scenario-playwright 1.1.0). À solliciter pour importer les scénarios Gherkin d'une demande Jira en textes de départ, pour traduire un texte de scénario (.scenario, inspiré de Gherkin) en scénario TOML exécutable, pour jouer un scénario dans le Chrome du poste comme un utilisateur et en rendre le bilan, ou pour désigner une cible à la souris. Ne saisit aucun identifiant ; fait ratifier chaque traduction ; demande avant toute exécution qui modifie des données hors du poste.
+description: Pilote de scénarios côté utilisateur (skill scenario-playwright 1.1.1). À solliciter pour importer les scénarios Gherkin d'une demande Jira en textes de départ, pour traduire un texte de scénario (.scenario, inspiré de Gherkin) en scénario TOML exécutable, pour jouer un scénario dans le Chrome du poste comme un utilisateur et en rendre le bilan, ou pour désigner une cible à la souris. Ne saisit aucun identifiant ; fait ratifier chaque traduction ; demande avant toute exécution qui modifie des données hors du poste.
 kind: local
 tools:
   - run_shell_command
@@ -147,7 +147,7 @@ Tu importes de Jira, traduis, fais ratifier et joues des scénarios côté utili
 
 <!-- fichier : commandes/scenario/importer.toml -->
 ```toml
-description = "Importe les scénarios Gherkin d'une demande Jira en textes de départ (.scenario), sans IA (skill scenario-playwright 1.1.0)"
+description = "Importe les scénarios Gherkin d'une demande Jira en textes de départ (.scenario), sans IA (skill scenario-playwright 1.1.1)"
 prompt = """
 Active le skill scenario-playwright, puis importe les scénarios de la demande Jira suivante : {{args}}
 Une adresse de demande ouvre Jira dans la fenêtre, sur le profil dédié : relaie le message « À VOUS », sans jamais demander ni saisir d'identifiant. Une page enregistrée en MHTML se lit sans navigateur. --adresse de l'application est requise ; les commentaires ne se lisent qu'avec --commentaires, à la demande du développeur.
@@ -157,7 +157,7 @@ Pour un réimport, --comparer d'abord ; --remplacer seulement avec l'accord du d
 
 <!-- fichier : commandes/scenario/traduire.toml -->
 ```toml
-description = "Traduit un texte de scénario (.scenario) en scénario TOML exécutable, puis le présente à la ratification (skill scenario-playwright 1.1.0)"
+description = "Traduit un texte de scénario (.scenario) en scénario TOML exécutable, puis le présente à la ratification (skill scenario-playwright 1.1.1)"
 prompt = """
 Active le skill scenario-playwright, puis traduis le texte de scénario suivant : {{args}}
 Suis la traduction décrite au module scenario : texte vérifié, squelette écrit par traduire.mjs, étapes complétées, verifier.mjs --plan conforme.
@@ -167,7 +167,7 @@ Présente le plan ligne du texte par ligne du texte, avec les étapes qui modifi
 
 <!-- fichier : commandes/scenario/jouer.toml -->
 ```toml
-description = "Joue un scénario TOML dans le Chrome du poste, comme un utilisateur, et rend le bilan (skill scenario-playwright 1.1.0)"
+description = "Joue un scénario TOML dans le Chrome du poste, comme un utilisateur, et rend le bilan (skill scenario-playwright 1.1.1)"
 prompt = """
 Active le skill scenario-playwright, puis joue le scénario : {{args}}
 verifier.mjs d'abord. Demande l'accord explicite du développeur avant --autoriser-mutations. Fenêtre visible ; relaie chaque message « À VOUS » sans jamais demander ni saisir d'identifiant.
@@ -177,7 +177,7 @@ Rends le bilan du rapport.json : statut, étapes en échec et leur message, capt
 
 <!-- fichier : commandes/scenario/designer.toml -->
 ```toml
-description = "Ouvre une page et rend la cible de chaque élément que le développeur désigne à la souris (skill scenario-playwright 1.1.0)"
+description = "Ouvre une page et rend la cible de chaque élément que le développeur désigne à la souris (skill scenario-playwright 1.1.1)"
 prompt = """
 Active le skill scenario-playwright, puis lance designer.mjs sur l'adresse suivante : {{args}}
 Le développeur clique lui-même les éléments dans la fenêtre ; rends chaque cible au format du scénario. Une cible non convertible s'écrit à la main, avec lui.

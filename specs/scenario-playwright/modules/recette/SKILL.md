@@ -77,7 +77,7 @@ Le même fichier sert un Jira factice, sur une troisième origine, et donne de q
 
 ## 4. Contrôle de la recette elle-même
 
-Vingt-neuf défauts, réintroduits un à un dans le code, font chacun échouer la recette par le scénario attendu (essai du 20 novembre 2026, Node 22.23.4, Chromium 159) :
+Vingt-neuf défauts, réintroduits un à un dans le code, font chacun échouer la recette par le scénario attendu (essai du 20 novembre 2026, Node 22.23.4, Chromium 159, rejoué en 1.1.1 pour les défauts que relèvent R5, R6, R8 et R11) :
 
 | ID | Défaut réintroduit | Scénarios en échec | Contrôles en échec |
 |---|---|---|---|
@@ -115,7 +115,7 @@ Chaque défaut a été retiré après son essai ; la recette du code publié pas
 
 ## 5. Recette en intégration continue
 
-Le workflow `.github/workflows/recette-scenario-playwright.yml` du dépôt Agent2Prompt suit le chemin de l'IA du développeur : il matérialise la transmission courante, extrait les fichiers par la commande du module `execution`, § 8, sous bash et sous CMD, installe la dépendance par `npm ci`, puis lance la recette, sous `xvfb-run` sur `ubuntu-latest` et directement sur `windows-latest`, avec Node 22, 24 et 26.13.0 et le Chrome stable des images GitHub.
+Le workflow `.github/workflows/recette-scenario-playwright.yml` du dépôt Agent2Prompt suit le chemin de l'IA du développeur : il matérialise la transmission courante, extrait les fichiers par la commande du module `execution`, § 8, sous bash et sous CMD, installe la dépendance par `npm ci`, puis lance la recette, sous `xvfb-run` sur `ubuntu-latest` et directement sur `windows-latest`, avec Node 22, 24 et 26.13.0 et le Chrome stable des images GitHub. Une recette en échec y laisse son dossier temporaire en artefact, sans les profils du navigateur : sortie de la recette, rapports, captures et instantanés ARIA, gardés sept jours.
 
 ## 6. Sources
 
@@ -123,7 +123,7 @@ Le workflow `.github/workflows/recette-scenario-playwright.yml` du dépôt Agent
 
 <!-- fichier : tests/application-demo.mjs -->
 ```javascript
-// scenario-playwright 1.1.0 : application de démonstration de la recette, servie sur 127.0.0.1 sans réseau.
+// scenario-playwright 1.1.1 : application de démonstration de la recette, servie sur 127.0.0.1 sans réseau.
 //
 // Deux origines : l'application, et une « autre » origine, que les scénarios ne déclarent pas, pour la
 // garde des origines. Les pages couvrent chaque action du jeu fermé : liste et formulaire de clients,
@@ -438,7 +438,7 @@ function jiraFactice(etat) {
 <!-- fichier : tests/run-tests.mjs -->
 ```javascript
 #!/usr/bin/env node
-// scenario-playwright 1.1.0 : recette du skill, scénarios R1 à R21, contre l'application de démonstration
+// scenario-playwright 1.1.1 : recette du skill, scénarios R1 à R21, contre l'application de démonstration
 // locale (tests/application-demo.mjs), sans réseau ni compte. Le navigateur s'ouvre, visible, sur des
 // profils temporaires : les profils et les résultats du dossier du skill ne sont pas touchés.
 //   Navigateur : celui de SCENARIO_PLAYWRIGHT_CANAL (chrome par défaut ; chromium après
@@ -557,7 +557,7 @@ async function principal() {
   const app = await demarrerApplication();
   const { base, autre, distante, jira: adresseJira } = app;
   const canal = session.lireReglages(ENV).reglages.canal;
-  console.log(`Recette de scenario-playwright 1.1.0 : Node ${process.versions.node}, navigateur ${canal}, application ${base}`);
+  console.log(`Recette de scenario-playwright 1.1.1 : Node ${process.versions.node}, navigateur ${canal}, application ${base}`);
   try {
     // ------------------------------------------------------------------------------------------
     scenarioRecette('R1', 'Texte de départ : structure, marques, variables, exemples, erreurs ligne par ligne');
@@ -835,7 +835,7 @@ attendu = "Client \${nom} créé"
 titre = "Parcours complet"
 etiquettes = ["DEMO-8-S01"]
 url_base = "${base}"
-delai = 5
+delai = 10
 
 [parametres]
 nom = "Zoé Martin"
@@ -991,8 +991,8 @@ nom = "export"
       controle('cible ambiguë : échec, candidats cités, code 1 (D4.INV-2)', r1.code === 1 && e1[1]?.statut === 'echec' && /cible ambiguë, \d+ éléments trouvés, aucune action faite/.test(e1[1]?.message) && /aka getByRole\('row'|aka getByRole\('button'/.test(e1[1]?.message), JSON.stringify(e1[1]));
       controle('aucune suppression faite', app.etat.clients.length === avant);
       controle('étape suivante non jouée (D5.INV-3)', e1[2]?.statut === 'non_jouee' && /non jouée : l'étape 2 a échoué/.test(e1[2]?.message));
-      controle('capture et instantané ARIA de l\'échec (D8.INV-2)', e1[1]?.capture && existsSync(join(r1.dossier, e1[1].capture)) && e1[1]?.aria && /Liste des clients|table/.test(readFileSync(join(r1.dossier, e1[1].aria), 'utf8')));
-      const suite = ecrire('r6', 'verifications.toml', `format = "scenario-playwright.scenario/1"\ntitre = "Vérifications"\nurl_base = "${base}"\ndelai = 2\n\n[[etapes]]\naction = "naviguer"\nurl = "/clients"\n\n[[etapes]]\naction = "verifier"\ncritere = "contient"\ncible = { role = "heading" }\nattendu = "Fournisseurs"\n\n[[etapes]]\naction = "verifier"\ncritere = "visible"\ncible = { role = "table" }\n\n[[etapes]]\naction = "verifier"\ncritere = "nombre"\ncible = { role = "button", nom = "Supprimer" }\nattendu = 99\n\n[[etapes]]\naction = "cliquer"\ncible = { role = "link", nom = "Clients" }\n`);
+      controle('capture et instantané ARIA de l\'échec (D8.INV-2)', e1[1]?.capture && existsSync(join(r1.dossier, e1[1].capture)) && e1[1]?.aria && /Liste des clients|table/.test(readFileSync(join(r1.dossier, e1[1].aria), 'utf8')), JSON.stringify(e1[1]));
+      const suite = ecrire('r6', 'verifications.toml', `format = "scenario-playwright.scenario/1"\ntitre = "Vérifications"\nurl_base = "${base}"\n\n[[etapes]]\naction = "naviguer"\nurl = "/clients"\n\n[[etapes]]\naction = "verifier"\ncritere = "contient"\ncible = { role = "heading" }\nattendu = "Fournisseurs"\ndelai = 2\n\n[[etapes]]\naction = "verifier"\ncritere = "visible"\ncible = { role = "table" }\n\n[[etapes]]\naction = "verifier"\ncritere = "nombre"\ncible = { role = "button", nom = "Supprimer" }\nattendu = 99\ndelai = 2\n\n[[etapes]]\naction = "cliquer"\ncible = { role = "link", nom = "Clients" }\n`);
       const r2 = await jouer(suite);
       const e2 = etapes(r2);
       controle('une vérification échouée n\'arrête pas les vérifications suivantes (D5.INV-3)', e2.map((x) => x.statut).join() === 'reussie,echec,reussie,echec,non_jouee', e2.map((x) => x.statut).join());
@@ -1046,7 +1046,7 @@ nom = "export"
         try {
           const dossier = rapport.dossierResultats(join(TMP, 'r8', 'api'), 'distant');
           const journal = await session.garderOrigines(ctx, sc.origines);
-          const joues = await moteur.jouerScenario(ctx, { scenario: sc, jeux, resultats: dossier, journal, delai: 5, autoriserMutations: false });
+          const joues = await moteur.jouerScenario(ctx, { scenario: sc, jeux, resultats: dossier, journal, delai: 10, autoriserMutations: false });
           const e = joues[0].etapes;
           controle('garde à l\'étape par l\'API : mutation sur une page hors du poste refusée, sans action', e[1].statut === 'echec' && /hors du poste, sans --autoriser-mutations : aucune action faite/.test(e[1].message) && app.etat.compteur === avant + 1, JSON.stringify(e[1]));
         } finally {
@@ -1106,7 +1106,7 @@ nom = "export"
       controle('dossier des profils relatif au skill, ou absolu', session.lireReglages({ SCENARIO_PLAYWRIGHT_PROFILS: 'p' }).reglages.profils === join(session.DOSSIER_SKILL, 'p') && session.lireReglages({ SCENARIO_PLAYWRIGHT_PROFILS: TMP }).reglages.profils === TMP);
       const r4 = await jouer(join(TMP, 'r11', 'meme.toml'), [], { env: { ...ENV, SCENARIO_PLAYWRIGHT_CANAL: 'firefox' } });
       controle('canal invalide : code 2 avant le navigateur', r4.code === 2 && /SCENARIO_PLAYWRIGHT_CANAL/.test(r4.erreurs));
-      const lent = ecrire('r11', 'delai.toml', `format = "scenario-playwright.scenario/1"\ntitre = "Délai"\nurl_base = "${base}"\n\n[[etapes]]\naction = "naviguer"\nurl = "/clients"\n\n[[etapes]]\naction = "cliquer"\ncible = { role = "button", nom = "Inexistant" }\n`);
+      const lent = ecrire('r11', 'delai.toml', `format = "scenario-playwright.scenario/1"\ntitre = "Délai"\nurl_base = "${base}"\n\n[[etapes]]\naction = "naviguer"\nurl = "/clients"\ndelai = 10\n\n[[etapes]]\naction = "cliquer"\ncible = { role = "button", nom = "Inexistant" }\n`);
       const r5 = await jouer(lent, [], { env: { ...ENV, SCENARIO_PLAYWRIGHT_DELAI: '1' } });
       controle('SCENARIO_PLAYWRIGHT_DELAI s\'applique sans délai dans le scénario', /délai de 1 s dépassé/.test(etapes(r5)[1]?.message ?? ''), JSON.stringify(etapes(r5)[1]));
     }

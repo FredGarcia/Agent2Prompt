@@ -1,6 +1,6 @@
 # Mode d'emploi : jouer un scénario côté utilisateur avec Playwright
 
-Ce mode d'emploi installe [`scenario-playwright`](../../specs/scenario-playwright/SKILL.md) 1.1.0 : faire faire à Chrome, sur votre poste, les manipulations d'un utilisateur décrites par un scénario. Vous écrivez le scénario en français ou en anglais, dans un texte inspiré de Gherkin, ou vous l'importez, sans IA, d'une demande Jira ; l'IA le traduit en TOML exécutable ; vous ratifiez la traduction ; le skill joue le scénario, sans IA, et rend un rapport avec ses captures. Vous gardez la main : chaque connexion se fait par vous, dans la fenêtre, et aucune donnée n'est modifiée hors de votre poste sans votre accord pour l'exécution.
+Ce mode d'emploi installe [`scenario-playwright`](../../specs/scenario-playwright/SKILL.md) 1.1.1 : faire faire à Chrome, sur votre poste, les manipulations d'un utilisateur décrites par un scénario. Vous écrivez le scénario en français ou en anglais, dans un texte inspiré de Gherkin, ou vous l'importez, sans IA, d'une demande Jira ; l'IA le traduit en TOML exécutable ; vous ratifiez la traduction ; le skill joue le scénario, sans IA, et rend un rapport avec ses captures. Vous gardez la main : chaque connexion se fait par vous, dans la fenêtre, et aucune donnée n'est modifiée hors de votre poste sans votre accord pour l'exécution.
 
 ```mermaid
 flowchart LR
@@ -32,7 +32,7 @@ cd ~/.gemini/skills/scenario-playwright && npm ci && npm test
 
 L'installateur pose le skill dans `~/.gemini/skills/scenario-playwright/`, avec l'agent `pilote-scenario` et les commandes `/scenario:importer`, `/scenario:traduire`, `/scenario:jouer` et `/scenario:designer`. Dans une session ouverte : `/skills reload`, `/agents reload`, `/commands reload`. Sous Linux sans écran, la recette se lance par `xvfb-run -a npm test`.
 
-Sans clone, remettez à l'IA la transmission [`transmissions/scenario-playwright-1.1.0.md`](../../transmissions/scenario-playwright-1.1.0.md) : elle matérialise le skill, vérifie les empreintes, installe la dépendance et lance la recette.
+Sans clone, remettez à l'IA la transmission [`transmissions/scenario-playwright-1.1.1.md`](../../transmissions/scenario-playwright-1.1.1.md) : elle matérialise le skill, vérifie les empreintes, installe la dépendance et lance la recette.
 
 ## 3. Écrire le texte de départ
 
