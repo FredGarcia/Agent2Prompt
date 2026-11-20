@@ -79,7 +79,7 @@ Les erreurs de console, les exceptions de la page et les réponses HTTP de statu
 
 <!-- fichier : scripts/rapport.mjs -->
 ```javascript
-// scenario-playwright 1.0.0 : rapport d'une exécution, en JSON (champs stables, E1) et en Markdown.
+// scenario-playwright 1.1.0 : rapport d'une exécution, en JSON (champs stables, E1) et en Markdown.
 //
 // Chaque exécution écrit son dossier de résultats horodaté : rapport.json, rapport.md, captures,
 // instantanés ARIA à l'échec, téléchargements, et la trace si elle est demandée (D8.INV-1, D8.INV-2).
@@ -87,7 +87,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 export const FORMAT_RAPPORT = 'scenario-playwright.rapport/1';
-export const VERSION_SKILL = '1.0.0';
+export const VERSION_SKILL = '1.1.0';
 
 const deux = (n) => String(n).padStart(2, '0');
 

@@ -1,6 +1,6 @@
 ---
 name: texte
-description: Texte de départ d'un scénario, fichier .scenario inspiré de Gherkin en français, écrit par le développeur (un seul scénario par texte, étiquettes, Fonctionnalité facultative, titre Scénario, réglages Adresse, Origines, Profil et Paramètre, étapes introduites par Étant donné, Soit, Sachant que, Quand, Lorsque, Alors, Et, Mais, marques (création), (modification), (suppression) et (à la main), variables <nom>, tableau Exemples, commentaires, erreurs données ligne par ligne, empreinte identique en LF et en CRLF, phrases conseillées et leur traduction, source de scripts/texte.mjs). À lire pour écrire un texte ou le traduire.
+description: Texte de départ d'un scénario, fichier .scenario inspiré de Gherkin en français ou en anglais, écrit par le développeur ou importé de Jira (un seul scénario par texte, étiquettes, Fonctionnalité ou Feature facultative, titre Scénario ou Scenario, réglages Adresse, Origines, Profil et Paramètre, étapes introduites par Étant donné, Soit, Sachant que, Quand, Lorsque, Alors, Donc, Et, Mais, ou Given, When, Then, And, But, marques (création), (modification), (suppression) et (à la main), variables <nom>, tableau Exemples ou Examples, Contexte et Règle refusés, commentaires, erreurs données ligne par ligne, empreinte identique en LF et en CRLF, phrases conseillées et leur traduction, source de scripts/texte.mjs). À lire pour écrire un texte ou le traduire.
 dimensions: [D2]
 status: active
 ---
@@ -11,7 +11,7 @@ Phase 7E couverte : Éléments.
 
 ## 1. Principe
 
-Le texte de départ appartient au développeur : il y dit, en français, ce qu'une personne fait et voit, dans l'ordre. Le skill en lit la structure sans IA (`scripts/texte.mjs`) : titre, étiquettes, réglages, étapes avec leur ligne, marques, variables et exemples. La phrase d'une étape n'est pas interprétée ici : c'est la traduction en TOML qui lui donne ses actions (module `scenario`). Le texte reste la référence : sa traduction cite son empreinte, et un texte modifié rend sa traduction périmée (D3.INV-2).
+Le texte de départ appartient au développeur : il y dit, en français ou en anglais, ce qu'une personne fait et voit, dans l'ordre. Il l'écrit, ou l'importe d'une demande Jira (module `jira`). Le skill en lit la structure sans IA (`scripts/texte.mjs`) : titre, étiquettes, réglages, étapes avec leur ligne, marques, variables et exemples. La phrase d'une étape n'est pas interprétée ici : c'est la traduction en TOML qui lui donne ses actions (module `scenario`). Le texte reste la référence : sa traduction cite son empreinte, et un texte modifié rend sa traduction périmée (D3.INV-2).
 
 ## 2. Forme d'un texte (D2.INV-1)
 
@@ -22,23 +22,30 @@ Un fichier `.scenario`, en UTF-8, décrit un seul scénario. Ses lignes, dans ce
 | commentaire | commence par `#`, partout ; `# language: fr` en tête, comme en Gherkin | non |
 | étiquettes | `@ECR-77-S01 @ECR-77-CA01`, une ou plusieurs lignes, avant le titre | non |
 | fonctionnalité | `Fonctionnalité: Clients`, une fois, avant le titre ; ses étiquettes rejoignent celles du scénario | non |
-| titre | `Scénario: Créer un client`, ou `Plan du scénario:` ; une seule fois | oui |
+| titre | `Scénario: Créer un client`, ou un autre titre de scénario (§ 3) ; une seule fois | oui |
 | réglages | `Adresse :`, `Origines :`, `Profil :`, `Paramètre :` (§ 4), entre le titre et la première étape | `Adresse` |
 | étapes | une par ligne, introduite par un mot-clé (§ 3) | au moins une |
 | exemples | `Exemples:`, puis un tableau (§ 6), après les étapes | non |
 
-Les lignes vides sont libres ; l'indentation est libre. Les deux-points s'écrivent collés ou précédés d'une espace (`Scénario :`). Toute autre ligne est refusée, et chaque erreur donne sa ligne : un texte se corrige en une fois (§ 7). Les fins de ligne CRLF et un BOM sont admis.
+Les lignes vides sont libres ; l'indentation est libre. Un texte décrivant un seul scénario, `Contexte:` et `Règle:` (`Background:`, `Rule:`) y sont refusés : les étapes d'un contexte s'écrivent dans le scénario, ce que fait l'import de Jira (module `jira`, § 4). Les deux-points s'écrivent collés ou précédés d'une espace (`Scénario :`). Toute autre ligne est refusée, et chaque erreur donne sa ligne : un texte se corrige en une fois (§ 7). Les fins de ligne CRLF et un BOM sont admis.
 
-## 3. Mots-clés des étapes
+## 3. Mots-clés, en français ou en anglais (D2.INV-4)
 
-| Mot-clé | Emploi conseillé |
-|---|---|
-| `Étant donné que`, `Étant donné qu'`, `Étant donné`, `Soit`, `Sachant que`, `Sachant qu'` | la situation de départ |
-| `Quand`, `Lorsque`, `Lorsqu'` | le geste de l'utilisateur |
-| `Alors` | ce qu'il voit ensuite |
-| `Et`, `Mais` | la suite de l'étape précédente |
+| Ligne | Français | Anglais |
+|---|---|---|
+| fonctionnalité | `Fonctionnalité:` | `Feature:`, `Business Need:`, `Ability:` |
+| titre | `Scénario:`, `Exemple:`, `Plan du scénario:` | `Scenario:`, `Example:`, `Scenario Outline:`, `Scenario Template:` |
+| exemples | `Exemples:`, `Scénarios:` | `Examples:`, `Scenarios:` |
+| refusé dans un texte | `Contexte:`, `Règle:` | `Background:`, `Rule:` |
 
-Les mots-clés se reconnaissent sans tenir compte des accents ni de la casse (`Etant donne que`, `QUAND`) ; ils n'ont pas d'effet sur l'exécution, seulement sur la lecture. Chaque étape garde son numéro de ligne, son mot-clé tel qu'écrit et sa phrase (D2.INV-2).
+| Étape | Français | Anglais |
+|---|---|---|
+| la situation de départ | `Étant donné que`, `Étant donné qu'`, `Étant donné`, `Étant donnée`, `Étant donnés`, `Étant données`, `Soit`, `Sachant que`, `Sachant qu'`, `Sachant` | `Given` |
+| le geste de l'utilisateur | `Quand`, `Lorsque`, `Lorsqu'` | `When` |
+| ce qu'il voit ensuite | `Alors`, `Donc` | `Then` |
+| la suite de l'étape précédente | `Et que`, `Et qu'`, `Et`, `Mais que`, `Mais qu'`, `Mais` | `And`, `But` |
+
+Les mots-clés se reconnaissent sans tenir compte des accents ni de la casse (`Etant donne que`, `QUAND`, `given`) ; les deux langues peuvent se mêler. Ils n'ont pas d'effet sur l'exécution, seulement sur la lecture. Chaque étape garde son numéro de ligne, son mot-clé tel qu'écrit et sa phrase (D2.INV-2). Les réglages (§ 4) et les marques (§ 5) s'écrivent en français, quelle que soit la langue des mots-clés.
 
 ## 4. Réglages
 
@@ -85,7 +92,7 @@ ERREUR creer.scenario, ligne 3 : ligne non reconnue : « Adress : http://127.0.0
 ERREUR creer.scenario, ligne 9 : variable <nom> non déclarée : ni paramètre, ni colonne d'exemples
 ```
 
-Sont refusés, entre autres : un second titre, un réglage après la première étape ou avant le titre, une étape avant le titre, une adresse absente ou qui n'est pas en http ou https, une origine avec un chemin, une adresse dont l'origine n'est pas parmi les origines déclarées, une variable non déclarée ou mal nommée, une ligne d'exemples irrégulière, un tableau vide, une ligne après le tableau, des étiquettes après le titre, un profil mal nommé, un paramètre en double.
+Sont refusés, entre autres : une ligne `Contexte:` ou `Règle:`, un second titre, un réglage après la première étape ou avant le titre, une étape avant le titre, une adresse absente ou qui n'est pas en http ou https, une origine avec un chemin, une adresse dont l'origine n'est pas parmi les origines déclarées, une variable non déclarée ou mal nommée, une ligne d'exemples irrégulière, un tableau vide, une ligne après le tableau, des étiquettes après le titre, un profil mal nommé, un paramètre en double.
 
 ## 8. Empreinte (D2.INV-3)
 
@@ -142,9 +149,29 @@ Scénario: Créer un client
 
 `verifier.mjs` le lit ainsi : « Créer un client », 6 étapes (l.8 à la main, l.12 création), 2 exemples, et son empreinte.
 
+Le même scénario, mots-clés en anglais :
+
+```text
+# language: en
+@ECR-77-S01 @ECR-77-CA01
+Scenario Outline: Create a client
+  Adresse : http://127.0.0.1:4200
+
+  Given I log in (à la main)
+  When I click the link "New client"
+  And I type "<nom>" in the field "Name"
+  And I click the button "Save" (création)
+  Then I see the message "Client <nom> created"
+
+  Examples:
+    | nom    |
+    | Dupuis |
+```
+
 ## 11. Contrôle de sortie
 
 - Un texte conforme est lu sans erreur, chaque étape avec sa ligne, son mot-clé, sa phrase, sa marque et ses variables (D2.INV-1, D2.INV-2).
+- Un texte aux mots-clés anglais, ou aux synonymes français, se lit de même, mots-clés gardés tels qu'écrits (D2.INV-4).
 - Un texte non conforme rend toutes ses erreurs, chacune avec sa ligne.
 - Le même texte en CRLF, avec un BOM, ou en caractères décomposés, a la même empreinte (D2.INV-3).
 
@@ -152,12 +179,13 @@ Scénario: Créer un client
 
 <!-- fichier : scripts/texte.mjs -->
 ```javascript
-// scenario-playwright 1.0.0 : lecteur du texte de départ d'un scénario (fichier .scenario), sans dépendance.
+// scenario-playwright 1.1.0 : lecteur du texte de départ d'un scénario (fichier .scenario), sans dépendance.
 //
-// Le texte, inspiré de Gherkin en français, décrit un seul scénario : étiquettes, titre, réglages
-// (adresse, origines, profil, paramètres), étapes introduites par un mot-clé, et au plus un tableau
-// d'exemples. Ce lecteur en tire la structure sans IA, avec le numéro de ligne de chaque étape ; la
-// phrase d'une étape n'est pas interprétée : c'est la traduction en TOML qui lui donne ses actions.
+// Le texte, inspiré de Gherkin, décrit un seul scénario : étiquettes, titre, réglages (adresse, origines,
+// profil, paramètres), étapes introduites par un mot-clé de Gherkin, en français ou en anglais, et au plus
+// un tableau d'exemples. Ce lecteur en tire la structure sans IA, avec le numéro de ligne de chaque étape ;
+// la phrase d'une étape n'est pas interprétée : c'est la traduction en TOML qui lui donne ses actions. Les
+// mots-clés servent aussi au lecteur des pages Jira (scripts/jira.mjs).
 import { createHash } from 'node:crypto';
 import { URL } from 'node:url';
 
@@ -175,7 +203,7 @@ export class ErreurTexte extends Error {
 
 /** Texte en fins de ligne LF, sans BOM, caractères composés (NFC) : la forme dont on prend l'empreinte. */
 export function normaliser(source) {
-  return source.replace(/^﻿/, '').replace(/\r\n/g, '\n').normalize('NFC');
+  return source.replace(/^\uFEFF/, '').replace(/\r\n/g, '\n').normalize('NFC');
 }
 
 /** Empreinte SHA-256 d'un texte de scénario, la même pour une extraction LF ou CRLF (D2.INV-3). */
@@ -183,23 +211,56 @@ export function empreinteTexte(source) {
   return createHash('sha256').update(normaliser(source), 'utf8').digest('hex');
 }
 
-// Comparaison sans accents ni casse, pour les mots-clés et les marques.
-const plat = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+/** Comparaison sans accents ni casse, pour les mots-clés et les marques. */
+export const plat = (s) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 
+// Mots-clés des étapes de Gherkin, en français et en anglais (D2.INV-4).
 const MOTS_CLES = [
   /^(etant donne(?:e|s|es)? (?:que |qu'))/,
   /^(etant donne(?:e|s|es)? )/,
   /^(sachant (?:que |qu'))/,
+  /^(sachant )/,
   /^(soit )/,
   /^(quand )/,
   /^(lorsque |lorsqu')/,
   /^(alors )/,
+  /^(donc )/,
+  /^(et (?:que |qu'))/,
   /^(et )/,
+  /^(mais (?:que |qu'))/,
   /^(mais )/,
+  /^(given )/,
+  /^(when )/,
+  /^(then )/,
+  /^(and )/,
+  /^(but )/,
 ];
+// Mots-clés des titres de Gherkin, en français et en anglais, et le genre de ligne qu'ils ouvrent.
+const TITRES = {
+  fonctionnalite: 'fonctionnalite', feature: 'fonctionnalite', 'business need': 'fonctionnalite', ability: 'fonctionnalite',
+  scenario: 'scenario', 'plan du scenario': 'scenario', 'scenario outline': 'scenario', 'scenario template': 'scenario', exemple: 'scenario', example: 'scenario',
+  exemples: 'exemples', examples: 'exemples', scenarios: 'exemples',
+  contexte: 'contexte', background: 'contexte',
+  regle: 'regle', rule: 'regle',
+};
+const RE_TITRE = new RegExp(`^(${Object.keys(TITRES).sort((a, b) => b.length - a.length).join('|')})\\s*:\\s*(.*)$`);
 const RE_MARQUE = /\s*\((creation|modification|suppression|a la main)\)\s*$/;
-const RE_TITRE = /^(fonctionnalite|scenario|plan du scenario)\s*:\s*(.*)$/;
 const RE_REGLAGE = /^(adresse|origines|profil|parametre)\s*:\s*(.*)$/;
+
+/** Mot-clé d'étape au début d'une ligne : { motCle tel qu'écrit, phrase }, ou null. */
+export function lireMotCle(ligne) {
+  const m = MOTS_CLES.map((re) => re.exec(plat(ligne))).find(Boolean);
+  if (!m) return null;
+  return { motCle: ligne.slice(0, m[1].length).trim(), phrase: ligne.slice(m[1].length).trim() };
+}
+
+/** Ligne de titre : { genre, motCle tel qu'écrit, valeur }, ou null. Genres : fonctionnalite, scenario, exemples, contexte, regle. */
+export function lireTitre(ligne) {
+  const m = RE_TITRE.exec(plat(ligne));
+  if (!m) return null;
+  const deuxPoints = ligne.indexOf(':');
+  return { genre: TITRES[m[1]], motCle: ligne.slice(0, deuxPoints).trim(), valeur: ligne.slice(deuxPoints + 1).trim() };
+}
 
 /** Origine d'une adresse http ou https, ou null. */
 export function origineDe(adresse) {
@@ -234,6 +295,7 @@ export function analyserTexte(source) {
     format: FORMAT_TEXTE,
     fonctionnalite: null,
     titre: null,
+    motCleTitre: null,
     etiquettes: [],
     adresse: null,
     origines: [],
@@ -291,12 +353,22 @@ export function analyserTexte(source) {
       continue;
     }
 
-    const titre = RE_TITRE.exec(p);
+    const titre = lireTitre(ligne);
     if (titre) {
-      const valeur = ligne.slice(ligne.indexOf(':') + 1).trim();
-      if (titre[1] === 'fonctionnalite') {
-        if (zone !== 'entete' || s.fonctionnalite !== null || s.titre !== null) err(n, '« Fonctionnalité: » se place une fois, avant le titre');
+      const valeur = titre.valeur;
+      if (titre.genre === 'fonctionnalite') {
+        if (zone !== 'entete' || s.fonctionnalite !== null || s.titre !== null) err(n, `« ${titre.motCle}: » se place une fois, avant le titre`);
         else s.fonctionnalite = valeur;
+        continue;
+      }
+      if (titre.genre === 'exemples') {
+        if (zone !== 'etapes') err(n, `« ${titre.motCle}: » vient après les étapes`);
+        zone = 'exemples';
+        tableau = { ligne: n, entetes: null, lignes: [] };
+        continue;
+      }
+      if (titre.genre === 'contexte' || titre.genre === 'regle') {
+        err(n, `« ${titre.motCle}: » n'a pas sa place dans un texte d'un seul scénario : ses étapes s'écrivent dans le scénario`);
         continue;
       }
       if (s.titre !== null) {
@@ -305,15 +377,9 @@ export function analyserTexte(source) {
       }
       if (valeur === '') err(n, 'titre vide');
       s.titre = valeur;
+      s.motCleTitre = titre.motCle;
       ligneTitre = n;
       zone = 'reglages';
-      continue;
-    }
-
-    if (/^exemples\s*:\s*$/.test(p)) {
-      if (zone !== 'etapes') err(n, '« Exemples: » vient après les étapes');
-      zone = 'exemples';
-      tableau = { ligne: n, entetes: null, lignes: [] };
       continue;
     }
 
@@ -356,15 +422,14 @@ export function analyserTexte(source) {
       continue;
     }
 
-    const motCle = MOTS_CLES.map((re) => re.exec(p)).find(Boolean);
+    const motCle = lireMotCle(ligne);
     if (motCle) {
       if (zone === 'entete') {
         err(n, 'étape avant le titre « Scénario: »');
         continue;
       }
       zone = 'etapes';
-      const longueur = motCle[1].length;
-      let phrase = ligne.slice(longueur).trim();
+      let phrase = motCle.phrase;
       let marque = null;
       const m = RE_MARQUE.exec(plat(phrase));
       if (m) {
@@ -374,7 +439,7 @@ export function analyserTexte(source) {
       if (phrase === '') err(n, 'étape sans phrase');
       const variables = [...new Set([...phrase.matchAll(/<([^<>\s]+)>/g)].map((v) => v[1]))];
       for (const v of variables) if (!RE_VARIABLE.test(v)) err(n, `variable invalide : <${v}> (minuscules, chiffres et _)`);
-      s.etapes.push({ ligne: n, motCle: ligne.slice(0, longueur).trim(), phrase, marque, variables });
+      s.etapes.push({ ligne: n, motCle: motCle.motCle, phrase, marque, variables });
       continue;
     }
 

@@ -1,9 +1,9 @@
 {
   "name": "scenario-playwright",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "specSchema": 1,
   "language": "fr",
-  "description": "Scénarios côté utilisateur joués dans le Chrome du poste par Playwright : texte de départ inspiré de Gherkin en français, écrit par le développeur ; traduction en scénario TOML exécutable par l'IA, sur un squelette produit sans IA, ratifiée par le développeur et contrôlée sans IA (empreinte, structure, lignes, marques, variables) ; jeu fermé de treize actions commun avec le navigateur d'Agent2Test, cibles par rôle et nom accessible, aucun code exécuté dans la page, attentes bornées, aucune étape rejouée ; origines gardées, mutations hors du poste sur autorisation explicite, connexion à la main dans un profil dédié ; rapport JSON et Markdown avec captures, instantanés ARIA et erreurs relevées ; désignation d'une cible à la souris ; agent pilote-scenario et commandes /scenario:traduire, /scenario:jouer et /scenario:designer.",
+  "description": "Scénarios côté utilisateur joués dans le Chrome du poste par Playwright : texte de départ inspiré de Gherkin, en français ou en anglais, écrit par le développeur ou importé sans IA d'une demande Jira (page enregistrée en MHTML ou adresse ouverte dans le navigateur du poste, connexion à la main ; Jira Cloud et Data Center ; description et champs de texte, commentaires sur demande ; provenance, étiquettes, comparaison et remplacement sur demande au réimport) ; traduction en scénario TOML exécutable par l'IA, sur un squelette produit sans IA, ratifiée par le développeur et contrôlée sans IA (empreinte, structure, lignes, marques, variables) ; jeu fermé de treize actions commun avec le navigateur d'Agent2Test, cibles par rôle et nom accessible, aucun code exécuté dans la page, attentes bornées, aucune étape rejouée ; origines gardées, mutations hors du poste sur autorisation explicite, connexion à la main dans un profil dédié ; rapport JSON et Markdown avec captures, instantanés ARIA et erreurs relevées ; désignation d'une cible à la souris ; agent pilote-scenario et commandes /scenario:importer, /scenario:traduire, /scenario:jouer et /scenario:designer.",
   "entry": "SKILL.md",
   "targets": {
     "node": ">=22",
@@ -14,11 +14,13 @@
   },
   "references": [
     { "name": "agent2test", "version": "1.3.1" },
-    { "name": "agent-tdd-jira", "version": "1.3.4" }
+    { "name": "agent-tdd-jira", "version": "1.3.4" },
+    { "name": "capture-sprint-jira", "version": "1.2.2" }
   ],
   "modules": [
     { "id": "execution", "path": "modules/execution/SKILL.md", "dimensions": ["D1"], "status": "active" },
     { "id": "texte", "path": "modules/texte/SKILL.md", "dimensions": ["D2"], "status": "active" },
+    { "id": "jira", "path": "modules/jira/SKILL.md", "dimensions": ["D16"], "status": "active" },
     { "id": "scenario", "path": "modules/scenario/SKILL.md", "dimensions": ["D3"], "status": "active" },
     { "id": "cibles", "path": "modules/cibles/SKILL.md", "dimensions": ["D4"], "status": "active" },
     { "id": "actions", "path": "modules/actions/SKILL.md", "dimensions": ["D5"], "status": "active" },
@@ -27,7 +29,7 @@
     { "id": "preuves", "path": "modules/preuves/SKILL.md", "dimensions": ["D8"], "status": "active" },
     { "id": "designer", "path": "modules/designer/SKILL.md", "dimensions": ["D9"], "status": "active" },
     { "id": "agent", "path": "modules/agent/SKILL.md", "dimensions": ["D10"], "status": "active" },
-    { "id": "recette", "path": "modules/recette/SKILL.md", "dimensions": ["D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9"], "status": "active" },
+    { "id": "recette", "path": "modules/recette/SKILL.md", "dimensions": ["D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D16"], "status": "active" },
     { "id": "traduction-auto", "path": "modules/traduction-auto/SKILL.md", "dimensions": ["D11"], "status": "reserved" },
     { "id": "demo", "path": "modules/demo/SKILL.md", "dimensions": ["D12"], "status": "reserved" },
     { "id": "remise", "path": "modules/remise/SKILL.md", "dimensions": ["D13"], "status": "reserved" },
@@ -39,5 +41,7 @@
     "E2",
     "E3"
   ],
-  "previousVersions": []
+  "previousVersions": [
+    { "version": "1.0.0", "file": "archives/SKILL-v1.0.0.md" }
+  ]
 }

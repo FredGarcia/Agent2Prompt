@@ -96,6 +96,19 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-11-20 : scenario-playwright 1.1.0
+
+- **scenario-playwright 1.1.0**, à la demande du développeur : « les scénarios pourraient aussi être récupérés depuis une page Jira ». Choix ratifiés : deux sources, un lecteur ; la description et les champs de texte, les commentaires sur demande, la provenance de chaque scénario ; des mots-clés en anglais ou en français ; la comparaison au réimport et le remplacement sur demande seulement ; une version 1.1.0 en une seule pull request.
+  - `importer.mjs` : depuis une page enregistrée en MHTML (à la main, par capture-sprint-jira, ou remise à agent-tdd-jira), lue sans navigateur ; ou par l'adresse de la demande, ouverte dans le navigateur du poste sur un profil dédié à Jira, connexion à la main, page enregistrée dans `<dossier>/jira/`. Le skill n'y fait que naviguer et n'écrit jamais dans Jira.
+  - Lecteur sans IA, `scripts/jira.mjs` : MHTML en quoted-printable ou en base64, Jira Cloud et Jira Data Center reconnus à leurs marqueurs, description et champs de texte, commentaires avec `--commentaires` ; scénarios Gherkin en français ou en anglais recopiés tels qu'écrits, contexte reporté en tête des étapes, colonnes d'exemples adaptées au format texte, refus motivés (table de données, texte multiligne, plusieurs tableaux d'exemples).
+  - Un texte `<ÉTIQUETTE>.scenario` par scénario, avec sa provenance et ses empreintes ; étiquette `@<CLÉ>-Snn` de Jira, sinon reprise d'un import précédent par le titre, sinon attribuée.
+  - Réimport : textes inchangés jamais réécrits ; `--comparer` dit identique, modifié, nouveau ou disparu, sans rien écrire ; `--remplacer` remplace les textes modifiés dans Jira et garde à côté un texte retouché depuis l'import ; un texte écrit à la main n'est jamais remplacé, un texte disparu jamais supprimé ; la traduction d'un texte remplacé devient périmée par l'empreinte.
+  - Texte de départ : mots-clés de Gherkin en anglais ou en français (D2.INV-4).
+  - Agent : protocole d'import, D10.INV-4, scénarios A7 et A8, commande `/scenario:importer`.
+  - Dimension D16 active, module `jira` ; quarante et un invariants. Référence à capture-sprint-jira 1.2.2 ajoutée.
+  - Recette étendue d'un Jira factice, pages de Jira Cloud et de Jira Data Center et leur MHTML : R1 étendu, R18 à R21, de la lecture à l'import par l'adresse ; défauts réintroduits étendus.
+- `installer.mjs` installe aussi la commande `/scenario:importer` ; mode d'emploi et README mis à jour.
+
 ### 2026-11-20 : scenario-playwright 1.0.0
 
 - **scenario-playwright 1.0.0**, nouvelle spécification, à la demande du développeur : « un skill playwright qui soit programmable par un scénario et permette d'effectuer les manipulations côté utilisateur ». Choix ratifiés : le nom ; un format de départ en texte inspiré de Gherkin, traduit en TOML ; la traduction par l'IA, ratifiée par le développeur ; la connexion à la main seulement ; le navigateur choisi pour la meilleure compatibilité avec Chrome ; les mutations hors du poste sur autorisation explicite.
