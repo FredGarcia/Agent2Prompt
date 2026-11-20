@@ -96,6 +96,21 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-11-20 : scenario-playwright 1.0.0
+
+- **scenario-playwright 1.0.0**, nouvelle spécification, à la demande du développeur : « un skill playwright qui soit programmable par un scénario et permette d'effectuer les manipulations côté utilisateur ». Choix ratifiés : le nom ; un format de départ en texte inspiré de Gherkin, traduit en TOML ; la traduction par l'IA, ratifiée par le développeur ; la connexion à la main seulement ; le navigateur choisi pour la meilleure compatibilité avec Chrome ; les mutations hors du poste sur autorisation explicite.
+  - Texte de départ `.scenario` : étiquettes, titre, adresse, origines, profil, paramètres, étapes en `Étant donné`, `Quand`, `Alors`, marques `(création)`, `(modification)`, `(suppression)` et `(à la main)`, variables `<nom>` et tableau d'exemples ; lu sans IA, chaque erreur avec sa ligne.
+  - Scénario TOML exécutable : squelette écrit sans IA par `traduire.mjs`, étapes complétées par l'IA, contrôle sans IA de la traduction (empreinte du texte, structure, lignes, ordre, marques, variables), plan ligne par ligne pour la ratification.
+  - Moteur : jeu fermé de treize actions, commun avec le navigateur d'Agent2Test pour les gestes partagés ; cibles par rôle et nom accessible, libellé ou texte ; cible ambiguë qui échoue sans agir ; attentes par état, bornées ; aucune étape rejouée ; aucun code exécuté dans la page.
+  - Garde : seules les origines déclarées sont permises, WebSocket compris ; mutations hors du poste refusées sans `--autoriser-mutations` ; aucun identifiant, connexion à la main dans un profil dédié ; trace seulement sur demande.
+  - Preuves : rapport JSON aux champs stables et rapport Markdown, captures, instantanés ARIA à l'échec, erreurs de console et réponses en erreur, téléchargements avec leur empreinte.
+  - `designer.mjs` rend la cible d'un élément cliqué par le développeur, sans actionner la page. Agent `pilote-scenario` et commandes `/scenario:traduire`, `/scenario:jouer` et `/scenario:designer`.
+  - `playwright-core` 1.65.1, dont le Chromium 159 suit le Chrome stable 158 et le suivant ; Node 22 ou plus récent, `playwright-core` 1.65 n'étant plus essayé sous Node 20.
+  - Dimensions D1 à D10 actives, D11 à D15 réservées ; points d'extension E1 à E3 ; trente-trois invariants. Références à agent2test 1.3.1 et à agent-tdd-jira 1.3.4, sans inclusion.
+  - Workflow `recette-scenario-playwright.yml` ; mode d'emploi `docs/scenario-playwright/mode-emploi.md`.
+- `installer.mjs` installe le skill avec son agent et ses commandes ; sa recette et le contrat avec Gemini CLI en tiennent compte.
+- Vérifications : recette de 17 scénarios (213 contrôles), sous Node 22 avec Chromium 159 et sous Node 24 avec Chrome for Testing 153 ; vingt défauts réintroduits, chacun relevé par la recette ; `tools/verifier.mjs`.
+
 ### 2026-11-17 : generateur-skill-ticket 1.1.1
 
 - **generateur-skill-ticket 1.1.1** : correctif, ce qu'a relevé la revérification de la 1.1.0, ratifié par le développeur ; aucune dimension ajoutée, aucune autre spécification touchée.

@@ -31,6 +31,7 @@ La colonne « Repris dans » cite les modules de la spécification qui reprennen
 | [`generateur-skill-ticket`](#generateur-skill-ticket-111) | 1.1.1 | 8 | 0 | 29 |
 | [`java`](#java-111) | 1.1.1 | 7 | 1 | 29 |
 | [`orchestrateur-c7e`](#orchestrateur-c7e-353) | 3.5.3 | 10 | 1 | 33 |
+| [`scenario-playwright`](#scenario-playwright-100) | 1.0.0 | 10 | 5 | 33 |
 | [`skill4appli`](#skill4appli-111) | 1.1.1 | 9 | 3 | 34 |
 | [`socle-back-front`](#socle-back-front-110) | 1.1.0 | 7 | 0 | 21 |
 | [`sonarqube`](#sonarqube-110) | 1.1.0 | 8 | 2 | 34 |
@@ -54,7 +55,7 @@ Agent de développement TDD : demande Jira en MHTML, analyse avec commentaires, 
 |---|---|---|
 | **D2.INV-1** | chaque scénario cite sa provenance : passage de la description, commentaire (auteur, date) ou réponse du développeur. | `analyse-demande` |
 | **D2.INV-2** | une contradiction ou une ambiguïté entre la description et les commentaires devient une question ; elle n'est jamais tranchée par l'agent. | `us-criteres`, `analyse-demande`, `agent2dev`, `agent2dev/cadrage` |
-| **D2.INV-3** | chaque scénario est écrit en Gherkin français, porte une étiquette unique `@<CLÉ>-Snn` et au moins une étape `Alors` vérifiable. | `us-criteres`, `analyse-demande` |
+| **D2.INV-3** | chaque scénario est écrit en Gherkin français, porte une étiquette unique `@<CLÉ>-Snn` et au moins une étape `Alors` vérifiable. | `us-criteres`, `analyse-demande`, `scenario-playwright` |
 | **D2.INV-4** | un scénario que la demande n'énonce pas explicitement (cas d'erreur, limite) porte l'étiquette `@propose` et n'est utilisé qu'après validation. | `analyse-demande` |
 | **D2.INV-5** | les scénarios sont validés par le développeur avant l'étude des variantes. | `analyse-demande`, `agent2dev/autonomie` |
 
@@ -395,11 +396,11 @@ Agent2Test : système multi-agents qui choisit, prépare, exécute et journalise
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
 | **D4.INV-1** | seul `navigateur` pilote Playwright ; aucun autre module n'ouvre de navigateur. | `navigateur` |
-| **D4.INV-2** | le navigateur ne charge que les origines déclarées au profil ; une navigation vers une autre origine est bloquée avant chargement, et le journal indique l'origine visée. | `navigateur` |
+| **D4.INV-2** | le navigateur ne charge que les origines déclarées au profil ; une navigation vers une autre origine est bloquée avant chargement, et le journal indique l'origine visée. | `navigateur`, `scenario-playwright`, `scenario-playwright/garde`, `scenario-playwright/remise` |
 | **D4.INV-3** | le système ne détient aucun identifiant SSO et ne saisit rien dans les pages du fournisseur SSO ; la session est un secret local (fichier hors dépôt, mode 0600), jamais journalisée ni transmise au moteur, et les traces conservées sont expurgées des en-têtes `Authorization`, `Cookie` et `Set-Cookie`. | `navigateur`, `journal`, `profil-recette` |
-| **D4.INV-4** | seules les actions du jeu fermé s'exécutent ; aucun code produit par le moteur n'atteint la page, ni par script, ni par évaluation. | `navigateur` |
-| **D4.INV-5** | une étape n'attend que des états, dans un délai borné ; aucune étape n'attend une durée fixe. | `navigateur` |
-| **D4.INV-6** | une étape de mutation exécutée n'est jamais rejouée ; une étape `verifier`, ou une étape dont l'action n'a pas eu lieu, est retentée deux fois au plus, et un succès au réessai classe l'étape `INSTABILITE`, jamais « réussie ». | `navigateur`, `verdict` |
+| **D4.INV-4** | seules les actions du jeu fermé s'exécutent ; aucun code produit par le moteur n'atteint la page, ni par script, ni par évaluation. | `navigateur`, `scenario-playwright`, `scenario-playwright/remise` |
+| **D4.INV-5** | une étape n'attend que des états, dans un délai borné ; aucune étape n'attend une durée fixe. | `navigateur`, `scenario-playwright` |
+| **D4.INV-6** | une étape de mutation exécutée n'est jamais rejouée ; une étape `verifier`, ou une étape dont l'action n'a pas eu lieu, est retentée deux fois au plus, et un succès au réessai classe l'étape `INSTABILITE`, jamais « réussie ». | `navigateur`, `verdict`, `scenario-playwright`, `scenario-playwright/remise` |
 | **D4.INV-7** | la session s'établit d'abord sans action humaine, par la stratégie configurée ; si cela échoue, CP-0 s'ouvre, et seul le système le ferme, après avoir atteint seul une page protégée. | `navigateur` |
 
 ### D5 : Cartographie de l'application (active)
@@ -1221,6 +1222,113 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 | **D11.INV-4** | `ticket.toml` garde la demande remplie, avec ses sources, et la composition confirmée ; si l'analyse montre ensuite que la demande sort des empreintes, l'IA revient à la qualification et fait confirmer une autre composition, sans en changer d'elle-même. | `referentiel`, `qualification` |
 | **D11.INV-5** | les possibilités du modèle se fondent sur l'analyse de l'application : à l'installation, l'IA propose celles qui s'appliquent, avec leurs repères, celles à retirer et celles qui manquent, rattachées à une couche et à une option ; le développeur seul les écrit dans le référentiel. | `qualification` |
 | **D11.INV-6** | chaque complément se justifie par au moins une possibilité à `oui` que le principal ne porte pas ; les compléments sont en plus petit nombre possible, et la qualification nomme pour chacun les possibilités qui le justifient ; un ticket que le principal porte en entier n'a aucun complément. | `qualification` |
+
+## scenario-playwright 1.0.0
+
+Scénarios côté utilisateur joués dans le Chrome du poste par Playwright : texte de départ inspiré de Gherkin en français, écrit par le développeur ; traduction en scénario TOML exécutable par l'IA, sur un squelette produit sans IA, ratifiée par le développeur et contrôlée sans IA (empreinte, structure, lignes, marques, variables) ; jeu fermé de treize actions commun avec le navigateur d'Agent2Test, cibles par rôle et nom accessible, aucun code exécuté dans la page, attentes bornées, aucune étape rejouée ; origines gardées, mutations hors du poste sur autorisation explicite, connexion à la main dans un profil dédié ; rapport JSON et Markdown avec captures, instantanés ARIA et erreurs relevées ; désignation d'une cible à la souris ; agent pilote-scenario et commandes /scenario:traduire, /scenario:jouer et /scenario:designer. Point d'entrée : [`specs/scenario-playwright/SKILL.md`](specs/scenario-playwright/SKILL.md).
+
+### D1 : Exécution : installation, dépendance, emplacements, réglages, lignes de commande (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D1.INV-1** | le skill demande Node 22 ou plus récent et une seule dépendance, `playwright-core` à version exacte, qui pilote le navigateur installé sur le poste sans en télécharger. | `execution`, `session`, `recette` |
+| **D1.INV-2** | ce que le skill écrit reste sur le poste : profils dans son dossier (`.profils/`), résultats à côté du scénario (`resultats/`) ou dans le dossier choisi ; son `.gitignore` écarte `node_modules/`, `.profils/` et `resultats/`. | `execution`, `session`, `garde`, `recette` |
+| **D1.INV-3** | chaque réglage se lit dans sa variable `SCENARIO_PLAYWRIGHT_CANAL`, `SCENARIO_PLAYWRIGHT_PROFILS` ou `SCENARIO_PLAYWRIGHT_DELAI`, ou prend son défaut ; une variable vide vaut absente ; une valeur invalide est refusée. | `execution`, `session`, `recette` |
+| **D1.INV-4** | `jouer.mjs` sort avec le code 0 quand tout a réussi, 1 quand une étape a échoué, 2 quand le scénario, une option ou l'environnement sont refusés, avant toute action dans le navigateur ; `verifier.mjs` et `traduire.mjs` sortent avec 0 ou 2. | `execution`, `recette` |
+
+### D2 : Texte de départ inspiré de Gherkin (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D2.INV-1** | un texte décrit un seul scénario : étiquettes facultatives, un titre, une adresse et des réglages, au moins une étape introduite par un mot-clé, et au plus un tableau d'exemples ; toute autre ligne est refusée, et chaque erreur donne sa ligne. | `texte`, `agent`, `recette` |
+| **D2.INV-2** | chaque étape garde son numéro de ligne, son mot-clé, sa phrase, sa marque `(création)`, `(modification)`, `(suppression)` ou `(à la main)`, et ses variables `<nom>` ; une variable qui n'est ni un paramètre ni une colonne des exemples est refusée. | `texte`, `recette` |
+| **D2.INV-3** | l'empreinte d'un texte est le SHA-256 de son contenu en fins de ligne LF, sans BOM, en caractères composés : une extraction en CRLF donne la même. | `texte`, `recette` |
+
+### D3 : Scénario TOML et contrôle de sa traduction (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D3.INV-1** | un scénario n'est joué que s'il est valide : format, champs requis, actions du jeu fermé, champs connus de chaque action, valeurs bornées ; chaque erreur cite l'étape, sa ligne du TOML et sa ligne du texte, et le refus a lieu avant d'ouvrir le navigateur. | `scenario`, `recette` |
+| **D3.INV-2** | un scénario traduit d'un texte cite le fichier du texte et son empreinte ; il est refusé si le texte manque ou a changé depuis la traduction. | `texte`, `scenario`, `garde`, `agent`, `recette` |
+| **D3.INV-3** | la traduction recopie exactement la structure du texte : titre, étiquettes, adresse, origines, profil, paramètres et exemples ; chaque étape cite une ligne d'étape du texte, dans l'ordre du texte, et chaque étape du texte a au moins une étape. | `scenario`, `recette`, `traduction-auto` |
+| **D3.INV-4** | une marque de mutation du texte se retrouve sur une étape de sa ligne ; une ligne marquée « (à la main) » donne une seule étape `main`, et une étape `main` vient toujours d'une telle ligne ; chaque variable `<nom>` d'une ligne se retrouve en `${nom}` dans une étape de cette ligne. | `texte`, `scenario`, `recette` |
+| **D3.INV-5** | le squelette d'une traduction est produit sans IA à partir du texte ; ses étapes restent à compléter, et un scénario qui en garde une est refusé. | `execution`, `scenario`, `agent`, `recette`, `traduction-auto` |
+| **D3.INV-6** | une variable `${nom}` prend la valeur de `--param`, sinon du jeu joué, sinon de `[parametres]` ; une variable non déclarée, ou un `--param` qui ne désigne ni un paramètre ni une colonne des jeux, est refusé. | `execution`, `scenario`, `recette` |
+
+### D4 : Cibles côté utilisateur (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D4.INV-1** | une cible se désigne par une seule stratégie côté utilisateur : rôle et nom accessible, libellé, texte, placeholder, identifiant de test, texte alternatif ou titre ; un sélecteur CSS et un rang ne servent qu'en dernier recours, et le rapport les signale fragiles. | `cibles`, `preuves`, `recette` |
+| **D4.INV-2** | une cible qui désigne plusieurs éléments fait échouer l'étape sans agir, et le message cite les éléments trouvés ; une cible absente fait échouer l'étape à son délai, sans agir. | `cibles`, `actions`, `agent`, `recette` |
+| **D4.INV-3** | `dans` restreint une cible à l'intérieur d'une autre, sur trois niveaux au plus. | `cibles`, `recette` |
+
+### D5 : Actions et étapes : jeu fermé, attentes, vérifications (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D5.INV-1** | le jeu d'actions est fermé : `naviguer`, `cliquer`, `saisir`, `choisir`, `cocher`, `survoler`, `touche`, `televerser`, `telecharger`, `attendre`, `verifier`, `capturer` et `main` ; aucune étape n'exécute de code dans la page, et les sources du skill n'emploient ni évaluation dans la page, ni script injecté, ni fonction exposée, ni attente d'une durée fixe. | `scenario`, `actions`, `recette`, `accessibilite`, `enregistrement` |
+| **D5.INV-2** | une étape attend un état, dans son délai : celui de l'étape, sinon du scénario, sinon du réglage, sinon 10 s ; jamais plus de 30 s, ni plus de 900 s pour une étape `main` ; elle s'arrête dès que l'état est obtenu. | `scenario`, `cibles`, `actions`, `recette` |
+| **D5.INV-3** | aucune étape n'est rejouée ; une étape échouée arrête le jeu et les suivantes sont « non jouées », sauf après une étape `verifier`, dont les étapes `verifier` qui suivent sont jouées. | `actions`, `recette` |
+| **D5.INV-4** | `verifier` compare selon son critère, `contient`, `visible`, `valeur`, `nombre`, `url` ou `actif`, en interrogeant l'état jusqu'à son délai ; un échec donne l'attendu et l'obtenu. | `actions`, `recette` |
+| **D5.INV-5** | `televerser` ne prend que des fichiers du dossier du scénario et de ses sous-dossiers ; `telecharger` enregistre le fichier dans les résultats, avec son empreinte. | `scenario`, `actions`, `recette` |
+
+### D6 : Session et navigateur du poste, étape à la main (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D6.INV-1** | le navigateur est celui du poste, Chrome par défaut, Edge ou le Chromium de Playwright sur réglage ; le rapport note sa version, et avertit quand son numéro majeur dépasse celui du Chromium de `playwright-core`, ou reste plus de deux versions en arrière. | `execution`, `session`, `preuves`, `recette` |
+| **D6.INV-2** | le skill ne demande, ne lit, ne stocke ni ne saisit aucun identifiant ; une connexion se fait à la main, dans la fenêtre visible, et la session vit dans un profil dédié, réutilisé d'une exécution à l'autre. | `session`, `garde`, `agent`, `recette` |
+| **D6.INV-3** | une étape `main` attend que le développeur atteigne l'état que décrit `jusqua`, dans son délai ; un scénario qui en a une est refusé sans fenêtre (`--sans-tete`), avant d'ouvrir le navigateur. | `execution`, `session`, `recette` |
+
+### D7 : Garde : origines, mutations hors du poste, trace (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D7.INV-1** | aucune requête ne part vers une origine que le scénario ne déclare pas, WebSocket compris : elle est interrompue avant chargement et comptée dans le rapport ; une navigation de la page vers une telle origine fait échouer l'étape. | `actions`, `session`, `garde`, `preuves`, `agent`, `recette` |
+| **D7.INV-2** | un scénario qui a une étape de mutation et une origine hors du poste (autre que 127.0.0.1, `localhost` ou `[::1]`) n'est joué qu'avec `--autoriser-mutations` ; sans cette option, il est refusé avant d'ouvrir le navigateur, et une étape de mutation sur une page hors du poste échoue sans agir. | `execution`, `texte`, `actions`, `session`, `garde`, `agent`, `recette` |
+| **D7.INV-3** | la trace n'est enregistrée que sur demande (`--trace`), et le rapport rappelle qu'elle contient les cookies et les en-têtes de la session ; les résultats ne quittent pas le poste. | `execution`, `garde`, `recette` |
+
+### D8 : Preuves et rapport (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D8.INV-1** | chaque exécution écrit, dans son dossier de résultats horodaté, `rapport.json`, aux champs stables, et `rapport.md` ; chaque étape y a son statut, sa durée, sa ligne du texte, sa cible et son message. | `preuves`, `recette` |
+| **D8.INV-2** | chaque étape `verifier`, chaque étape `capturer` et chaque échec ont leur capture ; un échec a aussi l'instantané ARIA de la page ; les erreurs de console, les erreurs de la page et les réponses de statut 400 ou plus sont relevées étape par étape. | `actions`, `preuves`, `recette` |
+
+### D9 : Désignation d'une cible à la souris (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D9.INV-1** | la désignation n'agit pas sur la page : chaque clic du développeur rend la cible de l'élément au format du scénario, par la meilleure stratégie que propose Playwright, ou la signale non convertible. | `cibles`, `designer`, `recette` |
+
+### D10 : Agent pilote-scenario et commandes de Gemini CLI (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D10.INV-1** | l'agent ne joue un scénario traduit qu'après la ratification explicite du développeur, à qui le plan est présenté ligne du texte par ligne du texte. | `scenario`, `agent`, `recette` |
+| **D10.INV-2** | l'agent ne passe `--autoriser-mutations` qu'avec l'accord explicite du développeur pour cette exécution, et ne demande ni ne saisit aucun identifiant. | `garde`, `agent` |
+| **D10.INV-3** | l'agent ne modifie ni le texte de départ ni un scénario ratifié sans l'accord du développeur ; une correction se propose, puis se ratifie. | `agent` |
+
+### D11 : Traduction sans IA du texte de départ, par un catalogue de phrases (reserved)
+
+Dimension réservée : aucun invariant en vigueur dans cette version.
+
+### D12 : Parcours du kit démo de generateur-skill-ticket, captures comparées aux images de l'objectif (reserved)
+
+Dimension réservée : aucun invariant en vigueur dans cette version.
+
+### D13 : Remise des scénarios et des rapports à Agent2Test (reserved)
+
+Dimension réservée : aucun invariant en vigueur dans cette version.
+
+### D14 : Audit d'accessibilité des pages parcourues (reserved)
+
+Dimension réservée : aucun invariant en vigueur dans cette version.
+
+### D15 : Enregistrement des gestes du développeur en scénario (reserved)
+
+Dimension réservée : aucun invariant en vigueur dans cette version.
 
 ## skill4appli 1.1.1
 
