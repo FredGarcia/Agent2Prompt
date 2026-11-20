@@ -1,6 +1,6 @@
 {
   "name": "scenario-playwright",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "specSchema": 1,
   "language": "fr",
   "description": "Scénarios côté utilisateur joués dans le Chrome du poste par Playwright : texte de départ inspiré de Gherkin, en français ou en anglais, écrit par le développeur ou importé sans IA d'une demande Jira (page enregistrée en MHTML ou adresse ouverte dans le navigateur du poste, connexion à la main ; Jira Cloud et Data Center ; description et champs de texte, commentaires sur demande ; provenance, étiquettes, comparaison et remplacement sur demande au réimport) ; traduction en scénario TOML exécutable par l'IA, sur un squelette produit sans IA, ratifiée par le développeur et contrôlée sans IA (empreinte, structure, lignes, marques, variables) ; jeu fermé de treize actions commun avec le navigateur d'Agent2Test, cibles par rôle et nom accessible, aucun code exécuté dans la page, attentes bornées, aucune étape rejouée ; origines gardées, mutations hors du poste sur autorisation explicite, connexion à la main dans un profil dédié ; rapport JSON et Markdown avec captures, instantanés ARIA et erreurs relevées ; désignation d'une cible à la souris ; agent pilote-scenario et commandes /scenario:importer, /scenario:traduire, /scenario:jouer et /scenario:designer.",
@@ -42,6 +42,7 @@
     "E3"
   ],
   "previousVersions": [
-    { "version": "1.0.0", "file": "archives/SKILL-v1.0.0.md" }
+    { "version": "1.0.0", "file": "archives/SKILL-v1.0.0.md" },
+    { "version": "1.1.0", "file": "archives/SKILL-v1.1.0.md" }
   ]
 }

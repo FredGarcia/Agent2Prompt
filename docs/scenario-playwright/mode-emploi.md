@@ -1,6 +1,6 @@
 # Mode d'emploi : jouer un scénario côté utilisateur avec Playwright
 
-Ce mode d'emploi installe [`scenario-playwright`](../../specs/scenario-playwright/SKILL.md) 1.1.0 : faire faire à Chrome, sur votre poste, les manipulations d'un utilisateur décrites par un scénario. Vous écrivez le scénario en français ou en anglais, dans un texte inspiré de Gherkin, ou vous l'importez, sans IA, d'une demande Jira ; l'IA le traduit en TOML exécutable ; vous ratifiez la traduction ; le skill joue le scénario, sans IA, et rend un rapport avec ses captures. Vous gardez la main : chaque connexion se fait par vous, dans la fenêtre, et aucune donnée n'est modifiée hors de votre poste sans votre accord pour l'exécution.
+Ce mode d'emploi installe [`scenario-playwright`](../../specs/scenario-playwright/SKILL.md) 1.1.1 : faire faire à Chrome, sur votre poste, les manipulations d'un utilisateur décrites par un scénario. Vous écrivez le scénario en français ou en anglais, dans un texte inspiré de Gherkin, ou vous l'importez, sans IA, d'une demande Jira ; l'IA le traduit en TOML exécutable ; vous ratifiez la traduction ; le skill joue le scénario, sans IA, et rend un rapport avec ses captures. Vous gardez la main : chaque connexion se fait par vous, dans la fenêtre, et aucune donnée n'est modifiée hors de votre poste sans votre accord pour l'exécution.
 
 ```mermaid
 flowchart LR
@@ -32,7 +32,7 @@ cd ~/.gemini/skills/scenario-playwright && npm ci && npm test
 
 L'installateur pose le skill dans `~/.gemini/skills/scenario-playwright/`, avec l'agent `pilote-scenario` et les commandes `/scenario:importer`, `/scenario:traduire`, `/scenario:jouer` et `/scenario:designer`. Dans une session ouverte : `/skills reload`, `/agents reload`, `/commands reload`. Sous Linux sans écran, la recette se lance par `xvfb-run -a npm test`.
 
-Sans clone, remettez à l'IA la transmission [`transmissions/scenario-playwright-1.1.0.md`](../../transmissions/scenario-playwright-1.1.0.md) : elle matérialise le skill, vérifie les empreintes, installe la dépendance et lance la recette.
+Sans clone, remettez à l'IA la transmission [`transmissions/scenario-playwright-1.1.1.md`](../../transmissions/scenario-playwright-1.1.1.md) : elle matérialise le skill, vérifie les empreintes, installe la dépendance et lance la recette.
 
 ## 3. Écrire le texte de départ
 
@@ -146,6 +146,7 @@ Options utiles : `--param ville=Nice`, `--jeu 2`, `--ralenti 300` pour une démo
 | `… a changé depuis la traduction` | le texte a été modifié : faire retraduire et ratifier |
 | `AVERTISSEMENT navigateur 160 plus récent…` | rien à faire tant que tout passe ; un échec inattendu se signale |
 | `--autoriser-mutations` demandé | le scénario modifie des données hors du poste : décider, pour cette exécution |
+| la recette ou un scénario se bloque sous Node 24 | le signaler, puis rejouer sous Node 22 ou 26 ; la recette s'arrête d'elle-même au bout de dix minutes et dit où |
 | `page non reconnue comme une demande de Jira…` | enregistrer la page de la demande elle-même, pas un tableau ni une recherche ; vérifier l'adresse |
 | `la demande ne s'est pas affichée en 300 s` | se connecter dans la fenêtre, puis rouvrir la demande ; `--delai-connexion 600` pour attendre plus |
 | `LIMITE … hors d'un titre « Scénario: »` | dans Jira, écrire `Scénario:` sans numéro avant les étapes, de préférence dans un bloc de code |

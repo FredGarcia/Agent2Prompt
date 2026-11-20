@@ -48,7 +48,7 @@ Champs de chaque étape :
 | `numero`, `ligne`, `action`, `resume` | numéro dans le jeu, ligne du texte (ou `null`), action, résumé lisible |
 | `cible`, `fragile` | cible dans la notation de Playwright, et si elle est fragile |
 | `mutation` | `creation`, `modification`, `suppression` ou `null` |
-| `statut`, `duree_ms`, `message` | `reussie`, `echec` ou `non_jouee` ; durée ; message d'échec ou motif de non-exécution |
+| `statut`, `duree_ms`, `message` | `reussie`, `echec` ou `non_jouee` ; durée de l'étape, arrêtée à son échec, sans le temps de ses preuves ; message d'échec ou motif de non-exécution |
 | `capture`, `aria` | chemins relatifs au dossier de résultats, ou `null` |
 | `telechargement` | `{ fichier, propose, octets, sha256 }`, ou `null` |
 | `console`, `erreurs_page`, `reponses` | erreurs de console, exceptions de la page, réponses de statut 400 ou plus (`500 http://…`) relevées pendant l'étape (D8.INV-2) |
@@ -63,7 +63,7 @@ Le même rapport, en français : statut et titre, scénario et texte d'origine, 
 
 - Chaque étape `verifier` a sa capture, réussie ou non : la zone de la cible si elle est unique et visible, sinon la page.
 - Chaque étape `capturer` a la sienne, nommée par `nom` : la zone de la cible, ou la page, entière avec `pleine_page = true`.
-- Chaque échec a la capture de la page et l'instantané ARIA de la page entière : l'arbre que voit un lecteur d'écran, où se lisent les rôles et les noms des éléments présents, pour corriger une cible.
+- Chaque échec a la capture de la page et l'instantané ARIA de la page entière : l'arbre que voit un lecteur d'écran, où se lisent les rôles et les noms des éléments présents, pour corriger une cible. Chacun attend 10 s au plus : une page figée ne retient pas l'exécution.
 
 ## 5. Erreurs relevées
 
@@ -79,7 +79,7 @@ Les erreurs de console, les exceptions de la page et les réponses HTTP de statu
 
 <!-- fichier : scripts/rapport.mjs -->
 ```javascript
-// scenario-playwright 1.1.0 : rapport d'une exécution, en JSON (champs stables, E1) et en Markdown.
+// scenario-playwright 1.1.1 : rapport d'une exécution, en JSON (champs stables, E1) et en Markdown.
 //
 // Chaque exécution écrit son dossier de résultats horodaté : rapport.json, rapport.md, captures,
 // instantanés ARIA à l'échec, téléchargements, et la trace si elle est demandée (D8.INV-1, D8.INV-2).
@@ -87,7 +87,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 export const FORMAT_RAPPORT = 'scenario-playwright.rapport/1';
-export const VERSION_SKILL = '1.1.0';
+export const VERSION_SKILL = '1.1.1';
 
 const deux = (n) => String(n).padStart(2, '0');
 

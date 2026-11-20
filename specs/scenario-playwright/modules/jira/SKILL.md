@@ -168,7 +168,7 @@ Le lecteur, sans navigateur : MHTML, demande, lignes du HTML, scénarios, étiqu
 
 <!-- fichier : scripts/jira.mjs -->
 ```javascript
-// scenario-playwright 1.1.0 : scénarios Gherkin d'une demande Jira enregistrée en MHTML, lus sans IA.
+// scenario-playwright 1.1.1 : scénarios Gherkin d'une demande Jira enregistrée en MHTML, lus sans IA.
 //
 // Le décodage du MHTML (en-têtes, frontière, quoted-printable, base64, jeu de caractères) et les
 // marqueurs de Jira Cloud et de Jira Data Center sont repris d'agent-tdd-jira 1.3.4 (module
@@ -600,7 +600,7 @@ export function texteImporte(sc, { cle, resume, source, page = null, date, adres
   }
   const corpsTexte = `${corps.join('\n')}\n`;
   const entete = [
-    `${ENTETE_IMPORT} (scenario-playwright 1.1.0), sans IA : le scénario est recopié tel qu'écrit dans Jira.`,
+    `${ENTETE_IMPORT} (scenario-playwright 1.1.1), sans IA : le scénario est recopié tel qu'écrit dans Jira.`,
     `# Demande : ${cle}${resume ? `, « ${resume} »` : ''}`,
     `# Scénario : @${sc.etiquette}, ${sc.provenance}`,
     `# Source : ${source}`,
@@ -694,7 +694,7 @@ La ligne de commande : options, page par l'adresse (capture) ou par le fichier, 
 <!-- fichier : scripts/importer.mjs -->
 ```javascript
 #!/usr/bin/env node
-// scenario-playwright 1.1.0 : importe les scénarios Gherkin d'une demande Jira en textes de départ, sans IA.
+// scenario-playwright 1.1.1 : importe les scénarios Gherkin d'une demande Jira en textes de départ, sans IA.
 //
 // Usage, depuis n'importe quel dossier :
 //   node <dossier du skill>/scripts/importer.mjs <page.mhtml | adresse de la demande> --adresse <url>
