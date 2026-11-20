@@ -11,7 +11,7 @@ Phase 7E couverte : Éléments.
 
 ## 1. Principe
 
-Le texte de départ appartient au développeur : il y dit, en français ou en anglais, ce qu'une personne fait et voit, dans l'ordre. Il l'écrit, ou l'importe d'une demande Jira (module `jira`). Le skill en lit la structure sans IA (`scripts/texte.mjs`) : titre, étiquettes, réglages, étapes avec leur ligne, marques, variables et exemples. La phrase d'une étape n'est pas interprétée ici : c'est la traduction en TOML qui lui donne ses actions (module `scenario`). Le texte reste la référence : sa traduction cite son empreinte, et un texte modifié rend sa traduction périmée (D3.INV-2).
+Le texte de départ appartient au développeur : il y dit, en français ou en anglais, ce qu'une personne fait et voit, dans l'ordre. Il l'écrit, ou l'importe d'une demande Jira (module `jira`), d'un fichier `.feature` ou d'un cas de test de Xray ou de Zephyr Scale (module `cas-de-test`). Le skill en lit la structure sans IA (`scripts/texte.mjs`) : titre, étiquettes, réglages, étapes avec leur ligne, marques, variables et exemples. La phrase d'une étape n'est pas interprétée ici : c'est la traduction en TOML qui lui donne ses actions (module `scenario`). Le texte reste la référence : sa traduction cite son empreinte, et un texte modifié rend sa traduction périmée (D3.INV-2).
 
 ## 2. Forme d'un texte (D2.INV-1)
 
@@ -179,7 +179,7 @@ Scenario Outline: Create a client
 
 <!-- fichier : scripts/texte.mjs -->
 ```javascript
-// scenario-playwright 1.1.1 : lecteur du texte de départ d'un scénario (fichier .scenario), sans dépendance.
+// scenario-playwright 1.2.0 : lecteur du texte de départ d'un scénario (fichier .scenario), sans dépendance.
 //
 // Le texte, inspiré de Gherkin, décrit un seul scénario : étiquettes, titre, réglages (adresse, origines,
 // profil, paramètres), étapes introduites par un mot-clé de Gherkin, en français ou en anglais, et au plus

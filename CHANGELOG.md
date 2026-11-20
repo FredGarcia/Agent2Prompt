@@ -96,6 +96,16 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-11-21 : scenario-playwright 1.2.0
+
+- **scenario-playwright 1.2.0**, première étape de la feuille de route qui répond à la demande du développeur : « à partir d'un scénario et de l'accès au code back/front ainsi qu'au navigateur, toute l'action d'un testeur humain soit émulée pour réaliser des tests automatisés », quel que soit l'outil. Feuille de route ratifiée : étendre ce skill par versions mineures ; les sources Xray et Zephyr d'abord ; puis un index sans IA du code, des vérifications hors de l'écran en lecture, la préparation des données sous la garde des mutations ; enfin l'export en test Playwright du projet et en résultats au format d'import de Xray ou de Zephyr ; une version par étape. Choix ratifiés pour la 1.2.0 : fichiers exportés et API REST en lecture seule, jeton par variable d'environnement seulement ; test manuel converti pas à pas en « Quand » puis « Alors », signalé en tête.
+  - `importer.mjs` lit aussi un fichier `.feature`, exporté de Xray ou de Zephyr Scale ou pris dans le dépôt, et une archive `.zip` d'un export, lue en mémoire, CRC-32 contrôlé, tailles bornées.
+  - Par l'API, en lecture seule : `xray:` (Xray Cloud, authentification puis GraphQL `query`), `xray-dc:` (API de Jira et de Xray), `zephyr:` (Zephyr Scale Cloud, API v2, pas lus page après page), `zephyr-dc:` (API atm 1.0). Jetons dans `XRAY_CLIENT_ID` et `XRAY_CLIENT_SECRET`, `ZEPHYR_TOKEN` ou `JIRA_TOKEN` seulement, jamais affichés ni écrits ; https hors du poste, aucune redirection suivie, aucune requête vers une autre origine ; rien n'est écrit dans Jira, Xray ni Zephyr Scale.
+  - Nouveau module `cas-de-test`, dimension D17, `scripts/cas.mjs` : test Cucumber ou BDD recopié sous le résumé du test, test manuel converti, test générique, en texte libre ou qui appelle un autre cas refusé avec son motif, préconditions signalées ; la clé du test pour identité, d'un chemin d'import à l'autre (`@TestCaseKey=` de Zephyr Scale, clé de Xray, préfixe `TEST_`) ; provenance par lot. D17.INV-1 à D17.INV-6 ; D16.INV-5 et D16.INV-6 étendus ; quarante-huit invariants.
+  - Agent : protocole d'import des cas de test, D10.INV-5 (aucun jeton demandé, affiché ni écrit ; un jeton collé se signale, avec la recommandation de le révoquer), scénarios A9 et A10, commande `/scenario:importer`.
+  - Recette étendue d'un Xray et d'un Zephyr Scale factices, Cloud et Data Center, qui notent chaque requête, et d'archives d'export : R22 à R25, de 279 à 338 contrôles ; vérifiée sous Node 26, 22 et 24 ; treize défauts réintroduits de plus, quarante-deux en tout, essai en cours.
+- Mode d'emploi et README mis à jour.
+
 ### 2026-11-20 : scenario-playwright 1.1.1
 
 - **scenario-playwright 1.1.1**, correctif. La recette passait par intermittence dans la CI, toujours sous Node 24 : un premier lancement du navigateur lent dépassait les délais courts de R5, R6, R8 et R11, ou ceux des preuves d'un échec, sur `main` après la fusion de 1.0.0 et sur la pull request de 1.1.0 ; puis, sur celle de 1.1.1, la recette s'est bloquée sous Windows jusqu'au délai du job, sans journal.

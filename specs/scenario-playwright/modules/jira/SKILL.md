@@ -1,6 +1,6 @@
 ---
 name: jira
-description: Scénarios importés d'une demande Jira (page enregistrée en MHTML par le développeur, par capture-sprint-jira ou remise à agent-tdd-jira, ou adresse de la demande ouverte dans le navigateur du poste, sur un profil dédié, connexion à la main, page enregistrée en MHTML ; Jira Cloud et Jira Data Center reconnus à leurs marqueurs ; description et champs de texte lus, commentaires sur demande ; scénarios Gherkin en français ou en anglais recopiés sans IA en textes de départ, contexte reporté, colonnes d'exemples adaptées, refus motivés ; étiquette @<CLÉ>-Snn de Jira, reprise ou attribuée ; provenance et empreintes en tête de chaque texte ; réimport, --comparer et --remplacer, textes retouchés gardés ; ligne de commande et codes de sortie), sources de scripts/jira.mjs et scripts/importer.mjs. À lire pour importer les scénarios d'une demande.
+description: Scénarios importés d'une demande Jira (page enregistrée en MHTML par le développeur, par capture-sprint-jira ou remise à agent-tdd-jira, ou adresse de la demande ouverte dans le navigateur du poste, sur un profil dédié, connexion à la main, page enregistrée en MHTML ; Jira Cloud et Jira Data Center reconnus à leurs marqueurs ; description et champs de texte lus, commentaires sur demande ; scénarios Gherkin en français ou en anglais recopiés sans IA en textes de départ, contexte reporté, colonnes d'exemples adaptées, refus motivés ; étiquette @<CLÉ>-Snn de Jira, reprise ou attribuée ; provenance et empreintes en tête de chaque texte ; réimport, --comparer et --remplacer, textes retouchés gardés, communs à toutes les sources ; ligne de commande et codes de sortie de importer.mjs, qui lit aussi les sources du module cas-de-test), sources de scripts/jira.mjs et scripts/importer.mjs. À lire pour importer les scénarios d'une demande, et pour les règles communes à tout import.
 dimensions: [D16]
 status: active
 ---
@@ -12,6 +12,8 @@ Phases 7E couvertes : Environnement et Éléments.
 ## 1. Principe
 
 Les scénarios d'une US s'écrivent souvent dans Jira, par le PO ou par agent-tdd-jira. `scripts/importer.mjs` les recopie, sans IA, en textes de départ : un fichier `.scenario` par scénario, que le développeur vérifie, fait traduire, ratifie et joue comme un texte écrit à la main (modules `texte` et `scenario`). Le texte reste la référence de sa traduction (D3.INV-2) ; Jira reste la référence du texte importé : un réimport, ou `--comparer`, dit ce qui a changé dans Jira depuis l'import.
+
+`importer.mjs` lit aussi des fichiers `.feature`, des archives d'export et les tests de Xray et de Zephyr Scale (module `cas-de-test`, D17). Le lecteur de Gherkin (§ 4), le texte importé (§ 5), le réimport (§ 6) et la ligne de commande (§ 7) de ce module valent pour toutes les sources ; ce qui leur est propre est dans `cas-de-test`.
 
 ```mermaid
 flowchart LR
@@ -78,7 +80,7 @@ Un scénario que le format texte n'exprime pas n'est pas écrit, et l'import dit
 ## 5. Le texte importé (D16.INV-4)
 
 ```text
-# Importé de Jira par importer.mjs (scenario-playwright 1.1.0), sans IA : le scénario est recopié tel qu'écrit dans Jira.
+# Importé de Jira par importer.mjs (scenario-playwright 1.2.0), sans IA : le scénario est recopié tel qu'écrit dans Jira.
 # Demande : DEMO-8, « Créer un client depuis Jira »
 # Scénario : @DEMO-8-S03, description
 # Source : https://jira.exemple.fr/browse/DEMO-8
@@ -113,10 +115,11 @@ Plan du scénario: Créer plusieurs clients
 - **Étiquette** : celle que Jira donne au scénario, `@<CLÉ>-Snn` (`agent-tdd-jira:D2.INV-3`) ; sinon celle qu'un import précédent a attribuée au scénario de même titre ; sinon le plus petit numéro libre, dans l'ordre de la page, hors des numéros déjà portés par un texte importé de la demande. Le second scénario d'une même étiquette est un doublon : il n'est pas écrit.
 - **Provenance** : les commentaires de tête, toujours dans cet ordre ; le lecteur de textes les ignore. L'empreinte Jira est le SHA-256 de ce que Jira dit du scénario : fonctionnalité, étiquettes, titre, étapes, exemples ; la prose autour n'y entre pas. L'empreinte du texte importé est celle du corps du texte, tel que l'import l'a écrit : elle dit si le texte a été retouché depuis.
 - **Réglages** : `--adresse`, et s'il y a lieu `--origines` et `--profil`, donnés à l'import, s'écrivent sous le titre ; la ligne « Adresse : » est obligatoire (D2.INV-1).
+- **Lot** : la demande est le lot de ses textes ; la première ligne de l'en-tête dit la source, `de Jira` ici, et la ligne « Demande : » le lot. Les textes des autres sources ont une ligne « Lot : » à la place (module `cas-de-test`, § 7).
 
 ## 6. Réimport et comparaison (D16.INV-5)
 
-Les textes du dossier dont la provenance désigne la même demande sont comparés aux scénarios de la page, par leur étiquette :
+Les textes du dossier dont la provenance désigne la même demande sont comparés aux scénarios de la page, par leur étiquette ; un scénario dont Jira donne l'étiquette retrouve aussi le texte qu'une autre source a importé sous la même étiquette (module `cas-de-test`, D17.INV-4). Les mêmes états valent pour toute source, « changé dans » et « disparu de » la nommant :
 
 | État | `--comparer` | import | import avec `--remplacer` |
 |---|---|---|---|
@@ -124,14 +127,14 @@ Les textes du dossier dont la provenance désigne la même demande sont comparé
 | modifié dans Jira | `modifié` | non remplacé ; code 1 | `remplacé` ; un texte retouché depuis l'import est d'abord gardé dans `<texte>.avant-<horodatage>` |
 | nouveau | `nouveau` | `écrit` | `écrit` |
 | disparu de Jira | `disparu` | signalé ; le texte reste | idem |
-| conflit : un texte du même nom ne vient pas d'un import de la demande | `conflit` | jamais remplacé ; code 1 | idem |
+| conflit : un texte du même nom ne vient pas d'un import de ce scénario, écrit à la main par exemple | `conflit` | jamais remplacé ; code 1 | idem |
 | refusé, doublon | `refusé`, `doublon`, avec le motif | non écrit ; code 1 | idem |
 
 `--comparer` n'écrit aucun texte. Un texte remplacé rend sa traduction périmée, par l'empreinte (D3.INV-2) : elle se refait et se ratifie. Les marques `(création)`, `(modification)`, `(suppression)` et `(à la main)` manquent souvent aux scénarios de Jira : elles s'ajoutent de préférence dans Jira, où un réimport les retrouve ; ajoutées dans le texte, elles font un texte retouché, gardé à côté avant tout remplacement.
 
 ## 7. Ligne de commande et codes de sortie (D16.INV-6)
 
-`importer.mjs <page.mhtml | adresse de la demande>` :
+`importer.mjs <page.mhtml | adresse de la demande | fichier.feature | export.zip | xray:CLÉ,… | xray-dc:CLÉ,… | zephyr:CLÉ,… | zephyr-dc:CLÉ,…>` ; une source dont le nom ne finit ni par `.feature` ni par `.zip`, et qui n'est ni une adresse ni une désignation d'outil, se lit comme une page enregistrée :
 
 | Option | Effet |
 |---|---|
@@ -139,19 +142,20 @@ Les textes du dossier dont la provenance désigne la même demande sont comparé
 | `--origines o1,o2` | ligne « Origines : » ; doit contenir l'origine de `--adresse` |
 | `--profil <nom>` | ligne « Profil : » |
 | `--dossier <dossier>` | dossier des textes, `scenarios` par défaut ; la page enregistrée par l'adresse va dans son sous-dossier `jira/` |
-| `--commentaires` | lit aussi les commentaires (D16.INV-2) |
+| `--commentaires` | lit aussi les commentaires (D16.INV-2) ; pour une demande Jira seulement |
 | `--remplacer` | remplace les textes des scénarios modifiés dans Jira (§ 6) |
 | `--comparer` | compare sans rien écrire ; exclut `--remplacer` |
-| `--profil-jira <nom>` | profil du navigateur pour Jira, `jira` par défaut |
-| `--delai-connexion <s>` | attente de la demande par l'adresse, de 1 à 900 s, 300 par défaut |
+| `--profil-jira <nom>` | profil du navigateur pour Jira, `jira` par défaut ; pour une demande Jira seulement |
+| `--delai-connexion <s>` | attente de la demande par l'adresse, de 1 à 900 s, 300 par défaut ; pour une demande Jira seulement |
+| `--api <url>` | adresse de l'API de Xray ou de Zephyr Scale (module `cas-de-test`, § 3) ; pour `xray:`, `xray-dc:`, `zephyr:` et `zephyr-dc:` seulement |
 
-Sortie : `page enregistrée : …` par l'adresse, une ligne `Demande <CLÉ> (Jira Cloud ou Data Center), « résumé » : n scénarios (par zone)`, les `LIMITE …`, une ligne par scénario (état, étiquette, titre, fichier ou motif), puis `Bilan : …`.
+Sortie : `page enregistrée : …` par l'adresse, une ligne `Demande <CLÉ> (Jira Cloud ou Data Center), « résumé » : n scénarios (par zone)`, les `LIMITE …`, une ligne par scénario (état, étiquette, titre, fichier ou motif), puis `Bilan : …`. Les autres sources ont leur propre première ligne, et une ligne `introuvable` par test absent (module `cas-de-test`, § 8).
 
 | Code | import | `--comparer` |
 |---|---|---|
 | 0 | chaque scénario est écrit, remplacé ou inchangé | chaque scénario est identique, aucun n'a disparu |
-| 1 | un scénario n'est pas écrit : modifié sans `--remplacer`, conflit, refus, doublon ; ou aucun scénario | une différence, un refus, ou aucun scénario |
-| 2 | option, réglage, page ou navigateur refusé, demande non affichée dans le délai, avant toute écriture de texte | idem |
+| 1 | un scénario n'est pas écrit : modifié sans `--remplacer`, conflit, refus, doublon, test introuvable ; ou aucun scénario | une différence, un refus, un test introuvable, ou aucun scénario |
+| 2 | option, réglage, page, fichier, archive, variable d'environnement, requête à une API ou navigateur refusé, demande non affichée dans le délai, avant toute écriture de texte | idem |
 
 ## 8. Contrôle de sortie
 
@@ -164,11 +168,11 @@ Sortie : `page enregistrée : …` par l'adresse, une ligne `Demande <CLÉ> (Jir
 
 ## 9. Source `scripts/jira.mjs`
 
-Le lecteur, sans navigateur : MHTML, demande, lignes du HTML, scénarios, étiquettes, texte importé, provenance, comparaison.
+Le lecteur, sans navigateur : MHTML, demande, lignes du HTML, scénarios, étiquettes, texte importé et sources de son en-tête, provenance et lots, comparaison, identité d'une source à l'autre.
 
 <!-- fichier : scripts/jira.mjs -->
 ```javascript
-// scenario-playwright 1.1.1 : scénarios Gherkin d'une demande Jira enregistrée en MHTML, lus sans IA.
+// scenario-playwright 1.2.0 : scénarios Gherkin d'une demande Jira enregistrée en MHTML, lus sans IA.
 //
 // Le décodage du MHTML (en-têtes, frontière, quoted-printable, base64, jeu de caractères) et les
 // marqueurs de Jira Cloud et de Jira Data Center sont repris d'agent-tdd-jira 1.3.4 (module
@@ -431,6 +435,7 @@ export function extraireScenarios(zones) {
           if (courant.exemples) courant.refus ??= 'plusieurs tableaux d\'exemples, quand le format texte n\'en prend qu\'un';
           else courant.exemples = { motCle: titre.motCle, lignes: [] };
           courant.etiquettesJira = [...new Set([...courant.etiquettesJira, ...enAttente])];
+          courant.etiquettesPropres = [...new Set([...courant.etiquettesPropres, ...enAttente])];
           enAttente = [];
           mode = 'exemples';
           continue;
@@ -455,7 +460,7 @@ export function extraireScenarios(zones) {
           const contexte = [...ctxFonctionnalite.etapes, ...ctxRegle.etapes];
           courant = {
             zone: z.zone, provenance: z.libelle, fonctionnalite, motTitre: titre.motCle, titre: titre.valeur,
-            etiquettesJira: [...new Set([...tagsFonctionnalite, ...tagsRegle, ...enAttente])],
+            etiquettesJira: [...new Set([...tagsFonctionnalite, ...tagsRegle, ...enAttente])], etiquettesPropres: [...new Set(enAttente)],
             etapes: contexte.map((e) => ({ ...e })), contexte: contexte.length, exemples: null,
             refus: ctxFonctionnalite.refus ?? ctxRegle.refus ?? null,
           };
@@ -507,8 +512,9 @@ export function extraireScenarios(zones) {
  * import précédent a attribuée au scénario de même titre ; sinon le plus petit numéro libre, dans
  * l'ordre de la page, hors des numéros déjà portés par un texte importé de la demande. Le second
  * scénario d'une même étiquette est un doublon. `importes` : textes importés de la demande (textesImportes).
+ * `identite(sc)` rend l'étiquette qu'une source donne d'elle-même à un scénario, la clé d'un test (D17.INV-4).
  */
-export function attribuerEtiquettes(scenarios, cle, importes = []) {
+export function attribuerEtiquettes(scenarios, cle, importes = [], identite = () => null) {
   const re = new RegExp(`^${cle}-S(\\d+)$`);
   const deJira = new Set(scenarios.flatMap((sc) => sc.etiquettesJira.filter((e) => re.test(e))));
   const pris = new Set([...deJira, ...importes.map((t) => t.etiquette)].filter((e) => re.test(e)).map((e) => Number(re.exec(e)[1])));
@@ -517,7 +523,7 @@ export function attribuerEtiquettes(scenarios, cle, importes = []) {
   const vues = new Map();
   let n = 1;
   for (const sc of scenarios) {
-    const propre = sc.etiquettesJira.find((e) => re.test(e));
+    const propre = identite(sc) ?? sc.etiquettesJira.find((e) => re.test(e));
     if (propre) {
       sc.etiquette = propre;
       sc.attribuee = false;
@@ -568,6 +574,16 @@ export function adapterVariables(sc) {
 }
 
 export const ENTETE_IMPORT = '# Importé de Jira par importer.mjs';
+/** Première ligne de tout texte importé : de Jira, de Xray, de Zephyr Scale, d'un fichier .feature ou d'une archive .zip. */
+const RE_ENTETE_IMPORT = /^# Importé (?:de |d')(.+?) par importer\.mjs\b/;
+/** Sources des textes importés, et ce que l'en-tête et les messages en disent. */
+export const ORIGINES = {
+  jira: { nom: 'Jira', de: 'de Jira', dans: 'dans Jira', fixer: 'dans Jira' },
+  xray: { nom: 'Xray', de: 'de Xray', dans: 'dans Xray', fixer: 'dans Xray' },
+  zephyr: { nom: 'Zephyr Scale', de: 'de Zephyr Scale', dans: 'dans Zephyr Scale', fixer: 'dans Zephyr Scale' },
+  feature: { nom: 'fichier .feature', de: 'd\'un fichier .feature', dans: 'dans le fichier', fixer: 'dans le fichier' },
+  zip: { nom: 'archive .zip', de: 'd\'une archive .zip', dans: 'dans l\'archive', fixer: 'dans le fichier .feature' },
+};
 
 /** En-tête de provenance et corps d'un texte : l'en-tête est la suite de commentaires qui l'ouvre. */
 function separerProvenance(texte) {
@@ -578,11 +594,13 @@ function separerProvenance(texte) {
 }
 
 /**
- * Texte de départ d'un scénario importé (D16.INV-3, D16.INV-4) : en-tête de provenance en commentaires,
- * puis le scénario tel qu'écrit dans Jira, avec les réglages donnés à l'import. Rend { texte, erreurs } ;
- * chaque erreur du lecteur de textes est rendue avec la ligne qu'elle concerne.
+ * Texte de départ d'un scénario importé (D16.INV-3, D16.INV-4, D17.INV-5) : en-tête de provenance en
+ * commentaires, puis le scénario tel qu'écrit dans sa source, avec les réglages donnés à l'import. Rend
+ * { texte, erreurs } ; chaque erreur du lecteur de textes est rendue avec la ligne qu'elle concerne.
+ * `origine` dit la source, Jira par défaut ; `lot` regroupe les textes d'une même importation hors de Jira ;
+ * `notes` s'ajoutent à l'en-tête.
  */
-export function texteImporte(sc, { cle, resume, source, page = null, date, adresse, origines = [], profil = null }) {
+export function texteImporte(sc, { cle, resume, source, page = null, date, adresse, origines = [], profil = null, origine = ORIGINES.jira, lot = null, notes = [] }) {
   const adapte = adapterVariables(sc);
   if (adapte.erreur) return { texte: null, erreurs: [adapte.erreur] };
   const corps = [''];
@@ -599,16 +617,19 @@ export function texteImporte(sc, { cle, resume, source, page = null, date, adres
     for (const r of adapte.exemples.lignes) corps.push(`    ${r}`);
   }
   const corpsTexte = `${corps.join('\n')}\n`;
+  const jira = origine.nom === 'Jira';
+  const facon = sc.manuel ? 'chaque pas du test manuel devient « Quand <action> », avec ses données, puis « Alors <résultat attendu> »' : `le scénario est recopié tel qu'écrit ${origine.dans}`;
   const entete = [
-    `${ENTETE_IMPORT} (scenario-playwright 1.1.1), sans IA : le scénario est recopié tel qu'écrit dans Jira.`,
-    `# Demande : ${cle}${resume ? `, « ${resume} »` : ''}`,
+    `# Importé ${origine.de} par importer.mjs (scenario-playwright 1.2.0), sans IA : ${facon}.`,
+    jira ? `# Demande : ${cle}${resume ? `, « ${resume} »` : ''}` : `# Lot : ${lot}`,
     `# Scénario : @${sc.etiquette}, ${sc.provenance}`,
     `# Source : ${source}`,
   ];
   if (page) entete.push(`# Page enregistrée : ${page.chemin} (sha256 ${page.sha256})`);
-  entete.push(`# Importé le : ${date}`, `# Empreinte Jira : ${sc.empreinte}`, `# Empreinte du texte importé : ${sha256(normaliser(corpsTexte))}`);
-  if (sc.attribuee) entete.push(`# Étiquette @${sc.etiquette} attribuée par l'import, Jira n'en donnant pas : l'écrire dans Jira, avant le titre du scénario, la fixe.`);
-  if (sc.contexte > 0) entete.push(`# Contexte de Jira reporté en tête des étapes : ${sc.contexte} étape${sc.contexte > 1 ? 's' : ''}.`);
+  entete.push(`# Importé le : ${date}`, `# Empreinte ${jira ? 'Jira' : 'de la source'} : ${sc.empreinte}`, `# Empreinte du texte importé : ${sha256(normaliser(corpsTexte))}`);
+  if (sc.attribuee) entete.push(`# Étiquette @${sc.etiquette} attribuée par l'import, ${jira ? 'Jira' : 'la source'} n'en donnant pas : l'écrire ${origine.fixer}, avant le titre du scénario, la fixe.`);
+  if (sc.contexte > 0) entete.push(`# Contexte ${jira ? 'de Jira ' : ''}reporté en tête des étapes : ${sc.contexte} étape${sc.contexte > 1 ? 's' : ''}.`);
+  for (const n of notes) entete.push(`# ${n}`);
   if (adapte.renommees.length) entete.push(`# Colonnes d'exemples adaptées au format texte : ${adapte.renommees.map(([a, b]) => `« ${a} » en <${b}>`).join(', ')}.`);
   const texte = `${entete.join('\n')}\n${corpsTexte}`;
   const lignes = texte.split('\n');
@@ -617,33 +638,40 @@ export function texteImporte(sc, { cle, resume, source, page = null, date, adres
 }
 
 /**
- * Provenance d'un texte importé : { cle, etiquette, attribuee, empreinte, retouche }, ou null pour un
- * texte écrit à la main. `retouche` dit si le corps du texte a changé depuis l'import.
+ * Provenance d'un texte importé : { source, cle, lot, etiquette, attribuee, empreinte, retouche }, ou null
+ * pour un texte écrit à la main. Le lot d'un texte de Jira est sa demande. `retouche` dit si le corps du
+ * texte a changé depuis l'import.
  */
 export function lireProvenance(texte) {
   const { entete, corps } = separerProvenance(texte);
-  if (!entete[0]?.startsWith(ENTETE_IMPORT)) return null;
+  const source = RE_ENTETE_IMPORT.exec(entete[0] ?? '')?.[1];
+  if (!source) return null;
   const champ = (re) => entete.map((l) => re.exec(l)?.[1]).find(Boolean) ?? null;
   const importe = champ(/^# Empreinte du texte importé : ([0-9a-f]{64})$/);
+  const cle = champ(/^# Demande : ([A-Z][A-Z0-9_]+-\d+)\b/);
   return {
-    cle: champ(/^# Demande : ([A-Z][A-Z0-9_]+-\d+)\b/),
+    source,
+    cle,
+    lot: cle ?? champ(/^# Lot : (.+)$/),
     etiquette: champ(/^# Scénario : @([^\s,]+)/),
     attribuee: entete.some((l) => /^# Étiquette @\S+ attribuée par l'import/.test(l)),
-    empreinte: champ(/^# Empreinte Jira : ([0-9a-f]{64})$/),
+    empreinte: champ(/^# Empreinte (?:Jira|de la source) : ([0-9a-f]{64})$/),
     retouche: importe === null ? null : importe !== sha256(corps),
   };
 }
 
 /**
- * Textes du dossier importés de la demande `cle` : [{ fichier, etiquette, attribuee, titre, empreinte,
- * retouche }], le premier texte d'une étiquette seulement. `existants` : [{ fichier, texte }].
+ * Textes du dossier importés d'un lot, la demande pour Jira : [{ fichier, etiquette, attribuee, titre,
+ * empreinte, retouche }], le premier texte d'une étiquette seulement. `lots` : un lot, un ensemble de lots,
+ * ou null pour tous les textes importés. `existants` : [{ fichier, texte }].
  */
-export function textesImportes(existants, cle) {
+export function textesImportes(existants, lots) {
+  const garde = lots === null ? () => true : typeof lots === 'string' ? (l) => l === lots : (l) => lots.has(l);
   const vus = new Set();
   const importes = [];
   for (const f of existants) {
     const p = lireProvenance(f.texte);
-    if (p?.cle !== cle || !p.etiquette || vus.has(p.etiquette)) continue;
+    if (!p?.lot || !garde(p.lot) || !p.etiquette || vus.has(p.etiquette)) continue;
     vus.add(p.etiquette);
     importes.push({ fichier: f.fichier, ...p, titre: analyserTexte(f.texte).scenario.titre });
   }
@@ -651,17 +679,21 @@ export function textesImportes(existants, cle) {
 }
 
 /**
- * État de chaque scénario de la page face aux textes du dossier (D16.INV-5) : nouveau, identique,
+ * État de chaque scénario lu face aux textes du dossier (D16.INV-5, D17.INV-4) : nouveau, identique,
  * modifie, conflit (un autre texte porte déjà son nom), refuse, doublon ; et disparu pour un texte
- * importé de la demande dont l'étiquette n'est plus dans la page. `fichiers` : noms des textes du dossier.
+ * importé du lot dont l'étiquette n'est plus dans la source. Un scénario dont la source donne l'étiquette
+ * retrouve son texte importé d'un autre lot, `ailleurs` (la même clé de test, d'un autre chemin d'import).
+ * `importes` : textes du lot ; `fichiers` : noms des textes du dossier.
  */
-export function comparer(scenarios, importes, fichiers) {
+export function comparer(scenarios, importes, fichiers, ailleurs = []) {
   const parEtiquette = new Map(importes.map((t) => [t.etiquette, t]));
+  const autres = new Map();
+  for (const t of ailleurs) if (!autres.has(t.etiquette)) autres.set(t.etiquette, t);
   const etats = [];
   for (const sc of scenarios) {
     if (sc.refus) { etats.push({ etat: 'refuse', sc, motif: sc.refus }); continue; }
     if (sc.doublonDe !== null) { etats.push({ etat: 'doublon', sc, motif: `même étiquette que « ${sc.doublonDe} »` }); continue; }
-    const t = parEtiquette.get(sc.etiquette);
+    const t = parEtiquette.get(sc.etiquette) ?? (sc.attribuee ? undefined : autres.get(sc.etiquette));
     if (t) {
       etats.push({ etat: t.empreinte === sc.empreinte ? 'identique' : 'modifie', sc, fichier: t.fichier, retouche: t.retouche });
       continue;
@@ -689,40 +721,52 @@ export function verifierReglages({ adresse, origines = [], profil = null }) {
 
 ## 10. Source `scripts/importer.mjs`
 
-La ligne de commande : options, page par l'adresse (capture) ou par le fichier, lecture, comparaison aux textes du dossier, écriture.
+La ligne de commande : options, genre de la source, page par l'adresse (capture) ou par le fichier, fichier `.feature`, archive, API (module `cas-de-test`), lecture, comparaison aux textes du dossier, écriture.
 
 <!-- fichier : scripts/importer.mjs -->
 ```javascript
 #!/usr/bin/env node
-// scenario-playwright 1.1.1 : importe les scénarios Gherkin d'une demande Jira en textes de départ, sans IA.
+// scenario-playwright 1.2.0 : importe en textes de départ, sans IA, les scénarios Gherkin d'une demande Jira,
+// d'un fichier .feature ou d'une archive .zip d'un export, et les tests de Xray et de Zephyr Scale lus par
+// leur API.
 //
 // Usage, depuis n'importe quel dossier :
-//   node <dossier du skill>/scripts/importer.mjs <page.mhtml | adresse de la demande> --adresse <url>
-//     [--origines o1,o2] [--profil nom] [--dossier dossier] [--commentaires] [--remplacer]
-//     [--profil-jira nom] [--delai-connexion s]
-//   node <dossier du skill>/scripts/importer.mjs <page.mhtml | adresse de la demande> --comparer [--dossier dossier] [--commentaires]
-// Avec une adresse, la demande s'ouvre dans le navigateur du poste, sur le profil dédié à Jira : la
-// connexion se fait par le développeur, dans la fenêtre ; le skill n'y clique ni n'y saisit rien, et
-// enregistre la page en MHTML dans <dossier>/jira/ (D16.INV-1). Chaque scénario devient <ÉTIQUETTE>.scenario
-// dans le dossier. Codes de sortie : 0 tout est écrit ou inchangé (avec --comparer : aucune différence),
-// 1 un scénario n'est pas écrit (avec --comparer : une différence), 2 refus avant toute écriture de texte.
+//   node <dossier du skill>/scripts/importer.mjs <source> --adresse <url> [--origines o1,o2] [--profil nom]
+//     [--dossier dossier] [--remplacer] [options de la source]
+//   node <dossier du skill>/scripts/importer.mjs <source> --comparer [--dossier dossier] [options de la source]
+// Sources :
+//   page.mhtml | adresse de la demande  demande Jira (D16) ; options --commentaires, --profil-jira nom, --delai-connexion s
+//   fichier.feature | export.zip        scénarios d'un fichier .feature, ou des fichiers .feature d'une archive (D17)
+//   xray:CLÉ[,CLÉ…]                     tests de Xray Cloud, avec XRAY_CLIENT_ID et XRAY_CLIENT_SECRET ; --api pour une autre région
+//   xray-dc:CLÉ[,CLÉ…]                  tests de Xray Data Center, avec JIRA_TOKEN ; --api <adresse de Jira>
+//   zephyr:CLÉ[,CLÉ…]                   cas de test de Zephyr Scale Cloud, avec ZEPHYR_TOKEN ; --api pour une autre région
+//   zephyr-dc:CLÉ[,CLÉ…]                cas de test de Zephyr Scale Data Center, avec JIRA_TOKEN ; --api <adresse de Jira>
+// Un jeton ne passe que par sa variable d'environnement, que le développeur définit lui-même ; les API ne
+// sont que lues (D17.INV-2, D17.INV-3). Avec l'adresse d'une demande, la demande s'ouvre dans le navigateur
+// du poste, sur le profil dédié à Jira : la connexion se fait par le développeur, dans la fenêtre ; le skill
+// n'y clique ni n'y saisit rien, et enregistre la page en MHTML dans <dossier>/jira/ (D16.INV-1). Chaque
+// scénario devient <ÉTIQUETTE>.scenario dans le dossier. Codes de sortie : 0 tout est écrit ou inchangé
+// (avec --comparer : aucune différence), 1 un scénario n'est pas écrit (avec --comparer : une différence),
+// 2 refus avant toute écriture de texte.
 import { Buffer } from 'node:buffer';
+import { createHash } from 'node:crypto';
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { join, relative, resolve } from 'node:path';
+import { basename, join, relative, resolve } from 'node:path';
 import { setTimeout as attendre } from 'node:timers/promises';
 import { pathToFileURL } from 'node:url';
-import { attribuerEtiquettes, comparer, ErreurJira, extraireScenarios, lireDemande, lireMhtml, texteImporte, textesImportes, verifierReglages } from './jira.mjs';
+import { adresseApi, ErreurCas, identitesGherkin, lignesDe, lireJetons, lireSource, lireTests, lireZip, OUTILS, prefixeDe, scenariosDesTests } from './cas.mjs';
+import { attribuerEtiquettes, comparer, ErreurJira, extraireScenarios, lireDemande, lireMhtml, ORIGINES, texteImporte, textesImportes, verifierReglages } from './jira.mjs';
 import { dossierProfil, lireReglages, ouvrirNavigateur } from './session.mjs';
 import { origineDe, RE_PROFIL } from './texte.mjs';
 
-const USAGE = 'Usage : node scripts/importer.mjs <page.mhtml | adresse de la demande> --adresse <url> [--origines o1,o2] [--profil nom] [--dossier dossier] [--commentaires] [--remplacer | --comparer] [--profil-jira nom] [--delai-connexion s]';
+const USAGE = 'Usage : node scripts/importer.mjs <page.mhtml | adresse de la demande | fichier.feature | export.zip | xray:CLÉ,… | xray-dc:CLÉ,… | zephyr:CLÉ,… | zephyr-dc:CLÉ,…> --adresse <url> [--origines o1,o2] [--profil nom] [--dossier dossier] [--remplacer | --comparer] [--api url] [--commentaires] [--profil-jira nom] [--delai-connexion s]';
 export const PROFIL_JIRA = 'jira';
 export const DELAI_CONNEXION = 300;
 const MARQUEURS = '[data-testid^="issue.views."], #summary-val, #description-val';
 
 /** Lit la ligne de commande ; rend { options } ou { erreur }. */
 export function lireArguments(args) {
-  const o = { source: null, adresse: null, origines: [], profil: null, dossier: 'scenarios', commentaires: false, remplacer: false, comparer: false, profilJira: PROFIL_JIRA, delaiConnexion: DELAI_CONNEXION };
+  const o = { source: null, adresse: null, origines: [], profil: null, dossier: 'scenarios', commentaires: false, remplacer: false, comparer: false, profilJira: PROFIL_JIRA, delaiConnexion: DELAI_CONNEXION, api: null, optionsJira: [] };
   for (let i = 0; i < args.length; i++) {
     const a = args[i];
     const suivant = () => {
@@ -734,24 +778,29 @@ export function lireArguments(args) {
       else if (a === '--origines') o.origines = suivant().split(',').map((x) => x.trim()).filter(Boolean);
       else if (a === '--profil') o.profil = suivant();
       else if (a === '--dossier') o.dossier = suivant();
+      else if (a === '--api') o.api = suivant();
       else if (a === '--profil-jira') {
+        o.optionsJira.push(a);
         o.profilJira = suivant();
         if (!RE_PROFIL.test(o.profilJira)) throw new Error(`--profil-jira invalide : « ${o.profilJira} » (minuscules, chiffres, - et _)`);
       } else if (a === '--delai-connexion') {
+        o.optionsJira.push(a);
         const v = Number(suivant());
         if (!Number.isInteger(v) || v < 1 || v > 900) throw new Error('--delai-connexion attend un nombre de secondes, de 1 à 900');
         o.delaiConnexion = v;
-      } else if (a === '--commentaires') o.commentaires = true;
-      else if (a === '--remplacer') o.remplacer = true;
+      } else if (a === '--commentaires') {
+        o.optionsJira.push(a);
+        o.commentaires = true;
+      } else if (a === '--remplacer') o.remplacer = true;
       else if (a === '--comparer') o.comparer = true;
       else if (a.startsWith('-')) throw new Error(`option inconnue : ${a}`);
-      else if (o.source !== null) throw new Error(`une seule demande à la fois (« ${a} » en plus)`);
+      else if (o.source !== null) throw new Error('une seule source à la fois');
       else o.source = a;
     } catch (e) {
       return { erreur: e.message };
     }
   }
-  if (o.source === null) return { erreur: 'page MHTML ou adresse de la demande manquante' };
+  if (o.source === null) return { erreur: 'source manquante : page MHTML ou adresse d\'une demande Jira, fichier .feature, archive .zip, ou xray:, xray-dc:, zephyr:, zephyr-dc: suivi des clés des tests' };
   if (o.remplacer && o.comparer) return { erreur: '--comparer n\'écrit rien : sans --remplacer' };
   return { options: o };
 }
@@ -760,6 +809,7 @@ const deux = (n) => String(n).padStart(2, '0');
 const horodatage = (d = new Date()) => `${d.getFullYear()}${deux(d.getMonth() + 1)}${deux(d.getDate())}-${deux(d.getHours())}${deux(d.getMinutes())}${deux(d.getSeconds())}`;
 const compte = (n, un, plusieurs) => `${n} ${n > 1 ? plusieurs : un}`;
 const chemin = (de, vers) => relative(de, vers).split('\\').join('/');
+const sha256 = (octets) => createHash('sha256').update(octets).digest('hex');
 const refus = (lignes) => {
   for (const l of [].concat(lignes)) console.error(`ERREUR ${l}`);
   return 2;
@@ -810,36 +860,29 @@ export async function capturer(adresse, { reglages, profilJira, delaiConnexion }
   }
 }
 
-const LIBELLES = { ecrit: 'écrit', inchange: 'inchangé', remplace: 'remplacé', modifie: 'modifié', refuse: 'refusé', doublon: 'doublon', conflit: 'conflit', disparu: 'disparu', identique: 'identique', nouveau: 'nouveau' };
-const ligne = (etat, etiquette, reste) => console.log(`  ${LIBELLES[etat].padEnd(10)} ${etiquette ? `@${etiquette}` : ''}  ${reste}`);
+const lignesHors = (horsScenario) => {
+  for (const h of horsScenario) console.log(`LIMITE ${compte(h.lignes, 'ligne d\'étape', 'lignes d\'étape')} hors d'un titre « Scénario: » ignorée${h.lignes > 1 ? 's' : ''} (${h.zone})`);
+};
+const parZone = (scenarios) => [...new Set(scenarios.map((s) => s.provenance))].map((z) => `${z} : ${scenarios.filter((s) => s.provenance === z).length}`);
 
-export async function main(args, env = process.env) {
-  const lu = lireArguments(args);
-  if (lu.erreur) return refus([lu.erreur, USAGE]);
-  const o = lu.options;
-  if (!o.comparer) {
-    const erreurs = verifierReglages(o);
-    if (erreurs.length) return refus(erreurs);
-  }
-  const { reglages, erreurs: erreursEnv } = lireReglages(env);
-  if (erreursEnv.length) return refus(erreursEnv);
-  const dossier = resolve(o.dossier);
-  const parAdresse = /^https?:\/\//i.test(o.source);
-
+/**
+ * Demande Jira, par sa page enregistrée ou par son adresse (D16) : { scenarios, lots, prefixe, origine,
+ * nomLot, contexte }, ou { code } quand l'import s'arrête.
+ */
+async function lireJira(o, source, { reglages, dossier }) {
   let octets;
-  if (parAdresse) {
-    if (origineDe(o.source) === null) return refus(`adresse de la demande invalide : ${o.source}`);
+  if (source.adresse) {
+    if (origineDe(o.source) === null) return { code: refus(`adresse de la demande invalide : ${o.source}`) };
     const capture = await capturer(o.source, { reglages, profilJira: o.profilJira, delaiConnexion: o.delaiConnexion });
-    if (capture.erreur) return refus(capture.erreur);
+    if (capture.erreur) return { code: refus(capture.erreur) };
     octets = capture.octets;
   } else {
     try {
       octets = readFileSync(o.source);
     } catch {
-      return refus(`${o.source} : fichier introuvable`);
+      return { code: refus(`${o.source} : fichier introuvable`) };
     }
   }
-
   let page;
   let demande;
   let erreurPage = null;
@@ -850,52 +893,136 @@ export async function main(args, env = process.env) {
     if (!(e instanceof ErreurJira)) throw e;
     erreurPage = e.message;
   }
-  let fichierPage = parAdresse ? null : resolve(o.source);
-  if (parAdresse) {
+  let fichierPage = source.adresse ? null : resolve(o.source);
+  if (source.adresse) {
     fichierPage = join(dossier, 'jira', `${demande?.cle ?? 'page'}-${horodatage()}.mhtml`);
     mkdirSync(join(dossier, 'jira'), { recursive: true });
     writeFileSync(fichierPage, octets);
     console.log(`page enregistrée : ${fichierPage} (elle reste sur le poste : l'écarter du dépôt du projet)`);
   }
-  if (erreurPage) return refus(`${o.source} : ${erreurPage}`);
+  if (erreurPage) return { code: refus(`${o.source} : ${erreurPage}`) };
+  const { scenarios, horsScenario } = extraireScenarios(demande.zones);
+  const zones = parZone(scenarios);
+  console.log(`Demande ${demande.cle} (Jira ${demande.variante === 'cloud' ? 'Cloud' : 'Data Center'})${demande.resume ? `, « ${demande.resume} »` : ''} : ${compte(scenarios.length, 'scénario', 'scénarios')}${zones.length ? ` (${zones.join(', ')})` : ''}${o.commentaires ? ', commentaires lus' : ''}`);
+  for (const l of demande.limites) console.log(`LIMITE ${l}`);
+  lignesHors(horsScenario);
+  if (scenarios.length === 0) {
+    console.log(`Bilan : aucun scénario Gherkin trouvé dans la description ni dans les champs de texte${o.commentaires ? ', ni dans les commentaires' : ' (les commentaires se lisent avec --commentaires)'}`);
+    return { code: 1 };
+  }
+  return {
+    scenarios, lots: demande.cle, prefixe: demande.cle, origine: ORIGINES.jira, nomLot: demande.cle,
+    contexte: { cle: demande.cle, resume: demande.resume, source: demande.url ?? (source.adresse ? o.source : 'page enregistrée'), page: { chemin: chemin(dossier, fichierPage), sha256: page.sha256 } },
+  };
+}
 
+/** Fichier .feature, ou fichiers .feature d'une archive .zip (D17.INV-1), lus sans IA. */
+function lireFichier(o, source, dossier) {
+  const fichier = resolve(o.source);
+  let octets;
+  try {
+    octets = readFileSync(fichier);
+  } catch {
+    return { code: refus(`${o.source} : fichier introuvable`) };
+  }
+  const nom = basename(fichier);
+  const archive = source.genre === 'zip';
+  let fichiers;
+  const limites = [];
+  if (archive) {
+    let zip;
+    try {
+      zip = lireZip(octets);
+    } catch (e) {
+      if (!(e instanceof ErreurCas)) throw e;
+      return { code: refus(`${o.source} : ${e.message}`) };
+    }
+    fichiers = zip.entrees.map((e) => ({ nom: e.nom, texte: e.octets.toString('utf8') }));
+    if (zip.ignorees.length) limites.push(`${compte(zip.ignorees.length, 'fichier de l\'archive ignoré', 'fichiers de l\'archive ignorés')} : ${zip.ignorees.slice(0, 3).join(', ')}${zip.ignorees.length > 3 ? ', …' : ''} (seuls les .feature sont lus)`);
+    for (const r of zip.refusees) limites.push(`${r.nom} : ${r.motif}`);
+  } else {
+    fichiers = [{ nom, texte: octets.toString('utf8') }];
+  }
+  const { scenarios, horsScenario } = extraireScenarios(fichiers.map((f) => ({ zone: 'fichier', libelle: f.nom, lignes: lignesDe(f.texte) })));
+  const zones = parZone(scenarios);
+  if (archive) console.log(`Archive ${nom} : ${compte(fichiers.length, 'fichier .feature', 'fichiers .feature')}, ${compte(scenarios.length, 'scénario', 'scénarios')}${zones.length ? ` (${zones.join(', ')})` : ''}`);
+  else console.log(`Fichier ${nom} : ${compte(scenarios.length, 'scénario', 'scénarios')}`);
+  for (const l of limites) console.log(`LIMITE ${l}`);
+  lignesHors(horsScenario);
+  if (scenarios.length === 0) {
+    console.log(`Bilan : aucun scénario Gherkin trouvé ${archive ? 'dans l\'archive' : 'dans le fichier'}`);
+    return { code: 1 };
+  }
+  const lot = `${archive ? 'archive' : 'fichier'} ${chemin(dossier, fichier)}`;
+  return {
+    scenarios, lots: lot, prefixe: prefixeDe(fichier), identite: identitesGherkin(scenarios), origine: archive ? ORIGINES.zip : ORIGINES.feature, nomLot: 'ce scénario',
+    contexte: { lot, source: `${lot} (sha256 ${sha256(octets)})` },
+  };
+}
+
+/** Tests de Xray ou de Zephyr Scale, lus par leur API, en lecture seule, avec le jeton de l'environnement (D17). */
+async function lireApi(o, source, env) {
+  const outil = OUTILS[source.outil];
+  let base;
+  try {
+    base = adresseApi(source.outil, o.api);
+  } catch (e) {
+    if (!(e instanceof ErreurCas)) throw e;
+    return { code: refus(e.message) };
+  }
+  const jetons = lireJetons(source.outil, env);
+  if (jetons.erreur) return { code: refus(jetons.erreur) };
+  let lu;
+  try {
+    lu = await lireTests(source.outil, source.cles, { base, jetons: jetons.valeurs });
+  } catch (e) {
+    if (!(e instanceof ErreurCas)) throw e;
+    return { code: refus(e.message) };
+  }
+  const scenarios = scenariosDesTests(lu.tests, source.outil);
+  const sortes = [...new Set(lu.tests.map((t) => t.sorte))].map((s) => `${lu.tests.filter((t) => t.sorte === s).length} ${s}`);
+  console.log(`${outil.nom} ${outil.variante} (${base}) : ${compte(source.cles.length, `${outil.test} demandé`, `${outil.tests} demandés`)}, ${compte(lu.tests.length, 'lu', 'lus')}${sortes.length ? ` (${sortes.join(', ')})` : ''}`);
+  return {
+    scenarios, lots: new Set(source.cles.map((c) => `${outil.lot} ${c}`)), prefixe: outil.lot, identite: (sc) => sc.cleTest ?? null,
+    origine: ORIGINES[outil.lot], nomLot: 'ce scénario', contexte: {}, introuvables: lu.introuvables,
+  };
+}
+
+const LIBELLES = { ecrit: 'écrit', inchange: 'inchangé', remplace: 'remplacé', modifie: 'modifié', refuse: 'refusé', doublon: 'doublon', conflit: 'conflit', disparu: 'disparu', identique: 'identique', nouveau: 'nouveau', introuvable: 'introuvable' };
+const ligne = (etat, etiquette, reste) => console.log(`  ${LIBELLES[etat].padEnd(10)} ${etiquette ? `@${etiquette}` : ''}  ${reste}`);
+
+/**
+ * Compare les scénarios lus aux textes du dossier, puis écrit ceux qui sont nouveaux, et ceux qui ont
+ * changé avec --remplacer (D16.INV-5) ; avec --comparer, n'écrit rien. Rend le code de sortie.
+ */
+function ecrireTextes(o, lecture, dossier) {
   const existants = existsSync(dossier)
     ? readdirSync(dossier, { withFileTypes: true }).filter((f) => f.isFile() && /\.scenario$/i.test(f.name)).map((f) => ({ fichier: f.name, texte: readFileSync(join(dossier, f.name), 'utf8') }))
     : [];
-  const importes = textesImportes(existants, demande.cle);
-  const { scenarios, horsScenario } = extraireScenarios(demande.zones);
-  attribuerEtiquettes(scenarios, demande.cle, importes);
-  const parZone = [...new Set(scenarios.map((s) => s.provenance))].map((z) => `${z} : ${scenarios.filter((s) => s.provenance === z).length}`);
-  console.log(`Demande ${demande.cle} (Jira ${demande.variante === 'cloud' ? 'Cloud' : 'Data Center'})${demande.resume ? `, « ${demande.resume} »` : ''} : ${compte(scenarios.length, 'scénario', 'scénarios')}${parZone.length ? ` (${parZone.join(', ')})` : ''}${o.commentaires ? ', commentaires lus' : ''}`);
-  for (const l of demande.limites) console.log(`LIMITE ${l}`);
-  for (const h of horsScenario) console.log(`LIMITE ${compte(h.lignes, 'ligne d\'étape', 'lignes d\'étape')} hors d'un titre « Scénario: » ignorée${h.lignes > 1 ? 's' : ''} (${h.zone})`);
-  if (scenarios.length === 0) {
-    console.log(`Bilan : aucun scénario Gherkin trouvé dans la description ni dans les champs de texte${o.commentaires ? ', ni dans les commentaires' : ' (les commentaires se lisent avec --commentaires)'}`);
-    return 1;
-  }
-
-  const etats = comparer(scenarios, importes, existants.map((f) => f.fichier));
+  const importes = textesImportes(existants, lecture.lots);
+  attribuerEtiquettes(lecture.scenarios, lecture.prefixe, importes, lecture.identite);
+  const etats = comparer(lecture.scenarios, importes, existants.map((f) => f.fichier), textesImportes(existants, null));
+  const introuvables = lecture.introuvables ?? [];
+  const { dans } = lecture.origine;
   const titre = (e) => (e.sc ? e.sc.titre : '');
 
   if (o.comparer) {
     const n = { identique: 0, modifie: 0, nouveau: 0, disparu: 0, autre: 0 };
     for (const e of etats) {
       if (e.etat === 'identique') ligne('identique', e.sc.etiquette, `${titre(e)} (${e.fichier})${e.retouche ? ' ; texte retouché depuis l\'import' : ''}`);
-      else if (e.etat === 'modifie') ligne('modifie', e.sc.etiquette, `${titre(e)} (${e.fichier}) : changé dans Jira depuis l'import${e.retouche ? ' ; texte retouché depuis l\'import' : ''}`);
+      else if (e.etat === 'modifie') ligne('modifie', e.sc.etiquette, `${titre(e)} (${e.fichier}) : changé ${dans} depuis l'import${e.retouche ? ' ; texte retouché depuis l\'import' : ''}`);
       else if (e.etat === 'nouveau') ligne('nouveau', e.sc.etiquette, `${titre(e)} : pas encore importé`);
-      else if (e.etat === 'disparu') ligne('disparu', e.etiquette, `${e.fichier} : le scénario n'est plus dans Jira`);
-      else ligne(e.etat, e.sc.etiquette, `${titre(e)} : ${e.etat === 'conflit' ? `${e.fichier} existe et ne vient pas d'un import de ${demande.cle}` : e.motif}`);
+      else if (e.etat === 'disparu') ligne('disparu', e.etiquette, `${e.fichier} : le scénario n'est plus ${dans}`);
+      else ligne(e.etat, e.sc.etiquette, `${titre(e)} : ${e.etat === 'conflit' ? `${e.fichier} existe et ne vient pas d'un import de ${lecture.nomLot}` : e.motif}`);
       if (e.etat in n) n[e.etat]++; else n.autre++;
     }
+    for (const i of introuvables) ligne('introuvable', i.cle, i.motif);
+    n.autre += introuvables.length;
     console.log(`Bilan : ${compte(n.identique, 'identique', 'identiques')}, ${compte(n.modifie, 'modifié', 'modifiés')}, ${compte(n.nouveau, 'nouveau', 'nouveaux')}, ${compte(n.disparu, 'disparu', 'disparus')}, ${compte(n.autre, 'non importable', 'non importables')}`);
     return n.modifie + n.nouveau + n.disparu + n.autre === 0 ? 0 : 1;
   }
 
-  const contexte = {
-    cle: demande.cle, resume: demande.resume, source: demande.url ?? (parAdresse ? o.source : 'page enregistrée'),
-    page: { chemin: chemin(dossier, fichierPage), sha256: page.sha256 }, date: `${new Date().toISOString().slice(0, 19)}Z`,
-    adresse: o.adresse, origines: o.origines.map((x) => x.replace(/\/$/, '')), profil: o.profil,
-  };
+  const contexte = { ...lecture.contexte, date: `${new Date().toISOString().slice(0, 19)}Z`, adresse: o.adresse, origines: o.origines.map((x) => x.replace(/\/$/, '')), profil: o.profil, origine: lecture.origine };
   const n = { ecrit: 0, remplace: 0, inchange: 0, nonEcrit: 0, disparu: 0 };
   const quand = horodatage();
   for (const e of etats) {
@@ -903,19 +1030,19 @@ export async function main(args, env = process.env) {
       ligne('inchange', e.sc.etiquette, `${titre(e)} (${e.fichier})`);
       n.inchange++;
     } else if (e.etat === 'disparu') {
-      ligne('disparu', e.etiquette, `${e.fichier} : le scénario n'est plus dans Jira ; le texte reste, à supprimer par vous s'il le faut`);
+      ligne('disparu', e.etiquette, `${e.fichier} : le scénario n'est plus ${dans} ; le texte reste, à supprimer par vous s'il le faut`);
       n.disparu++;
     } else if (e.etat === 'refuse' || e.etat === 'doublon') {
       ligne(e.etat, e.sc.etiquette, `${titre(e)} : ${e.motif}`);
       n.nonEcrit++;
     } else if (e.etat === 'conflit') {
-      ligne('conflit', e.sc.etiquette, `${titre(e)} : ${e.fichier} existe et ne vient pas d'un import de ${demande.cle} ; jamais remplacé`);
+      ligne('conflit', e.sc.etiquette, `${titre(e)} : ${e.fichier} existe et ne vient pas d'un import de ${lecture.nomLot} ; jamais remplacé`);
       n.nonEcrit++;
     } else if (e.etat === 'modifie' && !o.remplacer) {
-      ligne('modifie', e.sc.etiquette, `${titre(e)} (${e.fichier}) : changé dans Jira depuis l'import ; --remplacer pour remplacer le texte${e.retouche ? ', retouché depuis l\'import' : ''}`);
+      ligne('modifie', e.sc.etiquette, `${titre(e)} (${e.fichier}) : changé ${dans} depuis l'import ; --remplacer pour remplacer le texte${e.retouche ? ', retouché depuis l\'import' : ''}`);
       n.nonEcrit++;
     } else {
-      const { texte, erreurs } = texteImporte(e.sc, contexte);
+      const { texte, erreurs } = texteImporte(e.sc, { ...contexte, lot: e.sc.lot ?? contexte.lot ?? null, source: e.sc.source ?? contexte.source, notes: e.sc.notes ?? [] });
       if (!texte) {
         ligne('refuse', e.sc.etiquette, `${titre(e)} : ${erreurs.join(' ; ')}`);
         n.nonEcrit++;
@@ -939,9 +1066,34 @@ export async function main(args, env = process.env) {
       }
     }
   }
+  for (const i of introuvables) ligne('introuvable', i.cle, i.motif);
+  n.nonEcrit += introuvables.length;
   console.log(`Bilan : ${compte(n.ecrit, 'écrit', 'écrits')}, ${compte(n.remplace, 'remplacé', 'remplacés')}, ${compte(n.inchange, 'inchangé', 'inchangés')}, ${compte(n.nonEcrit, 'non écrit', 'non écrits')}, ${compte(n.disparu, 'disparu', 'disparus')}`);
   if (n.ecrit + n.remplace > 0) console.log(`Dossier : ${dossier} ; ensuite, pour chaque texte écrit : verifier.mjs, puis la traduction et sa ratification.`);
   return n.nonEcrit === 0 ? 0 : 1;
+}
+
+export async function main(args, env = process.env) {
+  const lu = lireArguments(args);
+  if (lu.erreur) return refus([lu.erreur, USAGE]);
+  const o = lu.options;
+  const source = lireSource(o.source);
+  if (source.erreur) return refus([source.erreur, USAGE]);
+  if (source.genre !== 'jira' && o.optionsJira.length) return refus(`${[...new Set(o.optionsJira)].join(', ')} : pour une demande Jira seulement`);
+  if (source.genre !== 'api' && o.api !== null) return refus('--api : pour xray:, xray-dc:, zephyr: et zephyr-dc: seulement');
+  if (!o.comparer) {
+    const erreurs = verifierReglages(o);
+    if (erreurs.length) return refus(erreurs);
+  }
+  const { reglages, erreurs: erreursEnv } = lireReglages(env);
+  if (erreursEnv.length) return refus(erreursEnv);
+  const dossier = resolve(o.dossier);
+  let lecture;
+  if (source.genre === 'jira') lecture = await lireJira(o, source, { reglages, dossier });
+  else if (source.genre === 'api') lecture = await lireApi(o, source, env);
+  else lecture = lireFichier(o, source, dossier);
+  if (lecture.code !== undefined) return lecture.code;
+  return ecrireTextes(o, lecture, dossier);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

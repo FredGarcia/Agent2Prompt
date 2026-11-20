@@ -131,7 +131,7 @@ Un scénario s'écrit aussi directement en TOML, sans texte de départ : il n'a 
 
 <!-- fichier : scripts/toml.mjs -->
 ```javascript
-// scenario-playwright 1.1.1 : lecteur TOML des scénarios exécutables, sans dépendance.
+// scenario-playwright 1.2.0 : lecteur TOML des scénarios exécutables, sans dépendance.
 //
 // Repris tel quel du lecteur de generateur-skill-ticket 1.1.1 (outils/toml.mjs). Il lit le sous-ensemble
 // de TOML 1.0 dont un scénario a besoin : tables, tableaux de tables, clés nues, entre guillemets ou
@@ -428,7 +428,7 @@ export function lireToml(source, nom = 'TOML') {
 
 <!-- fichier : scripts/scenario.mjs -->
 ```javascript
-// scenario-playwright 1.1.1 : scénario TOML exécutable, contrôle de sa traduction, squelette et plan.
+// scenario-playwright 1.2.0 : scénario TOML exécutable, contrôle de sa traduction, squelette et plan.
 //
 // Un scénario TOML (format scenario-playwright.scenario/1) n'est joué que s'il est valide (D3.INV-1).
 // Traduit d'un texte de départ, il en cite le fichier et l'empreinte (D3.INV-2) ; sa structure et ses
@@ -803,7 +803,7 @@ export function preparerJeux(scenario, dossier, params = {}, numeroJeu = null) {
 /** Squelette d'une traduction, produit sans IA à partir du texte analysé (D3.INV-5). */
 export function squeletteToml(texte, sourceRel) {
   const l = [];
-  l.push(`# Traduction de ${sourceRel}, squelette produit par traduire.mjs (scenario-playwright 1.1.1).`);
+  l.push(`# Traduction de ${sourceRel}, squelette produit par traduire.mjs (scenario-playwright 1.2.0).`);
   l.push('# La structure vient du texte, sans IA. Chaque étape du texte a son bloc [[etapes]] : choisir son action');
   l.push('# et ses champs (module actions). Une ligne du texte peut donner plusieurs étapes : recopier le bloc,');
   l.push('# avec la même ligne. Le scénario ne se joue qu\'une fois chaque étape complétée et la traduction ratifiée.');

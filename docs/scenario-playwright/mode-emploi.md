@@ -1,10 +1,11 @@
 # Mode d'emploi : jouer un scénario côté utilisateur avec Playwright
 
-Ce mode d'emploi installe [`scenario-playwright`](../../specs/scenario-playwright/SKILL.md) 1.1.1 : faire faire à Chrome, sur votre poste, les manipulations d'un utilisateur décrites par un scénario. Vous écrivez le scénario en français ou en anglais, dans un texte inspiré de Gherkin, ou vous l'importez, sans IA, d'une demande Jira ; l'IA le traduit en TOML exécutable ; vous ratifiez la traduction ; le skill joue le scénario, sans IA, et rend un rapport avec ses captures. Vous gardez la main : chaque connexion se fait par vous, dans la fenêtre, et aucune donnée n'est modifiée hors de votre poste sans votre accord pour l'exécution.
+Ce mode d'emploi installe [`scenario-playwright`](../../specs/scenario-playwright/SKILL.md) 1.2.0 : faire faire à Chrome, sur votre poste, les manipulations d'un utilisateur décrites par un scénario. Vous écrivez le scénario en français ou en anglais, dans un texte inspiré de Gherkin, ou vous l'importez, sans IA, d'une demande Jira, d'un fichier `.feature`, ou d'un cas de test de Xray ou de Zephyr Scale ; l'IA le traduit en TOML exécutable ; vous ratifiez la traduction ; le skill joue le scénario, sans IA, et rend un rapport avec ses captures. Vous gardez la main : chaque connexion se fait par vous, dans la fenêtre, et aucune donnée n'est modifiée hors de votre poste sans votre accord pour l'exécution.
 
 ```mermaid
 flowchart LR
   JI["Demande Jira<br/>page MHTML ou adresse"] -->|"importer.mjs, sans IA"| V
+  XZ["Xray, Zephyr Scale<br/>.feature, .zip, API"] -->|"importer.mjs, sans IA"| V
   V["texte de départ<br/>écrit par vous ou importé"] --> T["traduire.mjs :<br/>squelette sans IA"]
   T --> IA["IA : étapes<br/>complétées"]
   IA --> P["verifier.mjs --plan :<br/>plan ligne par ligne"]
@@ -32,7 +33,7 @@ cd ~/.gemini/skills/scenario-playwright && npm ci && npm test
 
 L'installateur pose le skill dans `~/.gemini/skills/scenario-playwright/`, avec l'agent `pilote-scenario` et les commandes `/scenario:importer`, `/scenario:traduire`, `/scenario:jouer` et `/scenario:designer`. Dans une session ouverte : `/skills reload`, `/agents reload`, `/commands reload`. Sous Linux sans écran, la recette se lance par `xvfb-run -a npm test`.
 
-Sans clone, remettez à l'IA la transmission [`transmissions/scenario-playwright-1.1.1.md`](../../transmissions/scenario-playwright-1.1.1.md) : elle matérialise le skill, vérifie les empreintes, installe la dépendance et lance la recette.
+Sans clone, remettez à l'IA la transmission [`transmissions/scenario-playwright-1.2.0.md`](../../transmissions/scenario-playwright-1.2.0.md) : elle matérialise le skill, vérifie les empreintes, installe la dépendance et lance la recette.
 
 ## 3. Écrire le texte de départ
 
@@ -86,7 +87,32 @@ node ~/.gemini/skills/scenario-playwright/scripts/importer.mjs https://jira.exem
 
 Plus tard, `--comparer` dit ce qui a changé dans Jira depuis l'import, sans rien écrire. `--remplacer` remplace les textes des scénarios modifiés ; un texte que vous aviez retouché est d'abord gardé à côté (`ECR-77-S01.scenario.avant-<horodatage>`). Un texte écrit à la main n'est jamais remplacé, et un texte dont le scénario a disparu de Jira reste, à supprimer par vous. Après un remplacement, la traduction est périmée : faites-la refaire et ratifiez.
 
-## 5. Faire traduire, puis ratifier
+## 5. Importer des tests de Xray ou de Zephyr Scale, ou un fichier .feature
+
+Quand vos cas de test vivent dans Xray ou dans Zephyr Scale, ou dans des fichiers `.feature` de votre dépôt, importez-les : un texte de départ par test, nommé par sa clé, `scenarios/ECR-80.scenario`.
+
+- **Un fichier `.feature`**, exporté de Xray ou de Zephyr Scale, ou pris dans le dépôt : `importer.mjs features/clients.feature --adresse http://127.0.0.1:4200 --dossier scenarios`.
+- **Une archive d'export** (l'export Cucumber de Xray, l'export des fichiers .feature de Zephyr Scale) : `importer.mjs FeatureBundle.zip --adresse …` ; l'archive est lue en mémoire, rien n'en est extrait.
+- **Par l'API, en lecture seule** : `xray:ECR-80,ECR-81` pour Xray Cloud, `xray-dc:ECR-80 --api https://jira.exemple.fr` pour Xray Data Center, `zephyr:ECR-T12` pour Zephyr Scale Cloud, `zephyr-dc:ECR-T12 --api https://jira.exemple.fr` pour Zephyr Scale Data Center. Dans Gemini CLI : `/scenario:importer xray:ECR-80 --adresse http://127.0.0.1:4200`.
+
+Le jeton de l'API se donne par une variable d'environnement, que vous définissez vous-même, dans votre terminal, et seulement là : jamais dans la commande, jamais dans un fichier du dépôt, jamais dans la conversation avec l'IA.
+
+```bash
+read -rs ZEPHYR_TOKEN && export ZEPHYR_TOKEN              # Zephyr Scale Cloud
+read -rs XRAY_CLIENT_ID && export XRAY_CLIENT_ID          # Xray Cloud : identifiant et secret d'une clé d'API
+read -rs XRAY_CLIENT_SECRET && export XRAY_CLIENT_SECRET
+read -rs JIRA_TOKEN && export JIRA_TOKEN                  # Data Center : jeton d'accès personnel de Jira
+```
+
+Sous PowerShell 7 : `$env:ZEPHYR_TOKEN = Read-Host -MaskInput 'Jeton'`. Le skill ne fait que lire : rien n'est écrit dans Jira, Xray ni Zephyr Scale ; le jeton ne part que vers l'API, en https, et aucune redirection n'est suivie.
+
+- **Test Cucumber ou BDD** : recopié tel qu'écrit, sous le résumé du test.
+- **Test manuel** : chaque pas devient `Quand <action>`, avec ses données, puis `Alors <résultat attendu>`. La conversion est mécanique : relisez le texte avant de le faire traduire.
+- **Préconditions** : signalées en tête du texte, non reprises ; jouez-les avant, ou reportez-les dans le texte.
+- **Refus** : un test Generic, en texte libre, ou qui appelle un autre cas, est refusé avec son motif ; écrivez-le en Cucumber, en BDD ou en pas à pas dans l'outil.
+- **Le même test, d'un export puis de l'API** : il retrouve son texte par sa clé ; `--comparer` et `--remplacer` s'y appliquent comme pour Jira.
+
+## 6. Faire traduire, puis ratifier
 
 Dans Gemini CLI : `/scenario:traduire scenarios/creer-client.scenario`. L'IA écrit `creer-client.toml` à côté du texte, sur le squelette de `traduire.mjs`, puis vous présente le plan :
 
@@ -99,7 +125,7 @@ l.12  Et je clique sur le bouton « Enregistrer » (création)
 
 Relisez chaque ligne : la cible désigne-t-elle le bon élément ? une étape touche-t-elle aux données sans marque ? Ratifiez, ou demandez une correction. Rien ne se joue avant. Si vous modifiez le texte ensuite, la traduction est périmée : le skill refuse de la jouer, et l'IA la refait.
 
-## 6. Jouer
+## 7. Jouer
 
 Dans Gemini CLI : `/scenario:jouer scenarios/creer-client.toml`. Sans l'agent :
 
@@ -113,28 +139,29 @@ node ~/.gemini/skills/scenario-playwright/scripts/jouer.mjs scenarios/creer-clie
 
 Options utiles : `--param ville=Nice`, `--jeu 2`, `--ralenti 300` pour une démonstration, `--sans-tete` sans étape à la main, `--trace` pour la trace de Playwright (elle contient vos cookies : elle ne se partage pas).
 
-## 7. Une cible qu'on ne sait pas nommer
+## 8. Une cible qu'on ne sait pas nommer
 
 `/scenario:designer http://127.0.0.1:4200/clients`, ou `node <skill>/scripts/designer.mjs <adresse>` : cliquez l'élément dans la fenêtre, le skill rend sa cible, par exemple `cible = { role = "button", nom = "Supprimer", dans = { role = "row", nom = "Martin" } }`. Le clic de désignation ne déclenche rien dans la page.
 
-## 8. Ce qui ne se négocie pas
+## 9. Ce qui ne se négocie pas
 
 - Le skill ne voit aucun identifiant : vous vous connectez vous-même, dans la fenêtre, à l'application comme à Jira.
-- Le skill n'écrit jamais dans Jira ; il n'en lit que la description, les champs de texte et, si vous le demandez, les commentaires.
+- Le skill n'écrit jamais dans Jira, Xray ni Zephyr Scale ; d'une demande, il ne lit que la description, les champs de texte et, si vous le demandez, les commentaires.
+- Un jeton d'API ne passe que par la variable d'environnement que vous définissez : ni le skill ni l'agent ne le demandent, ne l'affichent ou ne l'écrivent.
 - Rien ne se joue avant votre ratification de la traduction.
 - Aucune requête ne part vers une origine que le texte ne déclare pas.
 - Hors de votre poste, une étape qui modifie des données n'est jouée qu'avec `--autoriser-mutations`, que l'agent ne passe qu'avec votre accord, pour une exécution.
 - Le skill ne rejoue aucune étape : un échec reste un échec, à examiner.
 - Rapports, captures, téléchargements, pages Jira enregistrées et profils restent sur votre poste.
 
-## 9. Avec les autres skills
+## 10. Avec les autres skills
 
 - [`agent-tdd-jira`](../../specs/agent-tdd-jira/SKILL.md) : ses scénarios Gherkin donnent les étiquettes, et souvent les phrases, de vos textes de départ ; écrits dans la demande, ils s'importent, et la page MHTML qu'il lit s'importe aussi.
 - [`capture-sprint-jira`](../../specs/capture-sprint-jira/SKILL.md) : ses captures MHTML des tickets d'un sprint s'importent telles quelles, sans rouvrir Jira.
 - [`agent2test`](../../specs/agent2test/SKILL.md) : son navigateur partage le vocabulaire du scénario ; la remise d'un scénario ratifié à Agent2Test est réservée.
 - [`generateur-skill-ticket`](../../specs/generateur-skill-ticket/SKILL.md) : le parcours de son kit démo, joué par ce skill, est réservé.
 
-## 10. Dépannage
+## 11. Dépannage
 
 | Constat | Conduite |
 |---|---|
@@ -152,3 +179,9 @@ Options utiles : `--param ville=Nice`, `--jeu 2`, `--ralenti 300` pour une démo
 | `LIMITE … hors d'un titre « Scénario: »` | dans Jira, écrire `Scénario:` sans numéro avant les étapes, de préférence dans un bloc de code |
 | `conflit` à l'import | un texte du même nom, écrit à la main, existe : le renommer, ou changer l'étiquette dans Jira |
 | `modifié … --remplacer pour remplacer le texte` | `--comparer`, puis `--remplacer` si le changement de Jira doit l'emporter ; refaire la traduction |
+| `variable d'environnement … absente` | la définir vous-même dans le terminal (§ 5), puis relancer |
+| `accès refusé (401)` | jeton expiré, ou sans droit de lecture du projet : en créer un autre, et redéfinir la variable |
+| `… injoignable` | derrière un proxy d'entreprise : `NODE_USE_ENV_PROXY=1`, avec Node 24 ou plus ; certificat d'entreprise : `NODE_EXTRA_CA_CERTS` |
+| `redirection … refusée` | l'adresse donnée par `--api` n'est pas celle de l'API : donner celle de l'API elle-même, en https |
+| `introuvable @ECR-80` | clé inexacte, ou test d'un projet que le jeton ne peut pas lire |
+| un jeton collé par erreur dans une conversation ou une commande | le révoquer, en créer un autre, et le définir dans le terminal |

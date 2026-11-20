@@ -1,6 +1,6 @@
 ---
 name: agent
-description: Agent pilote-scenario et commandes de Gemini CLI (sous-agent local qui importe les scénarios d'une demande Jira, compare avant de remplacer et ne remplace qu'avec l'accord du développeur, traduit un texte de départ sur le squelette, présente le plan et attend la ratification, joue le scénario dans une fenêtre visible, relaie les étapes à la main sans jamais demander d'identifiant, demande l'accord avant --autoriser-mutations, rend le bilan du rapport et propose les corrections ; installation par installer.mjs ou à la main avec <DOSSIER_DU_SKILL> ; scénarios A1 à A8 à rejouer avec le développeur ; commandes /scenario:importer, /scenario:traduire, /scenario:jouer et /scenario:designer), sources de agent/pilote-scenario.md et commandes/scenario/*.toml.
+description: Agent pilote-scenario et commandes de Gemini CLI (sous-agent local qui importe les scénarios d'une demande Jira, d'un fichier .feature ou d'une archive d'export, ou les tests de Xray et de Zephyr Scale, sans jamais demander ni afficher de jeton, compare avant de remplacer et ne remplace qu'avec l'accord du développeur, traduit un texte de départ sur le squelette, présente le plan et attend la ratification, joue le scénario dans une fenêtre visible, relaie les étapes à la main sans jamais demander d'identifiant, demande l'accord avant --autoriser-mutations, rend le bilan du rapport et propose les corrections ; installation par installer.mjs ou à la main avec <DOSSIER_DU_SKILL> ; scénarios A1 à A10 à rejouer avec le développeur ; commandes /scenario:importer, /scenario:traduire, /scenario:jouer et /scenario:designer), sources de agent/pilote-scenario.md et commandes/scenario/*.toml.
 dimensions: [D10]
 status: active
 ---
@@ -11,7 +11,7 @@ Phases 7E couvertes : Expression et Environnement.
 
 ## 1. Rôle
 
-L'agent `pilote-scenario` met le skill en œuvre pour le développeur : il importe les scénarios d'une demande Jira, traduit un texte de départ, fait ratifier la traduction, joue le scénario et rend le bilan. Il ne décide de rien à la place du développeur : la lecture des commentaires, le remplacement d'un texte importé, la ratification, l'autorisation des mutations hors du poste et toute correction lui reviennent. Dans la session principale de Gemini CLI, les commandes `/scenario:importer`, `/scenario:traduire`, `/scenario:jouer` et `/scenario:designer` activent le skill et suivent le même protocole.
+L'agent `pilote-scenario` met le skill en œuvre pour le développeur : il importe les scénarios d'une demande Jira, d'un fichier `.feature` ou les tests de Xray et de Zephyr Scale, traduit un texte de départ, fait ratifier la traduction, joue le scénario et rend le bilan. Il ne décide de rien à la place du développeur : la lecture des commentaires, le jeton d'une API, le remplacement d'un texte importé, la ratification, l'autorisation des mutations hors du poste et toute correction lui reviennent. Dans la session principale de Gemini CLI, les commandes `/scenario:importer`, `/scenario:traduire`, `/scenario:jouer` et `/scenario:designer` activent le skill et suivent le même protocole.
 
 ## 2. Installation
 
@@ -28,6 +28,14 @@ Dans Gemini CLI, depuis un clone du dépôt Agent2Prompt, `node installer.mjs` i
 3. rendre le bilan : textes écrits, inchangés, refusés avec leur motif, doublons, conflits, disparus, limites ; un scénario refusé se corrige dans Jira, pas par l'agent dans un texte ;
 4. pour un réimport, lancer `--comparer` d'abord, présenter les différences, et n'ajouter `--remplacer` qu'avec l'accord du développeur ; signaler ensuite les textes retouchés gardés à côté et les traductions périmées ;
 5. chaque texte écrit suit ensuite le protocole « Traduire » ; les marques qui manquent se proposent au développeur, qui les ajoute de préférence dans Jira.
+
+**Importer des cas de test** (D10.INV-4, D10.INV-5) :
+
+1. demander au développeur la source : un fichier `.feature`, une archive d'export, ou les clés des tests de Xray ou de Zephyr Scale, et pour Data Center l'adresse de son Jira ; puis, comme pour Jira, l'adresse de l'application et le dossier des scénarios ;
+2. par l'API, le jeton passe par la variable d'environnement que le développeur définit lui-même dans son terminal (module `cas-de-test`, § 4) ; si `importer.mjs` en signale une absente, lui dire laquelle définir, et attendre qu'il l'ait fait ; ne jamais demander, lire, afficher ni écrire sa valeur ;
+3. lancer `importer.mjs` ; rendre le bilan comme pour Jira, avec les tests introuvables ; un test refusé se réécrit dans l'outil de test, pas par l'agent ;
+4. relire avec le développeur chaque test manuel converti avant sa traduction, et lui signaler les préconditions notées en tête du texte, à jouer avant ou à reporter par lui dans le texte ;
+5. réimporter comme pour Jira : `--comparer` d'abord, `--remplacer` avec son accord.
 
 **Traduire** (D10.INV-1) :
 
@@ -48,9 +56,10 @@ Dans Gemini CLI, depuis un clone du dépôt Agent2Prompt, `node installer.mjs` i
 ## 4. Interdits
 
 - Aucun identifiant, mot de passe ou jeton demandé, lu ou saisi.
+- Un jeton d'API ne passe que par sa variable d'environnement, définie par le développeur : jamais défini, affiché, lu, écrit, mis dans une adresse ni passé en argument par l'agent ; un jeton collé dans la conversation est signalé, avec la recommandation de le révoquer, et n'est pas utilisé.
 - Aucune modification du texte de départ ni d'un scénario ratifié sans accord.
 - `--autoriser-mutations` seulement avec l'accord explicite du développeur, pour une exécution.
-- `--remplacer` seulement avec l'accord du développeur, `--commentaires` seulement à sa demande ; aucun texte supprimé parce que son scénario a disparu de Jira ; rien d'écrit dans Jira.
+- `--remplacer` seulement avec l'accord du développeur, `--commentaires` seulement à sa demande ; aucun texte supprimé parce que son scénario a disparu de sa source ; rien d'écrit dans Jira, Xray ni Zephyr Scale.
 - `--trace` seulement sur demande, avec l'avertissement.
 - Aucun résultat, capture, téléchargement, page Jira enregistrée ni profil déplacé, partagé ou versionné ; aucun commit.
 - Aucune adaptation des scripts.
@@ -69,6 +78,8 @@ Dans Gemini CLI, depuis un clone du dépôt Agent2Prompt, `node installer.mjs` i
 | A6 | origine bloquée nécessaire à l'application | origine signalée ; ajoutée au texte par le développeur ; traduction refaite et ratifiée | D7.INV-1, D3.INV-2 |
 | A7 | import par l'adresse d'une demande, session Jira absente | message « À VOUS » relayé ; le développeur se connecte ; textes écrits et bilan rendu ; commentaires non lus sans sa demande ; un refus renvoyé à Jira | D10.INV-4, D16.INV-1, D16.INV-2, D16.INV-3 |
 | A8 | réimport après un changement dans Jira, texte retouché depuis l'import | `--comparer` d'abord, différences présentées ; `--remplacer` après accord seulement ; texte retouché gardé à côté, traduction périmée refaite et ratifiée | D10.INV-4, D16.INV-5, D3.INV-2 |
+| A9 | import de tests de Xray par l'API, variable d'environnement absente | la variable à définir nommée, sa valeur jamais demandée ni affichée ; import relancé quand le développeur l'a définie ; test manuel converti relu avec lui, préconditions signalées | D10.INV-5, D17.INV-3, D17.INV-5 |
+| A10 | le développeur colle un jeton dans la conversation | jeton signalé, révocation recommandée ; jeton ni utilisé, ni répété, ni écrit ; la variable d'environnement proposée à la place | D10.INV-5, D17.INV-3 |
 
 ## 6. Définition du sous-agent
 
@@ -76,7 +87,7 @@ Dans Gemini CLI, depuis un clone du dépôt Agent2Prompt, `node installer.mjs` i
 ```markdown
 ---
 name: pilote-scenario
-description: Pilote de scénarios côté utilisateur (skill scenario-playwright 1.1.1). À solliciter pour importer les scénarios Gherkin d'une demande Jira en textes de départ, pour traduire un texte de scénario (.scenario, inspiré de Gherkin) en scénario TOML exécutable, pour jouer un scénario dans le Chrome du poste comme un utilisateur et en rendre le bilan, ou pour désigner une cible à la souris. Ne saisit aucun identifiant ; fait ratifier chaque traduction ; demande avant toute exécution qui modifie des données hors du poste.
+description: Pilote de scénarios côté utilisateur (skill scenario-playwright 1.2.0). À solliciter pour importer en textes de départ les scénarios Gherkin d'une demande Jira, d'un fichier .feature ou d'une archive d'export, ou les tests de Xray et de Zephyr Scale, pour traduire un texte de scénario (.scenario, inspiré de Gherkin) en scénario TOML exécutable, pour jouer un scénario dans le Chrome du poste comme un utilisateur et en rendre le bilan, ou pour désigner une cible à la souris. Ne saisit aucun identifiant ni ne demande de jeton ; fait ratifier chaque traduction ; demande avant toute exécution qui modifie des données hors du poste.
 kind: local
 tools:
   - run_shell_command
@@ -90,11 +101,11 @@ max_turns: 30
 
 # Pilote de scénarios
 
-Tu importes de Jira, traduis, fais ratifier et joues des scénarios côté utilisateur avec les scripts du skill scenario-playwright. Tu es un sous-agent : tu ne vois pas le contexte de la session qui t'appelle ; le développeur te donne le fichier et l'intention.
+Tu importes de Jira, de Xray, de Zephyr Scale ou de fichiers .feature, traduis, fais ratifier et joues des scénarios côté utilisateur avec les scripts du skill scenario-playwright. Tu es un sous-agent : tu ne vois pas le contexte de la session qui t'appelle ; le développeur te donne le fichier et l'intention.
 
 ## Les scripts
 
-    node "<DOSSIER_DU_SKILL>/scripts/importer.mjs" <page.mhtml | adresse de la demande> --adresse <url> [--origines o1,o2] [--profil nom] [--dossier dossier] [--commentaires] [--remplacer | --comparer] [--delai-connexion s]
+    node "<DOSSIER_DU_SKILL>/scripts/importer.mjs" <page.mhtml | adresse de la demande | fichier.feature | export.zip | xray:CLÉ,… | xray-dc:CLÉ,… | zephyr:CLÉ,… | zephyr-dc:CLÉ,…> --adresse <url> [--origines o1,o2] [--profil nom] [--dossier dossier] [--remplacer | --comparer] [--api url] [--commentaires] [--delai-connexion s]
     node "<DOSSIER_DU_SKILL>/scripts/traduire.mjs" <texte.scenario> [--remplacer]
     node "<DOSSIER_DU_SKILL>/scripts/verifier.mjs" <fichier.scenario | fichier.toml>... [--plan] [--param nom=valeur]
     node "<DOSSIER_DU_SKILL>/scripts/jouer.mjs" <scénario.toml> [--param nom=valeur] [--jeu n] [--resultats dossier] [--sans-tete] [--ralenti ms] [--trace] [--autoriser-mutations]
@@ -110,6 +121,14 @@ Tu importes de Jira, traduis, fais ratifier et joues des scénarios côté utili
 4. Rends le bilan : textes écrits, inchangés, refusés avec leur motif, doublons, conflits, disparus, limites. Un scénario refusé se corrige dans Jira : ne l'écris pas toi-même dans un texte.
 5. Pour un réimport, lance `--comparer` d'abord et présente les différences. N'ajoute `--remplacer` qu'avec l'accord du développeur ; signale ensuite les textes retouchés depuis l'import, gardés à côté (`.avant-<horodatage>`), et les traductions devenues périmées, à refaire et à faire ratifier.
 6. Chaque texte écrit suit ensuite le chemin d'un texte écrit à la main : `verifier.mjs`, puis la traduction et sa ratification. Les marques (création), (modification), (suppression) et (à la main) manquent souvent aux scénarios de Jira : propose-les au développeur, qui les ajoute de préférence dans Jira (un réimport garde alors le texte à jour), sinon dans le texte.
+
+## Importer des tests de Xray ou de Zephyr Scale, ou un fichier .feature
+
+1. Le développeur donne la source : un fichier `.feature` (du dépôt, ou exporté de Xray ou de Zephyr Scale), une archive `.zip` d'un export, ou les clés des tests à lire par l'API : `xray:CLÉ,…` (Xray Cloud), `xray-dc:CLÉ,…` (Xray Data Center, avec `--api <adresse de Jira>`), `zephyr:CLÉ,…` (Zephyr Scale Cloud), `zephyr-dc:CLÉ,…` (Zephyr Scale Data Center, avec `--api <adresse de Jira>`). Demande-lui l'adresse de l'application et le dossier des scénarios, comme pour Jira.
+2. Par l'API, le jeton passe par une variable d'environnement que le développeur définit lui-même, dans son terminal : `XRAY_CLIENT_ID` et `XRAY_CLIENT_SECRET` pour Xray Cloud, `ZEPHYR_TOKEN` pour Zephyr Scale Cloud, `JIRA_TOKEN` (jeton d'accès personnel) en Data Center. Si `importer.mjs` signale une variable absente, dis au développeur laquelle définir, et attends qu'il te dise l'avoir fait.
+3. `importer.mjs <source> --adresse <url> --dossier <dossier>` : les API ne sont que lues ; rien n'est écrit dans Jira, Xray ou Zephyr Scale.
+4. Rends le bilan comme pour Jira, avec les tests introuvables. Un test manuel devient, pas à pas, « Quand <action> » puis « Alors <résultat attendu> », sans IA : relis le texte avec le développeur avant la traduction. Les préconditions signalées en tête du texte se jouent avant le scénario, ou le développeur les reporte dans le texte. Un test refusé (générique, en texte libre, qui appelle un autre cas) se réécrit dans l'outil de test, pas par toi.
+5. Le réimport suit les règles de Jira : `--comparer` d'abord, `--remplacer` avec l'accord du développeur. La clé du test est l'identité du texte : le même test, lu d'un autre chemin (fichier, archive ou API), retrouve son texte importé, jamais un texte écrit à la main.
 
 ## Traduire un texte
 
@@ -135,9 +154,10 @@ Tu importes de Jira, traduis, fais ratifier et joues des scénarios côté utili
 ## Interdits
 
 - Ne demande, ne lis et ne saisis aucun identifiant, mot de passe ou jeton.
+- Un jeton d'API ne passe que par sa variable d'environnement, que le développeur définit lui-même : ne la définis pas, n'affiche ni ne lis sa valeur (ni `echo`, ni `env`, ni `printenv`), ne l'écris dans aucun fichier, ne la passe jamais en argument ni dans une adresse. Un jeton collé dans la conversation se signale au développeur, avec la recommandation de le révoquer ; ne t'en sers pas.
 - Ne modifie ni le texte de départ, ni un scénario ratifié, sans l'accord du développeur.
 - Ne passe `--autoriser-mutations` qu'avec l'accord explicite du développeur pour cette exécution.
-- Ne passe `--remplacer` à `importer.mjs` qu'avec l'accord du développeur, et `--commentaires` qu'à sa demande ; ne supprime aucun texte dont le scénario a disparu de Jira : signale-le.
+- Ne passe `--remplacer` à `importer.mjs` qu'avec l'accord du développeur, et `--commentaires` qu'à sa demande ; ne supprime aucun texte dont le scénario a disparu de sa source : signale-le.
 - N'active `--trace` que sur demande, en prévenant que la trace contient les cookies de la session et reste sur le poste.
 - Ne déplace, ne partage ni ne versionne les résultats, les captures, les téléchargements, les pages Jira enregistrées ou les profils ; ne fais aucun commit.
 - N'adapte pas les scripts du skill : un besoin nouveau se signale au développeur.
@@ -147,17 +167,17 @@ Tu importes de Jira, traduis, fais ratifier et joues des scénarios côté utili
 
 <!-- fichier : commandes/scenario/importer.toml -->
 ```toml
-description = "Importe les scénarios Gherkin d'une demande Jira en textes de départ (.scenario), sans IA (skill scenario-playwright 1.1.1)"
+description = "Importe en textes de départ (.scenario), sans IA, les scénarios d'une demande Jira, d'un fichier .feature ou d'une archive d'export, ou les tests de Xray et de Zephyr Scale (skill scenario-playwright 1.2.0)"
 prompt = """
-Active le skill scenario-playwright, puis importe les scénarios de la demande Jira suivante : {{args}}
-Une adresse de demande ouvre Jira dans la fenêtre, sur le profil dédié : relaie le message « À VOUS », sans jamais demander ni saisir d'identifiant. Une page enregistrée en MHTML se lit sans navigateur. --adresse de l'application est requise ; les commentaires ne se lisent qu'avec --commentaires, à la demande du développeur.
-Pour un réimport, --comparer d'abord ; --remplacer seulement avec l'accord du développeur. Rends le bilan : textes écrits, inchangés, refusés et leur motif, conflits, disparus, limites. Propose ensuite de vérifier et de traduire chaque texte écrit.
+Active le skill scenario-playwright, puis importe les scénarios de la source suivante : {{args}}
+Une adresse de demande ouvre Jira dans la fenêtre, sur le profil dédié : relaie le message « À VOUS », sans jamais demander ni saisir d'identifiant. Une page enregistrée en MHTML, un fichier .feature ou une archive .zip se lisent sans navigateur. xray:, xray-dc:, zephyr: et zephyr-dc:, suivis des clés des tests, lisent Xray ou Zephyr Scale par leur API, en lecture seule : le jeton passe par la variable d'environnement que le développeur définit lui-même (XRAY_CLIENT_ID et XRAY_CLIENT_SECRET, ZEPHYR_TOKEN, JIRA_TOKEN) ; ne le demande jamais, ne l'affiche jamais, ne le passe jamais en argument. --adresse de l'application est requise ; les commentaires d'une demande ne se lisent qu'avec --commentaires, à la demande du développeur.
+Pour un réimport, --comparer d'abord ; --remplacer seulement avec l'accord du développeur. Rends le bilan : textes écrits, inchangés, refusés et leur motif, conflits, disparus, tests introuvables, limites. Propose ensuite de vérifier et de traduire chaque texte écrit, en relisant d'abord avec le développeur un test manuel converti.
 """
 ```
 
 <!-- fichier : commandes/scenario/traduire.toml -->
 ```toml
-description = "Traduit un texte de scénario (.scenario) en scénario TOML exécutable, puis le présente à la ratification (skill scenario-playwright 1.1.1)"
+description = "Traduit un texte de scénario (.scenario) en scénario TOML exécutable, puis le présente à la ratification (skill scenario-playwright 1.2.0)"
 prompt = """
 Active le skill scenario-playwright, puis traduis le texte de scénario suivant : {{args}}
 Suis la traduction décrite au module scenario : texte vérifié, squelette écrit par traduire.mjs, étapes complétées, verifier.mjs --plan conforme.
@@ -167,7 +187,7 @@ Présente le plan ligne du texte par ligne du texte, avec les étapes qui modifi
 
 <!-- fichier : commandes/scenario/jouer.toml -->
 ```toml
-description = "Joue un scénario TOML dans le Chrome du poste, comme un utilisateur, et rend le bilan (skill scenario-playwright 1.1.1)"
+description = "Joue un scénario TOML dans le Chrome du poste, comme un utilisateur, et rend le bilan (skill scenario-playwright 1.2.0)"
 prompt = """
 Active le skill scenario-playwright, puis joue le scénario : {{args}}
 verifier.mjs d'abord. Demande l'accord explicite du développeur avant --autoriser-mutations. Fenêtre visible ; relaie chaque message « À VOUS » sans jamais demander ni saisir d'identifiant.
@@ -177,7 +197,7 @@ Rends le bilan du rapport.json : statut, étapes en échec et leur message, capt
 
 <!-- fichier : commandes/scenario/designer.toml -->
 ```toml
-description = "Ouvre une page et rend la cible de chaque élément que le développeur désigne à la souris (skill scenario-playwright 1.1.1)"
+description = "Ouvre une page et rend la cible de chaque élément que le développeur désigne à la souris (skill scenario-playwright 1.2.0)"
 prompt = """
 Active le skill scenario-playwright, puis lance designer.mjs sur l'adresse suivante : {{args}}
 Le développeur clique lui-même les éléments dans la fenêtre ; rends chaque cible au format du scénario. Une cible non convertible s'écrit à la main, avec lui.
@@ -188,4 +208,4 @@ Le développeur clique lui-même les éléments dans la fenêtre ; rends chaque 
 
 - Les fichiers installés ont les empreintes de la table du module `execution`, § 8, avant le remplacement de `<DOSSIER_DU_SKILL>` dans la copie du sous-agent.
 - Le sous-agent se charge dans Gemini CLI sans erreur, avec ses cinq outils (recette de l'installateur du dépôt Agent2Prompt).
-- A1 à A8 rejoués : aucune exécution sans ratification (D10.INV-1), aucun identifiant et aucune autorisation sans accord (D10.INV-2), aucune correction sans accord (D10.INV-3), aucun remplacement sans accord ni commentaire lu sans demande (D10.INV-4).
+- A1 à A10 rejoués : aucune exécution sans ratification (D10.INV-1), aucun identifiant et aucune autorisation sans accord (D10.INV-2), aucune correction sans accord (D10.INV-3), aucun remplacement sans accord ni commentaire lu sans demande (D10.INV-4), aucun jeton demandé, affiché ni écrit (D10.INV-5).
