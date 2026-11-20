@@ -146,6 +146,7 @@ Options utiles : `--param ville=Nice`, `--jeu 2`, `--ralenti 300` pour une démo
 | `… a changé depuis la traduction` | le texte a été modifié : faire retraduire et ratifier |
 | `AVERTISSEMENT navigateur 160 plus récent…` | rien à faire tant que tout passe ; un échec inattendu se signale |
 | `--autoriser-mutations` demandé | le scénario modifie des données hors du poste : décider, pour cette exécution |
+| la recette ou un scénario se bloque sous Node 24 | le signaler, puis rejouer sous Node 22 ou 26 ; la recette s'arrête d'elle-même au bout de dix minutes et dit où |
 | `page non reconnue comme une demande de Jira…` | enregistrer la page de la demande elle-même, pas un tableau ni une recherche ; vérifier l'adresse |
 | `la demande ne s'est pas affichée en 300 s` | se connecter dans la fenêtre, puis rouvrir la demande ; `--delai-connexion 600` pour attendre plus |
 | `LIMITE … hors d'un titre « Scénario: »` | dans Jira, écrire `Scénario:` sans numéro avant les étapes, de préférence dans un bloc de code |

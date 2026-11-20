@@ -4,8 +4,9 @@ name: Recette de scenario-playwright
 # le chemin de l'IA du développeur, sous Linux et sous Windows : matérialiser la transmission courante, extraire les
 # fichiers par la commande du module execution, § 8, installer la dépendance par npm ci, puis lancer la recette
 # contre l'application de démonstration locale, avec le Chrome stable des images GitHub (sous écran virtuel pour Linux).
-# Une recette en échec laisse son dossier temporaire en artefact, sans les profils du navigateur : rapports, captures,
-# instantanés ARIA et sortie de la recette, pour examiner l'échec sans le reproduire.
+# La sortie de la recette s'affiche au fil de l'eau ; un pas bloqué s'arrête au bout de douze minutes. Une recette en
+# échec laisse son dossier temporaire en artefact, sans les profils du navigateur : rapports, captures, instantanés
+# ARIA et sortie de la recette, pour examiner l'échec sans le reproduire.
 
 on:
   pull_request:
@@ -95,11 +96,16 @@ jobs:
           // Dossier temporaire gardé par une recette en échec, copié sans les profils du navigateur, avec la sortie.
           const [fichier, cible] = process.argv.slice(2);
           const texte = readFileSync(fichier, 'utf8').replace(/\r\n/g, '\n');
-          const garde = /^Dossier temporaire gardé : (.+)$/m.exec(texte)?.[1]?.trim();
+          // Le dossier est dit gardé en fin de recette ; une recette arrêtée par le délai du pas ne l'a dit qu'au début.
+          const garde = (/^Dossier temporaire gardé : (.+)$/m.exec(texte) ?? /^Dossier temporaire : (.+)$/m.exec(texte))?.[1]?.trim();
           mkdirSync(cible, { recursive: true });
           cpSync(fichier, join(cible, 'recette.txt'));
-          if (garde) cpSync(garde, join(cible, basename(garde)), { recursive: true, filter: (s) => !/[\\/]profils([\\/]|$)/.test(s.slice(garde.length)) });
-          console.log(garde ? `dossier gardé : ${garde}` : 'aucun dossier gardé dans la sortie');
+          try {
+            if (garde) cpSync(garde, join(cible, basename(garde)), { recursive: true, filter: (s) => !/[\\/]profils([\\/]|$)/.test(s.slice(garde.length)) });
+          } catch (e) {
+            console.log(`copie partielle : ${e.message}`);
+          }
+          console.log(garde ? `dossier gardé : ${garde}` : 'aucun dossier temporaire dans la sortie');
           FIN
           node "$RUNNER_TEMP/materialiser.mjs"
 
@@ -123,29 +129,35 @@ jobs:
       - name: Recette sous Linux, écran virtuel
         if: runner.os != 'Windows'
         shell: bash
+        timeout-minutes: 12
         working-directory: ${{ runner.temp }}/scenario-playwright
         run: |
+          set -o pipefail
           node --version
           google-chrome --version || true
-          statut=0
-          xvfb-run -a npm test > recette.txt 2>&1 || statut=$?
-          cat recette.txt
-          node "$RUNNER_TEMP/annoter.mjs" recette.txt "${{ runner.os }}, Node ${{ matrix.node }}"
-          if [ $statut -ne 0 ]; then node "$RUNNER_TEMP/garder.mjs" recette.txt "$RUNNER_TEMP/recette-gardee"; fi
-          exit $statut
+          xvfb-run -a npm test 2>&1 | tee recette.txt
 
       - name: Recette sous Windows
         if: runner.os == 'Windows'
         shell: bash
+        timeout-minutes: 12
         working-directory: ${{ runner.temp }}/scenario-playwright
         run: |
+          set -o pipefail
           node --version
-          statut=0
-          npm test > recette.txt 2>&1 || statut=$?
-          cat recette.txt
-          node "$RUNNER_TEMP/annoter.mjs" recette.txt "${{ runner.os }}, Node ${{ matrix.node }}"
-          if [ $statut -ne 0 ]; then node "$RUNNER_TEMP/garder.mjs" recette.txt "$RUNNER_TEMP/recette-gardee"; fi
-          exit $statut
+          npm test 2>&1 | tee recette.txt
+
+      - name: Bilan en annotations
+        if: always()
+        shell: bash
+        working-directory: ${{ runner.temp }}/scenario-playwright
+        run: if [ -f recette.txt ]; then node "$RUNNER_TEMP/annoter.mjs" recette.txt "${{ runner.os }}, Node ${{ matrix.node }}"; fi
+
+      - name: Rassembler les preuves d'une recette en échec
+        if: failure()
+        shell: bash
+        working-directory: ${{ runner.temp }}/scenario-playwright
+        run: if [ -f recette.txt ]; then node "$RUNNER_TEMP/garder.mjs" recette.txt "$RUNNER_TEMP/recette-gardee"; fi
 
       - name: Garder les preuves d'une recette en échec
         if: failure()

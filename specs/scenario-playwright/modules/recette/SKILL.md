@@ -18,7 +18,7 @@ npm test
 - Depuis le dossier du skill, après `npm ci`. Sous Linux sans écran : `xvfb-run -a npm test` ; le scénario s'y joue dans une fenêtre, comme sur le poste.
 - Le navigateur est celui de `SCENARIO_PLAYWRIGHT_CANAL` : Chrome par défaut ; `chromium` après `npx playwright-core install chromium`.
 - La recette travaille sur des profils et des dossiers temporaires : les profils et les résultats du dossier du skill ne sont pas touchés. Elle efface son dossier temporaire si tout passe ; sinon, ou avec `GARDER_TMP=1`, elle le garde et en donne le chemin.
-- Durée : environ une minute et demie.
+- Durée : environ une minute et demie. Garde-fou : une recette bloquée s'arrête d'elle-même au bout de dix minutes, en disant dans quel scénario, son dossier temporaire gardé ; ce dossier est dit dès la première ligne.
 - Bilan attendu : `Bilan : 21 scénarios, 279 contrôles, 279 réussis, 0 en échec, 0 sautés`. Là où un serveur ne peut écouter sur 127.0.0.2, deux contrôles de R8 sont sautés.
 
 ## 2. L'application de démonstration
@@ -77,7 +77,7 @@ Le même fichier sert un Jira factice, sur une troisième origine, et donne de q
 
 ## 4. Contrôle de la recette elle-même
 
-Vingt-neuf défauts, réintroduits un à un dans le code, font chacun échouer la recette par le scénario attendu (essai du 20 novembre 2026, Node 22.23.4, Chromium 159, rejoué en 1.1.1 pour les défauts que relèvent R5, R6, R8 et R11) :
+Vingt-neuf défauts, réintroduits un à un dans le code, font chacun échouer la recette par le scénario attendu (essai du 20 novembre 2026, Node 22.23.4, Chromium 159, rejoué en entier en 1.1.1) :
 
 | ID | Défaut réintroduit | Scénarios en échec | Contrôles en échec |
 |---|---|---|---|
@@ -115,7 +115,7 @@ Chaque défaut a été retiré après son essai ; la recette du code publié pas
 
 ## 5. Recette en intégration continue
 
-Le workflow `.github/workflows/recette-scenario-playwright.yml` du dépôt Agent2Prompt suit le chemin de l'IA du développeur : il matérialise la transmission courante, extrait les fichiers par la commande du module `execution`, § 8, sous bash et sous CMD, installe la dépendance par `npm ci`, puis lance la recette, sous `xvfb-run` sur `ubuntu-latest` et directement sur `windows-latest`, avec Node 22, 24 et 26.13.0 et le Chrome stable des images GitHub. Une recette en échec y laisse son dossier temporaire en artefact, sans les profils du navigateur : sortie de la recette, rapports, captures et instantanés ARIA, gardés sept jours.
+Le workflow `.github/workflows/recette-scenario-playwright.yml` du dépôt Agent2Prompt suit le chemin de l'IA du développeur : il matérialise la transmission courante, extrait les fichiers par la commande du module `execution`, § 8, sous bash et sous CMD, installe la dépendance par `npm ci`, puis lance la recette, sous `xvfb-run` sur `ubuntu-latest` et directement sur `windows-latest`, avec Node 22, 24 et 26.13.0 et le Chrome stable des images GitHub. La sortie de la recette s'y affiche au fil de l'eau, et un pas de recette bloqué s'arrête au bout de douze minutes. Une recette en échec y laisse son dossier temporaire en artefact, sans les profils du navigateur : sortie de la recette, rapports, captures et instantanés ARIA, gardés sept jours.
 
 ## 6. Sources
 
@@ -506,9 +506,24 @@ function lancer(script, args, { env = ENV, delai = 120_000 } = {}) {
     enfant.stdout.setEncoding('utf8').on('data', (d) => { sortie += d; });
     enfant.stderr.setEncoding('utf8').on('data', (d) => { erreurs += d; });
     const minuterie = setTimeout(() => enfant.kill('SIGKILL'), delai);
-    enfant.on('close', (code) => { clearTimeout(minuterie); resolve({ code, sortie, erreurs }); });
+    // Fin du script : la sortie se lit jusqu'à la fermeture de ses flux, 2 s au plus après la fin du processus,
+    // pour qu'un processus du navigateur resté ouvert ne retienne pas la recette.
+    let grace = null;
+    let fini = false;
+    const finir = (code) => {
+      if (fini) return;
+      fini = true;
+      clearTimeout(minuterie);
+      clearTimeout(grace);
+      resolve({ code, sortie, erreurs });
+    };
+    enfant.on('exit', (code) => { grace = setTimeout(() => finir(code), 2000); });
+    enfant.on('close', (code) => finir(code));
   });
 }
+
+/** Ferme un contexte de navigateur ouvert par la recette elle-même, sans l'attendre plus de 15 s. */
+const fermer = (ctx) => Promise.race([ctx.close().catch(() => {}), new Promise((r) => { setTimeout(r, 15_000).unref(); })]);
 
 /** Joue un scénario et lit son rapport ; rend { code, sortie, erreurs, rapport, dossier }. */
 async function jouer(chemin, args = [], options = {}) {
@@ -558,6 +573,7 @@ async function principal() {
   const { base, autre, distante, jira: adresseJira } = app;
   const canal = session.lireReglages(ENV).reglages.canal;
   console.log(`Recette de scenario-playwright 1.1.1 : Node ${process.versions.node}, navigateur ${canal}, application ${base}`);
+  console.log(`Dossier temporaire : ${TMP}`);
   try {
     // ------------------------------------------------------------------------------------------
     scenarioRecette('R1', 'Texte de départ : structure, marques, variables, exemples, erreurs ligne par ligne');
@@ -1050,7 +1066,7 @@ nom = "export"
           const e = joues[0].etapes;
           controle('garde à l\'étape par l\'API : mutation sur une page hors du poste refusée, sans action', e[1].statut === 'echec' && /hors du poste, sans --autoriser-mutations : aucune action faite/.test(e[1].message) && app.etat.compteur === avant + 1, JSON.stringify(e[1]));
         } finally {
-          await ctx.close();
+          await fermer(ctx);
         }
       }
     }
@@ -1165,7 +1181,7 @@ nom = "export"
         controle('le clic de désignation n\'actionne pas la page (D9.INV-1)', page.url() === `${base}/clients` && app.etat.clients.length === avant);
         controle('cible rendue au format du scénario', /^\{ role = "link", nom = "Nouveau client" \}$/.test(cibles.cibleToml(rendues[0]?.cible ?? { texte: '?' })));
       } finally {
-        await ctx.close();
+        await fermer(ctx);
       }
     }
 
@@ -1440,6 +1456,15 @@ Fonctionnalité: Clients
 }
 
 let codeSortie = 0;
+// Garde-fou : une recette bloquée s'arrête d'elle-même au bout de dix minutes, en disant dans quel scénario, son
+// dossier temporaire gardé ; elle dure d'ordinaire moins de deux minutes.
+const DUREE_MAX = 600_000;
+setTimeout(() => {
+  console.log(`KO   ${courant} · recette bloquée, arrêtée au bout de ${DUREE_MAX / 60_000} min`);
+  console.log(`\nBilan : recette arrêtée dans ${courant}, après ${resultats.length} contrôles`);
+  console.log(`Dossier temporaire gardé : ${TMP}`);
+  process.exit(1);
+}, DUREE_MAX).unref();
 try {
   await principal();
 } catch (e) {

@@ -422,7 +422,7 @@ La version 1.1.0 répond à la demande du même jour : récupérer aussi les sc�
 
 ## 12. Journal de révision
 
-**1.1.1** (2026-11-20) : correctif. La recette passait par intermittence dans la CI : sous Node 24, un premier lancement du navigateur lent dépassait les délais courts de R5, R6, R8 et R11, ou ceux des preuves d'un échec. Les preuves d'un échec, capture et instantané ARIA, attendent 10 s au plus, au lieu de 5 et 3 ; la durée d'une étape en échec s'arrête à l'échec, sans le temps de ses preuves. Dans la recette, les délais courts ne portent plus que sur les étapes dont ils sont l'objet, et R5 prend le délai par défaut, 10 s. Le workflow garde en artefact le dossier temporaire d'une recette en échec, sans les profils du navigateur. Aucune dimension ni aucun invariant modifié ; recette de 21 scénarios (279 contrôles), 29 défauts réintroduits, ceux que relèvent R5, R6, R8 et R11 rejoués. Archive : `archives/SKILL-v1.1.0.md`.
+**1.1.1** (2026-11-20) : correctif. La recette passait par intermittence dans la CI, toujours sous Node 24 : un premier lancement du navigateur lent dépassait les délais courts de R5, R6, R8 et R11, ou ceux des preuves d'un échec, et une fois sous Windows la recette s'est bloquée jusqu'au délai du job. Les preuves d'un échec, capture et instantané ARIA, attendent 10 s au plus, au lieu de 5 et 3 ; la durée d'une étape en échec s'arrête à l'échec, sans le temps de ses preuves. Dans la recette, les délais courts ne portent plus que sur les étapes dont ils sont l'objet, et R5 prend le délai par défaut, 10 s ; la recette dit son dossier temporaire dès le début, ferme ses propres navigateurs sans les attendre plus de 15 s, lit la sortie d'un script 2 s au plus après sa fin, et s'arrête d'elle-même au bout de dix minutes en disant dans quel scénario. Le workflow affiche la sortie au fil de l'eau, arrête une recette bloquée au bout de douze minutes et garde en artefact le dossier temporaire d'une recette en échec, sans les profils du navigateur. Aucune dimension ni aucun invariant modifié ; recette de 21 scénarios (279 contrôles), 29 défauts réintroduits, tous rejoués. Archive : `archives/SKILL-v1.1.0.md`.
 
 **1.1.0** (2026-11-20) : scénarios importés d'une demande Jira. Dimension D16 active, module `jira` : `scripts/jira.mjs` et `scripts/importer.mjs`, page enregistrée en MHTML ou adresse de la demande, Jira Cloud et Jira Data Center, description et champs de texte, commentaires sur demande, scénarios recopiés sans IA avec leur provenance, étiquettes gardées, reprises ou attribuées, réimport, `--comparer` et `--remplacer`, textes retouchés gardés (D16.INV-1 à D16.INV-6). Mots-clés de Gherkin en anglais ou en français dans les textes (D2.INV-4) ; agent : protocole d'import, D10.INV-4, scénarios A7 et A8, commande `/scenario:importer`. Recette de 21 scénarios (279 contrôles), avec un Jira factice : R1 étendu, R18 à R21 ; 29 défauts réintroduits. Références : capture-sprint-jira 1.2.2 ajouté. Archive : `archives/SKILL-v1.0.0.md`.
 
@@ -526,6 +526,7 @@ Les options, la sortie et les codes de `importer.mjs` sont au module `jira`, § 
 - **Avertissement de compatibilité** : Chrome plus récent que le Chromium de `playwright-core`. Un échec inattendu se signale : une nouvelle version du skill monte `playwright-core` (module `session`, § 2).
 - **Origine bloquée** : une police ou un script d'un CDN, que le scénario ne déclare pas, est interrompu ; la page peut s'afficher autrement. L'origine s'ajoute au texte de départ si elle est légitime (module `garde`, § 1).
 - **Étape à la main dans Gemini CLI** : la commande lancée par l'agent attend, le temps que le développeur agisse dans la fenêtre ; elle reprend seule dès l'état atteint. Il en va de même de la connexion à Jira, lors d'un import par l'adresse.
+- **Node 24** : en intégration continue, des lenteurs du navigateur et un blocage ont été vus sous Node 24, jamais sous Node 22 ni 26, sans pouvoir les reproduire sur un poste. Un blocage sous Node 24 se signale, et le scénario se rejoue sous Node 22 ou 26.
 - **Jira qui ne ramène pas à la demande** : après la connexion, certains SSO mènent à l'accueil de Jira ; le développeur rouvre la demande dans la même fenêtre, et l'import reprend dès qu'elle s'affiche.
 
 ## 8. Matérialiser les fichiers exécutables
@@ -554,12 +555,12 @@ Les options, la sortie et les codes de `importer.mjs` sont au module `jira`, § 
 | `commandes/scenario/jouer.toml` | `agent`, § 7 | `a846bc5f9286660f34b668038c19cc753bd2f9e3e18b4a9d590a44b9516b8b10` |
 | `commandes/scenario/designer.toml` | `agent`, § 7 | `d8685f8e5c58519b2383f35bf05580f24cdbb374f52bbb25118c74a681e917e7` |
 | `tests/application-demo.mjs` | `recette`, § 6 | `e5b655e5d69b4baeaac6232f2e758be4a9ea9ab6e4e726a3a2a775bc82067bd1` |
-| `tests/run-tests.mjs` | `recette`, § 6 | `830ba71efa13027b5eddf7356e148aa8c25e919c385ffe2387d04b39b45c3954` |
+| `tests/run-tests.mjs` | `recette`, § 6 | `5674ab8a17f280f650869c9caf877b1b80f6ab273e880fafe75e76d3681107b5` |
 
 Depuis le dossier du skill, cette commande d'une ligne écrit les vingt-trois fichiers, compare leurs empreintes à celles du tableau et sort avec le code 1 au moindre écart. Elle ne contient ni `$`, ni accent grave, ni `!`, ni `%`, ni guillemet intérieur : elle se colle telle quelle dans bash, zsh, CMD ou PowerShell, et dans un fichier `.cmd`. Elle lit aussi des modules aux fins de ligne CRLF.
 
 ```text
-node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'package.json': 'd813ebbc91937c81baaead56ee0aec56914d5ef1c8f0ca384fb3c7c9aa6d06cb', 'package-lock.json': 'a9f540f15297163644362f45eca9e99e4a5a7e898e96cd0f44e65da55b29bad3', '.gitignore': '03bf7f97f17a0d1abb005b6480ec3b0f06a0b9c29c1d1f83131209b52b888a7e', 'scripts/jouer.mjs': '5b231b8e4086e0629fbfe82ae269781a2f92c199cfa765b3fdeb23fc54001f6a', 'scripts/verifier.mjs': 'd1ae67913a4c71a1344815599311eaa5333cf29241377eecb7d9f9768eece8a6', 'scripts/traduire.mjs': '28f19e04a84e636c07f9a0659ab25379d8a96a0443d4bf0a3134399de3ef30b4', 'scripts/texte.mjs': '6eb8365cb9dd6739390d94498132a8c9f01b78dbaa7c8566635189e817fcf80a', 'scripts/jira.mjs': 'c2c51288473a21c47637fa5221c299bdc5b5c47565324c78ec167f0cc86c2162', 'scripts/importer.mjs': 'fd14695ce30d39796fb988bfa38d469d0fbefa40e47d89a7b8fa59f8d4f285b3', 'scripts/toml.mjs': '418216cdf3e3eff891da54756a4487e854d77ab1c0b28bf1f3b66719ba1123fa', 'scripts/scenario.mjs': 'fc3b7e455866a072fd57e7d40cae848557677557940c618ecd76dab298f2ef7d', 'scripts/cibles.mjs': '90b0b585a0ac24f20b76f5932eeb7811b9004004385b6981180023418ca24d33', 'scripts/moteur.mjs': 'dbee3ecabba8f718a7d255d3b6e9e1a196931b703ab54eda71b12503d4180129', 'scripts/session.mjs': 'b155eca5bf83f524c4deb59b7557947749a24ef9fbcf62753ee74f40ecfdb1a0', 'scripts/rapport.mjs': 'c348427864ff5fa87ee327b9674c9cffd52126f957af7948a9dd943af5534a88', 'scripts/designer.mjs': '0ad485dfe65d797ec8dbae45e42d4ef3c8ab9ed57471197a1f3df7b7955b5fe9', 'agent/pilote-scenario.md': '519c079a299014dcf04b7a85ef8c193cd354213d526db5a79d719edba2a68da3', 'commandes/scenario/importer.toml': 'b5d758c637b82b8e7f460b28061e1855994bc5e1594232d0f787914c200c0e7f', 'commandes/scenario/traduire.toml': '32539c71038909d185aa2d6973413c737337e31573dc2dde867e45fb4f0a7c52', 'commandes/scenario/jouer.toml': 'a846bc5f9286660f34b668038c19cc753bd2f9e3e18b4a9d590a44b9516b8b10', 'commandes/scenario/designer.toml': 'd8685f8e5c58519b2383f35bf05580f24cdbb374f52bbb25118c74a681e917e7', 'tests/application-demo.mjs': 'e5b655e5d69b4baeaac6232f2e758be4a9ea9ab6e4e726a3a2a775bc82067bd1', 'tests/run-tests.mjs': '830ba71efa13027b5eddf7356e148aa8c25e919c385ffe2387d04b39b45c3954' }; const vus = new Set(); let ecarts = 0; for (const module of ['modules/execution/SKILL.md', 'modules/texte/SKILL.md', 'modules/jira/SKILL.md', 'modules/scenario/SKILL.md', 'modules/cibles/SKILL.md', 'modules/actions/SKILL.md', 'modules/session/SKILL.md', 'modules/preuves/SKILL.md', 'modules/designer/SKILL.md', 'modules/agent/SKILL.md', 'modules/recette/SKILL.md']) { const texte = fs.readFileSync(module, 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); vus.add(m[1]); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (conforme === false) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } } for (const f of Object.keys(attendu)) if (vus.has(f) === false) { ecarts++; console.log('ABSENT    ' + f); } if (ecarts > 0) process.exitCode = 1;"
+node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'package.json': 'd813ebbc91937c81baaead56ee0aec56914d5ef1c8f0ca384fb3c7c9aa6d06cb', 'package-lock.json': 'a9f540f15297163644362f45eca9e99e4a5a7e898e96cd0f44e65da55b29bad3', '.gitignore': '03bf7f97f17a0d1abb005b6480ec3b0f06a0b9c29c1d1f83131209b52b888a7e', 'scripts/jouer.mjs': '5b231b8e4086e0629fbfe82ae269781a2f92c199cfa765b3fdeb23fc54001f6a', 'scripts/verifier.mjs': 'd1ae67913a4c71a1344815599311eaa5333cf29241377eecb7d9f9768eece8a6', 'scripts/traduire.mjs': '28f19e04a84e636c07f9a0659ab25379d8a96a0443d4bf0a3134399de3ef30b4', 'scripts/texte.mjs': '6eb8365cb9dd6739390d94498132a8c9f01b78dbaa7c8566635189e817fcf80a', 'scripts/jira.mjs': 'c2c51288473a21c47637fa5221c299bdc5b5c47565324c78ec167f0cc86c2162', 'scripts/importer.mjs': 'fd14695ce30d39796fb988bfa38d469d0fbefa40e47d89a7b8fa59f8d4f285b3', 'scripts/toml.mjs': '418216cdf3e3eff891da54756a4487e854d77ab1c0b28bf1f3b66719ba1123fa', 'scripts/scenario.mjs': 'fc3b7e455866a072fd57e7d40cae848557677557940c618ecd76dab298f2ef7d', 'scripts/cibles.mjs': '90b0b585a0ac24f20b76f5932eeb7811b9004004385b6981180023418ca24d33', 'scripts/moteur.mjs': 'dbee3ecabba8f718a7d255d3b6e9e1a196931b703ab54eda71b12503d4180129', 'scripts/session.mjs': 'b155eca5bf83f524c4deb59b7557947749a24ef9fbcf62753ee74f40ecfdb1a0', 'scripts/rapport.mjs': 'c348427864ff5fa87ee327b9674c9cffd52126f957af7948a9dd943af5534a88', 'scripts/designer.mjs': '0ad485dfe65d797ec8dbae45e42d4ef3c8ab9ed57471197a1f3df7b7955b5fe9', 'agent/pilote-scenario.md': '519c079a299014dcf04b7a85ef8c193cd354213d526db5a79d719edba2a68da3', 'commandes/scenario/importer.toml': 'b5d758c637b82b8e7f460b28061e1855994bc5e1594232d0f787914c200c0e7f', 'commandes/scenario/traduire.toml': '32539c71038909d185aa2d6973413c737337e31573dc2dde867e45fb4f0a7c52', 'commandes/scenario/jouer.toml': 'a846bc5f9286660f34b668038c19cc753bd2f9e3e18b4a9d590a44b9516b8b10', 'commandes/scenario/designer.toml': 'd8685f8e5c58519b2383f35bf05580f24cdbb374f52bbb25118c74a681e917e7', 'tests/application-demo.mjs': 'e5b655e5d69b4baeaac6232f2e758be4a9ea9ab6e4e726a3a2a775bc82067bd1', 'tests/run-tests.mjs': '5674ab8a17f280f650869c9caf877b1b80f6ab273e880fafe75e76d3681107b5' }; const vus = new Set(); let ecarts = 0; for (const module of ['modules/execution/SKILL.md', 'modules/texte/SKILL.md', 'modules/jira/SKILL.md', 'modules/scenario/SKILL.md', 'modules/cibles/SKILL.md', 'modules/actions/SKILL.md', 'modules/session/SKILL.md', 'modules/preuves/SKILL.md', 'modules/designer/SKILL.md', 'modules/agent/SKILL.md', 'modules/recette/SKILL.md']) { const texte = fs.readFileSync(module, 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); vus.add(m[1]); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (conforme === false) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } } for (const f of Object.keys(attendu)) if (vus.has(f) === false) { ecarts++; console.log('ABSENT    ' + f); } if (ecarts > 0) process.exitCode = 1;"
 ```
 
 Puis, depuis le même dossier : `npm ci`, et la recette, `npm test` (sous Linux sans écran, `xvfb-run -a npm test`).
@@ -4729,7 +4730,7 @@ npm test
 - Depuis le dossier du skill, après `npm ci`. Sous Linux sans écran : `xvfb-run -a npm test` ; le scénario s'y joue dans une fenêtre, comme sur le poste.
 - Le navigateur est celui de `SCENARIO_PLAYWRIGHT_CANAL` : Chrome par défaut ; `chromium` après `npx playwright-core install chromium`.
 - La recette travaille sur des profils et des dossiers temporaires : les profils et les résultats du dossier du skill ne sont pas touchés. Elle efface son dossier temporaire si tout passe ; sinon, ou avec `GARDER_TMP=1`, elle le garde et en donne le chemin.
-- Durée : environ une minute et demie.
+- Durée : environ une minute et demie. Garde-fou : une recette bloquée s'arrête d'elle-même au bout de dix minutes, en disant dans quel scénario, son dossier temporaire gardé ; ce dossier est dit dès la première ligne.
 - Bilan attendu : `Bilan : 21 scénarios, 279 contrôles, 279 réussis, 0 en échec, 0 sautés`. Là où un serveur ne peut écouter sur 127.0.0.2, deux contrôles de R8 sont sautés.
 
 ## 2. L'application de démonstration
@@ -4788,7 +4789,7 @@ Le même fichier sert un Jira factice, sur une troisième origine, et donne de q
 
 ## 4. Contrôle de la recette elle-même
 
-Vingt-neuf défauts, réintroduits un à un dans le code, font chacun échouer la recette par le scénario attendu (essai du 20 novembre 2026, Node 22.23.4, Chromium 159, rejoué en 1.1.1 pour les défauts que relèvent R5, R6, R8 et R11) :
+Vingt-neuf défauts, réintroduits un à un dans le code, font chacun échouer la recette par le scénario attendu (essai du 20 novembre 2026, Node 22.23.4, Chromium 159, rejoué en entier en 1.1.1) :
 
 | ID | Défaut réintroduit | Scénarios en échec | Contrôles en échec |
 |---|---|---|---|
@@ -4826,7 +4827,7 @@ Chaque défaut a été retiré après son essai ; la recette du code publié pas
 
 ## 5. Recette en intégration continue
 
-Le workflow `.github/workflows/recette-scenario-playwright.yml` du dépôt Agent2Prompt suit le chemin de l'IA du développeur : il matérialise la transmission courante, extrait les fichiers par la commande du module `execution`, § 8, sous bash et sous CMD, installe la dépendance par `npm ci`, puis lance la recette, sous `xvfb-run` sur `ubuntu-latest` et directement sur `windows-latest`, avec Node 22, 24 et 26.13.0 et le Chrome stable des images GitHub. Une recette en échec y laisse son dossier temporaire en artefact, sans les profils du navigateur : sortie de la recette, rapports, captures et instantanés ARIA, gardés sept jours.
+Le workflow `.github/workflows/recette-scenario-playwright.yml` du dépôt Agent2Prompt suit le chemin de l'IA du développeur : il matérialise la transmission courante, extrait les fichiers par la commande du module `execution`, § 8, sous bash et sous CMD, installe la dépendance par `npm ci`, puis lance la recette, sous `xvfb-run` sur `ubuntu-latest` et directement sur `windows-latest`, avec Node 22, 24 et 26.13.0 et le Chrome stable des images GitHub. La sortie de la recette s'y affiche au fil de l'eau, et un pas de recette bloqué s'arrête au bout de douze minutes. Une recette en échec y laisse son dossier temporaire en artefact, sans les profils du navigateur : sortie de la recette, rapports, captures et instantanés ARIA, gardés sept jours.
 
 ## 6. Sources
 
@@ -5217,9 +5218,24 @@ function lancer(script, args, { env = ENV, delai = 120_000 } = {}) {
     enfant.stdout.setEncoding('utf8').on('data', (d) => { sortie += d; });
     enfant.stderr.setEncoding('utf8').on('data', (d) => { erreurs += d; });
     const minuterie = setTimeout(() => enfant.kill('SIGKILL'), delai);
-    enfant.on('close', (code) => { clearTimeout(minuterie); resolve({ code, sortie, erreurs }); });
+    // Fin du script : la sortie se lit jusqu'à la fermeture de ses flux, 2 s au plus après la fin du processus,
+    // pour qu'un processus du navigateur resté ouvert ne retienne pas la recette.
+    let grace = null;
+    let fini = false;
+    const finir = (code) => {
+      if (fini) return;
+      fini = true;
+      clearTimeout(minuterie);
+      clearTimeout(grace);
+      resolve({ code, sortie, erreurs });
+    };
+    enfant.on('exit', (code) => { grace = setTimeout(() => finir(code), 2000); });
+    enfant.on('close', (code) => finir(code));
   });
 }
+
+/** Ferme un contexte de navigateur ouvert par la recette elle-même, sans l'attendre plus de 15 s. */
+const fermer = (ctx) => Promise.race([ctx.close().catch(() => {}), new Promise((r) => { setTimeout(r, 15_000).unref(); })]);
 
 /** Joue un scénario et lit son rapport ; rend { code, sortie, erreurs, rapport, dossier }. */
 async function jouer(chemin, args = [], options = {}) {
@@ -5269,6 +5285,7 @@ async function principal() {
   const { base, autre, distante, jira: adresseJira } = app;
   const canal = session.lireReglages(ENV).reglages.canal;
   console.log(`Recette de scenario-playwright 1.1.1 : Node ${process.versions.node}, navigateur ${canal}, application ${base}`);
+  console.log(`Dossier temporaire : ${TMP}`);
   try {
     // ------------------------------------------------------------------------------------------
     scenarioRecette('R1', 'Texte de départ : structure, marques, variables, exemples, erreurs ligne par ligne');
@@ -5761,7 +5778,7 @@ nom = "export"
           const e = joues[0].etapes;
           controle('garde à l\'étape par l\'API : mutation sur une page hors du poste refusée, sans action', e[1].statut === 'echec' && /hors du poste, sans --autoriser-mutations : aucune action faite/.test(e[1].message) && app.etat.compteur === avant + 1, JSON.stringify(e[1]));
         } finally {
-          await ctx.close();
+          await fermer(ctx);
         }
       }
     }
@@ -5876,7 +5893,7 @@ nom = "export"
         controle('le clic de désignation n\'actionne pas la page (D9.INV-1)', page.url() === `${base}/clients` && app.etat.clients.length === avant);
         controle('cible rendue au format du scénario', /^\{ role = "link", nom = "Nouveau client" \}$/.test(cibles.cibleToml(rendues[0]?.cible ?? { texte: '?' })));
       } finally {
-        await ctx.close();
+        await fermer(ctx);
       }
     }
 
@@ -6151,6 +6168,15 @@ Fonctionnalité: Clients
 }
 
 let codeSortie = 0;
+// Garde-fou : une recette bloquée s'arrête d'elle-même au bout de dix minutes, en disant dans quel scénario, son
+// dossier temporaire gardé ; elle dure d'ordinaire moins de deux minutes.
+const DUREE_MAX = 600_000;
+setTimeout(() => {
+  console.log(`KO   ${courant} · recette bloquée, arrêtée au bout de ${DUREE_MAX / 60_000} min`);
+  console.log(`\nBilan : recette arrêtée dans ${courant}, après ${resultats.length} contrôles`);
+  console.log(`Dossier temporaire gardé : ${TMP}`);
+  process.exit(1);
+}, DUREE_MAX).unref();
 try {
   await principal();
 } catch (e) {
@@ -6315,8 +6341,8 @@ Le développeur fera une fois, dans la fenêtre, les gestes d'un parcours ; D15 
 Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichiers ont été matérialisés.
 
     26e6ce12c8f407883595b60ba1009e815389ab7e5f7c57dc2710333780fb8536  manifest.json
-    2855bab187e6b46301c690c7035614fbd166b133bfe8833eeb8723d3d4f9f0ad  SKILL.md
-    826ff565a9577001d2b930bf87c913ce3539a421bf98b9dd4ba834371b719063  modules/execution/SKILL.md
+    8775a23c8c2ba091eb1f492e3e590d1090e5a3a6cefcefe9fc957652f71a7360  SKILL.md
+    cd0697acb8fc03c324c438b428843a83a65d1d3776479733926102424567084a  modules/execution/SKILL.md
     d49df49769bd9fafb2428bd85dcb70db7abf93e422b213ae42a78b451964c01f  modules/texte/SKILL.md
     085536d21447e742331a304ee4e9c564ba8af08aca8ca64c9fa35a491e2c20c9  modules/jira/SKILL.md
     957bff89c34184e4b2bb62e28930a94fbbe85459318c9684ac9c119b5a5ea4f6  modules/scenario/SKILL.md
@@ -6327,7 +6353,7 @@ Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichier
     2110da1f6176bfe1a7d4f7025f182e75dac70906d2f72fca801c5e9be3af8734  modules/preuves/SKILL.md
     ec111f31d553e64b3ef229f1a28a0083f6324783e6cf2e2b426479159391cf0c  modules/designer/SKILL.md
     4a64c0f1c1570ea689e63c5601c08d302c66984d9e0d8832c50d7daf28f301f6  modules/agent/SKILL.md
-    01fc6badeec2043e9bf79362a8d60adf8e6582c151cf67abb4a55581557e3413  modules/recette/SKILL.md
+    22d88e33d70d36058a1ec07345907ee243340b31d5c8743e5205b64faa8b27eb  modules/recette/SKILL.md
     4966e366878732544faa9f20e65580a7348426d4e4c2a2b5f789dee4d59ce079  modules/traduction-auto/SKILL.md
     9dd5d57ca1b658cb15c7c1999ccfd94cb41491e0af15bbe151812f07d45929fc  modules/demo/SKILL.md
     4a202c9718112813a20437b56e250422013bebdfceee7f971922d246a4d2d606  modules/remise/SKILL.md
