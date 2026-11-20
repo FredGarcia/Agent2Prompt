@@ -21,6 +21,8 @@ Le scénario déclare ses origines : `origines`, sinon celle de `url_base`. Une 
 - les adresses `data:`, `blob:` et `about:` restent dans la page ;
 - `naviguer` n'accepte qu'un chemin, ou une adresse d'une origine déclarée : le reste est refusé avant le navigateur.
 
+La fenêtre de Jira qu'ouvre l'import par l'adresse (module `jira`, § 2) ne joue aucun scénario : elle n'est pas gardée, et le skill n'y fait que naviguer vers l'adresse donnée (D16.INV-1).
+
 Une origine bloquée qui manque à l'application, une API, un fournisseur d'identité, un CDN de polices, s'ajoute au texte de départ par le développeur (`Origines :`). La traduction est alors périmée par l'empreinte : elle se refait, et se ratifie (D3.INV-2). La règle est celle du navigateur d'Agent2Test (`agent2test:D4.INV-2`).
 
 ## 2. Mutations hors du poste (D7.INV-2)

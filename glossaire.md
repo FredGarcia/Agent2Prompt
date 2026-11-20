@@ -31,7 +31,7 @@ La colonne « Repris dans » cite les modules de la spécification qui reprennen
 | [`generateur-skill-ticket`](#generateur-skill-ticket-111) | 1.1.1 | 8 | 0 | 29 |
 | [`java`](#java-111) | 1.1.1 | 7 | 1 | 29 |
 | [`orchestrateur-c7e`](#orchestrateur-c7e-353) | 3.5.3 | 10 | 1 | 33 |
-| [`scenario-playwright`](#scenario-playwright-100) | 1.0.0 | 10 | 5 | 33 |
+| [`scenario-playwright`](#scenario-playwright-110) | 1.1.0 | 11 | 5 | 41 |
 | [`skill4appli`](#skill4appli-111) | 1.1.1 | 9 | 3 | 34 |
 | [`socle-back-front`](#socle-back-front-110) | 1.1.0 | 7 | 0 | 21 |
 | [`sonarqube`](#sonarqube-110) | 1.1.0 | 8 | 2 | 34 |
@@ -45,7 +45,7 @@ Agent de développement TDD : demande Jira en MHTML, analyse avec commentaires, 
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D1.INV-1** | le fichier MHTML n'est jamais modifié ; l'extraction travaille en lecture seule et enregistre l'empreinte sha256 de la source. | `ingestion-jira`, `parallele`, `agent2dev`, `agent2dev/cadrage`, `capture-sprint-jira/remise` |
+| **D1.INV-1** | le fichier MHTML n'est jamais modifié ; l'extraction travaille en lecture seule et enregistre l'empreinte sha256 de la source. | `ingestion-jira`, `parallele`, `agent2dev`, `agent2dev/cadrage`, `capture-sprint-jira/remise`, `scenario-playwright`, `scenario-playwright/jira` |
 | **D1.INV-2** | le résumé de l'extraction (clé, titre, description, nombre de commentaires, pièces, limites) est confirmé par le développeur avant toute analyse. | `ingestion-jira`, `agent2dev`, `agent2dev/cadrage` |
 | **D1.INV-3** | toute partie non extraite ou incertaine (commentaires repliés, pièces absentes, page non reconnue) est déclarée comme limite. | `ingestion-jira`, `capture-sprint-jira/capture` |
 
@@ -55,7 +55,7 @@ Agent de développement TDD : demande Jira en MHTML, analyse avec commentaires, 
 |---|---|---|
 | **D2.INV-1** | chaque scénario cite sa provenance : passage de la description, commentaire (auteur, date) ou réponse du développeur. | `analyse-demande` |
 | **D2.INV-2** | une contradiction ou une ambiguïté entre la description et les commentaires devient une question ; elle n'est jamais tranchée par l'agent. | `us-criteres`, `analyse-demande`, `agent2dev`, `agent2dev/cadrage` |
-| **D2.INV-3** | chaque scénario est écrit en Gherkin français, porte une étiquette unique `@<CLÉ>-Snn` et au moins une étape `Alors` vérifiable. | `us-criteres`, `analyse-demande`, `scenario-playwright` |
+| **D2.INV-3** | chaque scénario est écrit en Gherkin français, porte une étiquette unique `@<CLÉ>-Snn` et au moins une étape `Alors` vérifiable. | `us-criteres`, `analyse-demande`, `scenario-playwright`, `scenario-playwright/jira` |
 | **D2.INV-4** | un scénario que la demande n'énonce pas explicitement (cas d'erreur, limite) porte l'étiquette `@propose` et n'est utilisé qu'après validation. | `analyse-demande` |
 | **D2.INV-5** | les scénarios sont validés par le développeur avant l'étude des variantes. | `analyse-demande`, `agent2dev/autonomie` |
 
@@ -803,8 +803,8 @@ Capture en MHTML des tickets du prochain sprint d'un Jira protégé par un SSO, 
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D2.INV-1** | aucun outil de capture ne demande, ne lit ni ne stocke d'identifiant, de mot de passe ou de jeton : la connexion se fait à la main, dans une fenêtre visible du navigateur. | `session`, `ticket`, `interface`, `agent`, `recette`, `pilotage` |
-| **D2.INV-2** | la session vit dans un profil de navigateur dédié, réutilisé d'une ouverture à l'autre : un SSO aux cookies persistants ne redemande pas la connexion. | `session`, `recette` |
+| **D2.INV-1** | aucun outil de capture ne demande, ne lit ni ne stocke d'identifiant, de mot de passe ou de jeton : la connexion se fait à la main, dans une fenêtre visible du navigateur. | `session`, `ticket`, `interface`, `agent`, `recette`, `pilotage`, `scenario-playwright` |
+| **D2.INV-2** | la session vit dans un profil de navigateur dédié, réutilisé d'une ouverture à l'autre : un SSO aux cookies persistants ne redemande pas la connexion. | `session`, `recette`, `scenario-playwright` |
 
 ### D3 : Relevé des tickets sur la page du sprint, filtre (active)
 
@@ -820,7 +820,7 @@ Capture en MHTML des tickets du prochain sprint d'un Jira protégé par un SSO, 
 |---|---|---|
 | **D4.INV-1** | une page n'est capturée que si elle est celle du ticket : adresse `…/browse/<CLÉ>` ou titre qui la contient, et clé affichée ; sinon, passé le délai, le ticket est en erreur et rien n'est écrit pour lui. | `execution`, `capture`, `ticket`, `recette` |
 | **D4.INV-2** | avant la capture, la page du ticket défile tant que son texte s'allonge, puis attend qu'il ne change plus : un contenu chargé à l'affichage figure dans le fichier. | `capture`, `ticket`, `recette` |
-| **D4.INV-3** | chaque fichier est un MHTML de Chrome, au format « Page Web, un seul fichier » d'« Enregistrer sous… », nommé par la clé du ticket. | `capture`, `ticket`, `recette` |
+| **D4.INV-3** | chaque fichier est un MHTML de Chrome, au format « Page Web, un seul fichier » d'« Enregistrer sous… », nommé par la clé du ticket. | `capture`, `ticket`, `recette`, `scenario-playwright`, `scenario-playwright/jira` |
 | **D4.INV-4** | une erreur n'arrête pas la capture ; trois erreurs de suite, ou la fermeture du navigateur, l'arrêtent ; le rapport dit ce qui a été capturé et que la capture s'est arrêtée ; fermé pendant le relevé, avant tout ticket, le navigateur arrête la capture sans rapport, avec un message qui le dit. | `execution`, `capture`, `interface`, `recette` |
 
 ### D5 : Classement par terme clé dans la page du ticket, dossiers et rapport (superseded)
@@ -1223,9 +1223,9 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 | **D11.INV-5** | les possibilités du modèle se fondent sur l'analyse de l'application : à l'installation, l'IA propose celles qui s'appliquent, avec leurs repères, celles à retirer et celles qui manquent, rattachées à une couche et à une option ; le développeur seul les écrit dans le référentiel. | `qualification` |
 | **D11.INV-6** | chaque complément se justifie par au moins une possibilité à `oui` que le principal ne porte pas ; les compléments sont en plus petit nombre possible, et la qualification nomme pour chacun les possibilités qui le justifient ; un ticket que le principal porte en entier n'a aucun complément. | `qualification` |
 
-## scenario-playwright 1.0.0
+## scenario-playwright 1.1.0
 
-Scénarios côté utilisateur joués dans le Chrome du poste par Playwright : texte de départ inspiré de Gherkin en français, écrit par le développeur ; traduction en scénario TOML exécutable par l'IA, sur un squelette produit sans IA, ratifiée par le développeur et contrôlée sans IA (empreinte, structure, lignes, marques, variables) ; jeu fermé de treize actions commun avec le navigateur d'Agent2Test, cibles par rôle et nom accessible, aucun code exécuté dans la page, attentes bornées, aucune étape rejouée ; origines gardées, mutations hors du poste sur autorisation explicite, connexion à la main dans un profil dédié ; rapport JSON et Markdown avec captures, instantanés ARIA et erreurs relevées ; désignation d'une cible à la souris ; agent pilote-scenario et commandes /scenario:traduire, /scenario:jouer et /scenario:designer. Point d'entrée : [`specs/scenario-playwright/SKILL.md`](specs/scenario-playwright/SKILL.md).
+Scénarios côté utilisateur joués dans le Chrome du poste par Playwright : texte de départ inspiré de Gherkin, en français ou en anglais, écrit par le développeur ou importé sans IA d'une demande Jira (page enregistrée en MHTML ou adresse ouverte dans le navigateur du poste, connexion à la main ; Jira Cloud et Data Center ; description et champs de texte, commentaires sur demande ; provenance, étiquettes, comparaison et remplacement sur demande au réimport) ; traduction en scénario TOML exécutable par l'IA, sur un squelette produit sans IA, ratifiée par le développeur et contrôlée sans IA (empreinte, structure, lignes, marques, variables) ; jeu fermé de treize actions commun avec le navigateur d'Agent2Test, cibles par rôle et nom accessible, aucun code exécuté dans la page, attentes bornées, aucune étape rejouée ; origines gardées, mutations hors du poste sur autorisation explicite, connexion à la main dans un profil dédié ; rapport JSON et Markdown avec captures, instantanés ARIA et erreurs relevées ; désignation d'une cible à la souris ; agent pilote-scenario et commandes /scenario:importer, /scenario:traduire, /scenario:jouer et /scenario:designer. Point d'entrée : [`specs/scenario-playwright/SKILL.md`](specs/scenario-playwright/SKILL.md).
 
 ### D1 : Exécution : installation, dépendance, emplacements, réglages, lignes de commande (active)
 
@@ -1236,20 +1236,21 @@ Scénarios côté utilisateur joués dans le Chrome du poste par Playwright : te
 | **D1.INV-3** | chaque réglage se lit dans sa variable `SCENARIO_PLAYWRIGHT_CANAL`, `SCENARIO_PLAYWRIGHT_PROFILS` ou `SCENARIO_PLAYWRIGHT_DELAI`, ou prend son défaut ; une variable vide vaut absente ; une valeur invalide est refusée. | `execution`, `session`, `recette` |
 | **D1.INV-4** | `jouer.mjs` sort avec le code 0 quand tout a réussi, 1 quand une étape a échoué, 2 quand le scénario, une option ou l'environnement sont refusés, avant toute action dans le navigateur ; `verifier.mjs` et `traduire.mjs` sortent avec 0 ou 2. | `execution`, `recette` |
 
-### D2 : Texte de départ inspiré de Gherkin (active)
+### D2 : Texte de départ inspiré de Gherkin, en français ou en anglais (active)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D2.INV-1** | un texte décrit un seul scénario : étiquettes facultatives, un titre, une adresse et des réglages, au moins une étape introduite par un mot-clé, et au plus un tableau d'exemples ; toute autre ligne est refusée, et chaque erreur donne sa ligne. | `texte`, `agent`, `recette` |
+| **D2.INV-1** | un texte décrit un seul scénario : étiquettes facultatives, un titre, une adresse et des réglages, au moins une étape introduite par un mot-clé, et au plus un tableau d'exemples ; toute autre ligne est refusée, et chaque erreur donne sa ligne. | `texte`, `jira`, `agent`, `recette` |
 | **D2.INV-2** | chaque étape garde son numéro de ligne, son mot-clé, sa phrase, sa marque `(création)`, `(modification)`, `(suppression)` ou `(à la main)`, et ses variables `<nom>` ; une variable qui n'est ni un paramètre ni une colonne des exemples est refusée. | `texte`, `recette` |
 | **D2.INV-3** | l'empreinte d'un texte est le SHA-256 de son contenu en fins de ligne LF, sans BOM, en caractères composés : une extraction en CRLF donne la même. | `texte`, `recette` |
+| **D2.INV-4** | les mots-clés de Gherkin se lisent en français ou en anglais, sans tenir compte de la casse ni des accents, et chaque mot-clé se garde tel qu'écrit ; `Contexte:` et `Règle:` (`Background:`, `Rule:`) sont refusés dans un texte, avec leur ligne ; les réglages et les marques s'écrivent en français. | `texte`, `jira`, `recette` |
 
 ### D3 : Scénario TOML et contrôle de sa traduction (active)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
 | **D3.INV-1** | un scénario n'est joué que s'il est valide : format, champs requis, actions du jeu fermé, champs connus de chaque action, valeurs bornées ; chaque erreur cite l'étape, sa ligne du TOML et sa ligne du texte, et le refus a lieu avant d'ouvrir le navigateur. | `scenario`, `recette` |
-| **D3.INV-2** | un scénario traduit d'un texte cite le fichier du texte et son empreinte ; il est refusé si le texte manque ou a changé depuis la traduction. | `texte`, `scenario`, `garde`, `agent`, `recette` |
+| **D3.INV-2** | un scénario traduit d'un texte cite le fichier du texte et son empreinte ; il est refusé si le texte manque ou a changé depuis la traduction. | `texte`, `jira`, `scenario`, `garde`, `agent`, `recette` |
 | **D3.INV-3** | la traduction recopie exactement la structure du texte : titre, étiquettes, adresse, origines, profil, paramètres et exemples ; chaque étape cite une ligne d'étape du texte, dans l'ordre du texte, et chaque étape du texte a au moins une étape. | `scenario`, `recette`, `traduction-auto` |
 | **D3.INV-4** | une marque de mutation du texte se retrouve sur une étape de sa ligne ; une ligne marquée « (à la main) » donne une seule étape `main`, et une étape `main` vient toujours d'une telle ligne ; chaque variable `<nom>` d'une ligne se retrouve en `${nom}` dans une étape de cette ligne. | `texte`, `scenario`, `recette` |
 | **D3.INV-5** | le squelette d'une traduction est produit sans IA à partir du texte ; ses étapes restent à compléter, et un scénario qui en garde une est refusé. | `execution`, `scenario`, `agent`, `recette`, `traduction-auto` |
@@ -1309,6 +1310,7 @@ Scénarios côté utilisateur joués dans le Chrome du poste par Playwright : te
 | **D10.INV-1** | l'agent ne joue un scénario traduit qu'après la ratification explicite du développeur, à qui le plan est présenté ligne du texte par ligne du texte. | `scenario`, `agent`, `recette` |
 | **D10.INV-2** | l'agent ne passe `--autoriser-mutations` qu'avec l'accord explicite du développeur pour cette exécution, et ne demande ni ne saisit aucun identifiant. | `garde`, `agent` |
 | **D10.INV-3** | l'agent ne modifie ni le texte de départ ni un scénario ratifié sans l'accord du développeur ; une correction se propose, puis se ratifie. | `agent` |
+| **D10.INV-4** | l'agent ne lit les commentaires d'une demande Jira qu'à la demande du développeur, compare avant de remplacer, ne passe `--remplacer` qu'avec son accord, ne supprime aucun texte dont le scénario a disparu de Jira et ne corrige pas lui-même un scénario refusé. | `agent` |
 
 ### D11 : Traduction sans IA du texte de départ, par un catalogue de phrases (reserved)
 
@@ -1329,6 +1331,17 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 ### D15 : Enregistrement des gestes du développeur en scénario (reserved)
 
 Dimension réservée : aucun invariant en vigueur dans cette version.
+
+### D16 : Scénarios importés d'une demande Jira (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D16.INV-1** | une demande se lit depuis sa page enregistrée en MHTML, jamais modifiée, dont l'empreinte sha256 est notée dans chaque texte importé, ou depuis son adresse, ouverte dans le navigateur du poste, dans une fenêtre visible, sur un profil dédié à Jira : le skill y navigue vers l'adresse donnée et rien d'autre, sans cliquer, saisir ni envoyer de formulaire ; la connexion se fait à la main, dans le délai réglé ; la page est enregistrée en MHTML dans le sous-dossier `jira/` du dossier des textes, puis lue comme une page enregistrée. | `jira`, `garde`, `agent`, `recette` |
+| **D16.INV-2** | seules les pages de Jira Cloud et de Jira Data Center, reconnues à leurs marqueurs, sont lues, et seulement leur description, leurs champs de texte et, avec `--commentaires`, leurs commentaires ; scripts, styles et boutons ne sont jamais lus comme du texte ; une autre page est refusée. | `jira`, `agent`, `recette` |
+| **D16.INV-3** | chaque scénario est recopié sans IA, tel qu'écrit dans Jira, en français ou en anglais : mots-clés, titre, étapes et exemples ; ne s'y ajoutent que les réglages donnés à l'import, le contexte de sa fonctionnalité et de sa règle en tête de ses étapes, et ses colonnes d'exemples adaptées au format texte avec leurs variables, chaque ajout signalé en tête du texte ; un scénario que le format texte n'exprime pas n'est pas écrit, et son refus est motivé. | `jira`, `agent`, `recette` |
+| **D16.INV-4** | chaque texte importé se nomme `<ÉTIQUETTE>.scenario` et commence par sa provenance : demande, étiquette et zone, source, page enregistrée et son empreinte, date, empreinte Jira du scénario, empreinte du texte importé ; l'étiquette est celle que Jira donne au scénario, sinon celle qu'un import précédent a attribuée au scénario de même titre, sinon le plus petit numéro libre dans l'ordre de la page ; le second scénario d'une même étiquette n'est pas écrit. | `jira`, `recette` |
+| **D16.INV-5** | un texte dont le scénario n'a pas changé dans Jira n'est jamais réécrit ; un texte dont le scénario a changé n'est remplacé qu'avec `--remplacer`, et un texte retouché depuis l'import est d'abord gardé à côté ; un texte qui ne vient pas d'un import de la demande n'est jamais remplacé ; un texte dont le scénario a disparu de Jira est signalé, jamais supprimé ; `--comparer` n'écrit aucun texte et dit, pour chaque scénario, s'il est identique, modifié, nouveau ou disparu. | `jira`, `agent`, `recette` |
+| **D16.INV-6** | `importer.mjs` sort avec le code 0 quand chaque scénario est écrit, remplacé ou inchangé (avec `--comparer` : identique), 1 quand un scénario n'est pas écrit ou qu'il n'y en a aucun (avec `--comparer` : une différence), 2 quand une option, un réglage, la page ou le navigateur sont refusés, ou que la demande ne s'affiche pas dans le délai, avant toute écriture de texte. | `execution`, `jira`, `recette` |
 
 ## skill4appli 1.1.1
 
