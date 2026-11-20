@@ -1,0 +1,412 @@
+---
+name: texte
+description: Texte de départ d'un scénario, fichier .scenario inspiré de Gherkin en français, écrit par le développeur (un seul scénario par texte, étiquettes, Fonctionnalité facultative, titre Scénario, réglages Adresse, Origines, Profil et Paramètre, étapes introduites par Étant donné, Soit, Sachant que, Quand, Lorsque, Alors, Et, Mais, marques (création), (modification), (suppression) et (à la main), variables <nom>, tableau Exemples, commentaires, erreurs données ligne par ligne, empreinte identique en LF et en CRLF, phrases conseillées et leur traduction, source de scripts/texte.mjs). À lire pour écrire un texte ou le traduire.
+dimensions: [D2]
+status: active
+---
+
+# Module `texte` (D2)
+
+Phase 7E couverte : Éléments.
+
+## 1. Principe
+
+Le texte de départ appartient au développeur : il y dit, en français, ce qu'une personne fait et voit, dans l'ordre. Le skill en lit la structure sans IA (`scripts/texte.mjs`) : titre, étiquettes, réglages, étapes avec leur ligne, marques, variables et exemples. La phrase d'une étape n'est pas interprétée ici : c'est la traduction en TOML qui lui donne ses actions (module `scenario`). Le texte reste la référence : sa traduction cite son empreinte, et un texte modifié rend sa traduction périmée (D3.INV-2).
+
+## 2. Forme d'un texte (D2.INV-1)
+
+Un fichier `.scenario`, en UTF-8, décrit un seul scénario. Ses lignes, dans cet ordre :
+
+| Ligne | Forme | Obligatoire |
+|---|---|---|
+| commentaire | commence par `#`, partout ; `# language: fr` en tête, comme en Gherkin | non |
+| étiquettes | `@ECR-77-S01 @ECR-77-CA01`, une ou plusieurs lignes, avant le titre | non |
+| fonctionnalité | `Fonctionnalité: Clients`, une fois, avant le titre ; ses étiquettes rejoignent celles du scénario | non |
+| titre | `Scénario: Créer un client`, ou `Plan du scénario:` ; une seule fois | oui |
+| réglages | `Adresse :`, `Origines :`, `Profil :`, `Paramètre :` (§ 4), entre le titre et la première étape | `Adresse` |
+| étapes | une par ligne, introduite par un mot-clé (§ 3) | au moins une |
+| exemples | `Exemples:`, puis un tableau (§ 6), après les étapes | non |
+
+Les lignes vides sont libres ; l'indentation est libre. Les deux-points s'écrivent collés ou précédés d'une espace (`Scénario :`). Toute autre ligne est refusée, et chaque erreur donne sa ligne : un texte se corrige en une fois (§ 7). Les fins de ligne CRLF et un BOM sont admis.
+
+## 3. Mots-clés des étapes
+
+| Mot-clé | Emploi conseillé |
+|---|---|
+| `Étant donné que`, `Étant donné qu'`, `Étant donné`, `Soit`, `Sachant que`, `Sachant qu'` | la situation de départ |
+| `Quand`, `Lorsque`, `Lorsqu'` | le geste de l'utilisateur |
+| `Alors` | ce qu'il voit ensuite |
+| `Et`, `Mais` | la suite de l'étape précédente |
+
+Les mots-clés se reconnaissent sans tenir compte des accents ni de la casse (`Etant donne que`, `QUAND`) ; ils n'ont pas d'effet sur l'exécution, seulement sur la lecture. Chaque étape garde son numéro de ligne, son mot-clé tel qu'écrit et sa phrase (D2.INV-2).
+
+## 4. Réglages
+
+| Réglage | Forme | Effet |
+|---|---|---|
+| `Adresse :` | `http://…` ou `https://…` | adresse de base de l'application : les chemins des étapes s'y rapportent |
+| `Origines :` | origines séparées par des virgules : schéma, hôte et port, sans chemin | seules origines vers lesquelles une requête peut partir (module `garde`) ; à défaut, l'origine de l'adresse, qui doit sinon en faire partie |
+| `Profil :` | minuscules, chiffres, `-` et `_` | profil du navigateur où vit la session de l'application (module `session`) ; à défaut, `defaut` |
+| `Paramètre :` | `nom = valeur`, une ligne par paramètre | valeur par défaut de la variable `<nom>` ; `--param` la remplace pour une exécution |
+
+## 5. Marques
+
+Une marque, entre parenthèses à la fin de la phrase, dit ce que l'étape engage :
+
+| Marque | Sens | Dans la traduction (D3.INV-4) |
+|---|---|---|
+| `(création)` | l'étape crée des données | une étape de sa ligne porte `mutation = "creation"` |
+| `(modification)` | l'étape modifie des données | `mutation = "modification"` |
+| `(suppression)` | l'étape supprime des données | `mutation = "suppression"` |
+| `(à la main)` | le développeur fait l'étape lui-même, dans la fenêtre : se connecter, résoudre un défi, valider un paiement de test | une seule étape `main` |
+
+Les marques se reconnaissent sans accents ni casse (`(creation)`, `(A la main)`) ; elles sont retirées de la phrase. Les marques de mutation déclenchent la garde du module `garde` : hors du poste, une modification de données demande l'autorisation explicite du développeur (D7.INV-2). Une étape qui modifie des données sans marque le reste : la traduction lui ajoute `mutation` et le signale au développeur (module `agent`, § 3).
+
+## 6. Variables et exemples
+
+Une variable s'écrit `<nom>` dans une phrase : minuscules, chiffres et `_`, commençant par une lettre. Elle doit être déclarée, par une ligne `Paramètre :` ou par une colonne du tableau d'exemples (D2.INV-2) ; la traduction l'écrit `${nom}`.
+
+Le tableau d'exemples suit `Exemples:` : une ligne d'en-têtes, les noms des variables, puis une ligne par jeu de valeurs. Le scénario est joué une fois par ligne. Les cellules sont séparées par `|` ; `\|` écrit une barre dans une cellule ; chaque ligne a autant de cellules que l'en-tête.
+
+```text
+  Exemples:
+    | nom    | ville |
+    | Dupuis | Lyon  |
+    | Leroy  | Nice  |
+```
+
+## 7. Erreurs
+
+`node <skill>/scripts/verifier.mjs <texte.scenario>` rend toutes les erreurs, chacune avec sa ligne (0 pour une absence) :
+
+```text
+ERREUR creer.scenario, ligne 0 : titre absent : une ligne « Scénario: » est attendue
+ERREUR creer.scenario, ligne 3 : ligne non reconnue : « Adress : http://127.0.0.1:4200 »
+ERREUR creer.scenario, ligne 9 : variable <nom> non déclarée : ni paramètre, ni colonne d'exemples
+```
+
+Sont refusés, entre autres : un second titre, un réglage après la première étape ou avant le titre, une étape avant le titre, une adresse absente ou qui n'est pas en http ou https, une origine avec un chemin, une adresse dont l'origine n'est pas parmi les origines déclarées, une variable non déclarée ou mal nommée, une ligne d'exemples irrégulière, un tableau vide, une ligne après le tableau, des étiquettes après le titre, un profil mal nommé, un paramètre en double.
+
+## 8. Empreinte (D2.INV-3)
+
+L'empreinte d'un texte est le SHA-256 de son contenu en fins de ligne LF, sans BOM, en caractères composés (NFC). Un texte extrait en CRLF, comme par Git sous Windows avec `core.autocrlf`, a la même empreinte que dans le dépôt ; tout autre changement, même un commentaire, en donne une autre, et la traduction est alors à refaire et à ratifier (D3.INV-2).
+
+## 9. Phrases conseillées
+
+Une phrase libre se traduit ; une phrase de cette table se traduit sans hésitation, et le sera sans IA par la dimension réservée D11. Les guillemets français entourent ce que la personne lit à l'écran.
+
+| Phrase | Étape TOML |
+|---|---|
+| je suis sur la page « /clients » ; je vais sur la page « /clients » | `naviguer`, `url = "/clients"` |
+| je clique sur le bouton « Enregistrer » | `cliquer`, `cible = { role = "button", nom = "Enregistrer" }` |
+| je clique sur le lien « Nouveau client » | `cliquer`, `cible = { role = "link", nom = "Nouveau client" }` |
+| je saisis « Dupuis » dans le champ « Nom » | `saisir`, `cible = { libelle = "Nom" }`, `valeur = "Dupuis"` |
+| je choisis « Lyon » dans la liste « Ville » | `choisir`, `cible = { libelle = "Ville" }`, `valeur = "Lyon"` |
+| je coche la case « Client actif » ; je décoche… | `cocher`, `cible = { libelle = "Client actif" }`, `valeur = true` ou `false` |
+| je survole le menu « Menu » | `survoler`, `cible = { role = "button", nom = "Menu" }` |
+| j'appuie sur la touche « Entrée » (« Tab », « Échap ») | `touche`, `touche = "Enter"` (`"Tab"`, `"Escape"`) |
+| je joins le fichier « donnees/piece.pdf » au champ « Pièce jointe » | `televerser`, `cible = { libelle = "Pièce jointe" }`, `fichier = "donnees/piece.pdf"` |
+| je télécharge l'export « Exporter en CSV » | `telecharger`, `cible = { role = "link", nom = "Exporter en CSV" }` |
+| j'attends que le bouton « Continuer » soit actif | `attendre`, `etat = "actif"`, `cible = { role = "button", nom = "Continuer" }` |
+| je vois « Client Dupuis créé » ; je vois le message « … » | `verifier`, `critere = "contient"`, `cible = { role = "alert" }` ou la zone où il s'affiche, `attendu = "Client Dupuis créé"` |
+| je ne vois pas le bouton « Supprimer » | `verifier`, `critere = "visible"`, `cible = { role = "button", nom = "Supprimer" }`, `attendu = false` |
+| le champ « Nom » contient « Dupuis » | `verifier`, `critere = "valeur"`, `cible = { libelle = "Nom" }`, `attendu = "Dupuis"` |
+| je vois 3 boutons « Supprimer » | `verifier`, `critere = "nombre"`, `cible = { role = "button", nom = "Supprimer" }`, `attendu = 3` |
+| l'adresse est « /clients » | `verifier`, `critere = "url"`, `attendu = "/clients"` |
+| le bouton « Archiver » est inactif | `verifier`, `critere = "actif"`, `cible = { role = "button", nom = "Archiver" }`, `attendu = false` |
+| je capture l'écran « liste » | `capturer`, `nom = "liste"` |
+| je me connecte (à la main) | `main`, `message = "je me connecte"`, `jusqua = { url = "/accueil" }` |
+
+## 10. Exemple complet
+
+```text
+# language: fr
+@ECR-77-S01 @ECR-77-CA01
+Scénario: Créer un client
+  Adresse : http://127.0.0.1:4200
+  Origines : http://127.0.0.1:4200, http://127.0.0.1:8080
+  Paramètre : ville = Lyon
+
+  Étant donné que je me connecte (à la main)
+  Quand je clique sur le lien « Nouveau client »
+  Et je saisis « <nom> » dans le champ « Nom »
+  Et je choisis « <ville> » dans la liste « Ville »
+  Et je clique sur le bouton « Enregistrer » (création)
+  Alors je vois le message « Client <nom> créé »
+
+  Exemples:
+    | nom    |
+    | Dupuis |
+    | Leroy  |
+```
+
+`verifier.mjs` le lit ainsi : « Créer un client », 6 étapes (l.8 à la main, l.12 création), 2 exemples, et son empreinte.
+
+## 11. Contrôle de sortie
+
+- Un texte conforme est lu sans erreur, chaque étape avec sa ligne, son mot-clé, sa phrase, sa marque et ses variables (D2.INV-1, D2.INV-2).
+- Un texte non conforme rend toutes ses erreurs, chacune avec sa ligne.
+- Le même texte en CRLF, avec un BOM, ou en caractères décomposés, a la même empreinte (D2.INV-3).
+
+## 12. Source `scripts/texte.mjs`
+
+<!-- fichier : scripts/texte.mjs -->
+```javascript
+// scenario-playwright 1.0.0 : lecteur du texte de départ d'un scénario (fichier .scenario), sans dépendance.
+//
+// Le texte, inspiré de Gherkin en français, décrit un seul scénario : étiquettes, titre, réglages
+// (adresse, origines, profil, paramètres), étapes introduites par un mot-clé, et au plus un tableau
+// d'exemples. Ce lecteur en tire la structure sans IA, avec le numéro de ligne de chaque étape ; la
+// phrase d'une étape n'est pas interprétée : c'est la traduction en TOML qui lui donne ses actions.
+import { createHash } from 'node:crypto';
+import { URL } from 'node:url';
+
+export const FORMAT_TEXTE = 'scenario-playwright.texte/1';
+export const MARQUES = ['creation', 'modification', 'suppression', 'main'];
+export const RE_VARIABLE = /^[a-z][a-z0-9_]*$/;
+export const RE_PROFIL = /^[a-z0-9][a-z0-9_-]{0,39}$/;
+
+export class ErreurTexte extends Error {
+  constructor(nom, erreurs) {
+    super(erreurs.map((e) => `${nom}, ligne ${e.ligne} : ${e.message}`).join('\n'));
+    this.erreurs = erreurs;
+  }
+}
+
+/** Texte en fins de ligne LF, sans BOM, caractères composés (NFC) : la forme dont on prend l'empreinte. */
+export function normaliser(source) {
+  return source.replace(/^﻿/, '').replace(/\r\n/g, '\n').normalize('NFC');
+}
+
+/** Empreinte SHA-256 d'un texte de scénario, la même pour une extraction LF ou CRLF (D2.INV-3). */
+export function empreinteTexte(source) {
+  return createHash('sha256').update(normaliser(source), 'utf8').digest('hex');
+}
+
+// Comparaison sans accents ni casse, pour les mots-clés et les marques.
+const plat = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
+const MOTS_CLES = [
+  /^(etant donne(?:e|s|es)? (?:que |qu'))/,
+  /^(etant donne(?:e|s|es)? )/,
+  /^(sachant (?:que |qu'))/,
+  /^(soit )/,
+  /^(quand )/,
+  /^(lorsque |lorsqu')/,
+  /^(alors )/,
+  /^(et )/,
+  /^(mais )/,
+];
+const RE_MARQUE = /\s*\((creation|modification|suppression|a la main)\)\s*$/;
+const RE_TITRE = /^(fonctionnalite|scenario|plan du scenario)\s*:\s*(.*)$/;
+const RE_REGLAGE = /^(adresse|origines|profil|parametre)\s*:\s*(.*)$/;
+
+/** Origine d'une adresse http ou https, ou null. */
+export function origineDe(adresse) {
+  try {
+    const u = new URL(adresse);
+    return u.protocol === 'http:' || u.protocol === 'https:' ? u.origin : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Une origine écrite seule : schéma, hôte et port éventuel, sans chemin. */
+export function estOrigine(texte) {
+  const o = origineDe(texte);
+  return o !== null && o === texte.replace(/\/$/, '');
+}
+
+function cellules(ligne) {
+  const interieur = ligne.trim().replace(/^\|/, '').replace(/\|$/, '');
+  return interieur.split(/(?<!\\)\|/).map((c) => c.trim().replace(/\\\|/g, '|'));
+}
+
+/**
+ * Analyse un texte de scénario. Rend { scenario, erreurs } : toutes les erreurs trouvées, chacune avec
+ * son numéro de ligne (0 pour une absence), plutôt que la première seulement.
+ */
+export function analyserTexte(source) {
+  const lignes = normaliser(source).split('\n');
+  const erreurs = [];
+  const err = (ligne, message) => erreurs.push({ ligne, message });
+  const s = {
+    format: FORMAT_TEXTE,
+    fonctionnalite: null,
+    titre: null,
+    etiquettes: [],
+    adresse: null,
+    origines: [],
+    originesDeclarees: false,
+    profil: null,
+    parametres: {},
+    etapes: [],
+    jeux: null,
+    empreinte: empreinteTexte(source),
+  };
+  let ligneTitre = 0;
+  let ligneAdresse = 0;
+  let ligneOrigines = 0;
+  let zone = 'entete'; // entete, reglages, etapes, exemples, fin
+  let tableau = null;
+
+  for (let n = 1; n <= lignes.length; n++) {
+    const brute = lignes[n - 1];
+    const ligne = brute.trim();
+    if (ligne === '' || ligne.startsWith('#')) continue;
+    const p = plat(ligne);
+
+    if (zone === 'exemples' || zone === 'fin') {
+      if (ligne.startsWith('|') && zone === 'exemples') {
+        const c = cellules(ligne);
+        if (tableau.entetes === null) {
+          tableau.entetes = c;
+          const vues = new Set();
+          for (const nom of c) {
+            if (!RE_VARIABLE.test(nom)) err(n, `colonne d'exemples invalide : « ${nom} » (lettres minuscules, chiffres et _)`);
+            else if (vues.has(nom)) err(n, `colonne d'exemples en double : ${nom}`);
+            vues.add(nom);
+          }
+        } else if (c.length !== tableau.entetes.length) {
+          err(n, `ligne d'exemples de ${c.length} cellules, ${tableau.entetes.length} attendues`);
+        } else {
+          tableau.lignes.push(Object.fromEntries(tableau.entetes.map((k, i) => [k, c[i]])));
+        }
+        continue;
+      }
+      zone = 'fin';
+      err(n, 'ligne non reconnue après le tableau d\'exemples');
+      continue;
+    }
+
+    if (ligne.startsWith('@')) {
+      if (zone !== 'entete') {
+        err(n, 'étiquettes après le titre : elles se placent avant « Scénario: »');
+        continue;
+      }
+      for (const jeton of ligne.split(/\s+/)) {
+        if (!/^@\S+$/.test(jeton)) err(n, `étiquette invalide : « ${jeton} »`);
+        else if (!s.etiquettes.includes(jeton.slice(1))) s.etiquettes.push(jeton.slice(1));
+      }
+      continue;
+    }
+
+    const titre = RE_TITRE.exec(p);
+    if (titre) {
+      const valeur = ligne.slice(ligne.indexOf(':') + 1).trim();
+      if (titre[1] === 'fonctionnalite') {
+        if (zone !== 'entete' || s.fonctionnalite !== null || s.titre !== null) err(n, '« Fonctionnalité: » se place une fois, avant le titre');
+        else s.fonctionnalite = valeur;
+        continue;
+      }
+      if (s.titre !== null) {
+        err(n, `second titre : un texte décrit un seul scénario (le premier est ligne ${ligneTitre})`);
+        continue;
+      }
+      if (valeur === '') err(n, 'titre vide');
+      s.titre = valeur;
+      ligneTitre = n;
+      zone = 'reglages';
+      continue;
+    }
+
+    if (/^exemples\s*:\s*$/.test(p)) {
+      if (zone !== 'etapes') err(n, '« Exemples: » vient après les étapes');
+      zone = 'exemples';
+      tableau = { ligne: n, entetes: null, lignes: [] };
+      continue;
+    }
+
+    const reglage = RE_REGLAGE.exec(p);
+    if (reglage) {
+      const valeur = ligne.slice(ligne.indexOf(':') + 1).trim();
+      if (zone === 'entete') {
+        err(n, 'réglage avant le titre « Scénario: »');
+        continue;
+      }
+      if (zone !== 'reglages') {
+        err(n, 'réglage après la première étape : les réglages suivent le titre');
+        continue;
+      }
+      if (reglage[1] === 'adresse') {
+        if (ligneAdresse) err(n, `adresse déjà donnée ligne ${ligneAdresse}`);
+        else if (origineDe(valeur) === null) err(n, `adresse invalide : « ${valeur} » (http ou https)`);
+        else s.adresse = valeur;
+        ligneAdresse = n;
+      } else if (reglage[1] === 'origines') {
+        if (ligneOrigines) err(n, `origines déjà données ligne ${ligneOrigines}`);
+        ligneOrigines = n;
+        s.originesDeclarees = true;
+        for (const o of valeur.split(',').map((x) => x.trim()).filter(Boolean)) {
+          if (!estOrigine(o)) err(n, `origine invalide : « ${o} » (schéma, hôte et port, sans chemin)`);
+          else if (!s.origines.includes(o.replace(/\/$/, ''))) s.origines.push(o.replace(/\/$/, ''));
+        }
+        if (s.origines.length === 0) err(n, 'aucune origine');
+      } else if (reglage[1] === 'profil') {
+        if (s.profil !== null) err(n, 'profil déjà donné');
+        else if (!RE_PROFIL.test(valeur)) err(n, `profil invalide : « ${valeur} » (minuscules, chiffres, - et _)`);
+        else s.profil = valeur;
+      } else {
+        const m = /^([^=]+)=(.*)$/.exec(valeur);
+        const nom = m ? m[1].trim() : '';
+        if (!m || !RE_VARIABLE.test(nom)) err(n, `paramètre invalide : « ${valeur} » (nom = valeur, nom en minuscules)`);
+        else if (Object.hasOwn(s.parametres, nom)) err(n, `paramètre en double : ${nom}`);
+        else s.parametres[nom] = m[2].trim();
+      }
+      continue;
+    }
+
+    const motCle = MOTS_CLES.map((re) => re.exec(p)).find(Boolean);
+    if (motCle) {
+      if (zone === 'entete') {
+        err(n, 'étape avant le titre « Scénario: »');
+        continue;
+      }
+      zone = 'etapes';
+      const longueur = motCle[1].length;
+      let phrase = ligne.slice(longueur).trim();
+      let marque = null;
+      const m = RE_MARQUE.exec(plat(phrase));
+      if (m) {
+        marque = m[1] === 'a la main' ? 'main' : m[1];
+        phrase = phrase.slice(0, phrase.length - m[0].length).trim();
+      }
+      if (phrase === '') err(n, 'étape sans phrase');
+      const variables = [...new Set([...phrase.matchAll(/<([^<>\s]+)>/g)].map((v) => v[1]))];
+      for (const v of variables) if (!RE_VARIABLE.test(v)) err(n, `variable invalide : <${v}> (minuscules, chiffres et _)`);
+      s.etapes.push({ ligne: n, motCle: ligne.slice(0, longueur).trim(), phrase, marque, variables });
+      continue;
+    }
+
+    err(n, `ligne non reconnue : « ${ligne.length > 60 ? `${ligne.slice(0, 57)}...` : ligne} »`);
+  }
+
+  if (s.titre === null) err(0, 'titre absent : une ligne « Scénario: » est attendue');
+  if (s.titre !== null && s.adresse === null && !ligneAdresse) err(ligneTitre, 'adresse absente : une ligne « Adresse : http://… » suit le titre');
+  if (s.titre !== null && s.etapes.length === 0) err(ligneTitre, 'aucune étape');
+  if (s.adresse !== null) {
+    const o = origineDe(s.adresse);
+    if (!s.originesDeclarees) s.origines = [o];
+    else if (!s.origines.includes(o)) err(ligneOrigines, `l'origine de l'adresse, ${o}, n'est pas parmi les origines`);
+  }
+  if (tableau) {
+    if (tableau.entetes === null || tableau.lignes.length === 0) err(tableau.ligne, 'tableau d\'exemples vide : une ligne d\'en-têtes et au moins une ligne de valeurs');
+    else s.jeux = tableau.lignes;
+  }
+  const declarees = new Set([...Object.keys(s.parametres), ...(tableau?.entetes ?? [])]);
+  for (const e of s.etapes) {
+    for (const v of e.variables) {
+      if (RE_VARIABLE.test(v) && !declarees.has(v)) err(e.ligne, `variable <${v}> non déclarée : ni paramètre, ni colonne d'exemples`);
+    }
+  }
+  erreurs.sort((a, b) => a.ligne - b.ligne);
+  return { scenario: s, erreurs };
+}
+
+/** Lit un texte de scénario ; lève ErreurTexte avec toutes ses erreurs. */
+export function lireTexte(source, nom = 'texte') {
+  const { scenario, erreurs } = analyserTexte(source);
+  if (erreurs.length > 0) throw new ErreurTexte(nom, erreurs);
+  return scenario;
+}
+```

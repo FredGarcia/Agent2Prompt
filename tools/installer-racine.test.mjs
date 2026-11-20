@@ -22,8 +22,9 @@ const RACINE = dirname(dirname(fileURLToPath(import.meta.url)));
 const INSTALLATEUR = join(RACINE, 'installer.mjs');
 const OUTIL = join(RACINE, 'tools', 'installer.mjs');
 const SYSTEMES = ['agent2dev', 'agent2test', 'tension-dashboard-gitlab-agent'];
-const AGENTS = ['agents/capteur-sprint.md', 'agents/explicateur-hote.md', 'agents/memoire-appli.md'];
-const COMMANDES = ['commands/hote/carte.toml', 'commands/hote/explique.toml', 'commands/hote/pourquoi.toml'];
+const AGENTS = ['agents/capteur-sprint.md', 'agents/explicateur-hote.md', 'agents/memoire-appli.md', 'agents/pilote-scenario.md'];
+const COMMANDES = ['commands/hote/carte.toml', 'commands/hote/explique.toml', 'commands/hote/pourquoi.toml', 'commands/scenario/designer.toml', 'commands/scenario/jouer.toml', 'commands/scenario/traduire.toml'];
+const SKILL_DES_COMMANDES = { hote: 'explication-hote-ia', scenario: 'scenario-playwright' };
 
 const manifeste = (nom) => JSON.parse(readFileSync(join(RACINE, 'specs', nom, 'manifest.json'), 'utf8'));
 const transmission = (nom, version = manifeste(nom).version) => lireTransmission(join(RACINE, 'transmissions', `${nom}-${version}.md`));
@@ -130,12 +131,20 @@ test('installe au niveau utilisateur chaque skill installable, puis les agents e
   const explicateur = readFileSync(join(b.gemini, 'agents', 'explicateur-hote.md'), 'utf8');
   const brut = readFileSync(join(b.skills, 'explication-hote-ia', 'agent', 'explicateur-hote.md'), 'utf8');
   assert.equal(explicateur, brut.split('<DOSSIER_DU_SKILL>').join(join(b.skills, 'explication-hote-ia')));
-  for (const rel of COMMANDES) assert.equal(readFileSync(join(b.gemini, ...rel.split('/')), 'utf8'), readFileSync(join(b.skills, 'explication-hote-ia', 'commandes', ...rel.split('/').slice(1)), 'utf8'));
+  // pilote-scenario, écrit pour Gemini CLI comme explicateur-hote.
+  const pilote = readFileSync(join(b.gemini, 'agents', 'pilote-scenario.md'), 'utf8');
+  const brutPilote = readFileSync(join(b.skills, 'scenario-playwright', 'agent', 'pilote-scenario.md'), 'utf8');
+  assert.equal(pilote, brutPilote.split('<DOSSIER_DU_SKILL>').join(join(b.skills, 'scenario-playwright')));
+  for (const rel of COMMANDES) {
+    const [, groupe, fichier] = rel.split('/');
+    assert.equal(readFileSync(join(b.gemini, ...rel.split('/')), 'utf8'), readFileSync(join(b.skills, SKILL_DES_COMMANDES[groupe], 'commandes', groupe, fichier), 'utf8'));
+  }
   // Le fichier du skill ne change jamais : seule la copie s'adapte.
   assert.equal(source, attendus('capture-sprint-jira').get('agent/capteur-sprint.md'));
 
   assert.match(r.sortie, /\/skills reload, \/agents reload et \/commands reload/);
   assert.match(r.sortie, /capture-sprint-jira : ses dépendances, une fois, depuis son dossier : cd ".*" puis npm ci/);
+  assert.match(r.sortie, /scenario-playwright : ses dépendances, une fois, depuis son dossier : cd ".*" puis npm ci/);
   assert.ok(r.sortie.includes(`generateur-skill-ticket : le chemin du clone qu'il demande, <dépôt>, est ${RACINE}`));
 });
 
@@ -275,7 +284,7 @@ test("niveau d'un projet : skills masqués, agents, commandes et état exclus de
   assert.match(r.sortie, /analyse-projet : non installé, niveau utilisateur seul/);
   assert.equal(existsSync(join(ws, '.gemini', 'skills', 'analyse-projet')), false);
   assert.equal(b.statut(ws), '');
-  assert.match(r.sortie, /10 skills masqués à Git, lisibles par Gemini CLI/);
+  assert.match(r.sortie, /11 skills masqués à Git, lisibles par Gemini CLI/);
   const exclusion = readFileSync(join(ws, '.git', 'info', 'exclude'), 'utf8');
   assert.match(exclusion, /# >>> installateur agent2prompt : agents, commandes et état de installer\.mjs\n\/\.gemini\/agent2prompt\/\n\/\.gemini\/agents\/capteur-sprint\.md\n/);
   assert.match(exclusion, /\/\.gemini\/skills\/java\//);
