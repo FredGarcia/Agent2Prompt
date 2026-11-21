@@ -1,7 +1,7 @@
 ---
 name: recette
-description: Recette du skill (npm test, scénarios R1 à R21 contre une application de démonstration servie sur 127.0.0.1 sans réseau ni compte, deux origines, WebSocket d'écho, connexion simulée, export CSV, Jira factice à connexion simulée avec des demandes de Jira Cloud et de Jira Data Center et leurs pages MHTML ; profils et résultats temporaires ; navigateur de SCENARIO_PLAYWRIGHT_CANAL ; écran virtuel sous Linux ; bilan attendu ; défauts réintroduits qui font chacun échouer la recette ; recette en intégration continue sous Linux et Windows), sources de tests/application-demo.mjs et tests/run-tests.mjs.
-dimensions: [D1, D2, D3, D4, D5, D6, D7, D8, D9, D16]
+description: Recette du skill (npm test, scénarios R1 à R25 contre une application de démonstration servie sur 127.0.0.1 sans réseau ni compte, deux origines, WebSocket d'écho, connexion simulée, export CSV, Jira factice à connexion simulée avec des demandes de Jira Cloud et de Jira Data Center et leurs pages MHTML, Xray et Zephyr Scale factices, Cloud et Data Center, qui notent chaque requête, archives d'export ; profils et résultats temporaires ; navigateur de SCENARIO_PLAYWRIGHT_CANAL ; écran virtuel sous Linux ; bilan attendu ; défauts réintroduits qui font chacun échouer la recette ; recette en intégration continue sous Linux et Windows), sources de tests/application-demo.mjs et tests/run-tests.mjs.
+dimensions: [D1, D2, D3, D4, D5, D6, D7, D8, D9, D16, D17]
 status: active
 ---
 
@@ -18,8 +18,8 @@ npm test
 - Depuis le dossier du skill, après `npm ci`. Sous Linux sans écran : `xvfb-run -a npm test` ; le scénario s'y joue dans une fenêtre, comme sur le poste.
 - Le navigateur est celui de `SCENARIO_PLAYWRIGHT_CANAL` : Chrome par défaut ; `chromium` après `npx playwright-core install chromium`.
 - La recette travaille sur des profils et des dossiers temporaires : les profils et les résultats du dossier du skill ne sont pas touchés. Elle efface son dossier temporaire si tout passe ; sinon, ou avec `GARDER_TMP=1`, elle le garde et en donne le chemin.
-- Durée : environ une minute et demie. Garde-fou : une recette bloquée s'arrête d'elle-même au bout de dix minutes, en disant dans quel scénario, son dossier temporaire gardé ; ce dossier est dit dès la première ligne.
-- Bilan attendu : `Bilan : 21 scénarios, 279 contrôles, 279 réussis, 0 en échec, 0 sautés`. Là où un serveur ne peut écouter sur 127.0.0.2, deux contrôles de R8 sont sautés.
+- Durée : environ deux minutes. Garde-fou : une recette bloquée s'arrête d'elle-même au bout de dix minutes, en disant dans quel scénario, son dossier temporaire gardé ; ce dossier est dit dès la première ligne.
+- Bilan attendu : `Bilan : 25 scénarios, 339 contrôles, 339 réussis, 0 en échec, 0 sautés`. Là où un serveur ne peut écouter sur 127.0.0.2, deux contrôles de R8 sont sautés.
 
 ## 2. L'application de démonstration
 
@@ -49,6 +49,17 @@ Le même fichier sert un Jira factice, sur une troisième origine, et donne de q
 | `enMhtml(html, …)` | la page enregistrée comme le fait Chrome : en-têtes, frontière, quoted-printable ou base64, jeu de caractères, image | lecture du MHTML |
 | `/browse/<CLÉ>` | sans cookie de session, renvoie vers `/login`, dont la page pose le cookie après le délai réglé et revient à la demande, comme un développeur qui se connecte ; formulaire en POST, que le skill ne doit jamais envoyer ; clé inconnue : page sans marqueurs | import par l'adresse, profil dédié, navigation seule |
 
+Il sert enfin, sur une quatrième origine, un Xray et un Zephyr Scale factices, qui notent chaque requête, son en-tête `Authorization` et son corps, et de quoi fabriquer des archives :
+
+| Élément | Contenu | Sert à |
+|---|---|---|
+| `testsOutils()` | Xray : DEMO-12, Cucumber, plan de scénario en français, deux étiquettes, une précondition ; DEMO-13, manuel, deux pas, des données sur deux lignes ; DEMO-14, Generic ; DEMO-17, manuel, dont un pas vide ; DEMO-16, Cucumber qui porte son titre, en anglais ; DEMO-25, demande de Jira qui n'est pas un test. Zephyr Scale : DEMO-T1, BDD, précondition en HTML ; DEMO-T2, pas à pas en HTML, trois pas sur deux pages ; DEMO-T3, texte libre ; DEMO-T4, pas qui appelle un autre cas ; DEMO-T99, qui renvoie ailleurs | lecture des tests, conversion, refus |
+| Xray Cloud | `POST /api/v2/authenticate`, qui ne rend le jeton de session que pour l'identifiant et le secret attendus ; `POST /api/v2/graphql`, qui ne sert que les requêtes `query`, et rend une erreur de JQL pour DEMO-15 | authentification, lecture seule, test introuvable |
+| Xray Data Center | `GET /rest/api/2/issue/<CLÉ>` et `GET /rest/raven/1.0/api/test?keys=<CLÉ>`, avec le jeton d'accès personnel attendu | lecture par l'API de Jira et de Xray |
+| Zephyr Scale | `GET /v2/testcases/<CLÉ>`, `…/teststeps` par pages de deux, `…/testscript` ; `GET /rest/atm/1.0/testcase/<CLÉ>` ; DEMO-T99 renvoie vers la seconde origine, qui note toute requête reçue | Cloud et Data Center, pages, redirection refusée |
+| `JETONS_FACTICES` | les valeurs des variables d'environnement des jetons, qu'aucune sortie ni aucun texte ne doit contenir | garde des jetons |
+| `enZip(fichiers)` | une archive comme celle d'un export : deflate ou stockée, noms en UTF-8, CRC-32 qu'on peut abîmer, fichier marqué chiffré | lecture des archives |
+
 ## 3. Scénarios
 
 | ID | Scénario | Invariants |
@@ -74,10 +85,14 @@ Le même fichier sert un Jira factice, sur une troisième origine, et donne de q
 | R19 | Scénarios de la demande : ordre de la page et zones ; contexte reporté, ligne de description ignorée ; mots-clés recopiés en français et en anglais ; étiquettes de la fonctionnalité et de la règle ; étiquettes gardées ou attribuées ; ligne d'étape hors d'un scénario ; cinq refus motivés ; doublon ; texte importé valide, colonnes adaptées, provenance, relue, retouche détectée ; empreinte Jira stable ; texte invalide non écrit ; réglages contrôlés | D16.INV-2, D16.INV-3, D16.INV-4 |
 | R20 | `importer.mjs` sur des pages enregistrées : quatre textes écrits, nommés par leur étiquette ; limite signalée ; textes vérifiés, traduits, et l'un joué jusqu'au bout ; réimport sans réécriture ; `--comparer` identique ; après changements dans Jira : nouveau, modifié, identique, conflit, refusé, disparu, sans rien écrire ; étiquette reprise par le titre ; import sans `--remplacer`, puis avec : retouche gardée à côté, texte écrit à la main jamais remplacé, traduction périmée ; commentaires sur demande ; Jira Data Center ; demande sans scénario ; huit refus avant toute écriture | D16.INV-3, D16.INV-4, D16.INV-5, D16.INV-6, D3.INV-2 |
 | R21 | `importer.mjs` par l'adresse : message « À VOUS », connexion simulée, code 0 ; page enregistrée dans `jira/` et relisible ; textes et provenance ; requêtes GET seulement ; profil dédié ; session retrouvée sans message ; demande jamais affichée refusée au délai ; profil Jira invalide | D16.INV-1, D16.INV-6 |
+| R22 | Fichier `.feature` et archive : sources reconnues, clés contrôlées ; archive lue en mémoire, bornée, CRC-32 contrôlé ; identité (`@TestCaseKey=`, clé de Xray, préfixe `TEST_`, clé portée par deux titres écartée) ; export de Xray en CRLF avec BOM : textes nommés par la clé, provenance, contexte reporté, colonnes adaptées ; export de Zephyr Scale ; fichier du dépôt sans clé : étiquettes attribuées ; textes vérifiés ; réimport sans réécriture ; `--comparer` après changement ; archive : même test d'un autre chemin d'import inchangé, doublon, fichiers ignorés signalés ; fichier chiffré ; fichier sans scénario ; six refus avant toute écriture | D17.INV-1, D17.INV-4, D17.INV-6, D16.INV-5 |
+| R23 | Xray Cloud et Data Center : un état par test ; même clé d'un autre chemin d'import, modifiée, pas en conflit ; Generic refusé, test introuvable ; test manuel converti pas à pas, signalé en tête ; pas vide refusé ; test Cucumber qui porte son titre ; `--remplacer` : titre formé du résumé, étiquettes de Jira, préconditions signalées ; textes vérifiés ; `--comparer` ; Data Center : texte écrit à la main jamais remplacé, demande absente, demande qui n'est pas un test ; même texte et même empreinte qu'en Cloud | D17.INV-1, D17.INV-4, D17.INV-5, D17.INV-6, D16.INV-5 |
+| R24 | Zephyr Scale Cloud et Data Center : un état par cas ; BDD sous un titre en anglais, précondition signalée ; pas à pas depuis le HTML, lignes jointes, pas sans résultat ; pas lus page après page ; texte libre et appel d'un autre cas refusés ; Data Center : même texte et même empreinte ; textes vérifiés | D17.INV-1, D17.INV-5, D17.INV-6 |
+| R25 | Garde des jetons et de la lecture seule : neuf refus avant toute requête (variables absentes, valeur invalide, http hors du poste, identifiant dans l'adresse, `--api` manquant, clé invalide, option de Jira) ; redirection refusée, l'autre origine jamais jointe, rien d'écrit après une lecture réussie ; jeton et identifiants refusés (401) ; lectures seules, aucune mutation ; jetons dans l'en-tête seulement ; aucun jeton dans une sortie ni dans un texte | D17.INV-2, D17.INV-3, D16.INV-6 |
 
 ## 4. Contrôle de la recette elle-même
 
-Vingt-neuf défauts, réintroduits un à un dans le code, font chacun échouer la recette par le scénario attendu (essai du 20 novembre 2026, Node 22.23.4, Chromium 159, rejoué en entier en 1.1.1) :
+Quarante-deux défauts, réintroduits un à un dans le code, font chacun échouer la recette par le scénario attendu (essai du 21 novembre 2026, Node 26.13.0, Chromium 159 : les quarante-deux rejoués en 1.2.0, M30 à M42 encore une fois après les deux dernières corrections) :
 
 | ID | Défaut réintroduit | Scénarios en échec | Contrôles en échec |
 |---|---|---|---|
@@ -102,14 +117,27 @@ Vingt-neuf défauts, réintroduits un à un dans le code, font chacun échouer l
 | M19 | Une étape main est acceptée sur une ligne non marquée | R3 | 1 |
 | M20 | La désignation clique l'élément désigné | R13 | 1 |
 | M21 | Les commentaires de Jira Cloud sont lus sans --commentaires | R18, R20 | 8 |
-| M22 | Un texte modifié dans Jira est remplacé sans --remplacer | R20 | 2 |
-| M23 | Un texte écrit à la main est remplacé par un texte importé du même nom | R20 | 3 |
-| M24 | Le mot-clé anglais Given n'est pas reconnu | R1, R19, R20 | 4 |
-| M25 | Le contexte de la fonctionnalité n'est pas reporté dans ses scénarios | R19 | 6 |
-| M26 | L'étiquette attribuée par un import précédent n'est pas reprise par le titre | R20, R21 | 7 |
+| M22 | Un texte modifié dans Jira est remplacé sans --remplacer | R20, R23 | 5 |
+| M23 | Un texte écrit à la main est remplacé par un texte importé du même nom | R20, R23 | 4 |
+| M24 | Le mot-clé anglais Given n'est pas reconnu | R1, R19, R20, R22, R23 | 7 |
+| M25 | Le contexte de la fonctionnalité n'est pas reporté dans ses scénarios | R19, R22 | 8 |
+| M26 | L'étiquette attribuée par un import précédent n'est pas reprise par le titre | R20, R21, R22 | 9 |
 | M27 | Un texte retouché depuis l'import est remplacé sans être gardé | R20 | 1 |
 | M28 | Une table de données d'étape est ignorée au lieu d'être refusée | R19, R20 | 4 |
 | M29 | L'import par l'adresse saisit et envoie le formulaire de connexion | R21 | 1 |
+| M30 | Une requête à l'API suit une redirection | R25 | 1 |
+| M31 | Un jeton passe en clair, en http, hors du poste | R25 | 1 |
+| M32 | Un message d'erreur affiche le jeton | R25 | 3 |
+| M33 | Le jeton passe dans l'adresse de la requête | R25 | 1 |
+| M34 | L'import écrit dans Jira : une étiquette ajoutée au test | R25 | 1 |
+| M35 | Une requête GraphQL de mutation part vers Xray Cloud | R25 | 1 |
+| M36 | Le résultat attendu d'un pas manuel est perdu | R23, R24 | 2 |
+| M37 | L'étiquette @TestCaseKey= de Zephyr Scale n'est pas reconnue | R22 | 2 |
+| M38 | Une clé portée par des scénarios de titres différents devient leur identité | R22 | 5 |
+| M39 | Le même test, lu d'un autre chemin d'import, est en conflit avec son texte | R22, R23 | 5 |
+| M40 | Le CRC-32 d'un fichier de l'archive n'est pas contrôlé | R22 | 7 |
+| M41 | Les textes d'un autre lot sont pris pour ceux du lot importé | R22, R23 | 6 |
+| M42 | Seule la première page des pas de Zephyr Scale est lue | R24 | 3 |
 
 Chaque défaut a été retiré après son essai ; la recette du code publié passe en entier.
 
@@ -123,18 +151,20 @@ Le workflow `.github/workflows/recette-scenario-playwright.yml` du dépôt Agent
 
 <!-- fichier : tests/application-demo.mjs -->
 ```javascript
-// scenario-playwright 1.1.1 : application de démonstration de la recette, servie sur 127.0.0.1 sans réseau.
+// scenario-playwright 1.2.0 : application de démonstration de la recette, servie sur 127.0.0.1 sans réseau.
 //
 // Deux origines : l'application, et une « autre » origine, que les scénarios ne déclarent pas, pour la
 // garde des origines. Les pages couvrent chaque action du jeu fermé : liste et formulaire de clients,
 // menu au survol, contenu différé, connexion simulée pour une étape à la main, export CSV, erreurs de
 // console et réponses en erreur, WebSocket d'écho. Un Jira factice, à connexion simulée, sert des
-// demandes avec les marqueurs de Jira Cloud et de Jira Data Center. L'application a son propre
-// JavaScript ; le skill, lui, n'en exécute aucun dans la page.
+// demandes avec les marqueurs de Jira Cloud et de Jira Data Center. Un Xray et un Zephyr Scale factices
+// servent les API de lecture des tests, en Cloud et en Data Center, et notent chaque requête. L'application
+// a son propre JavaScript ; le skill, lui, n'en exécute aucun dans la page.
 import { Buffer } from 'node:buffer';
 import { createHash } from 'node:crypto';
 import http from 'node:http';
 import { URL } from 'node:url';
+import { crc32, deflateRawSync } from 'node:zlib';
 
 const page = (titre, corps, script = '') => `<!doctype html>
 <html lang="fr"><head><meta charset="utf-8"><title>${titre}</title>
@@ -161,12 +191,15 @@ function accepterWebSocket(req, socket) {
 }
 
 /**
- * Démarre l'application : rend { base, autre, distante, jira, etat, arreter }. `distante` est la même
- * application servie sur 127.0.0.2, origine hors du poste au sens du skill, ou null si l'adresse
- * n'est pas disponible ; `jira` est le Jira factice.
+ * Démarre l'application : rend { base, autre, distante, jira, outils, etat, arreter }. `distante` est la
+ * même application servie sur 127.0.0.2, origine hors du poste au sens du skill, ou null si l'adresse
+ * n'est pas disponible ; `jira` est le Jira factice ; `outils` sert les API factices de Xray et de Zephyr Scale.
  */
 export async function demarrerApplication() {
-  const etat = { clients: [{ nom: 'Dupont', ville: 'Paris' }, { nom: 'Martin', ville: 'Lyon' }], compteur: 0, ajouts: [], jira: demandesJira(), requetesJira: [], connexionJira: 4500 };
+  const etat = {
+    clients: [{ nom: 'Dupont', ville: 'Paris' }, { nom: 'Martin', ville: 'Lyon' }], compteur: 0, ajouts: [], jira: demandesJira(), requetesJira: [], connexionJira: 4500,
+    tests: testsOutils(), requetesOutils: [], requetesAutre: [], outils: '', autre: '',
+  };
   const serveurs = [];
   let autre = '';
 
@@ -259,11 +292,15 @@ export async function demarrerApplication() {
     s.listen(0, hote, () => { serveurs.push(s); resolve(`http://${hote}:${s.address().port}`); });
   });
   const autreApp = (req, res) => {
+    etat.requetesAutre.push(`${req.method} ${req.url}${req.headers.authorization ? ' (avec Authorization)' : ''}`);
     res.writeHead(200, { 'content-type': req.url.endsWith('.png') ? 'image/png' : 'text/html; charset=utf-8' });
     res.end(req.url.endsWith('.png') ? Buffer.alloc(0) : page('Autre origine', '<h1>Autre origine</h1>'));
   };
   autre = await demarrer(autreApp, '127.0.0.1');
+  etat.autre = autre;
   const jira = await demarrer(jiraFactice(etat), '127.0.0.1');
+  const outils = await demarrer(outilsFactices(etat), '127.0.0.1');
+  etat.outils = outils;
   const base = await demarrer(app, '127.0.0.1');
   let distante = null;
   try {
@@ -272,7 +309,7 @@ export async function demarrerApplication() {
     distante = null;
   }
   return {
-    base, autre, distante, jira, etat,
+    base, autre, distante, jira, outils, etat,
     arreter: () => Promise.all(serveurs.map((s) => new Promise((r) => { s.closeAllConnections?.(); s.close(() => r()); }))),
   };
 }
@@ -431,6 +468,207 @@ function jiraFactice(etat) {
     return html(404, '<!doctype html><html><body><h1>Introuvable</h1></body></html>');
   };
 }
+
+// --- Xray et Zephyr Scale factices ----------------------------------------------------------------
+// API de lecture des tests, comme les servent Xray Cloud (authentification, GraphQL), Xray Data Center
+// (API de Jira et de Xray), Zephyr Scale Cloud (API v2) et Zephyr Scale Data Center (API atm 1.0). Chaque
+// requête est notée dans etat.requetesOutils, avec son en-tête Authorization et son corps.
+
+/** Valeurs des variables d'environnement des jetons, pour la recette : chacune ne doit jamais s'afficher. */
+export const JETONS_FACTICES = {
+  XRAY_CLIENT_ID: 'id-xray-factice', XRAY_CLIENT_SECRET: 'secret-xray-ne-pas-afficher',
+  JIRA_TOKEN: 'pat-jira-ne-pas-afficher', ZEPHYR_TOKEN: 'zephyr-ne-pas-afficher',
+};
+export const SESSION_XRAY = 'session-xray-ne-pas-afficher';
+
+/** Tests du Xray factice (Cloud et Data Center) et cas de test du Zephyr Scale factice (Cloud et Data Center). */
+export function testsOutils() {
+  return {
+    xray: {
+      'DEMO-12': {
+        genre: 'Gherkin', nom: 'Cucumber', resume: 'Créer un client depuis la liste', etiquettes: ['crm', 'non-regression'], preconditions: ['DEMO-11'],
+        gherkin: 'Étant donné que je suis sur la page des clients\nQuand je clique sur le lien « Nouveau client »\nEt je saisis « <nom> » dans le champ « Nom »\nEt je clique sur le bouton « Enregistrer »\nAlors je vois le message « Client <nom> créé »\n\nExemples:\n  | nom |\n  | Roux |\n',
+      },
+      'DEMO-13': {
+        genre: 'Steps', nom: 'Manual', resume: 'Exporter les clients', etiquettes: [], preconditions: [],
+        pas: [
+          { action: 'Ouvrir la page « Export »', data: '', result: 'La page « Export » s\'affiche' },
+          { action: 'Cliquer sur le lien « Exporter en CSV »', data: 'format CSV\nséparateur ;', result: 'Le fichier « clients.csv » est téléchargé' },
+        ],
+      },
+      'DEMO-14': { genre: 'Unstructured', nom: 'Generic', resume: 'Relire les journaux', etiquettes: [], preconditions: [], definition: 'Lire les journaux du serveur' },
+      'DEMO-16': {
+        genre: 'Gherkin', nom: 'Cucumber', resume: 'Retour à l\'accueil', etiquettes: [], preconditions: [],
+        gherkin: 'Scenario: Back to home\n  Given I am on the export page\n  When I click the link "Accueil"\n  Then I see the heading "Démonstration"\n',
+      },
+      'DEMO-17': {
+        genre: 'Steps', nom: 'Manual', resume: 'Exporter, puis rejouer un autre test', etiquettes: [], preconditions: [],
+        pas: [{ action: 'Ouvrir la page « Export »', data: '', result: '' }, { action: '', data: '', result: '' }],
+      },
+      'DEMO-25': { jiraSeulement: true, resume: 'Une histoire, pas un test', etiquettes: [] },
+    },
+    zephyr: {
+      'DEMO-T1': { nom: 'Ouvrir le formulaire', labels: ['crm'], precondition: '<p>Être <strong>connecté</strong></p>', script: { type: 'bdd', text: 'Given je suis sur la page des clients\nWhen je clique sur le lien « Nouveau client »\nThen je vois le titre « Nouveau client »' } },
+      'DEMO-T2': {
+        nom: 'Exporter les clients pas à pas', labels: [], precondition: null,
+        pas: [
+          { description: '<p>Ouvrir la page <em>Export</em></p>', testData: '', expectedResult: '<p>La page « Export » s’affiche</p>' },
+          { description: '<p>Cliquer sur le lien « Exporter en CSV »</p>', testData: '<p>format&nbsp;CSV</p>', expectedResult: '<ul><li>Le fichier est téléchargé</li><li>Il contient deux clients</li></ul>' },
+          { description: '<p>Revenir à l’accueil</p>', testData: '', expectedResult: '' },
+        ],
+      },
+      'DEMO-T3': { nom: 'Tout vérifier', labels: [], precondition: null, script: { type: 'plain', text: '<p>Tout vérifier à la main</p>' } },
+      'DEMO-T4': { nom: 'Appelle un autre cas', labels: [], precondition: null, pas: [{ appel: 'DEMO-T2' }] },
+      'DEMO-T99': { redirection: true },
+    },
+  };
+}
+
+/**
+ * Serveur des API factices de Xray et de Zephyr Scale. Seules les lectures sont servies : une requête
+ * GraphQL qui n'est pas une « query » est refusée. Un jeton qui n'est pas le bon rend 401 ; DEMO-T99
+ * renvoie vers l'autre origine, que le skill ne doit jamais joindre.
+ */
+function outilsFactices(etat) {
+  const testGraphql = (cle, t) => ({
+    issueId: String(10000 + Number(cle.split('-')[1])),
+    testType: { name: t.nom, kind: t.genre },
+    steps: t.genre === 'Steps' ? t.pas.map((p, i) => ({ id: `s${i}`, action: p.action, data: p.data, result: p.result })) : [],
+    gherkin: t.genre === 'Gherkin' ? t.gherkin : null,
+    unstructured: t.genre === 'Unstructured' ? t.definition : null,
+    preconditions: { total: t.preconditions.length, results: t.preconditions.map((k) => ({ jira: { key: k } })) },
+    jira: { key: cle, summary: t.resume, labels: t.etiquettes },
+  });
+  const testDc = (cle, t) => ({
+    key: cle, self: `${etat.outils}/rest/api/2/issue/${cle}`, status: 'TODO',
+    type: t.genre === 'Gherkin' ? 'Automated[Cucumber]' : t.genre === 'Steps' ? 'Manual' : 'Automated[Generic]',
+    precondition: t.preconditions.map((k) => ({ key: k, condition: 'Être connecté', type: 'Manual' })),
+    definition: t.genre === 'Gherkin' ? t.gherkin : t.genre === 'Steps'
+      ? { steps: t.pas.map((p, i) => ({ id: i + 1, index: i + 1, step: { raw: p.action, rendered: `<p>${echapper(p.action)}</p>` }, data: { raw: p.data, rendered: '' }, result: { raw: p.result, rendered: '' }, attachments: [] })) }
+      : t.definition,
+  });
+  const casZephyr = (cle, t, dc) => {
+    const commun = { key: cle, name: t.nom, labels: t.labels, precondition: t.precondition };
+    if (!dc) return { id: 1, ...commun, project: { id: 10000 }, testScript: { self: `${etat.outils}/v2/testcases/${cle}/${t.pas ? 'teststeps' : 'testscript'}` } };
+    const testScript = t.pas
+      ? { type: 'STEP_BY_STEP', steps: t.pas.map((p, i) => (p.appel ? { index: i, testCaseKey: p.appel } : { index: i, description: p.description, testData: p.testData, expectedResult: p.expectedResult })) }
+      : { type: t.script.type === 'bdd' ? 'BDD' : 'PLAIN_TEXT', text: t.script.text };
+    return { ...commun, testScript };
+  };
+  return (req, res) => {
+    let corps = '';
+    req.setEncoding('utf8');
+    req.on('data', (d) => { corps += d; });
+    req.on('end', () => {
+      const u = new URL(req.url, 'http://x');
+      const autorisation = req.headers.authorization ?? null;
+      etat.requetesOutils.push({ methode: req.method, chemin: u.pathname, requete: u.search, autorisation, corps });
+      const json = (obj, code = 200) => { res.writeHead(code, { 'content-type': 'application/json' }); res.end(JSON.stringify(obj)); };
+      const refuse = () => json({ message: 'Unauthorized' }, 401);
+      const tests = etat.tests;
+      // Xray Cloud
+      if (u.pathname === '/api/v2/authenticate' && req.method === 'POST') {
+        let id = null;
+        try { id = JSON.parse(corps); } catch { id = null; }
+        if (id?.client_id !== JETONS_FACTICES.XRAY_CLIENT_ID || id?.client_secret !== JETONS_FACTICES.XRAY_CLIENT_SECRET) return refuse();
+        return json(SESSION_XRAY);
+      }
+      if (u.pathname === '/api/v2/graphql' && req.method === 'POST') {
+        if (autorisation !== `Bearer ${SESSION_XRAY}`) return refuse();
+        let q = null;
+        try { q = JSON.parse(corps); } catch { q = null; }
+        if (typeof q?.query !== 'string' || !/^\s*query\b/.test(q.query) || /\bmutation\b/.test(q.query)) return json({ errors: [{ message: 'seules les lectures sont servies' }] }, 400);
+        const cle = /key\s*=\s*"([A-Z][A-Z0-9_]+-\d+)"/.exec(q.variables?.jql ?? '')?.[1];
+        if (cle === 'DEMO-15') return json({ errors: [{ message: `An issue with key '${cle}' does not exist for field 'key'.` }], data: { getTests: null } });
+        const t = tests.xray[cle];
+        const results = t && !t.jiraSeulement ? [testGraphql(cle, t)] : [];
+        return json({ data: { getTests: { total: results.length, start: 0, limit: 1, results } } });
+      }
+      // Xray Data Center : API de Jira, puis de Xray
+      const demande = /^\/rest\/api\/2\/issue\/([A-Z][A-Z0-9_]+-\d+)$/.exec(u.pathname);
+      if (demande && req.method === 'GET') {
+        if (autorisation !== `Bearer ${JETONS_FACTICES.JIRA_TOKEN}`) return refuse();
+        const t = tests.xray[demande[1]];
+        if (!t) return json({ errorMessages: ['Issue Does Not Exist'], errors: {} }, 404);
+        return json({ key: demande[1], fields: { summary: t.resume, labels: t.etiquettes } });
+      }
+      if (u.pathname === '/rest/raven/1.0/api/test' && req.method === 'GET') {
+        if (autorisation !== `Bearer ${JETONS_FACTICES.JIRA_TOKEN}`) return refuse();
+        const cles = (u.searchParams.get('keys') ?? '').split(';').filter(Boolean);
+        return json(cles.filter((c) => tests.xray[c] && !tests.xray[c].jiraSeulement).map((c) => testDc(c, tests.xray[c])));
+      }
+      // Zephyr Scale Cloud (v2) et Data Center (atm 1.0)
+      const cloud = /^\/v2\/testcases\/([A-Z][A-Z0-9_]+-T\d+)(?:\/(teststeps|testscript))?$/.exec(u.pathname);
+      const dc = /^\/rest\/atm\/1\.0\/testcase\/([A-Z][A-Z0-9_]+-T\d+)$/.exec(u.pathname);
+      if ((cloud || dc) && req.method === 'GET') {
+        if (autorisation !== `Bearer ${cloud ? JETONS_FACTICES.ZEPHYR_TOKEN : JETONS_FACTICES.JIRA_TOKEN}`) return refuse();
+        const cle = (cloud ?? dc)[1];
+        const t = tests.zephyr[cle];
+        if (!t) return json({ errorCode: 404, message: 'Test case not found' }, 404);
+        if (t.redirection) { res.writeHead(302, { location: `${etat.autre}/v2/testcases/${cle}` }); return res.end(); }
+        if (dc) return json(casZephyr(cle, t, true));
+        if (!cloud[2]) return json(casZephyr(cle, t, false));
+        if (cloud[2] === 'testscript') return t.script ? json({ id: 1, type: t.script.type, text: t.script.text }) : json({ message: 'no script' }, 404);
+        const valeurs = (t.pas ?? []).map((p) => (p.appel
+          ? { inline: null, testCase: { self: `${etat.outils}/v2/testcases/${p.appel}`, testCaseKey: p.appel } }
+          : { inline: { description: p.description, testData: p.testData, expectedResult: p.expectedResult, customFields: {}, reflectRef: null }, testCase: null }));
+        const taille = Math.min(Number(u.searchParams.get('maxResults') ?? 10), 2);
+        const debut = Number(u.searchParams.get('startAt') ?? 0);
+        return json({ startAt: debut, maxResults: taille, total: valeurs.length, isLast: debut + taille >= valeurs.length, values: valeurs.slice(debut, debut + taille) });
+      }
+      return json({ message: 'introuvable' }, 404);
+    });
+  };
+}
+
+/**
+ * Archive .zip en mémoire, comme la produit un export : [{ nom, contenu, methode (8 deflate, 0 stockée),
+ * crc (pour l'abîmer), chiffre }]. Noms en UTF-8.
+ */
+export function enZip(fichiers) {
+  const locaux = [];
+  const centraux = [];
+  let decalage = 0;
+  for (const f of fichiers) {
+    const donnees = Buffer.isBuffer(f.contenu) ? f.contenu : Buffer.from(f.contenu, 'utf8');
+    const methode = f.methode ?? 8;
+    const comprime = methode === 8 ? deflateRawSync(donnees) : donnees;
+    const nom = Buffer.from(f.nom, 'utf8');
+    const crc = (f.crc ?? crc32(donnees)) >>> 0;
+    const drapeaux = 0x800 | (f.chiffre ? 0x1 : 0);
+    const local = Buffer.alloc(30);
+    local.writeUInt32LE(0x04034b50, 0);
+    local.writeUInt16LE(20, 4);
+    local.writeUInt16LE(drapeaux, 6);
+    local.writeUInt16LE(methode, 8);
+    local.writeUInt32LE(crc, 14);
+    local.writeUInt32LE(comprime.length, 18);
+    local.writeUInt32LE(donnees.length, 22);
+    local.writeUInt16LE(nom.length, 26);
+    const central = Buffer.alloc(46);
+    central.writeUInt32LE(0x02014b50, 0);
+    central.writeUInt16LE(20, 4);
+    central.writeUInt16LE(20, 6);
+    central.writeUInt16LE(drapeaux, 8);
+    central.writeUInt16LE(methode, 10);
+    central.writeUInt32LE(crc, 16);
+    central.writeUInt32LE(comprime.length, 20);
+    central.writeUInt32LE(donnees.length, 24);
+    central.writeUInt16LE(nom.length, 28);
+    central.writeUInt32LE(decalage, 42);
+    locaux.push(local, nom, comprime);
+    centraux.push(central, nom);
+    decalage += 30 + nom.length + comprime.length;
+  }
+  const repertoire = Buffer.concat(centraux);
+  const fin = Buffer.alloc(22);
+  fin.writeUInt32LE(0x06054b50, 0);
+  fin.writeUInt16LE(fichiers.length, 8);
+  fin.writeUInt16LE(fichiers.length, 10);
+  fin.writeUInt32LE(repertoire.length, 12);
+  fin.writeUInt32LE(decalage, 16);
+  return Buffer.concat([...locaux, repertoire, fin]);
+}
 ```
 
 ### `tests/run-tests.mjs`
@@ -438,7 +676,7 @@ function jiraFactice(etat) {
 <!-- fichier : tests/run-tests.mjs -->
 ```javascript
 #!/usr/bin/env node
-// scenario-playwright 1.1.1 : recette du skill, scénarios R1 à R21, contre l'application de démonstration
+// scenario-playwright 1.2.0 : recette du skill, scénarios R1 à R25, contre l'application de démonstration
 // locale (tests/application-demo.mjs), sans réseau ni compte. Le navigateur s'ouvre, visible, sur des
 // profils temporaires : les profils et les résultats du dossier du skill ne sont pas touchés.
 //   Navigateur : celui de SCENARIO_PLAYWRIGHT_CANAL (chrome par défaut ; chromium après
@@ -452,7 +690,8 @@ import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, 
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { clearTimeout, setTimeout } from 'node:timers';
-import { fileURLToPath, URL } from 'node:url';
+import { fileURLToPath, URL, URLSearchParams } from 'node:url';
+import * as cas from '../scripts/cas.mjs';
 import * as cibles from '../scripts/cibles.mjs';
 import * as jira from '../scripts/jira.mjs';
 import * as moteur from '../scripts/moteur.mjs';
@@ -462,7 +701,7 @@ import * as session from '../scripts/session.mjs';
 import * as texte from '../scripts/texte.mjs';
 import { lireToml } from '../scripts/toml.mjs';
 import { designer } from '../scripts/designer.mjs';
-import { demarrerApplication, demandesJira, descriptionCloud, enMhtml, pageJira } from './application-demo.mjs';
+import { demarrerApplication, demandesJira, descriptionCloud, enMhtml, enZip, JETONS_FACTICES, pageJira, SESSION_XRAY } from './application-demo.mjs';
 
 const SKILL = fileURLToPath(new URL('..', import.meta.url));
 const TMP = mkdtempSync(join(tmpdir(), 'scenario-playwright-'));
@@ -536,6 +775,13 @@ async function jouer(chemin, args = [], options = {}) {
 
 const etapes = (r) => (r.rapport ? r.rapport.jeux.flatMap((j) => j.etapes) : []);
 
+// Lecture des sorties et des dossiers de importer.mjs.
+const etatsDe = (sortie) => [...sortie.matchAll(/^ {2}(\S+)\s+@(\S+)/gm)].map((m) => `${m[1]} ${m[2]}`);
+const empreintes = (d) => readdirSync(d, { withFileTypes: true }).filter((f) => f.isFile()).map((f) => `${f.name}:${sha(join(d, f.name))}`).join();
+const lire = (d, nom) => (existsSync(join(d, nom)) ? readFileSync(join(d, nom), 'utf8') : '');
+const corps = (t) => t.slice(t.indexOf('\n\n'));
+const empreinteSource = (t) => /# Empreinte de la source : ([0-9a-f]{64})/.exec(t)?.[1] ?? null;
+
 // --------------------------------------------------------------------------------------------------
 // Textes et scénarios de la recette
 // --------------------------------------------------------------------------------------------------
@@ -570,9 +816,10 @@ Scénario : Créer des clients
 
 async function principal() {
   const app = await demarrerApplication();
-  const { base, autre, distante, jira: adresseJira } = app;
+  const { base, autre, distante, jira: adresseJira, outils } = app;
+  const sorties = [];
   const canal = session.lireReglages(ENV).reglages.canal;
-  console.log(`Recette de scenario-playwright 1.1.1 : Node ${process.versions.node}, navigateur ${canal}, application ${base}`);
+  console.log(`Recette de scenario-playwright 1.2.0 : Node ${process.versions.node}, navigateur ${canal}, application ${base}`);
   console.log(`Dossier temporaire : ${TMP}`);
   try {
     // ------------------------------------------------------------------------------------------
@@ -1317,8 +1564,6 @@ nom = "export"
         writeFileSync(chemin, enMhtml(pageJira(d), { emplacement: `https://jira.exemple.test/browse/${d.cle}`, ...options }));
         return chemin;
       };
-      const etatsDe = (sortie) => [...sortie.matchAll(/^ {2}(\S+)\s+@(\S+)/gm)].map((m) => `${m[1]} ${m[2]}`);
-      const empreintes = (d) => readdirSync(d, { withFileTypes: true }).filter((f) => f.isFile()).map((f) => `${f.name}:${sha(join(d, f.name))}`).join();
       const p8 = pageMhtml('DEMO-8.mhtml', demandes['DEMO-8']);
       const d = join(TMP, 'r20');
       let r = await lancer('importer.mjs', [p8, '--adresse', base, '--origines', base, '--profil', 'crm', '--dossier', d]);
@@ -1449,6 +1694,185 @@ Fonctionnalité: Clients
       controle('demande jamais affichée : refus après le délai, code 2, rien d\'écrit', r.code === 2 && /ne s'est pas affichée en 2 s/.test(r.erreurs) && !existsSync(join(TMP, 'r21-absente')), r.sortie + r.erreurs);
       r = await lancer('importer.mjs', [`${adresseJira}/browse/DEMO-9`, '--adresse', base, '--profil-jira', 'Jira Pro', '--dossier', d]);
       controle('--profil-jira invalide : refus, code 2', r.code === 2 && /--profil-jira invalide/.test(r.erreurs), r.erreurs);
+    }
+
+    // ------------------------------------------------------------------------------------------
+    scenarioRecette('R22', 'Fichier .feature et archive .zip : identité par la clé du test, étiquettes attribuées, contexte, doublons, archive contrôlée, réimport');
+    {
+      const sources = join(TMP, 'r22-sources');
+      mkdirSync(sources, { recursive: true });
+      const fichier = (nom, contenu) => { const c = join(sources, nom); writeFileSync(c, contenu); return c; };
+      controle('sources reconnues : .feature, .zip, xray:, xray-dc:, zephyr:, zephyr-dc:, page ou adresse d\'une demande (D17.INV-1)', cas.lireSource('a/b.feature').genre === 'feature' && cas.lireSource('Export.ZIP').genre === 'zip' && JSON.stringify(cas.lireSource('xray:DEMO-1, DEMO-2,DEMO-1')) === '{"genre":"api","outil":"xray","cles":["DEMO-1","DEMO-2"]}' && cas.lireSource('zephyr-dc:DEMO-T3').outil === 'zephyr-dc' && cas.lireSource('https://jira.exemple.test/browse/DEMO-8').adresse === true && cas.lireSource('page.mhtml').genre === 'jira');
+      controle('clés de test contrôlées : ABC-123 pour Xray, ABC-T123 pour Zephyr Scale, 200 au plus', /clé de test invalide/.test(cas.lireSource('xray:demo-1').erreur ?? '') && /forme ABC-T123/.test(cas.lireSource('zephyr:DEMO-12').erreur ?? '') && /200 au plus/.test(cas.lireSource(`xray:${Array.from({ length: 201 }, (_, i) => `DEMO-${i + 1}`).join(',')}`).erreur ?? '') && /attend les clés/.test(cas.lireSource('xray:').erreur ?? ''));
+      const zip = cas.lireZip(enZip([{ nom: 'a/é1.feature', contenu: 'Feature: A' }, { nom: 'b.feature', contenu: 'Feature: B', methode: 0 }, { nom: 'notes.txt', contenu: 'x' }, { nom: '__MACOSX/._b.feature', contenu: 'x' }, { nom: 'c.feature', contenu: 'Feature: C', chiffre: true }]));
+      controle('archive lue en mémoire : deflate et stockée, noms en UTF-8, autres fichiers ignorés, fichier chiffré refusé', JSON.stringify(zip.entrees.map((e) => `${e.nom}=${e.octets.toString('utf8')}`)) === '["a/é1.feature=Feature: A","b.feature=Feature: B"]' && JSON.stringify(zip.ignorees) === '["notes.txt","__MACOSX/._b.feature"]' && zip.refusees.length === 1 && zip.refusees[0].nom === 'c.feature', JSON.stringify(zip));
+      const bornes = { entrees: 10, fichier: 1000, total: 1500 };
+      controle('archive bornée et contrôlée : fichier trop gros refusé ; total dépassé, CRC-32 faux ou fichier qui n\'est pas une archive refusés', /1000 au plus/.test(cas.lireZip(enZip([{ nom: 'g.feature', contenu: 'x'.repeat(1200) }]), bornes).refusees[0]?.motif ?? '') && leve(() => cas.lireZip(enZip([{ nom: 'a.feature', contenu: 'x'.repeat(900) }, { nom: 'b.feature', contenu: 'y'.repeat(900) }]), bornes)) instanceof cas.ErreurCas && /CRC-32/.test(leve(() => cas.lireZip(enZip([{ nom: 'a.feature', contenu: 'Feature: A', crc: 1 }])))?.message ?? '') && /n'est pas une archive/.test(leve(() => cas.lireZip(Buffer.from('pas une archive')))?.message ?? ''));
+      const ids = jira.extraireScenarios([{ zone: 'fichier', libelle: 'x.feature', lignes: cas.lignesDe('@F-1\nFeature: F\n@TestCaseKey=ABC-T1 @ABC-9\nScenario: Z\n  When z\n@TEST_ABC-2 @ABC-7\nScenario: X\n  When x\n@ABC-5\nScenario: Y1\n  When y\n@ABC-5\nScenario: Y2\n  When y\n@ABC-8-S03\nScenario: J\n  When j\nScenario: N\n  When n\n') }]).scenarios;
+      const identite = cas.identitesGherkin(ids);
+      controle('identité : @TestCaseKey= de Zephyr Scale, sinon clé d\'un test de Xray (préfixe TEST_ retiré), sinon <CLÉ>-Snn ; clé portée par deux titres, étiquette de la fonctionnalité écartées (D17.INV-4)', ids.map((sc) => identite(sc) ?? '-').join(' ') === 'ABC-T1 ABC-2 - - ABC-8-S03 -', ids.map((sc) => identite(sc)).join(' '));
+      controle('lignes d\'un fichier : sans BOM, fins de ligne CRLF et tabulations ramenées', JSON.stringify(cas.lignesDe(`${String.fromCharCode(0xfeff)}Feature: A\r\n\tScenario: B\r\n`)) === '["Feature: A","Scenario: B",""]');
+      const XRAY = '@DEMO-30\nFeature: Gérer les clients\n\t#Exporté de Xray\n\n\tBackground:\n\t\t#@DEMO-31\n\t\tGiven je suis sur la page des clients\n\n\t@DEMO-32 @DEMO-30 @crm\n\tScenario: Créer un client\n\t\tWhen je clique sur le lien « Nouveau client »\n\t\tAnd je saisis « Roux » dans le champ « Nom »\n\t\tThen je vois le message « Client Roux créé »\n\n\t@TEST_DEMO-33 @REQ_DEMO-30\n\tScenario Outline: Créer plusieurs clients\n\t\tWhen je saisis « <Nom du client> » dans le champ « Nom »\n\t\tThen je vois le message « Client <Nom du client> créé »\n\n\t\tExamples:\n\t\t\t| Nom du client |\n\t\t\t| Petit         |\n';
+      const fX = fichier('1_DEMO-30.feature', `${String.fromCharCode(0xfeff)}${XRAY.replace(/\n/g, '\r\n')}`);
+      const d = join(TMP, 'r22');
+      let r = await lancer('importer.mjs', [fX, '--adresse', base, '--dossier', d]);
+      controle('export de Xray : un texte par test, nommé par la clé du test, code 0', r.code === 0 && JSON.stringify(etatsDe(r.sortie)) === '["écrit DEMO-32","écrit DEMO-33"]' && /^Fichier 1_DEMO-30\.feature : 2 scénarios$/m.test(r.sortie), r.sortie + r.erreurs);
+      const t33 = lire(d, 'DEMO-33.scenario');
+      controle('provenance d\'un fichier : lot, scénario, source et son empreinte, contexte reporté (D17.INV-4)', t33.startsWith('# Importé d\'un fichier .feature par importer.mjs (scenario-playwright 1.2.0), sans IA : le scénario est recopié tel qu\'écrit dans le fichier.\n# Lot : fichier ../r22-sources/1_DEMO-30.feature\n# Scénario : @DEMO-33, 1_DEMO-30.feature\n') && t33.includes(`# Source : fichier ../r22-sources/1_DEMO-30.feature (sha256 ${sha(fX)})`) && /# Empreinte de la source : [0-9a-f]{64}\n/.test(t33) && t33.includes('# Contexte reporté en tête des étapes : 1 étape.'), t33);
+      const lu33 = texte.analyserTexte(t33);
+      controle('scénario recopié : fonctionnalité, étiquettes, contexte en tête des étapes, colonnes d\'exemples adaptées', lu33.erreurs.length === 0 && lu33.scenario.fonctionnalite === 'Gérer les clients' && JSON.stringify(lu33.scenario.etiquettes) === '["DEMO-33","DEMO-30","TEST_DEMO-33","REQ_DEMO-30"]' && lu33.scenario.etapes[0].phrase === 'je suis sur la page des clients' && JSON.stringify(Object.keys(lu33.scenario.jeux?.[0] ?? {})) === '["nom_du_client"]', JSON.stringify(lu33.erreurs));
+      const fZ = fichier('zephyr-export.feature', 'Feature: Export\n  @TestCaseKey=DEMO-T7 @export\n  Scenario: Exporter les clients\n    Given I am on the export page\n    When I click the link "Export as CSV"\n    Then the file "clients.csv" is downloaded\n');
+      r = await lancer('importer.mjs', [fZ, '--adresse', base, '--dossier', d]);
+      controle('export de Zephyr Scale : texte nommé par la clé du cas de test, @TestCaseKey= gardé', r.code === 0 && JSON.stringify(etatsDe(r.sortie)) === '["écrit DEMO-T7"]' && lire(d, 'DEMO-T7.scenario').includes('\n@DEMO-T7 @TestCaseKey=DEMO-T7 @export\nScenario: Exporter les clients\n'), r.sortie + r.erreurs);
+      const PARCOURS = (fin) => `# language: fr\n@DEMO-8\nFonctionnalité: Parcours\n  @DEMO-40\n  Scénario: Ouvrir la liste\n    Quand je clique sur le lien « Clients »\n    Alors je vois le titre « Clients »\n\n  @DEMO-40\n  Scénario: Revenir à l'accueil\n    Quand je clique sur le lien « Accueil »\n    Alors je vois le titre « Démonstration »\n${fin}`;
+      const fP = fichier('parcours.feature', PARCOURS('\n  Scénario: Sans étiquette\n    Quand je regarde la page\n'));
+      r = await lancer('importer.mjs', [fP, '--adresse', base, '--dossier', d]);
+      controle('fichier du dépôt sans clé de test : étiquettes <fichier>-Snn attribuées, clé portée par deux titres écartée', r.code === 0 && JSON.stringify(etatsDe(r.sortie)) === '["écrit parcours-S01","écrit parcours-S02","écrit parcours-S03"]' && lire(d, 'parcours-S01.scenario').includes('# Étiquette @parcours-S01 attribuée par l\'import, la source n\'en donnant pas : l\'écrire dans le fichier, avant le titre du scénario, la fixe.'), r.sortie + r.erreurs);
+      const v = await lancer('verifier.mjs', readdirSync(d).filter((f) => f.endsWith('.scenario')).map((f) => join(d, f)));
+      controle('les textes importés de fichiers passent verifier.mjs', v.code === 0 && (v.sortie.match(/^ok /gm) ?? []).length === 6, v.sortie + v.erreurs);
+      const avant = empreintes(d);
+      r = await lancer('importer.mjs', [fP, '--adresse', base, '--dossier', d]);
+      controle('réimport sans changement : textes inchangés, non réécrits, code 0', r.code === 0 && etatsDe(r.sortie).length === 3 && etatsDe(r.sortie).every((x) => x.startsWith('inchangé')) && empreintes(d) === avant, r.sortie);
+      writeFileSync(fP, PARCOURS('\n  Scénario: Nouveau parcours\n    Quand je clique sur le lien « Export »\n').replace('Alors je vois le titre « Clients »', 'Alors je vois le tableau « Liste des clients »'));
+      r = await lancer('importer.mjs', [fP, '--comparer', '--dossier', d]);
+      controle('--comparer après changement du fichier : modifié, identique, nouveau sur un numéro libre, disparu, code 1', r.code === 1 && JSON.stringify(etatsDe(r.sortie)) === '["modifié parcours-S01","identique parcours-S02","nouveau parcours-S04","disparu parcours-S03"]' && /changé dans le fichier depuis l'import/.test(r.sortie) && /le scénario n'est plus dans le fichier/.test(r.sortie) && empreintes(d) === avant, r.sortie);
+      const fB = fichier('FeatureBundle.zip', enZip([
+        { nom: '1_DEMO-30.feature', contenu: XRAY },
+        { nom: '2_DEMO-35.feature', contenu: '@DEMO-35\nFeature: Clients actifs\n  @DEMO-32 @DEMO-35\n  Scenario: Créer un client\n    When je clique sur le lien « Nouveau client »\n  @DEMO-36\n  Scenario: Voir la liste\n    Then je vois le tableau « Liste des clients »\n', methode: 0 },
+        { nom: 'notes.txt', contenu: 'export du 20 novembre' },
+        { nom: '__MACOSX/._1_DEMO-30.feature', contenu: 'x' },
+      ]));
+      r = await lancer('importer.mjs', [fB, '--adresse', base, '--dossier', d]);
+      controle('archive d\'un export : même test retrouvé d\'un autre chemin d\'import, inchangé ; test présent dans deux fichiers, doublon ; code 1 (D17.INV-4)', r.code === 1 && JSON.stringify(etatsDe(r.sortie)) === '["inchangé DEMO-32","inchangé DEMO-33","doublon DEMO-32","écrit DEMO-36"]' && /^Archive FeatureBundle\.zip : 2 fichiers \.feature, 4 scénarios \(1_DEMO-30\.feature : 2, 2_DEMO-35\.feature : 2\)$/m.test(r.sortie), r.sortie + r.erreurs);
+      controle('fichiers de l\'archive qui ne sont pas des .feature signalés en limite', /LIMITE 2 fichiers de l'archive ignorés : notes\.txt, __MACOSX\/\._1_DEMO-30\.feature \(seuls les \.feature sont lus\)/.test(r.sortie), r.sortie);
+      const t36 = lire(d, 'DEMO-36.scenario');
+      controle('texte d\'une archive : lot et source de l\'archive, scénario désigné par son fichier', t36.includes('# Lot : archive ../r22-sources/FeatureBundle.zip\n# Scénario : @DEMO-36, 2_DEMO-35.feature\n') && t36.includes(`# Source : archive ../r22-sources/FeatureBundle.zip (sha256 ${sha(fB)})`), t36);
+      r = await lancer('importer.mjs', [fichier('chiffre.zip', enZip([{ nom: 'a.feature', contenu: 'x', chiffre: true }, { nom: 'b.feature', contenu: 'Feature: B\n  @DEMO-37\n  Scenario: C\n    When je regarde\n' }])), '--adresse', base, '--dossier', join(TMP, 'r22-chiffre')]);
+      controle('fichier chiffré de l\'archive signalé, les autres importés', r.code === 0 && /LIMITE a\.feature : chiffré, non lu/.test(r.sortie) && JSON.stringify(etatsDe(r.sortie)) === '["écrit DEMO-37"]', r.sortie + r.erreurs);
+      r = await lancer('importer.mjs', [fichier('vide.feature', 'Feature: Rien\n  Une description seulement.\n'), '--adresse', base, '--dossier', join(TMP, 'r22-vide')]);
+      controle('fichier sans scénario : rien d\'écrit, code 1', r.code === 1 && /Bilan : aucun scénario Gherkin trouvé dans le fichier/.test(r.sortie) && !existsSync(join(TMP, 'r22-vide')), r.sortie);
+      const refuse = join(TMP, 'r22-refus');
+      const casRefus = [
+        [[fichier('abime.zip', enZip([{ nom: 'a.feature', contenu: 'Feature: A\n  Scenario: B\n    When c\n', crc: 7 }])), '--adresse', base, '--dossier', refuse], 'contenu altéré (CRC-32)'],
+        [[fichier('faux.zip', 'pas une archive'), '--adresse', base, '--dossier', refuse], 'n\'est pas une archive .zip'],
+        [[join(sources, 'absent.feature'), '--adresse', base, '--dossier', refuse], 'fichier introuvable'],
+        [[fP, '--adresse', base, '--commentaires', '--dossier', refuse], 'pour une demande Jira seulement'],
+        [[fP, '--adresse', base, '--api', 'https://jira.exemple.test', '--dossier', refuse], '--api : pour xray:'],
+        [[fP, '--dossier', refuse], '--adresse attend'],
+      ];
+      for (const [args, motif] of casRefus) {
+        const x = await lancer('importer.mjs', args);
+        controle(`refus avant toute écriture, code 2 : ${motif}`, x.code === 2 && x.erreurs.includes(motif) && !existsSync(refuse), x.sortie + x.erreurs);
+      }
+    }
+
+    // ------------------------------------------------------------------------------------------
+    scenarioRecette('R23', 'Xray Cloud et Data Center par l\'API, en lecture seule : Cucumber recopié, test manuel converti pas à pas, Generic refusé, test introuvable, clé du test pour identité');
+    {
+      const env = { ...ENV, ...JETONS_FACTICES };
+      const d = join(TMP, 'r23');
+      const fE = join(TMP, 'r23-export.feature');
+      writeFileSync(fE, 'Feature: Clients\n  @DEMO-12\n  Scenario: Créer un client depuis la liste\n    Given je suis sur la page des clients\n    When je clique sur le lien « Nouveau client »\n');
+      let r = await lancer('importer.mjs', [fE, '--adresse', base, '--dossier', d]);
+      controle('test DEMO-12 importé d\'abord d\'un fichier .feature', r.code === 0 && JSON.stringify(etatsDe(r.sortie)) === '["écrit DEMO-12"]', r.sortie + r.erreurs);
+      app.etat.requetesOutils.length = 0;
+      r = await lancer('importer.mjs', ['xray:DEMO-12,DEMO-13,DEMO-14,DEMO-15,DEMO-16', '--api', outils, '--adresse', base, '--dossier', d], { env });
+      sorties.push(r.sortie + r.erreurs);
+      controle('Xray Cloud : tests lus par l\'API GraphQL, un état par test, code 1 (D17.INV-1)', r.code === 1 && r.sortie.includes(`Xray Cloud (${outils}) : 5 tests demandés, 4 lus (2 Cucumber, 1 manuel, 1 Generic)`) && JSON.stringify(etatsDe(r.sortie)) === '["modifié DEMO-12","écrit DEMO-13","refusé DEMO-14","écrit DEMO-16","introuvable DEMO-15"]', r.sortie + r.erreurs);
+      controle('même clé de test, d\'un autre chemin d\'import : modifié, pas en conflit (D17.INV-4)', /modifié\s+@DEMO-12 .*changé dans Xray depuis l'import ; --remplacer/.test(r.sortie), r.sortie);
+      controle('test Generic refusé avec son motif ; test introuvable avec la réponse de Xray (D17.INV-5)', /refusé\s+@DEMO-14\s+Relire les journaux : test Generic : définition en texte libre/.test(r.sortie) && /introuvable @DEMO-15\s+An issue with key 'DEMO-15' does not exist/.test(r.sortie), r.sortie);
+      const t13 = lire(d, 'DEMO-13.scenario');
+      controle('test manuel : chaque pas en « Quand <action> », avec ses données, puis « Alors <résultat attendu> », signalé en tête (D17.INV-5)', t13.startsWith('# Importé de Xray par importer.mjs (scenario-playwright 1.2.0), sans IA : chaque pas du test manuel devient « Quand <action> », avec ses données, puis « Alors <résultat attendu> ».\n# Lot : xray DEMO-13\n# Scénario : @DEMO-13, test manuel DEMO-13\n') && t13.includes('\n@DEMO-13\nScénario: Exporter les clients\n') && t13.includes('  Quand Ouvrir la page « Export »\n  Alors La page « Export » s\'affiche\n  Quand Cliquer sur le lien « Exporter en CSV », avec « format CSV ; séparateur ; »\n  Alors Le fichier « clients.csv » est téléchargé\n'), t13);
+      const appel = await lancer('importer.mjs', ['xray:DEMO-17', '--api', outils, '--adresse', base, '--dossier', join(TMP, 'r23-appel')], { env });
+      sorties.push(appel.sortie + appel.erreurs);
+      controle('pas vide, l\'appel d\'un autre test peut-être : test refusé, rien n\'est deviné (D17.INV-5)', appel.code === 1 && JSON.stringify(etatsDe(appel.sortie)) === '["refusé DEMO-17"]' && /refusé\s+@DEMO-17\s+Exporter, puis rejouer un autre test : pas 2 vide/.test(appel.sortie) && !existsSync(join(TMP, 'r23-appel')), appel.sortie + appel.erreurs);
+      const t16 = lire(d, 'DEMO-16.scenario');
+      controle('test Cucumber qui porte son titre : recopié tel quel', t16.includes('\n@DEMO-16\nScenario: Back to home\n') && t16.includes('  Given I am on the export page\n'), t16);
+      r = await lancer('importer.mjs', ['xray:DEMO-12,DEMO-13,DEMO-16', '--api', outils, '--adresse', base, '--dossier', d, '--remplacer'], { env });
+      sorties.push(r.sortie + r.erreurs);
+      const t12 = lire(d, 'DEMO-12.scenario');
+      controle('--remplacer : texte remplacé par celui de Xray, titre formé du résumé, plan du scénario, étiquettes de Jira, préconditions signalées', r.code === 0 && JSON.stringify(etatsDe(r.sortie)) === '["remplacé DEMO-12","inchangé DEMO-13","inchangé DEMO-16"]' && t12.includes('# Lot : xray DEMO-12\n') && t12.includes('# Préconditions dans Xray, non reprises : DEMO-11 ;') && t12.includes('\n@DEMO-12 @crm @non-regression\nPlan du scénario: Créer un client depuis la liste\n') && !readdirSync(d).some((f) => f.includes('.avant-')), r.sortie + t12);
+      const v = await lancer('verifier.mjs', ['DEMO-12', 'DEMO-13', 'DEMO-16'].map((n) => join(d, `${n}.scenario`)));
+      controle('les textes importés de Xray passent verifier.mjs', v.code === 0 && (v.sortie.match(/^ok /gm) ?? []).length === 3, v.sortie + v.erreurs);
+      r = await lancer('importer.mjs', ['xray:DEMO-12,DEMO-13,DEMO-14', '--api', outils, '--comparer', '--dossier', d], { env });
+      sorties.push(r.sortie + r.erreurs);
+      controle('--comparer : identiques, test refusé compté non importable, code 1', r.code === 1 && /Bilan : 2 identiques, 0 modifié, 0 nouveau, 0 disparu, 1 non importable/.test(r.sortie), r.sortie);
+      const dc = join(TMP, 'r23-dc');
+      mkdirSync(dc, { recursive: true });
+      writeFileSync(join(dc, 'DEMO-16.scenario'), `Scénario: Écrit à la main\n  Adresse : ${base}\n  Quand je regarde\n`);
+      r = await lancer('importer.mjs', ['xray-dc:DEMO-12,DEMO-13,DEMO-16,DEMO-24,DEMO-25', '--api', outils, '--adresse', base, '--dossier', dc], { env });
+      sorties.push(r.sortie + r.erreurs);
+      controle('Xray Data Center : résumé par l\'API de Jira, test par l\'API de Xray ; texte écrit à la main jamais remplacé ; demande absente, demande qui n\'est pas un test', r.code === 1 && r.sortie.includes(`Xray Data Center (${outils}) : 5 tests demandés, 3 lus (2 Cucumber, 1 manuel)`) && JSON.stringify(etatsDe(r.sortie)) === '["écrit DEMO-12","écrit DEMO-13","conflit DEMO-16","introuvable DEMO-24","introuvable DEMO-25"]' && lire(dc, 'DEMO-16.scenario').startsWith('Scénario: Écrit à la main'), r.sortie + r.erreurs);
+      controle('même test, même texte et même empreinte, par Xray Cloud ou par Xray Data Center', corps(lire(dc, 'DEMO-13.scenario')) === corps(t13) && empreinteSource(lire(dc, 'DEMO-13.scenario')) === empreinteSource(t13) && lire(dc, 'DEMO-12.scenario').includes(`# Source : ${outils}/rest/raven/1.0/api/test?keys=DEMO-12`) && lire(dc, 'DEMO-12.scenario').includes('# Préconditions dans Xray, non reprises : DEMO-11'));
+    }
+
+    // ------------------------------------------------------------------------------------------
+    scenarioRecette('R24', 'Zephyr Scale Cloud et Data Center par l\'API, en lecture seule : BDD recopié, pas à pas converti depuis le HTML, pages suivies, texte libre et appel d\'un autre cas refusés');
+    {
+      const env = { ...ENV, ...JETONS_FACTICES };
+      const d = join(TMP, 'r24');
+      let r = await lancer('importer.mjs', ['zephyr:DEMO-T1,DEMO-T2,DEMO-T3,DEMO-T4,DEMO-T9', '--api', `${outils}/v2`, '--adresse', base, '--dossier', d], { env });
+      sorties.push(r.sortie + r.erreurs);
+      controle('Zephyr Scale Cloud : cas de test et scripts lus, un état par cas, code 1 (D17.INV-1)', r.code === 1 && r.sortie.includes(`Zephyr Scale Cloud (${outils}/v2) : 5 cas de test demandés, 4 lus (1 BDD, 2 pas à pas, 1 texte libre)`) && JSON.stringify(etatsDe(r.sortie)) === '["écrit DEMO-T1","écrit DEMO-T2","refusé DEMO-T3","refusé DEMO-T4","introuvable DEMO-T9"]', r.sortie + r.erreurs);
+      const t1 = lire(d, 'DEMO-T1.scenario');
+      controle('BDD recopié sous un titre formé du nom du cas, en anglais comme ses mots-clés ; précondition signalée', t1.includes('\n@DEMO-T1 @crm\nScenario: Ouvrir le formulaire\n') && t1.includes('# Précondition dans Zephyr Scale, non reprise : « Être connecté » ;') && t1.includes('  When je clique sur le lien « Nouveau client »\n'), t1);
+      const t2 = lire(d, 'DEMO-T2.scenario');
+      controle('pas à pas : HTML ramené au texte, lignes jointes par « ; », pas sans résultat sans « Alors » (D17.INV-5)', t2.includes('  Quand Ouvrir la page Export\n  Alors La page « Export » s’affiche\n  Quand Cliquer sur le lien « Exporter en CSV », avec « format CSV »\n  Alors Le fichier est téléchargé ; Il contient deux clients\n  Quand Revenir à l’accueil\n'), t2);
+      const pages = app.etat.requetesOutils.filter((q) => q.chemin === '/v2/testcases/DEMO-T2/teststeps').map((q) => new URLSearchParams(q.requete).get('startAt'));
+      controle('pas lus page après page, jusqu\'à la dernière', JSON.stringify(pages) === '["0","2"]', JSON.stringify(pages));
+      controle('texte libre et appel d\'un autre cas refusés avec leur motif', /refusé\s+@DEMO-T3\s+Tout vérifier : script en texte libre/.test(r.sortie) && /refusé\s+@DEMO-T4\s+Appelle un autre cas : pas qui appelle le cas de test DEMO-T2/.test(r.sortie), r.sortie);
+      const dc = join(TMP, 'r24-dc');
+      r = await lancer('importer.mjs', ['zephyr-dc:DEMO-T1,DEMO-T2,DEMO-T3,DEMO-T4', '--api', outils, '--adresse', base, '--dossier', dc], { env });
+      sorties.push(r.sortie + r.erreurs);
+      controle('Zephyr Scale Data Center : mêmes états, même texte et même empreinte qu\'en Cloud', r.code === 1 && JSON.stringify(etatsDe(r.sortie)) === '["écrit DEMO-T1","écrit DEMO-T2","refusé DEMO-T3","refusé DEMO-T4"]' && corps(lire(dc, 'DEMO-T2.scenario')) === corps(t2) && empreinteSource(lire(dc, 'DEMO-T2.scenario')) === empreinteSource(t2) && lire(dc, 'DEMO-T1.scenario').includes(`# Source : ${outils}/rest/atm/1.0/testcase/DEMO-T1`), r.sortie + r.erreurs);
+      const v = await lancer('verifier.mjs', [join(d, 'DEMO-T1.scenario'), join(d, 'DEMO-T2.scenario'), join(dc, 'DEMO-T1.scenario'), join(dc, 'DEMO-T2.scenario')]);
+      controle('les textes importés de Zephyr Scale passent verifier.mjs', v.code === 0 && (v.sortie.match(/^ok /gm) ?? []).length === 4, v.sortie + v.erreurs);
+    }
+
+    // ------------------------------------------------------------------------------------------
+    scenarioRecette('R25', 'Garde des jetons et de la lecture seule : variables d\'environnement seulement, https hors du poste, aucune redirection suivie, accès refusé, lectures seules, jetons jamais affichés');
+    {
+      const env = { ...ENV, ...JETONS_FACTICES };
+      const sans = { ...ENV };
+      for (const k of Object.keys(JETONS_FACTICES)) delete sans[k];
+      const refuse = join(TMP, 'r25');
+      const avant = app.etat.requetesOutils.length;
+      const casRefus = [
+        [['xray:DEMO-12', '--api', outils, '--adresse', base, '--dossier', refuse], sans, 'variables d\'environnement XRAY_CLIENT_ID et XRAY_CLIENT_SECRET absentes'],
+        [['zephyr:DEMO-T1', '--api', `${outils}/v2`, '--adresse', base, '--dossier', refuse], sans, 'variable d\'environnement ZEPHYR_TOKEN absente'],
+        [['xray-dc:DEMO-12', '--api', outils, '--adresse', base, '--dossier', refuse], sans, 'variable d\'environnement JIRA_TOKEN absente'],
+        [['zephyr:DEMO-T1', '--api', 'http://zephyr.exemple.test/v2', '--adresse', base, '--dossier', refuse], env, 'https attendu'],
+        [['xray-dc:DEMO-12', '--api', 'https://moi:motdepasse@jira.exemple.test', '--adresse', base, '--dossier', refuse], env, 'sans identifiant'],
+        [['zephyr-dc:DEMO-T1', '--adresse', base, '--dossier', refuse], env, 'attend --api'],
+        [['xray:demo-12', '--adresse', base, '--dossier', refuse], env, 'clé de test invalide'],
+        [['xray:DEMO-12', '--api', outils, '--commentaires', '--adresse', base, '--dossier', refuse], env, 'pour une demande Jira seulement'],
+        [['zephyr:DEMO-T1', '--api', `${outils}/v2`, '--adresse', base, '--dossier', refuse], { ...env, ZEPHYR_TOKEN: 'jeton colle\tavec une tabulation' }, 'variable d\'environnement ZEPHYR_TOKEN : valeur invalide'],
+      ];
+      for (const [args, e, motif] of casRefus) {
+        const x = await lancer('importer.mjs', args, { env: e });
+        sorties.push(x.sortie + x.erreurs);
+        controle(`refus avant toute requête et toute écriture, code 2 : ${motif}`, x.code === 2 && x.erreurs.includes(motif) && !existsSync(refuse) && !x.erreurs.includes('motdepasse') && !x.erreurs.includes('jeton colle'), x.sortie + x.erreurs);
+      }
+      controle('aucune requête aux API avant ces refus (D17.INV-3)', app.etat.requetesOutils.length === avant, JSON.stringify(app.etat.requetesOutils.slice(avant)));
+      app.etat.requetesAutre.length = 0;
+      let r = await lancer('importer.mjs', ['zephyr:DEMO-T1,DEMO-T99', '--api', `${outils}/v2`, '--adresse', base, '--dossier', refuse], { env });
+      sorties.push(r.sortie + r.erreurs);
+      controle('redirection refusée : le jeton ne joint jamais l\'autre origine ; rien d\'écrit, même après une lecture réussie ; code 2 (D17.INV-3)', r.code === 2 && r.erreurs.includes(`redirection vers ${autre} refusée`) && app.etat.requetesAutre.length === 0 && !existsSync(refuse), r.sortie + r.erreurs + JSON.stringify(app.etat.requetesAutre));
+      r = await lancer('importer.mjs', ['xray-dc:DEMO-12', '--api', outils, '--adresse', base, '--dossier', refuse], { env: { ...env, JIRA_TOKEN: 'jeton-perime' } });
+      sorties.push(r.sortie + r.erreurs);
+      controle('jeton refusé par l\'API : accès refusé (401), code 2', r.code === 2 && /accès refusé \(401\) : jeton absent, expiré ou sans droit de lecture/.test(r.erreurs) && !r.erreurs.includes('jeton-perime'), r.erreurs);
+      r = await lancer('importer.mjs', ['xray:DEMO-12', '--api', outils, '--adresse', base, '--dossier', refuse], { env: { ...env, XRAY_CLIENT_SECRET: 'secret-revoque' } });
+      sorties.push(r.sortie + r.erreurs);
+      controle('identifiants de Xray Cloud refusés : accès refusé (401), code 2', r.code === 2 && /authenticate : accès refusé \(401\)/.test(r.erreurs) && !r.erreurs.includes('secret-revoque'), r.erreurs);
+      const requetes = app.etat.requetesOutils;
+      const ecritures = requetes.filter((q) => q.methode !== 'GET' && !(q.methode === 'POST' && ['/api/v2/authenticate', '/api/v2/graphql'].includes(q.chemin)));
+      const graphql = requetes.filter((q) => q.chemin === '/api/v2/graphql');
+      const lecture = (q) => { try { const b = JSON.parse(q.corps); return /^query\b/.test(b.query) && !/mutation/i.test(b.query); } catch { return false; } };
+      controle('lecture seule : des GET, et pour Xray Cloud l\'authentification et des requêtes GraphQL « query », jamais « mutation » (D17.INV-2)', requetes.length > 30 && ecritures.length === 0 && graphql.length > 0 && graphql.every(lecture), JSON.stringify(ecritures));
+      const valeurs = [...Object.values(JETONS_FACTICES), SESSION_XRAY];
+      controle('jetons dans l\'en-tête Authorization seulement, jamais dans une adresse ; secret de Xray Cloud dans l\'authentification seulement (D17.INV-3)', requetes.every((q) => !valeurs.some((j) => `${q.chemin}${q.requete}`.includes(j))) && requetes.filter((q) => q.corps.includes(JETONS_FACTICES.XRAY_CLIENT_SECRET)).every((q) => q.chemin === '/api/v2/authenticate') && requetes.filter((q) => q.autorisation).every((q) => /^Bearer \S+$/.test(q.autorisation)));
+      const ecrits = ['r23', 'r23-dc', 'r24', 'r24-dc'].flatMap((x) => (existsSync(join(TMP, x)) ? readdirSync(join(TMP, x), { withFileTypes: true }).filter((f) => f.isFile()).map((f) => readFileSync(join(TMP, x, f.name), 'utf8')) : []));
+      controle('aucun jeton affiché, ni écrit dans un texte importé (D17.INV-3)', sorties.length > 15 && !sorties.some((s) => valeurs.some((j) => s.includes(j))) && ecrits.length > 6 && !ecrits.some((t) => valeurs.some((j) => t.includes(j))));
     }
   } finally {
     await app.arreter();
