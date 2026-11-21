@@ -19,7 +19,7 @@ npm test
 - Le navigateur est celui de `SCENARIO_PLAYWRIGHT_CANAL` : Chrome par défaut ; `chromium` après `npx playwright-core install chromium`.
 - La recette travaille sur des profils et des dossiers temporaires : les profils et les résultats du dossier du skill ne sont pas touchés. Elle efface son dossier temporaire si tout passe ; sinon, ou avec `GARDER_TMP=1`, elle le garde et en donne le chemin.
 - Durée : environ deux minutes. Garde-fou : une recette bloquée s'arrête d'elle-même au bout de dix minutes, en disant dans quel scénario, son dossier temporaire gardé ; ce dossier est dit dès la première ligne.
-- Bilan attendu : `Bilan : 25 scénarios, 337 contrôles, 337 réussis, 0 en échec, 0 sautés`. Là où un serveur ne peut écouter sur 127.0.0.2, deux contrôles de R8 sont sautés.
+- Bilan attendu : `Bilan : 25 scénarios, 339 contrôles, 339 réussis, 0 en échec, 0 sautés`. Là où un serveur ne peut écouter sur 127.0.0.2, deux contrôles de R8 sont sautés.
 
 ## 2. L'application de démonstration
 
@@ -53,7 +53,7 @@ Il sert enfin, sur une quatrième origine, un Xray et un Zephyr Scale factices, 
 
 | Élément | Contenu | Sert à |
 |---|---|---|
-| `testsOutils()` | Xray : DEMO-12, Cucumber, plan de scénario en français, deux étiquettes, une précondition ; DEMO-13, manuel, deux pas, des données sur deux lignes ; DEMO-14, Generic ; DEMO-16, Cucumber qui porte son titre, en anglais ; DEMO-25, demande de Jira qui n'est pas un test. Zephyr Scale : DEMO-T1, BDD, précondition en HTML ; DEMO-T2, pas à pas en HTML, trois pas sur deux pages ; DEMO-T3, texte libre ; DEMO-T4, pas qui appelle un autre cas ; DEMO-T99, qui renvoie ailleurs | lecture des tests, conversion, refus |
+| `testsOutils()` | Xray : DEMO-12, Cucumber, plan de scénario en français, deux étiquettes, une précondition ; DEMO-13, manuel, deux pas, des données sur deux lignes ; DEMO-14, Generic ; DEMO-17, manuel, dont un pas vide ; DEMO-16, Cucumber qui porte son titre, en anglais ; DEMO-25, demande de Jira qui n'est pas un test. Zephyr Scale : DEMO-T1, BDD, précondition en HTML ; DEMO-T2, pas à pas en HTML, trois pas sur deux pages ; DEMO-T3, texte libre ; DEMO-T4, pas qui appelle un autre cas ; DEMO-T99, qui renvoie ailleurs | lecture des tests, conversion, refus |
 | Xray Cloud | `POST /api/v2/authenticate`, qui ne rend le jeton de session que pour l'identifiant et le secret attendus ; `POST /api/v2/graphql`, qui ne sert que les requêtes `query`, et rend une erreur de JQL pour DEMO-15 | authentification, lecture seule, test introuvable |
 | Xray Data Center | `GET /rest/api/2/issue/<CLÉ>` et `GET /rest/raven/1.0/api/test?keys=<CLÉ>`, avec le jeton d'accès personnel attendu | lecture par l'API de Jira et de Xray |
 | Zephyr Scale | `GET /v2/testcases/<CLÉ>`, `…/teststeps` par pages de deux, `…/testscript` ; `GET /rest/atm/1.0/testcase/<CLÉ>` ; DEMO-T99 renvoie vers la seconde origine, qui note toute requête reçue | Cloud et Data Center, pages, redirection refusée |
@@ -86,13 +86,13 @@ Il sert enfin, sur une quatrième origine, un Xray et un Zephyr Scale factices, 
 | R20 | `importer.mjs` sur des pages enregistrées : quatre textes écrits, nommés par leur étiquette ; limite signalée ; textes vérifiés, traduits, et l'un joué jusqu'au bout ; réimport sans réécriture ; `--comparer` identique ; après changements dans Jira : nouveau, modifié, identique, conflit, refusé, disparu, sans rien écrire ; étiquette reprise par le titre ; import sans `--remplacer`, puis avec : retouche gardée à côté, texte écrit à la main jamais remplacé, traduction périmée ; commentaires sur demande ; Jira Data Center ; demande sans scénario ; huit refus avant toute écriture | D16.INV-3, D16.INV-4, D16.INV-5, D16.INV-6, D3.INV-2 |
 | R21 | `importer.mjs` par l'adresse : message « À VOUS », connexion simulée, code 0 ; page enregistrée dans `jira/` et relisible ; textes et provenance ; requêtes GET seulement ; profil dédié ; session retrouvée sans message ; demande jamais affichée refusée au délai ; profil Jira invalide | D16.INV-1, D16.INV-6 |
 | R22 | Fichier `.feature` et archive : sources reconnues, clés contrôlées ; archive lue en mémoire, bornée, CRC-32 contrôlé ; identité (`@TestCaseKey=`, clé de Xray, préfixe `TEST_`, clé portée par deux titres écartée) ; export de Xray en CRLF avec BOM : textes nommés par la clé, provenance, contexte reporté, colonnes adaptées ; export de Zephyr Scale ; fichier du dépôt sans clé : étiquettes attribuées ; textes vérifiés ; réimport sans réécriture ; `--comparer` après changement ; archive : même test d'un autre chemin d'import inchangé, doublon, fichiers ignorés signalés ; fichier chiffré ; fichier sans scénario ; six refus avant toute écriture | D17.INV-1, D17.INV-4, D17.INV-6, D16.INV-5 |
-| R23 | Xray Cloud et Data Center : un état par test ; même clé d'un autre chemin d'import, modifiée, pas en conflit ; Generic refusé, test introuvable ; test manuel converti pas à pas, signalé en tête ; test Cucumber qui porte son titre ; `--remplacer` : titre formé du résumé, étiquettes de Jira, préconditions signalées ; textes vérifiés ; `--comparer` ; Data Center : texte écrit à la main jamais remplacé, demande absente, demande qui n'est pas un test ; même texte et même empreinte qu'en Cloud | D17.INV-1, D17.INV-4, D17.INV-5, D17.INV-6, D16.INV-5 |
+| R23 | Xray Cloud et Data Center : un état par test ; même clé d'un autre chemin d'import, modifiée, pas en conflit ; Generic refusé, test introuvable ; test manuel converti pas à pas, signalé en tête ; pas vide refusé ; test Cucumber qui porte son titre ; `--remplacer` : titre formé du résumé, étiquettes de Jira, préconditions signalées ; textes vérifiés ; `--comparer` ; Data Center : texte écrit à la main jamais remplacé, demande absente, demande qui n'est pas un test ; même texte et même empreinte qu'en Cloud | D17.INV-1, D17.INV-4, D17.INV-5, D17.INV-6, D16.INV-5 |
 | R24 | Zephyr Scale Cloud et Data Center : un état par cas ; BDD sous un titre en anglais, précondition signalée ; pas à pas depuis le HTML, lignes jointes, pas sans résultat ; pas lus page après page ; texte libre et appel d'un autre cas refusés ; Data Center : même texte et même empreinte ; textes vérifiés | D17.INV-1, D17.INV-5, D17.INV-6 |
 | R25 | Garde des jetons et de la lecture seule : neuf refus avant toute requête (variables absentes, valeur invalide, http hors du poste, identifiant dans l'adresse, `--api` manquant, clé invalide, option de Jira) ; redirection refusée, l'autre origine jamais jointe, rien d'écrit après une lecture réussie ; jeton et identifiants refusés (401) ; lectures seules, aucune mutation ; jetons dans l'en-tête seulement ; aucun jeton dans une sortie ni dans un texte | D17.INV-2, D17.INV-3, D16.INV-6 |
 
 ## 4. Contrôle de la recette elle-même
 
-Vingt-neuf défauts, réintroduits un à un dans le code, font chacun échouer la recette par le scénario attendu (essai du 20 novembre 2026, Node 22.23.4, Chromium 159, rejoué en entier en 1.1.1 ; essai de la 1.2.0 en cours) :
+Quarante-deux défauts, réintroduits un à un dans le code, font chacun échouer la recette par le scénario attendu (essai du 21 novembre 2026, Node 26.13.0, Chromium 159 : les quarante-deux rejoués en 1.2.0, M30 à M42 encore une fois après les deux dernières corrections) :
 
 | ID | Défaut réintroduit | Scénarios en échec | Contrôles en échec |
 |---|---|---|---|
@@ -117,14 +117,27 @@ Vingt-neuf défauts, réintroduits un à un dans le code, font chacun échouer l
 | M19 | Une étape main est acceptée sur une ligne non marquée | R3 | 1 |
 | M20 | La désignation clique l'élément désigné | R13 | 1 |
 | M21 | Les commentaires de Jira Cloud sont lus sans --commentaires | R18, R20 | 8 |
-| M22 | Un texte modifié dans Jira est remplacé sans --remplacer | R20 | 2 |
-| M23 | Un texte écrit à la main est remplacé par un texte importé du même nom | R20 | 3 |
-| M24 | Le mot-clé anglais Given n'est pas reconnu | R1, R19, R20 | 4 |
-| M25 | Le contexte de la fonctionnalité n'est pas reporté dans ses scénarios | R19 | 6 |
-| M26 | L'étiquette attribuée par un import précédent n'est pas reprise par le titre | R20, R21 | 7 |
+| M22 | Un texte modifié dans Jira est remplacé sans --remplacer | R20, R23 | 5 |
+| M23 | Un texte écrit à la main est remplacé par un texte importé du même nom | R20, R23 | 4 |
+| M24 | Le mot-clé anglais Given n'est pas reconnu | R1, R19, R20, R22, R23 | 7 |
+| M25 | Le contexte de la fonctionnalité n'est pas reporté dans ses scénarios | R19, R22 | 8 |
+| M26 | L'étiquette attribuée par un import précédent n'est pas reprise par le titre | R20, R21, R22 | 9 |
 | M27 | Un texte retouché depuis l'import est remplacé sans être gardé | R20 | 1 |
 | M28 | Une table de données d'étape est ignorée au lieu d'être refusée | R19, R20 | 4 |
 | M29 | L'import par l'adresse saisit et envoie le formulaire de connexion | R21 | 1 |
+| M30 | Une requête à l'API suit une redirection | R25 | 1 |
+| M31 | Un jeton passe en clair, en http, hors du poste | R25 | 1 |
+| M32 | Un message d'erreur affiche le jeton | R25 | 3 |
+| M33 | Le jeton passe dans l'adresse de la requête | R25 | 1 |
+| M34 | L'import écrit dans Jira : une étiquette ajoutée au test | R25 | 1 |
+| M35 | Une requête GraphQL de mutation part vers Xray Cloud | R25 | 1 |
+| M36 | Le résultat attendu d'un pas manuel est perdu | R23, R24 | 2 |
+| M37 | L'étiquette @TestCaseKey= de Zephyr Scale n'est pas reconnue | R22 | 2 |
+| M38 | Une clé portée par des scénarios de titres différents devient leur identité | R22 | 5 |
+| M39 | Le même test, lu d'un autre chemin d'import, est en conflit avec son texte | R22, R23 | 5 |
+| M40 | Le CRC-32 d'un fichier de l'archive n'est pas contrôlé | R22 | 7 |
+| M41 | Les textes d'un autre lot sont pris pour ceux du lot importé | R22, R23 | 6 |
+| M42 | Seule la première page des pas de Zephyr Scale est lue | R24 | 3 |
 
 Chaque défaut a été retiré après son essai ; la recette du code publié passe en entier.
 
@@ -487,6 +500,10 @@ export function testsOutils() {
       'DEMO-16': {
         genre: 'Gherkin', nom: 'Cucumber', resume: 'Retour à l\'accueil', etiquettes: [], preconditions: [],
         gherkin: 'Scenario: Back to home\n  Given I am on the export page\n  When I click the link "Accueil"\n  Then I see the heading "Démonstration"\n',
+      },
+      'DEMO-17': {
+        genre: 'Steps', nom: 'Manual', resume: 'Exporter, puis rejouer un autre test', etiquettes: [], preconditions: [],
+        pas: [{ action: 'Ouvrir la page « Export »', data: '', result: '' }, { action: '', data: '', result: '' }],
       },
       'DEMO-25': { jiraSeulement: true, resume: 'Une histoire, pas un test', etiquettes: [] },
     },
@@ -1766,6 +1783,9 @@ Fonctionnalité: Clients
       controle('test Generic refusé avec son motif ; test introuvable avec la réponse de Xray (D17.INV-5)', /refusé\s+@DEMO-14\s+Relire les journaux : test Generic : définition en texte libre/.test(r.sortie) && /introuvable @DEMO-15\s+An issue with key 'DEMO-15' does not exist/.test(r.sortie), r.sortie);
       const t13 = lire(d, 'DEMO-13.scenario');
       controle('test manuel : chaque pas en « Quand <action> », avec ses données, puis « Alors <résultat attendu> », signalé en tête (D17.INV-5)', t13.startsWith('# Importé de Xray par importer.mjs (scenario-playwright 1.2.0), sans IA : chaque pas du test manuel devient « Quand <action> », avec ses données, puis « Alors <résultat attendu> ».\n# Lot : xray DEMO-13\n# Scénario : @DEMO-13, test manuel DEMO-13\n') && t13.includes('\n@DEMO-13\nScénario: Exporter les clients\n') && t13.includes('  Quand Ouvrir la page « Export »\n  Alors La page « Export » s\'affiche\n  Quand Cliquer sur le lien « Exporter en CSV », avec « format CSV ; séparateur ; »\n  Alors Le fichier « clients.csv » est téléchargé\n'), t13);
+      const appel = await lancer('importer.mjs', ['xray:DEMO-17', '--api', outils, '--adresse', base, '--dossier', join(TMP, 'r23-appel')], { env });
+      sorties.push(appel.sortie + appel.erreurs);
+      controle('pas vide, l\'appel d\'un autre test peut-être : test refusé, rien n\'est deviné (D17.INV-5)', appel.code === 1 && JSON.stringify(etatsDe(appel.sortie)) === '["refusé DEMO-17"]' && /refusé\s+@DEMO-17\s+Exporter, puis rejouer un autre test : pas 2 vide/.test(appel.sortie) && !existsSync(join(TMP, 'r23-appel')), appel.sortie + appel.erreurs);
       const t16 = lire(d, 'DEMO-16.scenario');
       controle('test Cucumber qui porte son titre : recopié tel quel', t16.includes('\n@DEMO-16\nScenario: Back to home\n') && t16.includes('  Given I am on the export page\n'), t16);
       r = await lancer('importer.mjs', ['xray:DEMO-12,DEMO-13,DEMO-16', '--api', outils, '--adresse', base, '--dossier', d, '--remplacer'], { env });

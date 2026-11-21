@@ -29,7 +29,7 @@ Lis `SKILL.md`, `manifest.json`, puis les modules actifs dans l'ordre indiqué p
 1. Depuis le dossier du skill, écris les fichiers exécutables à partir des blocs annotés des modules, par la commande d'extraction du module `execution`, § 8. Elle se colle telle quelle dans bash, CMD ou PowerShell. Ne recopie pas les fichiers à la main.
 2. La commande vérifie elle-même leurs empreintes : elle écrit `conforme` pour chaque fichier, ou `ECART` ou `ABSENT`, et sort alors avec le code 1. Un écart arrête l'installation.
 3. Vérifie la version de Node (22 ou plus récent), puis installe la dépendance : `npm ci`. Elle ne télécharge aucun navigateur ; Chrome doit être installé sur le poste (module `execution`, § 2).
-4. Lance la recette : `npm test` ; sous Linux sans écran, `xvfb-run -a npm test`. Attendu : 25 scénarios, 337 contrôles réussis, aucun échec ; là où l'adresse 127.0.0.2 n'est pas disponible, deux contrôles sont sautés. Rapporte au développeur le bilan ; un échec arrête l'installation et se rapporte tel quel, sans modifier les scripts.
+4. Lance la recette : `npm test` ; sous Linux sans écran, `xvfb-run -a npm test`. Attendu : 25 scénarios, 339 contrôles réussis, aucun échec ; là où l'adresse 127.0.0.2 n'est pas disponible, deux contrôles sont sautés. Rapporte au développeur le bilan ; un échec arrête l'installation et se rapporte tel quel, sans modifier les scripts.
 
 ## Étape 3 : l'agent et les commandes
 
@@ -317,7 +317,7 @@ Points d'extension, actifs depuis la version indiquée :
 
 ## 8. Critères d'acceptation
 
-- La recette du module `recette` passe en entier : `npm test`, 25 scénarios et 337 contrôles ; là où l'adresse 127.0.0.2 n'est pas disponible, deux contrôles de R8 sont sautés.
+- La recette du module `recette` passe en entier : `npm test`, 25 scénarios et 339 contrôles ; là où l'adresse 127.0.0.2 n'est pas disponible, deux contrôles de R8 sont sautés.
 - La recette passe en intégration continue sur `ubuntu-latest` et `windows-latest`, avec Node 22, 24 et 26, après extraction par la commande du module `execution`, § 8, sous bash et sous CMD, puis `npm ci`, avec le Chrome stable des images GitHub.
 - Les fichiers tirés des modules ont exactement les empreintes de la table du module `execution`, § 8.
 - Les scénarios A1 à A10 du module `agent` sont rejoués avec le développeur avant que l'agent joue un scénario sur une application réelle.
@@ -408,7 +408,7 @@ Points d'extension, actifs depuis la version indiquée :
 - **D17.INV-2** : les API ne sont que lues : des requêtes GET, et pour Xray Cloud l'authentification et des requêtes GraphQL `query`, jamais `mutation` ; le skill n'écrit rien dans Jira, Xray ni Zephyr Scale ; toutes les lectures précèdent toute écriture de texte.
 - **D17.INV-3** : un jeton se lit dans sa variable d'environnement seulement, `XRAY_CLIENT_ID` et `XRAY_CLIENT_SECRET`, `ZEPHYR_TOKEN` ou `JIRA_TOKEN` ; il ne sort que dans l'en-tête `Authorization` des requêtes vers l'origine de l'API désignée, l'identifiant et le secret de Xray Cloud dans le corps de son authentification, jamais dans une adresse, un message ou un fichier ; l'adresse de l'API est en https, hors du poste même, sans identifiant, paramètre ni fragment ; aucune redirection n'est suivie ; une variable absente ou une adresse refusée arrêtent l'import avant toute requête.
 - **D17.INV-4** : la clé du test est l'identité de son scénario : clé demandée à l'API ; dans un fichier, étiquette `@TestCaseKey=` de Zephyr Scale, sinon première étiquette propre au scénario qui est une clé de Jira, préfixe `TEST_` retiré, sauf si un scénario d'un autre titre la porte aussi, sinon étiquette `<CLÉ>-Snn` ; à défaut, une étiquette `<fichier>-Snn` est reprise par le titre ou attribuée comme en D16.INV-4. Un texte importé d'une autre source sous la même identité est celui du même scénario : il se compare et se remplace selon D16.INV-5, jamais en conflit.
-- **D17.INV-5** : un test Cucumber ou BDD est recopié tel qu'écrit, sous un titre formé de son résumé quand ses étapes n'en ont pas ; un test manuel devient, pas à pas, « Quand <action> », avec ses données, puis « Alors <résultat attendu> », une partie de plusieurs lignes jointe par « ; », une partie vide omise, la conversion dite dès la première ligne du texte ; un test générique, en texte libre, qui appelle un autre cas, sans résumé ou sans pas est refusé avec son motif ; les préconditions sont signalées en tête du texte, non reprises.
+- **D17.INV-5** : un test Cucumber ou BDD est recopié tel qu'écrit, sous un titre formé de son résumé quand ses étapes n'en ont pas ; un test manuel devient, pas à pas, « Quand <action> », avec ses données, puis « Alors <résultat attendu> », une partie de plusieurs lignes jointe par « ; », une partie vide omise, la conversion dite dès la première ligne du texte ; un test générique, en texte libre, qui appelle un autre cas, sans résumé, sans pas ou avec un pas vide est refusé avec son motif ; les préconditions sont signalées en tête du texte, non reprises.
 - **D17.INV-6** : un texte importé hors de Jira commence par sa provenance : l'outil ou le fichier dont il vient et ce que l'import en a fait, recopie ou conversion d'un test manuel ; son lot (fichier, archive ou test) ; l'étiquette et la provenance du scénario ; l'adresse de l'API qui l'a rendu, ou le chemin du fichier ou de l'archive et son empreinte sha256 ; la date ; l'empreinte de la source et celle du texte importé ; puis ses notes ; un même test donne le même texte et la même empreinte par Xray Cloud ou Data Center, par Zephyr Scale Cloud ou Data Center.
 
 ## 10. Références
@@ -445,7 +445,7 @@ La version 1.2.0 ouvre la feuille de route qui répond à la demande du dévelop
 
 ## 12. Journal de révision
 
-**1.2.0** (2026-11-21) : cas de test de Xray et de Zephyr Scale, et fichiers .feature. Dimension D17 active, module `cas-de-test` : `scripts/cas.mjs` ; `importer.mjs` lit aussi un fichier `.feature`, une archive `.zip` d'un export, lue en mémoire, et les tests de Xray Cloud et Data Center et de Zephyr Scale Cloud et Data Center par leur API, en lecture seule, le jeton pris dans une variable d'environnement, en https, sans redirection suivie ; test Cucumber ou BDD recopié, test manuel converti pas à pas en « Quand » puis « Alors », test générique ou en texte libre refusé, préconditions signalées ; la clé du test pour identité, d'un chemin d'import à l'autre ; provenance par lot (D17.INV-1 à D17.INV-6). D16.INV-5 et D16.INV-6 étendus aux nouvelles sources ; agent : protocole d'import des cas de test, D10.INV-5, scénarios A9 et A10, commande `/scenario:importer`. Recette de 25 scénarios (337 contrôles), avec un Xray et un Zephyr Scale factices : R22 à R25 ; essai des défauts réintroduits en cours. Archive : `archives/SKILL-v1.1.1.md`.
+**1.2.0** (2026-11-21) : cas de test de Xray et de Zephyr Scale, et fichiers .feature. Dimension D17 active, module `cas-de-test` : `scripts/cas.mjs` ; `importer.mjs` lit aussi un fichier `.feature`, une archive `.zip` d'un export, lue en mémoire, et les tests de Xray Cloud et Data Center et de Zephyr Scale Cloud et Data Center par leur API, en lecture seule, le jeton pris dans une variable d'environnement, en https, sans redirection suivie ; test Cucumber ou BDD recopié, test manuel converti pas à pas en « Quand » puis « Alors », test générique ou en texte libre refusé, préconditions signalées ; la clé du test pour identité, d'un chemin d'import à l'autre ; provenance par lot (D17.INV-1 à D17.INV-6). D16.INV-5 et D16.INV-6 étendus aux nouvelles sources ; agent : protocole d'import des cas de test, D10.INV-5, scénarios A9 et A10, commande `/scenario:importer`. Recette de 25 scénarios (339 contrôles), avec un Xray et un Zephyr Scale factices : R22 à R25 ; 42 défauts réintroduits, tous rejoués. Archive : `archives/SKILL-v1.1.1.md`.
 
 **1.1.1** (2026-11-20) : correctif. La recette passait par intermittence dans la CI, toujours sous Node 24 : un premier lancement du navigateur lent dépassait les délais courts de R5, R6, R8 et R11, ou ceux des preuves d'un échec, et une fois sous Windows la recette s'est bloquée jusqu'au délai du job. Les preuves d'un échec, capture et instantané ARIA, attendent 10 s au plus, au lieu de 5 et 3 ; la durée d'une étape en échec s'arrête à l'échec, sans le temps de ses preuves. Dans la recette, les délais courts ne portent plus que sur les étapes dont ils sont l'objet, et R5 prend le délai par défaut, 10 s ; la recette dit son dossier temporaire dès le début, ferme ses propres navigateurs sans les attendre plus de 15 s, lit la sortie d'un script 2 s au plus après sa fin, et s'arrête d'elle-même au bout de dix minutes en disant dans quel scénario. Le workflow affiche la sortie au fil de l'eau, arrête une recette bloquée au bout de douze minutes et garde en artefact le dossier temporaire d'une recette en échec, sans les profils du navigateur. Aucune dimension ni aucun invariant modifié ; recette de 21 scénarios (279 contrôles), 29 défauts réintroduits, tous rejoués. Archive : `archives/SKILL-v1.1.0.md`.
 
@@ -570,7 +570,7 @@ Les options, la sortie et les codes de `importer.mjs` sont au module `jira`, § 
 | `scripts/texte.mjs` | `texte`, § 12 | `142538a9ec908d180211120d458de8a01d7cfe14b3802920c02ceb5fb97fda28` |
 | `scripts/jira.mjs` | `jira`, § 9 | `51cf7985eff34690cd3cb2d74081c5a957b8572bfe4335ba9f49308d10d1b928` |
 | `scripts/importer.mjs` | `jira`, § 10 | `6e80f46fe68cf5de006e358dc1ad711950d64d4fa68c5e2e69e7cf2fd64f878b` |
-| `scripts/cas.mjs` | `cas-de-test`, § 10 | `58787a17e56ecdb38ff63e86e170f56fad16eb1e4cf5cf387b41b21eaa5347b6` |
+| `scripts/cas.mjs` | `cas-de-test`, § 10 | `6ac3bc9b69028f625b0cb3621370ef227c0af0ab8b0ada9d086dfdd976553739` |
 | `scripts/toml.mjs` | `scenario`, § 6 | `3f1667795f0043a854d27de88da605af6ce0d7647bd0be7cae734a90434ec888` |
 | `scripts/scenario.mjs` | `scenario`, § 7 | `a8584772b8f8f3b9882cfc223ec60724517c9ea689eec53509946570dd489f29` |
 | `scripts/cibles.mjs` | `cibles`, § 6 | `a2d27f8f345099f8e1299e8ad88d3091aeb8c889eca709cb2d25aa9073a1a8f4` |
@@ -583,13 +583,13 @@ Les options, la sortie et les codes de `importer.mjs` sont au module `jira`, § 
 | `commandes/scenario/traduire.toml` | `agent`, § 7 | `bb423488c3544fd22e2ae0837c10772786e43c8de6c62b8dfda72b9f34f06986` |
 | `commandes/scenario/jouer.toml` | `agent`, § 7 | `2be21d89882011e10bf71c5a538de219a88ad69cf00b00d4d4ce2df3f6097758` |
 | `commandes/scenario/designer.toml` | `agent`, § 7 | `7b3c86484ddceb95158969a385bdb0859f010513b2705736c70498791471569e` |
-| `tests/application-demo.mjs` | `recette`, § 6 | `7d60bb26eb6baec676f6c319f86c8b82fe0aa8e55d036529280b46061499602a` |
-| `tests/run-tests.mjs` | `recette`, § 6 | `8010e62531fef18d0fd20b40a26281fc99664c6b4d70aa8ac3d5c000e420e50a` |
+| `tests/application-demo.mjs` | `recette`, § 6 | `17bdd397df13987f63cfca996dbab9a26a5e6bad6fd2b4eee62e060efde55185` |
+| `tests/run-tests.mjs` | `recette`, § 6 | `948948ab723b14aaacccb530be8384869833a7c805a01ff1a55b5ea85f0d28e1` |
 
 Depuis le dossier du skill, cette commande d'une ligne écrit les vingt-quatre fichiers, compare leurs empreintes à celles du tableau et sort avec le code 1 au moindre écart. Elle ne contient ni `$`, ni accent grave, ni `!`, ni `%`, ni guillemet intérieur : elle se colle telle quelle dans bash, zsh, CMD ou PowerShell, et dans un fichier `.cmd`. Elle lit aussi des modules aux fins de ligne CRLF.
 
 ```text
-node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'package.json': '74f2c41aa5e79b01fdcd5cd9ced7c6c3547d24a8f2faee8774e9ed0330fa28f3', 'package-lock.json': 'f27ac2c42e7850c9894e1416bc5cd459676e4d02df190de1396275d3d3db2506', '.gitignore': '03bf7f97f17a0d1abb005b6480ec3b0f06a0b9c29c1d1f83131209b52b888a7e', 'scripts/jouer.mjs': '88f507ede8d578dd8d31181466f83cc08ef9e1ce54764db35d60ff24277250d0', 'scripts/verifier.mjs': 'e569372af62ff4c95a5042279114892d3bd85e8759e14f57f09b5cc6de3489e3', 'scripts/traduire.mjs': '0a537b3d057ffba85162c20d6013a9766e92764c473258a52d98c42194ad06e5', 'scripts/texte.mjs': '142538a9ec908d180211120d458de8a01d7cfe14b3802920c02ceb5fb97fda28', 'scripts/jira.mjs': '51cf7985eff34690cd3cb2d74081c5a957b8572bfe4335ba9f49308d10d1b928', 'scripts/importer.mjs': '6e80f46fe68cf5de006e358dc1ad711950d64d4fa68c5e2e69e7cf2fd64f878b', 'scripts/cas.mjs': '58787a17e56ecdb38ff63e86e170f56fad16eb1e4cf5cf387b41b21eaa5347b6', 'scripts/toml.mjs': '3f1667795f0043a854d27de88da605af6ce0d7647bd0be7cae734a90434ec888', 'scripts/scenario.mjs': 'a8584772b8f8f3b9882cfc223ec60724517c9ea689eec53509946570dd489f29', 'scripts/cibles.mjs': 'a2d27f8f345099f8e1299e8ad88d3091aeb8c889eca709cb2d25aa9073a1a8f4', 'scripts/moteur.mjs': 'aa4fb1aaeea973c759f33465d382e47c654bfd90060c9603c807f915de6e5cdb', 'scripts/session.mjs': '15ccd88f483d2a798fa798d93f87ba47b1625ca6be7767c36b3d93abebb1849b', 'scripts/rapport.mjs': 'c409f50d3a00fc52d14a75a58c8b8226b317bfbe943af5026a069e812010b826', 'scripts/designer.mjs': 'b5ad94fc58ee043fddf043ff97a1f46b980a99843a5323d88f188b64ff0477ab', 'agent/pilote-scenario.md': '959de5dbd10544180b1c0bfd70662bcc2e164670b51101203639258877bd0496', 'commandes/scenario/importer.toml': '995a6c535e7225018a8c45321e3d205963622e22bb79b7d2d2c221d21d002b65', 'commandes/scenario/traduire.toml': 'bb423488c3544fd22e2ae0837c10772786e43c8de6c62b8dfda72b9f34f06986', 'commandes/scenario/jouer.toml': '2be21d89882011e10bf71c5a538de219a88ad69cf00b00d4d4ce2df3f6097758', 'commandes/scenario/designer.toml': '7b3c86484ddceb95158969a385bdb0859f010513b2705736c70498791471569e', 'tests/application-demo.mjs': '7d60bb26eb6baec676f6c319f86c8b82fe0aa8e55d036529280b46061499602a', 'tests/run-tests.mjs': '8010e62531fef18d0fd20b40a26281fc99664c6b4d70aa8ac3d5c000e420e50a' }; const vus = new Set(); let ecarts = 0; for (const module of ['modules/execution/SKILL.md', 'modules/texte/SKILL.md', 'modules/jira/SKILL.md', 'modules/cas-de-test/SKILL.md', 'modules/scenario/SKILL.md', 'modules/cibles/SKILL.md', 'modules/actions/SKILL.md', 'modules/session/SKILL.md', 'modules/preuves/SKILL.md', 'modules/designer/SKILL.md', 'modules/agent/SKILL.md', 'modules/recette/SKILL.md']) { const texte = fs.readFileSync(module, 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); vus.add(m[1]); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (conforme === false) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } } for (const f of Object.keys(attendu)) if (vus.has(f) === false) { ecarts++; console.log('ABSENT    ' + f); } if (ecarts > 0) process.exitCode = 1;"
+node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'package.json': '74f2c41aa5e79b01fdcd5cd9ced7c6c3547d24a8f2faee8774e9ed0330fa28f3', 'package-lock.json': 'f27ac2c42e7850c9894e1416bc5cd459676e4d02df190de1396275d3d3db2506', '.gitignore': '03bf7f97f17a0d1abb005b6480ec3b0f06a0b9c29c1d1f83131209b52b888a7e', 'scripts/jouer.mjs': '88f507ede8d578dd8d31181466f83cc08ef9e1ce54764db35d60ff24277250d0', 'scripts/verifier.mjs': 'e569372af62ff4c95a5042279114892d3bd85e8759e14f57f09b5cc6de3489e3', 'scripts/traduire.mjs': '0a537b3d057ffba85162c20d6013a9766e92764c473258a52d98c42194ad06e5', 'scripts/texte.mjs': '142538a9ec908d180211120d458de8a01d7cfe14b3802920c02ceb5fb97fda28', 'scripts/jira.mjs': '51cf7985eff34690cd3cb2d74081c5a957b8572bfe4335ba9f49308d10d1b928', 'scripts/importer.mjs': '6e80f46fe68cf5de006e358dc1ad711950d64d4fa68c5e2e69e7cf2fd64f878b', 'scripts/cas.mjs': '6ac3bc9b69028f625b0cb3621370ef227c0af0ab8b0ada9d086dfdd976553739', 'scripts/toml.mjs': '3f1667795f0043a854d27de88da605af6ce0d7647bd0be7cae734a90434ec888', 'scripts/scenario.mjs': 'a8584772b8f8f3b9882cfc223ec60724517c9ea689eec53509946570dd489f29', 'scripts/cibles.mjs': 'a2d27f8f345099f8e1299e8ad88d3091aeb8c889eca709cb2d25aa9073a1a8f4', 'scripts/moteur.mjs': 'aa4fb1aaeea973c759f33465d382e47c654bfd90060c9603c807f915de6e5cdb', 'scripts/session.mjs': '15ccd88f483d2a798fa798d93f87ba47b1625ca6be7767c36b3d93abebb1849b', 'scripts/rapport.mjs': 'c409f50d3a00fc52d14a75a58c8b8226b317bfbe943af5026a069e812010b826', 'scripts/designer.mjs': 'b5ad94fc58ee043fddf043ff97a1f46b980a99843a5323d88f188b64ff0477ab', 'agent/pilote-scenario.md': '959de5dbd10544180b1c0bfd70662bcc2e164670b51101203639258877bd0496', 'commandes/scenario/importer.toml': '995a6c535e7225018a8c45321e3d205963622e22bb79b7d2d2c221d21d002b65', 'commandes/scenario/traduire.toml': 'bb423488c3544fd22e2ae0837c10772786e43c8de6c62b8dfda72b9f34f06986', 'commandes/scenario/jouer.toml': '2be21d89882011e10bf71c5a538de219a88ad69cf00b00d4d4ce2df3f6097758', 'commandes/scenario/designer.toml': '7b3c86484ddceb95158969a385bdb0859f010513b2705736c70498791471569e', 'tests/application-demo.mjs': '17bdd397df13987f63cfca996dbab9a26a5e6bad6fd2b4eee62e060efde55185', 'tests/run-tests.mjs': '948948ab723b14aaacccb530be8384869833a7c805a01ff1a55b5ea85f0d28e1' }; const vus = new Set(); let ecarts = 0; for (const module of ['modules/execution/SKILL.md', 'modules/texte/SKILL.md', 'modules/jira/SKILL.md', 'modules/cas-de-test/SKILL.md', 'modules/scenario/SKILL.md', 'modules/cibles/SKILL.md', 'modules/actions/SKILL.md', 'modules/session/SKILL.md', 'modules/preuves/SKILL.md', 'modules/designer/SKILL.md', 'modules/agent/SKILL.md', 'modules/recette/SKILL.md']) { const texte = fs.readFileSync(module, 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); vus.add(m[1]); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (conforme === false) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } } for (const f of Object.keys(attendu)) if (vus.has(f) === false) { ecarts++; console.log('ABSENT    ' + f); } if (ecarts > 0) process.exitCode = 1;"
 ```
 
 Puis, depuis le même dossier : `npm ci`, et la recette, `npm test` (sous Linux sans écran, `xvfb-run -a npm test`).
@@ -2595,6 +2595,7 @@ Chaque texte importé appartient à un lot : sa demande pour Jira ; ici le fichi
 | manuel (Xray), pas à pas (Zephyr Scale) | chaque pas devient `Quand <action>`, avec ses données, `, avec « <données> »`, puis `Alors <résultat attendu>` ; une partie de plusieurs lignes tient sur une, ses lignes séparées par « ; » ; le HTML de Zephyr Scale est ramené au texte ; une partie vide est omise ; l'en-tête le dit dès sa première ligne |
 | Generic (Xray), texte libre (Zephyr Scale) | refusé : pas d'étapes à recopier ; le test s'écrit en Cucumber, BDD ou pas à pas dans l'outil |
 | pas qui appelle un autre cas (Zephyr Scale) | refusé : l'import ne le déplie pas |
+| pas vide, sans action, données ni résultat attendu (dans Xray, l'appel d'un autre test) | refusé : rien n'est deviné |
 | sans résumé, manuel sans pas | refusé |
 
 La phrase d'un pas reste telle qu'écrite : « Quand » et « Alors » ne disent pas la langue du test. Un test manuel converti se relit avec le développeur avant sa traduction (module `agent`). Les préconditions sont signalées en tête du texte, non reprises : celles de Xray par leurs clés, celle de Zephyr Scale par son texte ; elles se jouent avant le scénario, ou le développeur les reporte dans le texte. Un export `.feature` de Xray, lui, reprend les préconditions Cucumber en `Background`, reporté en tête des étapes (module `jira`, § 4).
@@ -2916,7 +2917,6 @@ export const REQUETE_XRAY = `query Tests($jql: String!, $limit: Int!) {
       testType { name kind }
       steps { action data result }
       gherkin
-      unstructured
       preconditions(limit: 20) { total results { jira(fields: ["key"]) } }
       jira(fields: ["key", "summary", "labels"])
     }
@@ -3115,8 +3115,8 @@ function scenarioVide(t, provenance, etiquettes) {
 
 /**
  * Scénarios des tests lus par l'API, un par test, identifiés par la clé du test (D17.INV-4) : { ...scénario,
- * cleTest, lot, source, notes, manuel }. Un test sans résumé, un test manuel sans pas, un test refusé par
- * sa lecture gardent leur motif.
+ * cleTest, lot, source, notes, manuel }. Un test sans résumé, un test manuel sans pas ou avec un pas vide
+ * (dans Xray, l'appel d'un autre test), un test refusé par sa lecture gardent leur motif.
  */
 export function scenariosDesTests(tests, cleOutil) {
   const outil = OUTILS[cleOutil];
@@ -3128,7 +3128,9 @@ export function scenariosDesTests(tests, cleOutil) {
     else if (t.genre === 'gherkin') sc = gherkinEnScenario(t, provenance, etiquettes);
     else if (t.genre === 'pas') {
       const etapes = pasEnEtapes(t.pas);
-      sc = { ...scenarioVide(t, provenance, etiquettes), etapes, manuel: true, refus: etapes.length ? null : `${outil.test} manuel sans pas` };
+      const vide = t.pas.findIndex((p) => [p.action, p.donnees, p.attendu].every((x) => lignesJointes(String(x ?? '').split(/\r?\n/)) === ''));
+      const refus = vide >= 0 ? `pas ${vide + 1} vide, sans action, données ni résultat attendu, l'appel d'un autre test peut-être : rien n'est deviné` : etapes.length ? null : `${outil.test} manuel sans pas`;
+      sc = { ...scenarioVide(t, provenance, etiquettes), etapes, manuel: true, refus };
     } else sc = { ...scenarioVide(t, provenance, etiquettes), refus: t.motif };
     if (!sc.empreinte) sc.empreinte = empreinteJira(sc);
     return Object.assign(sc, { cleTest: t.cle, lot: `${outil.lot} ${t.cle}`, source: t.source, notes: t.notes ?? [] });
@@ -5560,7 +5562,7 @@ npm test
 - Le navigateur est celui de `SCENARIO_PLAYWRIGHT_CANAL` : Chrome par défaut ; `chromium` après `npx playwright-core install chromium`.
 - La recette travaille sur des profils et des dossiers temporaires : les profils et les résultats du dossier du skill ne sont pas touchés. Elle efface son dossier temporaire si tout passe ; sinon, ou avec `GARDER_TMP=1`, elle le garde et en donne le chemin.
 - Durée : environ deux minutes. Garde-fou : une recette bloquée s'arrête d'elle-même au bout de dix minutes, en disant dans quel scénario, son dossier temporaire gardé ; ce dossier est dit dès la première ligne.
-- Bilan attendu : `Bilan : 25 scénarios, 337 contrôles, 337 réussis, 0 en échec, 0 sautés`. Là où un serveur ne peut écouter sur 127.0.0.2, deux contrôles de R8 sont sautés.
+- Bilan attendu : `Bilan : 25 scénarios, 339 contrôles, 339 réussis, 0 en échec, 0 sautés`. Là où un serveur ne peut écouter sur 127.0.0.2, deux contrôles de R8 sont sautés.
 
 ## 2. L'application de démonstration
 
@@ -5594,7 +5596,7 @@ Il sert enfin, sur une quatrième origine, un Xray et un Zephyr Scale factices, 
 
 | Élément | Contenu | Sert à |
 |---|---|---|
-| `testsOutils()` | Xray : DEMO-12, Cucumber, plan de scénario en français, deux étiquettes, une précondition ; DEMO-13, manuel, deux pas, des données sur deux lignes ; DEMO-14, Generic ; DEMO-16, Cucumber qui porte son titre, en anglais ; DEMO-25, demande de Jira qui n'est pas un test. Zephyr Scale : DEMO-T1, BDD, précondition en HTML ; DEMO-T2, pas à pas en HTML, trois pas sur deux pages ; DEMO-T3, texte libre ; DEMO-T4, pas qui appelle un autre cas ; DEMO-T99, qui renvoie ailleurs | lecture des tests, conversion, refus |
+| `testsOutils()` | Xray : DEMO-12, Cucumber, plan de scénario en français, deux étiquettes, une précondition ; DEMO-13, manuel, deux pas, des données sur deux lignes ; DEMO-14, Generic ; DEMO-17, manuel, dont un pas vide ; DEMO-16, Cucumber qui porte son titre, en anglais ; DEMO-25, demande de Jira qui n'est pas un test. Zephyr Scale : DEMO-T1, BDD, précondition en HTML ; DEMO-T2, pas à pas en HTML, trois pas sur deux pages ; DEMO-T3, texte libre ; DEMO-T4, pas qui appelle un autre cas ; DEMO-T99, qui renvoie ailleurs | lecture des tests, conversion, refus |
 | Xray Cloud | `POST /api/v2/authenticate`, qui ne rend le jeton de session que pour l'identifiant et le secret attendus ; `POST /api/v2/graphql`, qui ne sert que les requêtes `query`, et rend une erreur de JQL pour DEMO-15 | authentification, lecture seule, test introuvable |
 | Xray Data Center | `GET /rest/api/2/issue/<CLÉ>` et `GET /rest/raven/1.0/api/test?keys=<CLÉ>`, avec le jeton d'accès personnel attendu | lecture par l'API de Jira et de Xray |
 | Zephyr Scale | `GET /v2/testcases/<CLÉ>`, `…/teststeps` par pages de deux, `…/testscript` ; `GET /rest/atm/1.0/testcase/<CLÉ>` ; DEMO-T99 renvoie vers la seconde origine, qui note toute requête reçue | Cloud et Data Center, pages, redirection refusée |
@@ -5627,13 +5629,13 @@ Il sert enfin, sur une quatrième origine, un Xray et un Zephyr Scale factices, 
 | R20 | `importer.mjs` sur des pages enregistrées : quatre textes écrits, nommés par leur étiquette ; limite signalée ; textes vérifiés, traduits, et l'un joué jusqu'au bout ; réimport sans réécriture ; `--comparer` identique ; après changements dans Jira : nouveau, modifié, identique, conflit, refusé, disparu, sans rien écrire ; étiquette reprise par le titre ; import sans `--remplacer`, puis avec : retouche gardée à côté, texte écrit à la main jamais remplacé, traduction périmée ; commentaires sur demande ; Jira Data Center ; demande sans scénario ; huit refus avant toute écriture | D16.INV-3, D16.INV-4, D16.INV-5, D16.INV-6, D3.INV-2 |
 | R21 | `importer.mjs` par l'adresse : message « À VOUS », connexion simulée, code 0 ; page enregistrée dans `jira/` et relisible ; textes et provenance ; requêtes GET seulement ; profil dédié ; session retrouvée sans message ; demande jamais affichée refusée au délai ; profil Jira invalide | D16.INV-1, D16.INV-6 |
 | R22 | Fichier `.feature` et archive : sources reconnues, clés contrôlées ; archive lue en mémoire, bornée, CRC-32 contrôlé ; identité (`@TestCaseKey=`, clé de Xray, préfixe `TEST_`, clé portée par deux titres écartée) ; export de Xray en CRLF avec BOM : textes nommés par la clé, provenance, contexte reporté, colonnes adaptées ; export de Zephyr Scale ; fichier du dépôt sans clé : étiquettes attribuées ; textes vérifiés ; réimport sans réécriture ; `--comparer` après changement ; archive : même test d'un autre chemin d'import inchangé, doublon, fichiers ignorés signalés ; fichier chiffré ; fichier sans scénario ; six refus avant toute écriture | D17.INV-1, D17.INV-4, D17.INV-6, D16.INV-5 |
-| R23 | Xray Cloud et Data Center : un état par test ; même clé d'un autre chemin d'import, modifiée, pas en conflit ; Generic refusé, test introuvable ; test manuel converti pas à pas, signalé en tête ; test Cucumber qui porte son titre ; `--remplacer` : titre formé du résumé, étiquettes de Jira, préconditions signalées ; textes vérifiés ; `--comparer` ; Data Center : texte écrit à la main jamais remplacé, demande absente, demande qui n'est pas un test ; même texte et même empreinte qu'en Cloud | D17.INV-1, D17.INV-4, D17.INV-5, D17.INV-6, D16.INV-5 |
+| R23 | Xray Cloud et Data Center : un état par test ; même clé d'un autre chemin d'import, modifiée, pas en conflit ; Generic refusé, test introuvable ; test manuel converti pas à pas, signalé en tête ; pas vide refusé ; test Cucumber qui porte son titre ; `--remplacer` : titre formé du résumé, étiquettes de Jira, préconditions signalées ; textes vérifiés ; `--comparer` ; Data Center : texte écrit à la main jamais remplacé, demande absente, demande qui n'est pas un test ; même texte et même empreinte qu'en Cloud | D17.INV-1, D17.INV-4, D17.INV-5, D17.INV-6, D16.INV-5 |
 | R24 | Zephyr Scale Cloud et Data Center : un état par cas ; BDD sous un titre en anglais, précondition signalée ; pas à pas depuis le HTML, lignes jointes, pas sans résultat ; pas lus page après page ; texte libre et appel d'un autre cas refusés ; Data Center : même texte et même empreinte ; textes vérifiés | D17.INV-1, D17.INV-5, D17.INV-6 |
 | R25 | Garde des jetons et de la lecture seule : neuf refus avant toute requête (variables absentes, valeur invalide, http hors du poste, identifiant dans l'adresse, `--api` manquant, clé invalide, option de Jira) ; redirection refusée, l'autre origine jamais jointe, rien d'écrit après une lecture réussie ; jeton et identifiants refusés (401) ; lectures seules, aucune mutation ; jetons dans l'en-tête seulement ; aucun jeton dans une sortie ni dans un texte | D17.INV-2, D17.INV-3, D16.INV-6 |
 
 ## 4. Contrôle de la recette elle-même
 
-Vingt-neuf défauts, réintroduits un à un dans le code, font chacun échouer la recette par le scénario attendu (essai du 20 novembre 2026, Node 22.23.4, Chromium 159, rejoué en entier en 1.1.1 ; essai de la 1.2.0 en cours) :
+Quarante-deux défauts, réintroduits un à un dans le code, font chacun échouer la recette par le scénario attendu (essai du 21 novembre 2026, Node 26.13.0, Chromium 159 : les quarante-deux rejoués en 1.2.0, M30 à M42 encore une fois après les deux dernières corrections) :
 
 | ID | Défaut réintroduit | Scénarios en échec | Contrôles en échec |
 |---|---|---|---|
@@ -5658,14 +5660,27 @@ Vingt-neuf défauts, réintroduits un à un dans le code, font chacun échouer l
 | M19 | Une étape main est acceptée sur une ligne non marquée | R3 | 1 |
 | M20 | La désignation clique l'élément désigné | R13 | 1 |
 | M21 | Les commentaires de Jira Cloud sont lus sans --commentaires | R18, R20 | 8 |
-| M22 | Un texte modifié dans Jira est remplacé sans --remplacer | R20 | 2 |
-| M23 | Un texte écrit à la main est remplacé par un texte importé du même nom | R20 | 3 |
-| M24 | Le mot-clé anglais Given n'est pas reconnu | R1, R19, R20 | 4 |
-| M25 | Le contexte de la fonctionnalité n'est pas reporté dans ses scénarios | R19 | 6 |
-| M26 | L'étiquette attribuée par un import précédent n'est pas reprise par le titre | R20, R21 | 7 |
+| M22 | Un texte modifié dans Jira est remplacé sans --remplacer | R20, R23 | 5 |
+| M23 | Un texte écrit à la main est remplacé par un texte importé du même nom | R20, R23 | 4 |
+| M24 | Le mot-clé anglais Given n'est pas reconnu | R1, R19, R20, R22, R23 | 7 |
+| M25 | Le contexte de la fonctionnalité n'est pas reporté dans ses scénarios | R19, R22 | 8 |
+| M26 | L'étiquette attribuée par un import précédent n'est pas reprise par le titre | R20, R21, R22 | 9 |
 | M27 | Un texte retouché depuis l'import est remplacé sans être gardé | R20 | 1 |
 | M28 | Une table de données d'étape est ignorée au lieu d'être refusée | R19, R20 | 4 |
 | M29 | L'import par l'adresse saisit et envoie le formulaire de connexion | R21 | 1 |
+| M30 | Une requête à l'API suit une redirection | R25 | 1 |
+| M31 | Un jeton passe en clair, en http, hors du poste | R25 | 1 |
+| M32 | Un message d'erreur affiche le jeton | R25 | 3 |
+| M33 | Le jeton passe dans l'adresse de la requête | R25 | 1 |
+| M34 | L'import écrit dans Jira : une étiquette ajoutée au test | R25 | 1 |
+| M35 | Une requête GraphQL de mutation part vers Xray Cloud | R25 | 1 |
+| M36 | Le résultat attendu d'un pas manuel est perdu | R23, R24 | 2 |
+| M37 | L'étiquette @TestCaseKey= de Zephyr Scale n'est pas reconnue | R22 | 2 |
+| M38 | Une clé portée par des scénarios de titres différents devient leur identité | R22 | 5 |
+| M39 | Le même test, lu d'un autre chemin d'import, est en conflit avec son texte | R22, R23 | 5 |
+| M40 | Le CRC-32 d'un fichier de l'archive n'est pas contrôlé | R22 | 7 |
+| M41 | Les textes d'un autre lot sont pris pour ceux du lot importé | R22, R23 | 6 |
+| M42 | Seule la première page des pas de Zephyr Scale est lue | R24 | 3 |
 
 Chaque défaut a été retiré après son essai ; la recette du code publié passe en entier.
 
@@ -6028,6 +6043,10 @@ export function testsOutils() {
       'DEMO-16': {
         genre: 'Gherkin', nom: 'Cucumber', resume: 'Retour à l\'accueil', etiquettes: [], preconditions: [],
         gherkin: 'Scenario: Back to home\n  Given I am on the export page\n  When I click the link "Accueil"\n  Then I see the heading "Démonstration"\n',
+      },
+      'DEMO-17': {
+        genre: 'Steps', nom: 'Manual', resume: 'Exporter, puis rejouer un autre test', etiquettes: [], preconditions: [],
+        pas: [{ action: 'Ouvrir la page « Export »', data: '', result: '' }, { action: '', data: '', result: '' }],
       },
       'DEMO-25': { jiraSeulement: true, resume: 'Une histoire, pas un test', etiquettes: [] },
     },
@@ -7307,6 +7326,9 @@ Fonctionnalité: Clients
       controle('test Generic refusé avec son motif ; test introuvable avec la réponse de Xray (D17.INV-5)', /refusé\s+@DEMO-14\s+Relire les journaux : test Generic : définition en texte libre/.test(r.sortie) && /introuvable @DEMO-15\s+An issue with key 'DEMO-15' does not exist/.test(r.sortie), r.sortie);
       const t13 = lire(d, 'DEMO-13.scenario');
       controle('test manuel : chaque pas en « Quand <action> », avec ses données, puis « Alors <résultat attendu> », signalé en tête (D17.INV-5)', t13.startsWith('# Importé de Xray par importer.mjs (scenario-playwright 1.2.0), sans IA : chaque pas du test manuel devient « Quand <action> », avec ses données, puis « Alors <résultat attendu> ».\n# Lot : xray DEMO-13\n# Scénario : @DEMO-13, test manuel DEMO-13\n') && t13.includes('\n@DEMO-13\nScénario: Exporter les clients\n') && t13.includes('  Quand Ouvrir la page « Export »\n  Alors La page « Export » s\'affiche\n  Quand Cliquer sur le lien « Exporter en CSV », avec « format CSV ; séparateur ; »\n  Alors Le fichier « clients.csv » est téléchargé\n'), t13);
+      const appel = await lancer('importer.mjs', ['xray:DEMO-17', '--api', outils, '--adresse', base, '--dossier', join(TMP, 'r23-appel')], { env });
+      sorties.push(appel.sortie + appel.erreurs);
+      controle('pas vide, l\'appel d\'un autre test peut-être : test refusé, rien n\'est deviné (D17.INV-5)', appel.code === 1 && JSON.stringify(etatsDe(appel.sortie)) === '["refusé DEMO-17"]' && /refusé\s+@DEMO-17\s+Exporter, puis rejouer un autre test : pas 2 vide/.test(appel.sortie) && !existsSync(join(TMP, 'r23-appel')), appel.sortie + appel.erreurs);
       const t16 = lire(d, 'DEMO-16.scenario');
       controle('test Cucumber qui porte son titre : recopié tel quel', t16.includes('\n@DEMO-16\nScenario: Back to home\n') && t16.includes('  Given I am on the export page\n'), t16);
       r = await lancer('importer.mjs', ['xray:DEMO-12,DEMO-13,DEMO-16', '--api', outils, '--adresse', base, '--dossier', d, '--remplacer'], { env });
@@ -7574,11 +7596,11 @@ Le développeur fera une fois, dans la fenêtre, les gestes d'un parcours ; D15 
 Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichiers ont été matérialisés.
 
     f6996c2380877840bf9742597e6eb658caff97026081ecf185a327c7a2dc09f4  manifest.json
-    be80c71a3b68b6d9e449b8e6403a93540ca05bcce858dde2112842fc0593f4fd  SKILL.md
-    09abd5a0958b6429dfee4f6bba849c3cd567938ece44a37fcc2276c09c2553c9  modules/execution/SKILL.md
+    bd5afbf15b56158ed4c48c75818c36f238bb4df4ed5476548dfcc84754079b84  SKILL.md
+    e237c256edf7b817760598cef23c3d74ca32fda738ebd6cafd1a8193842c67ac  modules/execution/SKILL.md
     fc9bb43dab8252a41f4e455de48aee80ea22b186be7a5099365529f184eefa4e  modules/texte/SKILL.md
     966d211160dd5ca3044e9a085a3a84e23f1a59c24bca7de5fbc69a0914d1190c  modules/jira/SKILL.md
-    bdec3194d0ecde296e00ca3fe63ea26b2d0bc4bea92920957092caf96333c532  modules/cas-de-test/SKILL.md
+    69a8e54e96d84d3457054b1a4e49d186042757348b13a4ae49219226f9e497dd  modules/cas-de-test/SKILL.md
     21518ec85562fdefa9dd2b31d40a744d4a1643defcef68f50b32a0bdececb349  modules/scenario/SKILL.md
     8cee7712656889faf26dfee89eb2346f6ac0971a798b5f4ad8c9fb75784f5f43  modules/cibles/SKILL.md
     d9325724a7c08c369724fe7b2ea0629b6e37127a0b65de16eba4b48cc4f41495  modules/actions/SKILL.md
@@ -7587,7 +7609,7 @@ Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichier
     817eb2f3c456e192a8f6218942cb2ed180027de6ca915d2a8e52edf908c5453f  modules/preuves/SKILL.md
     4d8cb363549f37f2c85e6e75516742228acb3111e03ce315463e9027f0d0b4af  modules/designer/SKILL.md
     caf3963653a038c3b03afb25cd615398de6ba8bfbaed3bfbbd5567f4035454b9  modules/agent/SKILL.md
-    cdfc00e73f240dfeb7c39d7f62e58dfb7f98d73350d70eb21a7171baffc3bbbd  modules/recette/SKILL.md
+    cfda053e7da1d40997255a1780ca0f5b2cd855ec74a4ca767fdb3753e6a76439  modules/recette/SKILL.md
     4966e366878732544faa9f20e65580a7348426d4e4c2a2b5f789dee4d59ce079  modules/traduction-auto/SKILL.md
     9dd5d57ca1b658cb15c7c1999ccfd94cb41491e0af15bbe151812f07d45929fc  modules/demo/SKILL.md
     4a202c9718112813a20437b56e250422013bebdfceee7f971922d246a4d2d606  modules/remise/SKILL.md

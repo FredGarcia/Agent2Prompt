@@ -83,6 +83,7 @@ Chaque texte importé appartient à un lot : sa demande pour Jira ; ici le fichi
 | manuel (Xray), pas à pas (Zephyr Scale) | chaque pas devient `Quand <action>`, avec ses données, `, avec « <données> »`, puis `Alors <résultat attendu>` ; une partie de plusieurs lignes tient sur une, ses lignes séparées par « ; » ; le HTML de Zephyr Scale est ramené au texte ; une partie vide est omise ; l'en-tête le dit dès sa première ligne |
 | Generic (Xray), texte libre (Zephyr Scale) | refusé : pas d'étapes à recopier ; le test s'écrit en Cucumber, BDD ou pas à pas dans l'outil |
 | pas qui appelle un autre cas (Zephyr Scale) | refusé : l'import ne le déplie pas |
+| pas vide, sans action, données ni résultat attendu (dans Xray, l'appel d'un autre test) | refusé : rien n'est deviné |
 | sans résumé, manuel sans pas | refusé |
 
 La phrase d'un pas reste telle qu'écrite : « Quand » et « Alors » ne disent pas la langue du test. Un test manuel converti se relit avec le développeur avant sa traduction (module `agent`). Les préconditions sont signalées en tête du texte, non reprises : celles de Xray par leurs clés, celle de Zephyr Scale par son texte ; elles se jouent avant le scénario, ou le développeur les reporte dans le texte. Un export `.feature` de Xray, lui, reprend les préconditions Cucumber en `Background`, reporté en tête des étapes (module `jira`, § 4).
@@ -404,7 +405,6 @@ export const REQUETE_XRAY = `query Tests($jql: String!, $limit: Int!) {
       testType { name kind }
       steps { action data result }
       gherkin
-      unstructured
       preconditions(limit: 20) { total results { jira(fields: ["key"]) } }
       jira(fields: ["key", "summary", "labels"])
     }
@@ -603,8 +603,8 @@ function scenarioVide(t, provenance, etiquettes) {
 
 /**
  * Scénarios des tests lus par l'API, un par test, identifiés par la clé du test (D17.INV-4) : { ...scénario,
- * cleTest, lot, source, notes, manuel }. Un test sans résumé, un test manuel sans pas, un test refusé par
- * sa lecture gardent leur motif.
+ * cleTest, lot, source, notes, manuel }. Un test sans résumé, un test manuel sans pas ou avec un pas vide
+ * (dans Xray, l'appel d'un autre test), un test refusé par sa lecture gardent leur motif.
  */
 export function scenariosDesTests(tests, cleOutil) {
   const outil = OUTILS[cleOutil];
@@ -616,7 +616,9 @@ export function scenariosDesTests(tests, cleOutil) {
     else if (t.genre === 'gherkin') sc = gherkinEnScenario(t, provenance, etiquettes);
     else if (t.genre === 'pas') {
       const etapes = pasEnEtapes(t.pas);
-      sc = { ...scenarioVide(t, provenance, etiquettes), etapes, manuel: true, refus: etapes.length ? null : `${outil.test} manuel sans pas` };
+      const vide = t.pas.findIndex((p) => [p.action, p.donnees, p.attendu].every((x) => lignesJointes(String(x ?? '').split(/\r?\n/)) === ''));
+      const refus = vide >= 0 ? `pas ${vide + 1} vide, sans action, données ni résultat attendu, l'appel d'un autre test peut-être : rien n'est deviné` : etapes.length ? null : `${outil.test} manuel sans pas`;
+      sc = { ...scenarioVide(t, provenance, etiquettes), etapes, manuel: true, refus };
     } else sc = { ...scenarioVide(t, provenance, etiquettes), refus: t.motif };
     if (!sc.empreinte) sc.empreinte = empreinteJira(sc);
     return Object.assign(sc, { cleTest: t.cle, lot: `${outil.lot} ${t.cle}`, source: t.source, notes: t.notes ?? [] });
