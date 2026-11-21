@@ -1,17 +1,20 @@
 # Mode d'emploi : jouer un scénario côté utilisateur avec Playwright
 
-Ce mode d'emploi installe [`scenario-playwright`](../../specs/scenario-playwright/SKILL.md) 1.2.0 : faire faire à Chrome, sur votre poste, les manipulations d'un utilisateur décrites par un scénario. Vous écrivez le scénario en français ou en anglais, dans un texte inspiré de Gherkin, ou vous l'importez, sans IA, d'une demande Jira, d'un fichier `.feature`, ou d'un cas de test de Xray ou de Zephyr Scale ; l'IA le traduit en TOML exécutable ; vous ratifiez la traduction ; le skill joue le scénario, sans IA, et rend un rapport avec ses captures. Vous gardez la main : chaque connexion se fait par vous, dans la fenêtre, et aucune donnée n'est modifiée hors de votre poste sans votre accord pour l'exécution.
+Ce mode d'emploi installe [`scenario-playwright`](../../specs/scenario-playwright/SKILL.md) 1.3.0 : faire faire à Chrome, sur votre poste, les manipulations d'un utilisateur décrites par un scénario. Vous écrivez le scénario en français ou en anglais, dans un texte inspiré de Gherkin, ou vous l'importez, sans IA, d'une demande Jira, d'un fichier `.feature`, ou d'un cas de test de Xray ou de Zephyr Scale ; le skill indexe, sans IA, le code de votre projet ; l'IA traduit le scénario en TOML exécutable, en s'aidant de l'index ; vous ratifiez la traduction ; le skill joue le scénario, sans IA, vérifie ce qui s'affiche et ce qui se passe hors de l'écran, et rend un rapport avec ses captures. Vous gardez la main : chaque connexion se fait par vous, dans la fenêtre, et aucune donnée n'est modifiée hors de votre poste sans votre accord pour l'exécution.
 
 ```mermaid
 flowchart LR
   JI["Demande Jira<br/>page MHTML ou adresse"] -->|"importer.mjs, sans IA"| V
   XZ["Xray, Zephyr Scale<br/>.feature, .zip, API"] -->|"importer.mjs, sans IA"| V
   V["texte de départ<br/>écrit par vous ou importé"] --> T["traduire.mjs :<br/>squelette sans IA"]
+  C["code du projet<br/>front et back"] -->|"indexer.mjs, sans IA"| X["index du code"]
+  X -.->|"propositions"| T
   T --> IA["IA : étapes<br/>complétées"]
+  X -.->|"lu par l'IA"| IA
   IA --> P["verifier.mjs --plan :<br/>plan ligne par ligne"]
   P -->|"vous ratifiez"| J["jouer.mjs :<br/>Chrome du poste"]
   V -.->|"connexion à la main"| J
-  J --> R["resultats/ :<br/>rapport, captures"]
+  J --> R["resultats/ :<br/>rapport, captures,<br/>relevés hors de l'écran"]
 ```
 
 ## 1. Prérequis
@@ -31,9 +34,9 @@ node ~/dev/Agent2Prompt/installer.mjs
 cd ~/.gemini/skills/scenario-playwright && npm ci && npm test
 ```
 
-L'installateur pose le skill dans `~/.gemini/skills/scenario-playwright/`, avec l'agent `pilote-scenario` et les commandes `/scenario:importer`, `/scenario:traduire`, `/scenario:jouer` et `/scenario:designer`. Dans une session ouverte : `/skills reload`, `/agents reload`, `/commands reload`. Sous Linux sans écran, la recette se lance par `xvfb-run -a npm test`.
+L'installateur pose le skill dans `~/.gemini/skills/scenario-playwright/`, avec l'agent `pilote-scenario` et les commandes `/scenario:importer`, `/scenario:indexer`, `/scenario:traduire`, `/scenario:jouer` et `/scenario:designer`. Dans une session ouverte : `/skills reload`, `/agents reload`, `/commands reload`. Sous Linux sans écran, la recette se lance par `xvfb-run -a npm test`.
 
-Sans clone, remettez à l'IA la transmission [`transmissions/scenario-playwright-1.2.0.md`](../../transmissions/scenario-playwright-1.2.0.md) : elle matérialise le skill, vérifie les empreintes, installe la dépendance et lance la recette.
+Sans clone, remettez à l'IA la transmission [`transmissions/scenario-playwright-1.3.0.md`](../../transmissions/scenario-playwright-1.3.0.md) : elle matérialise le skill, vérifie les empreintes, installe la dépendance et lance la recette.
 
 ## 3. Écrire le texte de départ
 
@@ -112,9 +115,28 @@ Sous PowerShell 7 : `$env:ZEPHYR_TOKEN = Read-Host -MaskInput 'Jeton'`. Le skill
 - **Refus** : un test Generic, en texte libre, ou qui appelle un autre cas, est refusé avec son motif ; écrivez-le en Cucumber, en BDD ou en pas à pas dans l'outil.
 - **Le même test, d'un export puis de l'API** : il retrouve son texte par sa clé ; `--comparer` et `--remplacer` s'y appliquent comme pour Jira.
 
-## 6. Faire traduire, puis ratifier
+## 6. Indexer le code du projet
 
-Dans Gemini CLI : `/scenario:traduire scenarios/creer-client.scenario`. L'IA écrit `creer-client.toml` à côté du texte, sur le squelette de `traduire.mjs`, puis vous présente le plan :
+Si le code de l'application est sur votre poste, front, back ou les deux, faites-le indexer avant de traduire. Dans Gemini CLI : `/scenario:indexer ~/dev/boutique`. Sans l'agent, depuis le dossier du projet :
+
+```bash
+node ~/.gemini/skills/scenario-playwright/scripts/indexer.mjs . --dossier scenarios --langue fr
+```
+
+- Le skill lit le code sans rien exécuter, construire ni modifier, et écrit `scenarios/index/code.json` et `scenarios/index/code.md` : les routes, les boutons, liens et champs avec leurs noms tels qu'un lecteur d'écran les annonce, les libellés traduits dans la langue choisie, les identifiants de test, les endpoints du back et les appels du front, les contraintes de validation et leurs messages, chacun avec son fichier et sa ligne.
+- Il ne lit ni `node_modules`, ni `dist` ou `target`, ni les fichiers de test, ni les fichiers cachés comme `.env` ; de `application.properties`, il ne retient que le chemin de contexte, jamais un mot de passe.
+- Quand le code change, l'index est périmé : le skill le dit et ne l'emploie plus jusqu'à la prochaine indexation.
+
+## 7. Faire traduire, puis ratifier
+
+Dans Gemini CLI : `/scenario:traduire scenarios/creer-client.scenario`. L'IA écrit `creer-client.toml` à côté du texte, sur le squelette de `traduire.mjs`. Avec un index à jour, le squelette porte déjà, en commentaire sous chaque étape, les éléments du code dont le nom correspond aux libellés entre guillemets de votre phrase :
+
+```toml
+# index du code, pour « Enregistrer » (propositions à vérifier) :
+#   cible = { role = "button", nom = "Enregistrer", exact = true }  # src/app/clients/client-form.component.ts:19
+```
+
+Ce ne sont que des propositions : l'IA les contrôle avant de les reprendre, et l'étape reste à compléter tant qu'elle ne l'a pas fait. Elle vous présente ensuite le plan :
 
 ```text
 l.9  Quand je clique sur le lien « Nouveau client »
@@ -123,9 +145,21 @@ l.12  Et je clique sur le bouton « Enregistrer » (création)
         → cliquer getByRole('button', { name: 'Enregistrer' })  [création]
 ```
 
-Relisez chaque ligne : la cible désigne-t-elle le bon élément ? une étape touche-t-elle aux données sans marque ? Ratifiez, ou demandez une correction. Rien ne se joue avant. Si vous modifiez le texte ensuite, la traduction est périmée : le skill refuse de la jouer, et l'IA la refait.
+Relisez chaque ligne : la cible désigne-t-elle le bon élément ? une étape touche-t-elle aux données sans marque ? Si `verifier.mjs` note une cible absente de l'index, regardez-la avec l'IA : un nom qui dépend des données, un composant d'une bibliothèque, ou une cible à revoir. Ratifiez, ou demandez une correction. Rien ne se joue avant. Si vous modifiez le texte ensuite, la traduction est périmée : le skill refuse de la jouer, et l'IA la refait.
 
-## 7. Jouer
+## 8. Vérifier hors de l'écran
+
+Comme un testeur qui ouvre l'onglet réseau, une phrase peut demander ce qui se passe hors de l'écran :
+
+| Phrase du texte | Vérification |
+|---|---|
+| `Et la requête POST « /api/clients » répond 201` | `critere = "requete"` : la requête que votre dernier geste a fait partir, sa méthode, son statut, et les champs de son corps ou de sa réponse que vous attendez |
+| `Et l'API « /api/clients/<nom> » donne la ville « Lyon »` | `critere = "api"` : un GET, avec la session que vous avez ouverte dans la fenêtre, sur une origine du texte ; aucune redirection n'est suivie |
+| `Et le fichier téléchargé contient « Lyon » dans la colonne « ville »` | `critere = "fichier"` : le fichier d'une étape « télécharger » nommée ; texte, nombre de lignes, colonne d'un CSV |
+
+Le skill ne garde aucun en-tête ni cookie, ne relève rien pendant votre connexion à la main, et masque dans les rapports les valeurs des paramètres et des champs qui ressemblent à un secret (`token`, `password`, `jeton`…). Une page qui change de document juste après sa requête ne laisse pas lire sa réponse : vérifiez alors son statut, ou ce qui s'affiche.
+
+## 9. Jouer
 
 Dans Gemini CLI : `/scenario:jouer scenarios/creer-client.toml`. Sans l'agent :
 
@@ -135,33 +169,34 @@ node ~/.gemini/skills/scenario-playwright/scripts/jouer.mjs scenarios/creer-clie
 
 - Chrome s'ouvre sur le profil du scénario. À l'étape à la main, le message `À VOUS : je me connecte` s'affiche : connectez-vous dans la fenêtre ; la suite reprend seule. Le profil garde la session pour les fois suivantes.
 - Chaque étape s'affiche, `ok`, `KO` avec son message, ou `--` si elle n'a pas été jouée.
-- Le rapport est dans `scenarios/resultats/<horodatage>-creer-client/` : `rapport.md`, `rapport.json`, les captures, l'instantané ARIA de chaque échec, les fichiers téléchargés. Ajoutez `resultats/` au `.gitignore` de votre projet.
+- Le rapport est dans `scenarios/resultats/<horodatage>-creer-client/` : `rapport.md`, `rapport.json`, les captures, l'instantané ARIA de chaque échec, les fichiers téléchargés, et pour chaque vérification hors de l'écran son relevé (`requête POST …/api/clients → 201`). Ajoutez `resultats/` au `.gitignore` de votre projet.
 
 Options utiles : `--param ville=Nice`, `--jeu 2`, `--ralenti 300` pour une démonstration, `--sans-tete` sans étape à la main, `--trace` pour la trace de Playwright (elle contient vos cookies : elle ne se partage pas).
 
-## 8. Une cible qu'on ne sait pas nommer
+## 10. Une cible qu'on ne sait pas nommer
 
 `/scenario:designer http://127.0.0.1:4200/clients`, ou `node <skill>/scripts/designer.mjs <adresse>` : cliquez l'élément dans la fenêtre, le skill rend sa cible, par exemple `cible = { role = "button", nom = "Supprimer", dans = { role = "row", nom = "Martin" } }`. Le clic de désignation ne déclenche rien dans la page.
 
-## 9. Ce qui ne se négocie pas
+## 11. Ce qui ne se négocie pas
 
 - Le skill ne voit aucun identifiant : vous vous connectez vous-même, dans la fenêtre, à l'application comme à Jira.
 - Le skill n'écrit jamais dans Jira, Xray ni Zephyr Scale ; d'une demande, il ne lit que la description, les champs de texte et, si vous le demandez, les commentaires.
 - Un jeton d'API ne passe que par la variable d'environnement que vous définissez : ni le skill ni l'agent ne le demandent, ne l'affichent ou ne l'écrivent.
 - Rien ne se joue avant votre ratification de la traduction.
-- Aucune requête ne part vers une origine que le texte ne déclare pas.
+- Aucune requête ne part vers une origine que le texte ne déclare pas ; une vérification de l'API ne fait que des GET.
+- Le code de votre projet n'est que lu : rien n'y est exécuté ni écrit ; seul le dossier `index/` de vos scénarios reçoit l'index.
 - Hors de votre poste, une étape qui modifie des données n'est jouée qu'avec `--autoriser-mutations`, que l'agent ne passe qu'avec votre accord, pour une exécution.
 - Le skill ne rejoue aucune étape : un échec reste un échec, à examiner.
 - Rapports, captures, téléchargements, pages Jira enregistrées et profils restent sur votre poste.
 
-## 10. Avec les autres skills
+## 12. Avec les autres skills
 
 - [`agent-tdd-jira`](../../specs/agent-tdd-jira/SKILL.md) : ses scénarios Gherkin donnent les étiquettes, et souvent les phrases, de vos textes de départ ; écrits dans la demande, ils s'importent, et la page MHTML qu'il lit s'importe aussi.
 - [`capture-sprint-jira`](../../specs/capture-sprint-jira/SKILL.md) : ses captures MHTML des tickets d'un sprint s'importent telles quelles, sans rouvrir Jira.
 - [`agent2test`](../../specs/agent2test/SKILL.md) : son navigateur partage le vocabulaire du scénario ; la remise d'un scénario ratifié à Agent2Test est réservée.
 - [`generateur-skill-ticket`](../../specs/generateur-skill-ticket/SKILL.md) : le parcours de son kit démo, joué par ce skill, est réservé.
 
-## 11. Dépannage
+## 13. Dépannage
 
 | Constat | Conduite |
 |---|---|
@@ -185,3 +220,10 @@ Options utiles : `--param ville=Nice`, `--jeu 2`, `--ralenti 300` pour une démo
 | `redirection … refusée` | l'adresse donnée par `--api` n'est pas celle de l'API : donner celle de l'API elle-même, en https |
 | `introuvable @ECR-80` | clé inexacte, ou test d'un projet que le jeton ne peut pas lire |
 | un jeton collé par erreur dans une conversation ou une commande | le révoquer, en créer un autre, et le définir dans le terminal |
+| `note : index du code périmé` | le code a changé depuis l'indexation : relancer `indexer.mjs` (§ 6) |
+| `LIMITE fichier de plus de 1048576 octets, non lu` | un fichier de données volumineux : rien à faire ; sur un très grand dépôt, indexer le dossier du front ou du back seulement |
+| `cibles absentes de l'index du code` | regarder chaque cible citée : nom variable, composant d'une bibliothèque, ou cible à corriger ; la note ne bloque rien |
+| `aucune requête /api/… depuis l'étape …` | le message cite les requêtes vues depuis le dernier geste : comparer leur chemin et leur méthode à ceux du scénario |
+| `réponse interrompue avant la fin de sa lecture` | la page a changé de document juste après la requête : vérifier son statut, ou l'effet à l'écran |
+| `redirection vers … non suivie` | l'adresse de l'API renvoie ailleurs, souvent vers une connexion : se connecter à la main avant, ou vérifier l'adresse |
+| `API GET … ; obtenu : statut 401` | l'API attend son jeton dans un en-tête, que le skill n'ajoute jamais : vérifier plutôt l'appel que fait la page, par une phrase sur la requête (`critere = "requete"`) |

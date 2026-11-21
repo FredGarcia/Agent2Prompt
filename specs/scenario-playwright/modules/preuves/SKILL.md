@@ -1,6 +1,6 @@
 ---
 name: preuves
-description: Preuves et rapport d'une exécution (dossier de résultats horodaté à côté du scénario, rapport.json aux champs stables, point d'extension E1, rapport.md lisible, captures par vérification, par capture demandée et par échec, instantané ARIA à l'échec, erreurs de console, erreurs de la page et réponses de statut 400 ou plus relevées par étape, téléchargements et leur empreinte, origines bloquées, cibles fragiles, trace sur demande), source de scripts/rapport.mjs. À lire pour exploiter un rapport.
+description: Preuves et rapport d'une exécution (dossier de résultats horodaté à côté du scénario, rapport.json aux champs stables, point d'extension E1, rapport.md lisible, captures par vérification, par capture demandée et par échec, instantané ARIA à l'échec, erreurs de console, erreurs de la page et réponses de statut 400 ou plus relevées par étape, téléchargements et leur empreinte, relevé des vérifications hors de l'écran, origines bloquées, cibles fragiles, trace sur demande), source de scripts/rapport.mjs. À lire pour exploiter un rapport.
 dimensions: [D8]
 status: active
 ---
@@ -51,17 +51,18 @@ Champs de chaque étape :
 | `statut`, `duree_ms`, `message` | `reussie`, `echec` ou `non_jouee` ; durée de l'étape, arrêtée à son échec, sans le temps de ses preuves ; message d'échec ou motif de non-exécution |
 | `capture`, `aria` | chemins relatifs au dossier de résultats, ou `null` |
 | `telechargement` | `{ fichier, propose, octets, sha256 }`, ou `null` |
+| `hors_ecran` | relevé d'une vérification hors de l'écran (module `hors-ecran`, § 7) : `{ critere, methode, adresse, statut }`, avec `octets` pour `api`, ou `{ critere, fichier, lignes, octets }` ; sinon `null`. Ajouté en 1.3.0 |
 | `console`, `erreurs_page`, `reponses` | erreurs de console, exceptions de la page, réponses de statut 400 ou plus (`500 http://…`) relevées pendant l'étape (D8.INV-2) |
 
 Ces champs sont stables : un nouveau champ peut s'ajouter dans une version mineure, aucun ne change de sens. D12 et D13 liront le rapport sans rejouer le scénario.
 
 ## 3. `rapport.md`
 
-Le même rapport, en français : statut et titre, scénario et texte d'origine, étiquettes, durée et bilan, navigateur et avertissement, rappel sur la trace, un tableau des étapes par jeu (numéro, ligne du texte, résumé, statut, durée, message, capture, instantané, téléchargement, erreurs relevées), puis les origines bloquées et les cibles fragiles, avec la conduite à tenir.
+Le même rapport, en français : statut et titre, scénario et texte d'origine, étiquettes, durée et bilan, navigateur et avertissement, rappel sur la trace, un tableau des étapes par jeu (numéro, ligne du texte, résumé, statut, durée, message, capture, instantané, téléchargement, relevé hors de l'écran, erreurs relevées), puis les origines bloquées et les cibles fragiles, avec la conduite à tenir.
 
 ## 4. Captures et instantanés (D8.INV-2)
 
-- Chaque étape `verifier` a sa capture, réussie ou non : la zone de la cible si elle est unique et visible, sinon la page.
+- Chaque étape `verifier` à l'écran a sa capture, réussie ou non : la zone de la cible si elle est unique et visible, sinon la page. Une vérification hors de l'écran a son relevé, `hors_ecran`, et la capture de la page à l'échec seulement.
 - Chaque étape `capturer` a la sienne, nommée par `nom` : la zone de la cible, ou la page, entière avec `pleine_page = true`.
 - Chaque échec a la capture de la page et l'instantané ARIA de la page entière : l'arbre que voit un lecteur d'écran, où se lisent les rôles et les noms des éléments présents, pour corriger une cible. Chacun attend 10 s au plus : une page figée ne retient pas l'exécution.
 
@@ -79,7 +80,7 @@ Les erreurs de console, les exceptions de la page et les réponses HTTP de statu
 
 <!-- fichier : scripts/rapport.mjs -->
 ```javascript
-// scenario-playwright 1.2.0 : rapport d'une exécution, en JSON (champs stables, E1) et en Markdown.
+// scenario-playwright 1.3.0 : rapport d'une exécution, en JSON (champs stables, E1) et en Markdown.
 //
 // Chaque exécution écrit son dossier de résultats horodaté : rapport.json, rapport.md, captures,
 // instantanés ARIA à l'échec, téléchargements, et la trace si elle est demandée (D8.INV-1, D8.INV-2).
@@ -87,7 +88,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 export const FORMAT_RAPPORT = 'scenario-playwright.rapport/1';
-export const VERSION_SKILL = '1.2.0';
+export const VERSION_SKILL = '1.3.0';
 
 const deux = (n) => String(n).padStart(2, '0');
 
@@ -132,6 +133,13 @@ export function construireRapport({ fichier, scenario, empreinte, debut, fin, na
 }
 
 const STATUT = { reussie: 'réussie', echec: 'ÉCHEC', non_jouee: 'non jouée' };
+
+/** Relevé d'une vérification hors de l'écran, en une ligne (D19). */
+function horsEcran(h) {
+  if (!h) return null;
+  if (h.critere === 'fichier') return `fichier \`${h.fichier}\`, ${h.lignes} ligne${h.lignes > 1 ? 's' : ''}`;
+  return `${h.critere === 'api' ? 'API' : 'requête'} ${h.methode} ${h.adresse} → ${h.statut ?? 'sans réponse'}${h.octets !== null && h.octets !== undefined ? `, ${h.octets} octets` : ''}`;
+}
 const echapper = (s) => String(s ?? '').replace(/\|/g, '\\|').replace(/\n/g, ' ');
 
 /** Rapport lisible, en Markdown. */
@@ -147,7 +155,7 @@ export function rapportMarkdown(r) {
     l.push('', r.jeux.length > 1 ? `## Jeu ${j.numero} : ${Object.entries(j.valeurs).map(([k, v]) => `${k} = ${v}`).join(', ')}` : '## Étapes', '');
     l.push('| # | Ligne | Étape | Statut | Durée | Détail |', '|---|---|---|---|---|---|');
     for (const e of j.etapes) {
-      const details = [e.message, e.capture ? `capture \`${e.capture}\`` : null, e.aria ? `ARIA \`${e.aria}\`` : null, e.telechargement ? `fichier \`${e.telechargement.fichier}\`, ${e.telechargement.octets} octets` : null, e.fragile ? 'cible fragile' : null, ...e.console.map((c) => `console : ${c}`), ...e.erreurs_page.map((c) => `erreur de la page : ${c}`), ...e.reponses.map((c) => `réponse ${c}`)].filter(Boolean);
+      const details = [e.message, e.capture ? `capture \`${e.capture}\`` : null, e.aria ? `ARIA \`${e.aria}\`` : null, e.telechargement ? `fichier \`${e.telechargement.fichier}\`, ${e.telechargement.octets} octets` : null, horsEcran(e.hors_ecran), e.fragile ? 'cible fragile' : null, ...e.console.map((c) => `console : ${c}`), ...e.erreurs_page.map((c) => `erreur de la page : ${c}`), ...e.reponses.map((c) => `réponse ${c}`)].filter(Boolean);
       l.push(`| ${e.numero} | ${e.ligne ?? ''} | ${echapper(e.resume)} | ${STATUT[e.statut]} | ${e.statut === 'non_jouee' ? '' : `${e.duree_ms} ms`} | ${echapper(details.join(' ; '))} |`);
     }
   }
