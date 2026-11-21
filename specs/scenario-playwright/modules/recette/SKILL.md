@@ -1,7 +1,7 @@
 ---
 name: recette
-description: Recette du skill (npm test, scénarios R1 à R25 contre une application de démonstration servie sur 127.0.0.1 sans réseau ni compte, deux origines, WebSocket d'écho, connexion simulée, export CSV, Jira factice à connexion simulée avec des demandes de Jira Cloud et de Jira Data Center et leurs pages MHTML, Xray et Zephyr Scale factices, Cloud et Data Center, qui notent chaque requête, archives d'export ; profils et résultats temporaires ; navigateur de SCENARIO_PLAYWRIGHT_CANAL ; écran virtuel sous Linux ; bilan attendu ; défauts réintroduits qui font chacun échouer la recette ; recette en intégration continue sous Linux et Windows), sources de tests/application-demo.mjs et tests/run-tests.mjs.
-dimensions: [D1, D2, D3, D4, D5, D6, D7, D8, D9, D16, D17]
+description: Recette du skill (npm test, scénarios R1 à R29 contre une application de démonstration servie sur 127.0.0.1 sans réseau ni compte, deux origines, WebSocket d'écho, connexion simulée, export CSV, API de lecture, réponse lente et réponse volumineuse, secrets qu'aucun rapport ne doit contenir, projet de démonstration front et back pour l'index du code, Jira factice à connexion simulée avec des demandes de Jira Cloud et de Jira Data Center et leurs pages MHTML, Xray et Zephyr Scale factices, Cloud et Data Center, qui notent chaque requête, archives d'export ; profils et résultats temporaires ; navigateur de SCENARIO_PLAYWRIGHT_CANAL ; écran virtuel sous Linux ; bilan attendu ; défauts réintroduits qui font chacun échouer la recette ; recette en intégration continue sous Linux et Windows), sources de tests/application-demo.mjs, tests/projet-demo.mjs et tests/run-tests.mjs.
+dimensions: [D1, D2, D3, D4, D5, D6, D7, D8, D9, D16, D17, D18, D19]
 status: active
 ---
 
@@ -18,8 +18,8 @@ npm test
 - Depuis le dossier du skill, après `npm ci`. Sous Linux sans écran : `xvfb-run -a npm test` ; le scénario s'y joue dans une fenêtre, comme sur le poste.
 - Le navigateur est celui de `SCENARIO_PLAYWRIGHT_CANAL` : Chrome par défaut ; `chromium` après `npx playwright-core install chromium`.
 - La recette travaille sur des profils et des dossiers temporaires : les profils et les résultats du dossier du skill ne sont pas touchés. Elle efface son dossier temporaire si tout passe ; sinon, ou avec `GARDER_TMP=1`, elle le garde et en donne le chemin.
-- Durée : environ deux minutes. Garde-fou : une recette bloquée s'arrête d'elle-même au bout de dix minutes, en disant dans quel scénario, son dossier temporaire gardé ; ce dossier est dit dès la première ligne.
-- Bilan attendu : `Bilan : 25 scénarios, 339 contrôles, 339 réussis, 0 en échec, 0 sautés`. Là où un serveur ne peut écouter sur 127.0.0.2, deux contrôles de R8 sont sautés.
+- Durée : environ trois minutes. Garde-fou : une recette bloquée s'arrête d'elle-même au bout de dix minutes, en disant dans quel scénario, son dossier temporaire gardé ; ce dossier est dit dès la première ligne.
+- Bilan attendu : `Bilan : 29 scénarios, 426 contrôles, 426 réussis, 0 en échec, 0 sautés`. Là où un serveur ne peut écouter sur 127.0.0.2, deux contrôles de R8 sont sautés ; là où un lien symbolique, ou une jonction sous Windows, ne peut se créer, le contrôle de R26 qui le suit est sauté.
 
 ## 2. L'application de démonstration
 
@@ -29,15 +29,20 @@ npm test
 |---|---|---|
 | `/` | titre, liens vers les clients, l'export et la seconde origine | navigation bloquée, origine déclarée |
 | `/clients` | tableau des clients avec un bouton « Supprimer » par ligne, menu au survol, liens « Nouveau client » et « Nouveau fournisseur », alerte « Client … créé » | cible ambiguë, `dans`, `survoler`, `nombre`, `contient` |
-| `/clients/nouveau` | champs « Nom » (avec placeholder), « Ville » (liste), case « Client actif », pièce jointe, boutons « Enregistrer » et « Archiver » (inactif) ; l'envoi passe par l'API de l'application | `saisir`, `choisir`, `cocher`, `televerser`, `touche`, `actif`, `valeur` |
+| `/clients/nouveau` | champs « Nom » (avec placeholder), « Ville » (liste), case « Client actif », pièce jointe, boutons « Enregistrer » et « Archiver » (inactif) ; l'envoi passe par l'API de l'application, `POST /api/clients?source=formulaire&jeton=…`, avec un en-tête `Authorization`, et lit sa réponse avant de changer de page | `saisir`, `choisir`, `cocher`, `televerser`, `touche`, `actif`, `valeur`, `requete` |
 | `/differe` | texte « Chargement… » puis « Chargé », bouton activé et contenu affiché après 1,2 s | `attendre`, délais |
-| `/connexion?auto=<ms>` | pose un cookie de session et passe à `/accueil-connecte` après le délai, comme un développeur qui se connecte | étape à la main, profil |
+| `/connexion?auto=<ms>` | pose un cookie de session et passe à `/accueil-connecte` après le délai, comme un développeur qui se connecte ; avec `&poster=1`, envoie d'abord un identifiant et un mot de passe à `/api/connexion` | étape à la main, profil, corps jamais relevé à la main |
 | `/session` | dit si le cookie de session est présent | profil retrouvé |
 | `/export`, `/export.csv` | lien vers un CSV en pièce jointe | `telecharger` |
 | `/erreurs` | erreur de console, requête en erreur 500, exception | erreurs relevées |
 | `/externe` | image de la seconde origine | requête bloquée |
 | `/ws` | WebSocket d'écho vers l'application et vers la seconde origine | WebSocket gardés |
-| `/compteur` | bouton « Ajouter » qui incrémente un compteur par l'API | mutation hors du poste |
+| `/compteur` | bouton « Ajouter » qui incrémente un compteur par l'API, sans changer de page | mutation hors du poste, réponse JSON d'une requête |
+| `/api/clients`, `/api/clients/<nom>` | la liste des clients, un client ou un 404, en JSON | `api` : champs, tableau, statut |
+| `/api/session` | `{ ouverte }`, selon le cookie de session | `api` avec la session du profil |
+| `/api/redirection` | renvoie (302) vers la seconde origine, un jeton dans l'adresse | redirection non suivie, adresse masquée |
+| `/api/gros` | un tableau JSON de plus de 1 Mio | borne de taille de `api` |
+| `/interrompue`, `/api/lent` | une page qui change de document pendant que `/api/lent` répond lentement | statut gardé, réponse interrompue |
 | autre chemin | page de statut 404 | navigation en échec |
 
 Le même fichier sert un Jira factice, sur une troisième origine, et donne de quoi fabriquer des pages enregistrées :
@@ -60,6 +65,17 @@ Il sert enfin, sur une quatrième origine, un Xray et un Zephyr Scale factices, 
 | `JETONS_FACTICES` | les valeurs des variables d'environnement des jetons, qu'aucune sortie ni aucun texte ne doit contenir | garde des jetons |
 | `enZip(fichiers)` | une archive comme celle d'un export : deflate ou stockée, noms en UTF-8, CRC-32 qu'on peut abîmer, fichier marqué chiffré | lecture des archives |
 
+Le projet de démonstration, `tests/projet-demo.mjs`, s'écrit dans un dossier temporaire ; aucun de ses fichiers n'est exécuté, l'index les lit seulement :
+
+| Partie | Contenu | Sert à |
+|---|---|---|
+| Angular | routes avec redirection, titre, garde, composant et module chargés à la demande, joker ; gabarit avec clés ngx-translate, lien, boutons avec icônes, colonnes, blocs `@if` et `@for`, identifiant de test calculé, clé absente, message de statut à paramètre ; composant à gabarit en ligne avec `mat-form-field`, `label for`, `label` englobant, `aria-label`, placeholder, et appels `HttpClient` ; traductions `fr.json` et `en.json` | routes, éléments, noms accessibles, traductions, appels |
+| Vue | vue-router avec enfants ; composant avec `$t`, `v-t`, `router-link` et `data-cy`, icône de police, appel axios | routes, traductions, attribut de test |
+| React | `<Route>` imbriqués, `t()`, `htmlFor`, composant `Button`, `fetch` dans un attribut, texte avec apostrophe, texte avec expression ; TSX avec fonction générique `<T,>` ; traduction i18next par espace de noms | JSX, routes, appels |
+| Spring | contrôleur Java (constante, `@RequestParam`, `@RequestBody`, `@ResponseStatus`, commentaire trompeur), DTO avec contraintes et messages `{clé}`, client Feign à écarter, contrôleur et `data class` Kotlin, `ValidationMessages_fr.properties`, `application.properties` avec un mot de passe | endpoints, validations, configuration jamais recopiée |
+| OpenAPI | contrat YAML, serveur, résumé sur plusieurs lignes, statuts | endpoints du contrat |
+| à écarter | `node_modules/`, `dist/`, `.angular/`, fichier `.spec.ts`, `src/test/`, `.env` | exclusions |
+
 ## 3. Scénarios
 
 | ID | Scénario | Invariants |
@@ -79,7 +95,7 @@ Il sert enfin, sur une quatrième origine, un Xray et un Zephyr Scale factices, 
 | R13 | Désignation : deux clics simulés, deux cibles, un lien et un bouton d'une ligne avec `dans`, page non actionnée, cible au format du scénario | D9.INV-1 |
 | R14 | Compatibilité : `playwright-core` 1.65.1 et Chromium 159 lus dans le paquet ; écarts sans avertissement, ancien, plus récent, illisible ; avertissement du rapport | D6.INV-1 |
 | R15 | Dépendance unique à version exacte, Node 22, `.gitignore`, aucune exécution de code dans la page dans les sources | D1.INV-1, D1.INV-2, D5.INV-1 |
-| R16 | Points d'extension : champs du rapport, de ses étapes, du navigateur, du scénario et des options (E1) ; format et vocabulaire communs avec Agent2Test (E2) ; fonctions exportées du moteur, de la session et du scénario (E3) | |
+| R16 | Points d'extension : champs du rapport, de ses étapes, `hors_ecran` compris, du navigateur, du scénario et des options (E1) ; format et vocabulaire communs avec Agent2Test, critères hors de l'écran compris (E2) ; fonctions exportées du moteur, de la session et du scénario (E3) | |
 | R17 | Preuves : erreur de console, exception de la page et réponse 500 relevées, sans échec de l'étape ; trace avec `--trace` et son avertissement ; aucune trace sans l'option | D8.INV-2, D7.INV-3 |
 | R18 | Page Jira enregistrée : MHTML en quoted-printable et UTF-8, en base64 et ISO-8859-1 ; fichier qui n'est pas un MHTML refusé ; Jira Cloud et Data Center : variante, clé, résumé, description et champs de texte, commentaires seulement sur demande, avec auteur et date ; lignes du HTML ; page qui n'est pas une demande refusée ; commentaires repliés signalés ; clé lue dans l'adresse | D16.INV-1, D16.INV-2 |
 | R19 | Scénarios de la demande : ordre de la page et zones ; contexte reporté, ligne de description ignorée ; mots-clés recopiés en français et en anglais ; étiquettes de la fonctionnalité et de la règle ; étiquettes gardées ou attribuées ; ligne d'étape hors d'un scénario ; cinq refus motivés ; doublon ; texte importé valide, colonnes adaptées, provenance, relue, retouche détectée ; empreinte Jira stable ; texte invalide non écrit ; réglages contrôlés | D16.INV-2, D16.INV-3, D16.INV-4 |
@@ -89,10 +105,14 @@ Il sert enfin, sur une quatrième origine, un Xray et un Zephyr Scale factices, 
 | R23 | Xray Cloud et Data Center : un état par test ; même clé d'un autre chemin d'import, modifiée, pas en conflit ; Generic refusé, test introuvable ; test manuel converti pas à pas, signalé en tête ; pas vide refusé ; test Cucumber qui porte son titre ; `--remplacer` : titre formé du résumé, étiquettes de Jira, préconditions signalées ; textes vérifiés ; `--comparer` ; Data Center : texte écrit à la main jamais remplacé, demande absente, demande qui n'est pas un test ; même texte et même empreinte qu'en Cloud | D17.INV-1, D17.INV-4, D17.INV-5, D17.INV-6, D16.INV-5 |
 | R24 | Zephyr Scale Cloud et Data Center : un état par cas ; BDD sous un titre en anglais, précondition signalée ; pas à pas depuis le HTML, lignes jointes, pas sans résultat ; pas lus page après page ; texte libre et appel d'un autre cas refusés ; Data Center : même texte et même empreinte ; textes vérifiés | D17.INV-1, D17.INV-5, D17.INV-6 |
 | R25 | Garde des jetons et de la lecture seule : neuf refus avant toute requête (variables absentes, valeur invalide, http hors du poste, identifiant dans l'adresse, `--api` manquant, clé invalide, option de Jira) ; redirection refusée, l'autre origine jamais jointe, rien d'écrit après une lecture réussie ; jeton et identifiants refusés (401) ; lectures seules, aucune mutation ; jetons dans l'en-tête seulement ; aucun jeton dans une sortie ni dans un texte | D17.INV-2, D17.INV-3, D16.INV-6 |
+| R26 | Index du code : bilan et fichiers écrits ; format, projet relatif, empreinte ; projet seulement lu ; routes Angular (module chargé à la demande préfixé, garde, redirection), Vue Router, React Router en JSX ; éléments et noms accessibles (clés traduites, icônes écartées, `mat-label`, `label for`, `label` englobant, `aria-label`, placeholder, rôles des champs, composants) ; parties variables et clé absente ; JSX avec apostrophe, TSX générique ; endpoints Spring, Kotlin, OpenAPI et appels du front ; validations et messages ; sources ; exclusions, lien symbolique non suivi, configuration jamais recopiée ; même index octet pour octet ; anglais, langue sans traduction ; chemin de contexte ; bornes de taille et de nombre ; sept refus ; YAML, `.properties` et jetons JavaScript | D18.INV-1, D18.INV-2, D18.INV-3, D18.INV-5 |
+| R27 | Index à la traduction et au contrôle : propositions annoncées ; lien, champ et alternatives ; libellé tout entier variable sans proposition ; `exact = true` ; requête connue ; rôle seul pour un texte variable ; libellé absent sans proposition ; étapes toujours à compléter ; cibles et chemins absents notés, testid calculé reconnu, `data-cy` qui n'est pas un testid, code 0 ; index périmé dit et non employé, par `traduire.mjs` et par `verifier.mjs` ; index illisible ; sans index, rien | D18.INV-2, D18.INV-4, D3.INV-5 |
+| R28 | Requêtes de la page : dix-sept étapes et code 0 (document, corps JSON, requête de l'adresse en sous-ensemble, préfixe à étoile, adresse complète, segment `{nom}`, navigation qui suit, réponse JSON d'une page qui reste) ; relevé du rapport ; statut et corps différents, attendu et obtenu des seuls champs attendus ; aucune requête, avec les requêtes vues ; statut gardé et réponse interrompue d'une page qui change de document ; étape à la main : statut vérifié, corps jamais relevé ; ni en-tête, ni cookie, ni jeton, ni mot de passe dans les rapports ; dix refus à la validation | D19.INV-1, D19.INV-2, D19.INV-3 |
+| R29 | API et fichier : API en GET avec la session du profil (champs, tableau, nombre, 404 attendu), fichier (texte, lignes, colonne CSV sans casse), code 0 ; relevés ; sans session dans le profil, l'API la voit fermée ; relevé sans capture à la réussite, capture et ARIA à l'échec ; redirection non suivie, l'autre origine jamais jointe ; réponse de plus de 1 Mio ; attendu et obtenu ; GET seulement ; colonne et valeur absentes, lignes et texte ; neuf refus à la validation | D19.INV-1, D19.INV-3, D8.INV-2 |
 
 ## 4. Contrôle de la recette elle-même
 
-Quarante-deux défauts, réintroduits un à un dans le code, font chacun échouer la recette par le scénario attendu (essai du 21 novembre 2026, Node 26.13.0, Chromium 159 : les quarante-deux rejoués en 1.2.0, M30 à M42 encore une fois après les deux dernières corrections) :
+Soixante-six défauts, réintroduits un à un dans le code, font chacun échouer la recette par le scénario attendu (essai du 21 novembre 2026, Node 26.13.0, Chromium 159 : les soixante-six rejoués en 1.3.0, sur le code publié) :
 
 | ID | Défaut réintroduit | Scénarios en échec | Contrôles en échec |
 |---|---|---|---|
@@ -103,14 +123,14 @@ Quarante-deux défauts, réintroduits un à un dans le code, font chacun échoue
 | M5 | L'empreinte du texte n'est pas contrôlée | R3, R20 | 2 |
 | M6 | Une ligne du texte peut rester sans étape | R3 | 1 |
 | M7 | Une marque de mutation du texte peut se perdre | R3 | 1 |
-| M8 | Une vérification échouée arrête les vérifications suivantes | R6 | 3 |
+| M8 | Une vérification échouée arrête les vérifications suivantes | R6, R28, R29 | 9 |
 | M9 | Une étape échouée n'arrête pas la suite | R6, R7 | 2 |
 | M10 | Délai de 30 s pour toute étape, sans tenir compte des réglages | R6, R9, R11 | 4 |
 | M11 | Une étape à la main est acceptée sans fenêtre | R9 | 1 |
 | M12 | Une variable non déclarée est acceptée | R2 | 1 |
 | M13 | --param ne l'emporte plus sur [parametres] ni sur le jeu | R2, R10 | 3 |
 | M14 | Un fichier absolu ou hors du dossier du scénario est accepté | R2 | 2 |
-| M15 | Une cible ambiguë agit sur le premier élément | R5, R6 | 10 |
+| M15 | Une cible ambiguë agit sur le premier élément | R5, R6, R29 | 13 |
 | M16 | Pas de capture pour une vérification | R5, R10 | 2 |
 | M17 | Navigateur ancien de trois versions accepté sans avertissement | R14 | 1 |
 | M18 | Champ origines_bloquees du rapport renommé | R5 | 5 |
@@ -138,6 +158,30 @@ Quarante-deux défauts, réintroduits un à un dans le code, font chacun échoue
 | M40 | Le CRC-32 d'un fichier de l'archive n'est pas contrôlé | R22 | 7 |
 | M41 | Les textes d'un autre lot sont pris pour ceux du lot importé | R22, R23 | 6 |
 | M42 | Seule la première page des pas de Zephyr Scale est lue | R24 | 3 |
+| M43 | L'index suit les liens symboliques hors du projet | R26 | 2 |
+| M44 | L'empreinte de l'index ne couvre pas le contenu des fichiers | R27 | 2 |
+| M45 | Un index périmé est employé | R27 | 2 |
+| M46 | Les clés de traduction ne sont pas résolues | R26, R27 | 13 |
+| M47 | La configuration Spring entre entière dans l'index | R26, R27 | 5 |
+| M48 | Les dépendances et les sorties de construction ne sont pas écartées | R26 | 3 |
+| M49 | Les routes d'un module chargé à la demande ne sont pas préfixées | R26 | 1 |
+| M50 | Le texte d'une icône entre dans le nom accessible | R26 | 2 |
+| M51 | Pas de borne de taille par fichier lu | R26 | 1 |
+| M52 | Une proposition de l'index entre dans le squelette hors commentaire | R27 | 3 |
+| M53 | Une cible absente de l'index fait échouer le contrôle | R27 | 2 |
+| M54 | Le relevé d'une requête garde ses en-têtes | R28 | 2 |
+| M55 | Un jeton de l'adresse d'une requête n'est pas masqué | R28, R29 | 6 |
+| M56 | Le corps d'une requête faite pendant une étape à la main est relevé | R28 | 1 |
+| M57 | Une vérification api suit les redirections | R29 | 2 |
+| M58 | Une vérification api accepte une autre méthode que GET | R29 | 1 |
+| M59 | Le chemin d'une vérification requete ou api peut viser une origine non déclarée | R28, R29 | 3 |
+| M60 | La fenêtre des requêtes vérifiées ne part pas de la dernière action | R28 | 1 |
+| M61 | Les champs attendus du corps d'une requête ne sont pas comparés | R28 | 2 |
+| M62 | Pas de borne de taille de la réponse d'une vérification api | R29 | 1 |
+| M63 | La colonne CSV se cherche en tenant compte de la casse | R29 | 1 |
+| M64 | Le statut reçu d'une réponse interrompue est perdu | R28 | 5 |
+| M65 | Les réponses JSON des requêtes ne sont pas lues | R28 | 2 |
+| M66 | Le séparateur d'un CSV n'est pas deviné | R29 | 2 |
 
 Chaque défaut a été retiré après son essai ; la recette du code publié passe en entier.
 
@@ -151,7 +195,7 @@ Le workflow `.github/workflows/recette-scenario-playwright.yml` du dépôt Agent
 
 <!-- fichier : tests/application-demo.mjs -->
 ```javascript
-// scenario-playwright 1.2.0 : application de démonstration de la recette, servie sur 127.0.0.1 sans réseau.
+// scenario-playwright 1.3.0 : application de démonstration de la recette, servie sur 127.0.0.1 sans réseau.
 //
 // Deux origines : l'application, et une « autre » origine, que les scénarios ne déclarent pas, pour la
 // garde des origines. Les pages couvrent chaque action du jeu fermé : liste et formulaire de clients,
@@ -159,12 +203,21 @@ Le workflow `.github/workflows/recette-scenario-playwright.yml` du dépôt Agent
 // console et réponses en erreur, WebSocket d'écho. Un Jira factice, à connexion simulée, sert des
 // demandes avec les marqueurs de Jira Cloud et de Jira Data Center. Un Xray et un Zephyr Scale factices
 // servent les API de lecture des tests, en Cloud et en Data Center, et notent chaque requête. L'application
-// a son propre JavaScript ; le skill, lui, n'en exécute aucun dans la page.
+// a son propre JavaScript ; le skill, lui, n'en exécute aucun dans la page. Des API de lecture (client,
+// session, redirection vers l'autre origine, réponse volumineuse) servent les vérifications hors de
+// l'écran ; le formulaire envoie un en-tête Authorization et un jeton dans l'adresse, qu'aucun rapport ne
+// doit contenir.
 import { Buffer } from 'node:buffer';
 import { createHash } from 'node:crypto';
 import http from 'node:http';
+import { clearTimeout, setTimeout } from 'node:timers';
 import { URL } from 'node:url';
 import { crc32, deflateRawSync } from 'node:zlib';
+
+/** Valeurs secrètes de la démonstration : aucune ne doit figurer dans un rapport (D19.INV-2). */
+export const ENTETE_DEMO = 'secret-de-la-demo';
+export const JETON_REQUETE_DEMO = 'secret-requete-demo';
+export const MOT_DE_PASSE_MAIN_DEMO = 'secret-main-demo';
 
 const page = (titre, corps, script = '') => `<!doctype html>
 <html lang="fr"><head><meta charset="utf-8"><title>${titre}</title>
@@ -198,7 +251,7 @@ function accepterWebSocket(req, socket) {
 export async function demarrerApplication() {
   const etat = {
     clients: [{ nom: 'Dupont', ville: 'Paris' }, { nom: 'Martin', ville: 'Lyon' }], compteur: 0, ajouts: [], jira: demandesJira(), requetesJira: [], connexionJira: 4500,
-    tests: testsOutils(), requetesOutils: [], requetesAutre: [], outils: '', autre: '',
+    tests: testsOutils(), requetesOutils: [], requetesAutre: [], requetesApi: [], outils: '', autre: '',
   };
   const serveurs = [];
   let autre = '';
@@ -208,6 +261,7 @@ export async function demarrerApplication() {
     const html = (titre, corps, script, code = 200, entetes = {}) => { res.writeHead(code, { 'content-type': 'text/html; charset=utf-8', ...entetes }); res.end(page(titre, corps, script)); };
     const json = (obj, code = 200) => { res.writeHead(code, { 'content-type': 'application/json' }); res.end(JSON.stringify(obj)); };
     const corps = () => new Promise((r) => { let d = ''; req.on('data', (c) => { d += c; }); req.on('end', () => r(d)); });
+    if (u.pathname.startsWith('/api/')) etat.requetesApi.push(`${req.method} ${u.pathname}`);
     switch (u.pathname) {
       case '/':
         return html('Accueil', `<h1>Démonstration</h1><nav><ul><li><a href="/clients">Clients</a></li><li><a href="/export">Export</a></li><li><a href="${autre}/autre">Lien externe</a></li></ul></nav>`);
@@ -235,18 +289,39 @@ export async function demarrerApplication() {
            ev.preventDefault();
            const piece = document.getElementById('piece').files[0];
            const client = { nom: document.getElementById('nom').value, ville: document.getElementById('ville').value, actif: document.getElementById('actif').checked, piece: piece ? piece.name : null };
-           await fetch('/api/clients', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(client) });
+           const reponse = await fetch('/api/clients?source=formulaire&jeton=${JETON_REQUETE_DEMO}', { method: 'POST', headers: { 'content-type': 'application/json', authorization: 'Bearer ${ENTETE_DEMO}' }, body: JSON.stringify(client) });
+           await reponse.json();
            location.href = '/clients?cree=' + encodeURIComponent(client.nom);
          });`);
       case '/api/clients':
-        if (req.method === 'POST') return corps().then((d) => { const c = JSON.parse(d); etat.clients.push(c); etat.ajouts.push(c); json({ ok: true }, 201); });
+        if (req.method === 'POST') return corps().then((d) => { const c = JSON.parse(d); etat.clients.push(c); etat.ajouts.push(c); json({ ok: true, nom: c.nom }, 201); });
         return json(etat.clients);
+      case '/api/session':
+        return json({ ouverte: /(?:^|;\s*)session=ok/.test(req.headers.cookie ?? '') });
+      case '/api/redirection':
+        res.writeHead(302, { location: `${autre}/api/clients?jeton=${JETON_REQUETE_DEMO}` });
+        return res.end();
+      case '/api/gros':
+        return json(Array.from({ length: 45000 }, (_, i) => ({ numero: i, nom: `client-${i}` })));
+      case '/api/connexion':
+        return corps().then(() => json({ ok: true }));
+      case '/interrompue':
+        return html('Interruption', '<h1>Interruption</h1><p>La page change de document pendant une réponse.</p>', "fetch('/api/lent').then(() => { location.href = '/accueil-connecte'; });");
+      case '/api/lent': {
+        res.writeHead(200, { 'content-type': 'application/json' });
+        res.write('{"ok":');
+        const minuterie = setTimeout(() => res.end('true}'), 3000);
+        res.on('close', () => clearTimeout(minuterie));
+        return undefined;
+      }
       case '/differe':
         return html('Différé', `<h1>Contenu différé</h1><p id="etat">Chargement…</p><button type="button" id="b" disabled>Continuer</button><p id="tard" hidden>Données chargées</p>`,
           `setTimeout(() => { document.getElementById('etat').textContent = 'Chargé'; document.getElementById('b').disabled = false; document.getElementById('tard').hidden = false; }, 1200);`);
       case '/connexion':
         return html('Connexion', `<h1>Connexion</h1><p>Connectez-vous dans cette fenêtre.</p>`,
-          u.searchParams.get('auto') ? `setTimeout(() => { document.cookie = 'session=ok; max-age=86400; path=/'; location.href = '/accueil-connecte'; }, ${Number(u.searchParams.get('auto'))});` : '');
+          u.searchParams.get('auto') ? `setTimeout(async () => {
+            ${u.searchParams.get('poster') ? `await fetch('/api/connexion', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ identifiant: 'dupont', motdepasse: '${MOT_DE_PASSE_MAIN_DEMO}' }) });` : ''}
+            document.cookie = 'session=ok; max-age=86400; path=/'; location.href = '/accueil-connecte'; }, ${Number(u.searchParams.get('auto'))});` : '');
       case '/accueil-connecte':
         return html('Espace connecté', '<h1>Espace connecté</h1><p>Bienvenue</p>');
       case '/session':
@@ -280,6 +355,10 @@ export async function demarrerApplication() {
           const nom = decodeURIComponent(u.pathname.slice('/api/clients/'.length));
           etat.clients = etat.clients.filter((c) => c.nom !== nom);
           return json({ ok: true });
+        }
+        if (u.pathname.startsWith('/api/clients/') && req.method === 'GET') {
+          const client = etat.clients.find((c) => c.nom === decodeURIComponent(u.pathname.slice('/api/clients/'.length)));
+          return client ? json(client) : json({ erreur: 'client introuvable' }, 404);
         }
         return html('Introuvable', '<h1>Page introuvable</h1>', '', 404);
     }
@@ -671,13 +750,322 @@ export function enZip(fichiers) {
 }
 ```
 
+### `tests/projet-demo.mjs`
+
+<!-- fichier : tests/projet-demo.mjs -->
+```javascript
+// scenario-playwright 1.3.0 : projet de démonstration pour la recette de l'index du code (R26, R27).
+//
+// Un petit projet front et back, écrit dans un dossier temporaire : Angular (routes, gabarits, gabarit en
+// ligne, ngx-translate), Vue (vue-router, vue-i18n), React (React Router, i18next, JSX), Spring en Java et
+// en Kotlin (contrôleurs, validations, messages), contrat OpenAPI, et des fichiers que l'index doit écarter.
+// Aucun de ces fichiers n'est exécuté : l'index les lit seulement.
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+
+export const MOT_DE_PASSE_DEMO = 'motdepasse-secret-de-la-demo';
+
+export const FICHIERS_PROJET = {
+  'front/src/index.html': `<!doctype html>
+<html lang="fr">
+<head><title>Démo</title><meta charset="utf-8"></head>
+<body><app-root></app-root><noscript>Activer JavaScript</noscript></body>
+</html>
+`,
+  'front/src/app/app.routes.ts': `import { Routes } from '@angular/router';
+import { ClientsComponent } from './clients/clients.component';
+import { authGuard } from './auth.guard';
+
+export const routes: Routes = [
+  { path: '', redirectTo: 'clients', pathMatch: 'full' },
+  { path: 'clients', component: ClientsComponent, title: 'Clients' },
+  {
+    path: 'clients/nouveau',
+    loadComponent: () => import('./clients/client-form.component').then((m) => m.ClientFormComponent),
+    canActivate: [authGuard],
+  },
+  { path: 'admin', loadChildren: () => import('./admin/admin.routes').then((m) => m.ADMIN_ROUTES) },
+  { path: '**', component: PageIntrouvableComponent },
+];
+`,
+  'front/src/app/admin/admin.routes.ts': `import { Routes } from '@angular/router';
+
+export const ADMIN_ROUTES: Routes = [
+  { path: '', component: AdminComponent, children: [{ path: 'utilisateurs', component: UtilisateursComponent }] },
+];
+`,
+  'front/src/app/clients/clients.component.html': `<h1>{{ 'clients.titre' | translate }}</h1>
+<a routerLink="/clients/nouveau" data-testid="nouveau-client">{{ 'clients.nouveau' | translate }}</a>
+<button mat-raised-button (click)="exporter()" aria-label="Exporter les clients"><mat-icon>download</mat-icon></button>
+<button type="button" (click)="imprimer()"><mat-icon>print</mat-icon> Imprimer</button>
+@if (clients.length > 0) {
+  <table>
+    <tr><th>{{ 'clients.colonne.nom' | translate }}</th><th>Ville</th></tr>
+    @for (c of clients; track c.nom) {
+      <tr>
+        <td>{{ c.nom }}</td><td>{{ c.ville }}</td>
+        <td><button type="button" [attr.data-testid]="'supprimer-' + c.nom" (click)="supprimer(c)">Supprimer {{ c.nom }}</button></td>
+      </tr>
+    }
+  </table>
+} @else {
+  <p>{{ 'clients.vide' | translate }}</p>
+}
+<button type="button" (click)="aide()">{{ 'clients.aide.inconnue' | translate }}</button>
+<p role="status">{{ 'clients.cree' | translate: { nom: dernier } }}</p>
+`,
+  'front/src/app/clients/client-form.component.ts': `import { Component } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+
+@Component({
+  selector: 'app-client-form',
+  standalone: true,
+  template: \`
+    <form (ngSubmit)="enregistrer()">
+      <mat-form-field>
+        <mat-label>{{ 'client.nom' | translate }}</mat-label>
+        <input matInput formControlName="nom" data-testid="champ-nom">
+        <mat-error>{{ 'client.nomObligatoire' | translate }}</mat-error>
+      </mat-form-field>
+      <label for="ville">Ville</label>
+      <select id="ville" formControlName="ville"><option>Lyon</option><option>Paris</option></select>
+      <label><input type="checkbox" formControlName="actif"> Client actif</label>
+      <input type="password" aria-label="Mot de passe">
+      <input type="search" placeholder="Rechercher un client">
+      <button type="submit" mat-flat-button>Enregistrer</button>
+      <button type="button" (click)="enregistrerEtFermer()">Enregistrer et fermer</button>
+    </form>
+  \`,
+})
+export class ClientFormComponent {
+  constructor(private http: HttpClient) {}
+
+  enregistrer() {
+    return this.http.post<void>('/api/clients', this.form.value);
+  }
+
+  charger(nom: string) {
+    return this.http.get<Client>(\`\${environment.api}/clients/\${nom}\`);
+  }
+}
+`,
+  'front/src/app/clients/clients.component.spec.ts': `it('affiche', () => { document.body.innerHTML = '<button>Bouton de spec</button>'; });
+`,
+  'front/src/assets/i18n/fr.json': `{
+  "clients": {
+    "titre": "Clients",
+    "nouveau": "Nouveau client",
+    "colonne": { "nom": "Nom" },
+    "vide": "Aucun client",
+    "cree": "Client {{nom}} créé"
+  },
+  "client": { "nom": "Nom", "nomObligatoire": "Le nom est obligatoire" }
+}
+`,
+  'front/src/assets/i18n/en.json': `{
+  "clients": { "titre": "Customers", "nouveau": "New customer", "colonne": { "nom": "Name" }, "vide": "No customer", "cree": "Customer {{nom}} created" },
+  "client": { "nom": "Name", "nomObligatoire": "Name is required" }
+}
+`,
+  'front/node_modules/bibliotheque/index.html': '<button>Ne pas indexer</button>\n',
+  'front/dist/main.js': "fetch('/api/compilee');\n",
+  'front/.angular/cache/x.html': '<button>Cache caché</button>\n',
+  'vue/src/router/index.js': `import { createRouter, createWebHistory } from 'vue-router';
+
+const routes = [
+  { path: '/', name: 'accueil', component: () => import('../views/Accueil.vue') },
+  {
+    path: '/commandes',
+    name: 'commandes',
+    component: () => import('../views/Commandes.vue'),
+    children: [{ path: ':id', name: 'commande', component: () => import('../views/Commande.vue') }],
+  },
+];
+
+export default createRouter({ history: createWebHistory(), routes });
+`,
+  'vue/src/views/Commandes.vue': `<template>
+  <section>
+    <h2>{{ $t('commandes.titre') }}</h2>
+    <router-link to="/commandes/nouvelle" data-cy="nouvelle-commande">Nouvelle commande</router-link>
+    <button :aria-label="$t('commandes.rafraichir')" @click="charger"><i class="fa fa-refresh"></i></button>
+    <template v-if="vide"><p v-t="'commandes.vide'"></p></template>
+  </section>
+</template>
+
+<script>
+import axios from 'axios';
+
+export default {
+  methods: {
+    charger() {
+      return axios.get('/api/commandes');
+    },
+  },
+};
+</script>
+`,
+  'vue/src/locales/fr.json': '{ "commandes": { "titre": "Commandes", "rafraichir": "Rafraîchir la liste", "vide": "Aucune commande" } }\n',
+  'react/src/App.jsx': `import { Routes, Route } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import Button from '@mui/material/Button';
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<Accueil />}>
+        <Route path="factures" element={<Factures />} />
+        <Route path="factures/:id" element={<Facture />} />
+      </Route>
+    </Routes>
+  );
+}
+
+function Factures() {
+  const { t } = useTranslation();
+  const total = 3;
+  return (
+    <div>
+      <h3>{t('factures.titre')}</h3>
+      <label htmlFor="recherche">Rechercher</label>
+      <input id="recherche" type="text" data-testid="recherche-facture" />
+      <Button variant="contained" onClick={() => fetch('/api/factures', { method: 'POST' })}>Créer une facture</Button>
+      <p>Total : {total} factures</p>
+      {total > 0 && <span className="badge">Factures en attente</span>}
+      <img src="logo.png" alt="Logo de la société" />
+      <p>L'adresse n'est pas renseignée</p>
+    </div>
+  );
+}
+`,
+  'react/src/util.tsx': `export const identite = <T,>(x: T): T => x;
+
+export function Badge({ n }: { n: number }) {
+  const liste: Array<number> = [n];
+  return <span data-testid="badge">{liste.length} nouveaux</span>;
+}
+`,
+  'react/public/locales/fr/translation.json': '{ "factures": { "titre": "Factures" } }\n',
+  'back/src/main/java/demo/ClientController.java': `package demo;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
+/* Contrôleur des clients : @GetMapping("/commentaire") n'est pas un endpoint. */
+@RestController
+@RequestMapping("/api/clients")
+public class ClientController {
+    private static final String PAR_NOM = "/{nom}";
+
+    @GetMapping
+    public List<ClientDto> lister(@RequestParam(value = "ville", required = false) String ville) {
+        return List.of();
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public void creer(@Valid @RequestBody ClientDto client) {
+    }
+
+    @GetMapping(PAR_NOM)
+    public ClientDto lire(@PathVariable String nom) {
+        return null;
+    }
+
+    @DeleteMapping(value = PAR_NOM)
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> supprimer(@PathVariable("nom") String nom) {
+        return ResponseEntity.noContent().build();
+    }
+}
+`,
+  'back/src/main/java/demo/ClientDto.java': `package demo;
+
+public class ClientDto {
+    @NotBlank(message = "{client.nom.obligatoire}")
+    @Size(max = 40, message = "Le nom fait au plus {max} caractères")
+    private String nom;
+
+    @NotNull
+    private String ville;
+
+    @Email(message = "{client.courriel.invalide}")
+    private String courriel;
+}
+`,
+  'back/src/main/java/demo/AutreServiceClient.java': `package demo;
+
+@FeignClient(name = "autre")
+public interface AutreServiceClient {
+    @GetMapping("/api/autre")
+    String lire();
+}
+`,
+  'back/src/main/kotlin/demo/ExportController.kt': `package demo
+
+@RestController
+@RequestMapping(["/api/export"])
+class ExportController {
+    @GetMapping(produces = ["text/csv"])
+    fun exporter(): String = ""
+}
+
+data class FiltreDto(
+    @field:NotBlank(message = "Le filtre est obligatoire") val filtre: String,
+    @field:Size(min = 2) val ville: String?,
+)
+`,
+  'back/src/main/resources/ValidationMessages_fr.properties': 'client.nom.obligatoire=Le nom est obligatoire\nclient.courriel.invalide=Adresse \\u00e9lectronique invalide\n',
+  'back/src/main/resources/application.properties': `spring.application.name=demo
+spring.datasource.password=${MOT_DE_PASSE_DEMO}
+`,
+  'back/src/test/java/demo/ClientControllerTest.java': `@RestController
+class FauxControleur { @GetMapping("/api/test") void t() {} }
+`,
+  'back/openapi.yaml': `openapi: 3.0.3
+info:
+  title: Démo
+  version: "1"
+servers:
+  - url: http://localhost:8080
+paths:
+  /api/clients:
+    get:
+      operationId: listerClients
+      summary: Liste des clients
+      responses:
+        "200":
+          description: liste
+  /api/export.csv:
+    get:
+      operationId: exporterClients
+      summary: >
+        Exporte les clients
+        en CSV
+      responses:
+        '200': { description: CSV }
+`,
+  '.env': `MOT_DE_PASSE=${MOT_DE_PASSE_DEMO}\n`,
+};
+
+/** Écrit le projet de démonstration dans `dossier` ; rend la liste des chemins écrits. */
+export function ecrireProjetDemo(dossier) {
+  for (const [rel, contenu] of Object.entries(FICHIERS_PROJET)) {
+    const chemin = join(dossier, ...rel.split('/'));
+    mkdirSync(dirname(chemin), { recursive: true });
+    writeFileSync(chemin, contenu);
+  }
+  return Object.keys(FICHIERS_PROJET);
+}
+```
+
 ### `tests/run-tests.mjs`
 
 <!-- fichier : tests/run-tests.mjs -->
 ```javascript
 #!/usr/bin/env node
-// scenario-playwright 1.2.0 : recette du skill, scénarios R1 à R25, contre l'application de démonstration
-// locale (tests/application-demo.mjs), sans réseau ni compte. Le navigateur s'ouvre, visible, sur des
+// scenario-playwright 1.3.0 : recette du skill, scénarios R1 à R29, contre l'application de démonstration
+// locale (tests/application-demo.mjs) et le projet de démonstration (tests/projet-demo.mjs), sans réseau ni compte. Le navigateur s'ouvre, visible, sur des
 // profils temporaires : les profils et les résultats du dossier du skill ne sont pas touchés.
 //   Navigateur : celui de SCENARIO_PLAYWRIGHT_CANAL (chrome par défaut ; chromium après
 //   npx playwright-core install chromium). Linux sans écran : xvfb-run -a npm test.
@@ -686,13 +1074,15 @@ export function enZip(fichiers) {
 import { spawn } from 'node:child_process';
 import { Buffer } from 'node:buffer';
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { clearTimeout, setTimeout } from 'node:timers';
 import { fileURLToPath, URL, URLSearchParams } from 'node:url';
 import * as cas from '../scripts/cas.mjs';
 import * as cibles from '../scripts/cibles.mjs';
+import * as code from '../scripts/code.mjs';
+import * as lecteurs from '../scripts/lecteurs.mjs';
 import * as jira from '../scripts/jira.mjs';
 import * as moteur from '../scripts/moteur.mjs';
 import * as rapport from '../scripts/rapport.mjs';
@@ -701,7 +1091,8 @@ import * as session from '../scripts/session.mjs';
 import * as texte from '../scripts/texte.mjs';
 import { lireToml } from '../scripts/toml.mjs';
 import { designer } from '../scripts/designer.mjs';
-import { demarrerApplication, demandesJira, descriptionCloud, enMhtml, enZip, JETONS_FACTICES, pageJira, SESSION_XRAY } from './application-demo.mjs';
+import { demarrerApplication, demandesJira, descriptionCloud, enMhtml, enZip, ENTETE_DEMO, JETON_REQUETE_DEMO, JETONS_FACTICES, MOT_DE_PASSE_MAIN_DEMO, pageJira, SESSION_XRAY } from './application-demo.mjs';
+import { ecrireProjetDemo, FICHIERS_PROJET, MOT_DE_PASSE_DEMO } from './projet-demo.mjs';
 
 const SKILL = fileURLToPath(new URL('..', import.meta.url));
 const TMP = mkdtempSync(join(tmpdir(), 'scenario-playwright-'));
@@ -726,6 +1117,22 @@ function saut(nom, raison) {
 const leve = (f) => { try { f(); return null; } catch (e) { return e; } };
 const contient = (liste, motif) => liste.some((x) => (motif instanceof RegExp ? motif.test(x) : String(x).includes(motif)));
 const sha = (chemin) => createHash('sha256').update(readFileSync(chemin)).digest('hex');
+
+/** Empreinte d'une arborescence (chemins et contenus), sans le dossier de premier niveau `sauf`. */
+function arbre(racine, sauf = null) {
+  const lignes = [];
+  const visiter = (d, rel) => {
+    for (const f of readdirSync(d, { withFileTypes: true }).sort((a, b) => (a.name < b.name ? -1 : 1))) {
+      const r = rel ? `${rel}/${f.name}` : f.name;
+      if (!rel && f.name === sauf) continue;
+      if (f.isSymbolicLink()) lignes.push(`${r} lien`);
+      else if (f.isDirectory()) visiter(join(d, f.name), r);
+      else lignes.push(`${r} ${sha(join(d, f.name))}`);
+    }
+  };
+  visiter(racine, '');
+  return createHash('sha256').update(lignes.join('\n')).digest('hex');
+}
 
 /** Écrit un fichier de scénario dans un dossier de la recette ; rend son chemin. */
 function ecrire(dossier, nom, contenu) {
@@ -819,7 +1226,7 @@ async function principal() {
   const { base, autre, distante, jira: adresseJira, outils } = app;
   const sorties = [];
   const canal = session.lireReglages(ENV).reglages.canal;
-  console.log(`Recette de scenario-playwright 1.2.0 : Node ${process.versions.node}, navigateur ${canal}, application ${base}`);
+  console.log(`Recette de scenario-playwright 1.3.0 : Node ${process.versions.node}, navigateur ${canal}, application ${base}`);
   console.log(`Dossier temporaire : ${TMP}`);
   try {
     // ------------------------------------------------------------------------------------------
@@ -1466,10 +1873,10 @@ nom = "export"
       const r = rapportComplet;
       const champs = ['format', 'skill', 'version', 'scenario', 'debut', 'fin', 'duree_ms', 'navigateur', 'options', 'jeux', 'origines_bloquees', 'cibles_fragiles', 'bilan', 'statut'];
       controle('E1 : champs du rapport', r && JSON.stringify(Object.keys(r)) === JSON.stringify(champs) && r.format === rapport.FORMAT_RAPPORT, JSON.stringify(r && Object.keys(r)));
-      const champsEtape = ['numero', 'ligne', 'action', 'resume', 'cible', 'fragile', 'mutation', 'statut', 'duree_ms', 'message', 'capture', 'aria', 'telechargement', 'console', 'erreurs_page', 'reponses'];
+      const champsEtape = ['numero', 'ligne', 'action', 'resume', 'cible', 'fragile', 'mutation', 'statut', 'duree_ms', 'message', 'capture', 'aria', 'telechargement', 'hors_ecran', 'console', 'erreurs_page', 'reponses'];
       controle('E1 : champs de chaque étape', r && r.jeux[0].etapes.every((e) => JSON.stringify(Object.keys(e)) === JSON.stringify(champsEtape)));
       controle('E1 : champs du navigateur, du scénario et des options', r && JSON.stringify(Object.keys(r.navigateur)) === '["canal","version","playwright_core","chromium_reference","avertissement"]' && JSON.stringify(Object.keys(r.scenario)) === '["fichier","titre","etiquettes","source","empreinte","url_base","origines"]' && JSON.stringify(Object.keys(r.options)) === '["sans_tete","ralenti","trace","mutations_autorisees","params","jeu"]');
-      controle('E2 : format et vocabulaire communs avec le navigateur d\'Agent2Test', scenario.FORMAT_SCENARIO === 'scenario-playwright.scenario/1' && ['naviguer', 'cliquer', 'saisir', 'choisir', 'cocher', 'survoler', 'touche', 'televerser', 'attendre', 'verifier'].every((a) => a in scenario.ACTIONS) && JSON.stringify(scenario.CRITERES) === '["contient","visible","valeur","nombre","url","actif"]');
+      controle('E2 : format et vocabulaire communs avec le navigateur d\'Agent2Test', scenario.FORMAT_SCENARIO === 'scenario-playwright.scenario/1' && ['naviguer', 'cliquer', 'saisir', 'choisir', 'cocher', 'survoler', 'touche', 'televerser', 'attendre', 'verifier'].every((a) => a in scenario.ACTIONS) && JSON.stringify(scenario.CRITERES) === '["contient","visible","valeur","nombre","url","actif","requete","api","fichier"]');
       controle('E3 : fonctions exportées du moteur et de la session', ['jouerScenario', 'messageErreur', 'adresseCorrespond'].every((f) => typeof moteur[f] === 'function') && ['ouvrirNavigateur', 'garderOrigines', 'lireReglages', 'compatibilite'].every((f) => typeof session[f] === 'function') && ['lireScenario', 'preparerJeux', 'controlerTraduction', 'squeletteToml', 'planTraduction'].every((f) => typeof scenario[f] === 'function'));
     }
 
@@ -1718,7 +2125,7 @@ Fonctionnalité: Clients
       let r = await lancer('importer.mjs', [fX, '--adresse', base, '--dossier', d]);
       controle('export de Xray : un texte par test, nommé par la clé du test, code 0', r.code === 0 && JSON.stringify(etatsDe(r.sortie)) === '["écrit DEMO-32","écrit DEMO-33"]' && /^Fichier 1_DEMO-30\.feature : 2 scénarios$/m.test(r.sortie), r.sortie + r.erreurs);
       const t33 = lire(d, 'DEMO-33.scenario');
-      controle('provenance d\'un fichier : lot, scénario, source et son empreinte, contexte reporté (D17.INV-4)', t33.startsWith('# Importé d\'un fichier .feature par importer.mjs (scenario-playwright 1.2.0), sans IA : le scénario est recopié tel qu\'écrit dans le fichier.\n# Lot : fichier ../r22-sources/1_DEMO-30.feature\n# Scénario : @DEMO-33, 1_DEMO-30.feature\n') && t33.includes(`# Source : fichier ../r22-sources/1_DEMO-30.feature (sha256 ${sha(fX)})`) && /# Empreinte de la source : [0-9a-f]{64}\n/.test(t33) && t33.includes('# Contexte reporté en tête des étapes : 1 étape.'), t33);
+      controle('provenance d\'un fichier : lot, scénario, source et son empreinte, contexte reporté (D17.INV-4)', t33.startsWith('# Importé d\'un fichier .feature par importer.mjs (scenario-playwright 1.3.0), sans IA : le scénario est recopié tel qu\'écrit dans le fichier.\n# Lot : fichier ../r22-sources/1_DEMO-30.feature\n# Scénario : @DEMO-33, 1_DEMO-30.feature\n') && t33.includes(`# Source : fichier ../r22-sources/1_DEMO-30.feature (sha256 ${sha(fX)})`) && /# Empreinte de la source : [0-9a-f]{64}\n/.test(t33) && t33.includes('# Contexte reporté en tête des étapes : 1 étape.'), t33);
       const lu33 = texte.analyserTexte(t33);
       controle('scénario recopié : fonctionnalité, étiquettes, contexte en tête des étapes, colonnes d\'exemples adaptées', lu33.erreurs.length === 0 && lu33.scenario.fonctionnalite === 'Gérer les clients' && JSON.stringify(lu33.scenario.etiquettes) === '["DEMO-33","DEMO-30","TEST_DEMO-33","REQ_DEMO-30"]' && lu33.scenario.etapes[0].phrase === 'je suis sur la page des clients' && JSON.stringify(Object.keys(lu33.scenario.jeux?.[0] ?? {})) === '["nom_du_client"]', JSON.stringify(lu33.erreurs));
       const fZ = fichier('zephyr-export.feature', 'Feature: Export\n  @TestCaseKey=DEMO-T7 @export\n  Scenario: Exporter les clients\n    Given I am on the export page\n    When I click the link "Export as CSV"\n    Then the file "clients.csv" is downloaded\n');
@@ -1782,7 +2189,7 @@ Fonctionnalité: Clients
       controle('même clé de test, d\'un autre chemin d\'import : modifié, pas en conflit (D17.INV-4)', /modifié\s+@DEMO-12 .*changé dans Xray depuis l'import ; --remplacer/.test(r.sortie), r.sortie);
       controle('test Generic refusé avec son motif ; test introuvable avec la réponse de Xray (D17.INV-5)', /refusé\s+@DEMO-14\s+Relire les journaux : test Generic : définition en texte libre/.test(r.sortie) && /introuvable @DEMO-15\s+An issue with key 'DEMO-15' does not exist/.test(r.sortie), r.sortie);
       const t13 = lire(d, 'DEMO-13.scenario');
-      controle('test manuel : chaque pas en « Quand <action> », avec ses données, puis « Alors <résultat attendu> », signalé en tête (D17.INV-5)', t13.startsWith('# Importé de Xray par importer.mjs (scenario-playwright 1.2.0), sans IA : chaque pas du test manuel devient « Quand <action> », avec ses données, puis « Alors <résultat attendu> ».\n# Lot : xray DEMO-13\n# Scénario : @DEMO-13, test manuel DEMO-13\n') && t13.includes('\n@DEMO-13\nScénario: Exporter les clients\n') && t13.includes('  Quand Ouvrir la page « Export »\n  Alors La page « Export » s\'affiche\n  Quand Cliquer sur le lien « Exporter en CSV », avec « format CSV ; séparateur ; »\n  Alors Le fichier « clients.csv » est téléchargé\n'), t13);
+      controle('test manuel : chaque pas en « Quand <action> », avec ses données, puis « Alors <résultat attendu> », signalé en tête (D17.INV-5)', t13.startsWith('# Importé de Xray par importer.mjs (scenario-playwright 1.3.0), sans IA : chaque pas du test manuel devient « Quand <action> », avec ses données, puis « Alors <résultat attendu> ».\n# Lot : xray DEMO-13\n# Scénario : @DEMO-13, test manuel DEMO-13\n') && t13.includes('\n@DEMO-13\nScénario: Exporter les clients\n') && t13.includes('  Quand Ouvrir la page « Export »\n  Alors La page « Export » s\'affiche\n  Quand Cliquer sur le lien « Exporter en CSV », avec « format CSV ; séparateur ; »\n  Alors Le fichier « clients.csv » est téléchargé\n'), t13);
       const appel = await lancer('importer.mjs', ['xray:DEMO-17', '--api', outils, '--adresse', base, '--dossier', join(TMP, 'r23-appel')], { env });
       sorties.push(appel.sortie + appel.erreurs);
       controle('pas vide, l\'appel d\'un autre test peut-être : test refusé, rien n\'est deviné (D17.INV-5)', appel.code === 1 && JSON.stringify(etatsDe(appel.sortie)) === '["refusé DEMO-17"]' && /refusé\s+@DEMO-17\s+Exporter, puis rejouer un autre test : pas 2 vide/.test(appel.sortie) && !existsSync(join(TMP, 'r23-appel')), appel.sortie + appel.erreurs);
@@ -1873,6 +2280,207 @@ Fonctionnalité: Clients
       controle('jetons dans l\'en-tête Authorization seulement, jamais dans une adresse ; secret de Xray Cloud dans l\'authentification seulement (D17.INV-3)', requetes.every((q) => !valeurs.some((j) => `${q.chemin}${q.requete}`.includes(j))) && requetes.filter((q) => q.corps.includes(JETONS_FACTICES.XRAY_CLIENT_SECRET)).every((q) => q.chemin === '/api/v2/authenticate') && requetes.filter((q) => q.autorisation).every((q) => /^Bearer \S+$/.test(q.autorisation)));
       const ecrits = ['r23', 'r23-dc', 'r24', 'r24-dc'].flatMap((x) => (existsSync(join(TMP, x)) ? readdirSync(join(TMP, x), { withFileTypes: true }).filter((f) => f.isFile()).map((f) => readFileSync(join(TMP, x, f.name), 'utf8')) : []));
       controle('aucun jeton affiché, ni écrit dans un texte importé (D17.INV-3)', sorties.length > 15 && !sorties.some((s) => valeurs.some((j) => s.includes(j))) && ecrits.length > 6 && !ecrits.some((t) => valeurs.some((j) => t.includes(j))));
+    }
+    // ------------------------------------------------------------------------------------------
+    scenarioRecette('R26', 'Index du code sans IA : lecture seule, routes, éléments et noms accessibles, traductions, endpoints, validations, sources, exclusions, bornes');
+    {
+      const projet = join(TMP, 'r26', 'projet');
+      ecrireProjetDemo(projet);
+      ecrire(join('r26', 'ailleurs'), 'page.html', '<button>Hors du projet</button>\n');
+      let lien = true;
+      try { symlinkSync(join(TMP, 'r26', 'ailleurs'), join(projet, 'front', 'lien'), 'junction'); } catch { lien = false; }
+      const dossier = join(projet, 'scenarios');
+      const avant = arbre(projet, 'scenarios');
+      let x = await lancer('indexer.mjs', [projet, '--dossier', dossier]);
+      const fichierIndex = join(dossier, 'index', 'code.json');
+      controle('index écrit, code 0 : bilan sur une ligne, code.json et code.md', x.code === 0 && /^index du code : 20 fichiers lus ; 13 routes, 27 éléments d'interface, 25 textes, 11 endpoints et appels, 6 contraintes de validation ; 3 fichiers de traduction \(fr\)$/m.test(x.sortie) && existsSync(fichierIndex) && existsSync(join(dossier, 'index', 'code.md')), x.sortie + x.erreurs);
+      const ix = existsSync(fichierIndex) ? JSON.parse(readFileSync(fichierIndex, 'utf8')) : { routes: [], elements: [], textes: [], endpoints: [], validations: [], limites: [] };
+      controle('format, version, projet noté relativement au dossier des scénarios, langue, empreinte', ix.format === code.FORMAT_INDEX && ix.version === '1.3.0' && ix.projet === '..' && ix.langue === 'fr' && /^[0-9a-f]{64}$/.test(ix.empreinte) && ix.partiel === false && ix.limites.length === 0, JSON.stringify(ix.limites));
+      controle('projet seulement lu : rien de créé ni de modifié hors du dossier des scénarios, qui ne reçoit que index/ (D18.INV-1)', arbre(projet, 'scenarios') === avant && JSON.stringify(readdirSync(dossier)) === '["index"]' && JSON.stringify(readdirSync(join(dossier, 'index')).sort()) === '["code.json","code.md"]');
+      const routes = ix.routes.map((r) => [r.chemin, r.composant, r.redirection && `→ ${r.redirection}`, r.garde && 'garde'].filter(Boolean).join(' ')).sort();
+      const routesAttendues = ['/ Accueil', '/ Accueil', '/ → /clients', '/** PageIntrouvableComponent', '/admin', '/admin AdminComponent', '/admin/utilisateurs UtilisateursComponent', '/clients ClientsComponent', '/clients/nouveau ClientFormComponent garde', '/commandes Commandes', '/commandes/:id Commande', '/factures Factures', '/factures/:id Facture'].sort();
+      controle('routes : Angular (module chargé à la demande préfixé, garde, redirection), Vue Router (enfants), React Router en JSX', JSON.stringify(routes) === JSON.stringify(routesAttendues), JSON.stringify(routes));
+      const el = (role, nom) => ix.elements.find((e) => e.role === role && e.nom === nom);
+      controle('Angular : clés ngx-translate résolues en français, niveau du titre, testid, lien, aria-label, icône écartée du nom', el('heading', 'Clients')?.cle === 'clients.titre' && el('heading', 'Clients').niveau === 1 && el('link', 'Nouveau client')?.testid === 'nouveau-client' && el('link', 'Nouveau client').vers === '/clients/nouveau' && Boolean(el('button', 'Exporter les clients')) && Boolean(el('button', 'Imprimer')) && !ix.elements.some((e) => /download|print/.test(e.nom ?? '')) && !ix.textes.some((t) => /download|print/.test(t.texte)) && Boolean(el('columnheader', 'Nom')), JSON.stringify(ix.elements.slice(10, 18)));
+      controle('parties variables notées … : nom, identifiant de test calculé, message de statut ; blocs @if et @for retirés', el('button', 'Supprimer …')?.dynamique === true && el('button', 'Supprimer …').testid === 'supprimer-…' && ix.elements.find((e) => e.role === 'status')?.texte === 'Client … créé' && !ix.textes.some((t) => /@if|@for|track/.test(t.texte)));
+      controle('clé de traduction absente des fichiers : le nom affiché est la clé, signalée', el('button', 'clients.aide.inconnue')?.cleNonResolue === true);
+      controle('gabarit en ligne : mat-label, label for, label englobant, aria-label, placeholder ; rôles des champs ; message d\'erreur', el('textbox', 'Nom')?.libelle === 'Nom' && el('textbox', 'Nom').testid === 'champ-nom' && el('combobox', 'Ville')?.libelle === 'Ville' && Boolean(el('option', 'Lyon')) && Boolean(el('checkbox', 'Client actif')) && ix.elements.find((e) => e.type === 'password')?.nom === 'Mot de passe' && el('searchbox', 'Rechercher un client')?.placeholder === 'Rechercher un client' && Boolean(el('button', 'Enregistrer')) && Boolean(el('button', 'Enregistrer et fermer')) && ix.elements.some((e) => e.texte === 'Le nom est obligatoire'));
+      controle('Vue : $t et v-t résolus, data-cy noté comme attribut de test, icône écartée', el('heading', 'Commandes')?.niveau === 2 && el('link', 'Nouvelle commande')?.attributTest === 'data-cy' && Boolean(el('button', 'Rafraîchir la liste')) && ix.textes.some((t) => t.texte === 'Aucune commande'));
+      controle('React : apostrophe dans le texte JSX, t() résolu, htmlFor, composant Button, texte avec expression', el('heading', 'Factures')?.niveau === 3 && el('textbox', 'Rechercher')?.testid === 'recherche-facture' && el('button', 'Créer une facture')?.composant === true && Boolean(el('img', 'Logo de la société')) && ix.textes.some((t) => t.texte === "L'adresse n'est pas renseignée") && ix.textes.some((t) => t.texte === 'Total : … factures' && t.dynamique));
+      controle('TSX : la fonction générique <T,> se lit comme du code, pas comme du JSX', ix.elements.some((e) => e.testid === 'badge') && ix.textes.some((t) => t.texte === '… nouveaux'));
+      const eps = ix.endpoints.map((e) => `${e.methode} ${e.chemin} ${e.origine}`).sort();
+      const epsAttendus = ['GET /api/clients openapi', 'GET /api/clients spring', 'POST /api/clients spring', 'POST /api/clients js', 'DELETE /api/clients/{nom} spring', 'GET /api/clients/{nom} spring', 'GET /api/commandes js', 'GET /api/export spring', 'GET /api/export.csv openapi', 'GET …/clients/… js', 'POST /api/factures js'].sort();
+      controle('endpoints : Spring en Java et en Kotlin (constante, @RequestParam, @RequestBody, @ResponseStatus), contrat OpenAPI, appels HttpClient, axios et fetch', JSON.stringify(eps) === JSON.stringify(epsAttendus) && ix.endpoints.find((e) => e.methode === 'POST' && e.origine === 'spring')?.statut === 201 && ix.endpoints.find((e) => e.methode === 'POST' && e.origine === 'spring').corps === 'ClientDto' && JSON.stringify(ix.endpoints.find((e) => e.operation === 'lister')?.parametres) === '["ville"]' && ix.endpoints.find((e) => e.operation === 'exporterClients')?.resume === 'Exporte les clients en CSV', JSON.stringify(eps));
+      const vals = ix.validations.map((v) => `${v.classe}.${v.champ} ${v.contrainte}${v.message ? ` « ${v.message} »` : ''}`);
+      controle('validations : messages résolus dans ValidationMessages_fr, paramètres substitués, Kotlin @field', JSON.stringify(vals) === JSON.stringify(['ClientDto.nom NotBlank « Le nom est obligatoire »', 'ClientDto.nom Size « Le nom fait au plus 40 caractères »', 'ClientDto.ville NotNull', 'ClientDto.courriel Email « Adresse électronique invalide »', 'FiltreDto.filtre NotBlank « Le filtre est obligatoire »', 'FiltreDto.ville Size']) && ix.validations[0].cle === 'client.nom.obligatoire' && ix.validations[5].parametres?.min === 2, JSON.stringify(vals));
+      controle('chaque entrée cite sa source, fichier:ligne (D18.INV-2)', [...ix.routes, ...ix.elements, ...ix.textes, ...ix.endpoints, ...ix.validations].every((e) => /^[\w./-]+:\d+$/.test(e.source)) && el('button', 'Enregistrer')?.source === 'front/src/app/clients/client-form.component.ts:19' && el('heading', 'Clients')?.source === 'front/src/app/clients/clients.component.html:1' && ix.routes.find((r) => r.chemin === '/commandes/:id')?.source === 'vue/src/router/index.js:9' && ix.validations[4]?.source === 'back/src/main/kotlin/demo/ExportController.kt:11');
+      const tout = (existsSync(fichierIndex) ? readFileSync(fichierIndex, 'utf8') : '') + lire(join(dossier, 'index'), 'code.md');
+      controle('écartés : dépendances, construction, cache caché, fichiers de test, client Feign, commentaire (D18.INV-1)', tout.length > 1000 && !/Ne pas indexer|Cache caché|Bouton de spec|\/api\/compilee|\/api\/autre|\/api\/test|\/commentaire/.test(tout));
+      controle('configuration : rien d\'autre que le chemin de contexte ; ni mot de passe, ni .env (D18.INV-5)', !tout.includes(MOT_DE_PASSE_DEMO) && !tout.includes('spring.datasource'));
+      if (lien) controle('lien symbolique non suivi : rien de ce qu\'il désigne hors du projet n\'est lu (D18.INV-1)', tout.length > 1000 && !tout.includes('Hors du projet'));
+      else saut('lien symbolique non suivi (D18.INV-1)', 'lien symbolique impossible à créer sur ce poste');
+      const empreinteIndex = existsSync(fichierIndex) ? sha(fichierIndex) : null;
+      x = await lancer('indexer.mjs', [projet, '--dossier', dossier]);
+      controle('même projet, même index, octet pour octet', x.code === 0 && sha(fichierIndex) === empreinteIndex);
+      controle('le code.md cite les entrées et leurs sources', /^- `\/clients\/nouveau` → ClientFormComponent, garde — front\/src\/app\/app\.routes\.ts:8$/m.test(tout) && /^- l\.19 button « Enregistrer »$/m.test(tout) && /^- `POST \/api\/clients` ClientController\.creer, corps ClientDto, statut 201 — back\/src\/main\/java\/demo\/ClientController\.java:17$/m.test(tout));
+      x = await lancer('indexer.mjs', [projet, '--dossier', join(TMP, 'r26', 'en'), '--langue', 'en']);
+      const en = existsSync(join(TMP, 'r26', 'en', 'index', 'code.json')) ? JSON.parse(readFileSync(join(TMP, 'r26', 'en', 'index', 'code.json'), 'utf8')) : { elements: [] };
+      controle('--langue en : libellés anglais ; projet hors du dossier des scénarios noté relativement', x.code === 0 && en.elements.some((e) => e.role === 'heading' && e.nom === 'Customers') && en.elements.some((e) => e.role === 'textbox' && e.nom === 'Name') && en.projet === '../projet', x.sortie + x.erreurs);
+      x = await lancer('indexer.mjs', [projet, '--dossier', join(TMP, 'r26', 'de'), '--langue', 'de']);
+      controle('langue sans fichier de traduction : dit, clés laissées telles quelles', x.code === 0 && /^LIMITE aucun fichier de traduction pour la langue de \(langues trouvées : en, fr\) : clés non résolues$/m.test(x.sortie), x.sortie);
+      const contexte = join(TMP, 'r26', 'contexte');
+      ecrire(join('r26', 'contexte', 'src', 'main', 'resources'), 'application.yml', `server:\n  port: 8081\n  servlet:\n    context-path: /boutique\nspring:\n  datasource:\n    password: ${MOT_DE_PASSE_DEMO}\n`);
+      ecrire(join('r26', 'contexte', 'src', 'main', 'java'), 'Articles.java', '@RestController\n@RequestMapping("/api/articles")\nclass Articles {\n  @GetMapping("/{id:\\\\d+}")\n  String lire() { return ""; }\n}\n');
+      x = await lancer('indexer.mjs', [contexte, '--dossier', join(contexte, 'scenarios')]);
+      const ixc = lire(join(contexte, 'scenarios', 'index'), 'code.json');
+      controle('chemin de contexte Spring (YAML) appliqué aux endpoints ; {id:regex} réduit à {id}', x.code === 0 && ixc.includes('"methode":"GET","chemin":"/boutique/api/articles/{id}"') && ixc.includes('"contexte": "/boutique"') && !ixc.includes(MOT_DE_PASSE_DEMO), ixc.slice(0, 600));
+      const bornes = join(TMP, 'r26', 'bornes');
+      ecrire(join('r26', 'bornes'), 'a.html', `<button>Gros</button>${' '.repeat(code.LIMITES_INDEX.octets)}`);
+      ecrire(join('r26', 'bornes'), 'b.html', '<button>Petit</button>');
+      ecrire(join('r26', 'bornes'), 'c.html', '<button>Autre</button>');
+      x = await lancer('indexer.mjs', [bornes, '--dossier', join(bornes, 'scenarios')]);
+      controle('fichier de plus de 1 Mio : non lu, dit (D18.INV-3)', x.code === 0 && /^LIMITE fichier de plus de 1048576 octets, non lu : a\.html \(\d+ octets\)$/m.test(x.sortie) && !lire(join(bornes, 'scenarios', 'index'), 'code.json').includes('Gros') && lire(join(bornes, 'scenarios', 'index'), 'code.json').includes('Petit'), x.sortie);
+      const max = code.LIMITES_INDEX.fichiers;
+      code.LIMITES_INDEX.fichiers = 1;
+      const partiel = code.indexerProjet(bornes, { dossierScenarios: join(bornes, 'scenarios') });
+      code.LIMITES_INDEX.fichiers = max;
+      controle('au-delà du nombre de fichiers : index partiel, dit (D18.INV-3)', partiel.partiel === true && partiel.limites.some((l) => /^plus de 1 fichiers à lire : index partiel, arrêté à b\.html$/.test(l)), JSON.stringify(partiel.limites));
+      for (const [args, motif] of [[[], 'dossier du projet manquant'], [[projet, '--inconnue'], 'option inconnue : --inconnue'], [[projet, '--langue', 'français'], '--langue français'], [[join(TMP, 'r26', 'absent')], 'dossier introuvable'], [[projet, '--dossier', projet], 'le dossier des scénarios est le projet lui-même'], [[projet, projet], 'un seul dossier de projet'], [[projet, '--dossier'], '--dossier attend une valeur']]) {
+        const r = await lancer('indexer.mjs', args);
+        controle(`refus, code 2 : ${motif}`, r.code === 2 && r.erreurs.includes(motif), r.erreurs);
+      }
+      const y = lecteurs.lireYaml('---\na: 1\nb:\n  - x\n  - { c: "d", e: [1, 2] }\nf: |\n  ligne 1\n  ligne 2\ng: >\n  plié\n  ici\n"h i": \'j\'\'k\' # commentaire\nl:\n- m\n...\nn: hors du document\n').valeur;
+      controle('YAML minimal : cartes, listes, collections en ligne, blocs | et >, guillemets, commentaires, un seul document', y.a === '1' && y.b[0] === 'x' && y.b[1].c === 'd' && y.b[1].e[1] === '2' && y.f === 'ligne 1\nligne 2' && y.g === 'plié ici' && y['h i'] === "j'k" && y.l[0] === 'm' && !('n' in y), JSON.stringify(y));
+      const p = lecteurs.lireProprietes('# commentaire\na = b\\\n  c\nd:\\u00e9t\\u00e9\ne f\n');
+      controle('.properties : lignes continuées, \\uXXXX, séparateurs =, : et espace', p.get('a')?.valeur === 'bc' && p.get('d')?.valeur === 'été' && p.get('e')?.valeur === 'f');
+      const js = lecteurs.jetonsJs("const r = /'[\"]/g; const s = 'a'; const t = `x${1}y`; const u = a < b && c > d;", { jsx: true });
+      controle('jetons JavaScript : expression régulière, gabarit, comparaisons qui ne sont pas du JSX', js.some((j) => j.t === 'regex') && js.find((j) => j.t === 'gabarit')?.v === 'x…y' && !js.some((j) => j.t === 'jsx') && js.filter((j) => j.t === 'chaine').length === 1);
+    }
+
+    // ------------------------------------------------------------------------------------------
+    scenarioRecette('R27', 'Index à la traduction et au contrôle : propositions en commentaire, index périmé, notes qui ne changent pas le code de sortie');
+    {
+      const projet = join(TMP, 'r27', 'projet');
+      ecrireProjetDemo(projet);
+      const dossier = join(projet, 'scenarios');
+      await lancer('indexer.mjs', [projet, '--dossier', dossier]);
+      const texteR27 = `Scénario: Créer un client\n  Adresse : ${base}\n  Paramètre : nom = Dupont\n\n  Quand je clique sur le lien « Nouveau client »\n  Et je saisis « <nom> » dans le champ « Nom »\n  Et je clique sur le bouton « Enregistrer »\n  Alors la requête POST /api/clients répond 201\n  Et je vois « Client <nom> créé »\n  Et je clique sur « Inexistant »\n`;
+      const texteChemin = ecrire(join('r27', 'projet', 'scenarios'), 'creer.scenario', texteR27);
+      let x = await lancer('traduire.mjs', [texteChemin]);
+      const sq = lire(dossier, 'creer.toml');
+      controle('traduire.mjs annonce les propositions de l\'index du code', x.code === 0 && /^index du code : 5 étapes avec des propositions, en commentaire, à vérifier$/m.test(x.sortie) && sq.includes("# Propositions de l'index du code (index/code.md, empreinte"), x.sortie);
+      controle('lien : rôle et nom, testid en alternative, source', sq.includes('#   cible = { role = "link", nom = "Nouveau client" }  # front/src/app/clients/clients.component.html:2 ; aussi { testid = "nouveau-client" }'), sq);
+      controle('champ : rôle et nom, libellé et testid en alternatives ; un libellé tout entier variable ne propose rien', sq.includes('#   cible = { role = "textbox", nom = "Nom" }  # front/src/app/clients/client-form.component.ts:11 ; aussi { libelle = "Nom" }, { testid = "champ-nom" }') && !sq.includes('pour « ${nom} »'));
+      controle('nom contenu dans celui d\'un autre bouton : exact = true proposé', sq.includes('#   cible = { role = "button", nom = "Enregistrer", exact = true }'));
+      controle('requête citée par la phrase : endpoint connu, avec son statut', sq.includes('#   methode = "POST", chemin = "/api/clients"  # back/src/main/java/demo/ClientController.java:17, statut 201'));
+      controle('texte variable : rôle seul proposé, texte noté', sq.includes('#   cible = { role = "status" }  # front/src/app/clients/clients.component.html:19'));
+      const blocInexistant = sq.slice(sq.indexOf('# ligne 10 :'));
+      controle('libellé absent de l\'index : aucune proposition', blocInexistant.length > 0 && !blocInexistant.includes('index du code'));
+      x = await lancer('verifier.mjs', [join(dossier, 'creer.toml')]);
+      controle('propositions en commentaire seulement : chaque étape reste à compléter, le squelette ne se joue pas (D18.INV-4)', (sq.match(/^action = "à compléter"$/gm) ?? []).length === 6 && x.code === 2 && /étape à compléter/.test(x.sortie), x.sortie);
+      const complet = `format = "scenario-playwright.scenario/1"\ntitre = "Créer un client"\nurl_base = "${base}"\n\n[parametres]\nnom = "Dupont"\n\n[[etapes]]\naction = "cliquer"\ncible = { role = "link", nom = "Nouveau client" }\n\n[[etapes]]\naction = "saisir"\ncible = { libelle = "Nom" }\nvaleur = "\${nom}"\n\n[[etapes]]\naction = "cliquer"\ncible = { role = "button", nom = "Enregistrer", exact = true }\n\n[[etapes]]\naction = "verifier"\ncritere = "requete"\nmethode = "POST"\nchemin = "/api/clients"\nattendu = { statut = 201 }\n\n[[etapes]]\naction = "verifier"\ncritere = "contient"\ncible = { role = "status" }\nattendu = "Client \${nom} créé"\n\n[[etapes]]\naction = "cliquer"\ncible = { role = "button", nom = "Inexistant" }\n\n[[etapes]]\naction = "verifier"\ncritere = "api"\nchemin = "/api/absent"\n\n[[etapes]]\naction = "cliquer"\ncible = { testid = "supprimer-\${nom}" }\n\n[[etapes]]\naction = "cliquer"\ncible = { testid = "nouvelle-commande" }\n`;
+      const completChemin = ecrire(join('r27', 'projet', 'scenarios'), 'complet.toml', complet);
+      x = await lancer('verifier.mjs', [completChemin]);
+      controle('cible absente de l\'index : notée, avec son étape ; un testid calculé correspond ; data-cy n\'est pas un testid', x.code === 0 && /^note complet\.toml : cibles absentes de l'index du code \(texte variable, composant hors du projet, ou cible à revoir\) : étape 6 getByRole\('button', \{ name: 'Inexistant' \}\) ; étape 9 getByTestId\('nouvelle-commande'\)$/m.test(x.sortie), x.sortie);
+      controle('chemin absent de l\'index : noté ; le code de sortie n\'en dépend pas (D18.INV-4)', x.code === 0 && /^note complet\.toml : chemins absents de l'index du code : étape 7 GET \/api\/absent$/m.test(x.sortie) && /^ok {2}complet\.toml/m.test(x.sortie), x.sortie);
+      writeFileSync(join(projet, 'front', 'src', 'app', 'clients', 'clients.component.html'), `${FICHIERS_PROJET['front/src/app/clients/clients.component.html']}<p>modifié</p>\n`);
+      x = await lancer('traduire.mjs', [texteChemin, '--remplacer']);
+      controle('code modifié depuis l\'indexation : index périmé, dit, squelette sans propositions (D18.INV-2)', x.code === 0 && /^note : index du code périmé, le code a changé depuis l'indexation : relancer indexer\.mjs ; squelette sans propositions de l'index$/m.test(x.sortie) && !lire(dossier, 'creer.toml').includes('# index du code'), x.sortie);
+      x = await lancer('verifier.mjs', [completChemin]);
+      controle('verifier.mjs avec un index périmé : dit, cibles non comparées, code 0', x.code === 0 && /^note complet\.toml : index du code périmé.*cibles non comparées à l'index$/m.test(x.sortie) && !/cibles absentes/.test(x.sortie), x.sortie);
+      writeFileSync(join(dossier, 'index', 'code.json'), '{ pas du JSON');
+      x = await lancer('verifier.mjs', [completChemin]);
+      controle('index illisible : dit, sans erreur', x.code === 0 && /index\/code\.json illisible : relancer indexer\.mjs/.test(x.sortie), x.sortie);
+      x = await lancer('verifier.mjs', [ecrire('r27-sans-index', 'complet.toml', complet)]);
+      controle('sans index : rien sur l\'index', x.code === 0 && !/index du code/.test(x.sortie), x.sortie);
+    }
+
+    // ------------------------------------------------------------------------------------------
+    scenarioRecette('R28', 'Requêtes de la page : méthode, chemin, statut, champs du corps et de la réponse ; ni en-tête, ni cookie, ni jeton, ni corps d\'une étape à la main');
+    {
+      const tete = (titre, profil = null) => `format = "scenario-playwright.scenario/1"\ntitre = "${titre}"\nurl_base = "${base}"\n${profil ? `profil = "${profil}"\n` : ''}`;
+      const etape = (champs) => `\n[[etapes]]\n${champs}\n`;
+      const verifierRequete = (champs) => etape(`action = "verifier"\ncritere = "requete"\n${champs}`);
+      const compteur = app.etat.compteur + 1;
+      const r1 = await jouer(ecrire('r28', 'requetes.toml', `${tete('Requêtes')}\n[parametres]\nnom = "Requete"\n${etape('action = "naviguer"\nurl = "/clients/nouveau"')}${verifierRequete('methode = "GET"\nchemin = "/clients/nouveau"\nattendu = { statut = 200 }')}${etape('action = "saisir"\ncible = { libelle = "Nom" }\nvaleur = "${nom}"')}${etape('action = "choisir"\ncible = { libelle = "Ville" }\nvaleur = "Lyon"')}${etape('action = "cliquer"\ncible = { role = "button", nom = "Enregistrer" }\nmutation = "creation"')}${verifierRequete('methode = "POST"\nchemin = "/api/clients"\nattendu = { statut = 201, corps = { nom = "${nom}", ville = "Lyon", actif = false } }')}${verifierRequete('chemin = "/api/clients?source=formulaire"')}${verifierRequete('methode = "POST"\nchemin = "/api/cli*"')}${verifierRequete(`chemin = "${base}/api/clients"`)}${verifierRequete('methode = "GET"\nchemin = "/clients"')}${etape('action = "naviguer"\nurl = "/clients"')}${etape('action = "cliquer"\ncible = { role = "button", nom = "Supprimer", dans = { role = "row", nom = "${nom}" } }\nmutation = "suppression"')}${verifierRequete('methode = "DELETE"\nchemin = "/api/clients/{nom}"\nattendu = { statut = 200 }')}${verifierRequete('methode = "DELETE"\nchemin = "/api/clients/${nom}"')}${etape('action = "naviguer"\nurl = "/compteur"')}${etape('action = "cliquer"\ncible = { role = "button", nom = "Ajouter" }\nmutation = "modification"')}${verifierRequete(`methode = "POST"\nchemin = "/api/compteur"\nattendu = { statut = 200, reponse = { compteur = ${compteur} } }`)}`));
+      const e1 = etapes(r1);
+      controle('requête de la page : méthode, chemin, statut, champs du corps JSON ; les étapes réussissent, code 0 (D19)', r1.code === 0 && e1.length === 17 && e1.every((e) => e.statut === 'reussie'), r1.sortie + JSON.stringify(e1.filter((e) => e.statut !== 'reussie').map((e) => e.message)));
+      controle('relevé dans le rapport : méthode, adresse, statut', JSON.stringify(e1[1]?.hors_ecran) === JSON.stringify({ critere: 'requete', methode: 'GET', adresse: `${base}/clients/nouveau`, statut: 200 }) && e1[5]?.hors_ecran?.adresse === `${base}/api/clients?source=formulaire&jeton=***` && e1[5].hors_ecran.statut === 201, JSON.stringify(e1[5]?.hors_ecran));
+      controle('chemin : requête de l\'adresse en sous-ensemble, préfixe à étoile, adresse complète d\'une origine déclarée, segment {nom}', [6, 7, 8, 12, 13].every((i) => e1[i]?.statut === 'reussie' && e1[i].hors_ecran) && e1[12].hors_ecran.adresse === `${base}/api/clients/Requete`);
+      controle('la fenêtre d\'une vérification part de la dernière action : la navigation qui suit l\'enregistrement est vue', e1[9]?.hors_ecran?.adresse === `${base}/clients?cree=Requete`);
+      controle('réponse JSON lue quand la page garde son document', e1[16]?.statut === 'reussie' && e1[16].hors_ecran?.statut === 200);
+      const rapportsR28 = [];
+      const lireRapport = (r) => (r.dossier ? lire(r.dossier, 'rapport.json') + lire(r.dossier, 'rapport.md') : '');
+      rapportsR28.push(lireRapport(r1));
+      const r2 = await jouer(ecrire('r28', 'echecs.toml', `${tete('Requêtes en échec')}${etape('action = "naviguer"\nurl = "/clients/nouveau"')}${etape('action = "saisir"\ncible = { libelle = "Nom" }\nvaleur = "Echec"')}${etape('action = "cliquer"\ncible = { role = "button", nom = "Enregistrer" }\nmutation = "creation"')}${verifierRequete('methode = "POST"\nchemin = "/api/clients"\nattendu = { statut = 200 }\ndelai = 2')}${verifierRequete('methode = "POST"\nchemin = "/api/clients"\nattendu = { corps = { ville = "Marseille" } }\ndelai = 2')}${verifierRequete('chemin = "/api/inexistant"\ndelai = 1')}`));
+      const e2 = etapes(r2);
+      rapportsR28.push(lireRapport(r2));
+      controle('statut différent : attendu et obtenu, adresse masquée, code 1', r2.code === 1 && e2[3]?.statut === 'echec' && e2[3].message === `requête POST ${base}/api/clients?source=formulaire&jeton=*** : attendu : statut 200 ; obtenu : statut 201`, e2[3]?.message);
+      controle('champ du corps différent : seuls les champs attendus sont cités', e2[4]?.message === `requête POST ${base}/api/clients?source=formulaire&jeton=*** : attendu : un statut inférieur à 400, corps { ville = "Marseille" } ; obtenu : statut 201, corps { ville = "Paris" }`, e2[4]?.message);
+      controle('aucune requête du chemin : dit, avec les requêtes vues depuis la dernière action', e2[5]?.message === `aucune requête /api/inexistant depuis l'étape 3 ; requêtes vues : POST ${base}/api/clients?source=formulaire&jeton=*** 201, GET ${base}/clients?cree=Echec 200`, e2[5]?.message);
+      const r4 = await jouer(ecrire('r28', 'interrompue.toml', `${tete('Réponse interrompue')}${etape('action = "naviguer"\nurl = "/interrompue"')}${etape('action = "attendre"\netat = "url"\nurl = "/accueil-connecte"')}${verifierRequete('methode = "GET"\nchemin = "/api/lent"\nattendu = { statut = 200 }')}${verifierRequete('methode = "GET"\nchemin = "/api/lent"\nattendu = { reponse = { ok = true } }\ndelai = 1')}`));
+      const e4 = etapes(r4);
+      controle('page qui change de document pendant une réponse : son statut reste relevé, sa réponse est dite interrompue', e4[2]?.statut === 'reussie' && e4[2].hors_ecran?.statut === 200 && e4[3]?.message === `requête GET ${base}/api/lent : attendu : un statut inférieur à 400, réponse { ok = true } ; obtenu : statut 200, réponse interrompue avant la fin de sa lecture (la page a changé d'adresse)`, JSON.stringify(e4.map((e) => e.message)));
+      const r3 = await jouer(ecrire('r28', 'main.toml', `${tete('Connexion', 'r28')}${etape('action = "naviguer"\nurl = "/connexion?auto=600&poster=1"')}${etape('action = "main"\nmessage = "Connectez-vous"\njusqua = { url = "/accueil-connecte" }')}${verifierRequete('methode = "POST"\nchemin = "/api/connexion"\nattendu = { statut = 200 }')}${verifierRequete('methode = "POST"\nchemin = "/api/connexion"\nattendu = { corps = { identifiant = "dupont" } }\ndelai = 1')}`));
+      const e3 = etapes(r3);
+      rapportsR28.push(lireRapport(r3));
+      controle('étape à la main : sa requête se vérifie par son statut, son corps n\'est jamais relevé (D19.INV-2)', e3[2]?.statut === 'reussie' && e3[3]?.statut === 'echec' && /obtenu : statut 200, corps non relevé pendant une étape à la main$/.test(e3[3].message ?? ''), JSON.stringify(e3.map((e) => e.message)));
+      controle('aucun en-tête, aucun cookie, aucun jeton, aucun mot de passe dans les rapports (D19.INV-2)', rapportsR28.every((t) => t.length > 500) && !rapportsR28.some((t) => t.includes(ENTETE_DEMO) || t.includes(JETON_REQUETE_DEMO) || t.includes(MOT_DE_PASSE_MAIN_DEMO) || /authorization|bearer|cookie|session=ok/i.test(t)));
+      const erreurs = (etapes) => scenario.validerScenario(lireToml(`format = "scenario-playwright.scenario/1"\ntitre = "T"\nurl_base = "${base}"\n${etapes}`)).erreurs;
+      const v = (champs) => `[[etapes]]\naction = "verifier"\n${champs}\n`;
+      for (const [etapes, motif] of [
+        [v('critere = "requete"'), 'chemin manquant pour le critère requete'],
+        [v('critere = "requete"\nchemin = "/api"\ncible = { role = "button" }'), 'le critère requete ne prend ni cible ni exact'],
+        [v('critere = "requete"\nchemin = "/api"\nmethode = "FETCH"'), 'methode vaut GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS'],
+        [v('critere = "requete"\nchemin = "/api"\nattendu = "201"'), 'attendu est une table non vide pour le critère requete'],
+        [v('critere = "requete"\nchemin = "/api"\nattendu = { code = 201 }'), 'clé inconnue dans attendu pour le critère requete : « code » (statut, corps, reponse)'],
+        [v('critere = "requete"\nchemin = "/api"\nattendu = { statut = 999 }'), 'attendu.statut est un code HTTP, de 100 à 599'],
+        [v('critere = "requete"\nchemin = "/api"\nattendu = { corps = "x" }'), 'attendu.corps est une table ou un tableau de champs JSON'],
+        [v(`critere = "requete"\nchemin = "${autre}/api"`), `${autre} n'est pas parmi les origines (D19.INV-1)`],
+        [v('critere = "requete"\nchemin = "api/clients"'), 'chemin est un chemin qui commence par / ou une adresse http(s)'],
+        [v('critere = "contient"\ncible = { role = "heading" }\nattendu = "x"\nchemin = "/api"'), 'chemin ne s\'emploie qu\'avec les critères requete, api ou fichier'],
+      ]) controle(`refus à la validation : ${motif}`, contient(erreurs(etapes), motif), JSON.stringify(erreurs(etapes)));
+    }
+
+    // ------------------------------------------------------------------------------------------
+    scenarioRecette('R29', 'API en lecture avec la session du navigateur, fichier téléchargé : GET seulement, origines déclarées, aucune redirection suivie, bornes');
+    {
+      const tete = (titre, profil = null) => `format = "scenario-playwright.scenario/1"\ntitre = "${titre}"\nurl_base = "${base}"\n${profil ? `profil = "${profil}"\n` : ''}`;
+      const etape = (champs) => `\n[[etapes]]\n${champs}\n`;
+      const api = (champs) => etape(`action = "verifier"\ncritere = "api"\n${champs}`);
+      const fichier = (champs) => etape(`action = "verifier"\ncritere = "fichier"\nfichier = "export"\n${champs}`);
+      const exporter = `${etape('action = "naviguer"\nurl = "/export"')}${etape('action = "telecharger"\ncible = { role = "link", nom = "Exporter en CSV" }\nnom = "export"')}`;
+      const n = app.etat.clients.length;
+      const r1 = await jouer(ecrire('r29', 'api.toml', `${tete('API et fichier', 'r29')}${etape('action = "naviguer"\nurl = "/connexion?auto=300"')}${etape('action = "main"\nmessage = "Connectez-vous"\njusqua = { url = "/accueil-connecte" }')}${api('chemin = "/api/session"\nattendu = { contient = { ouverte = true } }')}${api(`chemin = "/api/clients"\nattendu = { statut = 200, contient = [{ nom = "Dupont", ville = "Paris" }], nombre = ${n} }`)}${api(`chemin = "${base}/api/clients/Dupont"\nattendu = { contient = { ville = "Paris" } }`)}${api('chemin = "/api/clients/Inconnu"\nattendu = { statut = 404, contient = "introuvable" }')}${exporter}${fichier('attendu = { contient = "Dupont;Paris" }')}${fichier(`attendu = { lignes = ${n + 1} }`)}${fichier('attendu = { csv = { colonne = "Ville", valeur = "Paris" } }')}`));
+      const e1 = etapes(r1);
+      controle('API en GET avec la session du navigateur : champs JSON, tableau, statut 404 attendu ; fichier : texte, lignes, colonne CSV ; code 0', r1.code === 0 && e1.length === 11 && e1.every((e) => e.statut === 'reussie'), r1.sortie + JSON.stringify(e1.filter((e) => e.statut !== 'reussie').map((e) => e.message)));
+      controle('relevés dans le rapport : API (adresse, statut, octets), fichier (lignes)', e1[2]?.hors_ecran?.critere === 'api' && e1[2].hors_ecran.adresse === `${base}/api/session` && e1[2].hors_ecran.statut === 200 && e1[2].hors_ecran.octets > 0 && JSON.stringify(e1[8]?.hors_ecran) === JSON.stringify({ critere: 'fichier', fichier: 'telechargements/export.csv', lignes: n + 1, octets: e1[7]?.telechargement?.octets }), JSON.stringify([e1[2]?.hors_ecran, e1[8]?.hors_ecran]));
+      const sans = await jouer(ecrire('r29', 'sans-session.toml', `${tete('Sans session', 'r29-sans')}${api('chemin = "/api/session"\nattendu = { contient = { ouverte = false } }')}`));
+      controle('sans session dans le profil : l\'API la voit fermée, aucun identifiant ajouté', sans.code === 0, sans.sortie);
+      app.etat.requetesAutre.length = 0;
+      const avantApi = app.etat.requetesApi.length;
+      const r2 = await jouer(ecrire('r29', 'echecs.toml', `${tete('API et fichier en échec')}${exporter}${api('chemin = "/api/redirection"\ndelai = 2')}${api('chemin = "/api/gros"\ndelai = 2')}${api('chemin = "/api/clients"\nattendu = { contient = "Inexistant" }\ndelai = 1')}${api('chemin = "/api/clients"\nattendu = { nombre = 999 }\ndelai = 1')}${fichier('attendu = { csv = { colonne = "pays", valeur = "France" } }')}${fichier('attendu = { csv = { colonne = "ville", valeur = "Nantes" } }')}${fichier('attendu = { lignes = 99, contient = "Zorro" }')}`));
+      const e2 = etapes(r2);
+      controle('vérification hors de l\'écran : son relevé, sans capture quand elle réussit ; capture et instantané ARIA quand elle échoue (D8.INV-2)', e1[2]?.capture === null && e1[8]?.capture === null && Boolean(e2[2]?.capture) && Boolean(e2[2]?.aria) && Boolean(e2[6]?.capture), JSON.stringify([e1[2]?.capture, e2[2]?.capture, e2[2]?.aria]));
+      controle('redirection : non suivie, l\'autre origine jamais jointe, adresse masquée (D19.INV-1)', r2.code === 1 && e2[2]?.message === `l'API répond 302, redirection vers ${autre}/api/clients?jeton=*** non suivie (D19.INV-1)` && app.etat.requetesAutre.length === 0, `${e2[2]?.message} ${JSON.stringify(app.etat.requetesAutre)}`);
+      controle('réponse de plus de 1 Mio : non lue, dit (D19.INV-3)', e2[3]?.message === `API GET ${base}/api/gros : réponse de plus de 1048576 octets, non lue`, e2[3]?.message);
+      controle('texte et tableau attendus : attendu et obtenu', /^API GET .+\/api\/clients : attendu : un statut 2xx, un corps qui contient « Inexistant » ; obtenu : statut 200, corps « \[\{/.test(e2[4]?.message ?? '') && e2[5]?.message === `API GET ${base}/api/clients : attendu : un statut 2xx, un tableau de 999 éléments ; obtenu : statut 200, ${n} éléments`, `${e2[4]?.message} | ${e2[5]?.message}`);
+      controle('l\'API n\'émet que des GET (D19.INV-1)', app.etat.requetesApi.length > avantApi && app.etat.requetesApi.slice(avantApi).every((q) => q.startsWith('GET ')), JSON.stringify(app.etat.requetesApi.slice(avantApi)));
+      controle('fichier : colonne absente, valeur absente, lignes et texte : attendu et obtenu', e2[6]?.message === 'fichier telechargements/export.csv : attendu : une colonne « pays » ; obtenu : colonnes nom, ville' && /^fichier telechargements\/export\.csv : attendu : la valeur « Nantes » dans la colonne ville ; obtenu : valeurs Dupont|^fichier telechargements\/export\.csv : attendu : la valeur « Nantes » dans la colonne ville ; obtenu : valeurs Paris/.test(e2[7]?.message ?? '') && /^fichier telechargements\/export\.csv : attendu : un texte qui contient « Zorro », 99 lignes ; obtenu : début « nom;ville Dupont;Paris .*», \d+ lignes$/.test(e2[8]?.message ?? ''), JSON.stringify(e2.slice(6).map((e) => e.message)));
+      const erreurs = (etapes) => scenario.validerScenario(lireToml(`format = "scenario-playwright.scenario/1"\ntitre = "T"\nurl_base = "${base}"\n${etapes}`)).erreurs;
+      const v = (champs) => `[[etapes]]\naction = "verifier"\n${champs}\n`;
+      const tel = '[[etapes]]\naction = "telecharger"\ncible = { role = "link" }\nnom = "export"\n';
+      for (const [etapes, motif] of [
+        [v('critere = "api"\nchemin = "/api"\nmethode = "POST"'), 'le critère api ne fait que des GET, en lecture (D19.INV-1)'],
+        [v(`critere = "api"\nchemin = "${autre}/api/clients"`), `${autre} n'est pas parmi les origines (D19.INV-1)`],
+        [v('critere = "api"\nchemin = "/api"\nattendu = { nombre = -1 }'), 'attendu.nombre est un entier positif ou nul'],
+        [v('critere = "api"\nchemin = "/api"\nattendu = { contient = 3 }'), 'attendu.contient est un texte, ou une table ou un tableau de champs JSON'],
+        [v('critere = "fichier"\nfichier = "export"\nattendu = { lignes = 2 }') + tel, 'aucune étape telecharger précédente avec nom = "export"'],
+        [tel + v('critere = "fichier"\nfichier = "Export.csv"\nattendu = { lignes = 2 }'), 'fichier est le nom d\'une étape telecharger précédente (nom = "…")'],
+        [tel + v('critere = "fichier"\nfichier = "export"'), 'attendu manquant pour le critère fichier'],
+        [tel + v('critere = "fichier"\nfichier = "export"\nattendu = { csv = { colonne = "ville" } }'), 'attendu.csv est { colonne = "…", valeur = "…" }'],
+        [tel + v('critere = "fichier"\nfichier = "export"\nchemin = "/x"\nattendu = { lignes = 1 }'), 'chemin ne s\'emploie pas avec le critère fichier'],
+      ]) controle(`refus à la validation : ${motif}`, contient(erreurs(etapes), motif), JSON.stringify(erreurs(etapes)));
     }
   } finally {
     await app.arreter();

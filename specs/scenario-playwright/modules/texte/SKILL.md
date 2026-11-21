@@ -100,7 +100,7 @@ L'empreinte d'un texte est le SHA-256 de son contenu en fins de ligne LF, sans B
 
 ## 9. Phrases conseillées
 
-Une phrase libre se traduit ; une phrase de cette table se traduit sans hésitation, et le sera sans IA par la dimension réservée D11. Les guillemets français entourent ce que la personne lit à l'écran.
+Une phrase libre se traduit ; une phrase de cette table se traduit sans hésitation, et le sera sans IA par la dimension réservée D11. Les guillemets français entourent ce que la personne lit à l'écran : avec un index du code, ce sont eux que le squelette compare aux noms des éléments (module `code`, § 9).
 
 | Phrase | Étape TOML |
 |---|---|
@@ -121,6 +121,9 @@ Une phrase libre se traduit ; une phrase de cette table se traduit sans hésitat
 | je vois 3 boutons « Supprimer » | `verifier`, `critere = "nombre"`, `cible = { role = "button", nom = "Supprimer" }`, `attendu = 3` |
 | l'adresse est « /clients » | `verifier`, `critere = "url"`, `attendu = "/clients"` |
 | le bouton « Archiver » est inactif | `verifier`, `critere = "actif"`, `cible = { role = "button", nom = "Archiver" }`, `attendu = false` |
+| la requête POST « /api/clients » répond 201 | `verifier`, `critere = "requete"`, `methode = "POST"`, `chemin = "/api/clients"`, `attendu = { statut = 201 }` (module `hors-ecran`) |
+| l'API « /api/clients/Dupuis » donne la ville « Lyon » | `verifier`, `critere = "api"`, `chemin = "/api/clients/Dupuis"`, `attendu = { contient = { ville = "Lyon" } }` |
+| le fichier téléchargé contient « Lyon » dans la colonne « ville » | après un `telecharger` avec `nom = "export"` : `verifier`, `critere = "fichier"`, `fichier = "export"`, `attendu = { csv = { colonne = "ville", valeur = "Lyon" } }` |
 | je capture l'écran « liste » | `capturer`, `nom = "liste"` |
 | je me connecte (à la main) | `main`, `message = "je me connecte"`, `jusqua = { url = "/accueil" }` |
 
@@ -179,7 +182,7 @@ Scenario Outline: Create a client
 
 <!-- fichier : scripts/texte.mjs -->
 ```javascript
-// scenario-playwright 1.2.0 : lecteur du texte de départ d'un scénario (fichier .scenario), sans dépendance.
+// scenario-playwright 1.3.0 : lecteur du texte de départ d'un scénario (fichier .scenario), sans dépendance.
 //
 // Le texte, inspiré de Gherkin, décrit un seul scénario : étiquettes, titre, réglages (adresse, origines,
 // profil, paramètres), étapes introduites par un mot-clé de Gherkin, en français ou en anglais, et au plus

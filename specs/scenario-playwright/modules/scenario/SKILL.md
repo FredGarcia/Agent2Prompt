@@ -1,6 +1,6 @@
 ---
 name: scenario
-description: Scénario TOML exécutable, format scenario-playwright.scenario/1 (clés de la racine, étapes et champs communs, valeurs par défaut, validation avant le navigateur avec l'étape et ses lignes, variables ${nom}, paramètres, jeux de valeurs et --param), traduction d'un texte de départ (squelette écrit sans IA par traduire.mjs, étapes complétées par l'IA, contrôle sans IA de la structure, des lignes, de l'ordre, des marques et des variables, empreinte du texte, plan présenté ligne par ligne pour la ratification), sources de scripts/toml.mjs et scripts/scenario.mjs. À lire pour traduire, vérifier ou corriger un scénario.
+description: Scénario TOML exécutable, format scenario-playwright.scenario/1 (clés de la racine, étapes et champs communs, valeurs par défaut, validation avant le navigateur avec l'étape et ses lignes, variables ${nom}, paramètres, jeux de valeurs et --param), traduction d'un texte de départ (squelette écrit sans IA par traduire.mjs, avec les propositions de l'index du code en commentaire, étapes complétées par l'IA, contrôle sans IA de la structure, des lignes, de l'ordre, des marques et des variables, empreinte du texte, plan présenté ligne par ligne pour la ratification ; validation des vérifications hors de l'écran), sources de scripts/toml.mjs et scripts/scenario.mjs. À lire pour traduire, vérifier ou corriger un scénario.
 dimensions: [D3]
 status: active
 ---
@@ -41,7 +41,7 @@ Les autres champs dépendent de l'action (module `actions`, § 1). Une clé inco
 
 ## 2. Validation (D3.INV-1)
 
-Un scénario n'est joué que s'il est valide. `verifier.mjs` et `jouer.mjs` font le même contrôle, avant d'ouvrir le navigateur : format, champs requis, action du jeu fermé, champs connus de l'action, cibles (module `cibles`), délais bornés, chemins de fichiers, origines des adresses, variables déclarées. Chaque erreur cite l'étape, sa ligne du TOML et sa ligne du texte :
+Un scénario n'est joué que s'il est valide. `verifier.mjs` et `jouer.mjs` font le même contrôle, avant d'ouvrir le navigateur : format, champs requis, action du jeu fermé, champs connus de l'action, cibles (module `cibles`), délais bornés, chemins de fichiers, origines des adresses, champs des vérifications hors de l'écran (module `hors-ecran`), variables déclarées. Chaque erreur cite l'étape, sa ligne du TOML et sa ligne du texte :
 
 ```text
 ERREUR creer.toml : étape 3 (ligne 26 du TOML, ligne 10 du texte) : action inconnue « clicker » ; actions : naviguer, cliquer, …
@@ -51,7 +51,7 @@ Les fichiers à téléverser, les jeux demandés et les valeurs de `--param` se 
 
 ## 3. Variables, paramètres et jeux (D3.INV-6)
 
-`${nom}` s'écrit dans tout texte d'une étape : adresse, valeur, texte attendu, message, chemin de fichier, textes d'une cible. Sa valeur vient, dans cet ordre :
+`${nom}` s'écrit dans tout texte d'une étape : adresse, valeur, texte attendu, message, chemin de fichier, textes d'une cible, chemin d'une vérification hors de l'écran et textes de ses tables `attendu`. Sa valeur vient, dans cet ordre :
 
 1. de `--param nom=valeur`, en ligne de commande ;
 2. du jeu joué, `[[jeux]]` ;
@@ -77,9 +77,13 @@ mutation = "creation"
 
 Une ligne marquée « (à la main) » reçoit déjà `action = "main"` et son `message` ; il reste à écrire `jusqua`. Une marque de mutation reçoit déjà sa `mutation`. Les variables à reprendre sont rappelées en commentaire. `traduire.mjs` refuse d'écraser un scénario existant sans `--remplacer`. Tant qu'une étape garde `action = "à compléter"`, le scénario est refusé.
 
+Si le dossier du texte a un index du code à jour (module `code`), chaque étape qui n'est pas à la main reçoit aussi, en commentaire, les cibles de l'index dont le nom correspond aux libellés entre guillemets de sa phrase, et les endpoints connus d'un chemin qu'elle cite (module `code`, § 9) ; ce ne sont que des propositions, et l'étape reste à compléter (D18.INV-4). Un index périmé n'est pas employé, et `traduire.mjs` le dit (D18.INV-2).
+
 ### 4.2 Compléter les étapes
 
 L'IA, ou le développeur, complète chaque bloc : une action du jeu fermé et ses champs. Une phrase peut donner plusieurs étapes : le bloc se recopie, avec la même ligne, dans l'ordre du texte. Rien de ce qui précède le premier bloc ne se modifie à la main : la structure vient du texte. Les phrases conseillées du module `texte`, § 9, ont leur traduction.
+
+Avec un index du code, l'IA y lit les cibles, leurs rôles et leurs noms, les routes des adresses à visiter, les endpoints des vérifications `requete` et `api`, et les messages de validation qu'une vérification `contient` attend ; elle contrôle chaque proposition du squelette avant de la reprendre. Une phrase qui parle d'une requête, d'une réponse du back ou d'un fichier téléchargé se traduit par une vérification hors de l'écran (module `hors-ecran`).
 
 ### 4.3 Contrôle sans IA (D3.INV-2, D3.INV-3, D3.INV-4)
 
@@ -116,6 +120,8 @@ l.12  Et je clique sur le bouton « Enregistrer » (création)
 6 étapes, dont 1 qui modifie des données, et des étapes à la main.
 ```
 
+Avec un index du code à jour, `verifier.mjs` note avant le plan les cibles et les chemins du scénario absents de l'index ; ces notes ne refusent rien, mais s'examinent avec le développeur avant la ratification (D18.INV-4, D10.INV-6).
+
 Le développeur ratifie ce plan, ou le corrige ; rien ne se joue avant (D10.INV-1). Une correction ultérieure d'une étape se ratifie de même ; une modification du texte rend la traduction périmée, par l'empreinte.
 
 Un scénario s'écrit aussi directement en TOML, sans texte de départ : il n'a alors ni `source` ni `ligne`, et seul le contrôle du § 2 s'applique.
@@ -123,7 +129,8 @@ Un scénario s'écrit aussi directement en TOML, sans texte de départ : il n'a 
 ## 5. Contrôle de sortie
 
 - Un scénario valide passe ; chaque cas refusé du § 2 cite l'étape et ses lignes (D3.INV-1).
-- Le squelette recopie la structure du texte et n'est pas jouable tant qu'une étape reste à compléter (D3.INV-5).
+- Le squelette recopie la structure du texte et n'est pas jouable tant qu'une étape reste à compléter, propositions de l'index comprises (D3.INV-5, D18.INV-4).
+- Les champs des vérifications hors de l'écran se valident avant le navigateur ; leurs variables se substituent jusque dans les tables `attendu` (D19).
 - Chaque écart du § 4.3 est relevé ; une traduction fidèle passe, en LF comme en CRLF (D3.INV-2 à D3.INV-4).
 - `--param`, jeu et `[parametres]` se combinent dans cet ordre (D3.INV-6).
 
@@ -131,7 +138,7 @@ Un scénario s'écrit aussi directement en TOML, sans texte de départ : il n'a 
 
 <!-- fichier : scripts/toml.mjs -->
 ```javascript
-// scenario-playwright 1.2.0 : lecteur TOML des scénarios exécutables, sans dépendance.
+// scenario-playwright 1.3.0 : lecteur TOML des scénarios exécutables, sans dépendance.
 //
 // Repris tel quel du lecteur de generateur-skill-ticket 1.1.1 (outils/toml.mjs). Il lit le sous-ensemble
 // de TOML 1.0 dont un scénario a besoin : tables, tableaux de tables, clés nues, entre guillemets ou
@@ -428,13 +435,13 @@ export function lireToml(source, nom = 'TOML') {
 
 <!-- fichier : scripts/scenario.mjs -->
 ```javascript
-// scenario-playwright 1.2.0 : scénario TOML exécutable, contrôle de sa traduction, squelette et plan.
+// scenario-playwright 1.3.0 : scénario TOML exécutable, contrôle de sa traduction, squelette et plan.
 //
 // Un scénario TOML (format scenario-playwright.scenario/1) n'est joué que s'il est valide (D3.INV-1).
 // Traduit d'un texte de départ, il en cite le fichier et l'empreinte (D3.INV-2) ; sa structure et ses
 // étapes se contrôlent alors contre le texte, sans IA (D3.INV-3, D3.INV-4). Le squelette d'une
 // traduction se produit sans IA (D3.INV-5), et les variables se résolvent avant d'ouvrir le navigateur
-// (D3.INV-6).
+// (D3.INV-6). Les critères requete, api et fichier vérifient ce qui se passe hors de l'écran (D19).
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { decrireCible, textesDe, transformerCible, validerCible } from './cibles.mjs';
@@ -449,7 +456,11 @@ export const DELAI_MAIN_DEFAUT = 300;
 export const DELAI_MAIN_MAX = 900;
 export const MUTATIONS = ['creation', 'modification', 'suppression'];
 export const ETATS = ['visible', 'masque', 'actif', 'inactif', 'texte', 'url'];
-export const CRITERES = ['contient', 'visible', 'valeur', 'nombre', 'url', 'actif'];
+export const CRITERES = ['contient', 'visible', 'valeur', 'nombre', 'url', 'actif', 'requete', 'api', 'fichier'];
+export const CRITERES_HORS_ECRAN = ['requete', 'api', 'fichier'];
+export const METHODES_REQUETE = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'];
+/** Noms de champs et de paramètres dont la valeur est masquée dans les rapports (D19.INV-2). */
+export const RE_SECRET = /pass|pwd|secret|token|jeton|api.?key|auth|session|cookie|signature|credential|otp|cvv|iban|card|carte/i;
 const RE_NOM_FICHIER = /^[a-z0-9][a-z0-9_-]{0,59}$/;
 const RE_TOUCHE = /^(?:(?:Control|Shift|Alt|Meta|ControlOrMeta)\+)*(?:[!-~]|F(?:[1-9]|1[0-2])|Enter|Tab|Escape|Backspace|Delete|Insert|Home|End|PageUp|PageDown|ArrowUp|ArrowDown|ArrowLeft|ArrowRight|Space)$/;
 
@@ -465,7 +476,7 @@ export const ACTIONS = {
   televerser: { requis: ['cible', 'fichier'], facultatifs: ['mutation'] },
   telecharger: { requis: ['cible'], facultatifs: ['nom', 'mutation'] },
   attendre: { requis: ['etat'], facultatifs: ['cible', 'url', 'texte'] },
-  verifier: { requis: ['critere'], facultatifs: ['cible', 'attendu', 'exact'] },
+  verifier: { requis: ['critere'], facultatifs: ['cible', 'attendu', 'exact', 'methode', 'chemin', 'fichier'] },
   capturer: { requis: ['nom'], facultatifs: ['cible', 'pleine_page'] },
   main: { requis: ['message', 'jusqua'], facultatifs: [] },
 };
@@ -496,10 +507,28 @@ export function substituer(texte, valeurs) {
   return String(texte).replace(/\$\$\{|\$\{([^}]*)\}/g, (m, nom) => (nom === undefined ? '${' : String(valeurs[nom])));
 }
 
+/** Textes d'une valeur, tables et tableaux compris (les valeurs, pas les clés). */
+const textesProfonds = (v) => (typeof v === 'string' ? [v] : Array.isArray(v) ? v.flatMap(textesProfonds) : estTable(v) ? Object.values(v).flatMap(textesProfonds) : []);
+
+/** Copie d'une valeur dont chaque texte, tables et tableaux compris, passe par `f`. */
+const transformerProfond = (v, f) => (typeof v === 'string' ? f(v) : Array.isArray(v) ? v.map((x) => transformerProfond(x, f)) : estTable(v) ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, transformerProfond(x, f)])) : v);
+
+/** Copie d'une valeur dont les champs au nom de secret sont masqués (D19.INV-2). */
+export const masquerValeurs = (v, cle = '') => (RE_SECRET.test(cle) && v !== undefined && v !== null ? '***' : Array.isArray(v) ? v.map((x) => masquerValeurs(x)) : estTable(v) ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, masquerValeurs(x, k)])) : v);
+
+/** Valeur écrite comme en TOML, sur une ligne : textes entre guillemets, tables { a = 1 }, tableaux [ … ]. */
+export function enTexte(v) {
+  if (typeof v === 'string') return JSON.stringify(v);
+  if (Array.isArray(v)) return `[${v.map(enTexte).join(', ')}]`;
+  if (estTable(v)) return `{ ${Object.entries(v).map(([k, x]) => `${/^[A-Za-z0-9_-]+$/.test(k) ? k : JSON.stringify(k)} = ${enTexte(x)}`).join(', ')} }`;
+  return String(v);
+}
+
 /** Tous les textes d'une étape où une variable peut figurer. */
 export function textesEtape(e) {
   const t = [];
-  for (const k of ['url', 'valeur', 'texte', 'attendu', 'message', 'nom']) if (typeof e[k] === 'string') t.push(e[k]);
+  for (const k of ['url', 'valeur', 'texte', 'message', 'nom', 'chemin']) if (typeof e[k] === 'string') t.push(e[k]);
+  t.push(...textesProfonds(e.attendu));
   if (Array.isArray(e.fichier)) t.push(...e.fichier.filter((f) => typeof f === 'string'));
   else if (typeof e.fichier === 'string') t.push(e.fichier);
   if (e.cible) t.push(...textesDe(e.cible));
@@ -550,6 +579,7 @@ function validerEtape(e, ou, erreurs, contexte) {
     case 'telecharger':
     case 'capturer':
       if (e.nom !== undefined && !(typeof e.nom === 'string' && RE_NOM_FICHIER.test(e.nom))) erreurs.push(`${ou} : nom invalide « ${e.nom} » (minuscules, chiffres, - et _)`);
+      else if (e.action === 'telecharger' && e.nom !== undefined) contexte.telechargements.add(e.nom);
       if (e.action === 'capturer' && e.pleine_page !== undefined && typeof e.pleine_page !== 'boolean') erreurs.push(`${ou} : pleine_page vaut true ou false`);
       break;
     case 'attendre':
@@ -568,6 +598,8 @@ function validerEtape(e, ou, erreurs, contexte) {
     case 'verifier': {
       const c = e.critere;
       if (c !== undefined && !CRITERES.includes(c)) { erreurs.push(`${ou} : critere vaut ${CRITERES.join(', ')}`); break; }
+      if (CRITERES_HORS_ECRAN.includes(c)) { validerHorsEcran(e, ou, erreurs, contexte); break; }
+      for (const k of ['methode', 'chemin', 'fichier']) if (e[k] !== undefined) erreurs.push(`${ou} : ${k} ne s'emploie qu'avec les critères requete, api ou fichier`);
       if (c === 'url') { if (e.cible !== undefined) erreurs.push(`${ou} : le critère url ne prend pas de cible`); }
       else if (c !== undefined && e.cible === undefined) erreurs.push(`${ou} : cible manquante pour le critère ${c}`);
       if (e.exact !== undefined && c !== 'contient') erreurs.push(`${ou} : exact ne s'emploie qu'avec le critère contient`);
@@ -598,6 +630,44 @@ function validerEtape(e, ou, erreurs, contexte) {
     default:
   }
   return undefined;
+}
+
+const CLES_ATTENDU = { requete: ['statut', 'corps', 'reponse'], api: ['statut', 'contient', 'nombre'], fichier: ['contient', 'lignes', 'csv'] };
+const EXEMPLES_ATTENDU = { requete: '{ statut = 201, reponse = { ok = true } }', api: '{ statut = 200, contient = "Dupont" }', fichier: '{ contient = "Lyon" }, { lignes = 3 } ou { csv = { colonne = "ville", valeur = "Lyon" } }' };
+
+/** Vérifications hors de l'écran (D19) : requête de la page, API en lecture, fichier téléchargé. */
+function validerHorsEcran(e, ou, erreurs, contexte) {
+  const c = e.critere;
+  if (e.cible !== undefined || e.exact !== undefined) erreurs.push(`${ou} : le critère ${c} ne prend ni cible ni exact`);
+  if (c === 'fichier') {
+    for (const k of ['methode', 'chemin']) if (e[k] !== undefined) erreurs.push(`${ou} : ${k} ne s'emploie pas avec le critère fichier`);
+    if (!(typeof e.fichier === 'string' && RE_NOM_FICHIER.test(e.fichier))) erreurs.push(`${ou} : fichier est le nom d'une étape telecharger précédente (nom = "…")`);
+    else if (!contexte.telechargements.has(e.fichier)) erreurs.push(`${ou} : aucune étape telecharger précédente avec nom = "${e.fichier}"`);
+  } else {
+    if (e.fichier !== undefined) erreurs.push(`${ou} : fichier ne s'emploie qu'avec le critère fichier`);
+    if (!estTexte(e.chemin)) erreurs.push(`${ou} : chemin manquant pour le critère ${c} : un chemin qui commence par /, ou une adresse http(s) d'une origine déclarée`);
+    else if (!e.chemin.startsWith('/') && variablesDe(e.chemin).length === 0) contexte.adresses.push({ ou, url: e.chemin });
+    if (e.methode !== undefined && !(typeof e.methode === 'string' && METHODES_REQUETE.includes(e.methode))) erreurs.push(`${ou} : methode vaut ${METHODES_REQUETE.join(', ')}`);
+    else if (c === 'api' && e.methode !== undefined && e.methode !== 'GET') erreurs.push(`${ou} : le critère api ne fait que des GET, en lecture (D19.INV-1)`);
+  }
+  const a = e.attendu;
+  if (a === undefined) {
+    if (c === 'fichier') erreurs.push(`${ou} : attendu manquant pour le critère fichier : ${EXEMPLES_ATTENDU.fichier}`);
+    return;
+  }
+  if (!estTable(a) || Object.keys(a).length === 0) { erreurs.push(`${ou} : attendu est une table non vide pour le critère ${c}, comme ${EXEMPLES_ATTENDU[c]}`); return; }
+  for (const k of Object.keys(a)) if (!CLES_ATTENDU[c].includes(k)) erreurs.push(`${ou} : clé inconnue dans attendu pour le critère ${c} : « ${k} » (${CLES_ATTENDU[c].join(', ')})`);
+  if (a.statut !== undefined && !(Number.isInteger(a.statut) && a.statut >= 100 && a.statut <= 599)) erreurs.push(`${ou} : attendu.statut est un code HTTP, de 100 à 599`);
+  for (const k of ['corps', 'reponse']) if (a[k] !== undefined && !(estTable(a[k]) || Array.isArray(a[k]))) erreurs.push(`${ou} : attendu.${k} est une table ou un tableau de champs JSON`);
+  if (a.contient !== undefined) {
+    if (c === 'fichier' && !estTexte(a.contient)) erreurs.push(`${ou} : attendu.contient est un texte non vide`);
+    else if (c === 'api' && !(estTexte(a.contient) || estTable(a.contient) || Array.isArray(a.contient))) erreurs.push(`${ou} : attendu.contient est un texte, ou une table ou un tableau de champs JSON`);
+  }
+  for (const k of ['nombre', 'lignes']) if (a[k] !== undefined && !(Number.isInteger(a[k]) && a[k] >= 0)) erreurs.push(`${ou} : attendu.${k} est un entier positif ou nul`);
+  if (a.csv !== undefined) {
+    const v = a.csv;
+    if (!estTable(v) || !estTexte(v.colonne) || typeof v.valeur !== 'string' || Object.keys(v).some((k) => k !== 'colonne' && k !== 'valeur')) erreurs.push(`${ou} : attendu.csv est { colonne = "…", valeur = "…" }`);
+  }
 }
 
 /**
@@ -648,7 +718,7 @@ export function validerScenario(objet, lignes = []) {
       });
     }
   }
-  const contexte = { urls: [] };
+  const contexte = { urls: [], adresses: [], telechargements: new Set() };
   if (!Array.isArray(objet.etapes) || objet.etapes.length === 0) erreurs.push('aucune étape [[etapes]]');
   else objet.etapes.forEach((e, i) => validerEtape(e, ouEtape(i, e, lignes), erreurs, contexte));
   for (const { ou, url } of contexte.urls) {
@@ -657,6 +727,11 @@ export function validerScenario(objet, lignes = []) {
       if (o === null) erreurs.push(`${ou} : url est un chemin qui commence par / ou une adresse http(s)`);
       else if (!origines.includes(o)) erreurs.push(`${ou} : ${o} n'est pas parmi les origines`);
     }
+  }
+  for (const { ou, url } of contexte.adresses) {
+    const o = origineDe(url);
+    if (o === null) erreurs.push(`${ou} : chemin est un chemin qui commence par / ou une adresse http(s)`);
+    else if (!origines.includes(o)) erreurs.push(`${ou} : ${o} n'est pas parmi les origines (D19.INV-1)`);
   }
   const declarees = new Set([...Object.keys(estTable(objet.parametres) ? objet.parametres : {}), ...Object.keys(Array.isArray(objet.jeux) && estTable(objet.jeux[0]) ? objet.jeux[0] : {})]);
   if (Array.isArray(objet.etapes)) objet.etapes.forEach((e, i) => {
@@ -775,14 +850,19 @@ export function preparerJeux(scenario, dossier, params = {}, numeroJeu = null) {
     const valeurs = { ...scenario.parametres, ...jeu, ...params };
     const etapes = scenario.etapes.map((e, k) => {
       const s = { ...e };
-      for (const c of ['url', 'valeur', 'texte', 'attendu', 'message', 'nom']) if (typeof s[c] === 'string') s[c] = substituer(s[c], valeurs);
-      if (s.fichier !== undefined) s.fichier = (Array.isArray(s.fichier) ? s.fichier : [s.fichier]).map((f) => substituer(f, valeurs));
+      for (const c of ['url', 'valeur', 'texte', 'message', 'nom', 'chemin']) if (typeof s[c] === 'string') s[c] = substituer(s[c], valeurs);
+      if (s.attendu !== undefined) s.attendu = transformerProfond(s.attendu, (t) => substituer(t, valeurs));
+      if (s.action === 'televerser') s.fichier = (Array.isArray(s.fichier) ? s.fichier : [s.fichier]).map((f) => substituer(f, valeurs));
       if (s.cible) s.cible = transformerCible(s.cible, (t) => substituer(t, valeurs));
       if (s.jusqua) s.jusqua = { ...s.jusqua, ...(s.jusqua.url ? { url: substituer(s.jusqua.url, valeurs) } : {}), ...(s.jusqua.cible ? { cible: transformerCible(s.jusqua.cible, (t) => substituer(t, valeurs)) } : {}) };
       const ou = `jeu ${i + 1}, ${ouEtape(k, e)}`;
       if (s.action === 'naviguer' && !s.url.startsWith('/')) {
         const o = origineDe(s.url);
         if (o === null || !scenario.origines.includes(o)) erreurs.push(`${ou} : ${s.url} hors des origines du scénario`);
+      }
+      if (s.action === 'verifier' && (s.critere === 'requete' || s.critere === 'api') && !s.chemin.startsWith('/')) {
+        const o = origineDe(s.chemin);
+        if (o === null || !scenario.origines.includes(o)) erreurs.push(`${ou} : ${s.chemin} hors des origines du scénario (D19.INV-1)`);
       }
       if (s.action === 'televerser') {
         s.fichiers = s.fichier.map((f) => {
@@ -800,13 +880,17 @@ export function preparerJeux(scenario, dossier, params = {}, numeroJeu = null) {
   return { jeux: prepares, erreurs };
 }
 
-/** Squelette d'une traduction, produit sans IA à partir du texte analysé (D3.INV-5). */
-export function squeletteToml(texte, sourceRel) {
+/**
+ * Squelette d'une traduction, produit sans IA à partir du texte analysé (D3.INV-5). Avec `proposer`, chaque
+ * étape reçoit en commentaire les propositions de l'index du code pour sa phrase (D18.INV-4).
+ */
+export function squeletteToml(texte, sourceRel, { proposer = null, empreinteIndex = null } = {}) {
   const l = [];
-  l.push(`# Traduction de ${sourceRel}, squelette produit par traduire.mjs (scenario-playwright 1.2.0).`);
+  l.push(`# Traduction de ${sourceRel}, squelette produit par traduire.mjs (scenario-playwright 1.3.0).`);
   l.push('# La structure vient du texte, sans IA. Chaque étape du texte a son bloc [[etapes]] : choisir son action');
   l.push('# et ses champs (module actions). Une ligne du texte peut donner plusieurs étapes : recopier le bloc,');
   l.push('# avec la même ligne. Le scénario ne se joue qu\'une fois chaque étape complétée et la traduction ratifiée.');
+  if (proposer) l.push(`# Propositions de l'index du code (index/code.md, empreinte ${String(empreinteIndex).slice(0, 12)}…) : des pistes, à vérifier.`);
   l.push(`format = ${chaineToml(FORMAT_SCENARIO)}`);
   l.push(`titre = ${chaineToml(texte.titre)}`);
   if (texte.etiquettes.length) l.push(`etiquettes = [${texte.etiquettes.map(chaineToml).join(', ')}]`);
@@ -833,6 +917,7 @@ export function squeletteToml(texte, sourceRel) {
       if (MUTATIONS.includes(e.marque)) l.push(`mutation = ${chaineToml(e.marque)}`);
     }
     if (e.variables.length) l.push(`# variables à reprendre : ${e.variables.map((v) => `\${${v}}`).join(', ')}`);
+    if (proposer && e.marque !== 'main') l.push(...proposer(e.phrase));
   }
   return `${l.join('\n')}\n`;
 }
@@ -855,6 +940,16 @@ export function resumeEtape(e) {
     case 'telecharger': return `télécharger par ${c}${m}`;
     case 'attendre': return e.etat === 'url' ? `attendre l'adresse ${e.url}` : `attendre ${c} ${e.etat === 'texte' ? `avec le texte « ${e.texte} »` : e.etat}`;
     case 'verifier':
+      if (e.critere === 'requete' || e.critere === 'api') {
+        const a = masquerValeurs(e.attendu ?? {});
+        const d = Object.entries(a).map(([k, v]) => (k === 'statut' ? `statut ${v}` : k === 'nombre' ? `${v} élément${v > 1 ? 's' : ''}` : `${({ corps: 'corps', reponse: 'réponse', contient: 'contient' })[k]} ${enTexte(v)}`));
+        return `vérifier ${e.critere === 'api' ? "l'API GET" : `la requête${e.methode ? ` ${e.methode}` : ''}`} ${e.chemin}${d.length ? ` : ${d.join(', ')}` : e.critere === 'api' ? ' : statut 2xx' : ' : statut inférieur à 400'}`;
+      }
+      if (e.critere === 'fichier') {
+        const a = e.attendu ?? {};
+        const d = [a.contient !== undefined ? `contient « ${a.contient} »` : null, a.lignes !== undefined ? `${a.lignes} ligne${a.lignes > 1 ? 's' : ''}` : null, a.csv ? `colonne ${a.csv.colonne} = « ${RE_SECRET.test(a.csv.colonne) ? '***' : a.csv.valeur} »` : null].filter(Boolean);
+        return `vérifier le fichier ${e.fichier} : ${d.join(', ')}`;
+      }
       if (e.critere === 'url') return `vérifier l'adresse ${e.attendu}`;
       if (e.critere === 'visible' || e.critere === 'actif') return `vérifier ${c} ${e.critere} : ${oui(e.attendu)}`;
       if (e.critere === 'nombre') return `vérifier ${e.attendu} élément${e.attendu > 1 ? 's' : ''} ${c}`;
