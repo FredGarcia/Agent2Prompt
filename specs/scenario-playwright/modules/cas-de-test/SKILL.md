@@ -91,7 +91,7 @@ La phrase d'un pas reste telle qu'écrite : « Quand » et « Alors » ne disent
 ## 7. Le texte importé (D17.INV-6)
 
 ```text
-# Importé de Xray par importer.mjs (scenario-playwright 1.4.0), sans IA : chaque pas du test manuel devient « Quand <action> », avec ses données, puis « Alors <résultat attendu> ».
+# Importé de Xray par importer.mjs (scenario-playwright 1.5.0), sans IA : chaque pas du test manuel devient « Quand <action> », avec ses données, puis « Alors <résultat attendu> ».
 # Lot : xray DEMO-13
 # Scénario : @DEMO-13, test manuel DEMO-13
 # Source : https://xray.cloud.getxray.app/api/v2/graphql, test DEMO-13
@@ -135,7 +135,7 @@ Désignation de la source, lecteur d'archive, lignes d'un fichier, identité des
 
 <!-- fichier : scripts/cas.mjs -->
 ```javascript
-// scenario-playwright 1.4.0 : cas de test de Xray et de Zephyr Scale, et fichiers .feature, lus sans IA.
+// scenario-playwright 1.5.0 : cas de test de Xray et de Zephyr Scale, et fichiers .feature, lus sans IA.
 //
 // Sources (D17.INV-1) : fichier .feature, exporté de Xray ou de Zephyr Scale ou pris dans le dépôt ; archive
 // .zip d'un export ; API REST de Xray (Cloud, Data Center) et de Zephyr Scale (Cloud, Data Center), en

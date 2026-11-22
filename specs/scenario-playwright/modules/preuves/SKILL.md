@@ -55,7 +55,7 @@ Champs de chaque étape :
 | `hors_ecran` | relevé d'une vérification hors de l'écran (module `hors-ecran`, § 7) : `{ critere, methode, adresse, statut }`, avec `octets` pour `api`, ou `{ critere, fichier, lignes, octets }` ; sinon `null`. Ajouté en 1.3.0 |
 | `console`, `erreurs_page`, `reponses` | erreurs de console, exceptions de la page, réponses de statut 400 ou plus (`500 http://…`) relevées pendant l'étape (D8.INV-2) |
 
-Ces champs sont stables : un nouveau champ peut s'ajouter dans une version mineure, aucun ne change de sens. D12 et D13 liront le rapport sans rejouer le scénario.
+Ces champs sont stables : un nouveau champ peut s'ajouter dans une version mineure, aucun ne change de sens. D12 et D13 liront le rapport sans rejouer le scénario ; `resultats.mjs` le lit déjà, pour en écrire les résultats au format d'import de Xray ou de Zephyr Scale, et retrouve le scénario joué à son empreinte, `scenario.empreinte` (module `export`, § 8).
 
 ## 3. `rapport.md`
 
@@ -81,7 +81,7 @@ Les erreurs de console, les exceptions de la page et les réponses HTTP de statu
 
 <!-- fichier : scripts/rapport.mjs -->
 ```javascript
-// scenario-playwright 1.4.0 : rapport d'une exécution, en JSON (champs stables, E1) et en Markdown.
+// scenario-playwright 1.5.0 : rapport d'une exécution, en JSON (champs stables, E1) et en Markdown.
 //
 // Chaque exécution écrit son dossier de résultats horodaté : rapport.json, rapport.md, captures,
 // instantanés ARIA à l'échec, téléchargements, et la trace si elle est demandée (D8.INV-1, D8.INV-2).
@@ -90,7 +90,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 export const FORMAT_RAPPORT = 'scenario-playwright.rapport/1';
-export const VERSION_SKILL = '1.4.0';
+export const VERSION_SKILL = '1.5.0';
 
 const deux = (n) => String(n).padStart(2, '0');
 
