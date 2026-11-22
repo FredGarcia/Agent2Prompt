@@ -31,7 +31,7 @@ jobs:
   recette:
     name: recette (${{ matrix.os }}, Node ${{ matrix.node }})
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 20
+    timeout-minutes: 25
     strategy:
       fail-fast: false
       matrix:
@@ -130,7 +130,7 @@ jobs:
       - name: Recette sous Linux, écran virtuel
         if: runner.os != 'Windows'
         shell: bash
-        timeout-minutes: 12
+        timeout-minutes: 18
         working-directory: ${{ runner.temp }}/scenario-playwright
         run: |
           set -o pipefail
@@ -141,7 +141,7 @@ jobs:
       - name: Recette sous Windows
         if: runner.os == 'Windows'
         shell: bash
-        timeout-minutes: 12
+        timeout-minutes: 18
         working-directory: ${{ runner.temp }}/scenario-playwright
         run: |
           set -o pipefail

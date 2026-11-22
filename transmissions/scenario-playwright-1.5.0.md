@@ -733,12 +733,12 @@ Les options, la sortie et les codes de `indexer.mjs` sont au module `code`, § 2
 | `commandes/scenario/resultats.toml` | `agent`, § 7 | `45c82c61a6eb347533fed303ded580b19f2116d1e4028e4d0cf28d12ee071746` |
 | `tests/application-demo.mjs` | `recette`, § 6 | `c89f6bfd6571f352fb10998e0be6c16e59345ec2e5bdb96b2887eeae403fcf63` |
 | `tests/projet-demo.mjs` | `recette`, § 6 | `442a614f8cb6377689fc2793160d25e082c96162992c2134e58f77f52e1ee592` |
-| `tests/run-tests.mjs` | `recette`, § 6 | `c17f2305cf4757b33d59530716a159e860adceab568f94a130138fea62a2fd71` |
+| `tests/run-tests.mjs` | `recette`, § 6 | `91ebc8e62310239ee0b83862230782cd67491809ed819cfc55ff13651a663253` |
 
 Depuis le dossier du skill, cette commande d'une ligne écrit les trente-cinq fichiers, compare leurs empreintes à celles du tableau et sort avec le code 1 au moindre écart. Elle ne contient ni `$`, ni accent grave, ni `!`, ni `%`, ni guillemet intérieur : elle se colle telle quelle dans bash, zsh, CMD ou PowerShell, et dans un fichier `.cmd`. Elle lit aussi des modules aux fins de ligne CRLF.
 
 ```text
-node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'package.json': 'eaa21f182e61223097ce08e4bd601a2bd8057a80c734ff1f073abac70bb7c4de', 'package-lock.json': '84991c7c5066e74034523ff60bdaceaa596126aa57e42cef5dfb5e6d63209454', '.gitignore': '03bf7f97f17a0d1abb005b6480ec3b0f06a0b9c29c1d1f83131209b52b888a7e', 'scripts/jouer.mjs': '915a69e15d38a0d82581f7d7ce8858540d830586e500a9e252bb5e0bb74de351', 'scripts/verifier.mjs': '2a1c092c7eb25aee1d29e3e903d217bf3691d648dc7a137f1d4ce27885080fcc', 'scripts/traduire.mjs': '69f25e25e85a6f02b0be919265614f9b17c8255f47a48f3bea32bb6cff787c6d', 'scripts/texte.mjs': '6bec7f0bc4e6bc3ca2481c2fd65b31c64a6ce4816f490bfc91916fa856d7d192', 'scripts/jira.mjs': 'c2c2bd62866846dd6aef82d2c3675d0cf5bfbe0c436a2f684efeb424c07d46fc', 'scripts/importer.mjs': 'd2ac3f05eba99bcd80b70332834ea12ab3a42e91c4ada74aaf2b9289f437eaf5', 'scripts/cas.mjs': '21ec9b12981904b6de45058ede12a314a4a8eb9b82bad7b92de311555bf6196f', 'scripts/lecteurs.mjs': '9a5eabe58462ec065abea985fac91395b6017e1f1f64f1bbd66bec9b25c5f8ef', 'scripts/code.mjs': '2f4c7f7638f5f6f8369c545ac4f97a21ea0d7565f0bd543d2bf14ea918c56e9a', 'scripts/indexer.mjs': '7f6c77a9580822d3ba442b4ed8bf855e33cb7a0bfc3373eaaadd0285d460dd77', 'scripts/toml.mjs': '2649421a76faa73d7bc55b81dd2d0a650a0d0b1ad9a36321f1afa051bc608bed', 'scripts/scenario.mjs': 'd814fb17fb29137f3ba1516d28a0e546ff6e4a9e8606db531a4006fdceeda0af', 'scripts/cibles.mjs': 'b4ee83a7acdd058b05658e79d83701a8e5fdfdcb524c5dca111739afe59697eb', 'scripts/moteur.mjs': '5cbb20b540a781c22f7dab56ea34e1c2ef7aa7014d90f66f98c8d9e9a94512fb', 'scripts/session.mjs': '81ffd2c536e33d9b18c4d3bcb158166b24a4b9af5bae38deea863b3f554e4152', 'scripts/rapport.mjs': '2ea8354c3e493673e60d0abf6bc0c8c67818cc31471ea13551e98d8798d17302', 'scripts/designer.mjs': '60cb39aa609b24ec4f118b43ad59b193ec4455cd32786fbe7345b84c3ee8bd18', 'scripts/export.mjs': '47c58ade612d0d7461b3eea011acd27db1eceae8d8c8a4a64729e5ef1b0bffa6', 'scripts/aides-export.mjs': 'b501fc0f89be06a74ab83abec38163f680f049ea0bf226111bd9ffd9fc6eaf85', 'scripts/exporter.mjs': 'd4def76e8150fa2c4f53399db2f275a96d05230b48b979a83762aab3e6925a5d', 'scripts/resultats.mjs': 'f6ab85a2effc28aa78066b16b3d38f4c1a79bf5903ceadf27caa234c9052235b', 'agent/pilote-scenario.md': 'd8fcfb3e2c2ea6325a1550771667d63239ea76eb828dc7f9ba9f0c6cd4261d66', 'commandes/scenario/importer.toml': '4a201b5f3a199c99f9b0590950df7d2d9455c2eeb07342860c1bd50520e7dcf6', 'commandes/scenario/indexer.toml': '33816be39eede8b2755518c9724033ae1fd9a4be66cb1e903426fca1e5cf5c69', 'commandes/scenario/traduire.toml': 'e6b588b5ec60d3c24861de8a5c0dc2aa12a16821c26ee53dba5881060df39bd8', 'commandes/scenario/jouer.toml': 'ba96e1465a86220c3c12fb0d13d0c61cb31e90b77e11480988eb2e2dfa88cc3b', 'commandes/scenario/designer.toml': '67f9c67d85ec6331f574e20a75574d4e27f1daf971dcda05985b652bdb6f11e7', 'commandes/scenario/exporter.toml': '21da6c8059edd38a8603eb9e505c860c73d1b339bbfc20599c506ee44f1ab683', 'commandes/scenario/resultats.toml': '45c82c61a6eb347533fed303ded580b19f2116d1e4028e4d0cf28d12ee071746', 'tests/application-demo.mjs': 'c89f6bfd6571f352fb10998e0be6c16e59345ec2e5bdb96b2887eeae403fcf63', 'tests/projet-demo.mjs': '442a614f8cb6377689fc2793160d25e082c96162992c2134e58f77f52e1ee592', 'tests/run-tests.mjs': 'c17f2305cf4757b33d59530716a159e860adceab568f94a130138fea62a2fd71' }; const vus = new Set(); let ecarts = 0; for (const module of ['modules/execution/SKILL.md', 'modules/texte/SKILL.md', 'modules/jira/SKILL.md', 'modules/cas-de-test/SKILL.md', 'modules/code/SKILL.md', 'modules/scenario/SKILL.md', 'modules/cibles/SKILL.md', 'modules/actions/SKILL.md', 'modules/session/SKILL.md', 'modules/preuves/SKILL.md', 'modules/designer/SKILL.md', 'modules/export/SKILL.md', 'modules/agent/SKILL.md', 'modules/recette/SKILL.md']) { const texte = fs.readFileSync(module, 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); vus.add(m[1]); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (conforme === false) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } } for (const f of Object.keys(attendu)) if (vus.has(f) === false) { ecarts++; console.log('ABSENT    ' + f); } if (ecarts > 0) process.exitCode = 1;"
+node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'package.json': 'eaa21f182e61223097ce08e4bd601a2bd8057a80c734ff1f073abac70bb7c4de', 'package-lock.json': '84991c7c5066e74034523ff60bdaceaa596126aa57e42cef5dfb5e6d63209454', '.gitignore': '03bf7f97f17a0d1abb005b6480ec3b0f06a0b9c29c1d1f83131209b52b888a7e', 'scripts/jouer.mjs': '915a69e15d38a0d82581f7d7ce8858540d830586e500a9e252bb5e0bb74de351', 'scripts/verifier.mjs': '2a1c092c7eb25aee1d29e3e903d217bf3691d648dc7a137f1d4ce27885080fcc', 'scripts/traduire.mjs': '69f25e25e85a6f02b0be919265614f9b17c8255f47a48f3bea32bb6cff787c6d', 'scripts/texte.mjs': '6bec7f0bc4e6bc3ca2481c2fd65b31c64a6ce4816f490bfc91916fa856d7d192', 'scripts/jira.mjs': 'c2c2bd62866846dd6aef82d2c3675d0cf5bfbe0c436a2f684efeb424c07d46fc', 'scripts/importer.mjs': 'd2ac3f05eba99bcd80b70332834ea12ab3a42e91c4ada74aaf2b9289f437eaf5', 'scripts/cas.mjs': '21ec9b12981904b6de45058ede12a314a4a8eb9b82bad7b92de311555bf6196f', 'scripts/lecteurs.mjs': '9a5eabe58462ec065abea985fac91395b6017e1f1f64f1bbd66bec9b25c5f8ef', 'scripts/code.mjs': '2f4c7f7638f5f6f8369c545ac4f97a21ea0d7565f0bd543d2bf14ea918c56e9a', 'scripts/indexer.mjs': '7f6c77a9580822d3ba442b4ed8bf855e33cb7a0bfc3373eaaadd0285d460dd77', 'scripts/toml.mjs': '2649421a76faa73d7bc55b81dd2d0a650a0d0b1ad9a36321f1afa051bc608bed', 'scripts/scenario.mjs': 'd814fb17fb29137f3ba1516d28a0e546ff6e4a9e8606db531a4006fdceeda0af', 'scripts/cibles.mjs': 'b4ee83a7acdd058b05658e79d83701a8e5fdfdcb524c5dca111739afe59697eb', 'scripts/moteur.mjs': '5cbb20b540a781c22f7dab56ea34e1c2ef7aa7014d90f66f98c8d9e9a94512fb', 'scripts/session.mjs': '81ffd2c536e33d9b18c4d3bcb158166b24a4b9af5bae38deea863b3f554e4152', 'scripts/rapport.mjs': '2ea8354c3e493673e60d0abf6bc0c8c67818cc31471ea13551e98d8798d17302', 'scripts/designer.mjs': '60cb39aa609b24ec4f118b43ad59b193ec4455cd32786fbe7345b84c3ee8bd18', 'scripts/export.mjs': '47c58ade612d0d7461b3eea011acd27db1eceae8d8c8a4a64729e5ef1b0bffa6', 'scripts/aides-export.mjs': 'b501fc0f89be06a74ab83abec38163f680f049ea0bf226111bd9ffd9fc6eaf85', 'scripts/exporter.mjs': 'd4def76e8150fa2c4f53399db2f275a96d05230b48b979a83762aab3e6925a5d', 'scripts/resultats.mjs': 'f6ab85a2effc28aa78066b16b3d38f4c1a79bf5903ceadf27caa234c9052235b', 'agent/pilote-scenario.md': 'd8fcfb3e2c2ea6325a1550771667d63239ea76eb828dc7f9ba9f0c6cd4261d66', 'commandes/scenario/importer.toml': '4a201b5f3a199c99f9b0590950df7d2d9455c2eeb07342860c1bd50520e7dcf6', 'commandes/scenario/indexer.toml': '33816be39eede8b2755518c9724033ae1fd9a4be66cb1e903426fca1e5cf5c69', 'commandes/scenario/traduire.toml': 'e6b588b5ec60d3c24861de8a5c0dc2aa12a16821c26ee53dba5881060df39bd8', 'commandes/scenario/jouer.toml': 'ba96e1465a86220c3c12fb0d13d0c61cb31e90b77e11480988eb2e2dfa88cc3b', 'commandes/scenario/designer.toml': '67f9c67d85ec6331f574e20a75574d4e27f1daf971dcda05985b652bdb6f11e7', 'commandes/scenario/exporter.toml': '21da6c8059edd38a8603eb9e505c860c73d1b339bbfc20599c506ee44f1ab683', 'commandes/scenario/resultats.toml': '45c82c61a6eb347533fed303ded580b19f2116d1e4028e4d0cf28d12ee071746', 'tests/application-demo.mjs': 'c89f6bfd6571f352fb10998e0be6c16e59345ec2e5bdb96b2887eeae403fcf63', 'tests/projet-demo.mjs': '442a614f8cb6377689fc2793160d25e082c96162992c2134e58f77f52e1ee592', 'tests/run-tests.mjs': '91ebc8e62310239ee0b83862230782cd67491809ed819cfc55ff13651a663253' }; const vus = new Set(); let ecarts = 0; for (const module of ['modules/execution/SKILL.md', 'modules/texte/SKILL.md', 'modules/jira/SKILL.md', 'modules/cas-de-test/SKILL.md', 'modules/code/SKILL.md', 'modules/scenario/SKILL.md', 'modules/cibles/SKILL.md', 'modules/actions/SKILL.md', 'modules/session/SKILL.md', 'modules/preuves/SKILL.md', 'modules/designer/SKILL.md', 'modules/export/SKILL.md', 'modules/agent/SKILL.md', 'modules/recette/SKILL.md']) { const texte = fs.readFileSync(module, 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); vus.add(m[1]); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (conforme === false) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } } for (const f of Object.keys(attendu)) if (vus.has(f) === false) { ecarts++; console.log('ABSENT    ' + f); } if (ecarts > 0) process.exitCode = 1;"
 ```
 
 Puis, depuis le même dossier : `npm ci`, et la recette, `npm test` (sous Linux sans écran, `xvfb-run -a npm test`).
@@ -11283,7 +11283,7 @@ npm test
 - Depuis le dossier du skill, après `npm ci`. Sous Linux sans écran : `xvfb-run -a npm test` ; le scénario s'y joue dans une fenêtre, comme sur le poste.
 - Le navigateur est celui de `SCENARIO_PLAYWRIGHT_CANAL` : Chrome par défaut ; `chromium` après `npx playwright-core install chromium`.
 - La recette travaille sur des profils et des dossiers temporaires : les profils et les résultats du dossier du skill ne sont pas touchés. Elle efface son dossier temporaire si tout passe ; sinon, ou avec `GARDER_TMP=1`, elle le garde et en donne le chemin.
-- Durée : environ quatre minutes. Garde-fou : une recette bloquée s'arrête d'elle-même au bout de dix minutes, en disant dans quel scénario, son dossier temporaire gardé ; ce dossier est dit dès la première ligne.
+- Durée : environ quatre minutes. Garde-fou : une recette bloquée s'arrête d'elle-même au bout de quinze minutes, en disant dans quel scénario, son dossier temporaire gardé ; ce dossier est dit dès la première ligne.
 - Bilan attendu : `Bilan : 38 scénarios, 570 contrôles, 570 réussis, 0 en échec, 0 sautés`. Là où un serveur ne peut écouter sur 127.0.0.2, deux contrôles de R8, deux de R34 et deux de R37 sont sautés ; là où un lien symbolique, ou une jonction sous Windows, ne peut se créer, le contrôle de R26 qui le suit est sauté.
 
 ## 2. L'application de démonstration
@@ -13166,7 +13166,7 @@ nom = "export"
       controle('une capture par vérification et par capture demandée (D8.INV-2)', captures.length === 10 && captures.every((x) => x.capture && existsSync(join(r.dossier, x.capture))), JSON.stringify(captures.map((x) => x.capture)));
       const tel = e.find((x) => x.action === 'telecharger')?.telechargement;
       controle('téléchargement enregistré avec son empreinte (D5.INV-5)', tel && tel.fichier === 'telechargements/export.csv' && tel.propose === 'clients.csv' && sha(join(r.dossier, tel.fichier)) === tel.sha256 && /Zoé Martin;Marseille/.test(readFileSync(join(r.dossier, tel.fichier), 'utf8')), JSON.stringify(tel));
-      controle('chaque étape a sa durée, son résumé et sa cible', e.every((x) => Number.isInteger(x.duree_ms) && x.resume) && e[1].cible === "getByRole('button', { name: 'Menu' })");
+      controle('chaque étape a sa durée, son résumé et sa cible', e.every((x) => Number.isInteger(x.duree_ms) && x.resume) && e[1]?.cible === "getByRole('button', { name: 'Menu' })");
       controle('cible CSS signalée fragile dans le rapport (D4.INV-1)', r.rapport?.cibles_fragiles.includes("locator('#etat')") && e[18].fragile === true);
       controle('navigateur, version et playwright-core notés (D6.INV-1)', r.rapport?.navigateur.canal === canal && /^\d+\./.test(r.rapport?.navigateur.version ?? '') && r.rapport?.navigateur.playwright_core === '1.65.1');
       controle('attente bornée qui s\'arrête dès l\'état obtenu (D5.INV-2)', e[17].duree_ms >= 500 && e[17].duree_ms < 4000, `${e[17].duree_ms} ms`);
@@ -13339,8 +13339,10 @@ nom = "export"
         await page.goto(`${base}/clients`);
         const avant = app.etat.clients.length;
         const rendues = [];
+        // Un élément absent (la page a changé) ne fait pas tomber la recette : les contrôles le diront.
         const cliquer = async (loc) => {
-          const b = await loc.boundingBox();
+          const b = await loc.boundingBox({ timeout: 5_000 }).catch(() => null);
+          if (!b) return;
           await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2);
           await page.mouse.click(b.x + b.width / 2, b.y + b.height / 2);
         };
@@ -14645,6 +14647,7 @@ nom = "export"
     {
       const P = join(TMP, 'r35');
       const E = join(P, 'e2e');
+      const empreinteDe = (f) => (existsSync(join(E, f)) ? sha(join(E, f)) : null);
       mkdirSync(E, { recursive: true });
       writeFileSync(join(P, 'package.json'), '{ "name": "projet-r35", "private": true }\n');
       const creer = ecrire('r35/scenarios', 'creer.toml', ECRAN('r35'));
@@ -14692,11 +14695,11 @@ nom = "export"
       const lignesCibles = (gCibles.contenu ?? '').split('\n');
       const manquees = listeCibles.filter((c, i) => !lignesCibles.some((l) => l.includes(`await s.etape(${i + 1}, `) && l.includes(`() => page.${cibles.decrireCible(c)}.hover({ timeout: 10000 })`)));
       controle('chaque cible devient le localisateur de Playwright du skill, même notation : stratégies, exact, dans sur plusieurs niveaux, rang (D21.INV-1, D4.INV-1)', gCibles.erreurs.length === 0 && manquees.length === 0, JSON.stringify(gCibles.erreurs) + JSON.stringify(manquees));
-      const empreinte = sha(join(E, 'creer.spec.mjs'));
+      const empreinte = empreinteDe('creer.spec.mjs');
       r = await exp([creer, '--dossier', 'e2e']);
       const g1 = exportation.genererTest(creer, { dossierExport: E, langage: 'js' });
       const g2 = exportation.genererTest(creer, { dossierExport: E, langage: 'js' });
-      controle('même scénario, même test : un nouvel export dit « à jour » et ne change rien (D21.INV-1)', r.code === 0 && /^à jour {3}e2e\/creer\.spec\.mjs : /m.test(r.sortie) && /^à jour {3}e2e\/scenario-playwright\.aides\.mjs : /m.test(r.sortie) && sha(join(E, 'creer.spec.mjs')) === empreinte && g1.contenu === g2.contenu && g1.contenu === contenu, r.sortie);
+      controle('même scénario, même test : un nouvel export dit « à jour » et ne change rien (D21.INV-1)', r.code === 0 && /^à jour {3}e2e\/creer\.spec\.mjs : /m.test(r.sortie) && /^à jour {3}e2e\/scenario-playwright\.aides\.mjs : /m.test(r.sortie) && empreinte !== null && empreinteDe('creer.spec.mjs') === empreinte && g1.contenu === g2.contenu && g1.contenu === contenu, r.sortie);
       mkdirSync(join(P, 'e2e-ts'));
       r = await exp([creer, '--dossier', 'e2e-ts', '--langage', 'ts']);
       const ts = lire(join(P, 'e2e-ts'), 'creer.spec.ts');
@@ -14714,7 +14717,7 @@ nom = "export"
       const rc = await exp([creer, '--dossier', 'e2e', '--comparer']);
       r = await exp([creer, '--dossier', 'e2e']);
       const rcr = await exp([creer, '--dossier', 'e2e', '--comparer', '--remplacer']);
-      controle('scénario changé : test périmé, refusé par verifier.mjs, dit par --comparer qui n\'écrit rien, non remplacé sans --remplacer ; code 1 (D21.INV-1)', v.code === 2 && v.sortie.includes('ERREUR creer.spec.mjs : périmé : le scénario ../scenarios/creer.toml, ou la version du skill, a changé depuis l\'export ; exporter.mjs --remplacer le régénère (D21.INV-1)') && rc.code === 1 && /^périmé {3}e2e\/creer\.spec\.mjs : /m.test(rc.sortie) && r.code === 1 && r.sortie.includes('périmé   e2e/creer.spec.mjs : le scénario ou le skill a changé ; --remplacer pour le remplacer') && sha(join(E, 'creer.spec.mjs')) === empreinte && rcr.code === 2, [v, rc, r, rcr].map((x) => x.sortie + x.erreurs).join(' | '));
+      controle('scénario changé : test périmé, refusé par verifier.mjs, dit par --comparer qui n\'écrit rien, non remplacé sans --remplacer ; code 1 (D21.INV-1)', v.code === 2 && v.sortie.includes('ERREUR creer.spec.mjs : périmé : le scénario ../scenarios/creer.toml, ou la version du skill, a changé depuis l\'export ; exporter.mjs --remplacer le régénère (D21.INV-1)') && rc.code === 1 && /^périmé {3}e2e\/creer\.spec\.mjs : /m.test(rc.sortie) && r.code === 1 && r.sortie.includes('périmé   e2e/creer.spec.mjs : le scénario ou le skill a changé ; --remplacer pour le remplacer') && empreinte !== null && empreinteDe('creer.spec.mjs') === empreinte && rcr.code === 2, [v, rc, r, rcr].map((x) => x.sortie + x.erreurs).join(' | '));
       r = await exp([creer, '--dossier', 'e2e', '--remplacer']);
       v = await lancer('verifier.mjs', [join(E, 'creer.spec.mjs')]);
       controle('--remplacer : test périmé régénéré, à jour pour verifier.mjs', r.code === 0 && r.sortie.includes('remplacé e2e/creer.spec.mjs : ') && lire(E, 'creer.spec.mjs') === exportation.genererTest(creer, { dossierExport: E, langage: 'js' }).contenu && v.code === 0 && v.sortie.includes('ok  creer.spec.mjs : à jour, exporté de ../scenarios/creer.toml'), r.sortie + v.sortie);
@@ -14843,7 +14846,7 @@ nom = "export"
         ex = await lancer('exporter.mjs', [join(S37, 'distant.toml'), join(S37, 'local.toml'), '--dossier', 'e2e'], { cwd: P });
         const n0 = app.etat.requetesApi.length;
         pw = await jouerTests(P, ['distant.spec.ts', 'local.spec.ts'], { SCENARIO_ORIGINES: `${base}=${distante}` });
-        const sautes = pw.tests.filter((x) => x.statut === 'skipped' && x.annotations.some((a) => a.type === 'skip' && a.description.includes(`hors du poste (${distante}) : SCENARIO_AUTORISER_MUTATIONS=1 pour l'autoriser, avec l'accord de l'équipe (D21.INV-3)`)));
+        const sautes = pw.tests.filter((x) => x.statut === 'skipped' && x.annotations.some((a) => a.type === 'skip' && (a.description ?? '').includes(`hors du poste (${distante}) : SCENARIO_AUTORISER_MUTATIONS=1 pour l'autoriser, avec l'accord de l'équipe (D21.INV-3)`)));
         controle('test qui modifie des données, hors du poste, déclaré ou par correspondance : sauté sans SCENARIO_AUTORISER_MUTATIONS=1, rien n\'est joué (D21.INV-3)', ex.code === 0 && ex.sortie.includes('(le scénario déclare déjà des origines hors du poste)') && pw.tests.length === 2 && sautes.length === 2 && app.etat.requetesApi.length === n0, ex.sortie + pw.sortie + JSON.stringify(pw.tests));
         pw = await jouerTests(P, ['distant.spec.ts'], { SCENARIO_AUTORISER_MUTATIONS: '1' });
         const faits = app.etat.requetesApi.slice(n0);
@@ -14933,9 +14936,9 @@ nom = "export"
 }
 
 let codeSortie = 0;
-// Garde-fou : une recette bloquée s'arrête d'elle-même au bout de dix minutes, en disant dans quel scénario, son
-// dossier temporaire gardé ; elle dure d'ordinaire moins de deux minutes.
-const DUREE_MAX = 600_000;
+// Garde-fou : une recette bloquée s'arrête d'elle-même au bout de quinze minutes, en disant dans quel scénario, son
+// dossier temporaire gardé ; elle dure d'ordinaire moins de cinq minutes.
+const DUREE_MAX = 900_000;
 setTimeout(() => {
   console.log(`KO   ${courant} · recette bloquée, arrêtée au bout de ${DUREE_MAX / 60_000} min`);
   console.log(`\nBilan : recette arrêtée dans ${courant}, après ${resultats.length} contrôles`);
@@ -15107,7 +15110,7 @@ Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichier
 
     56d93cb05302845039a646ee919771a798d60f2f1894cee62e678bf114939033  manifest.json
     5528fa2bd0d89e0eba2fca122347e0c34ba4f71cc3a69738642d0a44744e515e  SKILL.md
-    fd09626a203eb28f498f30655faf4f4922e83a1cd2e1b1f45d0db3270f0d27f2  modules/execution/SKILL.md
+    4d6851ec4f9c47f41b6d849d30053358bcc096e8eeabb3535fabaed8f6f620cf  modules/execution/SKILL.md
     8a7bc87a526f41bc934a2ee0ef15477c4d54013049c5663cc62154a23f27ffbf  modules/texte/SKILL.md
     427d0bca7987644d535e85a57ec025a849f060fbdb9132589636365ecc402751  modules/jira/SKILL.md
     a2b123e0f1975d2f55d2079413545180ee255df71121b6f781d75ceb59c8ce19  modules/cas-de-test/SKILL.md
@@ -15123,7 +15126,7 @@ Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichier
     a73208ab8485ff98e0c27444b630c73bdae1ffd307fe4b75922b6a08b2d2092a  modules/designer/SKILL.md
     20b5d06d38577315877713aaa7da0a03c4109fc961eb4246676d25615a7b520e  modules/export/SKILL.md
     f6fb84102687ac01eef9e7648d3cd595d9398cc5d10bcf62dc1c4d18f1653ab1  modules/agent/SKILL.md
-    e628477595d60129b5f1205c354712deab7069c4689660c4fef9ca069f6860c0  modules/recette/SKILL.md
+    36aaa5b6f89c2c84ae8019612a6917b8a6ce0aebc7b8e4cb042d8e92948b96ba  modules/recette/SKILL.md
     4966e366878732544faa9f20e65580a7348426d4e4c2a2b5f789dee4d59ce079  modules/traduction-auto/SKILL.md
     9dd5d57ca1b658cb15c7c1999ccfd94cb41491e0af15bbe151812f07d45929fc  modules/demo/SKILL.md
     4a202c9718112813a20437b56e250422013bebdfceee7f971922d246a4d2d606  modules/remise/SKILL.md

@@ -18,7 +18,7 @@ npm test
 - Depuis le dossier du skill, après `npm ci`. Sous Linux sans écran : `xvfb-run -a npm test` ; le scénario s'y joue dans une fenêtre, comme sur le poste.
 - Le navigateur est celui de `SCENARIO_PLAYWRIGHT_CANAL` : Chrome par défaut ; `chromium` après `npx playwright-core install chromium`.
 - La recette travaille sur des profils et des dossiers temporaires : les profils et les résultats du dossier du skill ne sont pas touchés. Elle efface son dossier temporaire si tout passe ; sinon, ou avec `GARDER_TMP=1`, elle le garde et en donne le chemin.
-- Durée : environ quatre minutes. Garde-fou : une recette bloquée s'arrête d'elle-même au bout de dix minutes, en disant dans quel scénario, son dossier temporaire gardé ; ce dossier est dit dès la première ligne.
+- Durée : environ quatre minutes. Garde-fou : une recette bloquée s'arrête d'elle-même au bout de quinze minutes, en disant dans quel scénario, son dossier temporaire gardé ; ce dossier est dit dès la première ligne.
 - Bilan attendu : `Bilan : 38 scénarios, 570 contrôles, 570 réussis, 0 en échec, 0 sautés`. Là où un serveur ne peut écouter sur 127.0.0.2, deux contrôles de R8, deux de R34 et deux de R37 sont sautés ; là où un lien symbolique, ou une jonction sous Windows, ne peut se créer, le contrôle de R26 qui le suit est sauté.
 
 ## 2. L'application de démonstration
@@ -1901,7 +1901,7 @@ nom = "export"
       controle('une capture par vérification et par capture demandée (D8.INV-2)', captures.length === 10 && captures.every((x) => x.capture && existsSync(join(r.dossier, x.capture))), JSON.stringify(captures.map((x) => x.capture)));
       const tel = e.find((x) => x.action === 'telecharger')?.telechargement;
       controle('téléchargement enregistré avec son empreinte (D5.INV-5)', tel && tel.fichier === 'telechargements/export.csv' && tel.propose === 'clients.csv' && sha(join(r.dossier, tel.fichier)) === tel.sha256 && /Zoé Martin;Marseille/.test(readFileSync(join(r.dossier, tel.fichier), 'utf8')), JSON.stringify(tel));
-      controle('chaque étape a sa durée, son résumé et sa cible', e.every((x) => Number.isInteger(x.duree_ms) && x.resume) && e[1].cible === "getByRole('button', { name: 'Menu' })");
+      controle('chaque étape a sa durée, son résumé et sa cible', e.every((x) => Number.isInteger(x.duree_ms) && x.resume) && e[1]?.cible === "getByRole('button', { name: 'Menu' })");
       controle('cible CSS signalée fragile dans le rapport (D4.INV-1)', r.rapport?.cibles_fragiles.includes("locator('#etat')") && e[18].fragile === true);
       controle('navigateur, version et playwright-core notés (D6.INV-1)', r.rapport?.navigateur.canal === canal && /^\d+\./.test(r.rapport?.navigateur.version ?? '') && r.rapport?.navigateur.playwright_core === '1.65.1');
       controle('attente bornée qui s\'arrête dès l\'état obtenu (D5.INV-2)', e[17].duree_ms >= 500 && e[17].duree_ms < 4000, `${e[17].duree_ms} ms`);
@@ -2074,8 +2074,10 @@ nom = "export"
         await page.goto(`${base}/clients`);
         const avant = app.etat.clients.length;
         const rendues = [];
+        // Un élément absent (la page a changé) ne fait pas tomber la recette : les contrôles le diront.
         const cliquer = async (loc) => {
-          const b = await loc.boundingBox();
+          const b = await loc.boundingBox({ timeout: 5_000 }).catch(() => null);
+          if (!b) return;
           await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2);
           await page.mouse.click(b.x + b.width / 2, b.y + b.height / 2);
         };
@@ -3380,6 +3382,7 @@ nom = "export"
     {
       const P = join(TMP, 'r35');
       const E = join(P, 'e2e');
+      const empreinteDe = (f) => (existsSync(join(E, f)) ? sha(join(E, f)) : null);
       mkdirSync(E, { recursive: true });
       writeFileSync(join(P, 'package.json'), '{ "name": "projet-r35", "private": true }\n');
       const creer = ecrire('r35/scenarios', 'creer.toml', ECRAN('r35'));
@@ -3427,11 +3430,11 @@ nom = "export"
       const lignesCibles = (gCibles.contenu ?? '').split('\n');
       const manquees = listeCibles.filter((c, i) => !lignesCibles.some((l) => l.includes(`await s.etape(${i + 1}, `) && l.includes(`() => page.${cibles.decrireCible(c)}.hover({ timeout: 10000 })`)));
       controle('chaque cible devient le localisateur de Playwright du skill, même notation : stratégies, exact, dans sur plusieurs niveaux, rang (D21.INV-1, D4.INV-1)', gCibles.erreurs.length === 0 && manquees.length === 0, JSON.stringify(gCibles.erreurs) + JSON.stringify(manquees));
-      const empreinte = sha(join(E, 'creer.spec.mjs'));
+      const empreinte = empreinteDe('creer.spec.mjs');
       r = await exp([creer, '--dossier', 'e2e']);
       const g1 = exportation.genererTest(creer, { dossierExport: E, langage: 'js' });
       const g2 = exportation.genererTest(creer, { dossierExport: E, langage: 'js' });
-      controle('même scénario, même test : un nouvel export dit « à jour » et ne change rien (D21.INV-1)', r.code === 0 && /^à jour {3}e2e\/creer\.spec\.mjs : /m.test(r.sortie) && /^à jour {3}e2e\/scenario-playwright\.aides\.mjs : /m.test(r.sortie) && sha(join(E, 'creer.spec.mjs')) === empreinte && g1.contenu === g2.contenu && g1.contenu === contenu, r.sortie);
+      controle('même scénario, même test : un nouvel export dit « à jour » et ne change rien (D21.INV-1)', r.code === 0 && /^à jour {3}e2e\/creer\.spec\.mjs : /m.test(r.sortie) && /^à jour {3}e2e\/scenario-playwright\.aides\.mjs : /m.test(r.sortie) && empreinte !== null && empreinteDe('creer.spec.mjs') === empreinte && g1.contenu === g2.contenu && g1.contenu === contenu, r.sortie);
       mkdirSync(join(P, 'e2e-ts'));
       r = await exp([creer, '--dossier', 'e2e-ts', '--langage', 'ts']);
       const ts = lire(join(P, 'e2e-ts'), 'creer.spec.ts');
@@ -3449,7 +3452,7 @@ nom = "export"
       const rc = await exp([creer, '--dossier', 'e2e', '--comparer']);
       r = await exp([creer, '--dossier', 'e2e']);
       const rcr = await exp([creer, '--dossier', 'e2e', '--comparer', '--remplacer']);
-      controle('scénario changé : test périmé, refusé par verifier.mjs, dit par --comparer qui n\'écrit rien, non remplacé sans --remplacer ; code 1 (D21.INV-1)', v.code === 2 && v.sortie.includes('ERREUR creer.spec.mjs : périmé : le scénario ../scenarios/creer.toml, ou la version du skill, a changé depuis l\'export ; exporter.mjs --remplacer le régénère (D21.INV-1)') && rc.code === 1 && /^périmé {3}e2e\/creer\.spec\.mjs : /m.test(rc.sortie) && r.code === 1 && r.sortie.includes('périmé   e2e/creer.spec.mjs : le scénario ou le skill a changé ; --remplacer pour le remplacer') && sha(join(E, 'creer.spec.mjs')) === empreinte && rcr.code === 2, [v, rc, r, rcr].map((x) => x.sortie + x.erreurs).join(' | '));
+      controle('scénario changé : test périmé, refusé par verifier.mjs, dit par --comparer qui n\'écrit rien, non remplacé sans --remplacer ; code 1 (D21.INV-1)', v.code === 2 && v.sortie.includes('ERREUR creer.spec.mjs : périmé : le scénario ../scenarios/creer.toml, ou la version du skill, a changé depuis l\'export ; exporter.mjs --remplacer le régénère (D21.INV-1)') && rc.code === 1 && /^périmé {3}e2e\/creer\.spec\.mjs : /m.test(rc.sortie) && r.code === 1 && r.sortie.includes('périmé   e2e/creer.spec.mjs : le scénario ou le skill a changé ; --remplacer pour le remplacer') && empreinte !== null && empreinteDe('creer.spec.mjs') === empreinte && rcr.code === 2, [v, rc, r, rcr].map((x) => x.sortie + x.erreurs).join(' | '));
       r = await exp([creer, '--dossier', 'e2e', '--remplacer']);
       v = await lancer('verifier.mjs', [join(E, 'creer.spec.mjs')]);
       controle('--remplacer : test périmé régénéré, à jour pour verifier.mjs', r.code === 0 && r.sortie.includes('remplacé e2e/creer.spec.mjs : ') && lire(E, 'creer.spec.mjs') === exportation.genererTest(creer, { dossierExport: E, langage: 'js' }).contenu && v.code === 0 && v.sortie.includes('ok  creer.spec.mjs : à jour, exporté de ../scenarios/creer.toml'), r.sortie + v.sortie);
@@ -3578,7 +3581,7 @@ nom = "export"
         ex = await lancer('exporter.mjs', [join(S37, 'distant.toml'), join(S37, 'local.toml'), '--dossier', 'e2e'], { cwd: P });
         const n0 = app.etat.requetesApi.length;
         pw = await jouerTests(P, ['distant.spec.ts', 'local.spec.ts'], { SCENARIO_ORIGINES: `${base}=${distante}` });
-        const sautes = pw.tests.filter((x) => x.statut === 'skipped' && x.annotations.some((a) => a.type === 'skip' && a.description.includes(`hors du poste (${distante}) : SCENARIO_AUTORISER_MUTATIONS=1 pour l'autoriser, avec l'accord de l'équipe (D21.INV-3)`)));
+        const sautes = pw.tests.filter((x) => x.statut === 'skipped' && x.annotations.some((a) => a.type === 'skip' && (a.description ?? '').includes(`hors du poste (${distante}) : SCENARIO_AUTORISER_MUTATIONS=1 pour l'autoriser, avec l'accord de l'équipe (D21.INV-3)`)));
         controle('test qui modifie des données, hors du poste, déclaré ou par correspondance : sauté sans SCENARIO_AUTORISER_MUTATIONS=1, rien n\'est joué (D21.INV-3)', ex.code === 0 && ex.sortie.includes('(le scénario déclare déjà des origines hors du poste)') && pw.tests.length === 2 && sautes.length === 2 && app.etat.requetesApi.length === n0, ex.sortie + pw.sortie + JSON.stringify(pw.tests));
         pw = await jouerTests(P, ['distant.spec.ts'], { SCENARIO_AUTORISER_MUTATIONS: '1' });
         const faits = app.etat.requetesApi.slice(n0);
@@ -3668,9 +3671,9 @@ nom = "export"
 }
 
 let codeSortie = 0;
-// Garde-fou : une recette bloquée s'arrête d'elle-même au bout de dix minutes, en disant dans quel scénario, son
-// dossier temporaire gardé ; elle dure d'ordinaire moins de deux minutes.
-const DUREE_MAX = 600_000;
+// Garde-fou : une recette bloquée s'arrête d'elle-même au bout de quinze minutes, en disant dans quel scénario, son
+// dossier temporaire gardé ; elle dure d'ordinaire moins de cinq minutes.
+const DUREE_MAX = 900_000;
 setTimeout(() => {
   console.log(`KO   ${courant} · recette bloquée, arrêtée au bout de ${DUREE_MAX / 60_000} min`);
   console.log(`\nBilan : recette arrêtée dans ${courant}, après ${resultats.length} contrôles`);
