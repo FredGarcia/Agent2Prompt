@@ -2806,7 +2806,8 @@ Fonctionnalité: Clients
 
     // ------------------------------------------------------------------------------------------
     scenarioRecette('R32', 'Préparation et nettoyage par l\'API, avec la session du navigateur et le jeton anti-CSRF recopié : valeur gardée, ${unique}, rapport, secrets masqués');
-    const tete32 = (titre, profil) => `format = "scenario-playwright.scenario/1"\ntitre = "${titre}"\nurl_base = "${base}"\nprofil = "${profil}"\n`;
+    // Délai long : la première adresse d'un profil neuf peut dépasser 10 s sur une machine d'intégration chargée.
+    const tete32 = (titre, profil) => `format = "scenario-playwright.scenario/1"\ntitre = "${titre}"\nurl_base = "${base}"\nprofil = "${profil}"\ndelai = 30\n`;
     const etape32 = (champs) => `\n[[etapes]]\n${champs}\n`;
     const prep32 = (champs) => `\n[[preparation]]\n${champs}\n`;
     const nett32 = (champs) => `\n[[nettoyage]]\n${champs}\n`;
@@ -2902,9 +2903,9 @@ Fonctionnalité: Clients
           await fermer(ctx);
         }
       }
-      const CREER = (attendu) => `format = "scenario-playwright.scenario/1"\ntitre = "Créer un client par l'écran"\nurl_base = "${base}"\nprofil = "r34"\n\n[parametres]\nnom = "Personne"\n\n[[etapes]]\naction = "naviguer"\nurl = "/clients/nouveau"\n\n[[etapes]]\naction = "saisir"\ncible = { libelle = "Nom" }\nvaleur = "\${nom}"\n\n[[etapes]]\naction = "cliquer"\ncible = { role = "button", nom = "Enregistrer" }\nmutation = "creation"\n\n[[etapes]]\naction = "verifier"\ncritere = "contient"\ncible = { role = "alert" }\nattendu = "${attendu}"\ndelai = 3\n`;
+      const CREER = (attendu) => `format = "scenario-playwright.scenario/1"\ntitre = "Créer un client par l'écran"\nurl_base = "${base}"\nprofil = "r34"\ndelai = 30\n\n[parametres]\nnom = "Personne"\n\n[[etapes]]\naction = "naviguer"\nurl = "/clients/nouveau"\n\n[[etapes]]\naction = "saisir"\ncible = { libelle = "Nom" }\nvaleur = "\${nom}"\n\n[[etapes]]\naction = "cliquer"\ncible = { role = "button", nom = "Enregistrer" }\nmutation = "creation"\n\n[[etapes]]\naction = "verifier"\ncritere = "contient"\ncible = { role = "alert" }\nattendu = "${attendu}"\ndelai = 3\n`;
       ecrire('r34', 'creer-client.toml', CREER('Client ${nom} créé'));
-      const PRINCIPAL = (sous, prefixe) => `format = "scenario-playwright.scenario/1"\ntitre = "Préparé par l'écran"\nurl_base = "${base}"\nprofil = "r34"\n\n[[preparation]]\nscenario = "${sous}"\nparametres = { nom = "${prefixe}-\${unique}" }\n\n[[etapes]]\naction = "naviguer"\nurl = "/clients"\n\n[[etapes]]\naction = "verifier"\ncritere = "contient"\ncible = { role = "table" }\nattendu = "${prefixe}-\${unique}"\n\n[[nettoyage]]\nmethode = "DELETE"\nchemin = "/api/clients/${prefixe}-\${unique}"\n`;
+      const PRINCIPAL = (sous, prefixe) => `format = "scenario-playwright.scenario/1"\ntitre = "Préparé par l'écran"\nurl_base = "${base}"\nprofil = "r34"\ndelai = 30\n\n[[preparation]]\nscenario = "${sous}"\nparametres = { nom = "${prefixe}-\${unique}" }\n\n[[etapes]]\naction = "naviguer"\nurl = "/clients"\n\n[[etapes]]\naction = "verifier"\ncritere = "contient"\ncible = { role = "table" }\nattendu = "${prefixe}-\${unique}"\n\n[[nettoyage]]\nmethode = "DELETE"\nchemin = "/api/clients/${prefixe}-\${unique}"\n`;
       const principal = ecrire('r34', 'ecran.toml', PRINCIPAL('creer-client.toml', 'Ecran'));
       const lu = scenario.lireScenario(principal);
       controle('un scénario de préparation qui modifie des données compte pour la garde (D20.INV-3)', JSON.stringify(scenario.mutationsDe(lu.scenario)) === '["préparation 1 (creer-client.toml)","nettoyage 1"]', JSON.stringify(lu.erreurs));
