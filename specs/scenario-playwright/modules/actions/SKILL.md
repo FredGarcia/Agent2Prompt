@@ -690,7 +690,8 @@ async function jouerEntree(page, entree, ctx, arret) {
     r.statut = 'echec';
     r.message = err instanceof Echec ? err.message : messageErreur(err, delaiMs);
     fin = Date.now();
-    if (e.type === 'api') await preuvesEchec(page, ctx.resultats, `${ctx.prefixeJeu}${marque}`, r, e.genre);
+    // Les preuves d'un appel en échec montrent la page ; avant la première adresse, il n'y en a aucune (D8.INV-2).
+    if (e.type === 'api' && page.url() !== 'about:blank') await preuvesEchec(page, ctx.resultats, `${ctx.prefixeJeu}${marque}`, r, e.genre);
   }
   r.duree_ms = (fin ?? Date.now()) - debut;
   ctx.surEvenement({ type: 'fin-entree', jeu: ctx.numeroJeu, entree: masquerSecretsGardes(r, ctx.gardees) });

@@ -17,7 +17,7 @@ Chaque exécution écrit son dossier, `resultats/<AAAAMMJJ-HHMMSS>-<scénario>/`
 rapport.json            champs stables (§ 2)
 rapport.md              le même rapport, lisible
 captures/<n>-<action>.png        vérification, capture demandée (nom donné), échec (…-echec.png)
-captures/p<k>-…, n<k>-…          entrée de préparation ou de nettoyage : appel en échec, étapes d'un scénario de préparation
+captures/p<k>-…, n<k>-…          entrée de préparation ou de nettoyage : appel en échec, sur la page ouverte, étapes d'un scénario de préparation
 aria/<n>-<action>.yml            instantané ARIA de la page, à chaque échec
 telechargements/<fichier>        fichiers téléchargés
 trace.zip               seulement avec --trace
