@@ -1,7 +1,7 @@
 ---
 name: recette
-description: Recette du skill (npm test, scénarios R1 à R34 contre une application de démonstration servie sur 127.0.0.1 sans réseau ni compte, deux origines, WebSocket d'écho, connexion simulée, export CSV, API de lecture, API d'écriture à session et jeton anti-CSRF, réponse lente et réponse volumineuse, secrets qu'aucun rapport ne doit contenir, projet de démonstration front et back pour l'index du code, Jira factice à connexion simulée avec des demandes de Jira Cloud et de Jira Data Center et leurs pages MHTML, Xray et Zephyr Scale factices, Cloud et Data Center, qui notent chaque requête, archives d'export ; profils et résultats temporaires ; navigateur de SCENARIO_PLAYWRIGHT_CANAL ; écran virtuel sous Linux ; bilan attendu ; défauts réintroduits qui font chacun échouer la recette ; recette en intégration continue sous Linux et Windows), sources de tests/application-demo.mjs, tests/projet-demo.mjs et tests/run-tests.mjs.
-dimensions: [D1, D2, D3, D4, D5, D6, D7, D8, D9, D16, D17, D18, D19, D20]
+description: Recette du skill (npm test, scénarios R1 à R38 contre une application de démonstration servie sur 127.0.0.1 sans réseau ni compte, deux origines, WebSocket d'écho, connexion simulée, export CSV, API de lecture, API d'écriture à session et jeton anti-CSRF, réponse lente et réponse volumineuse, secrets qu'aucun rapport ne doit contenir, projet de démonstration front et back pour l'index du code, Jira factice à connexion simulée avec des demandes de Jira Cloud et de Jira Data Center et leurs pages MHTML, Xray et Zephyr Scale factices, Cloud et Data Center, qui notent chaque requête, archives d'export ; projets de tests temporaires où @playwright/test 1.65.1 joue les tests exportés, comparés au skill étape par étape ; profils et résultats temporaires ; navigateur de SCENARIO_PLAYWRIGHT_CANAL ; écran virtuel sous Linux ; bilan attendu ; défauts réintroduits qui font chacun échouer la recette ; recette en intégration continue sous Linux et Windows), sources de tests/application-demo.mjs, tests/projet-demo.mjs et tests/run-tests.mjs.
+dimensions: [D1, D2, D3, D4, D5, D6, D7, D8, D9, D16, D17, D18, D19, D20, D21]
 status: active
 ---
 
@@ -18,8 +18,8 @@ npm test
 - Depuis le dossier du skill, après `npm ci`. Sous Linux sans écran : `xvfb-run -a npm test` ; le scénario s'y joue dans une fenêtre, comme sur le poste.
 - Le navigateur est celui de `SCENARIO_PLAYWRIGHT_CANAL` : Chrome par défaut ; `chromium` après `npx playwright-core install chromium`.
 - La recette travaille sur des profils et des dossiers temporaires : les profils et les résultats du dossier du skill ne sont pas touchés. Elle efface son dossier temporaire si tout passe ; sinon, ou avec `GARDER_TMP=1`, elle le garde et en donne le chemin.
-- Durée : environ trois minutes. Garde-fou : une recette bloquée s'arrête d'elle-même au bout de dix minutes, en disant dans quel scénario, son dossier temporaire gardé ; ce dossier est dit dès la première ligne.
-- Bilan attendu : `Bilan : 34 scénarios, 522 contrôles, 522 réussis, 0 en échec, 0 sautés`. Là où un serveur ne peut écouter sur 127.0.0.2, deux contrôles de R8 sont sautés ; là où un lien symbolique, ou une jonction sous Windows, ne peut se créer, le contrôle de R26 qui le suit est sauté.
+- Durée : environ quatre minutes. Garde-fou : une recette bloquée s'arrête d'elle-même au bout de quinze minutes, en disant dans quel scénario, son dossier temporaire gardé ; ce dossier est dit dès la première ligne.
+- Bilan attendu : `Bilan : 38 scénarios, 570 contrôles, 570 réussis, 0 en échec, 0 sautés`. Là où un serveur ne peut écouter sur 127.0.0.2, deux contrôles de R8, deux de R34 et deux de R37 sont sautés ; là où un lien symbolique, ou une jonction sous Windows, ne peut se créer, le contrôle de R26 qui le suit est sauté.
 
 ## 2. L'application de démonstration
 
@@ -69,6 +69,8 @@ Il sert enfin, sur une quatrième origine, un Xray et un Zephyr Scale factices, 
 | `JETONS_FACTICES` | les valeurs des variables d'environnement des jetons, qu'aucune sortie ni aucun texte ne doit contenir | garde des jetons |
 | `enZip(fichiers)` | une archive comme celle d'un export : deflate ou stockée, noms en UTF-8, CRC-32 qu'on peut abîmer, fichier marqué chiffré | lecture des archives |
 
+Les tests exportés (R35 à R38) jouent dans des projets temporaires, comme ceux d'une équipe : `package.json`, `playwright.config.mjs` (rapport JSON, navigateur de `SCENARIO_PLAYWRIGHT_CANAL`, fenêtre visible, un seul worker), dossiers `scenarios/` et `e2e/`, et `node_modules` lié à celui du skill par une jonction ; R37 y ajoute un `tsconfig.json`. La connexion de l'équipe y est une fonction qui note son appel : la page `/connexion?auto=…` se connecte d'elle-même. `@playwright/test` y est lancé par la recette, avec les seules variables `SCENARIO_ORIGINES` et `SCENARIO_AUTORISER_MUTATIONS` que chaque contrôle donne, et son rapport JSON se lit test par test, étape par étape.
+
 Le projet de démonstration, `tests/projet-demo.mjs`, s'écrit dans un dossier temporaire ; aucun de ses fichiers n'est exécuté, l'index les lit seulement :
 
 | Partie | Contenu | Sert à |
@@ -98,7 +100,7 @@ Le projet de démonstration, `tests/projet-demo.mjs`, s'écrit dans un dossier t
 | R12 | Lignes de commande : dix appels refusés avec le code 2, `verifier.mjs` sur un texte et un scénario, un fichier refusé suffit, note des mutations hors du poste | D1.INV-4 |
 | R13 | Désignation : deux clics simulés, deux cibles, un lien et un bouton d'une ligne avec `dans`, page non actionnée, cible au format du scénario | D9.INV-1 |
 | R14 | Compatibilité : `playwright-core` 1.65.1 et Chromium 159 lus dans le paquet ; écarts sans avertissement, ancien, plus récent, illisible ; avertissement du rapport | D6.INV-1 |
-| R15 | Dépendance unique à version exacte, Node 22, `.gitignore`, aucune exécution de code dans la page dans les sources | D1.INV-1, D1.INV-2, D5.INV-1 |
+| R15 | Dépendance d'exécution unique à version exacte, `@playwright/test` à la même version en dépendance de développement, qu'aucun script du skill n'importe, Node 22, `.gitignore`, aucune exécution de code dans la page dans les sources | D1.INV-1, D1.INV-2, D5.INV-1 |
 | R16 | Points d'extension : champs du rapport, de ses étapes, `hors_ecran` compris, du navigateur, du scénario et des options (E1) ; format et vocabulaire communs avec Agent2Test, critères hors de l'écran compris (E2) ; fonctions exportées du moteur, de la session et du scénario (E3) | |
 | R17 | Preuves : erreur de console, exception de la page et réponse 500 relevées, sans échec de l'étape ; trace avec `--trace` et son avertissement ; aucune trace sans l'option | D8.INV-2, D7.INV-3 |
 | R18 | Page Jira enregistrée : MHTML en quoted-printable et UTF-8, en base64 et ISO-8859-1 ; fichier qui n'est pas un MHTML refusé ; Jira Cloud et Data Center : variante, clé, résumé, description et champs de texte, commentaires seulement sur demande, avec auteur et date ; lignes du HTML ; page qui n'est pas une demande refusée ; commentaires repliés signalés ; clé lue dans l'adresse | D16.INV-1, D16.INV-2 |
@@ -118,10 +120,14 @@ Le projet de démonstration, `tests/projet-demo.mjs`, s'écrit dans un dossier t
 | R32 | Préparation et nettoyage par l'API : après la connexion à la main, appel avec la session et le jeton recopié dans `X-XSRF-TOKEN`, sans `Authorization`, corps JSON annoncé par `Content-Type` ; valeur gardée dans les étapes et le nettoyage ; `${unique}` dans le nom créé, client créé puis supprimé ; champs de l'entrée et du bilan ; `rapport.md` et sortie ; jeton jamais dans le rapport ni la sortie ; jeton de Django dans `X-CSRFToken` ; sans session, 401 et sa conduite, étapes non jouées, nettoyage d'une valeur non obtenue non joué, aucune preuve avant la première adresse ; sans cookie anti-CSRF, 403, capture et instantané ARIA de la page ouverte ; `corps_fichier`, plusieurs valeurs gardées, statut parmi une liste ; valeur gardée secrète masquée, aussi réemployée par une étape et un appel, paramètre de requête secret masqué dans l'adresse et le résumé ; chaque entrée une fois ; redirection non suivie ; réponse de plus de 1 Mio, non JSON, sans la valeur ou dont la valeur n'est pas simple : rien de gardé | D20.INV-2, D20.INV-4, D20.INV-6, D8.INV-2 |
 | R33 | Nettoyage après une étape en échec, une seule fois ; nettoyage en échec signalé, statut et code inchangés, entrée suivante jouée ; préparation en échec, un seul appel, préparation suivante et étapes non jouées, nettoyage de ce qui ne dépend d'aucune valeur gardée ; plusieurs jeux, chacun sa préparation, son `${unique}` et son nettoyage | D20.INV-4, D20.INV-6, D5.INV-3 |
 | R34 | Hors du poste avec `--autoriser-mutations`, l'appel part et se rapporte ; garde à l'appel par le moteur (E3), aucun appel fait ; un scénario de préparation qui modifie des données compte pour la garde ; préparation par l'écran dans le même onglet, avec ses paramètres et le même `${unique}`, ses étapes au rapport et leurs captures préfixées, sortie en retrait, nettoyage par l'API ensuite ; scénario de préparation en échec, étapes non jouées, nettoyage joué | D20.INV-3, D20.INV-5, D7.INV-2 |
+| R35 | Export : refus avant toute écriture (sans `--dossier`, dossier absent jamais créé, scénario invalide, texte changé depuis la traduction) ; test et aides écrits dans le seul dossier désigné, notes des origines et des mutations ; en-tête et empreinte du corps ; traduction (un test par jeu dans `test.describe`, tags, localisateurs, numéro et ligne, vérifications qui se poursuivent, mutation, téléversement, nettoyage dans `finally`) ; chaque stratégie de cible, `exact`, `dans` sur deux niveaux et `rang`, dans la notation du skill ; même scénario, même test, « à jour » ; TypeScript par `--langage` ou par le `tsconfig.json` du projet, chemins de la sortie écrits avec des « / » ; fichier qui n'est pas du skill jamais remplacé ; scénario changé : test périmé pour `verifier.mjs`, dit par `--comparer` sans écriture, remplacé par `--remplacer` ; test retouché gardé à côté ; souche de connexion posée une fois, connexion de l'équipe jamais remplacée | D21.INV-1, D21.INV-2, D1.INV-4 |
+| R36 | Tests exportés joués par `@playwright/test` 1.65.1 : test DEMO-13 importé de Xray, traduit et exporté ; sept scénarios joués par le skill, puis exportés et joués, huit tests ; pour chaque jeu, le statut du skill à chaque étape et à chaque entrée de préparation et de nettoyage : dix-sept étapes de l'écran sur deux jeux, vérification en échec suivie d'une autre, action en échec, dernière vérification en échec, étape à la main par la connexion de l'équipe et préparation par l'API, scénario de préparation, téléchargement et fichier ; même message d'échec ; requêtes vues, adresse masquée, aucun jeton dans le rapport de Playwright ; préparation à sa place ; appels avec la session et le jeton anti-CSRF recopié ; étapes d'un scénario de préparation sous son entrée ; nettoyage en échec annoté sans changer le résultat ; `<unique>` propre à chaque jeu ; fichier téléchargé, capture et tags ; aucune donnée laissée | D21.INV-1, D21.INV-3, D21.INV-5, D5.INV-3, D5.INV-4, D20.INV-4, D20.INV-5, D20.INV-6 |
+| R37 | Tests exportés en TypeScript, d'après le `tsconfig.json` du projet : souche de connexion qui échoue en disant ce qui manque, préparation et nettoyage non joués, aucun appel ; `SCENARIO_ORIGINES` : origine du scénario injoignable mise en correspondance, adresses, vérification d'adresse, API et WebSocket compris, l'autre origine bloquée, WebSocket compris ; correspondance mal formée ; test qui modifie des données hors du poste, déclaré ou par correspondance, sauté sans `SCENARIO_AUTORISER_MUTATIONS=1`, joué avec elle et nettoyé | D21.INV-2, D21.INV-3, D7.INV-1, D7.INV-2 |
+| R38 | Résultats : Xray, clé retenue à l'import, statut de chaque pas du test manuel converti, fichier à côté du rapport ; pas en échec avec le message de son étape, commentaire ; texte retouché depuis l'import : statut du test seul, avec une note ; plusieurs jeux en exemples, `--cle` ; captures seulement avec `--preuves`, en PNG encodé en base64 ; sept refus ; Zephyr Scale au format « custom », JSON et archive .zip lisible, résultat en échec ; plusieurs rapports dans un fichier ; rien n'est envoyé | D21.INV-4, D21.INV-5 |
 
 ## 4. Contrôle de la recette elle-même
 
-Cent dix-neuf défauts, réintroduits un à un dans le code, font chacun échouer la recette par le scénario attendu (essai des 21 et 22 novembre 2026, Node 26.13.0, Chromium 159 : les cent dix-neuf rejoués en 1.4.0, sur le code publié) :
+Cent cinquante-huit défauts, réintroduits un à un dans le code, font chacun échouer la recette par le scénario attendu (essai du 22 novembre 2026, Node 26.13.0, Chromium 159 : les cent cinquante-huit rejoués en 1.5.0, sur le code publié) :
 
 | ID | Défaut réintroduit | Scénarios en échec | Contrôles en échec |
 |---|---|---|---|
@@ -129,11 +135,11 @@ Cent dix-neuf défauts, réintroduits un à un dans le code, font chacun échoue
 | M2 | Les WebSocket ne sont pas gardés | R7 | 3 |
 | M3 | Pas de refus avant le navigateur d'un scénario qui modifie des données hors du poste | R8, R30 | 2 |
 | M4 | Pas de garde à l'étape de mutation | R8 | 1 |
-| M5 | L'empreinte du texte n'est pas contrôlée | R3, R20 | 2 |
+| M5 | L'empreinte du texte n'est pas contrôlée | R3, R20, R35 | 4 |
 | M6 | Une ligne du texte peut rester sans étape | R3 | 1 |
 | M7 | Une marque de mutation du texte peut se perdre | R3 | 1 |
-| M8 | Une vérification échouée arrête les vérifications suivantes | R6, R28, R29 | 9 |
-| M9 | Une étape échouée n'arrête pas la suite | R6, R7 | 2 |
+| M8 | Une vérification échouée arrête les vérifications suivantes | R6, R28, R29, R36 | 10 |
+| M9 | Une étape échouée n'arrête pas la suite | R6, R7, R36 | 3 |
 | M10 | Délai de 30 s pour toute étape, sans tenir compte des réglages | R6, R9, R11 | 4 |
 | M11 | Une étape à la main est acceptée sans fenêtre | R9, R30 | 2 |
 | M12 | Une variable non déclarée est acceptée | R2, R30 | 2 |
@@ -142,9 +148,9 @@ Cent dix-neuf défauts, réintroduits un à un dans le code, font chacun échoue
 | M15 | Une cible ambiguë agit sur le premier élément | R5, R6, R29 | 13 |
 | M16 | Pas de capture pour une vérification | R5, R10, R34 | 3 |
 | M17 | Navigateur ancien de trois versions accepté sans avertissement | R14 | 1 |
-| M18 | Champ origines_bloquees du rapport renommé | R5 | 5 |
+| M18 | Champ origines_bloquees du rapport renommé | R5, R6, R7, R8, R9, R10, R11, R14, R16, R17, R20, R28, R29, R32, R33, R34, R36, R38 | 103 |
 | M19 | Une étape main est acceptée sur une ligne non marquée | R3 | 1 |
-| M20 | La désignation clique l'élément désigné | R13 | 1 |
+| M20 | La désignation clique l'élément désigné | R13 | 3 |
 | M21 | Les commentaires de Jira Cloud sont lus sans --commentaires | R18, R20 | 8 |
 | M22 | Un texte modifié dans Jira est remplacé sans --remplacer | R20, R23 | 5 |
 | M23 | Un texte écrit à la main est remplacé par un texte importé du même nom | R20, R23 | 4 |
@@ -160,7 +166,7 @@ Cent dix-neuf défauts, réintroduits un à un dans le code, font chacun échoue
 | M33 | Le jeton passe dans l'adresse de la requête | R25 | 1 |
 | M34 | L'import écrit dans Jira : une étiquette ajoutée au test | R25 | 1 |
 | M35 | Une requête GraphQL de mutation part vers Xray Cloud | R25 | 1 |
-| M36 | Le résultat attendu d'un pas manuel est perdu | R23, R24 | 2 |
+| M36 | Le résultat attendu d'un pas manuel est perdu | R23, R24, R36, R38 | 21 |
 | M37 | L'étiquette @TestCaseKey= de Zephyr Scale n'est pas reconnue | R22 | 2 |
 | M38 | Une clé portée par des scénarios de titres différents devient leur identité | R22 | 5 |
 | M39 | Le même test, lu d'un autre chemin d'import, est en conflit avec son texte | R22, R23 | 5 |
@@ -179,21 +185,21 @@ Cent dix-neuf défauts, réintroduits un à un dans le code, font chacun échoue
 | M52 | Une proposition de l'index entre dans le squelette hors commentaire | R27 | 3 |
 | M53 | Une cible absente de l'index fait échouer le contrôle | R27 | 2 |
 | M54 | Le relevé d'une requête garde ses en-têtes | R28 | 2 |
-| M55 | Un jeton de l'adresse d'une requête n'est pas masqué | R28, R29, R32 | 8 |
+| M55 | Un jeton de l'adresse d'une requête n'est pas masqué | R28, R29, R32, R36 | 9 |
 | M56 | Le corps d'une requête faite pendant une étape à la main est relevé | R28 | 1 |
 | M57 | Une vérification api suit les redirections | R29 | 2 |
 | M58 | Une vérification api accepte une autre méthode que GET | R29 | 1 |
 | M59 | Le chemin d'une vérification requete ou api peut viser une origine non déclarée | R28, R29 | 3 |
-| M60 | La fenêtre des requêtes vérifiées ne part pas de la dernière action | R28 | 1 |
+| M60 | La fenêtre des requêtes vérifiées ne part pas de la dernière action | R28, R36 | 2 |
 | M61 | Les champs attendus du corps d'une requête ne sont pas comparés | R28 | 2 |
 | M62 | Pas de borne de taille de la réponse d'une vérification api | R29 | 1 |
 | M63 | La colonne CSV se cherche en tenant compte de la casse | R29 | 1 |
 | M64 | Le statut reçu d'une réponse interrompue est perdu | R28 | 5 |
 | M65 | Les réponses JSON des requêtes ne sont pas lues | R28 | 2 |
 | M66 | Le séparateur d'un CSV n'est pas deviné | R29 | 2 |
-| M67 | Le jeton anti-CSRF n'est pas recopié dans l'en-tête d'un appel | R32 | 9 |
+| M67 | Le jeton anti-CSRF n'est pas recopié dans l'en-tête d'un appel | R32, R33, R36 | 20 |
 | M68 | Le cookie csrftoken de Django n'est pas recopié | R32 | 1 |
-| M69 | Le corps d'un appel part sans Content-Type JSON | R32 | 9 |
+| M69 | Le corps d'un appel part sans Content-Type JSON | R32, R33, R36 | 16 |
 | M70 | Un appel de préparation suit une redirection | R32 | 1 |
 | M71 | Pas de garde à l'appel de préparation hors du poste | R34 | 1 |
 | M72 | Un appel en échec est rejoué | R33, R34 | 3 |
@@ -201,16 +207,16 @@ Cent dix-neuf défauts, réintroduits un à un dans le code, font chacun échoue
 | M74 | Une valeur gardée peut être un objet de la réponse | R32 | 1 |
 | M75 | Une valeur absente de la réponse est gardée | R32 | 1 |
 | M76 | Une valeur gardée au nom de secret n'est pas masquée dans le rapport | R32 | 1 |
-| M77 | Une préparation en échec n'arrête pas les étapes | R32, R33, R34 | 8 |
-| M78 | Toute la préparation se joue avant la première étape, même à la main | R32 | 10 |
+| M77 | Une préparation en échec n'arrête pas les étapes | R32, R33, R34, R36 | 10 |
+| M78 | Toute la préparation se joue avant la première étape, même à la main | R32, R33, R36, R37 | 25 |
 | M79 | Une entrée dont une valeur gardée manque est jouée | R32, R33 | 2 |
-| M80 | Le nettoyage ne se joue pas après un échec | R32, R33, R34 | 4 |
+| M80 | Le nettoyage ne se joue pas après un échec | R32, R33, R34, R36 | 8 |
 | M81 | Un nettoyage en échec arrête les nettoyages suivants | R33 | 1 |
-| M82 | Un nettoyage en échec change le statut du jeu | R33 | 1 |
+| M82 | Un nettoyage en échec change le statut du jeu | R33, R36 | 3 |
 | M83 | Un scénario de préparation en échec ne fait pas échouer son entrée | R34 | 1 |
 | M84 | Un appel de préparation ou de nettoyage ne compte pas pour la garde des mutations | R30, R34 | 4 |
 | M85 | Un scénario de préparation qui modifie des données ne compte pas pour la garde | R34 | 1 |
-| M86 | La mutation d'un appel DELETE n'est pas une suppression | R30, R32 | 4 |
+| M86 | La mutation d'un appel DELETE n'est pas une suppression | R30, R32, R35 | 5 |
 | M87 | Une préparation accepte une lecture GET | R30 | 1 |
 | M88 | Le chemin d'une préparation peut viser une origine non déclarée | R30 | 1 |
 | M89 | Un corps_fichier hors du dossier du scénario est accepté | R30 | 1 |
@@ -225,13 +231,13 @@ Cent dix-neuf défauts, réintroduits un à un dans le code, font chacun échoue
 | M98 | Un scénario de préparation peut avoir sa propre préparation ou son nettoyage | R30 | 1 |
 | M99 | Un paramètre inconnu du scénario de préparation est accepté | R30 | 1 |
 | M100 | Tous les jeux d'une exécution reçoivent le même ${unique} | R30, R33 | 2 |
-| M101 | Le scénario de préparation ne reçoit pas le ${unique} du jeu | R30 | 1 |
-| M102 | <unique> d'un exemple n'est pas remplacé | R30 | 1 |
-| M103 | Aucune valeur n'est gardée de la réponse d'une préparation | R32, R33 | 13 |
+| M101 | Le scénario de préparation ne reçoit pas le ${unique} du jeu | R30, R36 | 4 |
+| M102 | `<unique>` d'un exemple n'est pas remplacé | R30, R36, R38 | 7 |
+| M103 | Aucune valeur n'est gardée de la réponse d'une préparation | R32, R33, R36 | 17 |
 | M104 | Un jeton du chemin d'un appel n'est pas masqué dans son résumé | R32 | 1 |
 | M105 | Une préparation peut suivre les étapes ordinaires | R30 | 1 |
 | M106 | La marque (nettoyage par l’API), à l'apostrophe typographique, n'est pas reconnue | R30 | 4 |
-| M107 | <unique> est accepté comme paramètre du texte | R30 | 1 |
+| M107 | `<unique>` est accepté comme paramètre du texte | R30 | 1 |
 | M108 | L'index garde toutes les classes, pas seulement celles des corps | R26, R31 | 3 |
 | M109 | Un endpoint proposé entre dans le squelette hors commentaire | R31 | 3 |
 | M110 | Un endpoint de lecture est proposé pour une préparation | R31 | 2 |
@@ -244,12 +250,51 @@ Cent dix-neuf défauts, réintroduits un à un dans le code, font chacun échoue
 | M117 | Une étape à la main d'un scénario de préparation est acceptée sans fenêtre | R30 | 1 |
 | M118 | Un nettoyage par une variable dont chaque valeur contient ${unique} est noté comme fixe | R30 | 1 |
 | M119 | Une valeur gardée secrète réemployée par une étape ou un appel n'est pas masquée | R32 | 2 |
+| M120 | Un test exporté lit une valeur gardée parmi les valeurs du jeu | R36 | 5 |
+| M121 | Un test exporté perd exact de ses cibles | R35 | 2 |
+| M122 | Un test exporté perd le rang de ses cibles | R35 | 1 |
+| M123 | Un test exporté perd dans de ses cibles | R35 | 1 |
+| M124 | Un test exporté ne joue que le premier jeu | R35, R36 | 4 |
+| M125 | Les étiquettes du scénario ne deviennent pas des tags | R35, R36 | 2 |
+| M126 | Le nettoyage d'un test exporté ne se joue pas après un échec | R36, R37 | 4 |
+| M127 | Une vérification exportée en échec arrête les vérifications suivantes | R35, R36 | 2 |
+| M128 | Une étape exportée perd sa marque de mutation | R35 | 1 |
+| M129 | Un test retouché à la main est tenu pour périmé | R35 | 1 |
+| M130 | Un fichier qui n'est pas du skill est tenu pour un test périmé | R35 | 1 |
+| M131 | Le tsconfig.json du projet ne fait pas reconnaître TypeScript | R35, R37 | 7 |
+| M132 | Verifier.mjs ne dit pas périmé un test exporté dont le scénario a changé | R35 | 1 |
+| M133 | Exporter.mjs écrit hors du dossier désigné | R35, R36, R37 | 32 |
+| M134 | Un test périmé est remplacé sans --remplacer | R35 | 3 |
+| M135 | Un test retouché est remplacé sans être gardé à côté | R35 | 1 |
+| M136 | La connexion écrite par l'équipe est remplacée par la souche | R35, R36 | 6 |
+| M137 | Verifier.mjs sort avec 0 pour un test exporté périmé ou retouché | R35 | 2 |
+| M138 | Un test exporté qui modifie des données n'est pas sauté hors du poste | R37 | 1 |
+| M139 | SCENARIO_ORIGINES n'est pas lu | R37 | 2 |
+| M140 | Un test exporté laisse partir toute requête | R37 | 1 |
+| M141 | L'action qui suit une vérification exportée en échec est jouée | R36 | 1 |
+| M142 | Un test exporté dont la dernière vérification échoue réussit | R36 | 2 |
+| M143 | Un nettoyage exporté en échec fait échouer le test | R36 | 3 |
+| M144 | Un nettoyage exporté dont une valeur gardée manque est joué | R37 | 1 |
+| M145 | Un appel exporté ne recopie pas le jeton anti-CSRF | R36 | 4 |
+| M146 | ${unique} est le même pour tous les jeux d'un test exporté | R36 | 3 |
+| M147 | `<unique>` d'un jeu n'est pas remplacé dans un test exporté | R36 | 3 |
+| M148 | Les pas d'un texte retouché depuis l'import ont un statut | R38 | 1 |
+| M149 | Les captures s'ajoutent sans --preuves | R38 | 1 |
+| M150 | --cle ne l'emporte pas sur la clé retenue à l'import | R38 | 1 |
+| M151 | La forme de la clé n'est pas contrôlée | R38 | 1 |
+| M152 | Zephyr Scale reçoit Passed pour une exécution en échec | R38 | 1 |
+| M153 | Le scénario joué n'est cherché que dans le dossier du rapport | R38 | 5 |
+| M154 | Chaque ligne du texte devient un pas de Xray | R38 | 2 |
+| M155 | Un test exporté ne masque pas un paramètre secret d'une adresse | R36 | 1 |
+| M156 | Un test exporté laisse passer tout WebSocket | R37 | 1 |
+| M157 | Deux scénarios qui donnent le même test sont exportés | R35 | 2 |
+| M158 | `<unique>` des paramètres d'un scénario de préparation n'est pas remplacé dans un test exporté | R36 | 6 |
 
 Chaque défaut a été retiré après son essai ; la recette du code publié passe en entier.
 
 ## 5. Recette en intégration continue
 
-Le workflow `.github/workflows/recette-scenario-playwright.yml` du dépôt Agent2Prompt suit le chemin de l'IA du développeur : il matérialise la transmission courante, extrait les fichiers par la commande du module `execution`, § 8, sous bash et sous CMD, installe la dépendance par `npm ci`, puis lance la recette, sous `xvfb-run` sur `ubuntu-latest` et directement sur `windows-latest`, avec Node 22, 24 et 26.13.0 et le Chrome stable des images GitHub. La sortie de la recette s'y affiche au fil de l'eau, et un pas de recette bloqué s'arrête au bout de douze minutes. Une recette en échec y laisse son dossier temporaire en artefact, sans les profils du navigateur : sortie de la recette, rapports, captures et instantanés ARIA, gardés sept jours.
+Le workflow `.github/workflows/recette-scenario-playwright.yml` du dépôt Agent2Prompt suit le chemin de l'IA du développeur : il matérialise la transmission courante, extrait les fichiers par la commande du module `execution`, § 8, sous bash et sous CMD, installe les dépendances par `npm ci`, celle de la recette, `@playwright/test`, comprise, puis lance la recette, sous `xvfb-run` sur `ubuntu-latest` et directement sur `windows-latest`, avec Node 22, 24 et 26.13.0 et le Chrome stable des images GitHub. La sortie de la recette s'y affiche au fil de l'eau, et un pas de recette bloqué s'arrête au bout de douze minutes. Une recette en échec y laisse son dossier temporaire en artefact, sans les profils du navigateur : sortie de la recette, rapports, captures et instantanés ARIA, gardés sept jours.
 
 ## 6. Sources
 
@@ -257,7 +302,7 @@ Le workflow `.github/workflows/recette-scenario-playwright.yml` du dépôt Agent
 
 <!-- fichier : tests/application-demo.mjs -->
 ```javascript
-// scenario-playwright 1.4.0 : application de démonstration de la recette, servie sur 127.0.0.1 sans réseau.
+// scenario-playwright 1.5.0 : application de démonstration de la recette, servie sur 127.0.0.1 sans réseau.
 //
 // Deux origines : l'application, et une « autre » origine, que les scénarios ne déclarent pas, pour la
 // garde des origines. Les pages couvrent chaque action du jeu fermé : liste et formulaire de clients,
@@ -889,7 +934,7 @@ export function enZip(fichiers) {
 
 <!-- fichier : tests/projet-demo.mjs -->
 ```javascript
-// scenario-playwright 1.4.0 : projet de démonstration pour la recette de l'index du code (R26, R27).
+// scenario-playwright 1.5.0 : projet de démonstration pour la recette de l'index du code (R26, R27).
 //
 // Un petit projet front et back, écrit dans un dossier temporaire : Angular (routes, gabarits, gabarit en
 // ligne, ngx-translate), Vue (vue-router, vue-i18n), React (React Router, i18next, JSX), Spring en Java et
@@ -1230,9 +1275,10 @@ export function ecrireProjetDemo(dossier) {
 <!-- fichier : tests/run-tests.mjs -->
 ```javascript
 #!/usr/bin/env node
-// scenario-playwright 1.4.0 : recette du skill, scénarios R1 à R34, contre l'application de démonstration
+// scenario-playwright 1.5.0 : recette du skill, scénarios R1 à R38, contre l'application de démonstration
 // locale (tests/application-demo.mjs) et le projet de démonstration (tests/projet-demo.mjs), sans réseau ni compte. Le navigateur s'ouvre, visible, sur des
-// profils temporaires : les profils et les résultats du dossier du skill ne sont pas touchés.
+// profils temporaires : les profils et les résultats du dossier du skill ne sont pas touchés. Les tests exportés
+// (R35 à R38) sont joués par @playwright/test 1.65.1, dépendance de développement, dans des projets temporaires.
 //   Navigateur : celui de SCENARIO_PLAYWRIGHT_CANAL (chrome par défaut ; chromium après
 //   npx playwright-core install chromium). Linux sans écran : xvfb-run -a npm test.
 // Usage, depuis le dossier du skill : npm test ; sortie 0 si tout passe, 1 sinon (dossier temporaire gardé,
@@ -1240,7 +1286,7 @@ export function ecrireProjetDemo(dossier) {
 import { spawn } from 'node:child_process';
 import { Buffer } from 'node:buffer';
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { clearTimeout, setTimeout } from 'node:timers';
@@ -1248,6 +1294,7 @@ import { fileURLToPath, URL, URLSearchParams } from 'node:url';
 import * as cas from '../scripts/cas.mjs';
 import * as cibles from '../scripts/cibles.mjs';
 import * as code from '../scripts/code.mjs';
+import * as exportation from '../scripts/export.mjs';
 import * as lecteurs from '../scripts/lecteurs.mjs';
 import * as jira from '../scripts/jira.mjs';
 import * as moteur from '../scripts/moteur.mjs';
@@ -1309,10 +1356,10 @@ function ecrire(dossier, nom, contenu) {
   return chemin;
 }
 
-/** Lance un script du skill sans bloquer ce processus, qui sert l'application ; rend { code, sortie, erreurs }. */
-function lancer(script, args, { env = ENV, delai = 120_000 } = {}) {
+/** Lance un module Node sans bloquer ce processus, qui sert l'application ; rend { code, sortie, erreurs }. */
+function lancerModule(module, args, { env = ENV, delai = 120_000, cwd = undefined } = {}) {
   return new Promise((resolve) => {
-    const enfant = spawn(process.execPath, [join(SKILL, 'scripts', script), ...args], { env, stdio: ['ignore', 'pipe', 'pipe'] });
+    const enfant = spawn(process.execPath, [module, ...args], { env, cwd, stdio: ['ignore', 'pipe', 'pipe'] });
     let sortie = '';
     let erreurs = '';
     enfant.stdout.setEncoding('utf8').on('data', (d) => { sortie += d; });
@@ -1334,6 +1381,9 @@ function lancer(script, args, { env = ENV, delai = 120_000 } = {}) {
   });
 }
 
+/** Lance un script du skill ; `cwd`, le dossier courant du script, pour ses chemins relatifs. */
+const lancer = (script, args, options = {}) => lancerModule(join(SKILL, 'scripts', script), args, options);
+
 /** Ferme un contexte de navigateur ouvert par la recette elle-même, sans l'attendre plus de 15 s. */
 const fermer = (ctx) => Promise.race([ctx.close().catch(() => {}), new Promise((r) => { setTimeout(r, 15_000).unref(); })]);
 
@@ -1347,6 +1397,85 @@ async function jouer(chemin, args = [], options = {}) {
 }
 
 const etapes = (r) => (r.rapport ? r.rapport.jeux.flatMap((j) => j.etapes) : []);
+
+// Tests exportés (R35 à R38) : projet d'une équipe, tests joués par @playwright/test, comparaison avec le skill.
+const sansCouleur = (s) => String(s).replace(/\u001b\[[0-9;]*m/g, '');
+
+/**
+ * Projet de tests d'une équipe : package.json, dossiers des scénarios et des tests, configuration de
+ * @playwright/test (rapport JSON, navigateur de la recette, fenêtre visible) ; ses dépendances sont celles du
+ * skill, liées par une jonction, qui sous Windows ne demande aucun droit particulier.
+ */
+function projetExport(nom, canal) {
+  const d = join(TMP, nom);
+  mkdirSync(join(d, 'e2e'), { recursive: true });
+  mkdirSync(join(d, 'scenarios'), { recursive: true });
+  writeFileSync(join(d, 'package.json'), `{ "name": "projet-${nom}", "private": true }\n`);
+  const navigateur = canal === 'chromium' ? '' : `, channel: '${canal}'`;
+  writeFileSync(join(d, 'playwright.config.mjs'), `export default { testDir: './e2e', outputDir: './test-results', workers: 1, retries: 0, timeout: 120000, reporter: [['line'], ['json', { outputFile: 'resultats.json' }]], use: { headless: false${navigateur} } };\n`);
+  symlinkSync(join(SKILL, 'node_modules'), join(d, 'node_modules'), 'junction');
+  return d;
+}
+
+/**
+ * Joue des tests exportés par @playwright/test, avec les seules variables données parmi celles des tests exportés ;
+ * rend { code, sortie, erreurs, rapport, tests }, chaque test à plat, dans l'ordre :
+ * { fichier, titre, tags, statut, annotations, etapes, erreurs, stdout, stderr }.
+ */
+async function jouerTests(projet, fichiers = [], variables = {}) {
+  const env = { ...ENV };
+  delete env.SCENARIO_ORIGINES;
+  delete env.SCENARIO_AUTORISER_MUTATIONS;
+  Object.assign(env, variables);
+  rmSync(join(projet, 'resultats.json'), { force: true });
+  const r = await lancerModule(join(SKILL, 'node_modules', '@playwright', 'test', 'cli.js'), ['test', '-c', 'playwright.config.mjs', ...fichiers], { env, cwd: projet, delai: 300_000 });
+  let lu = null;
+  try { lu = JSON.parse(readFileSync(join(projet, 'resultats.json'), 'utf8')); } catch { /* aucun rapport */ }
+  const tests = [];
+  const parcourir = (suite, fichier) => {
+    for (const sp of suite.specs ?? []) {
+      for (const t of sp.tests ?? []) {
+        const res = t.results?.at(-1) ?? {};
+        tests.push({
+          fichier, titre: sp.title, tags: sp.tags ?? [], statut: res.status ?? 'absent',
+          annotations: [...(t.annotations ?? []), ...(res.annotations ?? [])], etapes: res.steps ?? [],
+          erreurs: (res.errors ?? []).map((e) => sansCouleur(e.message ?? '')), stdout: (res.stdout ?? []).map((x) => x.text ?? '').join(''),
+          stderr: (res.stderr ?? []).map((x) => x.text ?? '').join(''),
+        });
+      }
+    }
+    for (const s of suite.suites ?? []) parcourir(s, fichier);
+  };
+  for (const s of lu?.suites ?? []) parcourir(s, s.file);
+  return { ...r, rapport: lu, tests };
+}
+
+/** Statut de chaque entrée d'un jeu du rapport du skill : { 1: 'reussie', …, p1: …, n1: … }. */
+const statutsSkill = (j) => Object.fromEntries([...(j.preparation ?? []).map((e) => [`p${e.numero}`, e.statut]), ...j.etapes.map((e) => [String(e.numero), e.statut]), ...(j.nettoyage ?? []).map((e) => [`n${e.numero}`, e.statut])]);
+
+/** Mêmes statuts, lus des étapes d'un test exporté : étape en échec, réussie, ou absente, donc non jouée. */
+function statutsExport(t, cles) {
+  const vus = new Map();
+  for (const s of t.etapes) {
+    const m = /^([pn]?\d+)\. /.exec(s.title);
+    if (m) vus.set(m[1], s.error ? 'echec' : 'reussie');
+  }
+  return Object.fromEntries(cles.map((k) => [k, vus.get(k) ?? 'non_jouee']));
+}
+const enLigne = (o) => Object.entries(o).map(([k, v]) => `${k} ${v}`).join(', ');
+
+/** Premier fichier de ce nom sous un dossier, ou null. */
+function trouver(dossier, nom) {
+  if (!existsSync(dossier)) return null;
+  for (const f of readdirSync(dossier, { withFileTypes: true })) {
+    const c = join(dossier, f.name);
+    if (f.isDirectory()) {
+      const t = trouver(c, nom);
+      if (t) return t;
+    } else if (f.name === nom) return c;
+  }
+  return null;
+}
 
 // Lecture des sorties et des dossiers de importer.mjs.
 const etatsDe = (sortie) => [...sortie.matchAll(/^ {2}(\S+)\s+@(\S+)/gm)].map((m) => `${m[1]} ${m[2]}`);
@@ -1392,7 +1521,7 @@ async function principal() {
   const { base, autre, distante, jira: adresseJira, outils } = app;
   const sorties = [];
   const canal = session.lireReglages(ENV).reglages.canal;
-  console.log(`Recette de scenario-playwright 1.4.0 : Node ${process.versions.node}, navigateur ${canal}, application ${base}`);
+  console.log(`Recette de scenario-playwright 1.5.0 : Node ${process.versions.node}, navigateur ${canal}, application ${base}`);
   console.log(`Dossier temporaire : ${TMP}`);
   try {
     // ------------------------------------------------------------------------------------------
@@ -1811,10 +1940,10 @@ nom = "export"
       controle('une capture par vérification et par capture demandée (D8.INV-2)', captures.length === 10 && captures.every((x) => x.capture && existsSync(join(r.dossier, x.capture))), JSON.stringify(captures.map((x) => x.capture)));
       const tel = e.find((x) => x.action === 'telecharger')?.telechargement;
       controle('téléchargement enregistré avec son empreinte (D5.INV-5)', tel && tel.fichier === 'telechargements/export.csv' && tel.propose === 'clients.csv' && sha(join(r.dossier, tel.fichier)) === tel.sha256 && /Zoé Martin;Marseille/.test(readFileSync(join(r.dossier, tel.fichier), 'utf8')), JSON.stringify(tel));
-      controle('chaque étape a sa durée, son résumé et sa cible', e.every((x) => Number.isInteger(x.duree_ms) && x.resume) && e[1].cible === "getByRole('button', { name: 'Menu' })");
-      controle('cible CSS signalée fragile dans le rapport (D4.INV-1)', r.rapport?.cibles_fragiles.includes("locator('#etat')") && e[18].fragile === true);
-      controle('navigateur, version et playwright-core notés (D6.INV-1)', r.rapport?.navigateur.canal === canal && /^\d+\./.test(r.rapport?.navigateur.version ?? '') && r.rapport?.navigateur.playwright_core === '1.65.1');
-      controle('attente bornée qui s\'arrête dès l\'état obtenu (D5.INV-2)', e[17].duree_ms >= 500 && e[17].duree_ms < 4000, `${e[17].duree_ms} ms`);
+      controle('chaque étape a sa durée, son résumé et sa cible', e.every((x) => Number.isInteger(x.duree_ms) && x.resume) && e[1]?.cible === "getByRole('button', { name: 'Menu' })");
+      controle('cible CSS signalée fragile dans le rapport (D4.INV-1)', r.rapport?.cibles_fragiles?.includes("locator('#etat')") && e[18]?.fragile === true);
+      controle('navigateur, version et playwright-core notés (D6.INV-1)', r.rapport?.navigateur?.canal === canal && /^\d+\./.test(r.rapport?.navigateur?.version ?? '') && r.rapport?.navigateur?.playwright_core === '1.65.1');
+      controle('attente bornée qui s\'arrête dès l\'état obtenu (D5.INV-2)', e[17]?.duree_ms >= 500 && e[17]?.duree_ms < 4000, `${e[17]?.duree_ms} ms`);
     }
 
     // ------------------------------------------------------------------------------------------
@@ -1884,7 +2013,7 @@ nom = "export"
           const journal = await session.garderOrigines(ctx, sc.origines);
           const joues = await moteur.jouerScenario(ctx, { scenario: sc, jeux, resultats: dossier, journal, delai: 10, autoriserMutations: false });
           const e = joues[0].etapes;
-          controle('garde à l\'étape par l\'API : mutation sur une page hors du poste refusée, sans action', e[1].statut === 'echec' && /hors du poste, sans --autoriser-mutations : aucune action faite/.test(e[1].message) && app.etat.compteur === avant + 1, JSON.stringify(e[1]));
+          controle('garde à l\'étape par l\'API : mutation sur une page hors du poste refusée, sans action', e[1]?.statut === 'echec' && /hors du poste, sans --autoriser-mutations : aucune action faite/.test(e[1].message) && app.etat.compteur === avant + 1, JSON.stringify(e[1]));
         } finally {
           await fermer(ctx);
         }
@@ -1917,7 +2046,7 @@ nom = "export"
       const r2 = await jouer(chemin, ['--param', 'pays=FR']);
       controle('--param inconnu : code 2', r2.code === 2 && /--param pays/.test(r2.erreurs));
       const r3 = await jouer(chemin, ['--jeu', '2']);
-      controle('--jeu 2 : le seul jeu 2', r3.code === 0 && r3.rapport?.jeux.length === 1 && r3.rapport?.jeux[0].numero === 2);
+      controle('--jeu 2 : le seul jeu 2', r3.code === 0 && r3.rapport?.jeux.length === 1 && r3.rapport?.jeux[0]?.numero === 2);
       const r4 = await jouer(chemin, ['--jeu', '3']);
       controle('--jeu 3 : code 2', r4.code === 2);
     }
@@ -1984,8 +2113,10 @@ nom = "export"
         await page.goto(`${base}/clients`);
         const avant = app.etat.clients.length;
         const rendues = [];
+        // Un élément absent (la page a changé) ne fait pas tomber la recette : les contrôles le diront.
         const cliquer = async (loc) => {
-          const b = await loc.boundingBox();
+          const b = await loc.boundingBox({ timeout: 5_000 }).catch(() => null);
+          if (!b) return;
           await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2);
           await page.mouse.click(b.x + b.width / 2, b.y + b.height / 2);
         };
@@ -2023,7 +2154,9 @@ nom = "export"
     {
       const paquet = JSON.parse(readFileSync(join(SKILL, 'package.json'), 'utf8'));
       const verrou = JSON.parse(readFileSync(join(SKILL, 'package-lock.json'), 'utf8'));
-      controle('une seule dépendance, playwright-core à version exacte (D1.INV-1)', JSON.stringify(paquet.dependencies) === '{"playwright-core":"1.65.1"}' && verrou.packages['node_modules/playwright-core'].version === '1.65.1' && Object.keys(verrou.packages).length === 2);
+      const developpement = Object.entries(verrou.packages).filter(([k]) => k !== '' && k !== 'node_modules/playwright-core');
+      const importeurs = readdirSync(join(SKILL, 'scripts')).filter((f) => f.endsWith('.mjs') && f !== 'aides-export.mjs' && /^\s*import\b[^\n]*['"]@playwright\/test['"]/m.test(readFileSync(join(SKILL, 'scripts', f), 'utf8')));
+      controle('une seule dépendance d\'exécution, playwright-core à version exacte ; @playwright/test, à la même version, en dépendance de développement, qu\'aucun script du skill n\'importe (D1.INV-1)', JSON.stringify(paquet.dependencies) === '{"playwright-core":"1.65.1"}' && JSON.stringify(paquet.devDependencies) === '{"@playwright/test":"1.65.1"}' && verrou.packages['node_modules/playwright-core'].version === '1.65.1' && !verrou.packages['node_modules/playwright-core'].dev && verrou.packages['node_modules/@playwright/test']?.version === '1.65.1' && developpement.length === 2 && developpement.every(([, x]) => x.dev === true && x.version === '1.65.1') && importeurs.length === 0, JSON.stringify(importeurs));
       controle('Node 22 ou plus récent', paquet.engines.node === '>=22' && Number(process.versions.node.split('.')[0]) >= 22);
       const ignores = readFileSync(join(SKILL, '.gitignore'), 'utf8');
       controle('.gitignore écarte node_modules/, .profils/ et resultats/ (D1.INV-2)', ['node_modules/', '.profils/', 'resultats/'].every((x) => ignores.split('\n').includes(x)));
@@ -2292,7 +2425,7 @@ Fonctionnalité: Clients
       let r = await lancer('importer.mjs', [fX, '--adresse', base, '--dossier', d]);
       controle('export de Xray : un texte par test, nommé par la clé du test, code 0', r.code === 0 && JSON.stringify(etatsDe(r.sortie)) === '["écrit DEMO-32","écrit DEMO-33"]' && /^Fichier 1_DEMO-30\.feature : 2 scénarios$/m.test(r.sortie), r.sortie + r.erreurs);
       const t33 = lire(d, 'DEMO-33.scenario');
-      controle('provenance d\'un fichier : lot, scénario, source et son empreinte, contexte reporté (D17.INV-4)', t33.startsWith('# Importé d\'un fichier .feature par importer.mjs (scenario-playwright 1.4.0), sans IA : le scénario est recopié tel qu\'écrit dans le fichier.\n# Lot : fichier ../r22-sources/1_DEMO-30.feature\n# Scénario : @DEMO-33, 1_DEMO-30.feature\n') && t33.includes(`# Source : fichier ../r22-sources/1_DEMO-30.feature (sha256 ${sha(fX)})`) && /# Empreinte de la source : [0-9a-f]{64}\n/.test(t33) && t33.includes('# Contexte reporté en tête des étapes : 1 étape.'), t33);
+      controle('provenance d\'un fichier : lot, scénario, source et son empreinte, contexte reporté (D17.INV-4)', t33.startsWith('# Importé d\'un fichier .feature par importer.mjs (scenario-playwright 1.5.0), sans IA : le scénario est recopié tel qu\'écrit dans le fichier.\n# Lot : fichier ../r22-sources/1_DEMO-30.feature\n# Scénario : @DEMO-33, 1_DEMO-30.feature\n') && t33.includes(`# Source : fichier ../r22-sources/1_DEMO-30.feature (sha256 ${sha(fX)})`) && /# Empreinte de la source : [0-9a-f]{64}\n/.test(t33) && t33.includes('# Contexte reporté en tête des étapes : 1 étape.'), t33);
       const lu33 = texte.analyserTexte(t33);
       controle('scénario recopié : fonctionnalité, étiquettes, contexte en tête des étapes, colonnes d\'exemples adaptées', lu33.erreurs.length === 0 && lu33.scenario.fonctionnalite === 'Gérer les clients' && JSON.stringify(lu33.scenario.etiquettes) === '["DEMO-33","DEMO-30","TEST_DEMO-33","REQ_DEMO-30"]' && lu33.scenario.etapes[0].phrase === 'je suis sur la page des clients' && JSON.stringify(Object.keys(lu33.scenario.jeux?.[0] ?? {})) === '["nom_du_client"]', JSON.stringify(lu33.erreurs));
       const fZ = fichier('zephyr-export.feature', 'Feature: Export\n  @TestCaseKey=DEMO-T7 @export\n  Scenario: Exporter les clients\n    Given I am on the export page\n    When I click the link "Export as CSV"\n    Then the file "clients.csv" is downloaded\n');
@@ -2356,7 +2489,7 @@ Fonctionnalité: Clients
       controle('même clé de test, d\'un autre chemin d\'import : modifié, pas en conflit (D17.INV-4)', /modifié\s+@DEMO-12 .*changé dans Xray depuis l'import ; --remplacer/.test(r.sortie), r.sortie);
       controle('test Generic refusé avec son motif ; test introuvable avec la réponse de Xray (D17.INV-5)', /refusé\s+@DEMO-14\s+Relire les journaux : test Generic : définition en texte libre/.test(r.sortie) && /introuvable @DEMO-15\s+An issue with key 'DEMO-15' does not exist/.test(r.sortie), r.sortie);
       const t13 = lire(d, 'DEMO-13.scenario');
-      controle('test manuel : chaque pas en « Quand <action> », avec ses données, puis « Alors <résultat attendu> », signalé en tête (D17.INV-5)', t13.startsWith('# Importé de Xray par importer.mjs (scenario-playwright 1.4.0), sans IA : chaque pas du test manuel devient « Quand <action> », avec ses données, puis « Alors <résultat attendu> ».\n# Lot : xray DEMO-13\n# Scénario : @DEMO-13, test manuel DEMO-13\n') && t13.includes('\n@DEMO-13\nScénario: Exporter les clients\n') && t13.includes('  Quand Ouvrir la page « Export »\n  Alors La page « Export » s\'affiche\n  Quand Cliquer sur le lien « Exporter en CSV », avec « format CSV ; séparateur ; »\n  Alors Le fichier « clients.csv » est téléchargé\n'), t13);
+      controle('test manuel : chaque pas en « Quand <action> », avec ses données, puis « Alors <résultat attendu> », signalé en tête (D17.INV-5)', t13.startsWith('# Importé de Xray par importer.mjs (scenario-playwright 1.5.0), sans IA : chaque pas du test manuel devient « Quand <action> », avec ses données, puis « Alors <résultat attendu> ».\n# Lot : xray DEMO-13\n# Scénario : @DEMO-13, test manuel DEMO-13\n') && t13.includes('\n@DEMO-13\nScénario: Exporter les clients\n') && t13.includes('  Quand Ouvrir la page « Export »\n  Alors La page « Export » s\'affiche\n  Quand Cliquer sur le lien « Exporter en CSV », avec « format CSV ; séparateur ; »\n  Alors Le fichier « clients.csv » est téléchargé\n'), t13);
       const appel = await lancer('importer.mjs', ['xray:DEMO-17', '--api', outils, '--adresse', base, '--dossier', join(TMP, 'r23-appel')], { env });
       sorties.push(appel.sortie + appel.erreurs);
       controle('pas vide, l\'appel d\'un autre test peut-être : test refusé, rien n\'est deviné (D17.INV-5)', appel.code === 1 && JSON.stringify(etatsDe(appel.sortie)) === '["refusé DEMO-17"]' && /refusé\s+@DEMO-17\s+Exporter, puis rejouer un autre test : pas 2 vide/.test(appel.sortie) && !existsSync(join(TMP, 'r23-appel')), appel.sortie + appel.erreurs);
@@ -2462,7 +2595,7 @@ Fonctionnalité: Clients
       const fichierIndex = join(dossier, 'index', 'code.json');
       controle('index écrit, code 0 : bilan sur une ligne, code.json et code.md', x.code === 0 && /^index du code : 20 fichiers lus ; 13 routes, 27 éléments d'interface, 25 textes, 13 endpoints et appels, 3 classes de corps, 6 contraintes de validation ; 3 fichiers de traduction \(fr\)$/m.test(x.sortie) && existsSync(fichierIndex) && existsSync(join(dossier, 'index', 'code.md')), x.sortie + x.erreurs);
       const ix = existsSync(fichierIndex) ? JSON.parse(readFileSync(fichierIndex, 'utf8')) : { routes: [], elements: [], textes: [], endpoints: [], validations: [], modeles: [], limites: [] };
-      controle('format, version, projet noté relativement au dossier des scénarios, langue, empreinte', ix.format === code.FORMAT_INDEX && ix.version === '1.4.0' && ix.projet === '..' && ix.langue === 'fr' && /^[0-9a-f]{64}$/.test(ix.empreinte) && ix.partiel === false && ix.limites.length === 0, JSON.stringify(ix.limites));
+      controle('format, version, projet noté relativement au dossier des scénarios, langue, empreinte', ix.format === code.FORMAT_INDEX && ix.version === '1.5.0' && ix.projet === '..' && ix.langue === 'fr' && /^[0-9a-f]{64}$/.test(ix.empreinte) && ix.partiel === false && ix.limites.length === 0, JSON.stringify(ix.limites));
       controle('projet seulement lu : rien de créé ni de modifié hors du dossier des scénarios, qui ne reçoit que index/ (D18.INV-1)', arbre(projet, 'scenarios') === avant && JSON.stringify(readdirSync(dossier)) === '["index"]' && JSON.stringify(readdirSync(join(dossier, 'index')).sort()) === '["code.json","code.md"]');
       const routes = ix.routes.map((r) => [r.chemin, r.composant, r.redirection && `→ ${r.redirection}`, r.garde && 'garde'].filter(Boolean).join(' ')).sort();
       const routesAttendues = ['/ Accueil', '/ Accueil', '/ → /clients', '/** PageIntrouvableComponent', '/admin', '/admin AdminComponent', '/admin/utilisateurs UtilisateursComponent', '/clients ClientsComponent', '/clients/nouveau ClientFormComponent garde', '/commandes Commandes', '/commandes/:id Commande', '/factures Factures', '/factures/:id Facture'].sort();
@@ -2836,23 +2969,23 @@ Fonctionnalité: Clients
       controle('jeton de Django : cookie csrftoken recopié dans X-CSRFToken', r2.code === 0 && nd.length === 2 && nd.every((x) => x.csrf === 'X-CSRFToken'), r2.sortie + JSON.stringify(nd));
       const r3 = await jouer(ecrire('r32', 'sans-session.toml', `${tete32('Sans session', 'r32-sans')}${prep32('methode = "POST"\nchemin = "/api/donnees/clients"\ncorps = { nom = "X" }\ngarder = { id_client = "id" }')}${etape32('action = "naviguer"\nurl = "/"')}${nett32('methode = "DELETE"\nchemin = "/api/donnees/clients/${id_client}"')}`));
       const j3 = r3.rapport?.jeux[0];
-      controle('sans session : 401 avec la conduite à tenir ; étapes non jouées, code 1 (D20.INV-2)', r3.code === 1 && j3?.preparation[0].statut === 'echec' && j3.preparation[0].message === `POST ${base}/api/donnees/clients : attendu : un statut 2xx ; obtenu : statut 401 (l'API ne reconnaît pas la session du navigateur : se connecter à la main avant la préparation, ou, pour une API à jeton, préparer par un scénario (module donnees))` && j3.etapes[0].statut === 'non_jouee' && j3.etapes[0].message === 'non jouée : la préparation 1 a échoué', JSON.stringify(j3));
-      controle('nettoyage d\'une valeur non obtenue : non joué (D20.INV-4) ; avant la première adresse, aucune page à montrer en preuve (D8.INV-2)', j3?.nettoyage[0].statut === 'non_jouee' && j3.nettoyage[0].message === "non jouée : ${id_client} non obtenue, sa préparation n'a pas abouti (D20.INV-4)" && j3.preparation[0].capture === null && j3.preparation[0].aria === null, JSON.stringify([j3?.preparation[0], j3?.nettoyage[0]]));
+      controle('sans session : 401 avec la conduite à tenir ; étapes non jouées, code 1 (D20.INV-2)', r3.code === 1 && j3?.preparation[0]?.statut === 'echec' && j3.preparation[0].message === `POST ${base}/api/donnees/clients : attendu : un statut 2xx ; obtenu : statut 401 (l'API ne reconnaît pas la session du navigateur : se connecter à la main avant la préparation, ou, pour une API à jeton, préparer par un scénario (module donnees))` && j3.etapes[0].statut === 'non_jouee' && j3.etapes[0].message === 'non jouée : la préparation 1 a échoué', JSON.stringify(j3));
+      controle('nettoyage d\'une valeur non obtenue : non joué (D20.INV-4) ; avant la première adresse, aucune page à montrer en preuve (D8.INV-2)', j3?.nettoyage[0]?.statut === 'non_jouee' && j3.nettoyage[0].message === "non jouée : ${id_client} non obtenue, sa préparation n'a pas abouti (D20.INV-4)" && j3.preparation[0].capture === null && j3.preparation[0].aria === null, JSON.stringify([j3?.preparation[0], j3?.nettoyage[0]]));
       const r4 = await jouer(ecrire('r32', 'sans-csrf.toml', `${tete32('Sans jeton anti-CSRF', 'r32-csrf')}${connexion('aucun')}${prep32('ligne = 3\nmethode = "POST"\nchemin = "/api/donnees/clients"\ncorps = { nom = "Y" }')}${etape32('ligne = 4\naction = "naviguer"\nurl = "/"')}`));
-      controle('session sans cookie anti-CSRF : 403 avec la conduite à tenir', r4.code === 1 && /obtenu : statut 403 \(accès refusé : droits de l'utilisateur, ou jeton anti-CSRF absent ou refusé\)$/.test(r4.rapport?.jeux[0].preparation[0].message ?? ''), r4.sortie);
-      const p4 = r4.rapport?.jeux[0].preparation[0];
+      controle('session sans cookie anti-CSRF : 403 avec la conduite à tenir', r4.code === 1 && /obtenu : statut 403 \(accès refusé : droits de l'utilisateur, ou jeton anti-CSRF absent ou refusé\)$/.test(r4.rapport?.jeux[0]?.preparation[0].message ?? ''), r4.sortie);
+      const p4 = r4.rapport?.jeux[0]?.preparation[0];
       controle('preuves de l\'échec d\'une préparation, sur la page ouverte : capture et instantané ARIA (D8.INV-2)', p4?.capture === 'captures/p1-preparation-echec.png' && existsSync(join(r4.dossier ?? TMP, 'captures', 'p1-preparation-echec.png')) && p4.aria === 'aria/p1-preparation.yml' && existsSync(join(r4.dossier ?? TMP, 'aria', 'p1-preparation.yml')), JSON.stringify(p4));
       ecrire('r32/donnees', 'client.json', '{ "nom": "Fichier ${unique}", "ville": "Nantes" }');
       const r5 = await jouer(ecrire('r32', 'divers.toml', `${tete32('Divers', 'r32')}${prep32('methode = "POST"\nchemin = "/api/donnees/clients"\ncorps_fichier = "donnees/client.json"\nstatut = [200, 201]\ngarder = { id_fichier = "id", nom_fichier = "nom" }')}${prep32('methode = "POST"\nchemin = "/api/donnees/jetons"\ngarder = { jeton_acces = "jeton_acces", id_jeton = "id" }')}${prep32(`methode = "POST"\nchemin = "/api/donnees/jetons?source=essai&jeton=${JETON_REQUETE_DEMO}"`)}${etape32('action = "verifier"\ncritere = "api"\nchemin = "/api/donnees/clients/${id_fichier}"\nattendu = { contient = { ville = "Nantes" } }')}${etape32('action = "naviguer"\nurl = "/?ref=${jeton_acces}"')}${nett32('methode = "DELETE"\nchemin = "/api/donnees/clients/${id_fichier}"\nstatut = [204, 404]')}${nett32('methode = "DELETE"\nchemin = "/api/donnees/clients/${id_fichier}"\nstatut = [204, 404]')}${nett32('methode = "DELETE"\nchemin = "/api/donnees/clients/${jeton_acces}"\nstatut = [204, 404]')}`));
       const j5 = r5.rapport?.jeux[0];
-      controle('profil où la session est ouverte : corps_fichier lu et substitué, plusieurs valeurs gardées, statut parmi une liste', r5.code === 0 && j5?.preparation[0].statut === 'reussie' && j5.gardees.nom_fichier === `Fichier ${j5.valeurs.unique}` && j5.etapes[0].statut === 'reussie', r5.sortie + JSON.stringify(j5));
+      controle('profil où la session est ouverte : corps_fichier lu et substitué, plusieurs valeurs gardées, statut parmi une liste', r5.code === 0 && j5?.preparation[0]?.statut === 'reussie' && j5.gardees.nom_fichier === `Fichier ${j5.valeurs.unique}` && j5.etapes[0].statut === 'reussie', r5.sortie + JSON.stringify(j5));
       controle('valeur gardée au nom de secret : masquée dans le rapport, même courte, absente de ses fichiers et de la sortie (D20.INV-2)', j5?.gardees.jeton_acces === '***' && j5.gardees.id_jeton === '***' && !lire(r5.dossier ?? TMP, 'rapport.json').includes(JETON_GARDE_DEMO) && !lire(r5.dossier ?? TMP, 'rapport.md').includes(JETON_GARDE_DEMO) && !r5.sortie.includes(JETON_GARDE_DEMO), JSON.stringify(j5?.gardees));
-      controle('paramètre de requête au nom de secret : masqué dans l\'appel relevé et le résumé, absent du rapport et de la sortie (D20.INV-2)', j5?.preparation[2].appel.adresse === `${base}/api/donnees/jetons?source=essai&jeton=***` && j5.preparation[2].resume === 'POST /api/donnees/jetons?source=essai&jeton=***  [création]' && !lire(r5.dossier ?? TMP, 'rapport.json').includes(JETON_REQUETE_DEMO) && !lire(r5.dossier ?? TMP, 'rapport.md').includes(JETON_REQUETE_DEMO) && !r5.sortie.includes(JETON_REQUETE_DEMO), JSON.stringify(j5?.preparation[2]));
-      controle('valeur gardée au nom de secret, réemployée par une étape et un appel : masquée par sa valeur dans le résumé, l\'adresse et la sortie (D20.INV-2)', j5?.etapes[1].statut === 'reussie' && j5.etapes[1].resume.includes('ref=***') && j5.nettoyage[2]?.appel.adresse === `${base}/api/donnees/clients/***` && j5.nettoyage[2].resume === 'DELETE /api/donnees/clients/*** → 204 ou 404  [suppression]' && r5.sortie.includes('ref=***') && !r5.sortie.includes(JETON_GARDE_DEMO), JSON.stringify([j5?.etapes[1], j5?.nettoyage[2]]));
+      controle('paramètre de requête au nom de secret : masqué dans l\'appel relevé et le résumé, absent du rapport et de la sortie (D20.INV-2)', j5?.preparation[2]?.appel?.adresse === `${base}/api/donnees/jetons?source=essai&jeton=***` && j5.preparation[2].resume === 'POST /api/donnees/jetons?source=essai&jeton=***  [création]' && !lire(r5.dossier ?? TMP, 'rapport.json').includes(JETON_REQUETE_DEMO) && !lire(r5.dossier ?? TMP, 'rapport.md').includes(JETON_REQUETE_DEMO) && !r5.sortie.includes(JETON_REQUETE_DEMO), JSON.stringify(j5?.preparation[2]));
+      controle('valeur gardée au nom de secret, réemployée par une étape et un appel : masquée par sa valeur dans le résumé, l\'adresse et la sortie (D20.INV-2)', j5?.etapes[1]?.statut === 'reussie' && j5.etapes[1].resume.includes('ref=***') && j5.nettoyage[2]?.appel?.adresse === `${base}/api/donnees/clients/***` && j5.nettoyage[2].resume === 'DELETE /api/donnees/clients/*** → 204 ou 404  [suppression]' && r5.sortie.includes('ref=***') && !r5.sortie.includes(JETON_GARDE_DEMO), JSON.stringify([j5?.etapes[1], j5?.nettoyage[2]]));
       controle('chaque entrée jouée une fois : le second nettoyage reçoit 404, accepté (D5.INV-3)', j5?.nettoyage.map((x) => x.appel?.statut).join() === '204,404,404' && j5.nettoyage.every((x) => x.statut === 'reussie'), JSON.stringify(j5?.nettoyage));
       app.etat.requetesAutre.length = 0;
       const r6 = await jouer(ecrire('r32', 'redirection.toml', `${tete32('Redirection', 'r32')}${prep32('methode = "POST"\nchemin = "/api/donnees/redirection"')}${etape32('action = "naviguer"\nurl = "/"')}`));
-      controle('redirection : non suivie, l\'autre origine jamais jointe, adresse masquée (D20.INV-2)', r6.code === 1 && r6.rapport?.jeux[0].preparation[0].message === `POST ${base}/api/donnees/redirection : l'API répond 302, redirection vers ${autre}/api/clients?jeton=*** non suivie (D20.INV-2)` && app.etat.requetesAutre.length === 0, r6.sortie);
+      controle('redirection : non suivie, l\'autre origine jamais jointe, adresse masquée (D20.INV-2)', r6.code === 1 && r6.rapport?.jeux[0]?.preparation[0].message === `POST ${base}/api/donnees/redirection : l'API répond 302, redirection vers ${autre}/api/clients?jeton=*** non suivie (D20.INV-2)` && app.etat.requetesAutre.length === 0, r6.sortie);
       const r7 = await jouer(ecrire('r32', 'reponses.toml', `${tete32('Réponses', 'r32')}\n[[jeux]]\nforme = "gros"\n\n[[jeux]]\nforme = "texte"\n\n[[jeux]]\nforme = "vide"\n\n[[jeux]]\nforme = "objet"\n${prep32('methode = "POST"\nchemin = "/api/donnees/reponse?forme=${forme}"\ngarder = { v = "valeur" }')}${etape32('action = "naviguer"\nurl = "/"')}`));
       const m7 = (r7.rapport?.jeux ?? []).map((j) => j.preparation[0].message);
       const appel7 = `POST ${base}/api/donnees/reponse?forme=`;
@@ -2866,14 +2999,14 @@ Fonctionnalité: Clients
       const r1 = await jouer(ecrire('r33', 'echec.toml', `${tete32('Échec puis nettoyage', 'r32')}${prep32('methode = "POST"\nchemin = "/api/donnees/clients"\ncorps = { nom = "Echec ${unique}" }\ngarder = { id = "id" }')}${etape32('action = "naviguer"\nurl = "/clients/${id}"')}${etape32('action = "verifier"\ncritere = "contient"\ncible = { role = "heading" }\nattendu = "Inexistant"\ndelai = 1')}${etape32('action = "naviguer"\nurl = "/"')}${nett32('methode = "DELETE"\nchemin = "/api/donnees/clients/${id}"\nstatut = 204')}`));
       const j1 = r1.rapport?.jeux[0];
       const suppressions = app.etat.requetesDonnees.slice(avant).filter((x) => x.methode === 'DELETE');
-      controle('après une étape en échec : le nettoyage se joue, une seule fois ; code 1 (D20.INV-4, D5.INV-3)', r1.code === 1 && j1?.etapes[1].statut === 'echec' && j1.etapes[2].statut === 'non_jouee' && j1.nettoyage[0].statut === 'reussie' && suppressions.length === 1 && !app.etat.clients.some((c) => c.nom.startsWith('Echec ')), JSON.stringify(j1?.nettoyage) + JSON.stringify(suppressions));
+      controle('après une étape en échec : le nettoyage se joue, une seule fois ; code 1 (D20.INV-4, D5.INV-3)', r1.code === 1 && j1?.etapes[1]?.statut === 'echec' && j1.etapes[2].statut === 'non_jouee' && j1.nettoyage[0].statut === 'reussie' && suppressions.length === 1 && !app.etat.clients.some((c) => c.nom.startsWith('Echec ')), JSON.stringify(j1?.nettoyage) + JSON.stringify(suppressions));
       const r2 = await jouer(ecrire('r33', 'nettoyage-ko.toml', `${tete32('Nettoyage en échec', 'r32')}${etape32('action = "naviguer"\nurl = "/"')}${nett32('methode = "DELETE"\nchemin = "/api/donnees/clients/999999"\nstatut = 204')}${nett32('methode = "DELETE"\nchemin = "/api/donnees/clients/999998"\nstatut = 404')}`));
-      controle('nettoyage en échec : signalé, le statut et le code restent ceux des étapes, les entrées suivantes jouées (D20.INV-4)', r2.code === 0 && r2.rapport?.statut === 'reussi' && r2.rapport.jeux[0].nettoyage_en_echec === 1 && r2.rapport.bilan.nettoyages_en_echec === 1 && r2.rapport.jeux[0].nettoyage[1].statut === 'reussie' && r2.sortie.includes(`AVERTISSEMENT nettoyage 1 en échec : DELETE ${base}/api/donnees/clients/999999 : attendu : statut 204 ; obtenu : statut 404 ; des données de l'exécution peuvent rester (D20.INV-4)`) && /dont 1 en échec$/m.test(r2.sortie) && lire(r2.dossier ?? TMP, 'rapport.md').includes('**Nettoyage en échec** (1)'), r2.sortie);
+      controle('nettoyage en échec : signalé, le statut et le code restent ceux des étapes, les entrées suivantes jouées (D20.INV-4)', r2.code === 0 && r2.rapport?.statut === 'reussi' && r2.rapport.jeux[0].nettoyage_en_echec === 1 && r2.rapport.bilan.nettoyages_en_echec === 1 && r2.rapport.jeux[0].nettoyage[1]?.statut === 'reussie' && r2.sortie.includes(`AVERTISSEMENT nettoyage 1 en échec : DELETE ${base}/api/donnees/clients/999999 : attendu : statut 204 ; obtenu : statut 404 ; des données de l'exécution peuvent rester (D20.INV-4)`) && /dont 1 en échec$/m.test(r2.sortie) && lire(r2.dossier ?? TMP, 'rapport.md').includes('**Nettoyage en échec** (1)'), r2.sortie);
       const avant3 = app.etat.requetesDonnees.length;
       const r3 = await jouer(ecrire('r33', 'preparation-ko.toml', `${tete32('Préparation en échec', 'r32')}${prep32('methode = "POST"\nchemin = "/api/donnees/clients"\ncorps = { ville = "Lyon" }\nstatut = 201\ngarder = { id = "id" }')}${prep32('methode = "POST"\nchemin = "/api/donnees/clients"\ncorps = { nom = "Jamais" }')}${etape32('action = "naviguer"\nurl = "/"')}${nett32('methode = "DELETE"\nchemin = "/api/donnees/clients/${id}"')}${nett32('methode = "DELETE"\nchemin = "/api/donnees/clients/0"\nstatut = 404')}`));
       const j3 = r3.rapport?.jeux[0];
-      controle('préparation en échec : attendu et obtenu, un seul appel, rien de rejoué ; préparation suivante et étapes non jouées ; code 1 (D5.INV-3)', r3.code === 1 && j3?.preparation[0].message === `POST ${base}/api/donnees/clients : attendu : statut 201 ; obtenu : statut 400` && app.etat.requetesDonnees.slice(avant3).filter((x) => x.methode === 'POST').length === 1 && j3.preparation[1].statut === 'non_jouee' && j3.preparation[1].message === 'non jouée : la préparation 1 a échoué' && j3.etapes[0].message === 'non jouée : la préparation 1 a échoué' && !app.etat.clients.some((c) => c.nom === 'Jamais'), JSON.stringify(j3));
-      controle('nettoyage après une préparation en échec : l\'entrée qui ne dépend d\'aucune valeur gardée jouée, l\'autre non (D20.INV-4)', j3?.nettoyage[0].statut === 'non_jouee' && j3.nettoyage[1].statut === 'reussie' && j3.nettoyage[1].appel.statut === 404, JSON.stringify(j3?.nettoyage));
+      controle('préparation en échec : attendu et obtenu, un seul appel, rien de rejoué ; préparation suivante et étapes non jouées ; code 1 (D5.INV-3)', r3.code === 1 && j3?.preparation[0]?.message === `POST ${base}/api/donnees/clients : attendu : statut 201 ; obtenu : statut 400` && app.etat.requetesDonnees.slice(avant3).filter((x) => x.methode === 'POST').length === 1 && j3.preparation[1].statut === 'non_jouee' && j3.preparation[1].message === 'non jouée : la préparation 1 a échoué' && j3.etapes[0].message === 'non jouée : la préparation 1 a échoué' && !app.etat.clients.some((c) => c.nom === 'Jamais'), JSON.stringify(j3));
+      controle('nettoyage après une préparation en échec : l\'entrée qui ne dépend d\'aucune valeur gardée jouée, l\'autre non (D20.INV-4)', j3?.nettoyage[0]?.statut === 'non_jouee' && j3.nettoyage[1].statut === 'reussie' && j3.nettoyage[1].appel.statut === 404, JSON.stringify(j3?.nettoyage));
       const r4 = await jouer(ecrire('r33', 'jeux.toml', `${tete32('Plusieurs jeux', 'r32')}\n[[jeux]]\nville = "Lyon"\n\n[[jeux]]\nville = "Nice"\n${prep32('methode = "POST"\nchemin = "/api/donnees/clients"\ncorps = { nom = "Jeu ${unique}", ville = "${ville}" }\ngarder = { id = "id" }')}${etape32('action = "verifier"\ncritere = "api"\nchemin = "/api/donnees/clients/${id}"\nattendu = { contient = { ville = "${ville}" } }')}${nett32('methode = "DELETE"\nchemin = "/api/donnees/clients/${id}"')}`));
       const jx = r4.rapport?.jeux ?? [];
       controle('plusieurs jeux : chacun sa préparation, son ${unique}, sa valeur gardée et son nettoyage (D20.INV-6)', r4.code === 0 && jx.length === 2 && jx[0].valeurs.unique !== jx[1].valeurs.unique && jx[0].gardees.id !== jx[1].gardees.id && jx.every((j) => j.preparation[0].statut === 'reussie' && j.nettoyage[0].statut === 'reussie') && !app.etat.clients.some((c) => c.nom.startsWith('Jeu ')), r4.sortie + JSON.stringify(jx.map((j) => [j.valeurs, j.gardees])));
@@ -2914,11 +3047,662 @@ Fonctionnalité: Clients
       const p = j?.preparation[0];
       const nom = `Ecran-${j?.valeurs.unique}`;
       controle('préparation par l\'écran : le scénario ratifié joué dans le même onglet avec ses paramètres et le même ${unique}, ses étapes au rapport sous l\'entrée (D20.INV-5)', r3.code === 0 && p?.type === 'scenario' && p.scenario === 'creer-client.toml' && p.appel === null && p.etapes?.length === 4 && p.etapes.every((e) => e.statut === 'reussie') && p.etapes[1].resume === `saisir « ${nom} » dans getByLabel('Nom')` && p.resume === `scénario creer-client.toml { nom = "${nom}" }` && app.etat.ajouts.some((c) => c.nom === nom) && j.etapes.every((e) => e.statut === 'reussie'), r3.sortie + JSON.stringify(j));
-      controle('captures du scénario de préparation préfixées par son entrée ; sortie en retrait ; nettoyage par l\'API ensuite', p?.etapes[3].capture === 'captures/p1-04-verifier.png' && existsSync(join(r3.dossier ?? TMP, 'captures', 'p1-04-verifier.png')) && j.nettoyage[0].statut === 'reussie' && !app.etat.clients.some((c) => c.nom === nom) && /^ {8}ok {3}1\. naviguer \/clients\/nouveau$/m.test(r3.sortie) && lire(r3.dossier ?? TMP, 'rapport.md').includes('| p1.4 |'), r3.sortie);
+      controle('captures du scénario de préparation préfixées par son entrée ; sortie en retrait ; nettoyage par l\'API ensuite', p?.etapes[3]?.capture === 'captures/p1-04-verifier.png' && existsSync(join(r3.dossier ?? TMP, 'captures', 'p1-04-verifier.png')) && j.nettoyage[0].statut === 'reussie' && !app.etat.clients.some((c) => c.nom === nom) && /^ {8}ok {3}1\. naviguer \/clients\/nouveau$/m.test(r3.sortie) && lire(r3.dossier ?? TMP, 'rapport.md').includes('| p1.4 |'), r3.sortie);
       ecrire('r34', 'creer-ko.toml', CREER('Client ${nom} inexistant'));
       const r4 = await jouer(ecrire('r34', 'ecran-ko.toml', PRINCIPAL('creer-ko.toml', 'Ko')));
       const j4 = r4.rapport?.jeux[0];
-      controle('scénario de préparation en échec : l\'entrée échoue avec son étape, les étapes ne sont pas jouées, le nettoyage si', r4.code === 1 && /^scénario creer-ko\.toml, étape 4 : attendu : un texte qui contient « Client Ko-[a-z0-9]{7} inexistant » ; obtenu : texte « Client Ko-[a-z0-9]{7} créé »$/.test(j4?.preparation[0].message ?? '') && j4.preparation[0].etapes[3].statut === 'echec' && j4.etapes[0].statut === 'non_jouee' && j4.nettoyage[0].statut === 'reussie' && !app.etat.clients.some((c) => c.nom.startsWith('Ko-')), r4.sortie + JSON.stringify(j4?.preparation[0]));
+      controle('scénario de préparation en échec : l\'entrée échoue avec son étape, les étapes ne sont pas jouées, le nettoyage si', r4.code === 1 && /^scénario creer-ko\.toml, étape 4 : attendu : un texte qui contient « Client Ko-[a-z0-9]{7} inexistant » ; obtenu : texte « Client Ko-[a-z0-9]{7} créé »$/.test(j4?.preparation[0]?.message ?? '') && j4.preparation[0].etapes[3].statut === 'echec' && j4.etapes[0].statut === 'non_jouee' && j4.nettoyage[0].statut === 'reussie' && !app.etat.clients.some((c) => c.nom.startsWith('Ko-')), r4.sortie + JSON.stringify(j4?.preparation[0]));
+    }
+
+    // ------------------------------------------------------------------------------------------
+    // Scénarios des tests exportés (R35 à R38) : un même scénario, joué par le skill puis par @playwright/test.
+    const ECRAN = (profil) => `format = "scenario-playwright.scenario/1"
+titre = "Créer un client"
+etiquettes = ["DEMO-8-S02"]
+url_base = "${base}"
+profil = "${profil}"
+delai = 30
+
+[[jeux]]
+nom = "Ecran <unique>"
+ville = "Lyon"
+
+[[jeux]]
+nom = "Autre <unique>"
+ville = "Marseille"
+
+[[etapes]]
+action = "naviguer"
+url = "/clients/nouveau"
+
+[[etapes]]
+action = "saisir"
+cible = { libelle = "Nom" }
+valeur = "\${nom}"
+
+[[etapes]]
+action = "touche"
+cible = { libelle = "Nom" }
+touche = "End"
+
+[[etapes]]
+action = "choisir"
+cible = { libelle = "Ville" }
+valeur = "\${ville}"
+
+[[etapes]]
+action = "cocher"
+cible = { libelle = "Client actif" }
+valeur = true
+
+[[etapes]]
+action = "televerser"
+cible = { libelle = "Pièce jointe" }
+fichier = "piece.txt"
+
+[[etapes]]
+action = "verifier"
+critere = "valeur"
+cible = { placeholder = "Nom du client" }
+attendu = "\${nom}"
+
+[[etapes]]
+action = "verifier"
+critere = "actif"
+cible = { role = "button", nom = "Archiver" }
+attendu = false
+
+[[etapes]]
+action = "cliquer"
+cible = { role = "button", nom = "Enregistrer" }
+mutation = "creation"
+
+[[etapes]]
+action = "verifier"
+critere = "contient"
+cible = { role = "alert" }
+attendu = "Client \${nom} créé"
+
+[[etapes]]
+action = "verifier"
+critere = "url"
+attendu = "/clients*"
+
+[[etapes]]
+action = "verifier"
+critere = "requete"
+methode = "POST"
+chemin = "/api/clients"
+attendu = { statut = 201, corps = { nom = "\${nom}", ville = "\${ville}", actif = true, piece = "piece.txt" } }
+
+[[etapes]]
+action = "verifier"
+critere = "nombre"
+cible = { role = "cell", nom = "\${nom}", exact = true }
+attendu = 1
+
+[[etapes]]
+action = "verifier"
+critere = "api"
+chemin = "/api/clients/\${nom}"
+attendu = { contient = { ville = "\${ville}" } }
+
+[[etapes]]
+action = "survoler"
+cible = { role = "button", nom = "Menu" }
+
+[[etapes]]
+action = "attendre"
+etat = "visible"
+cible = { role = "link", nom = "Paramètres" }
+
+[[etapes]]
+action = "capturer"
+nom = "liste"
+
+[[nettoyage]]
+methode = "DELETE"
+chemin = "/api/clients/\${nom}"
+`;
+    const ECHECS = (profil) => `format = "scenario-playwright.scenario/1"
+titre = "Vérifications en échec"
+url_base = "${base}"
+profil = "${profil}"
+delai = 30
+
+[[etapes]]
+action = "naviguer"
+url = "/clients"
+
+[[etapes]]
+action = "verifier"
+critere = "contient"
+cible = { role = "heading" }
+attendu = "Inexistant"
+delai = 1
+
+[[etapes]]
+action = "verifier"
+critere = "visible"
+cible = { role = "table" }
+attendu = true
+
+[[etapes]]
+action = "cliquer"
+cible = { role = "link", nom = "Nouveau client" }
+
+[[etapes]]
+action = "verifier"
+critere = "contient"
+cible = { role = "heading" }
+attendu = "Nouveau client"
+
+[[nettoyage]]
+methode = "DELETE"
+chemin = "/api/clients/Echec-\${unique}"
+`;
+    const ACTION_KO = (profil) => `format = "scenario-playwright.scenario/1"
+titre = "Action en échec"
+url_base = "${base}"
+profil = "${profil}"
+delai = 30
+
+[[etapes]]
+action = "naviguer"
+url = "/"
+
+[[etapes]]
+action = "cliquer"
+cible = { role = "link", nom = "Inexistant" }
+delai = 2
+
+[[etapes]]
+action = "verifier"
+critere = "contient"
+cible = { role = "heading" }
+attendu = "Démonstration"
+`;
+    const FIN_KO = (profil) => `format = "scenario-playwright.scenario/1"
+titre = "Vérification finale en échec"
+url_base = "${base}"
+profil = "${profil}"
+delai = 30
+
+[[etapes]]
+action = "naviguer"
+url = "/clients/nouveau"
+
+[[etapes]]
+action = "saisir"
+cible = { libelle = "Nom" }
+valeur = "Masque-\${unique}"
+
+[[etapes]]
+action = "cliquer"
+cible = { role = "button", nom = "Enregistrer" }
+mutation = "creation"
+
+[[etapes]]
+action = "verifier"
+critere = "contient"
+cible = { role = "alert" }
+attendu = "Client Masque-\${unique} créé"
+
+[[etapes]]
+action = "verifier"
+critere = "requete"
+methode = "POST"
+chemin = "/api/absent"
+delai = 2
+
+[[nettoyage]]
+methode = "DELETE"
+chemin = "/api/clients/Masque-\${unique}"
+`;
+    const DONNEES = (profil) => `format = "scenario-playwright.scenario/1"
+titre = "Préparation par l'API"
+url_base = "${base}"
+profil = "${profil}"
+delai = 30
+
+[[etapes]]
+ligne = 1
+action = "naviguer"
+url = "/connexion?auto=300"
+
+[[etapes]]
+ligne = 2
+action = "main"
+message = "Connectez-vous"
+jusqua = { url = "/accueil-connecte" }
+
+[[preparation]]
+ligne = 3
+methode = "POST"
+chemin = "/api/donnees/clients"
+corps = { nom = "Client \${unique}", ville = "Lyon" }
+statut = 201
+garder = { id_client = "id" }
+
+[[etapes]]
+ligne = 4
+action = "naviguer"
+url = "/clients/\${id_client}"
+
+[[etapes]]
+ligne = 5
+action = "verifier"
+critere = "contient"
+cible = { role = "heading" }
+attendu = "Client \${unique}"
+
+[[etapes]]
+ligne = 6
+action = "verifier"
+critere = "api"
+chemin = "/api/donnees/clients/\${id_client}"
+attendu = { contient = { ville = "Lyon" } }
+
+[[nettoyage]]
+ligne = 7
+methode = "DELETE"
+chemin = "/api/donnees/clients/\${id_client}"
+statut = 204
+`;
+    const CREER_SOUS = (profil) => `format = "scenario-playwright.scenario/1"
+titre = "Créer un client par l'écran"
+url_base = "${base}"
+profil = "${profil}"
+delai = 30
+
+[parametres]
+nom = "Sous-<unique>"
+
+[[etapes]]
+action = "naviguer"
+url = "/clients/nouveau"
+
+[[etapes]]
+action = "saisir"
+cible = { libelle = "Nom" }
+valeur = "\${nom}"
+
+[[etapes]]
+action = "cliquer"
+cible = { role = "button", nom = "Enregistrer" }
+mutation = "creation"
+
+[[etapes]]
+action = "verifier"
+critere = "contient"
+cible = { role = "alert" }
+attendu = "Client \${nom} créé"
+`;
+    const SOUS = (profil) => `format = "scenario-playwright.scenario/1"
+titre = "Préparé par l'écran"
+url_base = "${base}"
+profil = "${profil}"
+delai = 30
+
+[[preparation]]
+scenario = "creer-client.toml"
+
+[[etapes]]
+action = "naviguer"
+url = "/clients"
+
+[[etapes]]
+action = "verifier"
+critere = "contient"
+cible = { role = "table" }
+attendu = "Sous-\${unique}"
+
+[[nettoyage]]
+methode = "DELETE"
+chemin = "/api/clients/Sous-\${unique}"
+
+[[nettoyage]]
+methode = "DELETE"
+chemin = "/api/clients/Sous-\${unique}"
+statut = 204
+`;
+    // Traduction du test manuel DEMO-13 importé de Xray : chaque étape garde la ligne de son pas.
+    const EXPORTER_CLIENTS = (t) => {
+      const [l1, l2, l3, l4] = t.etapes.map((e) => e.ligne);
+      return `format = "scenario-playwright.scenario/1"
+titre = "${t.titre}"
+etiquettes = ["DEMO-13"]
+url_base = "${base}"
+source = "DEMO-13.scenario"
+empreinte_source = "${t.empreinte}"
+delai = 30
+
+[[etapes]]
+ligne = ${l1}
+action = "naviguer"
+url = "/export"
+
+[[etapes]]
+ligne = ${l2}
+action = "verifier"
+critere = "contient"
+cible = { role = "heading" }
+attendu = "Export"
+
+[[etapes]]
+ligne = ${l3}
+action = "telecharger"
+cible = { role = "link", nom = "Exporter en CSV" }
+nom = "clients"
+
+[[etapes]]
+ligne = ${l4}
+action = "verifier"
+critere = "fichier"
+fichier = "clients"
+attendu = { contient = "nom;ville" }
+
+[[etapes]]
+ligne = ${l4}
+action = "capturer"
+nom = "export"
+`;
+    };
+    // Connexion écrite par l'équipe : la page de démonstration se connecte d'elle-même, comme le ferait le compte de
+    // test de la CI, sans rien écrire en clair.
+    const CONNEXION_EQUIPE = `export async function seConnecter(page, { message, jusqua }) {
+  console.log(\`connexion de l'équipe : « \${message} », jusqu'à \${jusqua.url}\`);
+}
+`;
+    let r36 = null;
+
+    // ------------------------------------------------------------------------------------------
+    scenarioRecette('R35', 'Export des scénarios ratifiés en tests @playwright/test, sans IA : traduction contrôlée, fichiers du skill seulement, en-tête et empreinte, test périmé ou retouché');
+    {
+      const P = join(TMP, 'r35');
+      const E = join(P, 'e2e');
+      const empreinteDe = (f) => (existsSync(join(E, f)) ? sha(join(E, f)) : null);
+      mkdirSync(E, { recursive: true });
+      writeFileSync(join(P, 'package.json'), '{ "name": "projet-r35", "private": true }\n');
+      const creer = ecrire('r35/scenarios', 'creer.toml', ECRAN('r35'));
+      ecrire('r35/scenarios', 'piece.txt', 'pièce jointe de démonstration\n');
+      const exp = (args) => lancer('exporter.mjs', args, { cwd: P });
+      const r1 = await exp([creer]);
+      const r2 = await exp([creer, '--dossier', 'absent']);
+      const invalide = ecrire('r35/scenarios', 'invalide.toml', `format = "scenario-playwright.scenario/1"\ntitre = "Invalide"\nurl_base = "${base}"\n\n[[etapes]]\naction = "cliquer"\n`);
+      const r3 = await exp([creer, invalide, '--dossier', 'e2e']);
+      ecrire('r35/scenarios', 'texte.scenario', `Scénario: Accueil\n  Adresse : ${base}\n  Quand j'ouvre l'accueil\n`);
+      const traduit = ecrire('r35/scenarios', 'traduit.toml', `format = "scenario-playwright.scenario/1"\ntitre = "Accueil"\nurl_base = "${base}"\nsource = "texte.scenario"\nempreinte_source = "${'0'.repeat(64)}"\n\n[[etapes]]\nligne = 3\naction = "naviguer"\nurl = "/"\n`);
+      const r4 = await exp([traduit, '--dossier', 'e2e']);
+      const homonyme = ecrire('r35/scenarios/autres', 'creer.toml', ECRAN('r35'));
+      ecrire('r35/scenarios/autres', 'piece.txt', 'pièce jointe de démonstration\n');
+      const r6 = await exp([creer, homonyme, '--dossier', 'e2e']);
+      controle('refus avant toute écriture : sans --dossier, dossier absent jamais créé, scénario invalide, texte changé depuis la traduction, deux scénarios pour un même test ; code 2 (D21.INV-1, D21.INV-2)', r1.code === 2 && r1.erreurs.includes('--dossier manquant') && r2.code === 2 && r2.erreurs.includes('dossier introuvable : absent') && !existsSync(join(P, 'absent')) && r3.code === 2 && /^ERREUR invalide\.toml : /m.test(r3.sortie) && r4.code === 2 && r4.sortie.includes('ERREUR traduit.toml : texte.scenario a changé depuis la traduction') && r6.code === 2 && r6.sortie.includes('ERREUR deux scénarios donneraient le même test : creer.spec.mjs') && readdirSync(E).length === 0, [r1, r2, r3, r4, r6].map((x) => x.sortie + x.erreurs).join(' | '));
+      const avant = arbre(P, 'e2e');
+      let r = await exp([creer, '--dossier', 'e2e']);
+      const contenu = lire(E, 'creer.spec.mjs');
+      controle('export : un test et les aides, dans le dossier désigné seulement ; rien d\'autre n\'est écrit dans le projet (D21.INV-2)', r.code === 0 && JSON.stringify(readdirSync(E).sort()) === '["creer.spec.mjs","scenario-playwright.aides.mjs"]' && arbre(P, 'e2e') === avant && r.sortie.includes('écrit    e2e/creer.spec.mjs : « Créer un client », 17 étapes, 2 jeux, nettoyage 1') && r.sortie.includes('écrit    e2e/scenario-playwright.aides.mjs : aides communes') && r.sortie.includes('Exporté : 1 test en JavaScript dans e2e ; npx playwright test e2e'), r.sortie + r.erreurs);
+      controle('notes : origines à faire correspondre pour jouer ailleurs ; test qui modifie des données sauté hors du poste sans autorisation (D21.INV-3)', r.sortie.includes(`note : origines du scénario : ${base} ; pour jouer ailleurs, SCENARIO_ORIGINES="${base}=<origine jouée>,…"`) && r.sortie.includes('note : 1 test modifie des données : hors du poste, il est sauté sans SCENARIO_AUTORISER_MUTATIONS=1 (D21.INV-3)'), r.sortie);
+      const lignes = contenu.split('\n');
+      controle('en-tête : test écrit sans IA depuis le scénario ratifié, à ne pas modifier, empreinte de son corps (D21.INV-1)', lignes[0] === '// Test écrit par scenario-playwright 1.5.0 (exporter.mjs), sans IA, depuis le scénario ratifié ../scenarios/creer.toml.' && lignes[1] === '// Ne pas le modifier à la main : exporter.mjs le régénère, et garde à côté un test retouché avant de le remplacer.' && lignes[2] === `// Empreinte : ${createHash('sha256').update(lignes.slice(3).join('\n')).digest('hex')}`, lignes.slice(0, 3).join(' | '));
+      controle('traduction : un test par jeu dans test.describe, étiquettes en tags, cibles en localisateurs de Playwright, numéro et ligne de chaque étape (D21.INV-1)', [
+        "test.describe('Créer un client', () => {",
+        '  for (const [indice, jeu] of JEUX.entries()) {',
+        "tag: ['@DEMO-8-S02']",
+        "const s = await ouvrir(page, DEFINITION, { parametres: PARAMETRES, jeu, indice });",
+        "await s.etape(2, 'saisir « ${nom} » dans getByLabel(\\'Nom\\')', () => page.getByLabel('Nom').fill(`${s.v.nom}`, { timeout: 30000 }));",
+        "await s.etape(4, 'choisir « ${ville} » dans getByLabel(\\'Ville\\')', () => page.getByLabel('Ville').selectOption({ label: `${s.v.ville}` }, { timeout: 30000 }));",
+        "() => page.getByRole('button', { name: 'Enregistrer' }).click({ timeout: 30000 }), { mutation: true });",
+        "() => s.contient(page.getByRole('alert'), `Client ${s.v.nom} créé`, { exact: false, delai: 30000 }), { verifier: true, action: false });",
+        "() => expect(page.getByRole('cell', { name: `${s.v.nom}`, exact: true })).toHaveCount(1, { timeout: 30000 }), { verifier: true, action: false });",
+        "page.getByLabel('Pièce jointe').setInputFiles([s.fichier('../scenarios/piece.txt')], { timeout: 30000 })",
+        '} finally {',
+        "await s.nettoyage(1, 'DELETE /api/clients/${nom}  [suppression]', () => s.appeler({ methode: 'DELETE', chemin: `/api/clients/${s.v.nom}`, delai: 30000 }));",
+      ].every((x) => contenu.includes(x)), contenu.slice(0, 3000));
+      const listeCibles = [
+        { role: 'button', nom: 'Enregistrer', exact: true }, { role: 'navigation' }, { libelle: 'Nom', exact: true }, { texte: 'Bienvenue' },
+        { placeholder: 'Nom du client' }, { testid: 'liste' }, { alt: 'Logo' }, { titre: 'Aide', exact: false }, { css: '#compte' },
+        { role: 'button', nom: 'Supprimer', dans: { role: 'row', nom: 'Martin', dans: { role: 'table' } } }, { role: 'link', rang: 2 },
+      ];
+      const tCibles = ecrire('r35/scenarios', 'cibles.toml', `format = "scenario-playwright.scenario/1"\ntitre = "Cibles"\nurl_base = "${base}"\n${listeCibles.map((c) => `\n[[etapes]]\naction = "survoler"\ncible = ${cibles.cibleToml(c)}\n`).join('')}`);
+      const gCibles = exportation.genererTest(tCibles, { dossierExport: E, langage: 'js' });
+      const lignesCibles = (gCibles.contenu ?? '').split('\n');
+      const manquees = listeCibles.filter((c, i) => !lignesCibles.some((l) => l.includes(`await s.etape(${i + 1}, `) && l.includes(`() => page.${cibles.decrireCible(c)}.hover({ timeout: 10000 })`)));
+      controle('chaque cible devient le localisateur de Playwright du skill, même notation : stratégies, exact, dans sur plusieurs niveaux, rang (D21.INV-1, D4.INV-1)', gCibles.erreurs.length === 0 && manquees.length === 0, JSON.stringify(gCibles.erreurs) + JSON.stringify(manquees));
+      const empreinte = empreinteDe('creer.spec.mjs');
+      r = await exp([creer, '--dossier', 'e2e']);
+      const g1 = exportation.genererTest(creer, { dossierExport: E, langage: 'js' });
+      const g2 = exportation.genererTest(creer, { dossierExport: E, langage: 'js' });
+      controle('même scénario, même test : un nouvel export dit « à jour » et ne change rien (D21.INV-1)', r.code === 0 && /^à jour {3}e2e\/creer\.spec\.mjs : /m.test(r.sortie) && /^à jour {3}e2e\/scenario-playwright\.aides\.mjs : /m.test(r.sortie) && empreinte !== null && empreinteDe('creer.spec.mjs') === empreinte && g1.contenu === g2.contenu && g1.contenu === contenu, r.sortie);
+      mkdirSync(join(P, 'e2e-ts'));
+      r = await exp([creer, '--dossier', 'e2e-ts', '--langage', 'ts']);
+      const ts = lire(join(P, 'e2e-ts'), 'creer.spec.ts');
+      const Q = join(TMP, 'r35-ts');
+      mkdirSync(join(Q, 'tests', 'e2e'), { recursive: true });
+      writeFileSync(join(Q, 'tsconfig.json'), '{}\n');
+      const rq = await lancer('exporter.mjs', [creer, '--dossier', join('tests', 'e2e')], { cwd: Q });
+      controle('TypeScript, par --langage ts ou d\'après le tsconfig.json du projet : // @ts-nocheck, imports sans extension ; en JavaScript, modules .mjs ; chemins de la sortie écrits avec des « / » (D21)', r.code === 0 && ts.startsWith('// @ts-nocheck\n// Test écrit par scenario-playwright 1.5.0') && ts.includes("import { ouvrir } from './scenario-playwright.aides';") && existsSync(join(P, 'e2e-ts', 'scenario-playwright.aides.ts')) && contenu.includes("import { ouvrir } from './scenario-playwright.aides.mjs';") && rq.code === 0 && existsSync(join(Q, 'tests', 'e2e', 'creer.spec.ts')) && rq.sortie.includes('écrit    tests/e2e/creer.spec.ts : ') && rq.sortie.includes('Exporté : 1 test en TypeScript dans tests/e2e ; npx playwright test tests/e2e'), r.sortie + rq.sortie);
+      const autre = ecrire('r35/scenarios', 'autre.toml', ECRAN('r35').replace('titre = "Créer un client"', 'titre = "Autre client"'));
+      writeFileSync(join(E, 'autre.spec.mjs'), '// test écrit par l\'équipe\n');
+      r = await exp([autre, '--dossier', 'e2e', '--remplacer']);
+      controle('fichier qui n\'est pas du skill : jamais remplacé, même avec --remplacer ; code 1 (D21.INV-2)', r.code === 1 && r.sortie.includes('conflit  e2e/autre.spec.mjs : ce fichier n\'a pas été écrit par le skill ; rien n\'est remplacé (D21.INV-2)') && lire(E, 'autre.spec.mjs') === '// test écrit par l\'équipe\n', r.sortie);
+      writeFileSync(creer, ECRAN('r35').replace('attendu = "Client ${nom} créé"', 'attendu = "Client ${nom} enregistré"'));
+      let v = await lancer('verifier.mjs', [join(E, 'creer.spec.mjs')]);
+      const rc = await exp([creer, '--dossier', 'e2e', '--comparer']);
+      r = await exp([creer, '--dossier', 'e2e']);
+      const rcr = await exp([creer, '--dossier', 'e2e', '--comparer', '--remplacer']);
+      controle('scénario changé : test périmé, refusé par verifier.mjs, dit par --comparer qui n\'écrit rien, non remplacé sans --remplacer ; code 1 (D21.INV-1)', v.code === 2 && v.sortie.includes('ERREUR creer.spec.mjs : périmé : le scénario ../scenarios/creer.toml, ou la version du skill, a changé depuis l\'export ; exporter.mjs --remplacer le régénère (D21.INV-1)') && rc.code === 1 && /^périmé {3}e2e\/creer\.spec\.mjs : /m.test(rc.sortie) && r.code === 1 && r.sortie.includes('périmé   e2e/creer.spec.mjs : le scénario ou le skill a changé ; --remplacer pour le remplacer') && empreinte !== null && empreinteDe('creer.spec.mjs') === empreinte && rcr.code === 2, [v, rc, r, rcr].map((x) => x.sortie + x.erreurs).join(' | '));
+      r = await exp([creer, '--dossier', 'e2e', '--remplacer']);
+      v = await lancer('verifier.mjs', [join(E, 'creer.spec.mjs')]);
+      controle('--remplacer : test périmé régénéré, à jour pour verifier.mjs', r.code === 0 && r.sortie.includes('remplacé e2e/creer.spec.mjs : ') && lire(E, 'creer.spec.mjs') === exportation.genererTest(creer, { dossierExport: E, langage: 'js' }).contenu && v.code === 0 && v.sortie.includes('ok  creer.spec.mjs : à jour, exporté de ../scenarios/creer.toml'), r.sortie + v.sortie);
+      const retouche = `${lire(E, 'creer.spec.mjs')}// retouche de l'équipe\n`;
+      writeFileSync(join(E, 'creer.spec.mjs'), retouche);
+      v = await lancer('verifier.mjs', [join(E, 'creer.spec.mjs')]);
+      r = await exp([creer, '--dossier', 'e2e']);
+      const r5 = await exp([creer, '--dossier', 'e2e', '--remplacer']);
+      const garde = readdirSync(E).find((f) => /^creer\.spec\.mjs\.avant-\d{8}T\d{6}Z$/.test(f));
+      controle('test retouché à la main : refusé par verifier.mjs, non remplacé sans --remplacer ; avec, gardé à côté puis remplacé (D21.INV-2)', v.code === 2 && v.sortie.includes('ERREUR creer.spec.mjs : retouché à la main depuis l\'export') && r.code === 1 && r.sortie.includes('retouché e2e/creer.spec.mjs : retouché à la main depuis l\'export ; --remplacer pour le remplacer, la version retouchée gardée à côté') && r5.code === 0 && garde && lire(E, garde) === retouche && r5.sortie.includes(`gardé    e2e/${garde} : la version retouchée`) && lire(E, 'creer.spec.mjs') === exportation.genererTest(creer, { dossierExport: E, langage: 'js' }).contenu, v.sortie + r.sortie + r5.sortie);
+      const cx = ecrire('r35/scenarios', 'donnees.toml', DONNEES('r35'));
+      r = await exp([cx, '--dossier', 'e2e']);
+      const souche = lire(E, 'scenario-playwright.connexion.mjs');
+      const tcx = lire(E, 'donnees.spec.mjs');
+      controle('étape à la main : souche de connexion posée une fois pour l\'équipe, qui échoue en disant ce qui manque ; aucun identifiant écrit (D21.INV-2, D6.INV-2)', r.code === 0 && r.sortie.includes('écrit    e2e/scenario-playwright.connexion.mjs : souche de connexion, à compléter par l\'équipe') && r.sortie.includes('note : la connexion reste à écrire dans e2e/scenario-playwright.connexion.mjs') && exportation.estSouche(souche) && souche.includes('throw new Error(') && !souche.includes('fill(') && tcx.includes("import { seConnecter } from './scenario-playwright.connexion.mjs';") && tcx.includes("() => seConnecter(page, { message: 'Connectez-vous', jusqua: { url: '/accueil-connecte' } }))") && tcx.includes("await s.preparation(1, 'l.3 POST /api/donnees/clients"), r.sortie + tcx.slice(0, 2500));
+      writeFileSync(join(E, 'scenario-playwright.connexion.mjs'), CONNEXION_EQUIPE);
+      r = await exp([cx, '--dossier', 'e2e']);
+      controle('connexion écrite par l\'équipe : jamais remplacée, plus de note (D21.INV-2)', r.code === 0 && lire(E, 'scenario-playwright.connexion.mjs') === CONNEXION_EQUIPE && !/souche|connexion reste/.test(r.sortie), r.sortie);
+    }
+
+    // ------------------------------------------------------------------------------------------
+    scenarioRecette('R36', 'Tests exportés joués par @playwright/test 1.65.1 contre l\'application de démonstration : mêmes résultats que le skill, étape par étape');
+    {
+      const P = projetExport('r36', canal);
+      const S36 = join(P, 'scenarios');
+      // Le test manuel DEMO-13 de Xray, importé puis traduit : la chaîne entière, de l'import à l'export.
+      const imp = await lancer('importer.mjs', ['xray:DEMO-13', '--api', outils, '--adresse', base, '--dossier', S36], { env: { ...ENV, ...JETONS_FACTICES } });
+      const t13 = texte.analyserTexte(lire(S36, 'DEMO-13.scenario')).scenario;
+      if (t13) writeFileSync(join(S36, 'exporter-clients.toml'), EXPORTER_CLIENTS(t13));
+      writeFileSync(join(S36, 'piece.txt'), 'pièce jointe de démonstration\n');
+      const sources = { ecran: ECRAN('r36'), echecs: ECHECS('r36'), 'action-ko': ACTION_KO('r36'), 'fin-ko': FIN_KO('r36'), donnees: DONNEES('r36-donnees'), 'creer-client': CREER_SOUS('r36-sous'), sous: SOUS('r36-sous') };
+      for (const [nom, contenu] of Object.entries(sources)) writeFileSync(join(S36, `${nom}.toml`), contenu);
+      const joues = ['ecran', 'echecs', 'action-ko', 'fin-ko', 'donnees', 'sous', 'exporter-clients'];
+      writeFileSync(join(P, 'e2e', 'scenario-playwright.connexion.mjs'), CONNEXION_EQUIPE);
+      const ex = await lancer('exporter.mjs', [...joues.map((n) => join(S36, `${n}.toml`)), '--dossier', 'e2e'], { cwd: P });
+      controle('test DEMO-13 importé de Xray et traduit ; sept scénarios exportés, la connexion de l\'équipe gardée, sans note (D21.INV-2)', imp.code === 0 && Boolean(t13) && ex.code === 0 && (ex.sortie.match(/^écrit {4}e2e\/[a-z-]+\.spec\.mjs : /gm) ?? []).length === 7 && !/souche|connexion reste/.test(ex.sortie) && lire(join(P, 'e2e'), 'scenario-playwright.connexion.mjs') === CONNEXION_EQUIPE, imp.sortie + imp.erreurs + ex.sortie + ex.erreurs);
+      const skill = {};
+      for (const n of joues) skill[n] = await jouer(join(S36, `${n}.toml`));
+      r36 = { dossier: S36, skill };
+      controle('les sept scénarios joués par le skill : quatre réussis, les trois scénarios d\'échec en échec', ['ecran', 'donnees', 'sous', 'exporter-clients'].every((n) => skill[n].code === 0) && ['echecs', 'action-ko', 'fin-ko'].every((n) => skill[n].code === 1 && skill[n].rapport), joues.map((n) => `${n} : code ${skill[n].code} ${skill[n].erreurs}`).join(' ; '));
+      const avantDonnees = app.etat.requetesDonnees.length;
+      const avantAjouts = app.etat.ajouts.length;
+      const pw = await jouerTests(P);
+      const testsDe = (n) => pw.tests.filter((t) => t.fichier === `${n}.spec.mjs`);
+      controle('@playwright/test 1.65.1 : un test par jeu, huit tests, cinq réussis et trois en échec ; code 1', pw.code === 1 && pw.tests.length === 8 && pw.tests.filter((t) => t.statut === 'passed').length === 5 && pw.tests.filter((t) => t.statut === 'failed').length === 3 && pw.rapport?.config?.version === '1.65.1', pw.sortie + pw.erreurs);
+      const comparer = (n) => {
+        const r = skill[n].rapport;
+        const ts = testsDe(n);
+        if (!r || ts.length !== r.jeux.length) return { ok: false, detail: `${n} : ${r ? `${r.jeux.length} jeux` : 'aucun rapport'}, ${ts.length} tests` };
+        const jeux = r.jeux.map((j, i) => {
+          const attendu = statutsSkill(j);
+          const obtenu = statutsExport(ts[i], Object.keys(attendu));
+          return { ok: enLigne(attendu) === enLigne(obtenu) && (j.statut === 'reussi') === (ts[i].statut === 'passed'), detail: `jeu ${i + 1} : skill ${j.statut} ${enLigne(attendu)} ; export ${ts[i].statut} ${enLigne(obtenu)} ${ts[i].erreurs.join(' / ')}` };
+        });
+        return { ok: jeux.every((x) => x.ok), detail: jeux.map((x) => x.detail).join(' | ') };
+      };
+      for (const [n, quoi] of [
+        ['ecran', 'deux jeux, dix-sept étapes de l\'écran (saisie, touche, choix, case, téléversement, vérifications de valeur, d\'état, de texte, d\'adresse, de requête, de nombre et d\'API, survol, attente, capture), nettoyage'],
+        ['echecs', 'vérification en échec, la suivante jouée, l\'action d\'après non jouée, nettoyage après l\'échec (D5.INV-4)'],
+        ['action-ko', 'action en échec, la suite non jouée'],
+        ['fin-ko', 'dernière étape, une vérification hors de l\'écran en échec : le test échoue à la fin (D5.INV-4)'],
+        ['donnees', 'étape à la main par la connexion de l\'équipe, préparation et nettoyage par l\'API avec la valeur gardée'],
+        ['sous', 'préparation par un scénario ratifié, joué dans le même onglet, <unique> de ses paramètres remplacé ; nettoyage en échec, qui ne change pas le résultat'],
+        ['exporter-clients', 'test DEMO-13 importé : téléchargement, fichier téléchargé, capture'],
+      ]) {
+        const c = comparer(n);
+        controle(`même résultat que le skill, étape par étape : ${quoi}`, c.ok, c.detail);
+      }
+      const ec = testsDe('echecs')[0];
+      const messageSkill = skill.echecs.rapport?.jeux[0]?.etapes[1]?.message ?? null;
+      const e2 = ec?.etapes.find((s) => s.title.startsWith('2. '));
+      controle('vérification en échec : le même message que le skill ; le test échoue par elle, à la fin (D5.INV-4)', Boolean(messageSkill) && sansCouleur(e2?.error?.message ?? '').includes(messageSkill) && ec.erreurs.some((m) => m.includes(messageSkill)), `${messageSkill} | ${JSON.stringify(e2)} | ${ec?.erreurs}`);
+      const tf = testsDe('fin-ko')[0];
+      const mf = skill['fin-ko'].rapport?.jeux[0]?.etapes[4]?.message ?? '';
+      const ef = sansCouleur(tf?.etapes.find((s) => s.title.startsWith('5. '))?.error?.message ?? '');
+      const fuites = [JETON_REQUETE_DEMO, JETON_CSRF_DEMO, ENTETE_DEMO].filter((j) => JSON.stringify(pw.rapport ?? {}).includes(j) || mf.includes(j));
+      controle('requête introuvable : les requêtes vues, l\'adresse masquée comme par le skill ; aucun jeton dans le rapport de @playwright/test (D19.INV-2)', /^aucune requête POST \/api\/absent depuis l'étape 3 ; requêtes vues : .*POST http:\/\/127\.0\.0\.1:\d+\/api\/clients\?source=formulaire&jeton=\*\*\* 201/.test(mf) && ef.includes('aucune requête POST /api/absent depuis l\'étape 3 ; requêtes vues : ') && ef.includes('/api/clients?source=formulaire&jeton=*** 201') && fuites.length === 0, `${mf} | ${ef} | ${fuites.length}`);
+      const td = testsDe('donnees')[0];
+      const ecritures = app.etat.requetesDonnees.slice(avantDonnees).filter((x) => x.methode !== 'GET');
+      controle('préparation à sa place, après l\'étape à la main ; la connexion de l\'équipe appelée avec le message et l\'état de fin de l\'étape (D21.INV-2)', td?.etapes.map((s) => /^([pn]?\d+)\. /.exec(s.title)?.[1]).join() === '1,2,p1,3,4,5,n1' && td.stdout.includes('connexion de l\'équipe : « Connectez-vous », jusqu\'à /accueil-connecte'), JSON.stringify(td?.etapes.map((s) => s.title)) + td?.stdout);
+      controle('appels du test exporté : session du navigateur, jeton anti-CSRF recopié de son cookie, aucun en-tête Authorization, corps JSON ; données supprimées (D20.INV-2)', ecritures.length === 2 && ecritures.every((x) => x.session && x.csrf === 'X-XSRF-TOKEN' && !x.autorisation) && ecritures[0].methode === 'POST' && ecritures[0].type === 'application/json' && /^\{"nom":"Client [a-z0-9]{7}","ville":"Lyon"\}$/.test(ecritures[0].corps ?? '') && ecritures[1].methode === 'DELETE' && app.etat.donnees.size === 0, JSON.stringify(ecritures));
+      const ts = testsDe('sous')[0];
+      controle('nettoyage en échec : annoté et signalé, le test reste réussi, l\'entrée suivante jouée (D20.INV-4)', ts?.statut === 'passed' && ts.annotations.some((a) => a.type === 'nettoyage en échec' && /^nettoyage 2 : DELETE http:\/\/127\.0\.0\.1:\d+\/api\/clients\/Sous-[a-z0-9]{7} : attendu : statut 204 ; obtenu : statut 200 ; des données de l'exécution peuvent rester \(D20\.INV-4\)$/.test(a.description)) && ts.stderr.includes('AVERTISSEMENT nettoyage 2 en échec : DELETE '), JSON.stringify(ts?.annotations) + ts?.stderr);
+      const ajouts = app.etat.ajouts.slice(avantAjouts).map((c) => c.nom);
+      const suffixe = (n) => n.slice(-7);
+      controle('valeurs des jeux : <unique> remplacé, sept caractères propres à chaque jeu, la même exécution (D20.INV-6)', ajouts.length === 4 && /^Ecran [a-z0-9]{7}$/.test(ajouts[0]) && /^Autre [a-z0-9]{7}$/.test(ajouts[1]) && /^Masque-[a-z0-9]{7}$/.test(ajouts[2]) && /^Sous-[a-z0-9]{7}$/.test(ajouts[3]) && suffixe(ajouts[0]) !== suffixe(ajouts[1]) && suffixe(ajouts[0]).slice(0, 6) === suffixe(ajouts[1]).slice(0, 6), JSON.stringify(ajouts));
+      const p1 = ts?.etapes.find((s) => s.title.startsWith('p1. '));
+      const sousSkill = skill.sous.rapport?.jeux[0]?.preparation[0];
+      controle('scénario de préparation : ses étapes sous l\'entrée, avec les statuts du skill (D20.INV-5)', Boolean(p1 && sousSkill) && (p1.steps ?? []).map((s) => `${/^(\d+)\. /.exec(s.title)?.[1]} ${s.error ? 'echec' : 'reussie'}`).join() === sousSkill.etapes.map((e) => `${e.numero} ${e.statut}`).join(), JSON.stringify(p1) + JSON.stringify(sousSkill?.etapes));
+      const tx = testsDe('exporter-clients')[0];
+      const csv = trouver(join(P, 'test-results'), 'clients.csv');
+      controle('fichier téléchargé et capture gardés dans les résultats du test ; étiquettes en tags : la clé du test importé, @DEMO-13 (D21.INV-4)', tx?.statut === 'passed' && Boolean(csv) && readFileSync(csv, 'utf8').startsWith('nom;ville\n') && Boolean(trouver(join(P, 'test-results'), 'export.png')) && JSON.stringify(tx.tags) === '["DEMO-13"]' && testsDe('ecran').every((t) => JSON.stringify(t.tags) === '["DEMO-8-S02"]'), JSON.stringify(tx) + csv);
+      controle('aucune donnée laissée par le skill ni par les tests exportés', !app.etat.clients.some((c) => /^(Ecran |Autre |Sous-|Client |Masque-)/.test(c.nom)) && app.etat.donnees.size === 0, JSON.stringify(app.etat.clients));
+    }
+
+    // ------------------------------------------------------------------------------------------
+    scenarioRecette('R37', 'Tests exportés en TypeScript, joués ailleurs : correspondance des origines, garde des origines, garde des mutations, souche de connexion qui échoue');
+    {
+      const P = projetExport('r37', canal);
+      const E = join(P, 'e2e');
+      const S37 = join(P, 'scenarios');
+      writeFileSync(join(P, 'tsconfig.json'), '{}\n');
+      writeFileSync(join(S37, 'donnees.toml'), DONNEES('r37'));
+      writeFileSync(join(S37, 'ailleurs.toml'), `format = "scenario-playwright.scenario/1"\ntitre = "Recette ailleurs"\nurl_base = "http://127.0.0.1:9"\ndelai = 10\n\n[[etapes]]\naction = "naviguer"\nurl = "/externe"\n\n[[etapes]]\naction = "verifier"\ncritere = "contient"\ncible = { texte = "Contenu local" }\nattendu = "Contenu local"\n\n[[etapes]]\naction = "verifier"\ncritere = "url"\nattendu = "/externe"\n\n[[etapes]]\naction = "verifier"\ncritere = "api"\nchemin = "/api/clients"\nattendu = { statut = 200 }\n\n[[etapes]]\naction = "naviguer"\nurl = "/ws"\n\n[[etapes]]\naction = "verifier"\ncritere = "contient"\ncible = { css = "#principal" }\nattendu = "principal : écho bonjour"\n\n[[etapes]]\naction = "verifier"\ncritere = "contient"\ncible = { css = "#autre" }\nattendu = "autre : fermé"\n`);
+      let ex = await lancer('exporter.mjs', [join(S37, 'donnees.toml'), join(S37, 'ailleurs.toml'), '--dossier', 'e2e'], { cwd: P });
+      controle('projet TypeScript reconnu à son tsconfig.json : tests .spec.ts ; souche de connexion posée, note de la connexion à écrire (D21.INV-2)', ex.code === 0 && ex.sortie.includes('écrit    e2e/donnees.spec.ts : ') && ex.sortie.includes('écrit    e2e/scenario-playwright.connexion.ts : souche de connexion, à compléter par l\'équipe') && ex.sortie.includes('note : la connexion reste à écrire dans e2e/scenario-playwright.connexion.ts') && lire(E, 'donnees.spec.ts').startsWith('// @ts-nocheck\n'), ex.sortie + ex.erreurs);
+      const avant = app.etat.requetesDonnees.length;
+      let pw = await jouerTests(P, ['donnees.spec.ts']);
+      let t = pw.tests[0];
+      const e2 = t?.etapes.find((s) => s.title.startsWith('2. '));
+      controle('souche de connexion : le test échoue à l\'étape à la main en disant ce qui manque ; préparation non jouée, nettoyage non joué faute de valeur, aucun appel (D21.INV-2, D20.INV-4)', t?.statut === 'failed' && sansCouleur(e2?.error?.message ?? '').includes('connexion à écrire par l\'équipe dans scenario-playwright.connexion : « Connectez-vous », jusqu\'à l\'adresse /accueil-connecte (D21.INV-2)') && !t.etapes.some((s) => s.title.startsWith('p1. ')) && t.annotations.some((a) => a.type === 'nettoyage non joué' && a.description === 'nettoyage 1 : ${id_client} non obtenue, sa préparation n\'a pas abouti (D20.INV-4)') && app.etat.requetesDonnees.length === avant, pw.sortie + JSON.stringify(t));
+      const autres = app.etat.requetesAutre.length;
+      pw = await jouerTests(P, ['ailleurs.spec.ts'], { SCENARIO_ORIGINES: `http://127.0.0.1:9=${base}` });
+      t = pw.tests[0];
+      controle('SCENARIO_ORIGINES : le test joué contre l\'origine correspondante, adresses relatives, vérification d\'adresse, API et WebSocket compris ; l\'autre origine bloquée par la garde, WebSocket compris (D21.INV-3)', t?.statut === 'passed' && t.etapes.length === 7 && app.etat.requetesAutre.length === autres, pw.sortie + JSON.stringify(t));
+      pw = await jouerTests(P, ['ailleurs.spec.ts'], { SCENARIO_ORIGINES: 'recette' });
+      t = pw.tests[0];
+      controle('SCENARIO_ORIGINES mal formé : le test échoue en le disant, sans rien jouer', t?.statut === 'failed' && t.etapes.length === 0 && t.erreurs.some((m) => m.includes('SCENARIO_ORIGINES : « recette » n\'est pas « origine du scénario=origine jouée »')), pw.sortie + JSON.stringify(t));
+      if (!distante) {
+        saut('test qui modifie des données, hors du poste : sauté sans SCENARIO_AUTORISER_MUTATIONS=1', '127.0.0.2 indisponible sur ce système');
+        saut('test qui modifie des données, hors du poste : joué avec SCENARIO_AUTORISER_MUTATIONS=1', '127.0.0.2 indisponible sur ce système');
+      } else {
+        const DISTANT = (url) => `format = "scenario-playwright.scenario/1"\ntitre = "Créer un client ailleurs"\nurl_base = "${url}"\ndelai = 30\n\n[[etapes]]\naction = "naviguer"\nurl = "/clients/nouveau"\n\n[[etapes]]\naction = "saisir"\ncible = { libelle = "Nom" }\nvaleur = "Distant \${unique}"\n\n[[etapes]]\naction = "cliquer"\ncible = { role = "button", nom = "Enregistrer" }\nmutation = "creation"\n\n[[etapes]]\naction = "verifier"\ncritere = "contient"\ncible = { role = "alert" }\nattendu = "Client Distant \${unique} créé"\n\n[[nettoyage]]\nmethode = "DELETE"\nchemin = "/api/clients/Distant \${unique}"\n`;
+        writeFileSync(join(S37, 'distant.toml'), DISTANT(distante));
+        writeFileSync(join(S37, 'local.toml'), DISTANT(base));
+        ex = await lancer('exporter.mjs', [join(S37, 'distant.toml'), join(S37, 'local.toml'), '--dossier', 'e2e'], { cwd: P });
+        const n0 = app.etat.requetesApi.length;
+        pw = await jouerTests(P, ['distant.spec.ts', 'local.spec.ts'], { SCENARIO_ORIGINES: `${base}=${distante}` });
+        const sautes = pw.tests.filter((x) => x.statut === 'skipped' && x.annotations.some((a) => a.type === 'skip' && (a.description ?? '').includes(`hors du poste (${distante}) : SCENARIO_AUTORISER_MUTATIONS=1 pour l'autoriser, avec l'accord de l'équipe (D21.INV-3)`)));
+        controle('test qui modifie des données, hors du poste, déclaré ou par correspondance : sauté sans SCENARIO_AUTORISER_MUTATIONS=1, rien n\'est joué (D21.INV-3)', ex.code === 0 && ex.sortie.includes('(le scénario déclare déjà des origines hors du poste)') && pw.tests.length === 2 && sautes.length === 2 && app.etat.requetesApi.length === n0, ex.sortie + pw.sortie + JSON.stringify(pw.tests));
+        pw = await jouerTests(P, ['distant.spec.ts'], { SCENARIO_AUTORISER_MUTATIONS: '1' });
+        const faits = app.etat.requetesApi.slice(n0);
+        controle('avec SCENARIO_AUTORISER_MUTATIONS=1 : joué hors du poste, le client créé puis supprimé par le nettoyage', pw.tests[0]?.statut === 'passed' && faits.includes('POST /api/clients') && faits.some((x) => x.startsWith('DELETE /api/clients/Distant')) && !app.etat.clients.some((c) => c.nom.startsWith('Distant ')), pw.sortie + JSON.stringify(faits));
+      }
+    }
+
+    // ------------------------------------------------------------------------------------------
+    scenarioRecette('R38', 'Résultats aux formats d\'import de Xray et de Zephyr Scale : clé retenue à l\'import, statut par pas du test manuel converti, exemples, preuves sur demande ; rien n\'est envoyé');
+    {
+      const res = (args) => lancer('resultats.mjs', args);
+      const outilsAvant = app.etat.requetesOutils.length;
+      const dX = r36?.skill['exporter-clients']?.dossier;
+      const dE = r36?.skill.ecran?.dossier;
+      const dK = r36?.skill.echecs?.dossier;
+      if (!dX || !dE || !dK) controle('rapports du skill de R36 disponibles', false, JSON.stringify({ dX, dE, dK }));
+      else {
+        const rX = JSON.parse(lire(dX, 'rapport.json'));
+        let r = await res([dX, '--format', 'xray']);
+        let x = JSON.parse(lire(dX, 'xray-exporter-clients.json') || 'null');
+        controle('Xray : clé du test retenue à l\'import ; test manuel converti, texte inchangé : statut de chacun de ses pas ; fichier à côté du rapport (D21.INV-4)', r.code === 0 && x?.info.summary === 'scenario-playwright : Exporter les clients' && x.info.startDate === rX.debut && x.info.finishDate === rX.fin && x.tests.length === 1 && x.tests[0].testKey === 'DEMO-13' && x.tests[0].status === 'PASSED' && JSON.stringify(x.tests[0].steps) === '[{"status":"PASSED"},{"status":"PASSED"}]' && x.tests[0].comment === 'scénario : réussi' && !('evidence' in x.tests[0]) && !('examples' in x.tests[0]) && r.sortie.includes('ok  DEMO-13 : PASSED, 2 pas'), r.sortie + r.erreurs + JSON.stringify(x));
+        // Le même rapport, l'étape du fichier téléchargé mise en échec : le second pas échoue avec son message.
+        const dKo = `${dX.replace(/[\\/]+$/, '')}-echec`;
+        cpSync(dX, dKo, { recursive: true });
+        const ko = JSON.parse(lire(dKo, 'rapport.json'));
+        const message = 'fichier clients : attendu : un texte qui contient « nom;prenom » ; obtenu : début « nom;ville »';
+        Object.assign(ko, { statut: 'echec' });
+        Object.assign(ko.jeux[0], { statut: 'echec' });
+        Object.assign(ko.jeux[0].etapes[3], { statut: 'echec', message });
+        Object.assign(ko.jeux[0].etapes[4], { statut: 'non_jouee', message: null });
+        writeFileSync(join(dKo, 'rapport.json'), JSON.stringify(ko));
+        r = await res([dKo, '--format', 'xray']);
+        x = JSON.parse(lire(dKo, 'xray-exporter-clients.json') || 'null');
+        const l4 = ko.jeux[0].etapes[3].ligne;
+        controle('pas en échec : FAILED avec le message de son étape, les autres pas avec les leurs ; commentaire : étape, ligne et message', r.code === 0 && x?.tests[0]?.status === 'FAILED' && JSON.stringify(x.tests[0].steps) === JSON.stringify([{ status: 'PASSED' }, { status: 'FAILED', actualResult: message }]) && x.tests[0].comment === `scénario : échec ; étape 4 (ligne ${l4}) en échec : ${message}`, r.sortie + JSON.stringify(x));
+        // Texte retouché depuis l'import, traduction refaite : les pas ne correspondent plus sûrement à ceux de Xray.
+        const d38 = join(TMP, 'r38');
+        mkdirSync(join(d38, 'resultats', 'retouche'), { recursive: true });
+        const tRetouche = lire(r36.dossier, 'DEMO-13.scenario').replace('Alors La page « Export » s\'affiche', 'Alors La page « Export » est affichée');
+        writeFileSync(join(d38, 'DEMO-13.scenario'), tRetouche);
+        writeFileSync(join(d38, 'exporter-clients.toml'), lire(r36.dossier, 'exporter-clients.toml').replace(/empreinte_source = "[0-9a-f]{64}"/, `empreinte_source = "${texte.empreinteTexte(tRetouche)}"`));
+        writeFileSync(join(d38, 'resultats', 'retouche', 'rapport.json'), JSON.stringify({ ...rX, scenario: { ...rX.scenario, empreinte: sha(join(d38, 'exporter-clients.toml')) } }));
+        r = await res([join(d38, 'resultats', 'retouche'), '--format', 'xray']);
+        x = JSON.parse(lire(join(d38, 'resultats', 'retouche'), 'xray-exporter-clients.json') || 'null');
+        controle('texte retouché depuis l\'import : la clé gardée, le statut du test seulement, avec une note', r.code === 0 && x?.tests[0]?.testKey === 'DEMO-13' && x.tests[0].status === 'PASSED' && !('steps' in x.tests[0]) && r.sortie.includes('note : DEMO-13 : texte retouché depuis l\'import, les pas ne correspondent plus sûrement à ceux de Xray : statut du test seulement'), r.sortie + JSON.stringify(x));
+        r = await res([dE, '--format', 'xray', '--cle', 'DEMO-8']);
+        x = JSON.parse(lire(dE, 'xray-ecran.json') || 'null');
+        const jeuxE = r36.skill.ecran.rapport.jeux;
+        controle('plusieurs jeux : un exemple par jeu ; --cle donne la clé d\'un scénario écrit à la main ; valeurs de chaque jeu dans le commentaire, sans ${unique}', r.code === 0 && x?.tests[0]?.testKey === 'DEMO-8' && JSON.stringify(x.tests[0].examples) === '["PASSED","PASSED"]' && x.tests[0].comment === `jeu 1 (nom = ${jeuxE[0].valeurs.nom}, ville = Lyon) : réussi\njeu 2 (nom = ${jeuxE[1].valeurs.nom}, ville = Marseille) : réussi` && !x.tests[0].comment.includes('unique') && r.sortie.includes('ok  DEMO-8 : PASSED, 2 exemples'), r.sortie + JSON.stringify(x));
+        r = await res([dK, '--format', 'xray', '--cle', 'DEMO-9']);
+        x = JSON.parse(lire(dK, 'xray-echecs.json') || 'null');
+        const sansPreuves = r.code === 0 && x?.tests[0]?.status === 'FAILED' && !('evidence' in x.tests[0]);
+        r = await res([dK, '--format', 'xray', '--cle', 'DEMO-9', '--preuves']);
+        x = JSON.parse(lire(dK, 'xray-echecs.json') || 'null');
+        const capture = r36.skill.echecs.rapport.jeux[0].etapes[1].capture;
+        const ev = x?.tests[0]?.evidence ?? [];
+        controle('aucune capture sans --preuves ; avec, la capture de l\'étape en échec, en PNG encodé en base64 (D21.INV-4)', sansPreuves && Boolean(capture) && ev.length === 1 && ev[0].filename === capture.split('/').pop() && ev[0].contentType === 'image/png' && Buffer.from(ev[0].data, 'base64').subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])) && x.tests[0].comment.startsWith('scénario : échec ; étape 2 en échec : attendu : un texte qui contient « Inexistant »'), r.sortie + JSON.stringify(x?.tests[0]?.comment) + capture);
+        const refus = await Promise.all([
+          res([dE, '--format', 'xray']),
+          res([dE, '--format', 'xray', '--cle', 'demo-8']),
+          res([dE, dK, '--format', 'xray', '--cle', 'DEMO-8']),
+          res([dE, '--format', 'zephyr', '--cle', 'DEMO-T8', '--preuves']),
+          res([dE, '--format', 'csv']),
+          res([join(r36.dossier, 'ecran.toml'), '--format', 'xray']),
+          res([dX, '--format', 'zephyr']),
+        ]);
+        controle('refus, code 2, rien d\'écrit : sans clé, clé mal formée, --cle pour plusieurs rapports, --preuves pour Zephyr Scale, format inconnu, fichier qui n\'est pas un rapport, clé de Xray pour Zephyr Scale', refus.every((x2) => x2.code === 2) && refus[0].sortie.includes('aucune clé de test, le scénario ne cite pas de texte de départ lisible ; --cle la donne (D21.INV-4)') && refus[1].sortie.includes('« demo-8 » n\'est pas une clé de test Xray (PROJET-123)') && refus[2].erreurs.includes('--cle ne vaut que pour un seul dossier de résultats') && refus[3].erreurs.includes('--preuves ne vaut que pour Xray') && refus[4].erreurs.includes('--format vaut xray ou zephyr') && refus[5].sortie.includes('rapport.json illisible') && refus[6].sortie.includes('« DEMO-13 » n\'est pas une clé de cas de test Zephyr Scale (PROJET-T123)') && !existsSync(join(dX, 'zephyr-exporter-clients.json')), refus.map((x2) => x2.sortie + x2.erreurs).join(' | '));
+        const rz = await res([dKo, '--format', 'zephyr', '--cle', 'DEMO-T14']);
+        const zko = JSON.parse(lire(dKo, 'zephyr-exporter-clients.json') || 'null');
+        r = await res([dX, '--format', 'zephyr', '--cle', 'DEMO-T13']);
+        const zj = lire(dX, 'zephyr-exporter-clients.json');
+        const zip = existsSync(join(dX, 'zephyr-exporter-clients.zip')) ? readFileSync(join(dX, 'zephyr-exporter-clients.zip')) : Buffer.alloc(0);
+        const lu = leve(() => cas.lireZip(zip)) ?? cas.lireZip(zip);
+        const n = zip.length > 30 ? zip.readUInt16LE(26) : 0;
+        const stocke = zip.length > 30 ? zip.subarray(30 + n, 30 + n + zip.readUInt32LE(18)).toString('utf8') : '';
+        controle('Zephyr Scale : format « custom », résultat et clé du cas de test ; même JSON dans l\'archive .zip à envoyer, lisible, contrôlée par son CRC-32 (D21.INV-4)', r.code === 0 && zj === `${JSON.stringify({ version: 1, executions: [{ source: 'exporter-clients.toml', result: 'Passed', testCase: { key: 'DEMO-T13' } }] }, null, 2)}\n` && !(lu instanceof Error) && JSON.stringify(lu.ignorees) === '["zephyr-exporter-clients.json"]' && stocke === zj && r.sortie.includes('ok  DEMO-T13 : Passed') && rz.code === 0 && zko?.executions[0]?.result === 'Failed' && zko.executions[0].testCase.key === 'DEMO-T14', r.sortie + rz.sortie + zj + String(lu?.message ?? ''));
+        r = await res([dX, dKo, '--format', 'xray', '--sortie', d38]);
+        x = JSON.parse(lire(d38, 'xray-resultats.json') || 'null');
+        controle('plusieurs rapports : un fichier, un test chacun, début et fin de l\'ensemble', r.code === 0 && x?.info.summary === 'scenario-playwright : 2 scénarios' && x.tests.map((y) => `${y.testKey} ${y.status}`).join() === 'DEMO-13 PASSED,DEMO-13 FAILED' && x.info.startDate === [rX.debut, ko.debut].sort()[0], r.sortie + JSON.stringify(x?.info));
+        const source = readFileSync(join(SKILL, 'scripts', 'resultats.mjs'), 'utf8');
+        controle('rien n\'est envoyé : aucun appel aux outils de test, aucun accès au réseau dans resultats.mjs (D21.INV-4)', app.etat.requetesOutils.length === outilsAvant && !/fetch\(|node:https?|node:net|request\(/.test(source));
+      }
     }
   } finally {
     await app.arreter();
@@ -2926,9 +3710,9 @@ Fonctionnalité: Clients
 }
 
 let codeSortie = 0;
-// Garde-fou : une recette bloquée s'arrête d'elle-même au bout de dix minutes, en disant dans quel scénario, son
-// dossier temporaire gardé ; elle dure d'ordinaire moins de deux minutes.
-const DUREE_MAX = 600_000;
+// Garde-fou : une recette bloquée s'arrête d'elle-même au bout de quinze minutes, en disant dans quel scénario, son
+// dossier temporaire gardé ; elle dure d'ordinaire moins de cinq minutes.
+const DUREE_MAX = 900_000;
 setTimeout(() => {
   console.log(`KO   ${courant} · recette bloquée, arrêtée au bout de ${DUREE_MAX / 60_000} min`);
   console.log(`\nBilan : recette arrêtée dans ${courant}, après ${resultats.length} contrôles`);

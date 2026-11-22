@@ -1,6 +1,6 @@
 # Mode d'emploi : jouer un scénario côté utilisateur avec Playwright
 
-Ce mode d'emploi installe [`scenario-playwright`](../../specs/scenario-playwright/SKILL.md) 1.4.0 : faire faire à Chrome, sur votre poste, les manipulations d'un utilisateur décrites par un scénario. Vous écrivez le scénario en français ou en anglais, dans un texte inspiré de Gherkin, ou vous l'importez, sans IA, d'une demande Jira, d'un fichier `.feature`, ou d'un cas de test de Xray ou de Zephyr Scale ; le skill indexe, sans IA, le code de votre projet ; l'IA traduit le scénario en TOML exécutable, en s'aidant de l'index ; vous ratifiez la traduction ; le skill joue le scénario, sans IA, prépare avant lui les données dont il a besoin et les nettoie après, vérifie ce qui s'affiche et ce qui se passe hors de l'écran, et rend un rapport avec ses captures. Vous gardez la main : chaque connexion se fait par vous, dans la fenêtre, et aucune donnée n'est modifiée hors de votre poste sans votre accord pour l'exécution.
+Ce mode d'emploi installe [`scenario-playwright`](../../specs/scenario-playwright/SKILL.md) 1.5.0 : faire faire à Chrome, sur votre poste, les manipulations d'un utilisateur décrites par un scénario. Vous écrivez le scénario en français ou en anglais, dans un texte inspiré de Gherkin, ou vous l'importez, sans IA, d'une demande Jira, d'un fichier `.feature`, ou d'un cas de test de Xray ou de Zephyr Scale ; le skill indexe, sans IA, le code de votre projet ; l'IA traduit le scénario en TOML exécutable, en s'aidant de l'index ; vous ratifiez la traduction ; le skill joue le scénario, sans IA, prépare avant lui les données dont il a besoin et les nettoie après, vérifie ce qui s'affiche et ce qui se passe hors de l'écran, et rend un rapport avec ses captures. Le scénario ratifié se met ensuite, sans IA, dans les tests `@playwright/test` de votre projet, que votre équipe rejoue dans sa CI, et les résultats d'une exécution s'écrivent au format d'import de Xray ou de Zephyr Scale. Vous gardez la main : chaque connexion se fait par vous, dans la fenêtre, et aucune donnée n'est modifiée hors de votre poste sans votre accord pour l'exécution.
 
 ```mermaid
 flowchart LR
@@ -16,6 +16,8 @@ flowchart LR
   V -.->|"connexion à la main"| J
   J -->|"préparation et nettoyage,<br/>avec votre session"| API["API de l'application"]
   J --> R["resultats/ :<br/>rapport, captures,<br/>relevés hors de l'écran"]
+  P -->|"exporter.mjs, sans IA"| E["tests du projet<br/>@playwright/test, CI"]
+  R -->|"resultats.mjs"| XR["fichier d'import<br/>Xray, Zephyr Scale"]
 ```
 
 ## 1. Prérequis
@@ -35,9 +37,9 @@ node ~/dev/Agent2Prompt/installer.mjs
 cd ~/.gemini/skills/scenario-playwright && npm ci && npm test
 ```
 
-L'installateur pose le skill dans `~/.gemini/skills/scenario-playwright/`, avec l'agent `pilote-scenario` et les commandes `/scenario:importer`, `/scenario:indexer`, `/scenario:traduire`, `/scenario:jouer` et `/scenario:designer`. Dans une session ouverte : `/skills reload`, `/agents reload`, `/commands reload`. Sous Linux sans écran, la recette se lance par `xvfb-run -a npm test`.
+L'installateur pose le skill dans `~/.gemini/skills/scenario-playwright/`, avec l'agent `pilote-scenario` et les commandes `/scenario:importer`, `/scenario:indexer`, `/scenario:traduire`, `/scenario:jouer`, `/scenario:designer`, `/scenario:exporter` et `/scenario:resultats`. Dans une session ouverte : `/skills reload`, `/agents reload`, `/commands reload`. Sous Linux sans écran, la recette se lance par `xvfb-run -a npm test`.
 
-Sans clone, remettez à l'IA la transmission [`transmissions/scenario-playwright-1.4.0.md`](../../transmissions/scenario-playwright-1.4.0.md) : elle matérialise le skill, vérifie les empreintes, installe la dépendance et lance la recette.
+Sans clone, remettez à l'IA la transmission [`transmissions/scenario-playwright-1.5.0.md`](../../transmissions/scenario-playwright-1.5.0.md) : elle matérialise le skill, vérifie les empreintes, installe les dépendances et lance la recette. `npm ci` installe `playwright-core`, la seule dépendance du skill, et `@playwright/test`, avec lequel la recette joue les tests exportés.
 
 ## 3. Écrire le texte de départ
 
@@ -225,11 +227,41 @@ node ~/.gemini/skills/scenario-playwright/scripts/jouer.mjs scenarios/creer-clie
 
 Options utiles : `--param ville=Nice`, `--jeu 2`, `--ralenti 300` pour une démonstration, `--sans-tete` sans étape à la main, `--trace` pour la trace de Playwright (elle contient vos cookies : elle ne se partage pas).
 
-## 11. Une cible qu'on ne sait pas nommer
+## 11. Mettre le scénario dans les tests du projet
+
+Un scénario ratifié se rejoue aussi sans le skill, dans la CI de votre équipe, à côté de ses autres tests. Dans Gemini CLI : `/scenario:exporter scenarios/creer-client.toml dans e2e`. Sans l'agent :
+
+```bash
+node ~/.gemini/skills/scenario-playwright/scripts/exporter.mjs scenarios/creer-client.toml --dossier e2e
+```
+
+- Le skill écrit, sans IA, dans le dossier de tests que vous désignez, et seulement là : `e2e/creer-client.spec.ts`, un test par jeu, chaque étape en `test.step` avec son numéro et sa ligne du texte ; `e2e/scenario-playwright.aides.ts`, les aides communes, qui reprennent le comportement du skill (attentes, vérifications qui se poursuivent, préparation, nettoyage même après un échec, garde des origines) ; en TypeScript si votre projet a un `tsconfig.json` ou un `playwright.config.ts`, en JavaScript sinon, ou selon `--langage`.
+- Les étiquettes du scénario deviennent des tags du test : `@ECR-80`, la clé d'un test importé de Xray, se retrouve dans le rapport de Playwright.
+- **La connexion** : une étape à la main appelle `seConnecter`, dans `e2e/scenario-playwright.connexion.ts`. Le skill n'en pose qu'une souche, qui fait échouer le test en disant ce qui manque : votre équipe y écrit la connexion de son application, avec le compte de test et les secrets de sa CI, ou une session préparée par Playwright. Le skill n'y écrit jamais d'identifiant, et ne remplace jamais ce fichier.
+- **Ailleurs que sur le poste** : `SCENARIO_ORIGINES="http://127.0.0.1:4200=https://recette.exemple.fr,http://127.0.0.1:8080=https://api-recette.exemple.fr"` fait jouer le test contre l'environnement de recette. Un test qui y modifie des données est sauté, avec son motif, sans `SCENARIO_AUTORISER_MUTATIONS=1`, que votre équipe définit là où elle l'autorise.
+- **Le scénario reste la source** : ne retouchez pas le test. Quand le scénario change et se ratifie, `verifier.mjs e2e/creer-client.spec.ts` dit le test périmé ; `exporter.mjs … --comparer` montre ce qui changerait, `--remplacer` le régénère. Un test retouché à la main est d'abord gardé à côté (`creer-client.spec.ts.avant-20261122T081500Z`) ; un fichier que le skill n'a pas écrit n'est jamais remplacé.
+
+Puis, comme vos autres tests : `npx playwright test e2e`. Un dossier imbriqué s'écrit avec des « / », sous Windows aussi : `npx playwright test tests/e2e` ; avec des « \ », Playwright n'y trouve aucun test, et `exporter.mjs` l'écrit donc ainsi.
+
+## 12. Rendre les résultats à Xray ou à Zephyr Scale
+
+Après une exécution par le skill, pour un texte importé d'un test de Xray ou de Zephyr Scale (§ 5) :
+
+```bash
+node ~/.gemini/skills/scenario-playwright/scripts/resultats.mjs scenarios/resultats/20261122-081500-ECR-80 --format xray
+```
+
+- `xray-ECR-80.json` s'écrit à côté du rapport, sous la clé du test retenue à l'import : son statut, un commentaire avec l'étape en échec et son message, un exemple par jeu, et pour un test manuel converti dont le texte n'a pas changé depuis l'import, le statut de chacun de ses pas. Importez-le dans Xray (Import Execution Results), ou faites-le importer par qui en a le droit.
+- Pour un cas de test de Zephyr Scale, `--format zephyr` écrit `zephyr-<scénario>.json` et son archive `.zip`, au format « custom », à importer avec les résultats d'automatisation.
+- Pour un scénario que vous avez écrit vous-même, donnez la clé du test : `--cle ECR-123` (Xray) ou `--cle ECR-T123` (Zephyr Scale).
+- Les captures des étapes en échec ne s'ajoutent qu'avec `--preuves`, pour Xray : elles montrent vos écrans et leurs données.
+- Rien n'est envoyé : le skill écrit un fichier, il n'écrit jamais dans Jira, Xray ni Zephyr Scale.
+
+## 13. Une cible qu'on ne sait pas nommer
 
 `/scenario:designer http://127.0.0.1:4200/clients`, ou `node <skill>/scripts/designer.mjs <adresse>` : cliquez l'élément dans la fenêtre, le skill rend sa cible, par exemple `cible = { role = "button", nom = "Supprimer", dans = { role = "row", nom = "Martin" } }`. Le clic de désignation ne déclenche rien dans la page.
 
-## 12. Ce qui ne se négocie pas
+## 14. Ce qui ne se négocie pas
 
 - Le skill ne voit aucun identifiant : vous vous connectez vous-même, dans la fenêtre, à l'application comme à Jira.
 - Le skill n'écrit jamais dans Jira, Xray ni Zephyr Scale ; d'une demande, il ne lit que la description, les champs de texte et, si vous le demandez, les commentaires.
@@ -240,16 +272,18 @@ Options utiles : `--param ville=Nice`, `--jeu 2`, `--ralenti 300` pour une démo
 - Une préparation ou un nettoyage ne vient que d'une ligne que vous avez marquée ; un appel ne part qu'avec votre session, vers une origine du texte, une seule fois, sans suivre de redirection.
 - Hors de votre poste, une étape, un appel ou un scénario de préparation qui modifie des données n'est joué qu'avec `--autoriser-mutations`, que l'agent ne passe qu'avec votre accord, pour une exécution.
 - Le skill ne rejoue aucune étape : un échec reste un échec, à examiner.
+- Dans votre projet, le skill n'écrit que ses tests, ses aides et la souche de connexion, dans le dossier que vous désignez, sans aucun identifiant ; il ne remplace ni un fichier qu'il n'a pas écrit, ni la connexion de votre équipe, et garde un test retouché avant de le régénérer.
+- Les résultats pour Xray et Zephyr Scale sont des fichiers : rien n'est envoyé.
 - Rapports, captures, téléchargements, pages Jira enregistrées et profils restent sur votre poste.
 
-## 13. Avec les autres skills
+## 15. Avec les autres skills
 
 - [`agent-tdd-jira`](../../specs/agent-tdd-jira/SKILL.md) : ses scénarios Gherkin donnent les étiquettes, et souvent les phrases, de vos textes de départ ; écrits dans la demande, ils s'importent, et la page MHTML qu'il lit s'importe aussi.
 - [`capture-sprint-jira`](../../specs/capture-sprint-jira/SKILL.md) : ses captures MHTML des tickets d'un sprint s'importent telles quelles, sans rouvrir Jira.
 - [`agent2test`](../../specs/agent2test/SKILL.md) : son navigateur partage le vocabulaire du scénario ; la remise d'un scénario ratifié à Agent2Test est réservée.
 - [`generateur-skill-ticket`](../../specs/generateur-skill-ticket/SKILL.md) : le parcours de son kit démo, joué par ce skill, est réservé.
 
-## 14. Dépannage
+## 16. Dépannage
 
 | Constat | Conduite |
 |---|---|
@@ -287,3 +321,10 @@ Options utiles : `--param ville=Nice`, `--jeu 2`, `--ralenti 300` pour une démo
 | `non jouée : ${id_client} non obtenue` | la préparation qui gardait cette valeur a échoué : la corriger, son message dit l'attendu et l'obtenu |
 | `AVERTISSEMENT nettoyage 1 en échec` | une donnée de l'exécution peut rester : la supprimer si besoin ; le résultat du scénario n'en dépend pas |
 | `note : nettoyage d'une donnée fixe` | le nettoyage ne vise ni une valeur gardée ni `<unique>` : vérifier qu'il ne supprime pas une donnée d'avant l'exécution, avant de ratifier |
+| `connexion à écrire par l'équipe dans scenario-playwright.connexion` | le test exporté a une étape à la main : écrire la connexion dans ce fichier (§ 11) ; le skill ne le fera pas |
+| test exporté « skipped » : `SCENARIO_AUTORISER_MUTATIONS=1 pour l'autoriser` | le test modifie des données hors du poste : à décider par l'équipe, pour cet environnement |
+| `conflit  e2e/….spec.ts : ce fichier n'a pas été écrit par le skill` | un test de l'équipe porte le nom du scénario : renommer l'un ou l'autre |
+| `périmé : le scénario …, ou la version du skill, a changé` | `exporter.mjs … --comparer`, puis `--remplacer` |
+| `retouché à la main depuis l'export` | reporter la retouche dans le scénario, faire ratifier, puis `--remplacer` : la version retouchée est gardée à côté |
+| `aucune clé de test` | le texte n'a pas été importé d'un test : donner la clé par `--cle` |
+| `« ECR-80 » n'est pas une clé de cas de test Zephyr Scale` | la clé retenue est celle d'un test de Xray : `--format xray`, ou `--cle ECR-T80` |

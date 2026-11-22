@@ -2,8 +2,9 @@ name: Recette de scenario-playwright
 
 # La spécification scenario-playwright contient ses scripts, sa recette, son agent et ses commandes. Ce workflow suit
 # le chemin de l'IA du développeur, sous Linux et sous Windows : matérialiser la transmission courante, extraire les
-# fichiers par la commande du module execution, § 8, installer la dépendance par npm ci, puis lancer la recette
-# contre l'application de démonstration locale, avec le Chrome stable des images GitHub (sous écran virtuel pour Linux).
+# fichiers par la commande du module execution, § 8, installer les dépendances par npm ci, playwright-core et, pour
+# les tests exportés, @playwright/test, puis lancer la recette contre l'application de démonstration locale, avec le
+# Chrome stable des images GitHub (sous écran virtuel pour Linux).
 # La sortie de la recette s'affiche au fil de l'eau ; un pas bloqué s'arrête au bout de douze minutes. Une recette en
 # échec laisse son dossier temporaire en artefact, sans les profils du navigateur : rapports, captures, instantanés
 # ARIA et sortie de la recette, pour examiner l'échec sans le reproduire.
@@ -30,7 +31,7 @@ jobs:
   recette:
     name: recette (${{ matrix.os }}, Node ${{ matrix.node }})
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 20
+    timeout-minutes: 25
     strategy:
       fail-fast: false
       matrix:
@@ -121,7 +122,7 @@ jobs:
         working-directory: ${{ runner.temp }}\scenario-playwright
         run: call extraire.cmd
 
-      - name: Installer la dépendance
+      - name: Installer les dépendances
         shell: bash
         working-directory: ${{ runner.temp }}/scenario-playwright
         run: npm ci
@@ -129,7 +130,7 @@ jobs:
       - name: Recette sous Linux, écran virtuel
         if: runner.os != 'Windows'
         shell: bash
-        timeout-minutes: 12
+        timeout-minutes: 18
         working-directory: ${{ runner.temp }}/scenario-playwright
         run: |
           set -o pipefail
@@ -140,7 +141,7 @@ jobs:
       - name: Recette sous Windows
         if: runner.os == 'Windows'
         shell: bash
-        timeout-minutes: 12
+        timeout-minutes: 18
         working-directory: ${{ runner.temp }}/scenario-playwright
         run: |
           set -o pipefail

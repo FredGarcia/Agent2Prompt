@@ -23,7 +23,7 @@ const INSTALLATEUR = join(RACINE, 'installer.mjs');
 const OUTIL = join(RACINE, 'tools', 'installer.mjs');
 const SYSTEMES = ['agent2dev', 'agent2test', 'tension-dashboard-gitlab-agent'];
 const AGENTS = ['agents/capteur-sprint.md', 'agents/explicateur-hote.md', 'agents/memoire-appli.md', 'agents/pilote-scenario.md'];
-const COMMANDES = ['commands/hote/carte.toml', 'commands/hote/explique.toml', 'commands/hote/pourquoi.toml', 'commands/scenario/designer.toml', 'commands/scenario/importer.toml', 'commands/scenario/indexer.toml', 'commands/scenario/jouer.toml', 'commands/scenario/traduire.toml'];
+const COMMANDES = ['commands/hote/carte.toml', 'commands/hote/explique.toml', 'commands/hote/pourquoi.toml', 'commands/scenario/designer.toml', 'commands/scenario/exporter.toml', 'commands/scenario/importer.toml', 'commands/scenario/indexer.toml', 'commands/scenario/jouer.toml', 'commands/scenario/resultats.toml', 'commands/scenario/traduire.toml'];
 const SKILL_DES_COMMANDES = { hote: 'explication-hote-ia', scenario: 'scenario-playwright' };
 
 const manifeste = (nom) => JSON.parse(readFileSync(join(RACINE, 'specs', nom, 'manifest.json'), 'utf8'));
