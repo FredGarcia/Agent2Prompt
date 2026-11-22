@@ -562,7 +562,7 @@ La version 1.5.0 achève la feuille de route : l'export du scénario ratifié en
 
 ## 12. Journal de révision
 
-**1.5.0** (2026-11-22) : export en tests `@playwright/test` du projet et résultats pour Xray et Zephyr Scale. Dimension D21 active, module `export` : `scripts/export.mjs`, `scripts/aides-export.mjs`, `scripts/exporter.mjs` et `scripts/resultats.mjs` ; test écrit sans IA depuis le scénario ratifié, un test par jeu, une étape par `test.step` avec son numéro et sa ligne, cibles en localisateurs de Playwright, étiquettes en tags ; aides qui reprennent le moteur : vérifications qui se poursuivent, préparation à sa place, nettoyage dans un bloc `finally`, garde des origines, WebSocket compris, et des mutations, `SCENARIO_ORIGINES` et `SCENARIO_AUTORISER_MUTATIONS` ; connexion de l'équipe, dont le skill ne pose qu'une souche ; dossier de tests désigné seulement, fichiers reconnus à leur en-tête et à l'empreinte de leur corps, conflit, test périmé, test retouché gardé à côté, `--comparer`, `--remplacer`, TypeScript ou JavaScript ; `verifier.mjs` compare un test exporté à son scénario ; `resultats.mjs` écrit le JSON d'import de Xray, statut par pas d'un test manuel converti et exemples des jeux compris, captures sur demande, ou le format « custom » de Zephyr Scale en JSON et en archive .zip, sous la clé retenue à l'import ou celle de `--cle`, sans rien envoyer (D21.INV-1 à D21.INV-5). D1.INV-1 précisé : `@playwright/test` 1.65.1 en dépendance de développement ; D1.INV-4 étendu ; agent : export et résultats, D10.INV-8, scénarios A15 et A16, commandes `/scenario:exporter` et `/scenario:resultats`. Recette de 38 scénarios (570 contrôles), où les tests exportés sont joués par `@playwright/test` 1.65.1 contre l'application de démonstration et comparés au skill étape par étape : R35 à R38 ; 119 défauts réintroduits, tous rejoués. Archive : `archives/SKILL-v1.4.0.md`.
+**1.5.0** (2026-11-22) : export en tests `@playwright/test` du projet et résultats pour Xray et Zephyr Scale. Dimension D21 active, module `export` : `scripts/export.mjs`, `scripts/aides-export.mjs`, `scripts/exporter.mjs` et `scripts/resultats.mjs` ; test écrit sans IA depuis le scénario ratifié, un test par jeu, une étape par `test.step` avec son numéro et sa ligne, cibles en localisateurs de Playwright, étiquettes en tags ; aides qui reprennent le moteur : vérifications qui se poursuivent, préparation à sa place, nettoyage dans un bloc `finally`, garde des origines, WebSocket compris, et des mutations, `SCENARIO_ORIGINES` et `SCENARIO_AUTORISER_MUTATIONS` ; connexion de l'équipe, dont le skill ne pose qu'une souche ; dossier de tests désigné seulement, fichiers reconnus à leur en-tête et à l'empreinte de leur corps, conflit, test périmé, test retouché gardé à côté, `--comparer`, `--remplacer`, TypeScript ou JavaScript ; `verifier.mjs` compare un test exporté à son scénario ; `resultats.mjs` écrit le JSON d'import de Xray, statut par pas d'un test manuel converti et exemples des jeux compris, captures sur demande, ou le format « custom » de Zephyr Scale en JSON et en archive .zip, sous la clé retenue à l'import ou celle de `--cle`, sans rien envoyer (D21.INV-1 à D21.INV-5). D1.INV-1 précisé : `@playwright/test` 1.65.1 en dépendance de développement ; D1.INV-4 étendu ; agent : export et résultats, D10.INV-8, scénarios A15 et A16, commandes `/scenario:exporter` et `/scenario:resultats`. Recette de 38 scénarios (570 contrôles), où les tests exportés sont joués par `@playwright/test` 1.65.1 contre l'application de démonstration et comparés au skill étape par étape : R35 à R38 ; 158 défauts réintroduits, tous rejoués. Archive : `archives/SKILL-v1.4.0.md`.
 
 **1.4.0** (2026-11-22) : préparation et nettoyage des données. Dimension D20 active, module `donnees` : marques `(par l'API)`, `(nettoyage par l'API)`, `(préparation : nom)` et `(nettoyage : nom)` du texte, à leur place ; sections `[[preparation]]` et `[[nettoyage]]` du scénario, hors du jeu d'actions ; appels d'écriture `POST`, `PUT`, `PATCH` et `DELETE` vers une origine déclarée, avec la session du navigateur et le jeton anti-CSRF recopié de son cookie, une fois, sans redirection suivie, corps JSON ou fichier `.json`, statut attendu, valeurs gardées de la réponse, `${unique}` ; scénario de préparation ratifié joué dans le même onglet ; préparation à sa place, nettoyage après les étapes même après un échec, nettoyage en échec signalé sans changer le statut ; garde des mutations avant le navigateur et à l'appel ; entrées au rapport (D20.INV-1 à D20.INV-6, E1, E2). Index : classes de corps des endpoints, Java, Kotlin et OpenAPI, avec leurs champs, et corps des opérations OpenAPI ; le squelette propose, pour une ligne de préparation, les endpoints d'écriture et les champs de leur corps avec leurs contraintes (D18.INV-4). D2.INV-2 étendu ; agent : traduction de la préparation, examen d'un nettoyage d'une donnée fixe, D10.INV-7, scénarios A13 et A14. Recette de 34 scénarios (522 contrôles), avec une API d'écriture à session et jeton anti-CSRF sur l'application de démonstration : R30 à R34 ; 119 défauts réintroduits, tous rejoués. Archive : `archives/SKILL-v1.3.0.md`.
 
@@ -733,12 +733,12 @@ Les options, la sortie et les codes de `indexer.mjs` sont au module `code`, § 2
 | `commandes/scenario/resultats.toml` | `agent`, § 7 | `45c82c61a6eb347533fed303ded580b19f2116d1e4028e4d0cf28d12ee071746` |
 | `tests/application-demo.mjs` | `recette`, § 6 | `c89f6bfd6571f352fb10998e0be6c16e59345ec2e5bdb96b2887eeae403fcf63` |
 | `tests/projet-demo.mjs` | `recette`, § 6 | `442a614f8cb6377689fc2793160d25e082c96162992c2134e58f77f52e1ee592` |
-| `tests/run-tests.mjs` | `recette`, § 6 | `91ebc8e62310239ee0b83862230782cd67491809ed819cfc55ff13651a663253` |
+| `tests/run-tests.mjs` | `recette`, § 6 | `e10dd6c480fabc1affbeec493f9b1a0f98519befc711d239bc09832505213354` |
 
 Depuis le dossier du skill, cette commande d'une ligne écrit les trente-cinq fichiers, compare leurs empreintes à celles du tableau et sort avec le code 1 au moindre écart. Elle ne contient ni `$`, ni accent grave, ni `!`, ni `%`, ni guillemet intérieur : elle se colle telle quelle dans bash, zsh, CMD ou PowerShell, et dans un fichier `.cmd`. Elle lit aussi des modules aux fins de ligne CRLF.
 
 ```text
-node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'package.json': 'eaa21f182e61223097ce08e4bd601a2bd8057a80c734ff1f073abac70bb7c4de', 'package-lock.json': '84991c7c5066e74034523ff60bdaceaa596126aa57e42cef5dfb5e6d63209454', '.gitignore': '03bf7f97f17a0d1abb005b6480ec3b0f06a0b9c29c1d1f83131209b52b888a7e', 'scripts/jouer.mjs': '915a69e15d38a0d82581f7d7ce8858540d830586e500a9e252bb5e0bb74de351', 'scripts/verifier.mjs': '2a1c092c7eb25aee1d29e3e903d217bf3691d648dc7a137f1d4ce27885080fcc', 'scripts/traduire.mjs': '69f25e25e85a6f02b0be919265614f9b17c8255f47a48f3bea32bb6cff787c6d', 'scripts/texte.mjs': '6bec7f0bc4e6bc3ca2481c2fd65b31c64a6ce4816f490bfc91916fa856d7d192', 'scripts/jira.mjs': 'c2c2bd62866846dd6aef82d2c3675d0cf5bfbe0c436a2f684efeb424c07d46fc', 'scripts/importer.mjs': 'd2ac3f05eba99bcd80b70332834ea12ab3a42e91c4ada74aaf2b9289f437eaf5', 'scripts/cas.mjs': '21ec9b12981904b6de45058ede12a314a4a8eb9b82bad7b92de311555bf6196f', 'scripts/lecteurs.mjs': '9a5eabe58462ec065abea985fac91395b6017e1f1f64f1bbd66bec9b25c5f8ef', 'scripts/code.mjs': '2f4c7f7638f5f6f8369c545ac4f97a21ea0d7565f0bd543d2bf14ea918c56e9a', 'scripts/indexer.mjs': '7f6c77a9580822d3ba442b4ed8bf855e33cb7a0bfc3373eaaadd0285d460dd77', 'scripts/toml.mjs': '2649421a76faa73d7bc55b81dd2d0a650a0d0b1ad9a36321f1afa051bc608bed', 'scripts/scenario.mjs': 'd814fb17fb29137f3ba1516d28a0e546ff6e4a9e8606db531a4006fdceeda0af', 'scripts/cibles.mjs': 'b4ee83a7acdd058b05658e79d83701a8e5fdfdcb524c5dca111739afe59697eb', 'scripts/moteur.mjs': '5cbb20b540a781c22f7dab56ea34e1c2ef7aa7014d90f66f98c8d9e9a94512fb', 'scripts/session.mjs': '81ffd2c536e33d9b18c4d3bcb158166b24a4b9af5bae38deea863b3f554e4152', 'scripts/rapport.mjs': '2ea8354c3e493673e60d0abf6bc0c8c67818cc31471ea13551e98d8798d17302', 'scripts/designer.mjs': '60cb39aa609b24ec4f118b43ad59b193ec4455cd32786fbe7345b84c3ee8bd18', 'scripts/export.mjs': '47c58ade612d0d7461b3eea011acd27db1eceae8d8c8a4a64729e5ef1b0bffa6', 'scripts/aides-export.mjs': 'b501fc0f89be06a74ab83abec38163f680f049ea0bf226111bd9ffd9fc6eaf85', 'scripts/exporter.mjs': 'd4def76e8150fa2c4f53399db2f275a96d05230b48b979a83762aab3e6925a5d', 'scripts/resultats.mjs': 'f6ab85a2effc28aa78066b16b3d38f4c1a79bf5903ceadf27caa234c9052235b', 'agent/pilote-scenario.md': 'd8fcfb3e2c2ea6325a1550771667d63239ea76eb828dc7f9ba9f0c6cd4261d66', 'commandes/scenario/importer.toml': '4a201b5f3a199c99f9b0590950df7d2d9455c2eeb07342860c1bd50520e7dcf6', 'commandes/scenario/indexer.toml': '33816be39eede8b2755518c9724033ae1fd9a4be66cb1e903426fca1e5cf5c69', 'commandes/scenario/traduire.toml': 'e6b588b5ec60d3c24861de8a5c0dc2aa12a16821c26ee53dba5881060df39bd8', 'commandes/scenario/jouer.toml': 'ba96e1465a86220c3c12fb0d13d0c61cb31e90b77e11480988eb2e2dfa88cc3b', 'commandes/scenario/designer.toml': '67f9c67d85ec6331f574e20a75574d4e27f1daf971dcda05985b652bdb6f11e7', 'commandes/scenario/exporter.toml': '21da6c8059edd38a8603eb9e505c860c73d1b339bbfc20599c506ee44f1ab683', 'commandes/scenario/resultats.toml': '45c82c61a6eb347533fed303ded580b19f2116d1e4028e4d0cf28d12ee071746', 'tests/application-demo.mjs': 'c89f6bfd6571f352fb10998e0be6c16e59345ec2e5bdb96b2887eeae403fcf63', 'tests/projet-demo.mjs': '442a614f8cb6377689fc2793160d25e082c96162992c2134e58f77f52e1ee592', 'tests/run-tests.mjs': '91ebc8e62310239ee0b83862230782cd67491809ed819cfc55ff13651a663253' }; const vus = new Set(); let ecarts = 0; for (const module of ['modules/execution/SKILL.md', 'modules/texte/SKILL.md', 'modules/jira/SKILL.md', 'modules/cas-de-test/SKILL.md', 'modules/code/SKILL.md', 'modules/scenario/SKILL.md', 'modules/cibles/SKILL.md', 'modules/actions/SKILL.md', 'modules/session/SKILL.md', 'modules/preuves/SKILL.md', 'modules/designer/SKILL.md', 'modules/export/SKILL.md', 'modules/agent/SKILL.md', 'modules/recette/SKILL.md']) { const texte = fs.readFileSync(module, 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); vus.add(m[1]); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (conforme === false) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } } for (const f of Object.keys(attendu)) if (vus.has(f) === false) { ecarts++; console.log('ABSENT    ' + f); } if (ecarts > 0) process.exitCode = 1;"
+node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'package.json': 'eaa21f182e61223097ce08e4bd601a2bd8057a80c734ff1f073abac70bb7c4de', 'package-lock.json': '84991c7c5066e74034523ff60bdaceaa596126aa57e42cef5dfb5e6d63209454', '.gitignore': '03bf7f97f17a0d1abb005b6480ec3b0f06a0b9c29c1d1f83131209b52b888a7e', 'scripts/jouer.mjs': '915a69e15d38a0d82581f7d7ce8858540d830586e500a9e252bb5e0bb74de351', 'scripts/verifier.mjs': '2a1c092c7eb25aee1d29e3e903d217bf3691d648dc7a137f1d4ce27885080fcc', 'scripts/traduire.mjs': '69f25e25e85a6f02b0be919265614f9b17c8255f47a48f3bea32bb6cff787c6d', 'scripts/texte.mjs': '6bec7f0bc4e6bc3ca2481c2fd65b31c64a6ce4816f490bfc91916fa856d7d192', 'scripts/jira.mjs': 'c2c2bd62866846dd6aef82d2c3675d0cf5bfbe0c436a2f684efeb424c07d46fc', 'scripts/importer.mjs': 'd2ac3f05eba99bcd80b70332834ea12ab3a42e91c4ada74aaf2b9289f437eaf5', 'scripts/cas.mjs': '21ec9b12981904b6de45058ede12a314a4a8eb9b82bad7b92de311555bf6196f', 'scripts/lecteurs.mjs': '9a5eabe58462ec065abea985fac91395b6017e1f1f64f1bbd66bec9b25c5f8ef', 'scripts/code.mjs': '2f4c7f7638f5f6f8369c545ac4f97a21ea0d7565f0bd543d2bf14ea918c56e9a', 'scripts/indexer.mjs': '7f6c77a9580822d3ba442b4ed8bf855e33cb7a0bfc3373eaaadd0285d460dd77', 'scripts/toml.mjs': '2649421a76faa73d7bc55b81dd2d0a650a0d0b1ad9a36321f1afa051bc608bed', 'scripts/scenario.mjs': 'd814fb17fb29137f3ba1516d28a0e546ff6e4a9e8606db531a4006fdceeda0af', 'scripts/cibles.mjs': 'b4ee83a7acdd058b05658e79d83701a8e5fdfdcb524c5dca111739afe59697eb', 'scripts/moteur.mjs': '5cbb20b540a781c22f7dab56ea34e1c2ef7aa7014d90f66f98c8d9e9a94512fb', 'scripts/session.mjs': '81ffd2c536e33d9b18c4d3bcb158166b24a4b9af5bae38deea863b3f554e4152', 'scripts/rapport.mjs': '2ea8354c3e493673e60d0abf6bc0c8c67818cc31471ea13551e98d8798d17302', 'scripts/designer.mjs': '60cb39aa609b24ec4f118b43ad59b193ec4455cd32786fbe7345b84c3ee8bd18', 'scripts/export.mjs': '47c58ade612d0d7461b3eea011acd27db1eceae8d8c8a4a64729e5ef1b0bffa6', 'scripts/aides-export.mjs': 'b501fc0f89be06a74ab83abec38163f680f049ea0bf226111bd9ffd9fc6eaf85', 'scripts/exporter.mjs': 'd4def76e8150fa2c4f53399db2f275a96d05230b48b979a83762aab3e6925a5d', 'scripts/resultats.mjs': 'f6ab85a2effc28aa78066b16b3d38f4c1a79bf5903ceadf27caa234c9052235b', 'agent/pilote-scenario.md': 'd8fcfb3e2c2ea6325a1550771667d63239ea76eb828dc7f9ba9f0c6cd4261d66', 'commandes/scenario/importer.toml': '4a201b5f3a199c99f9b0590950df7d2d9455c2eeb07342860c1bd50520e7dcf6', 'commandes/scenario/indexer.toml': '33816be39eede8b2755518c9724033ae1fd9a4be66cb1e903426fca1e5cf5c69', 'commandes/scenario/traduire.toml': 'e6b588b5ec60d3c24861de8a5c0dc2aa12a16821c26ee53dba5881060df39bd8', 'commandes/scenario/jouer.toml': 'ba96e1465a86220c3c12fb0d13d0c61cb31e90b77e11480988eb2e2dfa88cc3b', 'commandes/scenario/designer.toml': '67f9c67d85ec6331f574e20a75574d4e27f1daf971dcda05985b652bdb6f11e7', 'commandes/scenario/exporter.toml': '21da6c8059edd38a8603eb9e505c860c73d1b339bbfc20599c506ee44f1ab683', 'commandes/scenario/resultats.toml': '45c82c61a6eb347533fed303ded580b19f2116d1e4028e4d0cf28d12ee071746', 'tests/application-demo.mjs': 'c89f6bfd6571f352fb10998e0be6c16e59345ec2e5bdb96b2887eeae403fcf63', 'tests/projet-demo.mjs': '442a614f8cb6377689fc2793160d25e082c96162992c2134e58f77f52e1ee592', 'tests/run-tests.mjs': 'e10dd6c480fabc1affbeec493f9b1a0f98519befc711d239bc09832505213354' }; const vus = new Set(); let ecarts = 0; for (const module of ['modules/execution/SKILL.md', 'modules/texte/SKILL.md', 'modules/jira/SKILL.md', 'modules/cas-de-test/SKILL.md', 'modules/code/SKILL.md', 'modules/scenario/SKILL.md', 'modules/cibles/SKILL.md', 'modules/actions/SKILL.md', 'modules/session/SKILL.md', 'modules/preuves/SKILL.md', 'modules/designer/SKILL.md', 'modules/export/SKILL.md', 'modules/agent/SKILL.md', 'modules/recette/SKILL.md']) { const texte = fs.readFileSync(module, 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); vus.add(m[1]); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (conforme === false) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } } for (const f of Object.keys(attendu)) if (vus.has(f) === false) { ecarts++; console.log('ABSENT    ' + f); } if (ecarts > 0) process.exitCode = 1;"
 ```
 
 Puis, depuis le même dossier : `npm ci`, et la recette, `npm test` (sous Linux sans écran, `xvfb-run -a npm test`).
@@ -11400,11 +11400,11 @@ Cent cinquante-huit défauts, réintroduits un à un dans le code, font chacun �
 | M2 | Les WebSocket ne sont pas gardés | R7 | 3 |
 | M3 | Pas de refus avant le navigateur d'un scénario qui modifie des données hors du poste | R8, R30 | 2 |
 | M4 | Pas de garde à l'étape de mutation | R8 | 1 |
-| M5 | L'empreinte du texte n'est pas contrôlée | R3, R20 | 2 |
+| M5 | L'empreinte du texte n'est pas contrôlée | R3, R20, R35 | 4 |
 | M6 | Une ligne du texte peut rester sans étape | R3 | 1 |
 | M7 | Une marque de mutation du texte peut se perdre | R3 | 1 |
-| M8 | Une vérification échouée arrête les vérifications suivantes | R6, R28, R29 | 9 |
-| M9 | Une étape échouée n'arrête pas la suite | R6, R7 | 2 |
+| M8 | Une vérification échouée arrête les vérifications suivantes | R6, R28, R29, R36 | 10 |
+| M9 | Une étape échouée n'arrête pas la suite | R6, R7, R36 | 3 |
 | M10 | Délai de 30 s pour toute étape, sans tenir compte des réglages | R6, R9, R11 | 4 |
 | M11 | Une étape à la main est acceptée sans fenêtre | R9, R30 | 2 |
 | M12 | Une variable non déclarée est acceptée | R2, R30 | 2 |
@@ -11413,9 +11413,9 @@ Cent cinquante-huit défauts, réintroduits un à un dans le code, font chacun �
 | M15 | Une cible ambiguë agit sur le premier élément | R5, R6, R29 | 13 |
 | M16 | Pas de capture pour une vérification | R5, R10, R34 | 3 |
 | M17 | Navigateur ancien de trois versions accepté sans avertissement | R14 | 1 |
-| M18 | Champ origines_bloquees du rapport renommé | R5 | 5 |
+| M18 | Champ origines_bloquees du rapport renommé | R5, R6, R7, R8, R9, R10, R11, R14, R16, R17, R20, R28, R29, R32, R33, R34, R36, R38 | 103 |
 | M19 | Une étape main est acceptée sur une ligne non marquée | R3 | 1 |
-| M20 | La désignation clique l'élément désigné | R13 | 1 |
+| M20 | La désignation clique l'élément désigné | R13 | 3 |
 | M21 | Les commentaires de Jira Cloud sont lus sans --commentaires | R18, R20 | 8 |
 | M22 | Un texte modifié dans Jira est remplacé sans --remplacer | R20, R23 | 5 |
 | M23 | Un texte écrit à la main est remplacé par un texte importé du même nom | R20, R23 | 4 |
@@ -11431,7 +11431,7 @@ Cent cinquante-huit défauts, réintroduits un à un dans le code, font chacun �
 | M33 | Le jeton passe dans l'adresse de la requête | R25 | 1 |
 | M34 | L'import écrit dans Jira : une étiquette ajoutée au test | R25 | 1 |
 | M35 | Une requête GraphQL de mutation part vers Xray Cloud | R25 | 1 |
-| M36 | Le résultat attendu d'un pas manuel est perdu | R23, R24 | 2 |
+| M36 | Le résultat attendu d'un pas manuel est perdu | R23, R24, R36, R38 | 21 |
 | M37 | L'étiquette @TestCaseKey= de Zephyr Scale n'est pas reconnue | R22 | 2 |
 | M38 | Une clé portée par des scénarios de titres différents devient leur identité | R22 | 5 |
 | M39 | Le même test, lu d'un autre chemin d'import, est en conflit avec son texte | R22, R23 | 5 |
@@ -11450,21 +11450,21 @@ Cent cinquante-huit défauts, réintroduits un à un dans le code, font chacun �
 | M52 | Une proposition de l'index entre dans le squelette hors commentaire | R27 | 3 |
 | M53 | Une cible absente de l'index fait échouer le contrôle | R27 | 2 |
 | M54 | Le relevé d'une requête garde ses en-têtes | R28 | 2 |
-| M55 | Un jeton de l'adresse d'une requête n'est pas masqué | R28, R29, R32 | 8 |
+| M55 | Un jeton de l'adresse d'une requête n'est pas masqué | R28, R29, R32, R36 | 9 |
 | M56 | Le corps d'une requête faite pendant une étape à la main est relevé | R28 | 1 |
 | M57 | Une vérification api suit les redirections | R29 | 2 |
 | M58 | Une vérification api accepte une autre méthode que GET | R29 | 1 |
 | M59 | Le chemin d'une vérification requete ou api peut viser une origine non déclarée | R28, R29 | 3 |
-| M60 | La fenêtre des requêtes vérifiées ne part pas de la dernière action | R28 | 1 |
+| M60 | La fenêtre des requêtes vérifiées ne part pas de la dernière action | R28, R36 | 2 |
 | M61 | Les champs attendus du corps d'une requête ne sont pas comparés | R28 | 2 |
 | M62 | Pas de borne de taille de la réponse d'une vérification api | R29 | 1 |
 | M63 | La colonne CSV se cherche en tenant compte de la casse | R29 | 1 |
 | M64 | Le statut reçu d'une réponse interrompue est perdu | R28 | 5 |
 | M65 | Les réponses JSON des requêtes ne sont pas lues | R28 | 2 |
 | M66 | Le séparateur d'un CSV n'est pas deviné | R29 | 2 |
-| M67 | Le jeton anti-CSRF n'est pas recopié dans l'en-tête d'un appel | R32 | 9 |
+| M67 | Le jeton anti-CSRF n'est pas recopié dans l'en-tête d'un appel | R32, R33, R36 | 20 |
 | M68 | Le cookie csrftoken de Django n'est pas recopié | R32 | 1 |
-| M69 | Le corps d'un appel part sans Content-Type JSON | R32 | 9 |
+| M69 | Le corps d'un appel part sans Content-Type JSON | R32, R33, R36 | 16 |
 | M70 | Un appel de préparation suit une redirection | R32 | 1 |
 | M71 | Pas de garde à l'appel de préparation hors du poste | R34 | 1 |
 | M72 | Un appel en échec est rejoué | R33, R34 | 3 |
@@ -11472,16 +11472,16 @@ Cent cinquante-huit défauts, réintroduits un à un dans le code, font chacun �
 | M74 | Une valeur gardée peut être un objet de la réponse | R32 | 1 |
 | M75 | Une valeur absente de la réponse est gardée | R32 | 1 |
 | M76 | Une valeur gardée au nom de secret n'est pas masquée dans le rapport | R32 | 1 |
-| M77 | Une préparation en échec n'arrête pas les étapes | R32, R33, R34 | 8 |
-| M78 | Toute la préparation se joue avant la première étape, même à la main | R32 | 10 |
+| M77 | Une préparation en échec n'arrête pas les étapes | R32, R33, R34, R36 | 10 |
+| M78 | Toute la préparation se joue avant la première étape, même à la main | R32, R33, R36, R37 | 25 |
 | M79 | Une entrée dont une valeur gardée manque est jouée | R32, R33 | 2 |
-| M80 | Le nettoyage ne se joue pas après un échec | R32, R33, R34 | 4 |
+| M80 | Le nettoyage ne se joue pas après un échec | R32, R33, R34, R36 | 8 |
 | M81 | Un nettoyage en échec arrête les nettoyages suivants | R33 | 1 |
-| M82 | Un nettoyage en échec change le statut du jeu | R33 | 1 |
+| M82 | Un nettoyage en échec change le statut du jeu | R33, R36 | 3 |
 | M83 | Un scénario de préparation en échec ne fait pas échouer son entrée | R34 | 1 |
 | M84 | Un appel de préparation ou de nettoyage ne compte pas pour la garde des mutations | R30, R34 | 4 |
 | M85 | Un scénario de préparation qui modifie des données ne compte pas pour la garde | R34 | 1 |
-| M86 | La mutation d'un appel DELETE n'est pas une suppression | R30, R32 | 4 |
+| M86 | La mutation d'un appel DELETE n'est pas une suppression | R30, R32, R35 | 5 |
 | M87 | Une préparation accepte une lecture GET | R30 | 1 |
 | M88 | Le chemin d'une préparation peut viser une origine non déclarée | R30 | 1 |
 | M89 | Un corps_fichier hors du dossier du scénario est accepté | R30 | 1 |
@@ -11496,13 +11496,13 @@ Cent cinquante-huit défauts, réintroduits un à un dans le code, font chacun �
 | M98 | Un scénario de préparation peut avoir sa propre préparation ou son nettoyage | R30 | 1 |
 | M99 | Un paramètre inconnu du scénario de préparation est accepté | R30 | 1 |
 | M100 | Tous les jeux d'une exécution reçoivent le même ${unique} | R30, R33 | 2 |
-| M101 | Le scénario de préparation ne reçoit pas le ${unique} du jeu | R30 | 1 |
-| M102 | <unique> d'un exemple n'est pas remplacé | R30 | 1 |
-| M103 | Aucune valeur n'est gardée de la réponse d'une préparation | R32, R33 | 13 |
+| M101 | Le scénario de préparation ne reçoit pas le ${unique} du jeu | R30, R36 | 4 |
+| M102 | `<unique>` d'un exemple n'est pas remplacé | R30, R36, R38 | 7 |
+| M103 | Aucune valeur n'est gardée de la réponse d'une préparation | R32, R33, R36 | 17 |
 | M104 | Un jeton du chemin d'un appel n'est pas masqué dans son résumé | R32 | 1 |
 | M105 | Une préparation peut suivre les étapes ordinaires | R30 | 1 |
 | M106 | La marque (nettoyage par l’API), à l'apostrophe typographique, n'est pas reconnue | R30 | 4 |
-| M107 | <unique> est accepté comme paramètre du texte | R30 | 1 |
+| M107 | `<unique>` est accepté comme paramètre du texte | R30 | 1 |
 | M108 | L'index garde toutes les classes, pas seulement celles des corps | R26, R31 | 3 |
 | M109 | Un endpoint proposé entre dans le squelette hors commentaire | R31 | 3 |
 | M110 | Un endpoint de lecture est proposé pour une préparation | R31 | 2 |
@@ -11515,6 +11515,45 @@ Cent cinquante-huit défauts, réintroduits un à un dans le code, font chacun �
 | M117 | Une étape à la main d'un scénario de préparation est acceptée sans fenêtre | R30 | 1 |
 | M118 | Un nettoyage par une variable dont chaque valeur contient ${unique} est noté comme fixe | R30 | 1 |
 | M119 | Une valeur gardée secrète réemployée par une étape ou un appel n'est pas masquée | R32 | 2 |
+| M120 | Un test exporté lit une valeur gardée parmi les valeurs du jeu | R36 | 5 |
+| M121 | Un test exporté perd exact de ses cibles | R35 | 2 |
+| M122 | Un test exporté perd le rang de ses cibles | R35 | 1 |
+| M123 | Un test exporté perd dans de ses cibles | R35 | 1 |
+| M124 | Un test exporté ne joue que le premier jeu | R35, R36 | 4 |
+| M125 | Les étiquettes du scénario ne deviennent pas des tags | R35, R36 | 2 |
+| M126 | Le nettoyage d'un test exporté ne se joue pas après un échec | R36, R37 | 4 |
+| M127 | Une vérification exportée en échec arrête les vérifications suivantes | R35, R36 | 2 |
+| M128 | Une étape exportée perd sa marque de mutation | R35 | 1 |
+| M129 | Un test retouché à la main est tenu pour périmé | R35 | 1 |
+| M130 | Un fichier qui n'est pas du skill est tenu pour un test périmé | R35 | 1 |
+| M131 | Le tsconfig.json du projet ne fait pas reconnaître TypeScript | R35, R37 | 7 |
+| M132 | Verifier.mjs ne dit pas périmé un test exporté dont le scénario a changé | R35 | 1 |
+| M133 | Exporter.mjs écrit hors du dossier désigné | R35, R36, R37 | 32 |
+| M134 | Un test périmé est remplacé sans --remplacer | R35 | 3 |
+| M135 | Un test retouché est remplacé sans être gardé à côté | R35 | 1 |
+| M136 | La connexion écrite par l'équipe est remplacée par la souche | R35, R36 | 6 |
+| M137 | Verifier.mjs sort avec 0 pour un test exporté périmé ou retouché | R35 | 2 |
+| M138 | Un test exporté qui modifie des données n'est pas sauté hors du poste | R37 | 1 |
+| M139 | SCENARIO_ORIGINES n'est pas lu | R37 | 2 |
+| M140 | Un test exporté laisse partir toute requête | R37 | 1 |
+| M141 | L'action qui suit une vérification exportée en échec est jouée | R36 | 1 |
+| M142 | Un test exporté dont la dernière vérification échoue réussit | R36 | 2 |
+| M143 | Un nettoyage exporté en échec fait échouer le test | R36 | 3 |
+| M144 | Un nettoyage exporté dont une valeur gardée manque est joué | R37 | 1 |
+| M145 | Un appel exporté ne recopie pas le jeton anti-CSRF | R36 | 4 |
+| M146 | ${unique} est le même pour tous les jeux d'un test exporté | R36 | 3 |
+| M147 | `<unique>` d'un jeu n'est pas remplacé dans un test exporté | R36 | 3 |
+| M148 | Les pas d'un texte retouché depuis l'import ont un statut | R38 | 1 |
+| M149 | Les captures s'ajoutent sans --preuves | R38 | 1 |
+| M150 | --cle ne l'emporte pas sur la clé retenue à l'import | R38 | 1 |
+| M151 | La forme de la clé n'est pas contrôlée | R38 | 1 |
+| M152 | Zephyr Scale reçoit Passed pour une exécution en échec | R38 | 1 |
+| M153 | Le scénario joué n'est cherché que dans le dossier du rapport | R38 | 5 |
+| M154 | Chaque ligne du texte devient un pas de Xray | R38 | 2 |
+| M155 | Un test exporté ne masque pas un paramètre secret d'une adresse | R36 | 1 |
+| M156 | Un test exporté laisse passer tout WebSocket | R37 | 1 |
+| M157 | Deux scénarios qui donnent le même test sont exportés | R35 | 2 |
+| M158 | `<unique>` des paramètres d'un scénario de préparation n'est pas remplacé dans un test exporté | R36 | 6 |
 
 Chaque défaut a été retiré après son essai ; la recette du code publié passe en entier.
 
@@ -13167,9 +13206,9 @@ nom = "export"
       const tel = e.find((x) => x.action === 'telecharger')?.telechargement;
       controle('téléchargement enregistré avec son empreinte (D5.INV-5)', tel && tel.fichier === 'telechargements/export.csv' && tel.propose === 'clients.csv' && sha(join(r.dossier, tel.fichier)) === tel.sha256 && /Zoé Martin;Marseille/.test(readFileSync(join(r.dossier, tel.fichier), 'utf8')), JSON.stringify(tel));
       controle('chaque étape a sa durée, son résumé et sa cible', e.every((x) => Number.isInteger(x.duree_ms) && x.resume) && e[1]?.cible === "getByRole('button', { name: 'Menu' })");
-      controle('cible CSS signalée fragile dans le rapport (D4.INV-1)', r.rapport?.cibles_fragiles.includes("locator('#etat')") && e[18].fragile === true);
-      controle('navigateur, version et playwright-core notés (D6.INV-1)', r.rapport?.navigateur.canal === canal && /^\d+\./.test(r.rapport?.navigateur.version ?? '') && r.rapport?.navigateur.playwright_core === '1.65.1');
-      controle('attente bornée qui s\'arrête dès l\'état obtenu (D5.INV-2)', e[17].duree_ms >= 500 && e[17].duree_ms < 4000, `${e[17].duree_ms} ms`);
+      controle('cible CSS signalée fragile dans le rapport (D4.INV-1)', r.rapport?.cibles_fragiles?.includes("locator('#etat')") && e[18]?.fragile === true);
+      controle('navigateur, version et playwright-core notés (D6.INV-1)', r.rapport?.navigateur?.canal === canal && /^\d+\./.test(r.rapport?.navigateur?.version ?? '') && r.rapport?.navigateur?.playwright_core === '1.65.1');
+      controle('attente bornée qui s\'arrête dès l\'état obtenu (D5.INV-2)', e[17]?.duree_ms >= 500 && e[17]?.duree_ms < 4000, `${e[17]?.duree_ms} ms`);
     }
 
     // ------------------------------------------------------------------------------------------
@@ -13239,7 +13278,7 @@ nom = "export"
           const journal = await session.garderOrigines(ctx, sc.origines);
           const joues = await moteur.jouerScenario(ctx, { scenario: sc, jeux, resultats: dossier, journal, delai: 10, autoriserMutations: false });
           const e = joues[0].etapes;
-          controle('garde à l\'étape par l\'API : mutation sur une page hors du poste refusée, sans action', e[1].statut === 'echec' && /hors du poste, sans --autoriser-mutations : aucune action faite/.test(e[1].message) && app.etat.compteur === avant + 1, JSON.stringify(e[1]));
+          controle('garde à l\'étape par l\'API : mutation sur une page hors du poste refusée, sans action', e[1]?.statut === 'echec' && /hors du poste, sans --autoriser-mutations : aucune action faite/.test(e[1].message) && app.etat.compteur === avant + 1, JSON.stringify(e[1]));
         } finally {
           await fermer(ctx);
         }
@@ -13272,7 +13311,7 @@ nom = "export"
       const r2 = await jouer(chemin, ['--param', 'pays=FR']);
       controle('--param inconnu : code 2', r2.code === 2 && /--param pays/.test(r2.erreurs));
       const r3 = await jouer(chemin, ['--jeu', '2']);
-      controle('--jeu 2 : le seul jeu 2', r3.code === 0 && r3.rapport?.jeux.length === 1 && r3.rapport?.jeux[0].numero === 2);
+      controle('--jeu 2 : le seul jeu 2', r3.code === 0 && r3.rapport?.jeux.length === 1 && r3.rapport?.jeux[0]?.numero === 2);
       const r4 = await jouer(chemin, ['--jeu', '3']);
       controle('--jeu 3 : code 2', r4.code === 2);
     }
@@ -14195,23 +14234,23 @@ Fonctionnalité: Clients
       controle('jeton de Django : cookie csrftoken recopié dans X-CSRFToken', r2.code === 0 && nd.length === 2 && nd.every((x) => x.csrf === 'X-CSRFToken'), r2.sortie + JSON.stringify(nd));
       const r3 = await jouer(ecrire('r32', 'sans-session.toml', `${tete32('Sans session', 'r32-sans')}${prep32('methode = "POST"\nchemin = "/api/donnees/clients"\ncorps = { nom = "X" }\ngarder = { id_client = "id" }')}${etape32('action = "naviguer"\nurl = "/"')}${nett32('methode = "DELETE"\nchemin = "/api/donnees/clients/${id_client}"')}`));
       const j3 = r3.rapport?.jeux[0];
-      controle('sans session : 401 avec la conduite à tenir ; étapes non jouées, code 1 (D20.INV-2)', r3.code === 1 && j3?.preparation[0].statut === 'echec' && j3.preparation[0].message === `POST ${base}/api/donnees/clients : attendu : un statut 2xx ; obtenu : statut 401 (l'API ne reconnaît pas la session du navigateur : se connecter à la main avant la préparation, ou, pour une API à jeton, préparer par un scénario (module donnees))` && j3.etapes[0].statut === 'non_jouee' && j3.etapes[0].message === 'non jouée : la préparation 1 a échoué', JSON.stringify(j3));
-      controle('nettoyage d\'une valeur non obtenue : non joué (D20.INV-4) ; avant la première adresse, aucune page à montrer en preuve (D8.INV-2)', j3?.nettoyage[0].statut === 'non_jouee' && j3.nettoyage[0].message === "non jouée : ${id_client} non obtenue, sa préparation n'a pas abouti (D20.INV-4)" && j3.preparation[0].capture === null && j3.preparation[0].aria === null, JSON.stringify([j3?.preparation[0], j3?.nettoyage[0]]));
+      controle('sans session : 401 avec la conduite à tenir ; étapes non jouées, code 1 (D20.INV-2)', r3.code === 1 && j3?.preparation[0]?.statut === 'echec' && j3.preparation[0].message === `POST ${base}/api/donnees/clients : attendu : un statut 2xx ; obtenu : statut 401 (l'API ne reconnaît pas la session du navigateur : se connecter à la main avant la préparation, ou, pour une API à jeton, préparer par un scénario (module donnees))` && j3.etapes[0].statut === 'non_jouee' && j3.etapes[0].message === 'non jouée : la préparation 1 a échoué', JSON.stringify(j3));
+      controle('nettoyage d\'une valeur non obtenue : non joué (D20.INV-4) ; avant la première adresse, aucune page à montrer en preuve (D8.INV-2)', j3?.nettoyage[0]?.statut === 'non_jouee' && j3.nettoyage[0].message === "non jouée : ${id_client} non obtenue, sa préparation n'a pas abouti (D20.INV-4)" && j3.preparation[0].capture === null && j3.preparation[0].aria === null, JSON.stringify([j3?.preparation[0], j3?.nettoyage[0]]));
       const r4 = await jouer(ecrire('r32', 'sans-csrf.toml', `${tete32('Sans jeton anti-CSRF', 'r32-csrf')}${connexion('aucun')}${prep32('ligne = 3\nmethode = "POST"\nchemin = "/api/donnees/clients"\ncorps = { nom = "Y" }')}${etape32('ligne = 4\naction = "naviguer"\nurl = "/"')}`));
-      controle('session sans cookie anti-CSRF : 403 avec la conduite à tenir', r4.code === 1 && /obtenu : statut 403 \(accès refusé : droits de l'utilisateur, ou jeton anti-CSRF absent ou refusé\)$/.test(r4.rapport?.jeux[0].preparation[0].message ?? ''), r4.sortie);
-      const p4 = r4.rapport?.jeux[0].preparation[0];
+      controle('session sans cookie anti-CSRF : 403 avec la conduite à tenir', r4.code === 1 && /obtenu : statut 403 \(accès refusé : droits de l'utilisateur, ou jeton anti-CSRF absent ou refusé\)$/.test(r4.rapport?.jeux[0]?.preparation[0].message ?? ''), r4.sortie);
+      const p4 = r4.rapport?.jeux[0]?.preparation[0];
       controle('preuves de l\'échec d\'une préparation, sur la page ouverte : capture et instantané ARIA (D8.INV-2)', p4?.capture === 'captures/p1-preparation-echec.png' && existsSync(join(r4.dossier ?? TMP, 'captures', 'p1-preparation-echec.png')) && p4.aria === 'aria/p1-preparation.yml' && existsSync(join(r4.dossier ?? TMP, 'aria', 'p1-preparation.yml')), JSON.stringify(p4));
       ecrire('r32/donnees', 'client.json', '{ "nom": "Fichier ${unique}", "ville": "Nantes" }');
       const r5 = await jouer(ecrire('r32', 'divers.toml', `${tete32('Divers', 'r32')}${prep32('methode = "POST"\nchemin = "/api/donnees/clients"\ncorps_fichier = "donnees/client.json"\nstatut = [200, 201]\ngarder = { id_fichier = "id", nom_fichier = "nom" }')}${prep32('methode = "POST"\nchemin = "/api/donnees/jetons"\ngarder = { jeton_acces = "jeton_acces", id_jeton = "id" }')}${prep32(`methode = "POST"\nchemin = "/api/donnees/jetons?source=essai&jeton=${JETON_REQUETE_DEMO}"`)}${etape32('action = "verifier"\ncritere = "api"\nchemin = "/api/donnees/clients/${id_fichier}"\nattendu = { contient = { ville = "Nantes" } }')}${etape32('action = "naviguer"\nurl = "/?ref=${jeton_acces}"')}${nett32('methode = "DELETE"\nchemin = "/api/donnees/clients/${id_fichier}"\nstatut = [204, 404]')}${nett32('methode = "DELETE"\nchemin = "/api/donnees/clients/${id_fichier}"\nstatut = [204, 404]')}${nett32('methode = "DELETE"\nchemin = "/api/donnees/clients/${jeton_acces}"\nstatut = [204, 404]')}`));
       const j5 = r5.rapport?.jeux[0];
-      controle('profil où la session est ouverte : corps_fichier lu et substitué, plusieurs valeurs gardées, statut parmi une liste', r5.code === 0 && j5?.preparation[0].statut === 'reussie' && j5.gardees.nom_fichier === `Fichier ${j5.valeurs.unique}` && j5.etapes[0].statut === 'reussie', r5.sortie + JSON.stringify(j5));
+      controle('profil où la session est ouverte : corps_fichier lu et substitué, plusieurs valeurs gardées, statut parmi une liste', r5.code === 0 && j5?.preparation[0]?.statut === 'reussie' && j5.gardees.nom_fichier === `Fichier ${j5.valeurs.unique}` && j5.etapes[0].statut === 'reussie', r5.sortie + JSON.stringify(j5));
       controle('valeur gardée au nom de secret : masquée dans le rapport, même courte, absente de ses fichiers et de la sortie (D20.INV-2)', j5?.gardees.jeton_acces === '***' && j5.gardees.id_jeton === '***' && !lire(r5.dossier ?? TMP, 'rapport.json').includes(JETON_GARDE_DEMO) && !lire(r5.dossier ?? TMP, 'rapport.md').includes(JETON_GARDE_DEMO) && !r5.sortie.includes(JETON_GARDE_DEMO), JSON.stringify(j5?.gardees));
       controle('paramètre de requête au nom de secret : masqué dans l\'appel relevé et le résumé, absent du rapport et de la sortie (D20.INV-2)', j5?.preparation[2]?.appel?.adresse === `${base}/api/donnees/jetons?source=essai&jeton=***` && j5.preparation[2].resume === 'POST /api/donnees/jetons?source=essai&jeton=***  [création]' && !lire(r5.dossier ?? TMP, 'rapport.json').includes(JETON_REQUETE_DEMO) && !lire(r5.dossier ?? TMP, 'rapport.md').includes(JETON_REQUETE_DEMO) && !r5.sortie.includes(JETON_REQUETE_DEMO), JSON.stringify(j5?.preparation[2]));
       controle('valeur gardée au nom de secret, réemployée par une étape et un appel : masquée par sa valeur dans le résumé, l\'adresse et la sortie (D20.INV-2)', j5?.etapes[1]?.statut === 'reussie' && j5.etapes[1].resume.includes('ref=***') && j5.nettoyage[2]?.appel?.adresse === `${base}/api/donnees/clients/***` && j5.nettoyage[2].resume === 'DELETE /api/donnees/clients/*** → 204 ou 404  [suppression]' && r5.sortie.includes('ref=***') && !r5.sortie.includes(JETON_GARDE_DEMO), JSON.stringify([j5?.etapes[1], j5?.nettoyage[2]]));
       controle('chaque entrée jouée une fois : le second nettoyage reçoit 404, accepté (D5.INV-3)', j5?.nettoyage.map((x) => x.appel?.statut).join() === '204,404,404' && j5.nettoyage.every((x) => x.statut === 'reussie'), JSON.stringify(j5?.nettoyage));
       app.etat.requetesAutre.length = 0;
       const r6 = await jouer(ecrire('r32', 'redirection.toml', `${tete32('Redirection', 'r32')}${prep32('methode = "POST"\nchemin = "/api/donnees/redirection"')}${etape32('action = "naviguer"\nurl = "/"')}`));
-      controle('redirection : non suivie, l\'autre origine jamais jointe, adresse masquée (D20.INV-2)', r6.code === 1 && r6.rapport?.jeux[0].preparation[0].message === `POST ${base}/api/donnees/redirection : l'API répond 302, redirection vers ${autre}/api/clients?jeton=*** non suivie (D20.INV-2)` && app.etat.requetesAutre.length === 0, r6.sortie);
+      controle('redirection : non suivie, l\'autre origine jamais jointe, adresse masquée (D20.INV-2)', r6.code === 1 && r6.rapport?.jeux[0]?.preparation[0].message === `POST ${base}/api/donnees/redirection : l'API répond 302, redirection vers ${autre}/api/clients?jeton=*** non suivie (D20.INV-2)` && app.etat.requetesAutre.length === 0, r6.sortie);
       const r7 = await jouer(ecrire('r32', 'reponses.toml', `${tete32('Réponses', 'r32')}\n[[jeux]]\nforme = "gros"\n\n[[jeux]]\nforme = "texte"\n\n[[jeux]]\nforme = "vide"\n\n[[jeux]]\nforme = "objet"\n${prep32('methode = "POST"\nchemin = "/api/donnees/reponse?forme=${forme}"\ngarder = { v = "valeur" }')}${etape32('action = "naviguer"\nurl = "/"')}`));
       const m7 = (r7.rapport?.jeux ?? []).map((j) => j.preparation[0].message);
       const appel7 = `POST ${base}/api/donnees/reponse?forme=`;
@@ -14225,14 +14264,14 @@ Fonctionnalité: Clients
       const r1 = await jouer(ecrire('r33', 'echec.toml', `${tete32('Échec puis nettoyage', 'r32')}${prep32('methode = "POST"\nchemin = "/api/donnees/clients"\ncorps = { nom = "Echec ${unique}" }\ngarder = { id = "id" }')}${etape32('action = "naviguer"\nurl = "/clients/${id}"')}${etape32('action = "verifier"\ncritere = "contient"\ncible = { role = "heading" }\nattendu = "Inexistant"\ndelai = 1')}${etape32('action = "naviguer"\nurl = "/"')}${nett32('methode = "DELETE"\nchemin = "/api/donnees/clients/${id}"\nstatut = 204')}`));
       const j1 = r1.rapport?.jeux[0];
       const suppressions = app.etat.requetesDonnees.slice(avant).filter((x) => x.methode === 'DELETE');
-      controle('après une étape en échec : le nettoyage se joue, une seule fois ; code 1 (D20.INV-4, D5.INV-3)', r1.code === 1 && j1?.etapes[1].statut === 'echec' && j1.etapes[2].statut === 'non_jouee' && j1.nettoyage[0].statut === 'reussie' && suppressions.length === 1 && !app.etat.clients.some((c) => c.nom.startsWith('Echec ')), JSON.stringify(j1?.nettoyage) + JSON.stringify(suppressions));
+      controle('après une étape en échec : le nettoyage se joue, une seule fois ; code 1 (D20.INV-4, D5.INV-3)', r1.code === 1 && j1?.etapes[1]?.statut === 'echec' && j1.etapes[2].statut === 'non_jouee' && j1.nettoyage[0].statut === 'reussie' && suppressions.length === 1 && !app.etat.clients.some((c) => c.nom.startsWith('Echec ')), JSON.stringify(j1?.nettoyage) + JSON.stringify(suppressions));
       const r2 = await jouer(ecrire('r33', 'nettoyage-ko.toml', `${tete32('Nettoyage en échec', 'r32')}${etape32('action = "naviguer"\nurl = "/"')}${nett32('methode = "DELETE"\nchemin = "/api/donnees/clients/999999"\nstatut = 204')}${nett32('methode = "DELETE"\nchemin = "/api/donnees/clients/999998"\nstatut = 404')}`));
       controle('nettoyage en échec : signalé, le statut et le code restent ceux des étapes, les entrées suivantes jouées (D20.INV-4)', r2.code === 0 && r2.rapport?.statut === 'reussi' && r2.rapport.jeux[0].nettoyage_en_echec === 1 && r2.rapport.bilan.nettoyages_en_echec === 1 && r2.rapport.jeux[0].nettoyage[1]?.statut === 'reussie' && r2.sortie.includes(`AVERTISSEMENT nettoyage 1 en échec : DELETE ${base}/api/donnees/clients/999999 : attendu : statut 204 ; obtenu : statut 404 ; des données de l'exécution peuvent rester (D20.INV-4)`) && /dont 1 en échec$/m.test(r2.sortie) && lire(r2.dossier ?? TMP, 'rapport.md').includes('**Nettoyage en échec** (1)'), r2.sortie);
       const avant3 = app.etat.requetesDonnees.length;
       const r3 = await jouer(ecrire('r33', 'preparation-ko.toml', `${tete32('Préparation en échec', 'r32')}${prep32('methode = "POST"\nchemin = "/api/donnees/clients"\ncorps = { ville = "Lyon" }\nstatut = 201\ngarder = { id = "id" }')}${prep32('methode = "POST"\nchemin = "/api/donnees/clients"\ncorps = { nom = "Jamais" }')}${etape32('action = "naviguer"\nurl = "/"')}${nett32('methode = "DELETE"\nchemin = "/api/donnees/clients/${id}"')}${nett32('methode = "DELETE"\nchemin = "/api/donnees/clients/0"\nstatut = 404')}`));
       const j3 = r3.rapport?.jeux[0];
-      controle('préparation en échec : attendu et obtenu, un seul appel, rien de rejoué ; préparation suivante et étapes non jouées ; code 1 (D5.INV-3)', r3.code === 1 && j3?.preparation[0].message === `POST ${base}/api/donnees/clients : attendu : statut 201 ; obtenu : statut 400` && app.etat.requetesDonnees.slice(avant3).filter((x) => x.methode === 'POST').length === 1 && j3.preparation[1].statut === 'non_jouee' && j3.preparation[1].message === 'non jouée : la préparation 1 a échoué' && j3.etapes[0].message === 'non jouée : la préparation 1 a échoué' && !app.etat.clients.some((c) => c.nom === 'Jamais'), JSON.stringify(j3));
-      controle('nettoyage après une préparation en échec : l\'entrée qui ne dépend d\'aucune valeur gardée jouée, l\'autre non (D20.INV-4)', j3?.nettoyage[0].statut === 'non_jouee' && j3.nettoyage[1].statut === 'reussie' && j3.nettoyage[1].appel.statut === 404, JSON.stringify(j3?.nettoyage));
+      controle('préparation en échec : attendu et obtenu, un seul appel, rien de rejoué ; préparation suivante et étapes non jouées ; code 1 (D5.INV-3)', r3.code === 1 && j3?.preparation[0]?.message === `POST ${base}/api/donnees/clients : attendu : statut 201 ; obtenu : statut 400` && app.etat.requetesDonnees.slice(avant3).filter((x) => x.methode === 'POST').length === 1 && j3.preparation[1].statut === 'non_jouee' && j3.preparation[1].message === 'non jouée : la préparation 1 a échoué' && j3.etapes[0].message === 'non jouée : la préparation 1 a échoué' && !app.etat.clients.some((c) => c.nom === 'Jamais'), JSON.stringify(j3));
+      controle('nettoyage après une préparation en échec : l\'entrée qui ne dépend d\'aucune valeur gardée jouée, l\'autre non (D20.INV-4)', j3?.nettoyage[0]?.statut === 'non_jouee' && j3.nettoyage[1].statut === 'reussie' && j3.nettoyage[1].appel.statut === 404, JSON.stringify(j3?.nettoyage));
       const r4 = await jouer(ecrire('r33', 'jeux.toml', `${tete32('Plusieurs jeux', 'r32')}\n[[jeux]]\nville = "Lyon"\n\n[[jeux]]\nville = "Nice"\n${prep32('methode = "POST"\nchemin = "/api/donnees/clients"\ncorps = { nom = "Jeu ${unique}", ville = "${ville}" }\ngarder = { id = "id" }')}${etape32('action = "verifier"\ncritere = "api"\nchemin = "/api/donnees/clients/${id}"\nattendu = { contient = { ville = "${ville}" } }')}${nett32('methode = "DELETE"\nchemin = "/api/donnees/clients/${id}"')}`));
       const jx = r4.rapport?.jeux ?? [];
       controle('plusieurs jeux : chacun sa préparation, son ${unique}, sa valeur gardée et son nettoyage (D20.INV-6)', r4.code === 0 && jx.length === 2 && jx[0].valeurs.unique !== jx[1].valeurs.unique && jx[0].gardees.id !== jx[1].gardees.id && jx.every((j) => j.preparation[0].statut === 'reussie' && j.nettoyage[0].statut === 'reussie') && !app.etat.clients.some((c) => c.nom.startsWith('Jeu ')), r4.sortie + JSON.stringify(jx.map((j) => [j.valeurs, j.gardees])));
@@ -14273,11 +14312,11 @@ Fonctionnalité: Clients
       const p = j?.preparation[0];
       const nom = `Ecran-${j?.valeurs.unique}`;
       controle('préparation par l\'écran : le scénario ratifié joué dans le même onglet avec ses paramètres et le même ${unique}, ses étapes au rapport sous l\'entrée (D20.INV-5)', r3.code === 0 && p?.type === 'scenario' && p.scenario === 'creer-client.toml' && p.appel === null && p.etapes?.length === 4 && p.etapes.every((e) => e.statut === 'reussie') && p.etapes[1].resume === `saisir « ${nom} » dans getByLabel('Nom')` && p.resume === `scénario creer-client.toml { nom = "${nom}" }` && app.etat.ajouts.some((c) => c.nom === nom) && j.etapes.every((e) => e.statut === 'reussie'), r3.sortie + JSON.stringify(j));
-      controle('captures du scénario de préparation préfixées par son entrée ; sortie en retrait ; nettoyage par l\'API ensuite', p?.etapes[3].capture === 'captures/p1-04-verifier.png' && existsSync(join(r3.dossier ?? TMP, 'captures', 'p1-04-verifier.png')) && j.nettoyage[0].statut === 'reussie' && !app.etat.clients.some((c) => c.nom === nom) && /^ {8}ok {3}1\. naviguer \/clients\/nouveau$/m.test(r3.sortie) && lire(r3.dossier ?? TMP, 'rapport.md').includes('| p1.4 |'), r3.sortie);
+      controle('captures du scénario de préparation préfixées par son entrée ; sortie en retrait ; nettoyage par l\'API ensuite', p?.etapes[3]?.capture === 'captures/p1-04-verifier.png' && existsSync(join(r3.dossier ?? TMP, 'captures', 'p1-04-verifier.png')) && j.nettoyage[0].statut === 'reussie' && !app.etat.clients.some((c) => c.nom === nom) && /^ {8}ok {3}1\. naviguer \/clients\/nouveau$/m.test(r3.sortie) && lire(r3.dossier ?? TMP, 'rapport.md').includes('| p1.4 |'), r3.sortie);
       ecrire('r34', 'creer-ko.toml', CREER('Client ${nom} inexistant'));
       const r4 = await jouer(ecrire('r34', 'ecran-ko.toml', PRINCIPAL('creer-ko.toml', 'Ko')));
       const j4 = r4.rapport?.jeux[0];
-      controle('scénario de préparation en échec : l\'entrée échoue avec son étape, les étapes ne sont pas jouées, le nettoyage si', r4.code === 1 && /^scénario creer-ko\.toml, étape 4 : attendu : un texte qui contient « Client Ko-[a-z0-9]{7} inexistant » ; obtenu : texte « Client Ko-[a-z0-9]{7} créé »$/.test(j4?.preparation[0].message ?? '') && j4.preparation[0].etapes[3].statut === 'echec' && j4.etapes[0].statut === 'non_jouee' && j4.nettoyage[0].statut === 'reussie' && !app.etat.clients.some((c) => c.nom.startsWith('Ko-')), r4.sortie + JSON.stringify(j4?.preparation[0]));
+      controle('scénario de préparation en échec : l\'entrée échoue avec son étape, les étapes ne sont pas jouées, le nettoyage si', r4.code === 1 && /^scénario creer-ko\.toml, étape 4 : attendu : un texte qui contient « Client Ko-[a-z0-9]{7} inexistant » ; obtenu : texte « Client Ko-[a-z0-9]{7} créé »$/.test(j4?.preparation[0]?.message ?? '') && j4.preparation[0].etapes[3].statut === 'echec' && j4.etapes[0].statut === 'non_jouee' && j4.nettoyage[0].statut === 'reussie' && !app.etat.clients.some((c) => c.nom.startsWith('Ko-')), r4.sortie + JSON.stringify(j4?.preparation[0]));
     }
 
     // ------------------------------------------------------------------------------------------
@@ -14787,11 +14826,11 @@ nom = "export"
         controle(`même résultat que le skill, étape par étape : ${quoi}`, c.ok, c.detail);
       }
       const ec = testsDe('echecs')[0];
-      const messageSkill = skill.echecs.rapport?.jeux[0].etapes[1]?.message ?? null;
+      const messageSkill = skill.echecs.rapport?.jeux[0]?.etapes[1]?.message ?? null;
       const e2 = ec?.etapes.find((s) => s.title.startsWith('2. '));
       controle('vérification en échec : le même message que le skill ; le test échoue par elle, à la fin (D5.INV-4)', Boolean(messageSkill) && sansCouleur(e2?.error?.message ?? '').includes(messageSkill) && ec.erreurs.some((m) => m.includes(messageSkill)), `${messageSkill} | ${JSON.stringify(e2)} | ${ec?.erreurs}`);
       const tf = testsDe('fin-ko')[0];
-      const mf = skill['fin-ko'].rapport?.jeux[0].etapes[4]?.message ?? '';
+      const mf = skill['fin-ko'].rapport?.jeux[0]?.etapes[4]?.message ?? '';
       const ef = sansCouleur(tf?.etapes.find((s) => s.title.startsWith('5. '))?.error?.message ?? '');
       const fuites = [JETON_REQUETE_DEMO, JETON_CSRF_DEMO, ENTETE_DEMO].filter((j) => JSON.stringify(pw.rapport ?? {}).includes(j) || mf.includes(j));
       controle('requête introuvable : les requêtes vues, l\'adresse masquée comme par le skill ; aucun jeton dans le rapport de @playwright/test (D19.INV-2)', /^aucune requête POST \/api\/absent depuis l'étape 3 ; requêtes vues : .*POST http:\/\/127\.0\.0\.1:\d+\/api\/clients\?source=formulaire&jeton=\*\*\* 201/.test(mf) && ef.includes('aucune requête POST /api/absent depuis l\'étape 3 ; requêtes vues : ') && ef.includes('/api/clients?source=formulaire&jeton=*** 201') && fuites.length === 0, `${mf} | ${ef} | ${fuites.length}`);
@@ -14805,7 +14844,7 @@ nom = "export"
       const suffixe = (n) => n.slice(-7);
       controle('valeurs des jeux : <unique> remplacé, sept caractères propres à chaque jeu, la même exécution (D20.INV-6)', ajouts.length === 4 && /^Ecran [a-z0-9]{7}$/.test(ajouts[0]) && /^Autre [a-z0-9]{7}$/.test(ajouts[1]) && /^Masque-[a-z0-9]{7}$/.test(ajouts[2]) && /^Sous-[a-z0-9]{7}$/.test(ajouts[3]) && suffixe(ajouts[0]) !== suffixe(ajouts[1]) && suffixe(ajouts[0]).slice(0, 6) === suffixe(ajouts[1]).slice(0, 6), JSON.stringify(ajouts));
       const p1 = ts?.etapes.find((s) => s.title.startsWith('p1. '));
-      const sousSkill = skill.sous.rapport?.jeux[0].preparation[0];
+      const sousSkill = skill.sous.rapport?.jeux[0]?.preparation[0];
       controle('scénario de préparation : ses étapes sous l\'entrée, avec les statuts du skill (D20.INV-5)', Boolean(p1 && sousSkill) && (p1.steps ?? []).map((s) => `${/^(\d+)\. /.exec(s.title)?.[1]} ${s.error ? 'echec' : 'reussie'}`).join() === sousSkill.etapes.map((e) => `${e.numero} ${e.statut}`).join(), JSON.stringify(p1) + JSON.stringify(sousSkill?.etapes));
       const tx = testsDe('exporter-clients')[0];
       const csv = trouver(join(P, 'test-results'), 'clients.csv');
@@ -14881,7 +14920,7 @@ nom = "export"
         r = await res([dKo, '--format', 'xray']);
         x = JSON.parse(lire(dKo, 'xray-exporter-clients.json') || 'null');
         const l4 = ko.jeux[0].etapes[3].ligne;
-        controle('pas en échec : FAILED avec le message de son étape, les autres pas avec les leurs ; commentaire : étape, ligne et message', r.code === 0 && x?.tests[0].status === 'FAILED' && JSON.stringify(x.tests[0].steps) === JSON.stringify([{ status: 'PASSED' }, { status: 'FAILED', actualResult: message }]) && x.tests[0].comment === `scénario : échec ; étape 4 (ligne ${l4}) en échec : ${message}`, r.sortie + JSON.stringify(x));
+        controle('pas en échec : FAILED avec le message de son étape, les autres pas avec les leurs ; commentaire : étape, ligne et message', r.code === 0 && x?.tests[0]?.status === 'FAILED' && JSON.stringify(x.tests[0].steps) === JSON.stringify([{ status: 'PASSED' }, { status: 'FAILED', actualResult: message }]) && x.tests[0].comment === `scénario : échec ; étape 4 (ligne ${l4}) en échec : ${message}`, r.sortie + JSON.stringify(x));
         // Texte retouché depuis l'import, traduction refaite : les pas ne correspondent plus sûrement à ceux de Xray.
         const d38 = join(TMP, 'r38');
         mkdirSync(join(d38, 'resultats', 'retouche'), { recursive: true });
@@ -14891,19 +14930,19 @@ nom = "export"
         writeFileSync(join(d38, 'resultats', 'retouche', 'rapport.json'), JSON.stringify({ ...rX, scenario: { ...rX.scenario, empreinte: sha(join(d38, 'exporter-clients.toml')) } }));
         r = await res([join(d38, 'resultats', 'retouche'), '--format', 'xray']);
         x = JSON.parse(lire(join(d38, 'resultats', 'retouche'), 'xray-exporter-clients.json') || 'null');
-        controle('texte retouché depuis l\'import : la clé gardée, le statut du test seulement, avec une note', r.code === 0 && x?.tests[0].testKey === 'DEMO-13' && x.tests[0].status === 'PASSED' && !('steps' in x.tests[0]) && r.sortie.includes('note : DEMO-13 : texte retouché depuis l\'import, les pas ne correspondent plus sûrement à ceux de Xray : statut du test seulement'), r.sortie + JSON.stringify(x));
+        controle('texte retouché depuis l\'import : la clé gardée, le statut du test seulement, avec une note', r.code === 0 && x?.tests[0]?.testKey === 'DEMO-13' && x.tests[0].status === 'PASSED' && !('steps' in x.tests[0]) && r.sortie.includes('note : DEMO-13 : texte retouché depuis l\'import, les pas ne correspondent plus sûrement à ceux de Xray : statut du test seulement'), r.sortie + JSON.stringify(x));
         r = await res([dE, '--format', 'xray', '--cle', 'DEMO-8']);
         x = JSON.parse(lire(dE, 'xray-ecran.json') || 'null');
         const jeuxE = r36.skill.ecran.rapport.jeux;
-        controle('plusieurs jeux : un exemple par jeu ; --cle donne la clé d\'un scénario écrit à la main ; valeurs de chaque jeu dans le commentaire, sans ${unique}', r.code === 0 && x?.tests[0].testKey === 'DEMO-8' && JSON.stringify(x.tests[0].examples) === '["PASSED","PASSED"]' && x.tests[0].comment === `jeu 1 (nom = ${jeuxE[0].valeurs.nom}, ville = Lyon) : réussi\njeu 2 (nom = ${jeuxE[1].valeurs.nom}, ville = Marseille) : réussi` && !x.tests[0].comment.includes('unique') && r.sortie.includes('ok  DEMO-8 : PASSED, 2 exemples'), r.sortie + JSON.stringify(x));
+        controle('plusieurs jeux : un exemple par jeu ; --cle donne la clé d\'un scénario écrit à la main ; valeurs de chaque jeu dans le commentaire, sans ${unique}', r.code === 0 && x?.tests[0]?.testKey === 'DEMO-8' && JSON.stringify(x.tests[0].examples) === '["PASSED","PASSED"]' && x.tests[0].comment === `jeu 1 (nom = ${jeuxE[0].valeurs.nom}, ville = Lyon) : réussi\njeu 2 (nom = ${jeuxE[1].valeurs.nom}, ville = Marseille) : réussi` && !x.tests[0].comment.includes('unique') && r.sortie.includes('ok  DEMO-8 : PASSED, 2 exemples'), r.sortie + JSON.stringify(x));
         r = await res([dK, '--format', 'xray', '--cle', 'DEMO-9']);
         x = JSON.parse(lire(dK, 'xray-echecs.json') || 'null');
-        const sansPreuves = r.code === 0 && x?.tests[0].status === 'FAILED' && !('evidence' in x.tests[0]);
+        const sansPreuves = r.code === 0 && x?.tests[0]?.status === 'FAILED' && !('evidence' in x.tests[0]);
         r = await res([dK, '--format', 'xray', '--cle', 'DEMO-9', '--preuves']);
         x = JSON.parse(lire(dK, 'xray-echecs.json') || 'null');
         const capture = r36.skill.echecs.rapport.jeux[0].etapes[1].capture;
-        const ev = x?.tests[0].evidence ?? [];
-        controle('aucune capture sans --preuves ; avec, la capture de l\'étape en échec, en PNG encodé en base64 (D21.INV-4)', sansPreuves && Boolean(capture) && ev.length === 1 && ev[0].filename === capture.split('/').pop() && ev[0].contentType === 'image/png' && Buffer.from(ev[0].data, 'base64').subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])) && x.tests[0].comment.startsWith('scénario : échec ; étape 2 en échec : attendu : un texte qui contient « Inexistant »'), r.sortie + JSON.stringify(x?.tests[0].comment) + capture);
+        const ev = x?.tests[0]?.evidence ?? [];
+        controle('aucune capture sans --preuves ; avec, la capture de l\'étape en échec, en PNG encodé en base64 (D21.INV-4)', sansPreuves && Boolean(capture) && ev.length === 1 && ev[0].filename === capture.split('/').pop() && ev[0].contentType === 'image/png' && Buffer.from(ev[0].data, 'base64').subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])) && x.tests[0].comment.startsWith('scénario : échec ; étape 2 en échec : attendu : un texte qui contient « Inexistant »'), r.sortie + JSON.stringify(x?.tests[0]?.comment) + capture);
         const refus = await Promise.all([
           res([dE, '--format', 'xray']),
           res([dE, '--format', 'xray', '--cle', 'demo-8']),
@@ -14922,7 +14961,7 @@ nom = "export"
         const lu = leve(() => cas.lireZip(zip)) ?? cas.lireZip(zip);
         const n = zip.length > 30 ? zip.readUInt16LE(26) : 0;
         const stocke = zip.length > 30 ? zip.subarray(30 + n, 30 + n + zip.readUInt32LE(18)).toString('utf8') : '';
-        controle('Zephyr Scale : format « custom », résultat et clé du cas de test ; même JSON dans l\'archive .zip à envoyer, lisible, contrôlée par son CRC-32 (D21.INV-4)', r.code === 0 && zj === `${JSON.stringify({ version: 1, executions: [{ source: 'exporter-clients.toml', result: 'Passed', testCase: { key: 'DEMO-T13' } }] }, null, 2)}\n` && !(lu instanceof Error) && JSON.stringify(lu.ignorees) === '["zephyr-exporter-clients.json"]' && stocke === zj && r.sortie.includes('ok  DEMO-T13 : Passed') && rz.code === 0 && zko?.executions[0].result === 'Failed' && zko.executions[0].testCase.key === 'DEMO-T14', r.sortie + rz.sortie + zj + String(lu?.message ?? ''));
+        controle('Zephyr Scale : format « custom », résultat et clé du cas de test ; même JSON dans l\'archive .zip à envoyer, lisible, contrôlée par son CRC-32 (D21.INV-4)', r.code === 0 && zj === `${JSON.stringify({ version: 1, executions: [{ source: 'exporter-clients.toml', result: 'Passed', testCase: { key: 'DEMO-T13' } }] }, null, 2)}\n` && !(lu instanceof Error) && JSON.stringify(lu.ignorees) === '["zephyr-exporter-clients.json"]' && stocke === zj && r.sortie.includes('ok  DEMO-T13 : Passed') && rz.code === 0 && zko?.executions[0]?.result === 'Failed' && zko.executions[0].testCase.key === 'DEMO-T14', r.sortie + rz.sortie + zj + String(lu?.message ?? ''));
         r = await res([dX, dKo, '--format', 'xray', '--sortie', d38]);
         x = JSON.parse(lire(d38, 'xray-resultats.json') || 'null');
         controle('plusieurs rapports : un fichier, un test chacun, début et fin de l\'ensemble', r.code === 0 && x?.info.summary === 'scenario-playwright : 2 scénarios' && x.tests.map((y) => `${y.testKey} ${y.status}`).join() === 'DEMO-13 PASSED,DEMO-13 FAILED' && x.info.startDate === [rX.debut, ko.debut].sort()[0], r.sortie + JSON.stringify(x?.info));
@@ -15109,8 +15148,8 @@ Le développeur fera une fois, dans la fenêtre, les gestes d'un parcours ; D15 
 Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichiers ont été matérialisés.
 
     56d93cb05302845039a646ee919771a798d60f2f1894cee62e678bf114939033  manifest.json
-    5528fa2bd0d89e0eba2fca122347e0c34ba4f71cc3a69738642d0a44744e515e  SKILL.md
-    4d6851ec4f9c47f41b6d849d30053358bcc096e8eeabb3535fabaed8f6f620cf  modules/execution/SKILL.md
+    f26e2a683ee5c5a0b24e5b9df43fb785e6ca1f0a9664ab69950d6e31edb6403c  SKILL.md
+    87203fe6f3b54f0d3a0e2f831cc32f1345378566d23505af79f44fa78a9dc817  modules/execution/SKILL.md
     8a7bc87a526f41bc934a2ee0ef15477c4d54013049c5663cc62154a23f27ffbf  modules/texte/SKILL.md
     427d0bca7987644d535e85a57ec025a849f060fbdb9132589636365ecc402751  modules/jira/SKILL.md
     a2b123e0f1975d2f55d2079413545180ee255df71121b6f781d75ceb59c8ce19  modules/cas-de-test/SKILL.md
@@ -15126,7 +15165,7 @@ Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichier
     a73208ab8485ff98e0c27444b630c73bdae1ffd307fe4b75922b6a08b2d2092a  modules/designer/SKILL.md
     20b5d06d38577315877713aaa7da0a03c4109fc961eb4246676d25615a7b520e  modules/export/SKILL.md
     f6fb84102687ac01eef9e7648d3cd595d9398cc5d10bcf62dc1c4d18f1653ab1  modules/agent/SKILL.md
-    36aaa5b6f89c2c84ae8019612a6917b8a6ce0aebc7b8e4cb042d8e92948b96ba  modules/recette/SKILL.md
+    a942278f5c153e09544235d7243efc4ea55d018d8e6b3874d3ad6b93210881c4  modules/recette/SKILL.md
     4966e366878732544faa9f20e65580a7348426d4e4c2a2b5f789dee4d59ce079  modules/traduction-auto/SKILL.md
     9dd5d57ca1b658cb15c7c1999ccfd94cb41491e0af15bbe151812f07d45929fc  modules/demo/SKILL.md
     4a202c9718112813a20437b56e250422013bebdfceee7f971922d246a4d2d606  modules/remise/SKILL.md
