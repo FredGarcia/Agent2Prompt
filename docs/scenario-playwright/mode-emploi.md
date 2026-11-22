@@ -241,7 +241,7 @@ node ~/.gemini/skills/scenario-playwright/scripts/exporter.mjs scenarios/creer-c
 - **Ailleurs que sur le poste** : `SCENARIO_ORIGINES="http://127.0.0.1:4200=https://recette.exemple.fr,http://127.0.0.1:8080=https://api-recette.exemple.fr"` fait jouer le test contre l'environnement de recette. Un test qui y modifie des données est sauté, avec son motif, sans `SCENARIO_AUTORISER_MUTATIONS=1`, que votre équipe définit là où elle l'autorise.
 - **Le scénario reste la source** : ne retouchez pas le test. Quand le scénario change et se ratifie, `verifier.mjs e2e/creer-client.spec.ts` dit le test périmé ; `exporter.mjs … --comparer` montre ce qui changerait, `--remplacer` le régénère. Un test retouché à la main est d'abord gardé à côté (`creer-client.spec.ts.avant-20261122T081500Z`) ; un fichier que le skill n'a pas écrit n'est jamais remplacé.
 
-Puis, comme vos autres tests : `npx playwright test e2e`.
+Puis, comme vos autres tests : `npx playwright test e2e`. Un dossier imbriqué s'écrit avec des « / », sous Windows aussi : `npx playwright test tests/e2e` ; avec des « \ », Playwright n'y trouve aucun test, et `exporter.mjs` l'écrit donc ainsi.
 
 ## 12. Rendre les résultats à Xray ou à Zephyr Scale
 

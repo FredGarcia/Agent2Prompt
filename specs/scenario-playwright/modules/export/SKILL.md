@@ -32,7 +32,7 @@ node <skill>/scripts/exporter.mjs <scénario.toml>... --dossier <dossier de test
 
 Chaque scénario est lu et contrôlé comme pour l'exécution (modules `scenario` et `donnees`) : un scénario invalide, ou dont le texte a changé depuis la traduction, refuse l'export entier, avant toute écriture.
 
-Sortie : une ligne par fichier, `écrit`, `à jour`, `périmé`, `retouché`, `conflit`, `gardé` ou `remplacé`, avec le titre du scénario, ses étapes, ses jeux, sa préparation et son nettoyage ; puis les notes : la connexion qui reste à écrire, les origines du scénario et la façon de les faire correspondre ailleurs, les tests qui modifient des données ; enfin `Exporté : n tests en TypeScript dans <dossier> ; npx playwright test <dossier>`.
+Sortie : une ligne par fichier, `écrit`, `à jour`, `périmé`, `retouché`, `conflit`, `gardé` ou `remplacé`, avec le titre du scénario, ses étapes, ses jeux, sa préparation et son nettoyage ; puis les notes : la connexion qui reste à écrire, les origines du scénario et la façon de les faire correspondre ailleurs, les tests qui modifient des données ; enfin `Exporté : n tests en TypeScript dans <dossier> ; npx playwright test <dossier>`. Les chemins s'écrivent avec des « / » sur tous les systèmes : `npx playwright test` lit son argument comme une expression régulière, où une barre oblique inverse de Windows serait un échappement.
 
 | Code | Sens |
 |---|---|
@@ -1057,13 +1057,16 @@ class Jeu {
 // --comparer dit ce qui changerait, sans rien écrire. Code 0 si tout est écrit ou à jour, 1 si un fichier
 // n'est pas écrit (conflit, périmé ou retouché sans --remplacer), 2 si un scénario ou une option est refusé.
 import { existsSync, readFileSync, renameSync, statSync, writeFileSync } from 'node:fs';
-import { basename, join, relative, resolve } from 'node:path';
+import { basename, join, relative, resolve, sep } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { contenuAides, contenuConnexion, estSouche, etatFichier, genererTest, langageDuProjet, NOM_AIDES, NOM_CONNEXION } from './export.mjs';
 import { estLocale } from './session.mjs';
 
 const USAGE = 'Usage : node scripts/exporter.mjs <scénario.toml>... --dossier <dossier de tests du projet> [--langage ts|js] [--comparer] [--remplacer]';
 const horodatage = () => new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+Z$/, 'Z');
+// Chemins affichés avec des « / » sur tous les systèmes : npx playwright test lit son argument comme une
+// expression régulière, où une barre oblique inverse de Windows serait un échappement.
+const affiche = (p) => p.split(sep).join('/');
 
 export function main(args) {
   const scenarios = [];
@@ -1105,7 +1108,7 @@ export function main(args) {
     fichiers.push({ nom: t.nom, contenu: t.contenu, quoi: `« ${s.titre} », ${s.etapes.length} étape${s.etapes.length > 1 ? 's' : ''}${s.jeux ? `, ${s.jeux.length} jeux` : ''}${entrees.length ? `, ${entrees.join(', ')}` : ''}` });
   }
   let code = 0;
-  const rel = (f) => relative(process.cwd(), join(cible, f)) || f;
+  const rel = (f) => affiche(relative(process.cwd(), join(cible, f))) || f;
   for (const f of fichiers) {
     const chemin = join(cible, f.nom);
     const etat = etatFichier(chemin, f.contenu);
@@ -1138,7 +1141,8 @@ export function main(args) {
   const avecMutations = tests.filter((t) => t.scenario.etapes.some((e) => e.mutation) || t.scenario.preparation.length || t.scenario.nettoyage.length);
   console.log(`note : origines du scénario : ${distantes.join(', ')} ; pour jouer ailleurs, SCENARIO_ORIGINES="${distantes[0] ?? 'origine'}=<origine jouée>,…"`);
   if (avecMutations.length) console.log(`note : ${avecMutations.length} test${avecMutations.length > 1 ? 's modifient' : ' modifie'} des données : hors du poste, ${avecMutations.length > 1 ? 'ils sont sautés' : 'il est sauté'} sans SCENARIO_AUTORISER_MUTATIONS=1${distantes.some((o) => !estLocale(o)) ? ' (le scénario déclare déjà des origines hors du poste)' : ''} (D21.INV-3)`);
-  console.log(`Exporté : ${tests.length} test${tests.length > 1 ? 's' : ''} en ${lang === 'ts' ? 'TypeScript' : 'JavaScript'} dans ${relative(process.cwd(), cible) || '.'} ; npx playwright test ${relative(process.cwd(), cible) || '.'}`);
+  const ici = affiche(relative(process.cwd(), cible)) || '.';
+  console.log(`Exporté : ${tests.length} test${tests.length > 1 ? 's' : ''} en ${lang === 'ts' ? 'TypeScript' : 'JavaScript'} dans ${ici} ; npx playwright test ${ici}`);
   return code;
 }
 
