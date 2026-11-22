@@ -1,6 +1,6 @@
 ---
 name: code
-description: Index du code du projet, produit sans IA et sans rien exécuter (indexer.mjs ; lecture seule du projet, liens symboliques non suivis, dossiers de dépendances, de construction et de tests écartés ; routes Angular, Vue Router et React Router, modules chargés à la demande ; éléments d'interface des gabarits Angular, Vue, HTML et JSX, avec leur rôle, leurs noms accessibles possibles et leurs identifiants de test ; libellés traduits par les fichiers JSON de ngx-translate, Transloco, vue-i18n et i18next ; endpoints des contrôleurs Spring en Java et en Kotlin, du contrat OpenAPI et des appels du front ; contraintes de validation et leurs messages ; chaque entrée avec sa source ; empreinte et index périmé ; bornes ; propositions du squelette et notes du contrôle), sources de scripts/lecteurs.mjs, scripts/code.mjs et scripts/indexer.mjs. À lire pour indexer un projet, ou exploiter l'index à la traduction.
+description: Index du code du projet, produit sans IA et sans rien exécuter (indexer.mjs ; lecture seule du projet, liens symboliques non suivis, dossiers de dépendances, de construction et de tests écartés ; routes Angular, Vue Router et React Router, modules chargés à la demande ; éléments d'interface des gabarits Angular, Vue, HTML et JSX, avec leur rôle, leurs noms accessibles possibles et leurs identifiants de test ; libellés traduits par les fichiers JSON de ngx-translate, Transloco, vue-i18n et i18next ; endpoints des contrôleurs Spring en Java et en Kotlin, du contrat OpenAPI et des appels du front ; classes de leurs corps et leurs champs ; contraintes de validation et leurs messages ; chaque entrée avec sa source ; empreinte et index périmé ; bornes ; propositions du squelette et notes du contrôle), sources de scripts/lecteurs.mjs, scripts/code.mjs et scripts/indexer.mjs. À lire pour indexer un projet, ou exploiter l'index à la traduction.
 dimensions: [D18]
 status: active
 ---
@@ -94,7 +94,11 @@ Les textes visibles des gabarits, hors des éléments masqués, traduits, et ras
 - **OpenAPI** 3 et Swagger 2, en JSON ou en YAML : chaque opération, son `operationId`, son résumé et ses statuts, préfixée du chemin du premier serveur ou de `basePath`.
 - **Appels du front** : `http.get(…)`, `post`, `put`, `patch`, `delete`, `request(…)` d'un `HttpClient` ou d'un client comme axios, `fetch(…)` et sa méthode, `axios({ url, method })`, `$fetch`, `useFetch` ; l'adresse lue d'une chaîne, d'un gabarit ou d'une concaténation, sans son origine ni sa requête, ses parties variables en `…` : `` `${environment.api}/clients/${nom}` `` donne `…/clients/…`. Ils sont notés `js`.
 
-### 4.5 Contraintes de validation
+### 4.5 Classes de corps
+
+Les classes reçues en corps par un endpoint, et elles seules, avec leurs champs : classe Java à champs (les champs non statiques de son corps), record Java (ses composants), classe et `data class` Kotlin (les `val` et `var` de son constructeur et de son corps), schéma d'un contrat OpenAPI ou Swagger (ses propriétés, et celles qui sont requises). Le corps d'une opération OpenAPI se lit de son `requestBody`, ou de son paramètre `body` en Swagger 2. Un type générique désigne ses classes : `List<ClientDto>` donne `ClientDto`. L'IA y lit les champs d'un corps valide pour une préparation par l'API (module `donnees`) ; le squelette les propose avec leurs contraintes (§ 9). Ajouté en 1.4.0.
+
+### 4.6 Contraintes de validation
 
 Les annotations de Bean Validation (`@NotNull`, `@NotBlank`, `@NotEmpty`, `@Size`, `@Min`, `@Max`, `@Email`, `@Pattern`, `@Positive`… et `@Length`, `@Range` de Hibernate Validator) des champs, des accesseurs et des paramètres d'un constructeur (record Java, `data class` Kotlin avec `@field:`), avec leurs paramètres et leur message : un message `{cle}` se résout dans `ValidationMessages_<langue>.properties`, sinon `ValidationMessages.properties`, ses `{min}`, `{max}`, `{value}` remplacés par les paramètres de la contrainte.
 
@@ -118,10 +122,11 @@ Une clé de traduction se résout dans la langue de `--langue` : `{{ 'clients.ti
 | `elements` | `{ role, niveau, nom, libelle, placeholder, titre, texte, testid, attributTest, vers, type, dynamique, cle, cleNonResolue, composant, source }` |
 | `textes` | `{ texte, dynamique, cle, source }` |
 | `endpoints` | `{ methode, chemin, classe, operation, resume, corps, parametres, statut, statuts, origine, source }` ; `origine` vaut `spring`, `openapi` ou `js` |
+| `modeles` | `{ classe, champs, origine, source }`, `champs` étant `[{ nom, type, requis }]` ; `origine` vaut `java`, `kotlin` ou `openapi` (1.4.0) |
 | `validations` | `{ classe, champ, contrainte, parametres, message, cle, cleNonResolue, source }` |
 | `limites` | ce qui n'a pas été lu, et pourquoi |
 
-Un champ sans valeur est omis. `code.md` donne le même index à lire : routes, éléments par fichier, endpoints et appels, contraintes, textes (mille au plus), limites, chaque entrée avec sa source :
+Un champ sans valeur est omis. `code.md` donne le même index à lire : routes, éléments par fichier, endpoints et appels, classes de corps, contraintes, textes (mille au plus), limites, chaque entrée avec sa source :
 
 ```text
 - `/clients/nouveau` → ClientFormComponent, garde — front/src/app/app.routes.ts:8
@@ -129,6 +134,7 @@ Un champ sans valeur est omis. `code.md` donne le même index à lire : routes, 
 - l.11 textbox « Nom » ; libellé « Nom » ; testid champ-nom ; clé client.nom
 - l.19 button « Enregistrer »
 - `POST /api/clients` ClientController.creer, corps ClientDto, statut 201 — back/src/main/java/demo/ClientController.java:17
+- ClientDto (corps de POST /api/clients) : nom String, ville String, courriel String — back/src/main/java/demo/ClientDto.java:3
 - ClientDto.nom : NotBlank, « Le nom est obligatoire » — back/src/main/java/demo/ClientDto.java:4
 ```
 
@@ -170,9 +176,22 @@ mutation = "creation"
 #   cible = { role = "button", nom = "Enregistrer", exact = true }  # front/src/app/clients/client-form.component.ts:19
 ```
 
-Les propositions restent des commentaires : chaque étape reste à compléter, et le scénario refusé tant qu'elle l'est (D3.INV-5). `traduire.mjs` dit combien d'étapes en ont reçu.
+Pour une ligne de préparation ou de nettoyage par l'API (module `donnees`), `traduire.mjs` propose sous son bloc les endpoints d'écriture du back, `POST`, `PUT`, `PATCH` et `DELETE`, appels du front exclus : ceux d'un chemin cité par la phrase, sinon ceux dont un segment du chemin ou le nom de la classe, au singulier, est un mot de la phrase de quatre lettres au moins, hors des guillemets ; cinq au plus, `POST` d'abord. Suivent les champs de leur classe de corps, avec leurs contraintes de validation :
 
-`verifier.mjs` compare ensuite chaque cible du scénario à l'index, comme Playwright compare les noms : sans `exact`, une partie du nom, sans tenir compte de la casse ; avec `exact`, le nom entier ; une partie variable, `…` dans l'index ou `${nom}` dans le scénario, s'accepte largement. Il compare de même le chemin d'une vérification `requete` ou `api` aux endpoints et aux appels de l'index. Une cible ou un chemin absent est une note, jamais une erreur : le code de sortie n'en dépend pas.
+```toml
+# ligne 5 : Et que le client « Client <unique> » existe (par l'API)
+[[preparation]]
+ligne = 5
+methode = "à compléter"
+chemin = "/…"
+# index du code, endpoints d'écriture pour cette ligne (propositions à vérifier) :
+#   methode = "POST", chemin = "/api/clients"  # back/src/main/java/demo/ClientController.java:17, corps ClientDto, statut 201
+#   corps ClientDto : nom String (NotBlank, Size max 40), ville String (NotNull), courriel String (Email)  # back/src/main/java/demo/ClientDto.java:3
+```
+
+Les propositions restent des commentaires : chaque étape et chaque appel restent à compléter, et le scénario refusé tant qu'ils le sont (D3.INV-5). `traduire.mjs` dit combien d'étapes en ont reçu.
+
+`verifier.mjs` compare ensuite chaque cible du scénario à l'index, comme Playwright compare les noms : sans `exact`, une partie du nom, sans tenir compte de la casse ; avec `exact`, le nom entier ; une partie variable, `…` dans l'index ou `${nom}` dans le scénario, s'accepte largement. Il compare de même le chemin d'une vérification `requete` ou `api`, et celui d'un appel de préparation ou de nettoyage, aux endpoints et aux appels de l'index. Une cible ou un chemin absent est une note, jamais une erreur : le code de sortie n'en dépend pas.
 
 ```text
 note creer.toml : cibles absentes de l'index du code (texte variable, composant hors du projet, ou cible à revoir) : étape 6 getByRole('button', { name: 'Inexistant' })
@@ -187,6 +206,7 @@ Une cible `testid` ne correspond qu'à un `data-testid` : `getByTestId` ne lit p
 - Chaque entrée cite sa source ; un code modifié rend l'index périmé, qui n'est plus employé (D18.INV-2).
 - Un fichier trop gros n'est pas lu, une borne atteinte rend l'index partiel, chacun dit (D18.INV-3).
 - Les propositions restent en commentaire ; une cible absente de l'index est une note, sans changer le code de sortie (D18.INV-4).
+- Les classes de corps des endpoints, Java, Kotlin et OpenAPI, se relèvent avec leurs champs ; une ligne de préparation reçoit les endpoints d'écriture et les champs de leur corps, en commentaire (module `recette`, R31).
 - Aucune valeur de la configuration n'entre dans l'index, hors du chemin de contexte (D18.INV-5).
 
 ## 11. Source `scripts/lecteurs.mjs`
@@ -195,7 +215,7 @@ Lecteurs sans dépendance : texte, `.properties`, YAML minimal ; jetons JavaScri
 
 <!-- fichier : scripts/lecteurs.mjs -->
 ```javascript
-// scenario-playwright 1.3.0 : lecteurs du code du projet, pour l'index du code (D18).
+// scenario-playwright 1.4.0 : lecteurs du code du projet, pour l'index du code (D18).
 //
 // Chaque lecteur lit un texte sans jamais l'exécuter ni l'importer (D18.INV-1), et rend ce qu'un testeur
 // humain voit ou peut observer : éléments d'interface et leurs noms accessibles possibles, textes,
@@ -1845,27 +1865,178 @@ export function lireJava(src, fichier, ligne) {
   return { endpoints, validations };
 }
 
+// --- Classes de corps : records, data classes, classes à champs (D18, 1.4.0) ---------------------------------
+
+const MODIFICATEURS = new Set(['private', 'protected', 'public', 'internal', 'final', 'transient', 'volatile', 'open', 'override', 'lateinit', 'abstract', 'const']);
+
+/** Paramètres d'un constructeur, séparés aux virgules de premier niveau, chevrons des types génériques compris. */
+function decouperParametres(jetons) {
+  const args = [];
+  let courant = [];
+  let prof = 0;
+  for (const j of jetons) {
+    if (j.t === 'p') {
+      if (['(', '[', '{', '<'].includes(j.v)) prof++;
+      else if ([')', ']', '}', '>'].includes(j.v)) prof--;
+      else if (j.v === ',' && prof === 0) { args.push(courant); courant = []; continue; }
+    }
+    courant.push(j);
+  }
+  if (courant.length) args.push(courant);
+  return args;
+}
+
+/** Saute annotations et modificateurs à partir de k ; rend l'indice suivant. */
+function sauterModificateurs(p, k = 0) {
+  let m = k;
+  while (m < p.length) {
+    if (p[m].t === '@') m = lireAnnotation(p, m).suite + 1;
+    else if (p[m].t === 'id' && MODIFICATEURS.has(p[m].v)) m++;
+    else break;
+  }
+  return m;
+}
+
+const texteType = (jets) => jets.map((x) => x.v).join('');
+const MOTS_HORS_CHAMP = new Set(['static', 'return', 'import', 'package', 'fun', 'class', 'interface', 'enum', 'object', 'companion', 'init', 'this', 'super', 'throw', 'new', 'get', 'set']);
+
+/** Champ d'une déclaration : propriété Kotlin (val nom: Type) ou champ Java (Type nom) ; null sinon. */
+function champDeDeclaration(jets, { record = false } = {}) {
+  const reste = jets.slice(sauterModificateurs(jets));
+  const eq = reste.findIndex((x) => estP(x, '='));
+  const gauche = eq < 0 ? reste : reste.slice(0, eq);
+  if (!gauche.length || gauche.some((x) => estP(x, '(') || (x.t === 'id' && MOTS_HORS_CHAMP.has(x.v)))) return null;
+  const vv = gauche.findIndex((x) => x.t === 'id' && (x.v === 'val' || x.v === 'var'));
+  if (vv >= 0) {
+    const nom = gauche[vv + 1];
+    const dp = gauche.findIndex((x) => estP(x, ':'));
+    return nom?.t === 'id' ? { nom: nom.v, type: dp > vv ? texteType(gauche.slice(dp + 1)) : null } : null;
+  }
+  if (gauche.length < 2 || gauche.at(-1).t !== 'id') return null;
+  if (!record && gauche.some((x) => estP(x, ':'))) return null;
+  return { nom: gauche.at(-1).v, type: texteType(gauche.slice(0, -1)) };
+}
+
+/**
+ * Classes d'un fichier Java ou Kotlin avec leurs champs : composants d'un record, propriétés val et var d'un
+ * constructeur Kotlin, champs non statiques du corps. Rend [{ classe, champs: [{ nom, type }], source }] ;
+ * l'index n'en garde que les classes de corps des endpoints.
+ */
+export function lireModeles(src, fichier, ligne) {
+  const jetons = jetonsJava(src);
+  const modeles = [];
+  for (let k = 0; k + 1 < jetons.length; k++) {
+    const j = jetons[k];
+    if (j.t !== 'id' || !['class', 'record'].includes(j.v) || jetons[k + 1]?.t !== 'id') continue;
+    if (estP(jetons[k - 1], '.') || estP(jetons[k - 1], '::') || ['enum', 'annotation'].includes(jetons[k - 1]?.v)) continue;
+    const record = j.v === 'record';
+    const champs = [];
+    let m = k + 2;
+    if (estP(jetons[m], '<')) {
+      let p = 0;
+      for (; m < jetons.length; m++) { if (estP(jetons[m], '<')) p++; else if (estP(jetons[m], '>')) { p--; if (p === 0) { m++; break; } } }
+    }
+    if (estP(jetons[m], '(')) {
+      const fin = finGroupe(jetons, m);
+      for (const p of decouperParametres(jetons.slice(m + 1, fin))) {
+        const c = champDeDeclaration(p, { record });
+        if (c && (record || p.some((x) => x.t === 'id' && (x.v === 'val' || x.v === 'var')))) champs.push(c);
+      }
+      m = fin + 1;
+    }
+    while (m < jetons.length && !estP(jetons[m], '{') && !estP(jetons[m], ';') && !(jetons[m].t === 'id' && ['class', 'record', 'interface', 'enum'].includes(jetons[m].v))) m++;
+    if (estP(jetons[m], '{')) {
+      const fin = finGroupe(jetons, m);
+      let instr = [];
+      let prof = 0;
+      const clore = () => { if (instr.length) { const c = champDeDeclaration(instr); if (c) champs.push(c); } instr = []; };
+      for (let x = m + 1; x < fin; x++) {
+        const y = jetons[x];
+        if (estP(y, '{')) { if (prof === 0) instr = []; prof++; continue; }
+        if (estP(y, '}')) { prof--; if (prof === 0) instr = []; continue; }
+        if (prof > 0) continue;
+        if (estP(y, ';')) { clore(); continue; }
+        // Kotlin, sans point-virgule : val, var ou une annotation ouvre une nouvelle déclaration.
+        if ((y.t === 'id' && (y.v === 'val' || y.v === 'var' || y.v === 'fun')) || y.t === '@') {
+          if (instr.slice(sauterModificateurs(instr)).length) clore();
+        }
+        instr.push(y);
+      }
+      clore();
+    }
+    const vus = new Set();
+    const uniques = champs.filter((c) => c.nom && !vus.has(c.nom) && vus.add(c.nom));
+    if (uniques.length) modeles.push({ classe: jetons[k + 1].v, champs: uniques, source: `${fichier}:${ligne(j.debut)}` });
+  }
+  return modeles;
+}
+
 // --- Contrat OpenAPI, configuration Spring --------------------------------------------------------------
 
-/** Endpoints d'un contrat OpenAPI (3) ou Swagger (2), en JSON ou en YAML. */
-export function lireOpenApi(src, fichier, json) {
+/** Contrat OpenAPI lu : { doc, lignes (YAML), debuts (JSON) }, ou null. */
+function documentOpenApi(src, json) {
   let doc;
   let lignes = null;
   if (json) {
-    try { doc = JSON.parse(String(src).replace(/^\uFEFF/, '')); } catch { return []; }
+    try { doc = JSON.parse(String(src).replace(/^\uFEFF/, '')); } catch { return null; }
   } else {
     const y = lireYaml(src);
     doc = y.valeur;
     lignes = y.lignes;
   }
-  if (!estTable(doc) || !estTable(doc.paths) || !(doc.openapi || doc.swagger)) return [];
+  if (!estTable(doc) || !(doc.openapi || doc.swagger)) return null;
+  return { doc, lignes, debuts: json ? debutsDeLignes(src) : null };
+}
+
+/** Nom d'un schéma désigné par $ref, ou type lisible d'une propriété : string(date), ClientDto, ClientDto[]. */
+function typeOpenApi(s) {
+  if (!estTable(s)) return 'object';
+  if (typeof s.$ref === 'string') return s.$ref.split('/').pop();
+  if (s.type === 'array') return `${typeOpenApi(s.items)}[]`;
+  return typeof s.type === 'string' ? `${s.type}${typeof s.format === 'string' ? `(${s.format})` : ''}` : 'object';
+}
+
+/** Corps d'une opération : le schéma de son requestBody (OpenAPI 3) ou de son paramètre body (Swagger 2). */
+function corpsOpenApi(op) {
+  const contenu = estTable(op.requestBody) && estTable(op.requestBody.content) ? op.requestBody.content : null;
+  if (contenu) {
+    const types = Object.keys(contenu);
+    const t = types.find((x) => /json/i.test(x)) ?? types[0];
+    if (t && estTable(contenu[t]) && estTable(contenu[t].schema)) return typeOpenApi(contenu[t].schema);
+  }
+  const p = Array.isArray(op.parameters) ? op.parameters.find((x) => estTable(x) && x.in === 'body' && estTable(x.schema)) : null;
+  return p ? typeOpenApi(p.schema) : null;
+}
+
+/** Schémas d'un contrat OpenAPI ou Swagger avec leurs propriétés : [{ classe, champs: [{ nom, type, requis }], source }]. */
+export function lireModelesOpenApi(src, fichier, json) {
+  const lu = documentOpenApi(src, json);
+  if (!lu) return [];
+  const schemas = estTable(lu.doc.components?.schemas) ? lu.doc.components.schemas : estTable(lu.doc.definitions) ? lu.doc.definitions : null;
+  if (!schemas) return [];
+  const modeles = [];
+  for (const [nom, s] of Object.entries(schemas)) {
+    if (!estTable(s) || !estTable(s.properties)) continue;
+    const requis = new Set(Array.isArray(s.required) ? s.required : []);
+    const champs = Object.entries(s.properties).map(([k, v]) => ({ nom: k, type: typeOpenApi(v), ...(requis.has(k) ? { requis: true } : {}) }));
+    const ligne = json ? (() => { const k = String(src).indexOf(JSON.stringify(nom)); return k < 0 ? 1 : ligneDe(lu.debuts, k); })() : lu.lignes.get(schemas)?.[nom] ?? 1;
+    modeles.push({ classe: nom, champs, source: `${fichier}:${ligne}` });
+  }
+  return modeles;
+}
+
+/** Endpoints d'un contrat OpenAPI (3) ou Swagger (2), en JSON ou en YAML. */
+export function lireOpenApi(src, fichier, json) {
+  const lu = documentOpenApi(src, json);
+  if (!lu || !estTable(lu.doc.paths)) return [];
+  const { doc, lignes } = lu;
   const serveur = Array.isArray(doc.servers) && estTable(doc.servers[0]) && typeof doc.servers[0].url === 'string' ? doc.servers[0].url : null;
   let prefixe = typeof doc.basePath === 'string' ? doc.basePath : '';
   if (serveur) {
     const c = /^[a-z{][\w{}+.-]*:\/\/[^/]+(\/.*)?$/i.exec(serveur);
     prefixe = c ? c[1] ?? '' : serveur.startsWith('/') ? serveur : '';
   }
-  const debuts = json ? debutsDeLignes(src) : null;
+  const debuts = lu.debuts;
   const endpoints = [];
   for (const [chemin, item] of Object.entries(doc.paths)) {
     if (!estTable(item)) continue;
@@ -1875,6 +2046,8 @@ export function lireOpenApi(src, fichier, json) {
       const e = { methode: m.toUpperCase(), chemin: joindreChemin(prefixe, chemin) };
       if (typeof op.operationId === 'string') e.operation = op.operationId;
       if (typeof op.summary === 'string') e.resume = normaliser(op.summary);
+      const corps = corpsOpenApi(op);
+      if (corps) e.corps = corps;
       if (estTable(op.responses)) {
         const s = Object.keys(op.responses).filter((x) => /^\d{3}$/.test(x)).map(Number);
         if (s.length) e.statuts = s;
@@ -1915,7 +2088,7 @@ Parcours du projet, nature des fichiers, empreinte, construction et écriture de
 
 <!-- fichier : scripts/code.mjs -->
 ```javascript
-// scenario-playwright 1.3.0 : index du code du projet, produit sans IA et sans exécuter le code (D18).
+// scenario-playwright 1.4.0 : index du code du projet, produit sans IA et sans exécuter le code (D18).
 //
 // L'index relève dans le code front et back du projet ce qu'un testeur humain voit et ce que la page
 // échange : routes, éléments d'interface et leurs noms accessibles possibles, identifiants de test,
@@ -1931,7 +2104,7 @@ import { cibleToml, strategie } from './cibles.mjs';
 import * as L from './lecteurs.mjs';
 
 export const FORMAT_INDEX = 'scenario-playwright.index/1';
-export const VERSION = '1.3.0';
+export const VERSION = '1.4.0';
 export const DOSSIER_INDEX = 'index';
 export const LIMITES_INDEX = { fichiers: 20000, octets: 1048576, total: 209715200, profondeur: 40 };
 export const RE_LANGUE = /^[a-z]{2}(?:-[a-z]{2,4})?$/;
@@ -2098,6 +2271,7 @@ export function indexerProjet(racine, { dossierScenarios = null, langue = 'fr' }
   const routesJsx = [];
   const endpoints = [];
   const validations = [];
+  const modeles = [];
   const parFichier = new Map();
   for (const f of lu.fichiers) {
     const debuts = L.debutsDeLignes(f.texte);
@@ -2138,9 +2312,13 @@ export function indexerProjet(racine, { dossierScenarios = null, langue = 'fr' }
           const r = L.lireJava(f.texte, f.rel, ligne);
           for (const e of r.endpoints) endpoints.push(contexte ? { ...e, chemin: L.joindreChemin(contexte, e.chemin) } : e);
           validations.push(...r.validations);
+          modeles.push(...L.lireModeles(f.texte, f.rel, ligne).map((m) => ({ ...m, origine: /\.kts?$/i.test(f.rel) ? 'kotlin' : 'java' })));
           break;
         }
-        case 'openapi': endpoints.push(...L.lireOpenApi(f.texte, f.rel, /\.json$/i.test(f.rel))); break;
+        case 'openapi':
+          endpoints.push(...L.lireOpenApi(f.texte, f.rel, /\.json$/i.test(f.rel)));
+          modeles.push(...L.lireModelesOpenApi(f.texte, f.rel, /\.json$/i.test(f.rel)).map((m) => ({ ...m, origine: 'openapi' })));
+          break;
         default:
       }
     } catch (e) {
@@ -2169,6 +2347,9 @@ export function indexerProjet(racine, { dossierScenarios = null, langue = 'fr' }
     v.message = L.normaliser(texte.replace(/\{(\w+)\}/g, (x, k) => (v.parametres && Object.hasOwn(v.parametres, k) ? String(v.parametres[k]) : x)).replace(/\$\{[^}]*\}/g, L.VARIABLE));
   }
   const unique = (liste, cle) => { const vus = new Set(); return liste.filter((x) => { const k = cle(x); if (vus.has(k)) return false; vus.add(k); return true; }); };
+  // Seules les classes de corps des endpoints entrent dans l'index : celles d'où l'IA tire un corps valide (D20).
+  const corps = new Set(endpoints.flatMap((e) => (e.corps ? typesDe(e.corps) : [])));
+  const modelesCorps = unique(modeles.filter((m) => corps.has(m.classe)).sort((a, b) => (a.classe < b.classe ? -1 : a.classe > b.classe ? 1 : parSource(a, b))), (m) => `${m.classe}\0${m.source}`);
   routes = unique(routes.sort((a, b) => (a.chemin < b.chemin ? -1 : a.chemin > b.chemin ? 1 : parSource(a, b))), (r) => `${r.chemin}\0${r.source}`);
   const index = {
     format: FORMAT_INDEX,
@@ -2184,10 +2365,16 @@ export function indexerProjet(racine, { dossierScenarios = null, langue = 'fr' }
     elements: elements.sort(parSource),
     textes: unique(textes.sort(parSource), (t) => t.texte),
     endpoints: unique(endpoints.sort((a, b) => (a.chemin < b.chemin ? -1 : a.chemin > b.chemin ? 1 : a.methode < b.methode ? -1 : a.methode > b.methode ? 1 : parSource(a, b))), (e) => `${e.methode} ${e.chemin}\0${e.origine}\0${e.source}`),
+    modeles: modelesCorps,
     validations: validations.sort(parSource),
     limites,
   };
   return index;
+}
+
+/** Noms de classes d'un type de corps : List<ClientDto>, ClientDto[], Map<String, LigneDto> donnent leurs classes. */
+export function typesDe(type) {
+  return [...new Set(String(type).match(/[A-Z][A-Za-z0-9_]*/g) ?? [])].filter((x) => !['List', 'Set', 'Map', 'Collection', 'Optional', 'Mono', 'Flux', 'String', 'Integer', 'Long', 'Object', 'Array', 'MutableList', 'Iterable', 'ResponseEntity'].includes(x));
 }
 
 function enJson(index) {
@@ -2250,6 +2437,12 @@ export function indexEnMarkdown(index, nomProjet) {
     if (e.statut) d.push(`statut ${e.statut}`);
     if (e.statuts) d.push(`statuts ${e.statuts.join(', ')}`);
     l.push(`- \`${e.methode} ${e.chemin}\`${d.length ? ` ${d.join(', ')}` : ''} — ${e.source}`);
+  }
+  const modeles = index.modeles ?? [];
+  l.push('', `## Classes de corps (${modeles.length})`, '');
+  for (const m of modeles) {
+    const ou = index.endpoints.filter((e) => e.corps && typesDe(e.corps).includes(m.classe)).map((e) => `${e.methode} ${e.chemin}`);
+    l.push(`- ${m.classe}${ou.length ? ` (corps de ${[...new Set(ou)].join(', ')})` : ''} : ${m.champs.map((c) => `${c.nom}${c.type ? ` ${c.type}` : ''}${c.requis ? ' (requis)' : ''}`).join(', ')} — ${m.source}`);
   }
   l.push('', `## Contraintes de validation (${index.validations.length})`, '');
   for (const v of index.validations) {
@@ -2480,6 +2673,57 @@ export function candidats(index, phrase) {
   if (requetes.length) lignes.push('# index du code, requêtes connues pour ce chemin (propositions à vérifier) :', ...requetes);
   return lignes;
 }
+
+const MOTS_VIDES = new Set(['existe', 'existent', 'cree', 'creee', 'crees', 'creees', 'supprime', 'supprimee', 'supprimes', 'modifie', 'modifiee', 'avec', 'dans', 'pour', 'sont', 'etre', 'avoir', 'donne', 'quand', 'alors', 'cette', 'leur', 'leurs', 'exists', 'created', 'deleted', 'updated', 'with', 'that', 'there', 'have', 'from']);
+const singulier = (m) => (m.length > 4 ? m.replace(/(?:s|x)$/, '') : m);
+/** Mots d'une phrase comparables à un chemin ou à une classe : sans accents, quatre lettres au moins, au singulier. */
+export function motsDe(phrase) {
+  const p = String(phrase).replace(/«[^»]*»|"[^"]*"|“[^”]*”|<[^>]*>/g, ' ').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  return [...new Set(p.split(/[^a-z0-9]+/).filter((m) => m.length >= 4 && !MOTS_VIDES.has(m)).map(singulier))];
+}
+
+/**
+ * Lignes de commentaire du squelette pour une ligne de préparation ou de nettoyage par l'API (D20) : les
+ * endpoints d'écriture du back dont le chemin cité, ou un segment du chemin, ou la classe, correspond à un mot
+ * de la phrase, au plus MAX_CANDIDATS ; puis les champs de leur classe de corps, avec leurs contraintes de
+ * validation. Ce ne sont que des propositions : le bloc reste à compléter (D18.INV-4).
+ */
+export function candidatsAppel(index, phrase) {
+  const ecriture = index.endpoints.filter((e) => ['POST', 'PUT', 'PATCH', 'DELETE', '*'].includes(e.methode) && e.origine !== 'js');
+  const cites = [...String(phrase).matchAll(/(?:^|[\s«"“(])(\/[^\s»"”)]*)/g)].map((m) => m[1].replace(/[.,;:]+$/, '').replace(/<[^>]+>/g, 'x'));
+  let retenus;
+  if (cites.length) retenus = ecriture.filter((e) => cites.some((c) => motifChemin(e.chemin).test(c)));
+  else {
+    const mots = motsDe(phrase);
+    const evalue = ecriture.map((e) => {
+      const segments = e.chemin.split('/').filter((s) => s && !/^\{|^:/.test(s)).map((s) => singulier(s.toLowerCase()));
+      const classe = singulier(String(e.classe ?? '').toLowerCase().replace(/(?:controller|resource|api|endpoint|rest)$/, ''));
+      const score = mots.filter((m) => segments.some((s) => s === m || s.split(/[-_]/).includes(m)) || (classe && classe === m)).length;
+      return { e, score };
+    }).filter((x) => x.score > 0);
+    const meilleur = Math.max(0, ...evalue.map((x) => x.score));
+    retenus = evalue.filter((x) => x.score === meilleur).map((x) => x.e);
+  }
+  const ordre = { POST: 0, PUT: 1, PATCH: 2, DELETE: 3, '*': 4 };
+  retenus.sort((a, b) => ordre[a.methode] - ordre[b.methode] || (a.chemin < b.chemin ? -1 : a.chemin > b.chemin ? 1 : parSource(a, b)));
+  if (!retenus.length) return [];
+  const lignes = ['# index du code, endpoints d\'écriture pour cette ligne (propositions à vérifier) :'];
+  for (const e of retenus.slice(0, MAX_CANDIDATS)) lignes.push(`#   methode = "${e.methode}", chemin = "${e.chemin}"  # ${e.source}${e.corps ? `, corps ${e.corps}` : ''}${e.statut ? `, statut ${e.statut}` : ''}`);
+  if (retenus.length > MAX_CANDIDATS) lignes.push(`#   … ${retenus.length - MAX_CANDIDATS} autres dans index/code.md`);
+  const vus = new Set();
+  for (const nom of retenus.slice(0, MAX_CANDIDATS).flatMap((e) => (e.corps ? typesDe(e.corps) : []))) {
+    if (vus.has(nom) || vus.size >= 2) continue;
+    vus.add(nom);
+    const m = (index.modeles ?? []).find((x) => x.classe === nom);
+    if (!m) continue;
+    const champs = m.champs.map((c) => {
+      const contraintes = index.validations.filter((v) => v.classe === nom && v.champ === c.nom).map((v) => `${v.contrainte}${v.parametres ? ` ${Object.entries(v.parametres).map(([k, x]) => `${k} ${x}`).join(' ')}` : ''}`);
+      return `${c.nom}${c.type ? ` ${c.type}` : ''}${c.requis ? ' requis' : ''}${contraintes.length ? ` (${contraintes.join(', ')})` : ''}`;
+    });
+    lignes.push(`#   corps ${nom} : ${champs.join(', ')}  # ${m.source}`);
+  }
+  return lignes;
+}
 ```
 
 ## 13. Source `scripts/indexer.mjs`
@@ -2487,13 +2731,13 @@ export function candidats(index, phrase) {
 <!-- fichier : scripts/indexer.mjs -->
 ```javascript
 #!/usr/bin/env node
-// scenario-playwright 1.3.0 : index du code du projet, sans IA et sans exécuter le code (D18).
+// scenario-playwright 1.4.0 : index du code du projet, sans IA et sans exécuter le code (D18).
 //
 // Usage : node <dossier du skill>/scripts/indexer.mjs <dossier du projet> [--dossier scenarios] [--langue fr]
 // Lit le code front et back du projet sans rien y écrire ni rien exécuter (D18.INV-1), et écrit
 // <dossier>/index/code.json et code.md : routes, éléments d'interface et leurs noms accessibles
-// possibles, identifiants de test, textes, endpoints et appels, contraintes de validation, chacun avec
-// sa source (D18.INV-2). Le dossier des scénarios est écarté de la lecture. traduire.mjs et
+// possibles, identifiants de test, textes, endpoints et appels, classes de leurs corps et leurs champs,
+// contraintes de validation, chacun avec sa source (D18.INV-2). Le dossier des scénarios est écarté de la lecture. traduire.mjs et
 // verifier.mjs emploient l'index tant que le code n'a pas changé. Code 0 si l'index est écrit, 2 sinon.
 import { existsSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -2523,7 +2767,7 @@ export function main(args) {
   const index = indexerProjet(o.projet, { dossierScenarios: dossier, langue });
   const { json, md } = ecrireIndex(dossier, o.projet, index);
   const n = (x, un, plusieurs = `${un}s`) => `${x} ${x > 1 ? plusieurs : un}`;
-  console.log(`index du code : ${n(index.fichiers, 'fichier lu', 'fichiers lus')} ; ${n(index.routes.length, 'route')}, ${n(index.elements.length, 'élément d\'interface', 'éléments d\'interface')}, ${n(index.textes.length, 'texte')}, ${n(index.endpoints.length, 'endpoint ou appel', 'endpoints et appels')}, ${n(index.validations.length, 'contrainte de validation', 'contraintes de validation')}${index.traductions.length ? ` ; ${n(index.traductions.length, 'fichier de traduction', 'fichiers de traduction')} (${langue})` : ''}${index.partiel ? ' ; index partiel' : ''}`);
+  console.log(`index du code : ${n(index.fichiers, 'fichier lu', 'fichiers lus')} ; ${n(index.routes.length, 'route')}, ${n(index.elements.length, 'élément d\'interface', 'éléments d\'interface')}, ${n(index.textes.length, 'texte')}, ${n(index.endpoints.length, 'endpoint ou appel', 'endpoints et appels')}, ${n(index.modeles.length, 'classe de corps', 'classes de corps')}, ${n(index.validations.length, 'contrainte de validation', 'contraintes de validation')}${index.traductions.length ? ` ; ${n(index.traductions.length, 'fichier de traduction', 'fichiers de traduction')} (${langue})` : ''}${index.partiel ? ' ; index partiel' : ''}`);
   for (const l of index.limites) console.log(`LIMITE ${l}`);
   console.log(`écrit : ${json}`);
   console.log(`écrit : ${md}`);

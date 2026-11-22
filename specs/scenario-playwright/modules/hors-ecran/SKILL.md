@@ -13,7 +13,7 @@ Phases 7E couvertes : Espace et État.
 
 Un testeur ne regarde pas que l'écran. Il ouvre l'onglet réseau pour voir partir la requête d'un formulaire et ce que le back répond ; il interroge l'API dans la barre d'adresse, avec sa session ; il ouvre le fichier qu'il vient de télécharger. Trois critères de `verifier` font de même, sans agir : `requete` observe les requêtes que la page a faites, `api` lit une ressource en GET, `fichier` lit un fichier téléchargé par le scénario (D19.INV-1). Ils ne prennent pas de `cible`, et suivent les règles des autres vérifications : un délai borné, l'attendu et l'obtenu à l'échec, et les vérifications qui suivent jouées après un échec (D5.INV-3).
 
-Ces critères sont propres à ce skill, comme l'action `telecharger` : la remise à Agent2Test (D13, réservée) les traduira.
+Ces critères sont propres à ce skill, comme l'action `telecharger` : la remise à Agent2Test (D13, réservée) les traduira. Créer, modifier ou supprimer des données n'est pas vérifier : c'est la préparation et le nettoyage, sous la garde des mutations (module `donnees`).
 
 ## 2. Critères
 

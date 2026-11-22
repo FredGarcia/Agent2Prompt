@@ -8,7 +8,7 @@ Ce texte contient à la fois la consigne de travail et le skill complet. Il n'y 
 
 ---
 
-À partir de maintenant, tu installes le skill scenario-playwright décrit par ce texte sur le poste du développeur, tu le fais fonctionner, puis tu peux importer de Jira, de Xray, de Zephyr Scale ou de fichiers .feature, indexer le code de son projet, traduire, faire ratifier et jouer ses scénarios comme son agent. Le skill fait foi. Si tu relèves une ambiguïté ou une contradiction dans le skill, signale-la au développeur. Ne corrige pas le skill toi-même, ni ses scripts.
+À partir de maintenant, tu installes le skill scenario-playwright décrit par ce texte sur le poste du développeur, tu le fais fonctionner, puis tu peux importer de Jira, de Xray, de Zephyr Scale ou de fichiers .feature, indexer le code de son projet, traduire, faire ratifier et jouer ses scénarios, avec la préparation et le nettoyage de leurs données, comme son agent. Le skill fait foi. Si tu relèves une ambiguïté ou une contradiction dans le skill, signale-la au développeur. Ne corrige pas le skill toi-même, ni ses scripts.
 
 ## Étape 0 : matérialiser le skill
 
@@ -29,7 +29,7 @@ Lis `SKILL.md`, `manifest.json`, puis les modules actifs dans l'ordre indiqué p
 1. Depuis le dossier du skill, écris les fichiers exécutables à partir des blocs annotés des modules, par la commande d'extraction du module `execution`, § 8. Elle se colle telle quelle dans bash, CMD ou PowerShell. Ne recopie pas les fichiers à la main.
 2. La commande vérifie elle-même leurs empreintes : elle écrit `conforme` pour chaque fichier, ou `ECART` ou `ABSENT`, et sort alors avec le code 1. Un écart arrête l'installation.
 3. Vérifie la version de Node (22 ou plus récent), puis installe la dépendance : `npm ci`. Elle ne télécharge aucun navigateur ; Chrome doit être installé sur le poste (module `execution`, § 2).
-4. Lance la recette : `npm test` ; sous Linux sans écran, `xvfb-run -a npm test`. Attendu : 29 scénarios, 426 contrôles réussis, aucun échec ; là où l'adresse 127.0.0.2 n'est pas disponible, deux contrôles sont sautés, et un troisième là où un lien symbolique ne peut se créer. Rapporte au développeur le bilan ; un échec arrête l'installation et se rapporte tel quel, sans modifier les scripts.
+4. Lance la recette : `npm test` ; sous Linux sans écran, `xvfb-run -a npm test`. Attendu : 34 scénarios, 521 contrôles réussis, aucun échec ; là où l'adresse 127.0.0.2 n'est pas disponible, quatre contrôles sont sautés, et un cinquième là où un lien symbolique ne peut se créer. Rapporte au développeur le bilan ; un échec arrête l'installation et se rapporte tel quel, sans modifier les scripts.
 
 ## Étape 3 : l'agent et les commandes
 
@@ -39,7 +39,7 @@ Propose au développeur d'installer le sous-agent `agent/pilote-scenario.md` et 
 
 1. Il écrit un texte de départ (module `texte`) pour une application de son poste ; vérifie-le. Si ses scénarios sont dans une demande Jira, importe-les plutôt (module `jira`) : depuis la page qu'il a enregistrée, ou par l'adresse de la demande, où il se connecte lui-même. S'ils sont des tests de Xray ou de Zephyr Scale, ou des fichiers `.feature`, importe-les depuis un export, ou par l'API avec le jeton qu'il définit lui-même dans une variable d'environnement (module `cas-de-test`). Rends-lui le bilan de l'import, relis avec lui chaque test manuel converti, puis vérifie chaque texte écrit.
 2. Si le code de son projet est sur le poste, indexe-le d'abord, avec son accord : `indexer.mjs` le lit sans rien exécuter et n'écrit que dans `index/` du dossier des scénarios (module `code`) ; rends-lui le bilan et chaque limite.
-3. Traduis le texte sur le squelette de `traduire.mjs` (module `scenario`, § 4) ; contrôle chaque proposition de l'index avant de la reprendre, et ne vérifie hors de l'écran (module `hors-ecran`) que ce qu'une phrase demande. Présente-lui ensuite le plan de `verifier.mjs --plan`, ligne du texte par ligne du texte, examine avec lui chaque cible notée absente de l'index, et attends sa ratification.
+3. Traduis le texte sur le squelette de `traduire.mjs` (module `scenario`, § 4) ; contrôle chaque proposition de l'index avant de la reprendre, et ne vérifie hors de l'écran (module `hors-ecran`) que ce qu'une phrase demande, et ne prépare ou ne nettoie les données (module `donnees`) que pour une ligne marquée. Présente-lui ensuite le plan de `verifier.mjs --plan`, ligne du texte par ligne du texte, examine avec lui chaque cible notée absente de l'index, et attends sa ratification.
 4. Joue-le dans une fenêtre visible ; il fait lui-même chaque étape à la main. Examine ensuite avec lui le rapport, chaque étape en échec, chaque relevé hors de l'écran et chaque origine bloquée.
 
 ## Règles qui ne se négocient pas
@@ -50,6 +50,7 @@ Propose au développeur d'installer le sous-agent `agent/pilote-scenario.md` et 
 - Tu ne passes `--autoriser-mutations` qu'avec l'accord explicite du développeur, pour une exécution.
 - Tu n'écris jamais dans Jira, Xray ni Zephyr Scale ; tu ne lis les commentaires d'une demande qu'à sa demande ; tu compares avant de remplacer un texte importé, et tu ne passes `--remplacer` qu'avec son accord.
 - Tu n'exécutes, ne construis ni ne modifies le code du projet : l'index le lit seulement ; une vérification `api` ne fait que des GET, vers une origine que le scénario déclare.
+- Tu ne crées, ne modifies ni ne supprimes aucune donnée hors d'une entrée de préparation ou de nettoyage ratifiée ; ses appels partent avec la session du développeur, sans en-tête ni jeton ajouté, et hors du poste avec son accord seulement.
 - Les résultats, les captures, les téléchargements, les traces, les pages Jira enregistrées et les profils restent sur le poste : tu ne les déplaces, ne les partages ni ne les versionnes.
 - Tu n'adaptes pas les scripts : un écart, une erreur ou un besoin nouveau se signale au développeur.
 - N'applique aucune dimension au statut `reserved`.

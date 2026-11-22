@@ -27,7 +27,7 @@ Phases 7E couvertes : Éléments et État.
 | `capturer` | `nom` : minuscules, chiffres, `-`, `_` | `cible`, `pleine_page` | capture la zone de la cible, ou la page, entière avec `pleine_page = true` |
 | `main` | `message`, `jusqua` : `{ url = "…" }` ou `{ cible = { … }, etat = "visible" }` | | rend la main au développeur, jusqu'à l'état décrit (module `session`, § 4) |
 
-Les champs communs, `ligne`, `delai` et `mutation`, sont décrits au module `scenario`, § 1. Aucune action n'exécute de code dans la page : ni évaluation, ni script injecté, ni fonction exposée ; le moteur ne voit la page que par les localisateurs de Playwright. Les sources du skill n'emploient ni `evaluate`, ni `addInitScript`, ni `exposeFunction`, ni `waitForTimeout`, et la recette le vérifie (R15). Le JavaScript de l'application, lui, s'exécute normalement.
+Les champs communs, `ligne`, `delai` et `mutation`, sont décrits au module `scenario`, § 1. Aucune action n'exécute de code dans la page : ni évaluation, ni script injecté, ni fonction exposée ; le moteur ne voit la page que par les localisateurs de Playwright. La préparation et le nettoyage des données ne sont pas des actions : ils ont leurs sections du scénario, hors de ce jeu, qui ne change pas (module `donnees`). Les sources du skill n'emploient ni `evaluate`, ni `addInitScript`, ni `exposeFunction`, ni `waitForTimeout`, et la recette le vérifie (R15). Le JavaScript de l'application, lui, s'exécute normalement.
 
 ## 2. Attentes et délais (D5.INV-2)
 
@@ -57,11 +57,11 @@ Une adresse attendue (`verifier` et `url`, `attendre` et `url`, `jusqua.url`) se
 
 ## 4. Déroulé d'un jeu (D5.INV-3)
 
-Les étapes se jouent dans l'ordre, une fois chacune : aucune étape n'est rejouée, ni après un échec, ni en cas d'instabilité. Une étape échouée arrête le jeu ; les étapes suivantes sont « non jouées », avec le motif. Une exception : après une étape `verifier` échouée, les étapes `verifier` qui suivent sont jouées, car aucune ne change la page et chaque attendu reçoit son constat ; la première étape d'une autre action est alors non jouée, et le jeu s'arrête. Le jeu suivant, s'il y en a, est joué dans un onglet neuf du même profil.
+Les étapes se jouent dans l'ordre, une fois chacune : aucune étape n'est rejouée, ni après un échec, ni en cas d'instabilité. Les entrées de préparation se jouent à leur place parmi elles, et le nettoyage après elles, même après un échec (module `donnees`, § 7). Une étape échouée arrête le jeu ; les étapes suivantes sont « non jouées », avec le motif. Une exception : après une étape `verifier` échouée, les étapes `verifier` qui suivent sont jouées, car aucune ne change la page et chaque attendu reçoit son constat ; la première étape d'une autre action est alors non jouée, et le jeu s'arrête. Le jeu suivant, s'il y en a, est joué dans un onglet neuf du même profil.
 
 ## 5. Mutations
 
-Une étape qui crée, modifie ou supprime des données porte `mutation` : sa ligne du texte est marquée, ou la traduction la signale (module `texte`, § 5). Hors du poste, ces étapes demandent l'autorisation explicite du développeur pour l'exécution, et une étape de mutation sur une page hors du poste échoue sans agir quand elle manque (D7.INV-2, module `garde`, § 2). Une mutation n'est jamais rejouée, comme toute étape (§ 4).
+Une étape qui crée, modifie ou supprime des données porte `mutation` : sa ligne du texte est marquée, ou la traduction la signale (module `texte`, § 5). Hors du poste, ces étapes demandent l'autorisation explicite du développeur pour l'exécution, et une étape de mutation sur une page hors du poste échoue sans agir quand elle manque (D7.INV-2, module `garde`, § 2). Un appel de préparation ou de nettoyage est toujours une mutation, que sa méthode détermine (D20.INV-3). Une mutation n'est jamais rejouée, comme toute étape (§ 4).
 
 ## 6. Fichiers (D5.INV-5)
 
@@ -70,7 +70,7 @@ Une étape qui crée, modifie ou supprime des données porte `mutation` : sa lig
 
 ## 7. Point d'extension E3
 
-`jouerScenario(contexte, options)` joue des jeux préparés dans un contexte de navigateur ouvert, et rend la liste des jeux joués, chacun avec ses étapes au format du rapport (module `preuves`, § 2). Options : `scenario` (validé), `jeux` (préparés par `preparerJeux` du module `scenario`), `resultats` (dossier), `journal` (rendu par `garderOrigines` du module `session`), `delai` (s), `autoriserMutations`, `surEvenement` (avancement : début d'un jeu, début et fin d'une étape, étape à la main). `jouer.mjs` en est le premier appelant ; la recette en est un second (R8).
+`jouerScenario(contexte, options)` joue des jeux préparés dans un contexte de navigateur ouvert, et rend la liste des jeux joués, chacun avec ses entrées de préparation et de nettoyage et ses étapes au format du rapport (module `preuves`, § 2). Options : `scenario` (validé), `jeux` (préparés par `preparerJeux` du module `scenario`), `resultats` (dossier), `journal` (rendu par `garderOrigines` du module `session`), `delai` (s), `autoriserMutations`, `surEvenement` (avancement : début d'un jeu, début et fin d'une étape, d'une étape d'un scénario de préparation et d'une entrée, étape à la main). La garde des appels hors du poste tient pour tout appelant (D20.INV-3). `jouer.mjs` en est le premier appelant ; la recette en est un second (R8).
 
 ## 8. Contrôle de sortie
 
@@ -79,12 +79,13 @@ Une étape qui crée, modifie ou supprime des données porte `mutation` : sa lig
 - Les vérifications échouées se poursuivent, les autres échecs arrêtent le jeu, rien n'est rejoué (D5.INV-3).
 - Chaque critère donne l'attendu et l'obtenu (D5.INV-4), hors de l'écran compris (D19.INV-3).
 - Aucune source n'exécute de code dans la page (D5.INV-1).
+- La préparation se joue à sa place, le nettoyage après les étapes, même après un échec (D20.INV-4).
 
 ## 9. Source `scripts/moteur.mjs`
 
 <!-- fichier : scripts/moteur.mjs -->
 ```javascript
-// scenario-playwright 1.3.0 : moteur des étapes, jeu d'actions fermé.
+// scenario-playwright 1.4.0 : moteur des étapes, jeu d'actions fermé, préparation et nettoyage des données.
 //
 // Chaque étape agit comme une personne devant l'écran, sur une cible résolue côté utilisateur (D4).
 // Aucune étape n'exécute de code dans la page (D5.INV-1) ; les attentes portent sur un état, dans un
@@ -93,13 +94,16 @@ Une étape qui crée, modifie ou supprime des données porte `mutation` : sa lig
 // observent les requêtes de la page, lisent l'API en GET sur une origine déclarée, sans suivre de
 // redirection, et lisent les fichiers téléchargés (D19.INV-1) ; aucun en-tête ni cookie n'est relevé,
 // les corps restent en mémoire, jamais ceux d'une étape à la main, et les secrets sont masqués (D19.INV-2).
+// La préparation et le nettoyage des données appellent l'API d'une origine déclarée avec la session du
+// navigateur et le jeton anti-CSRF recopié de son cookie, sans suivre de redirection ni rejouer un appel
+// (D20.INV-2), sous la garde des mutations (D20.INV-3) ; le nettoyage se joue même après un échec (D20.INV-4).
 import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, extname, join } from 'node:path';
 import { setTimeout as pause } from 'node:timers/promises';
 import { URL, URLSearchParams } from 'node:url';
 import { decrireCible, estFragile, localisateur } from './cibles.mjs';
-import { DELAI_MAIN_DEFAUT, enTexte, masquerValeurs, RE_SECRET, resumeEtape } from './scenario.mjs';
+import { afficherGardees, DELAI_MAIN_DEFAUT, enTexte, masquerValeurs, RE_SECRET, resoudreGardees, resumeEntree, resumeEtape } from './scenario.mjs';
 import { estLocale } from './session.mjs';
 
 export const INTERVALLES = [100, 250, 500, 1000];
@@ -475,10 +479,229 @@ async function attendre(page, e, delaiMs, urlBase) {
   throw new Echec(`${decrireCible(e.cible)} n'est pas ${libelle} en ${Math.round(delaiMs / 1000)} s`);
 }
 
+// --- Préparation et nettoyage des données (D20) -------------------------------------------------------------
+
+/** Cookies anti-CSRF et l'en-tête où les recopier, comme Angular, Spring, Laravel et Django (D20.INV-2). */
+export const JETONS_CSRF = [['XSRF-TOKEN', 'X-XSRF-TOKEN'], ['csrftoken', 'X-CSRFToken']];
+/** Taille au-delà de laquelle la réponse d'un appel n'est pas lue : aucune valeur n'en est gardée. */
+export const LIMITE_REPONSE_APPEL = 1048576;
+const INDICES_STATUT = {
+  401: "l'API ne reconnaît pas la session du navigateur : se connecter à la main avant la préparation, ou, pour une API à jeton, préparer par un scénario (module donnees)",
+  403: "accès refusé : droits de l'utilisateur, ou jeton anti-CSRF absent ou refusé",
+};
+
+/** Indice de l'étape devant laquelle se joue chaque entrée de préparation : la première étape de ligne plus grande, sinon la première qui n'est pas à la main. */
+export function positionsPreparation(etapes, preparation) {
+  return preparation.map((p) => {
+    const k = etapes.findIndex((e) => (Number.isInteger(p.ligne) && Number.isInteger(e.ligne) ? e.ligne > p.ligne : e.action !== 'main'));
+    return k < 0 ? etapes.length : k;
+  });
+}
+
+/** Valeur d'un chemin dans une réponse JSON : id, client.id, items.0.id ; « . » pour la réponse entière. */
+export function valeurAuChemin(json, chemin) {
+  if (chemin === '.') return json;
+  let v = json;
+  for (const p of chemin.split('.')) {
+    if (Array.isArray(v) && /^\d+$/.test(p)) v = v[Number(p)];
+    else if (estTable(v) && Object.hasOwn(v, p)) v = v[p];
+    else return undefined;
+  }
+  return v;
+}
+
+/** En-tête anti-CSRF recopié de son cookie, en mémoire, jamais écrit ; {} sans cookie. */
+async function enteteCsrf(contexte, adresse) {
+  const cookies = await contexte.cookies(adresse).catch(() => []);
+  for (const [nom, entete] of JETONS_CSRF) {
+    const c = cookies.find((x) => x.name === nom);
+    if (!c) continue;
+    let v = c.value;
+    try { v = decodeURIComponent(v); } catch { /* valeur telle quelle */ }
+    return { [entete]: v };
+  }
+  return {};
+}
+
+/**
+ * Appel d'API d'une préparation ou d'un nettoyage : origine déclarée, session du navigateur, une seule
+ * tentative, aucune redirection suivie, garde des mutations ; les valeurs gardées vont dans `gardees`.
+ */
+async function appeler(page, e, { scenario, delaiMs, autoriserMutations, gardees, r }) {
+  const adresse = new URL(e.chemin, scenario.url_base);
+  if (!scenario.origines.includes(adresse.origin)) throw new Echec(`${adresse.origin} n'est pas parmi les origines du scénario : aucun appel fait (D20.INV-2)`);
+  if (!estLocale(adresse.origin) && !autoriserMutations) throw new Echec(`appel ${e.methode} sur ${adresse.origin}, hors du poste, sans --autoriser-mutations : aucun appel fait (D7.INV-2)`);
+  const contexte = page.context();
+  const entetes = { accept: 'application/json', ...(await enteteCsrf(contexte, adresse.href)) };
+  const options = { method: e.methode, headers: entetes, maxRedirects: 0, failOnStatusCode: false, timeout: delaiMs };
+  if (e.corps !== undefined) { entetes['content-type'] = 'application/json'; options.data = JSON.stringify(e.corps); }
+  const desig = `${e.methode} ${adresseMasquee(adresse.href)}`;
+  let rep;
+  try {
+    rep = await contexte.request.fetch(adresse.href, options);
+  } catch (err) {
+    throw new Echec(`${desig} : ${messageErreur(err, delaiMs)}`);
+  }
+  try {
+    const statut = rep.status();
+    r.appel = { methode: e.methode, adresse: adresseMasquee(adresse.href), statut, octets: null };
+    if (statut >= 300 && statut < 400) throw new Echec(`${desig} : l'API répond ${statut}, redirection vers ${adresseMasquee(new URL(rep.headers().location ?? '', adresse).href)} non suivie (D20.INV-2)`);
+    const corps = await rep.body();
+    r.appel.octets = corps.length;
+    const attendus = e.statut === undefined ? null : [].concat(e.statut);
+    if (!(attendus ? attendus.includes(statut) : statut >= 200 && statut < 300)) {
+      throw new Echec(`${desig} : attendu : ${attendus ? `statut ${attendus.join(' ou ')}` : 'un statut 2xx'} ; obtenu : statut ${statut}${INDICES_STATUT[statut] ? ` (${INDICES_STATUT[statut]})` : ''}`);
+    }
+    if (!e.garder) return;
+    if (corps.length > LIMITE_REPONSE_APPEL) throw new Echec(`${desig} : réponse de plus de ${LIMITE_REPONSE_APPEL} octets, non lue : aucune valeur gardée`);
+    let json;
+    try { json = JSON.parse(corps.toString('utf8')); } catch { throw new Echec(`${desig} : réponse non JSON : aucune valeur gardée`); }
+    for (const [nom, chemin] of Object.entries(e.garder)) {
+      const v = valeurAuChemin(json, chemin);
+      if (v === undefined || v === null) throw new Echec(`${desig} : valeur « ${chemin} » absente de la réponse : ${nom} non gardée`);
+      if (typeof v === 'object') throw new Echec(`${desig} : « ${chemin} » n'est pas une valeur simple de la réponse : ${nom} non gardée`);
+      gardees.set(nom, String(v));
+      r.gardees.push(nom);
+    }
+  } finally {
+    await rep.dispose().catch(() => {});
+  }
+}
+
+/** Valeurs gardées d'un jeu, pour le rapport : masquées par leur nom (D20.INV-2). */
+const gardeesLisibles = (gardees) => Object.fromEntries([...gardees].map(([k, v]) => [k, RE_SECRET.test(k) ? '***' : v]));
+
+/**
+ * Masque, dans les textes d'un résultat, chaque valeur gardée au nom de secret, de quatre caractères au
+ * moins, telle quelle ou encodée dans une adresse : réemployée par une étape ou un appel, elle ne paraît ni
+ * dans la sortie ni dans le rapport (D20.INV-2). Le résultat est modifié en place.
+ */
+function masquerSecretsGardes(objet, gardees) {
+  const secrets = [...new Set([...gardees].filter(([k, v]) => RE_SECRET.test(k) && String(v).length >= 4).flatMap(([, v]) => [String(v), encodeURIComponent(String(v))]))].sort((a, b) => b.length - a.length);
+  if (!secrets.length) return objet;
+  const parcourir = (o) => {
+    for (const [k, x] of Object.entries(o)) {
+      if (typeof x === 'string') o[k] = secrets.reduce((t, s) => t.split(s).join('***'), x);
+      else if (x && typeof x === 'object') parcourir(x);
+    }
+  };
+  if (objet && typeof objet === 'object') parcourir(objet);
+  return objet;
+}
+
+/**
+ * Joue une suite d'étapes dans une page : celles d'un jeu, ou celles d'un scénario de préparation. `avant(i,
+ * arret)` joue, s'il est donné, les entrées de préparation placées devant l'étape i, et rend le motif d'arrêt
+ * si l'une échoue. Rend { statut, etapes }.
+ */
+async function jouerSuite(page, etapes, ctx, { avant = null, prefixe, sous = false } = {}) {
+  const { scenario, resultats, journal, delai, autoriserMutations, surEvenement, reseau, telechargements, gardees, numeroJeu } = ctx;
+  const sortie = { statut: 'reussi', etapes: [] };
+  let arret = null; // motif d'arrêt : les étapes suivantes ne sont pas jouées
+  let echecVerifier = false;
+  for (let i = 0; i <= etapes.length; i++) {
+    if (avant) {
+      const motif = await avant(i, arret ?? (echecVerifier ? 'une vérification a échoué' : null));
+      if (motif && !arret) { arret = motif; sortie.statut = 'echec'; }
+    }
+    if (i === etapes.length) break;
+    const { valeur: e, manquantes } = resoudreGardees(etapes[i], gardees);
+    const affichee = afficherGardees(e);
+    const r = {
+      numero: i + 1, ligne: e.ligne ?? null, action: e.action, resume: resumeEtape(affichee), cible: e.cible ? decrireCible(affichee.cible) : null,
+      fragile: estFragile(e.cible) || estFragile(e.jusqua?.cible), mutation: e.mutation ?? null, statut: 'reussie', duree_ms: 0, message: null,
+      capture: null, aria: null, telechargement: null, hors_ecran: null, console: [], erreurs_page: [], reponses: [],
+    };
+    sortie.etapes.push(r);
+    if (arret || (echecVerifier && e.action !== 'verifier')) {
+      if (!arret) arret = 'une vérification a échoué';
+      r.statut = 'non_jouee';
+      r.message = `non jouée : ${arret}`;
+      continue;
+    }
+    ctx.seau.courant = r;
+    const delaiMs = (e.delai ?? (e.action === 'main' ? DELAI_MAIN_DEFAUT : delai)) * 1000;
+    const debut = Date.now();
+    let fin = null;
+    surEvenement({ type: 'etape', jeu: numeroJeu, etape: masquerSecretsGardes(r, gardees), sous });
+    if (!ETAPES_SANS_ACTION.has(e.action)) { reseau.debutAction = debut; reseau.etapeAction = i + 1; }
+    reseau.main = e.action === 'main';
+    try {
+      if (manquantes.length) throw new Echec(`variable${manquantes.length > 1 ? 's' : ''} ${manquantes.map((m) => `\${${m}}`).join(', ')} non obtenue${manquantes.length > 1 ? 's' : ''} : aucune action faite (D20.INV-6)`);
+      if (e.mutation) {
+        const origine = new URL(page.url()).origin;
+        if (!/^https?:/.test(page.url()) || (!estLocale(origine) && !autoriserMutations)) {
+          throw new Echec(`étape de mutation sur ${/^https?:/.test(page.url()) ? origine : page.url()}, hors du poste, sans --autoriser-mutations : aucune action faite (D7.INV-2)`);
+        }
+      }
+      await jouerEtape(page, e, { delaiMs, scenario, resultats, prefixe: prefixe(i), r, surEvenement, reseau, telechargements });
+      const bloquee = journal?.navigations.find((n) => n.page === page && n.quand >= debut);
+      if (bloquee) throw new Echec(`navigation vers ${bloquee.url}, origine non déclarée par le scénario, interrompue (D7.INV-1)`);
+    } catch (err) {
+      r.statut = 'echec';
+      r.message = err instanceof Echec ? err.message : messageErreur(err, delaiMs);
+      sortie.statut = 'echec';
+      if (e.action === 'verifier') echecVerifier = true;
+      else arret = `l'étape ${i + 1} a échoué`;
+      // La durée de l'étape s'arrête à l'échec : les preuves de l'échec n'y entrent pas.
+      fin = Date.now();
+      await preuvesEchec(page, resultats, prefixe(i), r);
+    }
+    reseau.main = false;
+    r.duree_ms = (fin ?? Date.now()) - debut;
+    // Le seau reste celui de cette étape jusqu'au début de la suivante : un message tardif lui revient.
+    surEvenement({ type: 'fin-etape', jeu: numeroJeu, etape: masquerSecretsGardes(r, gardees), sous });
+  }
+  return sortie;
+}
+
+/**
+ * Joue une entrée de préparation ou de nettoyage, une seule fois (D5.INV-3) : un appel d'API, ou les étapes
+ * d'un scénario de préparation dans la même page (D20.INV-5). Une entrée dont une variable gardée manque
+ * n'est pas jouée. Rend son résultat au format du rapport.
+ */
+async function jouerEntree(page, entree, ctx, arret) {
+  const { valeur: e, manquantes } = resoudreGardees(entree, ctx.gardees);
+  const r = {
+    numero: e.numero, ligne: e.ligne, genre: e.genre, type: e.type, resume: resumeEntree(afficherGardees(e)), mutation: e.type === 'api' ? e.mutation : null,
+    statut: 'reussie', duree_ms: 0, message: null, appel: null, gardees: [], scenario: e.type === 'scenario' ? e.scenario : null, etapes: null, capture: null, aria: null,
+  };
+  const marque = `${e.genre === 'preparation' ? 'p' : 'n'}${e.numero}`;
+  if (arret || manquantes.length) {
+    r.statut = 'non_jouee';
+    r.message = `non jouée : ${arret ?? `${manquantes.map((m) => `\${${m}}`).join(', ')} non obtenue${manquantes.length > 1 ? 's' : ''}, sa préparation n'a pas abouti (D20.INV-4)`}`;
+    return r;
+  }
+  ctx.seau.courant = null;
+  ctx.surEvenement({ type: 'entree', jeu: ctx.numeroJeu, entree: masquerSecretsGardes(r, ctx.gardees) });
+  const delaiMs = (e.delai ?? ctx.delai) * 1000;
+  const debut = Date.now();
+  let fin = null;
+  try {
+    if (e.type === 'api') await appeler(page, e, { scenario: ctx.scenario, delaiMs, autoriserMutations: ctx.autoriserMutations, gardees: ctx.gardees, r });
+    else {
+      const { scenario: s, jeu } = e.sous;
+      const suite = await jouerSuite(page, jeu.etapes, { ...ctx, scenario: s, delai: s.delai ?? ctx.delai, telechargements: new Map() }, { prefixe: (i) => `${ctx.prefixeJeu}${marque}-${String(i + 1).padStart(2, '0')}`, sous: true });
+      r.etapes = suite.etapes;
+      const ko = suite.etapes.find((x) => x.statut === 'echec');
+      if (ko) throw new Echec(`scénario ${e.scenario}, étape ${ko.numero} : ${ko.message}`);
+    }
+  } catch (err) {
+    r.statut = 'echec';
+    r.message = err instanceof Echec ? err.message : messageErreur(err, delaiMs);
+    fin = Date.now();
+    if (e.type === 'api') await preuvesEchec(page, ctx.resultats, `${ctx.prefixeJeu}${marque}`, r, e.genre);
+  }
+  r.duree_ms = (fin ?? Date.now()) - debut;
+  ctx.surEvenement({ type: 'fin-entree', jeu: ctx.numeroJeu, entree: masquerSecretsGardes(r, ctx.gardees) });
+  return r;
+}
+
 /**
  * Joue les jeux préparés dans le contexte du navigateur (point d'extension E3). Options :
  * { scenario, jeux, resultats (dossier), journal (garde des origines), delai (s), autoriserMutations,
- *   surEvenement }. Rend la liste des jeux joués, avec le résultat de chaque étape.
+ *   surEvenement }. Chaque jeu : sa préparation à sa place, ses étapes, puis son nettoyage, même après un
+ * échec (D20.INV-4). Rend la liste des jeux joués, avec le résultat de chaque entrée et de chaque étape.
  */
 export async function jouerScenario(contexte, { scenario, jeux, resultats, journal, delai, autoriserMutations = false, surEvenement = () => {} }) {
   const joues = [];
@@ -489,74 +712,49 @@ export async function jouerScenario(contexte, { scenario, jeux, resultats, journ
     const page = precedente === null && contexte.pages().length > 0 ? contexte.pages()[0] : await contexte.newPage();
     if (precedente) await precedente.close().catch(() => {});
     precedente = page;
-    let seau = null;
-    page.on('console', (m) => { if (seau && m.type() === 'error') seau.console.push(m.text().slice(0, 500)); });
-    page.on('pageerror', (err) => { if (seau) seau.erreurs_page.push(String(err.message).slice(0, 500)); });
-    page.on('response', (rep) => { if (seau && rep.status() >= 400) seau.reponses.push(`${rep.status()} ${rep.url()}`); });
+    const seau = { courant: null };
+    page.on('console', (m) => { if (seau.courant && m.type() === 'error') seau.courant.console.push(m.text().slice(0, 500)); });
+    page.on('pageerror', (err) => { if (seau.courant) seau.courant.erreurs_page.push(String(err.message).slice(0, 500)); });
+    page.on('response', (rep) => { if (seau.courant && rep.status() >= 400) seau.courant.reponses.push(`${rep.status()} ${rep.url()}`); });
     const reseau = { requetes: [], debutAction: Date.now(), etapeAction: 0, main: false };
     releverRequetes(page, reseau);
-    const telechargements = new Map();
-    const resultat = { numero: jeu.numero, valeurs: jeu.valeurs, statut: 'reussi', etapes: [] };
+    const gardees = new Map();
+    const prefixeJeu = plusieurs ? `j${jeu.numero}-` : '';
+    const ctx = { scenario, resultats, journal, delai, autoriserMutations, surEvenement, reseau, telechargements: new Map(), gardees, numeroJeu: jeu.numero, seau, prefixeJeu };
+    const resultat = { numero: jeu.numero, valeurs: jeu.valeurs, statut: 'reussi', preparation: [], etapes: [], nettoyage: [], gardees: {}, nettoyage_en_echec: 0 };
     surEvenement({ type: 'jeu', jeu: jeu.numero, valeurs: jeu.valeurs, plusieurs });
-    let arret = null; // motif d'arrêt : les étapes suivantes ne sont pas jouées
-    let echecVerifier = false;
-    for (let i = 0; i < jeu.etapes.length; i++) {
-      const e = jeu.etapes[i];
-      const prefixe = `${plusieurs ? `j${jeu.numero}-` : ''}${String(i + 1).padStart(2, '0')}`;
-      const r = {
-        numero: i + 1, ligne: e.ligne ?? null, action: e.action, resume: resumeEtape(e), cible: e.cible ? decrireCible(e.cible) : null,
-        fragile: estFragile(e.cible) || estFragile(e.jusqua?.cible), mutation: e.mutation ?? null, statut: 'reussie', duree_ms: 0, message: null,
-        capture: null, aria: null, telechargement: null, hors_ecran: null, console: [], erreurs_page: [], reponses: [],
-      };
-      resultat.etapes.push(r);
-      if (arret || (echecVerifier && e.action !== 'verifier')) {
-        if (!arret) arret = 'une vérification a échoué';
-        r.statut = 'non_jouee';
-        r.message = `non jouée : ${arret}`;
-        continue;
+    const preparation = jeu.preparation ?? [];
+    const positions = positionsPreparation(jeu.etapes, preparation);
+    const avant = async (i, arret) => {
+      let motif = null;
+      for (const [k, p] of preparation.entries()) {
+        if (positions[k] !== i) continue;
+        const r = await jouerEntree(page, p, ctx, arret ?? motif);
+        resultat.preparation.push(r);
+        if (r.statut === 'echec' && !motif) motif = `la préparation ${k + 1} a échoué`;
       }
-      seau = r;
-      const delaiMs = (e.delai ?? (e.action === 'main' ? DELAI_MAIN_DEFAUT : delai)) * 1000;
-      const debut = Date.now();
-      let fin = null;
-      surEvenement({ type: 'etape', jeu: jeu.numero, etape: r });
-      if (!ETAPES_SANS_ACTION.has(e.action)) { reseau.debutAction = debut; reseau.etapeAction = i + 1; }
-      reseau.main = e.action === 'main';
-      try {
-        if (e.mutation) {
-          const origine = new URL(page.url()).origin;
-          if (!/^https?:/.test(page.url()) || (!estLocale(origine) && !autoriserMutations)) {
-            throw new Echec(`étape de mutation sur ${/^https?:/.test(page.url()) ? origine : page.url()}, hors du poste, sans --autoriser-mutations : aucune action faite (D7.INV-2)`);
-          }
-        }
-        await jouerEtape(page, e, { delaiMs, scenario, resultats, prefixe, r, surEvenement, reseau, telechargements });
-        const bloquee = journal?.navigations.find((n) => n.page === page && n.quand >= debut);
-        if (bloquee) throw new Echec(`navigation vers ${bloquee.url}, origine non déclarée par le scénario, interrompue (D7.INV-1)`);
-      } catch (err) {
-        r.statut = 'echec';
-        r.message = err instanceof Echec ? err.message : messageErreur(err, delaiMs);
-        resultat.statut = 'echec';
-        if (e.action === 'verifier') echecVerifier = true;
-        else arret = `l'étape ${i + 1} a échoué`;
-        // La durée de l'étape s'arrête à l'échec : les preuves de l'échec n'y entrent pas.
-        fin = Date.now();
-        await preuvesEchec(page, resultats, prefixe, r);
-      }
-      reseau.main = false;
-      r.duree_ms = (fin ?? Date.now()) - debut;
-      // Le seau reste celui de cette étape jusqu'au début de la suivante : un message tardif lui revient.
-      surEvenement({ type: 'fin-etape', jeu: jeu.numero, etape: r });
+      return motif;
+    };
+    const suite = await jouerSuite(page, jeu.etapes, ctx, { avant, prefixe: (i) => `${prefixeJeu}${String(i + 1).padStart(2, '0')}` });
+    resultat.etapes = suite.etapes;
+    resultat.statut = suite.statut;
+    // Le nettoyage se joue après les étapes, même après un échec ; ses échecs ne changent pas le statut (D20.INV-4).
+    for (const n of jeu.nettoyage ?? []) {
+      const r = await jouerEntree(page, n, ctx, null);
+      resultat.nettoyage.push(r);
+      if (r.statut === 'echec') resultat.nettoyage_en_echec++;
     }
-    joues.push(resultat);
+    resultat.gardees = gardeesLisibles(gardees);
+    joues.push(masquerSecretsGardes(resultat, gardees));
   }
   return joues;
 }
 
-async function preuvesEchec(page, resultats, prefixe, r) {
+async function preuvesEchec(page, resultats, prefixe, r, action = r.action) {
   if (page.isClosed()) return;
   try {
     if (!r.capture) {
-      const rel = `captures/${prefixe}-${r.action}-echec.png`;
+      const rel = `captures/${prefixe}-${action}-echec.png`;
       mkdirSync(join(resultats, 'captures'), { recursive: true });
       await page.screenshot({ path: join(resultats, rel), timeout: 10_000 });
       r.capture = rel;
@@ -564,7 +762,7 @@ async function preuvesEchec(page, resultats, prefixe, r) {
   } catch { /* page fermée ou figée : pas de capture */ }
   try {
     const arbre = await page.locator('body').ariaSnapshot({ timeout: 10_000 });
-    const rel = `aria/${prefixe}-${r.action}.yml`;
+    const rel = `aria/${prefixe}-${action}.yml`;
     mkdirSync(join(resultats, 'aria'), { recursive: true });
     writeFileSync(join(resultats, rel), `${arbre}\n`);
     r.aria = rel;
