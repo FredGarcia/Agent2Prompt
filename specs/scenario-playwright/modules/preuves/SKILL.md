@@ -1,6 +1,6 @@
 ---
 name: preuves
-description: Preuves et rapport d'une exécution (dossier de résultats horodaté à côté du scénario, rapport.json aux champs stables, point d'extension E1, rapport.md lisible, captures par vérification, par capture demandée et par échec, instantané ARIA à l'échec, erreurs de console, erreurs de la page et réponses de statut 400 ou plus relevées par étape, téléchargements et leur empreinte, relevé des vérifications hors de l'écran, origines bloquées, cibles fragiles, trace sur demande), source de scripts/rapport.mjs. À lire pour exploiter un rapport.
+description: Preuves et rapport d'une exécution (dossier de résultats horodaté à côté du scénario, rapport.json aux champs stables, point d'extension E1, rapport.md lisible, captures par vérification, par capture demandée et par échec, instantané ARIA à l'échec, erreurs de console, erreurs de la page et réponses de statut 400 ou plus relevées par étape, téléchargements et leur empreinte, relevé des vérifications hors de l'écran, entrées de préparation et de nettoyage et valeurs gardées, nettoyage en échec signalé, origines bloquées, cibles fragiles, trace sur demande), source de scripts/rapport.mjs. À lire pour exploiter un rapport.
 dimensions: [D8]
 status: active
 ---
@@ -17,6 +17,7 @@ Chaque exécution écrit son dossier, `resultats/<AAAAMMJJ-HHMMSS>-<scénario>/`
 rapport.json            champs stables (§ 2)
 rapport.md              le même rapport, lisible
 captures/<n>-<action>.png        vérification, capture demandée (nom donné), échec (…-echec.png)
+captures/p<k>-…, n<k>-…          entrée de préparation ou de nettoyage : appel en échec, sur la page ouverte, étapes d'un scénario de préparation
 aria/<n>-<action>.yml            instantané ARIA de la page, à chaque échec
 telechargements/<fichier>        fichiers téléchargés
 trace.zip               seulement avec --trace
@@ -35,10 +36,10 @@ Format `scenario-playwright.rapport/1`. Champs de l'exécution :
 | `debut`, `fin`, `duree_ms` | horodatages ISO et durée |
 | `navigateur` | `canal`, `version`, `playwright_core`, `chromium_reference`, `avertissement` (D6.INV-1) |
 | `options` | `sans_tete`, `ralenti`, `trace`, `mutations_autorisees`, `params`, `jeu` |
-| `jeux` | pour chaque jeu : `numero`, `valeurs` (variables résolues), `statut` (`reussi`, `echec`), `etapes` |
+| `jeux` | pour chaque jeu : `numero`, `valeurs` (variables résolues, `unique` compris), `statut` (`reussi`, `echec`), `preparation`, `etapes`, `nettoyage`, `gardees` (valeurs gardées, masquées par leur nom), `nettoyage_en_echec` ; les entrées de préparation et de nettoyage ont leurs champs au module `donnees`, § 9 ; ajoutés en 1.4.0 |
 | `origines_bloquees` | `[{ origine, requetes }]` (D7.INV-1) |
 | `cibles_fragiles` | cibles en `css` ou `rang` employées (D4.INV-1) |
-| `bilan` | `jeux`, `etapes`, `reussies`, `echecs`, `non_jouees` |
+| `bilan` | `jeux`, `etapes`, `reussies`, `echecs`, `non_jouees`, et depuis 1.4.0 `preparations`, `nettoyages`, `nettoyages_en_echec` |
 | `statut` | `reussi` si chaque jeu a réussi, sinon `echec` |
 
 Champs de chaque étape :
@@ -58,13 +59,13 @@ Ces champs sont stables : un nouveau champ peut s'ajouter dans une version mineu
 
 ## 3. `rapport.md`
 
-Le même rapport, en français : statut et titre, scénario et texte d'origine, étiquettes, durée et bilan, navigateur et avertissement, rappel sur la trace, un tableau des étapes par jeu (numéro, ligne du texte, résumé, statut, durée, message, capture, instantané, téléchargement, relevé hors de l'écran, erreurs relevées), puis les origines bloquées et les cibles fragiles, avec la conduite à tenir.
+Le même rapport, en français : statut et titre, scénario et texte d'origine, étiquettes, durée et bilan, nettoyage en échec s'il y en a, navigateur et avertissement, rappel sur la trace, les tableaux de la préparation et du nettoyage et les valeurs gardées, un tableau des étapes par jeu (numéro, ligne du texte, résumé, statut, durée, message, capture, instantané, téléchargement, relevé hors de l'écran, erreurs relevées), puis les origines bloquées et les cibles fragiles, avec la conduite à tenir.
 
 ## 4. Captures et instantanés (D8.INV-2)
 
 - Chaque étape `verifier` à l'écran a sa capture, réussie ou non : la zone de la cible si elle est unique et visible, sinon la page. Une vérification hors de l'écran a son relevé, `hors_ecran`, et la capture de la page à l'échec seulement.
 - Chaque étape `capturer` a la sienne, nommée par `nom` : la zone de la cible, ou la page, entière avec `pleine_page = true`.
-- Chaque échec a la capture de la page et l'instantané ARIA de la page entière : l'arbre que voit un lecteur d'écran, où se lisent les rôles et les noms des éléments présents, pour corriger une cible. Chacun attend 10 s au plus : une page figée ne retient pas l'exécution.
+- Chaque échec a la capture de la page et l'instantané ARIA de la page entière, échec d'un appel de préparation ou de nettoyage compris : l'arbre que voit un lecteur d'écran, où se lisent les rôles et les noms des éléments présents, pour corriger une cible. Chacun attend 10 s au plus : une page figée ne retient pas l'exécution.
 
 ## 5. Erreurs relevées
 
@@ -80,15 +81,16 @@ Les erreurs de console, les exceptions de la page et les réponses HTTP de statu
 
 <!-- fichier : scripts/rapport.mjs -->
 ```javascript
-// scenario-playwright 1.3.0 : rapport d'une exécution, en JSON (champs stables, E1) et en Markdown.
+// scenario-playwright 1.4.0 : rapport d'une exécution, en JSON (champs stables, E1) et en Markdown.
 //
 // Chaque exécution écrit son dossier de résultats horodaté : rapport.json, rapport.md, captures,
 // instantanés ARIA à l'échec, téléchargements, et la trace si elle est demandée (D8.INV-1, D8.INV-2).
+// La préparation et le nettoyage des données ont leurs entrées, et un nettoyage en échec est signalé (D20).
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 export const FORMAT_RAPPORT = 'scenario-playwright.rapport/1';
-export const VERSION_SKILL = '1.3.0';
+export const VERSION_SKILL = '1.4.0';
 
 const deux = (n) => String(n).padStart(2, '0');
 
@@ -113,6 +115,7 @@ export function dossierResultats(base, nomScenario, date = new Date()) {
 export function construireRapport({ fichier, scenario, empreinte, debut, fin, navigateur, options, jeux, journal }) {
   const etapes = jeux.flatMap((j) => j.etapes);
   const compte = (s) => etapes.filter((e) => e.statut === s).length;
+  const entrees = (g) => jeux.flatMap((j) => j[g] ?? []);
   const statut = jeux.every((j) => j.statut === 'reussi') ? 'reussi' : 'echec';
   return {
     format: FORMAT_RAPPORT,
@@ -127,7 +130,10 @@ export function construireRapport({ fichier, scenario, empreinte, debut, fin, na
     jeux,
     origines_bloquees: [...(journal?.bloquees ?? new Map())].map(([origine, requetes]) => ({ origine, requetes })),
     cibles_fragiles: [...new Set(etapes.filter((e) => e.fragile).map((e) => e.cible))],
-    bilan: { jeux: jeux.length, etapes: etapes.length, reussies: compte('reussie'), echecs: compte('echec'), non_jouees: compte('non_jouee') },
+    bilan: {
+      jeux: jeux.length, etapes: etapes.length, reussies: compte('reussie'), echecs: compte('echec'), non_jouees: compte('non_jouee'),
+      preparations: entrees('preparation').length, nettoyages: entrees('nettoyage').length, nettoyages_en_echec: entrees('nettoyage').filter((e) => e.statut === 'echec').length,
+    },
     statut,
   };
 }
@@ -142,22 +148,42 @@ function horsEcran(h) {
 }
 const echapper = (s) => String(s ?? '').replace(/\|/g, '\\|').replace(/\n/g, ' ');
 
+/** Détails d'une étape, en une cellule. */
+const detailsEtape = (e) => [e.message, e.capture ? `capture \`${e.capture}\`` : null, e.aria ? `ARIA \`${e.aria}\`` : null, e.telechargement ? `fichier \`${e.telechargement.fichier}\`, ${e.telechargement.octets} octets` : null, horsEcran(e.hors_ecran), e.fragile ? 'cible fragile' : null, ...e.console.map((c) => `console : ${c}`), ...e.erreurs_page.map((c) => `erreur de la page : ${c}`), ...e.reponses.map((c) => `réponse ${c}`)].filter(Boolean);
+
+/** Lignes du tableau d'une section de préparation ou de nettoyage : chaque entrée, et les étapes d'un scénario de préparation. */
+function lignesEntrees(liste, marque) {
+  const l = ['| # | Ligne | Entrée | Statut | Durée | Détail |', '|---|---|---|---|---|---|'];
+  for (const x of liste) {
+    const d = [x.message, x.appel ? `${x.appel.methode} ${x.appel.adresse} → ${x.appel.statut}${x.appel.octets !== null ? `, ${x.appel.octets} octets` : ''}` : null, x.gardees.length ? `garde ${x.gardees.join(', ')}` : null, x.capture ? `capture \`${x.capture}\`` : null, x.aria ? `ARIA \`${x.aria}\`` : null].filter(Boolean);
+    l.push(`| ${marque}${x.numero} | ${x.ligne ?? ''} | ${echapper(x.resume)} | ${STATUT[x.statut]} | ${x.statut === 'non_jouee' ? '' : `${x.duree_ms} ms`} | ${echapper(d.join(' ; '))} |`);
+    for (const e of x.etapes ?? []) l.push(`| ${marque}${x.numero}.${e.numero} | ${e.ligne ?? ''} | ${echapper(e.resume)} | ${STATUT[e.statut]} | ${e.statut === 'non_jouee' ? '' : `${e.duree_ms} ms`} | ${echapper(detailsEtape(e).join(' ; '))} |`);
+  }
+  return l;
+}
+
 /** Rapport lisible, en Markdown. */
 export function rapportMarkdown(r) {
   const l = [];
   l.push(`# ${r.statut === 'reussi' ? 'Réussi' : 'Échec'} : ${r.scenario.titre}`, '');
   l.push(`- Scénario : \`${r.scenario.fichier}\`${r.scenario.source ? `, traduit de \`${r.scenario.source}\`` : ''}${r.scenario.etiquettes.length ? ` ; étiquettes ${r.scenario.etiquettes.map((x) => `@${x}`).join(' ')}` : ''}`);
-  l.push(`- Exécution : ${r.debut}, ${Math.round(r.duree_ms / 100) / 10} s ; ${r.bilan.etapes} étapes, ${r.bilan.reussies} réussies, ${r.bilan.echecs} en échec, ${r.bilan.non_jouees} non jouées`);
+  l.push(`- Exécution : ${r.debut}, ${Math.round(r.duree_ms / 100) / 10} s ; ${r.bilan.etapes} étapes, ${r.bilan.reussies} réussies, ${r.bilan.echecs} en échec, ${r.bilan.non_jouees} non jouées${r.bilan.preparations || r.bilan.nettoyages ? ` ; préparation : ${r.bilan.preparations} entrée${r.bilan.preparations > 1 ? 's' : ''}, nettoyage : ${r.bilan.nettoyages}` : ''}`);
+  if (r.bilan.nettoyages_en_echec) l.push(`- **Nettoyage en échec** (${r.bilan.nettoyages_en_echec}) : des données créées par l'exécution peuvent rester ; voir les entrées en échec, puis nettoyer à la main si besoin.`);
   l.push(`- Navigateur : ${r.navigateur.canal} ${r.navigateur.version}, playwright-core ${r.navigateur.playwright_core}${r.options.sans_tete ? ', sans fenêtre' : ''}${r.options.mutations_autorisees ? ' ; mutations autorisées hors du poste' : ''}`);
   if (r.navigateur.avertissement) l.push(`- **Compatibilité** : ${r.navigateur.avertissement}`);
   if (r.options.trace) l.push('- **Trace** : `trace.zip` contient les cookies et les en-têtes de la session ; elle reste sur le poste et ne se partage pas.');
   for (const j of r.jeux) {
-    l.push('', r.jeux.length > 1 ? `## Jeu ${j.numero} : ${Object.entries(j.valeurs).map(([k, v]) => `${k} = ${v}`).join(', ')}` : '## Étapes', '');
-    l.push('| # | Ligne | Étape | Statut | Durée | Détail |', '|---|---|---|---|---|---|');
-    for (const e of j.etapes) {
-      const details = [e.message, e.capture ? `capture \`${e.capture}\`` : null, e.aria ? `ARIA \`${e.aria}\`` : null, e.telechargement ? `fichier \`${e.telechargement.fichier}\`, ${e.telechargement.octets} octets` : null, horsEcran(e.hors_ecran), e.fragile ? 'cible fragile' : null, ...e.console.map((c) => `console : ${c}`), ...e.erreurs_page.map((c) => `erreur de la page : ${c}`), ...e.reponses.map((c) => `réponse ${c}`)].filter(Boolean);
-      l.push(`| ${e.numero} | ${e.ligne ?? ''} | ${echapper(e.resume)} | ${STATUT[e.statut]} | ${e.statut === 'non_jouee' ? '' : `${e.duree_ms} ms`} | ${echapper(details.join(' ; '))} |`);
-    }
+    const plusieurs = r.jeux.length > 1;
+    const titre = (x) => (plusieurs ? `### ${x}` : `## ${x}`);
+    const entrees = Boolean(j.preparation?.length || j.nettoyage?.length);
+    if (plusieurs) l.push('', `## Jeu ${j.numero} : ${Object.entries(j.valeurs).map(([k, v]) => `${k} = ${v}`).join(', ')}`);
+    if (j.preparation?.length) l.push('', titre('Préparation'), '', ...lignesEntrees(j.preparation, 'p'));
+    if (!plusieurs || entrees) l.push('', titre('Étapes'));
+    l.push('', '| # | Ligne | Étape | Statut | Durée | Détail |', '|---|---|---|---|---|---|');
+    for (const e of j.etapes) l.push(`| ${e.numero} | ${e.ligne ?? ''} | ${echapper(e.resume)} | ${STATUT[e.statut]} | ${e.statut === 'non_jouee' ? '' : `${e.duree_ms} ms`} | ${echapper(detailsEtape(e).join(' ; '))} |`);
+    if (j.nettoyage?.length) l.push('', titre('Nettoyage'), '', ...lignesEntrees(j.nettoyage, 'n'));
+    const gardees = Object.entries(j.gardees ?? {});
+    if (gardees.length) l.push('', `Valeurs gardées : ${gardees.map(([k, v]) => `${k} = ${v}`).join(', ')}`);
   }
   if (r.origines_bloquees.length) {
     l.push('', '## Origines bloquées', '', 'Requêtes interrompues avant chargement : ces origines ne sont pas déclarées par le scénario. Une origine légitime s\'ajoute au texte de départ, puis à la traduction ratifiée.', '');

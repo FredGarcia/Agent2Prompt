@@ -1,6 +1,6 @@
 ---
 name: execution
-description: Exécution du skill (installation par npm ci, Node 22 ou plus récent, navigateur du poste et canal Chrome, Edge ou Chromium, dépendance unique playwright-core 1.65.1 à version exacte, emplacements des profils et des résultats, .gitignore du skill, réglages par variables SCENARIO_PLAYWRIGHT_*, lignes de commande de jouer, verifier, traduire, importer et indexer et leurs codes de sortie, pièges connus dont le proxy des API, commande d'extraction des fichiers exécutables à empreintes, sources de package.json, package-lock.json, .gitignore, scripts/jouer.mjs, scripts/verifier.mjs et scripts/traduire.mjs). À lire en premier, pour installer le skill.
+description: Exécution du skill (installation par npm ci, Node 22 ou plus récent, navigateur du poste et canal Chrome, Edge ou Chromium, dépendance unique playwright-core 1.65.1 à version exacte, emplacements des profils et des résultats, .gitignore du skill, réglages par variables SCENARIO_PLAYWRIGHT_*, lignes de commande de jouer, verifier, traduire, importer et indexer et leurs codes de sortie, pièges connus dont le proxy des API et la préparation refusée par l'API, commande d'extraction des fichiers exécutables à empreintes, sources de package.json, package-lock.json, .gitignore, scripts/jouer.mjs, scripts/verifier.mjs et scripts/traduire.mjs). À lire en premier, pour installer le skill.
 dimensions: [D1]
 status: active
 ---
@@ -18,7 +18,7 @@ Les scripts se lancent depuis n'importe quel dossier ; un scénario se désigne 
 | `node <skill>/scripts/indexer.mjs <dossier du projet> [--dossier scenarios] [--langue fr]` | index du code du projet, sans IA et sans rien exécuter, écrit dans `index/` du dossier des scénarios | `code` |
 | `node <skill>/scripts/traduire.mjs <texte.scenario> [--remplacer]` | squelette TOML de la traduction, écrit à côté du texte, avec les propositions de l'index du code | `scenario`, `code` |
 | `node <skill>/scripts/verifier.mjs <fichier>... [--plan] [--param nom=valeur]...` | vérification sans navigateur d'un texte ou d'un scénario | `texte`, `scenario` |
-| `node <skill>/scripts/jouer.mjs <scénario.toml> [options]` | exécution dans le navigateur du poste, rapport | `actions` |
+| `node <skill>/scripts/jouer.mjs <scénario.toml> [options]` | exécution dans le navigateur du poste, préparation et nettoyage des données compris, rapport | `actions`, `donnees` |
 | `node <skill>/scripts/designer.mjs <adresse> [--profil nom] [--max n]` | désignation de cibles à la souris | `designer` |
 | `node <skill>/scripts/importer.mjs <page.mhtml \| adresse> --adresse <url> [options]` | un texte de départ par scénario Gherkin d'une demande Jira ; `--comparer` compare sans écrire | `jira` |
 | `node <skill>/scripts/importer.mjs <fichier.feature \| export.zip \| xray:CLÉ,… \| xray-dc:CLÉ,… \| zephyr:CLÉ,… \| zephyr-dc:CLÉ,…> --adresse <url> [options]` | un texte de départ par test d'un fichier, d'une archive, de Xray ou de Zephyr Scale ; jeton par variable d'environnement | `cas-de-test` |
@@ -72,19 +72,19 @@ Une variable vide vaut absente ; une valeur invalide est refusée, avec le code 
 | `--sans-tete` | sans fenêtre ; refusé avec une étape à la main (D6.INV-3) |
 | `--ralenti <ms>` | pause de 0 à 2 000 ms avant chaque geste de Playwright, pour suivre une démonstration |
 | `--trace` | enregistre `trace.zip`, qui contient les cookies de la session (D7.INV-3) |
-| `--autoriser-mutations` | autorise, pour cette exécution, les étapes de mutation hors du poste (D7.INV-2) |
+| `--autoriser-mutations` | autorise, pour cette exécution, les étapes de mutation hors du poste, et les appels et scénarios de préparation et de nettoyage qui modifient des données (D7.INV-2, D20.INV-3) |
 
-Sortie : une ligne d'en-tête (titre, jeux, étapes, navigateur et version), `AVERTISSEMENT` de compatibilité s'il y a lieu (D6.INV-1), `Jeu n : …` pour chaque jeu quand il y en a plusieurs, `À VOUS : …` pour une étape à la main, une ligne par étape (`ok`, `KO` avec le message, `--` non jouée), `origine bloquée : …` pour chaque origine interrompue, puis `Bilan : …` et `Rapport : <chemin de rapport.md>`.
+Sortie : une ligne d'en-tête (titre, jeux, étapes, navigateur et version), `AVERTISSEMENT` de compatibilité s'il y a lieu (D6.INV-1), `Jeu n : …` pour chaque jeu quand il y en a plusieurs, `À VOUS : …` pour une étape à la main, une ligne par étape (`ok`, `KO` avec le message, `--` non jouée), une ligne par entrée de préparation, à sa place parmi les étapes (`p1.`), et de nettoyage, après elles (`n1.`), les étapes d'un scénario de préparation en retrait, `AVERTISSEMENT nettoyage …` pour un nettoyage en échec (module `donnees`, § 7), `origine bloquée : …` pour chaque origine interrompue, puis `Bilan : …`, qui compte les entrées de préparation et de nettoyage, et `Rapport : <chemin de rapport.md>`.
 
 | Code | `jouer.mjs` | `verifier.mjs`, `traduire.mjs`, `indexer.mjs` |
 |---|---|---|
-| 0 | toutes les étapes de tous les jeux ont réussi | tout est conforme ; squelette écrit ; index écrit |
-| 1 | au moins une étape a échoué ; le rapport est écrit | |
+| 0 | toutes les étapes et toutes les préparations de tous les jeux ont réussi ; un nettoyage en échec est signalé sans changer le code (D20.INV-4) | tout est conforme ; squelette écrit ; index écrit |
+| 1 | au moins une étape ou une préparation a échoué ; le rapport est écrit | |
 | 2 | scénario, option, réglage ou navigateur refusé, avant toute action dans le navigateur ; aucun rapport | un fichier refusé ; squelette non écrit ; option refusée ou projet introuvable, index non écrit |
 
 Les options, la sortie et les codes de `importer.mjs` sont au module `jira`, § 7 (D16.INV-6) ; ses sources de cas de test et leurs jetons, au module `cas-de-test`, § 2 à § 4.
 
-`verifier.mjs` écrit `ok` pour chaque fichier conforme, `ERREUR` pour chaque erreur, et `note` pour ce que le développeur doit savoir avant de jouer : étapes de mutation et origines hors du poste, étapes à la main, cibles fragiles, et, avec un index du code dans le dossier du scénario, cibles et chemins absents de l'index, ou index périmé (module `code`, § 9) ; une note ne change pas le code de sortie. `--plan` ajoute le plan de la traduction (module `scenario`, § 4.4) ; `--param` y vérifie une valeur donnée en ligne de commande.
+`verifier.mjs` écrit `ok` pour chaque fichier conforme, `ERREUR` pour chaque erreur, et `note` pour ce que le développeur doit savoir avant de jouer : ce qui modifie des données, étapes, appels et scénarios de préparation et de nettoyage, et les origines hors du poste, étapes à la main, nettoyage d'une donnée fixe (module `donnees`, § 7), cibles fragiles, et, avec un index du code dans le dossier du scénario, cibles et chemins absents de l'index, ou index périmé (module `code`, § 9) ; une note ne change pas le code de sortie. `--plan` ajoute le plan de la traduction (module `scenario`, § 4.4) ; `--param` y vérifie une valeur donnée en ligne de commande.
 
 Les options, la sortie et les codes de `indexer.mjs` sont au module `code`, § 2.
 
@@ -104,46 +104,47 @@ Les options, la sortie et les codes de `indexer.mjs` sont au module `code`, § 2
 - **API de Xray ou de Zephyr Scale derrière un proxy d'entreprise** : Node ne lit pas `HTTPS_PROXY` de lui-même ; avec Node 24 ou plus récent, `NODE_USE_ENV_PROXY=1` l'y fait passer. Un certificat d'entreprise s'ajoute par `NODE_EXTRA_CA_CERTS`. Une API injoignable arrête l'import avant toute écriture, avec le code 2.
 - **Jeton refusé** : « accès refusé (401) » ou « (403) » dit un jeton absent, expiré ou sans droit de lecture du projet ; le développeur en crée un autre, et redéfinit lui-même sa variable d'environnement.
 - **Index du code périmé** : après chaque modification du code, `traduire.mjs` et `verifier.mjs` le disent périmé et ne l'emploient plus ; `indexer.mjs` se relance. Sur un très grand dépôt, l'index s'arrête à ses bornes (module `code`, § 8) : il se lance alors sur le dossier du front ou du back seulement.
+- **Préparation refusée par l'API** : 401 dit que l'API ne reconnaît pas la session du navigateur ; la connexion se fait à la main avant la préparation, par une ligne « (à la main) » qui la précède, ou dans le profil avant l'exécution. Une API qui attend un jeton dans l'en-tête `Authorization` répond toujours 401 : elle se prépare par un scénario, par l'écran. 403 dit des droits insuffisants, ou un jeton anti-CSRF refusé : le skill recopie `XSRF-TOKEN` et `csrftoken`, pas un autre nom de cookie. 415 dit une API qui n'accepte pas de corps JSON : elle se prépare aussi par un scénario (module `donnees`, § 5 et § 6).
 - **Réponse interrompue** : une vérification `requete` ne lit pas la réponse d'une page qui change de document juste après (navigation complète) ; elle vérifie alors le statut, ou l'effet à l'écran (module `hors-ecran`, § 3).
 
 ## 8. Matérialiser les fichiers exécutables
 
 | Fichier | Module, section | Empreinte sha256 |
 |---|---|---|
-| `package.json` | `execution`, § 10 | `c8e7829e37f09c5087de2558dcbbc64ca52df846eca5f9ee54b4659c4d097f4b` |
-| `package-lock.json` | `execution`, § 10 | `759d1400c4441b80bdd4344ee8451d074a368797acc4459886a3c819e969e83c` |
+| `package.json` | `execution`, § 10 | `dd88ebaec8e256e47718e7e06db858988c22fe395e9a29dbf0cadf8cc9cd647e` |
+| `package-lock.json` | `execution`, § 10 | `cbb8330ecbc733493ff86ebaa85ff7879e26faff92306a73134a7c02a2a2b01a` |
 | `.gitignore` | `execution`, § 10 | `03bf7f97f17a0d1abb005b6480ec3b0f06a0b9c29c1d1f83131209b52b888a7e` |
-| `scripts/jouer.mjs` | `execution`, § 11 | `73c6f0fa0e81e2639691b5a18da077ed27106f0b4a7552aa9f683aab8db7a62a` |
-| `scripts/verifier.mjs` | `execution`, § 12 | `366393bebaddda71c8439a9f2135ddc8a75bf3ef557e66a8de89ad999eb9c821` |
-| `scripts/traduire.mjs` | `execution`, § 13 | `b925d5fd70eff587ab76adf2e73e9c550063a5b952c7ee5591060e9711f0687a` |
-| `scripts/texte.mjs` | `texte`, § 12 | `cb9b43e8ae4fd4d7fc3d1b00179fbfba76d1d4822b2e4ce0a10e3db379068f00` |
-| `scripts/jira.mjs` | `jira`, § 9 | `d2e7b1187543ff59bc028ff7bf9ac7d211c6c457fea73728b5ca26e390d7ec0f` |
-| `scripts/importer.mjs` | `jira`, § 10 | `4509057c5a3880d3a8da2e6a3a14ac1766783ecfce221a7cd43813301f0075ef` |
-| `scripts/cas.mjs` | `cas-de-test`, § 10 | `bbe16a4bc07890c7a18a31120db98242e8c33629a7282c9811ec4f9d6a112c07` |
-| `scripts/lecteurs.mjs` | `code`, § 11 | `7fdf23bdf24adcc9095a91e5c003154d945741ab89e46086c6eb08ee8179b726` |
-| `scripts/code.mjs` | `code`, § 12 | `cadfff08e78346b1b25ba1454f98de358863e0911e2717bb0e623fcb5be7cbe7` |
-| `scripts/indexer.mjs` | `code`, § 13 | `7e22c1efec5caa6a4076fea8bf3a685d23d50820efcc6f38eb64fcc01fc96a98` |
-| `scripts/toml.mjs` | `scenario`, § 6 | `3f3d485ca220be4ad2911e72cfd6857ac30518cf4c9d8df2a4850c99a9e5a552` |
-| `scripts/scenario.mjs` | `scenario`, § 7 | `4ce2736900fa18c0e023da664cf457c17bac755f9be9613e44f6f71aab11a70d` |
-| `scripts/cibles.mjs` | `cibles`, § 6 | `88164e96e034f375dc98679111bac1d3e4c9dbb3a4f00c97c09c05b148bd2801` |
-| `scripts/moteur.mjs` | `actions`, § 9 | `92378640332838861d958475d637e4a16ad2dfd1091a33988389b491b3fcfcbf` |
-| `scripts/session.mjs` | `session`, § 7 | `9947efbe1bdb09564104496f6c47c8eeb732a47f4ac4adf0d392b8e4298e4017` |
-| `scripts/rapport.mjs` | `preuves`, § 7 | `3f7884f20c488f38c11cf076b9cd023c0816bbe6ca19b01e32cda9196ea6175a` |
-| `scripts/designer.mjs` | `designer`, § 5 | `9dd8af109c930ff6eac54b904bfd34f17ff595c62c6a687f271431005a72869a` |
-| `agent/pilote-scenario.md` | `agent`, § 6 | `38d737cb0a864c93f3e143aac6b6f801e19aed6410b3e1983dc277703d5cbc4a` |
-| `commandes/scenario/importer.toml` | `agent`, § 7 | `9f98971165d1ac1c27dfd07736ef861071fb3a07d31d784e62eb09cbbac85cbb` |
-| `commandes/scenario/indexer.toml` | `agent`, § 7 | `cf8aec4bcb12f183132923a4b264f24983e6070e5dc40178e724ad5d5570ff6f` |
-| `commandes/scenario/traduire.toml` | `agent`, § 7 | `5d3ad75a85e9b779c1f208ab1614c1fda554c8aeb9006a39071a6038309c4df5` |
-| `commandes/scenario/jouer.toml` | `agent`, § 7 | `f7e0d54a37343e67925bd7e2b81c9533f40b8dddb1809206e66efe29f11be134` |
-| `commandes/scenario/designer.toml` | `agent`, § 7 | `24937398ace037f59135e78997e362ae99e980341a08d19494ec593421c39631` |
-| `tests/application-demo.mjs` | `recette`, § 6 | `0d9fce4cd94e9852360c9d97999edd507bae7fd25a6caf0ab73a501ea0472135` |
-| `tests/projet-demo.mjs` | `recette`, § 6 | `581276f66f2138898758318e86534d4d2f82f722bf472f49a24da5e02e303ce3` |
-| `tests/run-tests.mjs` | `recette`, § 6 | `5772adfca1f7b36d77a0ed3343f65c6be4e2bd1d0138a9a5b434cac6accb61c8` |
+| `scripts/jouer.mjs` | `execution`, § 11 | `ad8837a53da336ae8e7b22d1007075618381a87b66151fd2acb6a48fa8e10db6` |
+| `scripts/verifier.mjs` | `execution`, § 12 | `3b4235e38b2b97fd22a4644f30d0c365d7804c3e00287ccb290d89cbbc403e35` |
+| `scripts/traduire.mjs` | `execution`, § 13 | `bd141ee155f89e6212e9068f00a45de5600054cf3698531711c83dab77475ca6` |
+| `scripts/texte.mjs` | `texte`, § 12 | `8166c574df00c99df2c418d2e431d3101a4a700d8dd250739eafbf1bdf54d693` |
+| `scripts/jira.mjs` | `jira`, § 9 | `86ef113cc4824581e4c8f9df8291ad2254ab08ea8dab1b5b4d5567dd80f2be78` |
+| `scripts/importer.mjs` | `jira`, § 10 | `1cf3e8f5b51386558e1c5b8a9659a8e11a7c57b1c869f2e6ac1f8ffe64cf3607` |
+| `scripts/cas.mjs` | `cas-de-test`, § 10 | `8f30a83c378a526676a2ea6c1879d306df128cb8897ec4d02c0c3d71bea04019` |
+| `scripts/lecteurs.mjs` | `code`, § 11 | `00ba500a0c9bcc7db6d2b00a2185c87197d6379685cd442f8c0cfb65668150c4` |
+| `scripts/code.mjs` | `code`, § 12 | `2d2f24ad34a66e31bf32c2235da8549816cf1e9e0d50483454cdb8ba7a20ece3` |
+| `scripts/indexer.mjs` | `code`, § 13 | `e16db5372ec74b052dcfc61ff32d2f531397dd31c607ae458f8f4931c63388e2` |
+| `scripts/toml.mjs` | `scenario`, § 6 | `6310e3eaea0a0887d99e3ead6697c429909ff4e0d65d7bc82bc6f6ba0e2eef44` |
+| `scripts/scenario.mjs` | `scenario`, § 7 | `1101fb7cc4031f0f56434db35667649a5768ce886b2ce2150766c22adcced857` |
+| `scripts/cibles.mjs` | `cibles`, § 6 | `e1b4576c02337e0f14962fe9e070ffcff86f65e2275a354d46e30439789e0a80` |
+| `scripts/moteur.mjs` | `actions`, § 9 | `598eb60b074d05c5e4242eab13be6b3fd38588c55ae3bf293d74f7ccc3d07067` |
+| `scripts/session.mjs` | `session`, § 7 | `716ab5aba57c7fa2e9155e812cd95cef072f0347a9bd0e090d21d1100f13b600` |
+| `scripts/rapport.mjs` | `preuves`, § 7 | `77b4b4b8fc3e829fd1c776de2e2571ceb94ac740b12a1853b31c65456fa997e5` |
+| `scripts/designer.mjs` | `designer`, § 5 | `931678611f04ab6991981abaf374730d35346c40d60e3c98200c27c2bbf51cfe` |
+| `agent/pilote-scenario.md` | `agent`, § 6 | `07595c96799cf719a69ae28034c95842b16598ed330b143f6ca60b49af822a8d` |
+| `commandes/scenario/importer.toml` | `agent`, § 7 | `a9bb446d8350fc03dbd2a486c0cc61730cebfba049f38f2f9c98d447b487b3c7` |
+| `commandes/scenario/indexer.toml` | `agent`, § 7 | `50cca3628af8772440c609d1282042ffac9db5c4ea06e171609f25a0a0d7802a` |
+| `commandes/scenario/traduire.toml` | `agent`, § 7 | `03f4ec736e434349e6978335828020fad538c16ccda100df946e0a11c0ace32c` |
+| `commandes/scenario/jouer.toml` | `agent`, § 7 | `de037b1e2bcaed27ee403dfc899dffbac8538e6f169744750c38b944a0dada92` |
+| `commandes/scenario/designer.toml` | `agent`, § 7 | `c98bf6b1db170a2e7804b368dfa5b6a5ed5087d95aa431ada98dcdf12d0df46e` |
+| `tests/application-demo.mjs` | `recette`, § 6 | `b16026fad5ef8881183895b6937a59e4c6f97ceccd7364ad09072c75ed239da5` |
+| `tests/projet-demo.mjs` | `recette`, § 6 | `783a9177117db34d69304a59c02d4cad398a7b3759c36fc0d0d4e7b50792d8f3` |
+| `tests/run-tests.mjs` | `recette`, § 6 | `edf8c619f7e437cbe1dee90077cd558f850d0d6179977a145dff467285ec28ed` |
 
 Depuis le dossier du skill, cette commande d'une ligne écrit les vingt-neuf fichiers, compare leurs empreintes à celles du tableau et sort avec le code 1 au moindre écart. Elle ne contient ni `$`, ni accent grave, ni `!`, ni `%`, ni guillemet intérieur : elle se colle telle quelle dans bash, zsh, CMD ou PowerShell, et dans un fichier `.cmd`. Elle lit aussi des modules aux fins de ligne CRLF.
 
 ```text
-node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'package.json': 'c8e7829e37f09c5087de2558dcbbc64ca52df846eca5f9ee54b4659c4d097f4b', 'package-lock.json': '759d1400c4441b80bdd4344ee8451d074a368797acc4459886a3c819e969e83c', '.gitignore': '03bf7f97f17a0d1abb005b6480ec3b0f06a0b9c29c1d1f83131209b52b888a7e', 'scripts/jouer.mjs': '73c6f0fa0e81e2639691b5a18da077ed27106f0b4a7552aa9f683aab8db7a62a', 'scripts/verifier.mjs': '366393bebaddda71c8439a9f2135ddc8a75bf3ef557e66a8de89ad999eb9c821', 'scripts/traduire.mjs': 'b925d5fd70eff587ab76adf2e73e9c550063a5b952c7ee5591060e9711f0687a', 'scripts/texte.mjs': 'cb9b43e8ae4fd4d7fc3d1b00179fbfba76d1d4822b2e4ce0a10e3db379068f00', 'scripts/jira.mjs': 'd2e7b1187543ff59bc028ff7bf9ac7d211c6c457fea73728b5ca26e390d7ec0f', 'scripts/importer.mjs': '4509057c5a3880d3a8da2e6a3a14ac1766783ecfce221a7cd43813301f0075ef', 'scripts/cas.mjs': 'bbe16a4bc07890c7a18a31120db98242e8c33629a7282c9811ec4f9d6a112c07', 'scripts/lecteurs.mjs': '7fdf23bdf24adcc9095a91e5c003154d945741ab89e46086c6eb08ee8179b726', 'scripts/code.mjs': 'cadfff08e78346b1b25ba1454f98de358863e0911e2717bb0e623fcb5be7cbe7', 'scripts/indexer.mjs': '7e22c1efec5caa6a4076fea8bf3a685d23d50820efcc6f38eb64fcc01fc96a98', 'scripts/toml.mjs': '3f3d485ca220be4ad2911e72cfd6857ac30518cf4c9d8df2a4850c99a9e5a552', 'scripts/scenario.mjs': '4ce2736900fa18c0e023da664cf457c17bac755f9be9613e44f6f71aab11a70d', 'scripts/cibles.mjs': '88164e96e034f375dc98679111bac1d3e4c9dbb3a4f00c97c09c05b148bd2801', 'scripts/moteur.mjs': '92378640332838861d958475d637e4a16ad2dfd1091a33988389b491b3fcfcbf', 'scripts/session.mjs': '9947efbe1bdb09564104496f6c47c8eeb732a47f4ac4adf0d392b8e4298e4017', 'scripts/rapport.mjs': '3f7884f20c488f38c11cf076b9cd023c0816bbe6ca19b01e32cda9196ea6175a', 'scripts/designer.mjs': '9dd8af109c930ff6eac54b904bfd34f17ff595c62c6a687f271431005a72869a', 'agent/pilote-scenario.md': '38d737cb0a864c93f3e143aac6b6f801e19aed6410b3e1983dc277703d5cbc4a', 'commandes/scenario/importer.toml': '9f98971165d1ac1c27dfd07736ef861071fb3a07d31d784e62eb09cbbac85cbb', 'commandes/scenario/indexer.toml': 'cf8aec4bcb12f183132923a4b264f24983e6070e5dc40178e724ad5d5570ff6f', 'commandes/scenario/traduire.toml': '5d3ad75a85e9b779c1f208ab1614c1fda554c8aeb9006a39071a6038309c4df5', 'commandes/scenario/jouer.toml': 'f7e0d54a37343e67925bd7e2b81c9533f40b8dddb1809206e66efe29f11be134', 'commandes/scenario/designer.toml': '24937398ace037f59135e78997e362ae99e980341a08d19494ec593421c39631', 'tests/application-demo.mjs': '0d9fce4cd94e9852360c9d97999edd507bae7fd25a6caf0ab73a501ea0472135', 'tests/projet-demo.mjs': '581276f66f2138898758318e86534d4d2f82f722bf472f49a24da5e02e303ce3', 'tests/run-tests.mjs': '5772adfca1f7b36d77a0ed3343f65c6be4e2bd1d0138a9a5b434cac6accb61c8' }; const vus = new Set(); let ecarts = 0; for (const module of ['modules/execution/SKILL.md', 'modules/texte/SKILL.md', 'modules/jira/SKILL.md', 'modules/cas-de-test/SKILL.md', 'modules/code/SKILL.md', 'modules/scenario/SKILL.md', 'modules/cibles/SKILL.md', 'modules/actions/SKILL.md', 'modules/session/SKILL.md', 'modules/preuves/SKILL.md', 'modules/designer/SKILL.md', 'modules/agent/SKILL.md', 'modules/recette/SKILL.md']) { const texte = fs.readFileSync(module, 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); vus.add(m[1]); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (conforme === false) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } } for (const f of Object.keys(attendu)) if (vus.has(f) === false) { ecarts++; console.log('ABSENT    ' + f); } if (ecarts > 0) process.exitCode = 1;"
+node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'package.json': 'dd88ebaec8e256e47718e7e06db858988c22fe395e9a29dbf0cadf8cc9cd647e', 'package-lock.json': 'cbb8330ecbc733493ff86ebaa85ff7879e26faff92306a73134a7c02a2a2b01a', '.gitignore': '03bf7f97f17a0d1abb005b6480ec3b0f06a0b9c29c1d1f83131209b52b888a7e', 'scripts/jouer.mjs': 'ad8837a53da336ae8e7b22d1007075618381a87b66151fd2acb6a48fa8e10db6', 'scripts/verifier.mjs': '3b4235e38b2b97fd22a4644f30d0c365d7804c3e00287ccb290d89cbbc403e35', 'scripts/traduire.mjs': 'bd141ee155f89e6212e9068f00a45de5600054cf3698531711c83dab77475ca6', 'scripts/texte.mjs': '8166c574df00c99df2c418d2e431d3101a4a700d8dd250739eafbf1bdf54d693', 'scripts/jira.mjs': '86ef113cc4824581e4c8f9df8291ad2254ab08ea8dab1b5b4d5567dd80f2be78', 'scripts/importer.mjs': '1cf3e8f5b51386558e1c5b8a9659a8e11a7c57b1c869f2e6ac1f8ffe64cf3607', 'scripts/cas.mjs': '8f30a83c378a526676a2ea6c1879d306df128cb8897ec4d02c0c3d71bea04019', 'scripts/lecteurs.mjs': '00ba500a0c9bcc7db6d2b00a2185c87197d6379685cd442f8c0cfb65668150c4', 'scripts/code.mjs': '2d2f24ad34a66e31bf32c2235da8549816cf1e9e0d50483454cdb8ba7a20ece3', 'scripts/indexer.mjs': 'e16db5372ec74b052dcfc61ff32d2f531397dd31c607ae458f8f4931c63388e2', 'scripts/toml.mjs': '6310e3eaea0a0887d99e3ead6697c429909ff4e0d65d7bc82bc6f6ba0e2eef44', 'scripts/scenario.mjs': '1101fb7cc4031f0f56434db35667649a5768ce886b2ce2150766c22adcced857', 'scripts/cibles.mjs': 'e1b4576c02337e0f14962fe9e070ffcff86f65e2275a354d46e30439789e0a80', 'scripts/moteur.mjs': '598eb60b074d05c5e4242eab13be6b3fd38588c55ae3bf293d74f7ccc3d07067', 'scripts/session.mjs': '716ab5aba57c7fa2e9155e812cd95cef072f0347a9bd0e090d21d1100f13b600', 'scripts/rapport.mjs': '77b4b4b8fc3e829fd1c776de2e2571ceb94ac740b12a1853b31c65456fa997e5', 'scripts/designer.mjs': '931678611f04ab6991981abaf374730d35346c40d60e3c98200c27c2bbf51cfe', 'agent/pilote-scenario.md': '07595c96799cf719a69ae28034c95842b16598ed330b143f6ca60b49af822a8d', 'commandes/scenario/importer.toml': 'a9bb446d8350fc03dbd2a486c0cc61730cebfba049f38f2f9c98d447b487b3c7', 'commandes/scenario/indexer.toml': '50cca3628af8772440c609d1282042ffac9db5c4ea06e171609f25a0a0d7802a', 'commandes/scenario/traduire.toml': '03f4ec736e434349e6978335828020fad538c16ccda100df946e0a11c0ace32c', 'commandes/scenario/jouer.toml': 'de037b1e2bcaed27ee403dfc899dffbac8538e6f169744750c38b944a0dada92', 'commandes/scenario/designer.toml': 'c98bf6b1db170a2e7804b368dfa5b6a5ed5087d95aa431ada98dcdf12d0df46e', 'tests/application-demo.mjs': 'b16026fad5ef8881183895b6937a59e4c6f97ceccd7364ad09072c75ed239da5', 'tests/projet-demo.mjs': '783a9177117db34d69304a59c02d4cad398a7b3759c36fc0d0d4e7b50792d8f3', 'tests/run-tests.mjs': 'edf8c619f7e437cbe1dee90077cd558f850d0d6179977a145dff467285ec28ed' }; const vus = new Set(); let ecarts = 0; for (const module of ['modules/execution/SKILL.md', 'modules/texte/SKILL.md', 'modules/jira/SKILL.md', 'modules/cas-de-test/SKILL.md', 'modules/code/SKILL.md', 'modules/scenario/SKILL.md', 'modules/cibles/SKILL.md', 'modules/actions/SKILL.md', 'modules/session/SKILL.md', 'modules/preuves/SKILL.md', 'modules/designer/SKILL.md', 'modules/agent/SKILL.md', 'modules/recette/SKILL.md']) { const texte = fs.readFileSync(module, 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); vus.add(m[1]); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (conforme === false) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } } for (const f of Object.keys(attendu)) if (vus.has(f) === false) { ecarts++; console.log('ABSENT    ' + f); } if (ecarts > 0) process.exitCode = 1;"
 ```
 
 Puis, depuis le même dossier : `npm ci`, et la recette, `npm test` (sous Linux sans écran, `xvfb-run -a npm test`).
@@ -162,7 +163,7 @@ Puis, depuis le même dossier : `npm ci`, et la recette, `npm test` (sous Linux 
 ```json
 {
   "name": "scenario-playwright",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "private": true,
   "description": "Scénarios côté utilisateur, joués dans le Chrome du poste par Playwright (skill scenario-playwright)",
   "engines": {
@@ -187,13 +188,13 @@ Puis, depuis le même dossier : `npm ci`, et la recette, `npm test` (sous Linux 
 ```json
 {
   "name": "scenario-playwright",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "lockfileVersion": 3,
   "requires": true,
   "packages": {
     "": {
       "name": "scenario-playwright",
-      "version": "1.3.0",
+      "version": "1.4.0",
       "dependencies": {
         "playwright-core": "1.65.1"
       },
@@ -228,12 +229,12 @@ resultats/
 
 ## 11. `scripts/jouer.mjs`
 
-L'exécution : lecture de la ligne de commande et des réglages, lecture et contrôle du scénario (module `scenario`), préparation des jeux, refus avant le navigateur (D6.INV-3, D7.INV-2), ouverture du navigateur et garde des origines (module `session`), moteur (module `actions`), rapport (module `preuves`).
+L'exécution : lecture de la ligne de commande et des réglages, lecture et contrôle du scénario et de ses scénarios de préparation (modules `scenario` et `donnees`), préparation des jeux, refus avant le navigateur (D6.INV-3, D7.INV-2, D20.INV-3), ouverture du navigateur et garde des origines (module `session`), moteur (modules `actions` et `donnees`), rapport (module `preuves`).
 
 <!-- fichier : scripts/jouer.mjs -->
 ```javascript
 #!/usr/bin/env node
-// scenario-playwright 1.3.0 : joue un scénario TOML dans le navigateur du poste, comme un utilisateur.
+// scenario-playwright 1.4.0 : joue un scénario TOML dans le navigateur du poste, comme un utilisateur.
 //
 // Usage, depuis n'importe quel dossier :
 //   node <dossier du skill>/scripts/jouer.mjs <scénario.toml> [--param nom=valeur]... [--jeu n]
@@ -246,7 +247,7 @@ import { basename, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { jouerScenario } from './moteur.mjs';
 import { construireRapport, dossierResultats, ecrireRapport } from './rapport.mjs';
-import { DELAI_DEFAUT, lireScenario, preparerJeux } from './scenario.mjs';
+import { DELAI_DEFAUT, lireScenario, mutationsDe, preparerJeux } from './scenario.mjs';
 import { compatibilite, dossierProfil, estLocale, garderOrigines, lireReglages, ouvrirNavigateur, reference } from './session.mjs';
 
 const USAGE = 'Usage : node scripts/jouer.mjs <scénario.toml> [--param nom=valeur]... [--jeu n] [--resultats dossier] [--sans-tete] [--ralenti ms] [--trace] [--autoriser-mutations]';
@@ -306,10 +307,12 @@ export async function main(args, env = process.env) {
   if (!scenario) return refus(erreurs.map((e) => `${basename(fichier)} : ${e}`));
   const { jeux, erreurs: erreursJeux } = preparerJeux(scenario, dossier, o.params, o.jeu);
   if (erreursJeux.length) return refus(erreursJeux.map((e) => `${basename(fichier)} : ${e}`));
-  if (o.sansTete && scenario.etapes.some((e) => e.action === 'main')) return refus('le scénario a une étape à la main : il se joue dans une fenêtre visible, sans --sans-tete (D6.INV-3)');
+  const sous = [...scenario.preparation, ...scenario.nettoyage].filter((e) => e.charge).map((e) => e.charge.scenario);
+  if (o.sansTete && [scenario, ...sous].some((s) => s.etapes.some((e) => e.action === 'main'))) return refus('le scénario, ou un scénario de préparation, a une étape à la main : il se joue dans une fenêtre visible, sans --sans-tete (D6.INV-3)');
   const distantes = scenario.origines.filter((x) => !estLocale(x));
-  if (scenario.etapes.some((e) => e.mutation) && distantes.length && !o.autoriserMutations) {
-    return refus(`le scénario modifie des données (étapes ${scenario.etapes.flatMap((e, i) => (e.mutation ? [i + 1] : [])).join(', ')}) et déclare des origines hors du poste (${distantes.join(', ')}) : --autoriser-mutations, avec l'accord du développeur pour cette exécution (D7.INV-2)`);
+  const mutantes = mutationsDe(scenario);
+  if (mutantes.length && distantes.length && !o.autoriserMutations) {
+    return refus(`le scénario modifie des données (${mutantes.join(', ')}) et déclare des origines hors du poste (${distantes.join(', ')}) : --autoriser-mutations, avec l'accord du développeur pour cette exécution (D7.INV-2, D20.INV-3)`);
   }
 
   const ref = reference();
@@ -341,7 +344,12 @@ export async function main(args, env = process.env) {
         if (ev.type === 'fin-etape') {
           const e = ev.etape;
           const marque = { reussie: 'ok  ', echec: 'KO  ', non_jouee: '--  ' }[e.statut];
-          console.log(`  ${marque}${String(e.numero).padStart(2)}. ${e.resume}${e.statut === 'echec' ? ` : ${e.message}` : ''}`);
+          console.log(`  ${ev.sous ? '      ' : ''}${marque}${String(e.numero).padStart(2)}. ${e.resume}${e.statut === 'echec' ? ` : ${e.message}` : ''}`);
+        }
+        if (ev.type === 'fin-entree') {
+          const e = ev.entree;
+          const marque = { reussie: 'ok  ', echec: 'KO  ', non_jouee: '--  ' }[e.statut];
+          console.log(`  ${marque}${e.genre === 'preparation' ? 'p' : 'n'}${e.numero}. ${e.genre === 'preparation' ? 'préparation' : 'nettoyage'} : ${e.resume}${e.appel ? ` → ${e.appel.statut}` : ''}${e.statut === 'echec' ? ` : ${e.message}` : ''}`);
         }
       },
     });
@@ -359,7 +367,9 @@ export async function main(args, env = process.env) {
   ecrireRapport(resultats, rapport);
   const b = rapport.bilan;
   for (const x of rapport.origines_bloquees) console.log(`origine bloquée : ${x.origine} (${x.requetes} requête${x.requetes > 1 ? 's' : ''})`);
-  console.log(`Bilan : ${rapport.statut === 'reussi' ? 'réussi' : 'échec'}, ${b.etapes} étapes, ${b.reussies} réussies, ${b.echecs} en échec, ${b.non_jouees} non jouées`);
+  // Un nettoyage en échec est dit, sans changer le code de sortie (D20.INV-4).
+  for (const j of joues) for (const e of j.nettoyage.filter((x) => x.statut === 'echec')) console.log(`AVERTISSEMENT nettoyage ${e.numero}${joues.length > 1 ? ` du jeu ${j.numero}` : ''} en échec : ${e.message} ; des données de l'exécution peuvent rester (D20.INV-4)`);
+  console.log(`Bilan : ${rapport.statut === 'reussi' ? 'réussi' : 'échec'}, ${b.etapes} étapes, ${b.reussies} réussies, ${b.echecs} en échec, ${b.non_jouees} non jouées${b.preparations || b.nettoyages ? ` ; préparation : ${b.preparations}, nettoyage : ${b.nettoyages}${b.nettoyages_en_echec ? `, dont ${b.nettoyages_en_echec} en échec` : ''}` : ''}`);
   console.log(`Rapport : ${join(resultats, 'rapport.md')}`);
   return rapport.statut === 'reussi' ? 0 : 1;
 }
@@ -374,24 +384,25 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
 <!-- fichier : scripts/verifier.mjs -->
 ```javascript
 #!/usr/bin/env node
-// scenario-playwright 1.3.0 : vérifie des textes de départ et des scénarios TOML, sans ouvrir de navigateur.
+// scenario-playwright 1.4.0 : vérifie des textes de départ et des scénarios TOML, sans ouvrir de navigateur.
 //
 // Usage : node <dossier du skill>/scripts/verifier.mjs <fichier.scenario | fichier.toml>... [--plan] [--param nom=valeur]...
 // Un texte : sa structure (D2). Un scénario : sa validité, le contrôle de sa traduction s'il cite un texte,
 // ses variables et ses fichiers (D3) ; --plan montre la traduction ligne du texte par ligne du texte, pour
 // la ratification. Avec un index du code à jour dans le dossier du scénario, une cible ou un chemin absent
-// de l'index est noté, sans changer le code de sortie (D18.INV-4). Code 0 si tout est conforme, 2 sinon.
+// de l'index est noté, sans changer le code de sortie (D18.INV-4). La préparation et le nettoyage des
+// données sont notés avec la garde qui s'y applique, et un nettoyage qui vise une donnée fixe, sans valeur
+// gardée ni ${unique}, est signalé avant la ratification (D20). Code 0 si tout est conforme, 2 sinon.
 import { basename, resolve } from 'node:path';
 import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { decrireCible, estFragile } from './cibles.mjs';
 import { cheminDansIndex, cibleDansIndex, lireIndex } from './code.mjs';
-import { lireScenario, planTraduction, preparerJeux } from './scenario.mjs';
+import { cheminMasque, lireScenario, mutationsDe, planTraduction, preparerJeux, textesEntree, variablesDe } from './scenario.mjs';
 import { estLocale } from './session.mjs';
-import { analyserTexte } from './texte.mjs';
+import { analyserTexte, libelleMarque } from './texte.mjs';
 
 const USAGE = 'Usage : node scripts/verifier.mjs <fichier.scenario | fichier.toml>... [--plan] [--param nom=valeur]...';
-const MARQUES = { creation: 'création', modification: 'modification', suppression: 'suppression', main: 'à la main' };
 
 export function main(args) {
   const fichiers = [];
@@ -418,7 +429,7 @@ export function main(args) {
       try { source = readFileSync(f, 'utf8'); } catch { console.log(`ERREUR ${nom} : fichier introuvable`); code = 2; continue; }
       const { scenario: t, erreurs } = analyserTexte(source);
       if (erreurs.length) { for (const e of erreurs) console.log(`ERREUR ${nom}, ligne ${e.ligne} : ${e.message}`); code = 2; continue; }
-      const marques = t.etapes.filter((e) => e.marque).map((e) => `l.${e.ligne} ${MARQUES[e.marque]}`);
+      const marques = t.etapes.filter((e) => e.marque).map((e) => `l.${e.ligne} ${libelleMarque(e)}`);
       console.log(`ok  ${nom} : « ${t.titre} », ${t.etapes.length} étape${t.etapes.length > 1 ? 's' : ''}${marques.length ? ` (${marques.join(', ')})` : ''}${t.jeux ? `, ${t.jeux.length} exemple${t.jeux.length > 1 ? 's' : ''}` : ''} ; empreinte ${t.empreinte}`);
       continue;
     }
@@ -426,11 +437,20 @@ export function main(args) {
     if (!scenario) { for (const e of erreurs) console.log(`ERREUR ${nom} : ${e}`); code = 2; continue; }
     const { erreurs: erreursJeux } = preparerJeux(scenario, dossier, params);
     if (erreursJeux.length) { for (const e of erreursJeux) console.log(`ERREUR ${nom} : ${e}`); code = 2; continue; }
-    console.log(`ok  ${nom} : « ${scenario.titre} », ${scenario.etapes.length} étapes${scenario.jeux ? `, ${scenario.jeux.length} jeux` : ''}${texte ? `, traduit de ${scenario.source}, empreinte conforme, traduction contrôlée` : ''}`);
-    const mutations = scenario.etapes.flatMap((e, i) => (e.mutation ? [i + 1] : []));
+    const entrees = [scenario.preparation.length ? `${scenario.preparation.length} en préparation` : null, scenario.nettoyage.length ? `${scenario.nettoyage.length} en nettoyage` : null].filter(Boolean);
+    console.log(`ok  ${nom} : « ${scenario.titre} », ${scenario.etapes.length} étapes${entrees.length ? ` (et ${entrees.join(', ')})` : ''}${scenario.jeux ? `, ${scenario.jeux.length} jeux` : ''}${texte ? `, traduit de ${scenario.source}, empreinte conforme, traduction contrôlée` : ''}`);
+    const mutations = mutationsDe(scenario);
     const distantes = scenario.origines.filter((o) => !estLocale(o));
-    if (mutations.length) console.log(`note ${nom} : étapes qui modifient des données : ${mutations.join(', ')}${distantes.length ? ` ; origines hors du poste (${distantes.join(', ')}) : se joue avec --autoriser-mutations, après accord du développeur` : ''}`);
-    if (scenario.etapes.some((e) => e.action === 'main')) console.log(`note ${nom} : étapes à la main : fenêtre visible nécessaire`);
+    if (mutations.length) console.log(`note ${nom} : modifient des données : ${mutations.join(', ')}${distantes.length ? ` ; origines hors du poste (${distantes.join(', ')}) : se joue avec --autoriser-mutations, après accord du développeur` : ''}`);
+    const sous = [...scenario.preparation, ...scenario.nettoyage].filter((e) => e.charge).map((e) => e.charge.scenario);
+    if ([scenario, ...sous].some((s) => s.etapes.some((e) => e.action === 'main'))) console.log(`note ${nom} : étapes à la main : fenêtre visible nécessaire`);
+    // Un nettoyage qui ne vise ni une valeur gardée ni ${unique}, même par une variable dont chaque valeur le
+    // contient, peut supprimer une donnée d'avant l'exécution (D20.INV-4).
+    const gardees = new Set(scenario.preparation.flatMap((e) => Object.keys(e.garder ?? {})));
+    const valeursDe = (v) => (Object.hasOwn(params, v) ? [params[v]] : (scenario.jeux ?? []).some((j) => Object.hasOwn(j, v)) ? scenario.jeux.map((j) => j[v]) : Object.hasOwn(scenario.parametres, v) ? [scenario.parametres[v]] : []);
+    const unique = (v) => { const l = valeursDe(v); return l.length > 0 && l.every((x) => /\$\{unique\}|<unique>/.test(String(x))); };
+    const fixes = scenario.nettoyage.flatMap((e, i) => (e.scenario === undefined && !textesEntree(e).flatMap(variablesDe).some((v) => v === 'unique' || gardees.has(v) || unique(v)) ? [`nettoyage ${i + 1} (${e.methode} ${cheminMasque(e.chemin)})`] : []));
+    if (fixes.length) console.log(`note ${nom} : nettoyage d'une donnée fixe, sans valeur gardée ni \${unique} : ${fixes.join(' ; ')} ; il peut supprimer une donnée qui existait avant l'exécution, à examiner avant la ratification`);
     const fragiles = [...new Set(scenario.etapes.filter((e) => estFragile(e.cible)).map((e) => decrireCible(e.cible)))];
     if (fragiles.length) console.log(`note ${nom} : cibles fragiles : ${fragiles.join(' ; ')}`);
     if (!index.has(dossier)) index.set(dossier, lireIndex(dossier));
@@ -442,6 +462,9 @@ export function main(args) {
         const ou = `étape ${i + 1}${e.ligne ? ` (l.${e.ligne})` : ''}`;
         for (const c of [e.cible, e.jusqua?.cible]) if (c && !cibleDansIndex(ix.index, c)) cibles.push(`${ou} ${decrireCible(c)}`);
         if (e.action === 'verifier' && (e.critere === 'requete' || e.critere === 'api') && typeof e.chemin === 'string' && !cheminDansIndex(ix.index, e.critere === 'api' ? 'GET' : e.methode ?? null, e.chemin)) chemins.push(`${ou} ${e.critere === 'api' ? 'GET' : e.methode ?? ''} ${e.chemin}`.replace(/\s+/g, ' '));
+      });
+      for (const genre of ['preparation', 'nettoyage']) scenario[genre].forEach((e, i) => {
+        if (e.scenario === undefined && typeof e.chemin === 'string' && !cheminDansIndex(ix.index, e.methode, e.chemin)) chemins.push(`${genre === 'preparation' ? 'préparation' : 'nettoyage'} ${i + 1}${e.ligne ? ` (l.${e.ligne})` : ''} ${e.methode} ${cheminMasque(e.chemin)}`);
       });
       if (cibles.length) console.log(`note ${nom} : cibles absentes de l'index du code (texte variable, composant hors du projet, ou cible à revoir) : ${cibles.join(' ; ')}`);
       if (chemins.length) console.log(`note ${nom} : chemins absents de l'index du code : ${chemins.join(' ; ')}`);
@@ -459,20 +482,24 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
 <!-- fichier : scripts/traduire.mjs -->
 ```javascript
 #!/usr/bin/env node
-// scenario-playwright 1.3.0 : squelette TOML de la traduction d'un texte de départ, produit sans IA.
+// scenario-playwright 1.4.0 : squelette TOML de la traduction d'un texte de départ, produit sans IA.
 //
 // Usage : node <dossier du skill>/scripts/traduire.mjs <fichier.scenario> [--remplacer]
 // Écrit <fichier>.toml à côté du texte : structure recopiée du texte, empreinte du texte, et un bloc
 // [[etapes]] par étape du texte, à compléter (D3.INV-5). Si le dossier du texte a un index du code à
 // jour (indexer.mjs), chaque étape reçoit en commentaire les cibles de l'index dont le nom correspond aux
 // libellés entre guillemets de sa phrase (D18.INV-4) ; un index périmé n'est pas employé (D18.INV-2).
+// Une ligne de préparation ou de nettoyage a son bloc [[preparation]] ou [[nettoyage]] : par l'API, avec
+// les endpoints d'écriture de l'index et les champs de leur corps en commentaire ; par un scénario, avec ses
+// paramètres s'il existe déjà (D20).
 // Refuse d'écraser un scénario existant sans --remplacer. Code 0 si le squelette est écrit, 2 sinon.
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { candidats, lireIndex } from './code.mjs';
+import { candidats, candidatsAppel, lireIndex } from './code.mjs';
 import { squeletteToml } from './scenario.mjs';
 import { analyserTexte } from './texte.mjs';
+import { lireToml } from './toml.mjs';
 
 const USAGE = 'Usage : node scripts/traduire.mjs <fichier.scenario> [--remplacer]';
 
@@ -489,15 +516,24 @@ export function main(args) {
   if (existsSync(cible) && !remplacer) { console.error(`ERREUR ${cible} existe déjà : --remplacer pour l'écraser, après accord du développeur`); return 2; }
   const ix = lireIndex(dirname(resolve(fichier)));
   const proposer = ix.etat === 'frais' ? (phrase) => candidats(ix.index, phrase) : null;
-  const squelette = squeletteToml(texte, basename(fichier), { proposer, empreinteIndex: ix.index?.empreinte });
+  const proposerAppel = ix.etat === 'frais' ? (phrase) => candidatsAppel(ix.index, phrase) : null;
+  // Paramètres d'un scénario de préparation déjà écrit, lus sans le valider : une aide au squelette.
+  const parametresDe = (nom) => {
+    try {
+      const objet = lireToml(readFileSync(join(dirname(fichier), `${nom}.toml`), 'utf8'), nom);
+      return Object.keys(objet.parametres ?? {});
+    } catch { return null; }
+  };
+  const squelette = squeletteToml(texte, basename(fichier), { proposer, proposerAppel, parametresDe, empreinteIndex: ix.index?.empreinte });
   writeFileSync(cible, squelette);
-  const aCompleter = texte.etapes.length;
+  const entrees = texte.etapes.filter((e) => e.marque === 'preparation' || e.marque === 'nettoyage');
+  const aCompleter = texte.etapes.length - entrees.length;
   console.log(`écrit : ${cible}`);
   if (proposer) {
-    const avec = texte.etapes.filter((e) => e.marque !== 'main' && proposer(e.phrase).length > 0).length;
+    const avec = texte.etapes.filter((e) => (e.marque === 'preparation' || e.marque === 'nettoyage' ? !e.scenario && proposerAppel(e.phrase).length > 0 : e.marque !== 'main' && proposer(e.phrase).length > 0)).length;
     console.log(`index du code : ${avec} étape${avec > 1 ? 's' : ''} avec des propositions, en commentaire, à vérifier`);
   } else if (ix.etat !== 'absent') console.log(`note : ${ix.raison} ; squelette sans propositions de l'index`);
-  console.log(`${aCompleter} étape${aCompleter > 1 ? 's' : ''} à compléter, une par ligne d'étape du texte ; puis node scripts/verifier.mjs ${basename(cible)} --plan, et la ratification.`);
+  console.log(`${aCompleter} étape${aCompleter > 1 ? 's' : ''} à compléter, une par ligne d'étape du texte${entrees.length ? `, et ${entrees.length} entrée${entrees.length > 1 ? 's' : ''} de préparation ou de nettoyage` : ''} ; puis node scripts/verifier.mjs ${basename(cible)} --plan, et la ratification.`);
   return 0;
 }
 

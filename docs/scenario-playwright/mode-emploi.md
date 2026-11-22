@@ -1,6 +1,6 @@
 # Mode d'emploi : jouer un scénario côté utilisateur avec Playwright
 
-Ce mode d'emploi installe [`scenario-playwright`](../../specs/scenario-playwright/SKILL.md) 1.3.0 : faire faire à Chrome, sur votre poste, les manipulations d'un utilisateur décrites par un scénario. Vous écrivez le scénario en français ou en anglais, dans un texte inspiré de Gherkin, ou vous l'importez, sans IA, d'une demande Jira, d'un fichier `.feature`, ou d'un cas de test de Xray ou de Zephyr Scale ; le skill indexe, sans IA, le code de votre projet ; l'IA traduit le scénario en TOML exécutable, en s'aidant de l'index ; vous ratifiez la traduction ; le skill joue le scénario, sans IA, vérifie ce qui s'affiche et ce qui se passe hors de l'écran, et rend un rapport avec ses captures. Vous gardez la main : chaque connexion se fait par vous, dans la fenêtre, et aucune donnée n'est modifiée hors de votre poste sans votre accord pour l'exécution.
+Ce mode d'emploi installe [`scenario-playwright`](../../specs/scenario-playwright/SKILL.md) 1.4.0 : faire faire à Chrome, sur votre poste, les manipulations d'un utilisateur décrites par un scénario. Vous écrivez le scénario en français ou en anglais, dans un texte inspiré de Gherkin, ou vous l'importez, sans IA, d'une demande Jira, d'un fichier `.feature`, ou d'un cas de test de Xray ou de Zephyr Scale ; le skill indexe, sans IA, le code de votre projet ; l'IA traduit le scénario en TOML exécutable, en s'aidant de l'index ; vous ratifiez la traduction ; le skill joue le scénario, sans IA, prépare avant lui les données dont il a besoin et les nettoie après, vérifie ce qui s'affiche et ce qui se passe hors de l'écran, et rend un rapport avec ses captures. Vous gardez la main : chaque connexion se fait par vous, dans la fenêtre, et aucune donnée n'est modifiée hors de votre poste sans votre accord pour l'exécution.
 
 ```mermaid
 flowchart LR
@@ -14,6 +14,7 @@ flowchart LR
   IA --> P["verifier.mjs --plan :<br/>plan ligne par ligne"]
   P -->|"vous ratifiez"| J["jouer.mjs :<br/>Chrome du poste"]
   V -.->|"connexion à la main"| J
+  J -->|"préparation et nettoyage,<br/>avec votre session"| API["API de l'application"]
   J --> R["resultats/ :<br/>rapport, captures,<br/>relevés hors de l'écran"]
 ```
 
@@ -36,7 +37,7 @@ cd ~/.gemini/skills/scenario-playwright && npm ci && npm test
 
 L'installateur pose le skill dans `~/.gemini/skills/scenario-playwright/`, avec l'agent `pilote-scenario` et les commandes `/scenario:importer`, `/scenario:indexer`, `/scenario:traduire`, `/scenario:jouer` et `/scenario:designer`. Dans une session ouverte : `/skills reload`, `/agents reload`, `/commands reload`. Sous Linux sans écran, la recette se lance par `xvfb-run -a npm test`.
 
-Sans clone, remettez à l'IA la transmission [`transmissions/scenario-playwright-1.3.0.md`](../../transmissions/scenario-playwright-1.3.0.md) : elle matérialise le skill, vérifie les empreintes, installe la dépendance et lance la recette.
+Sans clone, remettez à l'IA la transmission [`transmissions/scenario-playwright-1.4.0.md`](../../transmissions/scenario-playwright-1.4.0.md) : elle matérialise le skill, vérifie les empreintes, installe la dépendance et lance la recette.
 
 ## 3. Écrire le texte de départ
 
@@ -67,7 +68,7 @@ Scénario: Créer un client
 - **Étiquettes** : celles du scénario Gherkin de l'US, `@<CLÉ>-Snn` et `@<CLÉ>-CAnn` ; le rapport s'y rattache.
 - **Adresse, Origines** : l'application, et les seules origines vers lesquelles le navigateur aura le droit d'aller (API, fournisseur d'identité, CDN).
 - **Profil** : le profil du navigateur où vit la session de cette application.
-- **Marques** : `(création)`, `(modification)`, `(suppression)` pour une étape qui touche aux données ; `(à la main)` pour ce que vous faites vous-même, comme vous connecter.
+- **Marques** : `(création)`, `(modification)`, `(suppression)` pour une étape qui touche aux données ; `(à la main)` pour ce que vous faites vous-même, comme vous connecter ; `(par l'API)` et `(nettoyage par l'API)` pour préparer et nettoyer les données (§ 9).
 - **Variables et exemples** : `<nom>` prend chaque valeur du tableau ; le scénario est joué une fois par ligne.
 - **Langue** : les mots-clés s'écrivent en français ou en anglais (`Given`, `When`, `Then`, `And`, `But`, `Scenario:`, `Examples:`) ; les réglages et les marques restent en français.
 
@@ -159,7 +160,58 @@ Comme un testeur qui ouvre l'onglet réseau, une phrase peut demander ce qui se 
 
 Le skill ne garde aucun en-tête ni cookie, ne relève rien pendant votre connexion à la main, et masque dans les rapports les valeurs des paramètres et des champs qui ressemblent à un secret (`token`, `password`, `jeton`…). Une page qui change de document juste après sa requête ne laisse pas lire sa réponse : vérifiez alors son statut, ou ce qui s'affiche.
 
-## 9. Jouer
+## 9. Préparer et nettoyer les données
+
+Un scénario a souvent besoin d'une donnée qui existe avant lui : un client à modifier, une commande à valider. Comme un testeur, le skill la crée avant, par l'API ou par l'écran, et la supprime à la fin. Une ligne marquée du texte le demande :
+
+```text
+Scénario: Modifier la ville d'un client
+  Adresse : http://127.0.0.1:4200
+  Origines : http://127.0.0.1:4200, http://127.0.0.1:8080
+  Profil : crm
+
+  Étant donné que je me connecte (à la main)
+  Et que le client « Client <unique> » existe (par l'API)
+  Quand j'ouvre la fiche du client « Client <unique> »
+  Et je choisis la ville « Lyon » (modification)
+  Alors la fiche affiche « Lyon »
+  Et le client est supprimé (nettoyage par l'API)
+```
+
+| Marque | Ce qui se passe |
+|---|---|
+| `(par l'API)` | un ou plusieurs appels `POST`, `PUT`, `PATCH` ou `DELETE`, joués à la place de la ligne, avant les étapes ordinaires |
+| `(nettoyage par l'API)` | des appels joués après la dernière étape, même si une étape a échoué |
+| `(préparation : creer-client)` | le scénario ratifié `creer-client.toml`, joué par l'écran, dans le même onglet |
+| `(nettoyage : supprimer-client)` | le scénario `supprimer-client.toml`, joué à la fin |
+
+- **Avec votre session** : un appel part avec la session que vous avez ouverte dans la fenêtre, et le jeton anti-CSRF que l'application a déposé dans un cookie (`XSRF-TOKEN`, ou `csrftoken` de Django), comme le ferait la page. Le skill n'ajoute aucun identifiant : la préparation se place après votre connexion à la main.
+- **Une API à jeton**, qui attend un en-tête `Authorization`, répond 401 : préparez alors par l'écran, avec un scénario de préparation.
+- **`<unique>`** donne à chaque exécution un suffixe propre : le client créé ne heurte pas celui de la fois précédente.
+- **Une valeur de la réponse**, l'identifiant du client créé par exemple, se garde : `garder = { id_client = "id" }`, puis `${id_client}` dans les étapes et le nettoyage.
+- **Le nettoyage** se joue une fois par appel, après les étapes, réussies ou non. Un nettoyage en échec est signalé (`AVERTISSEMENT nettoyage 1 en échec`) sans changer le résultat du scénario. Un nettoyage qui vise une donnée fixe, sans valeur gardée ni `<unique>`, est noté par `verifier.mjs` : regardez-le avant de ratifier, il pourrait supprimer une donnée qui existait avant.
+
+L'IA écrit chaque appel dans le TOML. Avec un index du code à jour, le squelette lui propose, en commentaire, les endpoints d'écriture du back et les champs de leur corps, avec leurs contraintes :
+
+```toml
+[[preparation]]
+ligne = 7
+methode = "POST"
+chemin = "http://127.0.0.1:8080/api/clients"
+corps = { nom = "Client ${unique}", ville = "Paris" }
+statut = 201
+garder = { id_client = "id" }
+
+[[nettoyage]]
+ligne = 11
+methode = "DELETE"
+chemin = "http://127.0.0.1:8080/api/clients/${id_client}"
+statut = [204, 404]
+```
+
+Le plan montre chaque appel à sa place, et vous le ratifiez comme les étapes. Sur votre poste, un appel part sans rien demander ; hors du poste, le scénario n'est joué qu'avec `--autoriser-mutations`, que l'agent ne passe qu'avec votre accord, pour une exécution. Le rapport a ses parties Préparation et Nettoyage : chaque appel, son statut, et les valeurs gardées, masquées si leur nom ressemble à un secret.
+
+## 10. Jouer
 
 Dans Gemini CLI : `/scenario:jouer scenarios/creer-client.toml`. Sans l'agent :
 
@@ -168,16 +220,16 @@ node ~/.gemini/skills/scenario-playwright/scripts/jouer.mjs scenarios/creer-clie
 ```
 
 - Chrome s'ouvre sur le profil du scénario. À l'étape à la main, le message `À VOUS : je me connecte` s'affiche : connectez-vous dans la fenêtre ; la suite reprend seule. Le profil garde la session pour les fois suivantes.
-- Chaque étape s'affiche, `ok`, `KO` avec son message, ou `--` si elle n'a pas été jouée.
+- Chaque étape s'affiche, `ok`, `KO` avec son message, ou `--` si elle n'a pas été jouée ; chaque appel de préparation aussi, à sa place (`p1.`), et de nettoyage, à la fin (`n1.`).
 - Le rapport est dans `scenarios/resultats/<horodatage>-creer-client/` : `rapport.md`, `rapport.json`, les captures, l'instantané ARIA de chaque échec, les fichiers téléchargés, et pour chaque vérification hors de l'écran son relevé (`requête POST …/api/clients → 201`). Ajoutez `resultats/` au `.gitignore` de votre projet.
 
 Options utiles : `--param ville=Nice`, `--jeu 2`, `--ralenti 300` pour une démonstration, `--sans-tete` sans étape à la main, `--trace` pour la trace de Playwright (elle contient vos cookies : elle ne se partage pas).
 
-## 10. Une cible qu'on ne sait pas nommer
+## 11. Une cible qu'on ne sait pas nommer
 
 `/scenario:designer http://127.0.0.1:4200/clients`, ou `node <skill>/scripts/designer.mjs <adresse>` : cliquez l'élément dans la fenêtre, le skill rend sa cible, par exemple `cible = { role = "button", nom = "Supprimer", dans = { role = "row", nom = "Martin" } }`. Le clic de désignation ne déclenche rien dans la page.
 
-## 11. Ce qui ne se négocie pas
+## 12. Ce qui ne se négocie pas
 
 - Le skill ne voit aucun identifiant : vous vous connectez vous-même, dans la fenêtre, à l'application comme à Jira.
 - Le skill n'écrit jamais dans Jira, Xray ni Zephyr Scale ; d'une demande, il ne lit que la description, les champs de texte et, si vous le demandez, les commentaires.
@@ -185,18 +237,19 @@ Options utiles : `--param ville=Nice`, `--jeu 2`, `--ralenti 300` pour une démo
 - Rien ne se joue avant votre ratification de la traduction.
 - Aucune requête ne part vers une origine que le texte ne déclare pas ; une vérification de l'API ne fait que des GET.
 - Le code de votre projet n'est que lu : rien n'y est exécuté ni écrit ; seul le dossier `index/` de vos scénarios reçoit l'index.
-- Hors de votre poste, une étape qui modifie des données n'est jouée qu'avec `--autoriser-mutations`, que l'agent ne passe qu'avec votre accord, pour une exécution.
+- Une préparation ou un nettoyage ne vient que d'une ligne que vous avez marquée ; un appel ne part qu'avec votre session, vers une origine du texte, une seule fois, sans suivre de redirection.
+- Hors de votre poste, une étape, un appel ou un scénario de préparation qui modifie des données n'est joué qu'avec `--autoriser-mutations`, que l'agent ne passe qu'avec votre accord, pour une exécution.
 - Le skill ne rejoue aucune étape : un échec reste un échec, à examiner.
 - Rapports, captures, téléchargements, pages Jira enregistrées et profils restent sur votre poste.
 
-## 12. Avec les autres skills
+## 13. Avec les autres skills
 
 - [`agent-tdd-jira`](../../specs/agent-tdd-jira/SKILL.md) : ses scénarios Gherkin donnent les étiquettes, et souvent les phrases, de vos textes de départ ; écrits dans la demande, ils s'importent, et la page MHTML qu'il lit s'importe aussi.
 - [`capture-sprint-jira`](../../specs/capture-sprint-jira/SKILL.md) : ses captures MHTML des tickets d'un sprint s'importent telles quelles, sans rouvrir Jira.
 - [`agent2test`](../../specs/agent2test/SKILL.md) : son navigateur partage le vocabulaire du scénario ; la remise d'un scénario ratifié à Agent2Test est réservée.
 - [`generateur-skill-ticket`](../../specs/generateur-skill-ticket/SKILL.md) : le parcours de son kit démo, joué par ce skill, est réservé.
 
-## 13. Dépannage
+## 14. Dépannage
 
 | Constat | Conduite |
 |---|---|
@@ -227,3 +280,10 @@ Options utiles : `--param ville=Nice`, `--jeu 2`, `--ralenti 300` pour une démo
 | `réponse interrompue avant la fin de sa lecture` | la page a changé de document juste après la requête : vérifier son statut, ou l'effet à l'écran |
 | `redirection vers … non suivie` | l'adresse de l'API renvoie ailleurs, souvent vers une connexion : se connecter à la main avant, ou vérifier l'adresse |
 | `API GET … ; obtenu : statut 401` | l'API attend son jeton dans un en-tête, que le skill n'ajoute jamais : vérifier plutôt l'appel que fait la page, par une phrase sur la requête (`critere = "requete"`) |
+| `appel à compléter` | l'IA n'a pas encore écrit l'appel d'une ligne de préparation : le lui faire compléter, puis ratifier |
+| `POST … ; obtenu : statut 401 (l'API ne reconnaît pas la session…)` | placer la préparation après la connexion à la main ; une API à jeton se prépare par un scénario de préparation (§ 9) |
+| `POST … ; obtenu : statut 403` | droits insuffisants, ou jeton anti-CSRF refusé : le skill recopie `XSRF-TOKEN` et `csrftoken`, pas un autre nom de cookie ; préparer alors par un scénario |
+| `POST … ; obtenu : statut 415` | l'API n'accepte pas de corps JSON : préparer par un scénario |
+| `non jouée : ${id_client} non obtenue` | la préparation qui gardait cette valeur a échoué : la corriger, son message dit l'attendu et l'obtenu |
+| `AVERTISSEMENT nettoyage 1 en échec` | une donnée de l'exécution peut rester : la supprimer si besoin ; le résultat du scénario n'en dépend pas |
+| `note : nettoyage d'une donnée fixe` | le nettoyage ne vise ni une valeur gardée ni `<unique>` : vérifier qu'il ne supprime pas une donnée d'avant l'exécution, avant de ratifier |

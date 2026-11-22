@@ -80,7 +80,7 @@ Un scénario que le format texte n'exprime pas n'est pas écrit, et l'import dit
 ## 5. Le texte importé (D16.INV-4)
 
 ```text
-# Importé de Jira par importer.mjs (scenario-playwright 1.3.0), sans IA : le scénario est recopié tel qu'écrit dans Jira.
+# Importé de Jira par importer.mjs (scenario-playwright 1.4.0), sans IA : le scénario est recopié tel qu'écrit dans Jira.
 # Demande : DEMO-8, « Créer un client depuis Jira »
 # Scénario : @DEMO-8-S03, description
 # Source : https://jira.exemple.fr/browse/DEMO-8
@@ -172,7 +172,7 @@ Le lecteur, sans navigateur : MHTML, demande, lignes du HTML, scénarios, étiqu
 
 <!-- fichier : scripts/jira.mjs -->
 ```javascript
-// scenario-playwright 1.3.0 : scénarios Gherkin d'une demande Jira enregistrée en MHTML, lus sans IA.
+// scenario-playwright 1.4.0 : scénarios Gherkin d'une demande Jira enregistrée en MHTML, lus sans IA.
 //
 // Le décodage du MHTML (en-têtes, frontière, quoted-printable, base64, jeu de caractères) et les
 // marqueurs de Jira Cloud et de Jira Data Center sont repris d'agent-tdd-jira 1.3.4 (module
@@ -620,7 +620,7 @@ export function texteImporte(sc, { cle, resume, source, page = null, date, adres
   const jira = origine.nom === 'Jira';
   const facon = sc.manuel ? 'chaque pas du test manuel devient « Quand <action> », avec ses données, puis « Alors <résultat attendu> »' : `le scénario est recopié tel qu'écrit ${origine.dans}`;
   const entete = [
-    `# Importé ${origine.de} par importer.mjs (scenario-playwright 1.3.0), sans IA : ${facon}.`,
+    `# Importé ${origine.de} par importer.mjs (scenario-playwright 1.4.0), sans IA : ${facon}.`,
     jira ? `# Demande : ${cle}${resume ? `, « ${resume} »` : ''}` : `# Lot : ${lot}`,
     `# Scénario : @${sc.etiquette}, ${sc.provenance}`,
     `# Source : ${source}`,
@@ -726,7 +726,7 @@ La ligne de commande : options, genre de la source, page par l'adresse (capture)
 <!-- fichier : scripts/importer.mjs -->
 ```javascript
 #!/usr/bin/env node
-// scenario-playwright 1.3.0 : importe en textes de départ, sans IA, les scénarios Gherkin d'une demande Jira,
+// scenario-playwright 1.4.0 : importe en textes de départ, sans IA, les scénarios Gherkin d'une demande Jira,
 // d'un fichier .feature ou d'une archive .zip d'un export, et les tests de Xray et de Zephyr Scale lus par
 // leur API.
 //

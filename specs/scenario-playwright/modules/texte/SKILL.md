@@ -1,6 +1,6 @@
 ---
 name: texte
-description: Texte de départ d'un scénario, fichier .scenario inspiré de Gherkin en français ou en anglais, écrit par le développeur ou importé de Jira (un seul scénario par texte, étiquettes, Fonctionnalité ou Feature facultative, titre Scénario ou Scenario, réglages Adresse, Origines, Profil et Paramètre, étapes introduites par Étant donné, Soit, Sachant que, Quand, Lorsque, Alors, Donc, Et, Mais, ou Given, When, Then, And, But, marques (création), (modification), (suppression) et (à la main), variables <nom>, tableau Exemples ou Examples, Contexte et Règle refusés, commentaires, erreurs données ligne par ligne, empreinte identique en LF et en CRLF, phrases conseillées et leur traduction, source de scripts/texte.mjs). À lire pour écrire un texte ou le traduire.
+description: Texte de départ d'un scénario, fichier .scenario inspiré de Gherkin en français ou en anglais, écrit par le développeur ou importé de Jira (un seul scénario par texte, étiquettes, Fonctionnalité ou Feature facultative, titre Scénario ou Scenario, réglages Adresse, Origines, Profil et Paramètre, étapes introduites par Étant donné, Soit, Sachant que, Quand, Lorsque, Alors, Donc, Et, Mais, ou Given, When, Then, And, But, marques (création), (modification), (suppression), (à la main), (par l'API), (nettoyage par l'API) et celles qui nomment un scénario de préparation ou de nettoyage, à leur place, variables <nom> et <unique>, tableau Exemples ou Examples, Contexte et Règle refusés, commentaires, erreurs données ligne par ligne, empreinte identique en LF et en CRLF, phrases conseillées et leur traduction, source de scripts/texte.mjs). À lire pour écrire un texte ou le traduire.
 dimensions: [D2]
 status: active
 ---
@@ -66,12 +66,16 @@ Une marque, entre parenthèses à la fin de la phrase, dit ce que l'étape engag
 | `(modification)` | l'étape modifie des données | `mutation = "modification"` |
 | `(suppression)` | l'étape supprime des données | `mutation = "suppression"` |
 | `(à la main)` | le développeur fait l'étape lui-même, dans la fenêtre : se connecter, résoudre un défi, valider un paiement de test | une seule étape `main` |
+| `(par l'API)` | la ligne prépare des données par l'API, avant les étapes | une ou plusieurs entrées `[[preparation]]` : des appels (module `donnees`) |
+| `(nettoyage par l'API)` | la ligne nettoie des données par l'API, après les étapes | une ou plusieurs entrées `[[nettoyage]]` : des appels |
+| `(préparation : nom)` | la ligne prépare des données par le scénario `nom.toml` | une seule entrée `[[preparation]]`, `scenario = "nom.toml"` |
+| `(nettoyage : nom)` | la ligne nettoie des données par le scénario `nom.toml` | une seule entrée `[[nettoyage]]`, `scenario = "nom.toml"` |
 
-Les marques se reconnaissent sans accents ni casse (`(creation)`, `(A la main)`) ; elles sont retirées de la phrase. Les marques de mutation déclenchent la garde du module `garde` : hors du poste, une modification de données demande l'autorisation explicite du développeur (D7.INV-2). Une étape qui modifie des données sans marque le reste : la traduction lui ajoute `mutation` et le signale au développeur (module `agent`, § 3).
+Les marques se reconnaissent sans accents ni casse (`(creation)`, `(A la main)`, `(Par l’API)`), l'apostrophe droite ou courbe ; elles sont retirées de la phrase ; `nom` est un chemin relatif sans extension, sans `..` ni espace. Une ligne de préparation précède toute étape qui n'est ni à la main ni de préparation, une ligne de nettoyage suit toutes les autres, et il reste au moins une étape hors de la préparation et du nettoyage (D20.INV-1). Les marques de mutation déclenchent la garde du module `garde` : hors du poste, une modification de données demande l'autorisation explicite du développeur (D7.INV-2). Une étape qui modifie des données sans marque le reste : la traduction lui ajoute `mutation` et le signale au développeur (module `agent`, § 3).
 
 ## 6. Variables et exemples
 
-Une variable s'écrit `<nom>` dans une phrase : minuscules, chiffres et `_`, commençant par une lettre. Elle doit être déclarée, par une ligne `Paramètre :` ou par une colonne du tableau d'exemples (D2.INV-2) ; la traduction l'écrit `${nom}`.
+Une variable s'écrit `<nom>` dans une phrase : minuscules, chiffres et `_`, commençant par une lettre. Elle doit être déclarée, par une ligne `Paramètre :` ou par une colonne du tableau d'exemples (D2.INV-2) ; la traduction l'écrit `${nom}`. `<unique>` se passe de déclaration : elle vaut un suffixe propre à chaque jeu de chaque exécution, pour nommer des données qu'un scénario rejoué ne heurte pas, et se remplace aussi dans les valeurs des paramètres et des exemples (`| Client <unique> |`) ; `unique` ne se déclare donc pas (D20.INV-6).
 
 Le tableau d'exemples suit `Exemples:` : une ligne d'en-têtes, les noms des variables, puis une ligne par jeu de valeurs. Le scénario est joué une fois par ligne. Les cellules sont séparées par `|` ; `\|` écrit une barre dans une cellule ; chaque ligne a autant de cellules que l'en-tête.
 
@@ -92,7 +96,7 @@ ERREUR creer.scenario, ligne 3 : ligne non reconnue : « Adress : http://127.0.0
 ERREUR creer.scenario, ligne 9 : variable <nom> non déclarée : ni paramètre, ni colonne d'exemples
 ```
 
-Sont refusés, entre autres : une ligne `Contexte:` ou `Règle:`, un second titre, un réglage après la première étape ou avant le titre, une étape avant le titre, une adresse absente ou qui n'est pas en http ou https, une origine avec un chemin, une adresse dont l'origine n'est pas parmi les origines déclarées, une variable non déclarée ou mal nommée, une ligne d'exemples irrégulière, un tableau vide, une ligne après le tableau, des étiquettes après le titre, un profil mal nommé, un paramètre en double.
+Sont refusés, entre autres : une ligne `Contexte:` ou `Règle:`, un second titre, un réglage après la première étape ou avant le titre, une étape avant le titre, une adresse absente ou qui n'est pas en http ou https, une origine avec un chemin, une adresse dont l'origine n'est pas parmi les origines déclarées, une variable non déclarée ou mal nommée, une ligne d'exemples irrégulière, un tableau vide, une ligne après le tableau, des étiquettes après le titre, un profil mal nommé, un paramètre en double, un paramètre ou une colonne `unique`, un scénario de préparation mal nommé, une préparation après une étape ordinaire, une étape après le nettoyage.
 
 ## 8. Empreinte (D2.INV-3)
 
@@ -126,6 +130,9 @@ Une phrase libre se traduit ; une phrase de cette table se traduit sans hésitat
 | le fichier téléchargé contient « Lyon » dans la colonne « ville » | après un `telecharger` avec `nom = "export"` : `verifier`, `critere = "fichier"`, `fichier = "export"`, `attendu = { csv = { colonne = "ville", valeur = "Lyon" } }` |
 | je capture l'écran « liste » | `capturer`, `nom = "liste"` |
 | je me connecte (à la main) | `main`, `message = "je me connecte"`, `jusqua = { url = "/accueil" }` |
+| le client « Client <unique> » existe (par l'API) | `[[preparation]]`, `methode = "POST"`, `chemin = "/api/clients"`, `corps = { nom = "Client ${unique}" }`, `statut = 201`, `garder = { id_client = "id" }` (module `donnees`) |
+| le client est supprimé (nettoyage par l'API) | `[[nettoyage]]`, `methode = "DELETE"`, `chemin = "/api/clients/${id_client}"`, `statut = [204, 404]` |
+| la fiche du client est prête (préparation : creer-client) | `[[preparation]]`, `scenario = "creer-client.toml"`, `parametres = { nom = "Client ${unique}" }` |
 
 ## 10. Exemple complet
 
@@ -176,25 +183,32 @@ Scenario Outline: Create a client
 - Un texte conforme est lu sans erreur, chaque étape avec sa ligne, son mot-clé, sa phrase, sa marque et ses variables (D2.INV-1, D2.INV-2).
 - Un texte aux mots-clés anglais, ou aux synonymes français, se lit de même, mots-clés gardés tels qu'écrits (D2.INV-4).
 - Un texte non conforme rend toutes ses erreurs, chacune avec sa ligne.
+- Les marques de préparation et de nettoyage se lisent avec leur scénario nommé, à leur place ; une préparation après une étape ordinaire, une étape après le nettoyage, un nom invalide et `unique` déclarée sont refusés (D20.INV-1, D20.INV-6).
 - Le même texte en CRLF, avec un BOM, ou en caractères décomposés, a la même empreinte (D2.INV-3).
 
 ## 12. Source `scripts/texte.mjs`
 
 <!-- fichier : scripts/texte.mjs -->
 ```javascript
-// scenario-playwright 1.3.0 : lecteur du texte de départ d'un scénario (fichier .scenario), sans dépendance.
+// scenario-playwright 1.4.0 : lecteur du texte de départ d'un scénario (fichier .scenario), sans dépendance.
 //
 // Le texte, inspiré de Gherkin, décrit un seul scénario : étiquettes, titre, réglages (adresse, origines,
 // profil, paramètres), étapes introduites par un mot-clé de Gherkin, en français ou en anglais, et au plus
 // un tableau d'exemples. Ce lecteur en tire la structure sans IA, avec le numéro de ligne de chaque étape ;
-// la phrase d'une étape n'est pas interprétée : c'est la traduction en TOML qui lui donne ses actions. Les
-// mots-clés servent aussi au lecteur des pages Jira (scripts/jira.mjs).
+// la phrase d'une étape n'est pas interprétée : c'est la traduction en TOML qui lui donne ses actions. Une
+// marque finale dit ce que l'étape engage : mutation, geste à la main, préparation ou nettoyage des données,
+// par l'API ou par un autre scénario ; la préparation précède les étapes ordinaires, le nettoyage les suit
+// (D20.INV-1). Les mots-clés servent aussi au lecteur des pages Jira (scripts/jira.mjs).
 import { createHash } from 'node:crypto';
 import { URL } from 'node:url';
 
 export const FORMAT_TEXTE = 'scenario-playwright.texte/1';
-export const MARQUES = ['creation', 'modification', 'suppression', 'main'];
+export const MARQUES = ['creation', 'modification', 'suppression', 'main', 'preparation', 'nettoyage'];
 export const RE_VARIABLE = /^[a-z][a-z0-9_]*$/;
+/** Variable intégrée : un suffixe propre à chaque jeu de chaque exécution (D20.INV-6) ; nom réservé. */
+export const VARIABLE_UNIQUE = 'unique';
+/** Nom d'un scénario de préparation ou de nettoyage : chemin relatif, sans extension, sans « .. » ni espace. */
+export const RE_NOM_SCENARIO = /^[A-Za-z0-9_][A-Za-z0-9_.-]*(?:\/[A-Za-z0-9_][A-Za-z0-9_.-]*)*$/;
 export const RE_PROFIL = /^[a-z0-9][a-z0-9_-]{0,39}$/;
 
 export class ErreurTexte extends Error {
@@ -247,8 +261,38 @@ const TITRES = {
   regle: 'regle', rule: 'regle',
 };
 const RE_TITRE = new RegExp(`^(${Object.keys(TITRES).sort((a, b) => b.length - a.length).join('|')})\\s*:\\s*(.*)$`);
-const RE_MARQUE = /\s*\((creation|modification|suppression|a la main)\)\s*$/;
+const RE_PARENTHESE_FINALE = /\s*\(([^()]*)\)\s*$/;
 const RE_REGLAGE = /^(adresse|origines|profil|parametre)\s*:\s*(.*)$/;
+
+/**
+ * Marque finale d'une phrase, sans accents ni casse : (création), (modification), (suppression), (à la main),
+ * (par l'API), (nettoyage par l'API), (préparation : nom), (nettoyage : nom). Rend { marque, scenario,
+ * phrase sans la marque, erreur } ; marque vaut null quand la parenthèse finale n'est pas une marque.
+ */
+export function lireMarque(phrase) {
+  const sans = { marque: null, scenario: null, phrase, erreur: null };
+  const m = RE_PARENTHESE_FINALE.exec(phrase);
+  if (!m) return sans;
+  const contenu = m[1].trim();
+  const p = plat(contenu).replace(/\s+/g, ' ');
+  const reste = phrase.slice(0, m.index).trim();
+  if (['creation', 'modification', 'suppression'].includes(p)) return { ...sans, marque: p, phrase: reste };
+  if (p === 'a la main') return { ...sans, marque: 'main', phrase: reste };
+  const api = /^(nettoyage )?par l['’] ?api$/.exec(p);
+  if (api) return { ...sans, marque: api[1] ? 'nettoyage' : 'preparation', phrase: reste };
+  const sc = /^(preparation|nettoyage) ?:/.exec(p);
+  if (!sc) return sans;
+  const nom = contenu.slice(contenu.indexOf(':') + 1).trim().replace(/\.toml$/i, '');
+  if (RE_NOM_SCENARIO.test(nom)) return { ...sans, marque: sc[1], scenario: nom, phrase: reste };
+  return { ...sans, marque: sc[1], phrase: reste, erreur: `scénario de ${sc[1] === 'preparation' ? 'préparation' : 'nettoyage'} invalide : « ${nom} » (chemin relatif d'un scénario, sans « .. » ni espace)` };
+}
+
+/** Marque d'une étape du texte, lisible : création, à la main, par l'API, préparation : nom… ; '' sans marque. */
+export function libelleMarque(e) {
+  if (e.marque === 'preparation') return e.scenario ? `préparation : ${e.scenario}` : "par l'API";
+  if (e.marque === 'nettoyage') return e.scenario ? `nettoyage : ${e.scenario}` : "nettoyage par l'API";
+  return ({ creation: 'création', main: 'à la main' })[e.marque] ?? e.marque ?? '';
+}
 
 /** Mot-clé d'étape au début d'une ligne : { motCle tel qu'écrit, phrase }, ou null. */
 export function lireMotCle(ligne) {
@@ -329,6 +373,7 @@ export function analyserTexte(source) {
           const vues = new Set();
           for (const nom of c) {
             if (!RE_VARIABLE.test(nom)) err(n, `colonne d'exemples invalide : « ${nom} » (lettres minuscules, chiffres et _)`);
+            else if (nom === VARIABLE_UNIQUE) err(n, `colonne d'exemples réservée : <${VARIABLE_UNIQUE}> vaut un suffixe propre à chaque exécution`);
             else if (vues.has(nom)) err(n, `colonne d'exemples en double : ${nom}`);
             vues.add(nom);
           }
@@ -419,6 +464,7 @@ export function analyserTexte(source) {
         const m = /^([^=]+)=(.*)$/.exec(valeur);
         const nom = m ? m[1].trim() : '';
         if (!m || !RE_VARIABLE.test(nom)) err(n, `paramètre invalide : « ${valeur} » (nom = valeur, nom en minuscules)`);
+        else if (nom === VARIABLE_UNIQUE) err(n, `paramètre réservé : <${VARIABLE_UNIQUE}> vaut un suffixe propre à chaque exécution`);
         else if (Object.hasOwn(s.parametres, nom)) err(n, `paramètre en double : ${nom}`);
         else s.parametres[nom] = m[2].trim();
       }
@@ -432,17 +478,12 @@ export function analyserTexte(source) {
         continue;
       }
       zone = 'etapes';
-      let phrase = motCle.phrase;
-      let marque = null;
-      const m = RE_MARQUE.exec(plat(phrase));
-      if (m) {
-        marque = m[1] === 'a la main' ? 'main' : m[1];
-        phrase = phrase.slice(0, phrase.length - m[0].length).trim();
-      }
+      const { marque, scenario, phrase, erreur } = lireMarque(motCle.phrase);
+      if (erreur) err(n, erreur);
       if (phrase === '') err(n, 'étape sans phrase');
       const variables = [...new Set([...phrase.matchAll(/<([^<>\s]+)>/g)].map((v) => v[1]))];
       for (const v of variables) if (!RE_VARIABLE.test(v)) err(n, `variable invalide : <${v}> (minuscules, chiffres et _)`);
-      s.etapes.push({ ligne: n, motCle: motCle.motCle, phrase, marque, variables });
+      s.etapes.push({ ligne: n, motCle: motCle.motCle, phrase, marque, scenario, variables });
       continue;
     }
 
@@ -452,6 +493,14 @@ export function analyserTexte(source) {
   if (s.titre === null) err(0, 'titre absent : une ligne « Scénario: » est attendue');
   if (s.titre !== null && s.adresse === null && !ligneAdresse) err(ligneTitre, 'adresse absente : une ligne « Adresse : http://… » suit le titre');
   if (s.titre !== null && s.etapes.length === 0) err(ligneTitre, 'aucune étape');
+  // La préparation précède les étapes ordinaires, le nettoyage suit toutes les autres (D20.INV-1).
+  const ordinaire = s.etapes.find((e) => !['main', 'preparation', 'nettoyage'].includes(e.marque));
+  for (const e of s.etapes) {
+    if (e.marque === 'preparation' && ordinaire && e.ligne > ordinaire.ligne) err(e.ligne, `préparation après l'étape de la ligne ${ordinaire.ligne} : elle se place avant les étapes qui ne sont ni à la main ni de préparation`);
+  }
+  const nettoyage = s.etapes.find((e) => e.marque === 'nettoyage');
+  if (nettoyage) for (const e of s.etapes) if (e.marque !== 'nettoyage' && e.ligne > nettoyage.ligne) err(e.ligne, `étape après le nettoyage de la ligne ${nettoyage.ligne} : le nettoyage se place à la fin`);
+  if (s.etapes.length > 0 && s.etapes.every((e) => e.marque === 'preparation' || e.marque === 'nettoyage')) err(ligneTitre, 'aucune étape hors de la préparation et du nettoyage');
   if (s.adresse !== null) {
     const o = origineDe(s.adresse);
     if (!s.originesDeclarees) s.origines = [o];
@@ -461,7 +510,7 @@ export function analyserTexte(source) {
     if (tableau.entetes === null || tableau.lignes.length === 0) err(tableau.ligne, 'tableau d\'exemples vide : une ligne d\'en-têtes et au moins une ligne de valeurs');
     else s.jeux = tableau.lignes;
   }
-  const declarees = new Set([...Object.keys(s.parametres), ...(tableau?.entetes ?? [])]);
+  const declarees = new Set([...Object.keys(s.parametres), ...(tableau?.entetes ?? []), VARIABLE_UNIQUE]);
   for (const e of s.etapes) {
     for (const v of e.variables) {
       if (RE_VARIABLE.test(v) && !declarees.has(v)) err(e.ligne, `variable <${v}> non déclarée : ni paramètre, ni colonne d'exemples`);

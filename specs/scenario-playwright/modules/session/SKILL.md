@@ -29,7 +29,7 @@ L'avertissement s'affiche en début d'exécution et figure dans le rapport ; il 
 
 Le navigateur s'ouvre sur un profil dédié, réutilisé d'une exécution à l'autre : `.profils/<profil>/` dans le dossier du skill, ou dans `SCENARIO_PLAYWRIGHT_PROFILS`. Le profil se nomme dans le texte (`Profil :`) et le scénario (`profil`), un par application de préférence ; à défaut, `defaut`. Une session ouverte une fois, dont les cookies persistent, sert aux exécutions suivantes sans nouvelle connexion. L'import de Jira par l'adresse a son propre profil, `jira` par défaut (module `jira`, § 2) : la session de Jira ne se mêle à celle d'aucune application.
 
-Le skill ne demande, ne lit, ne stocke ni ne saisit aucun identifiant, mot de passe ou jeton : une connexion se fait à la main, dans la fenêtre, lors d'une étape `main`. Le profil contient des cookies de session : il ne se copie, ne se partage ni ne se versionne (D1.INV-2). Un profil ne s'ouvre que dans une fenêtre à la fois.
+Le skill ne demande, ne lit, ne stocke ni ne saisit aucun identifiant, mot de passe ou jeton : une connexion se fait à la main, dans la fenêtre, lors d'une étape `main`. Le profil contient des cookies de session : il ne se copie, ne se partage ni ne se versionne (D1.INV-2). Un profil ne s'ouvre que dans une fenêtre à la fois. Les vérifications `api` et les appels de préparation et de nettoyage emploient ces cookies, et le jeton anti-CSRF que l'application y a déposé, en mémoire, sans les relever (modules `hors-ecran` et `donnees`) : la session ouverte à la main sert aussi à l'API.
 
 ## 4. Étape à la main (D6.INV-3)
 
@@ -62,7 +62,7 @@ La suite reprend seule, dès l'état atteint ; au-delà du délai de l'étape, 3
 
 <!-- fichier : scripts/session.mjs -->
 ```javascript
-// scenario-playwright 1.3.0 : réglages, navigateur du poste, profil dédié et garde des origines.
+// scenario-playwright 1.4.0 : réglages, navigateur du poste, profil dédié et garde des origines.
 //
 // Le navigateur est celui du poste, Chrome par défaut, piloté par playwright-core sans en télécharger
 // aucun (D1.INV-1, D6.INV-1). La session vit dans un profil dédié ; le skill ne voit aucun identifiant
