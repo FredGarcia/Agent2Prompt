@@ -1,11 +1,12 @@
 # Mode d'emploi : jouer un scénario côté utilisateur avec Playwright
 
-Ce mode d'emploi installe [`scenario-playwright`](../../specs/scenario-playwright/SKILL.md) 1.5.0 : faire faire à Chrome, sur votre poste, les manipulations d'un utilisateur décrites par un scénario. Vous écrivez le scénario en français ou en anglais, dans un texte inspiré de Gherkin, ou vous l'importez, sans IA, d'une demande Jira, d'un fichier `.feature`, ou d'un cas de test de Xray ou de Zephyr Scale ; le skill indexe, sans IA, le code de votre projet ; l'IA traduit le scénario en TOML exécutable, en s'aidant de l'index ; vous ratifiez la traduction ; le skill joue le scénario, sans IA, prépare avant lui les données dont il a besoin et les nettoie après, vérifie ce qui s'affiche et ce qui se passe hors de l'écran, et rend un rapport avec ses captures. Le scénario ratifié se met ensuite, sans IA, dans les tests `@playwright/test` de votre projet, que votre équipe rejoue dans sa CI, et les résultats d'une exécution s'écrivent au format d'import de Xray ou de Zephyr Scale. Vous gardez la main : chaque connexion se fait par vous, dans la fenêtre, et aucune donnée n'est modifiée hors de votre poste sans votre accord pour l'exécution.
+Ce mode d'emploi installe [`scenario-playwright`](../../specs/scenario-playwright/SKILL.md) 1.6.0 : faire faire à Chrome, sur votre poste, les manipulations d'un utilisateur décrites par un scénario. Vous écrivez le scénario en français ou en anglais, dans un texte inspiré de Gherkin, ou vous l'importez, sans IA, d'une demande Jira, d'un fichier `.feature`, d'un cas de test de Xray ou de Zephyr Scale, ou de la page d'un test de Xray enregistrée sur votre poste ; le skill indexe, sans IA, le code de votre projet ; l'IA traduit le scénario en TOML exécutable, en s'aidant de l'index ; vous ratifiez la traduction ; le skill joue le scénario, sans IA, prépare avant lui les données dont il a besoin et les nettoie après, vérifie ce qui s'affiche et ce qui se passe hors de l'écran, et rend un rapport avec ses captures. Plusieurs scénarios se jouent en campagne, dans une seule fenêtre : chaque test reçoit son verdict, conforme, non conforme ou bloqué, avec ses copies d'écran, et le rapport de conformité s'écrit prêt à coller dans Jira. Le scénario ratifié se met ensuite, sans IA, dans les tests `@playwright/test` de votre projet, que votre équipe rejoue dans sa CI, et les résultats d'une exécution ou d'une campagne s'écrivent au format d'import de Xray ou de Zephyr Scale. Vous gardez la main : chaque connexion se fait par vous, dans la fenêtre, et aucune donnée n'est modifiée hors de votre poste sans votre accord pour l'exécution.
 
 ```mermaid
 flowchart LR
   JI["Demande Jira<br/>page MHTML ou adresse"] -->|"importer.mjs, sans IA"| V
   XZ["Xray, Zephyr Scale<br/>.feature, .zip, API"] -->|"importer.mjs, sans IA"| V
+  PG["pages de tests de Xray<br/>enregistrées sur le poste"] -->|"importer.mjs, sans IA"| V
   V["texte de départ<br/>écrit par vous ou importé"] --> T["traduire.mjs :<br/>squelette sans IA"]
   C["code du projet<br/>front et back"] -->|"indexer.mjs, sans IA"| X["index du code"]
   X -.->|"propositions"| T
@@ -18,6 +19,7 @@ flowchart LR
   J --> R["resultats/ :<br/>rapport, captures,<br/>relevés hors de l'écran"]
   P -->|"exporter.mjs, sans IA"| E["tests du projet<br/>@playwright/test, CI"]
   R -->|"resultats.mjs"| XR["fichier d'import<br/>Xray, Zephyr Scale"]
+  R -->|"resultats.mjs --format jira"| CF["rapport de conformité<br/>à coller dans Jira"]
 ```
 
 ## 1. Prérequis
@@ -39,7 +41,7 @@ cd ~/.gemini/skills/scenario-playwright && npm ci && npm test
 
 L'installateur pose le skill dans `~/.gemini/skills/scenario-playwright/`, avec l'agent `pilote-scenario` et les commandes `/scenario:importer`, `/scenario:indexer`, `/scenario:traduire`, `/scenario:jouer`, `/scenario:designer`, `/scenario:exporter` et `/scenario:resultats`. Dans une session ouverte : `/skills reload`, `/agents reload`, `/commands reload`. Sous Linux sans écran, la recette se lance par `xvfb-run -a npm test`.
 
-Sans clone, remettez à l'IA la transmission [`transmissions/scenario-playwright-1.5.0.md`](../../transmissions/scenario-playwright-1.5.0.md) : elle matérialise le skill, vérifie les empreintes, installe les dépendances et lance la recette. `npm ci` installe `playwright-core`, la seule dépendance du skill, et `@playwright/test`, avec lequel la recette joue les tests exportés.
+Sans clone, remettez à l'IA la transmission [`transmissions/scenario-playwright-1.6.0.md`](../../transmissions/scenario-playwright-1.6.0.md) : elle matérialise le skill, vérifie les empreintes, installe les dépendances et lance la recette. `npm ci` installe `playwright-core`, la seule dépendance du skill, et `@playwright/test`, avec lequel la recette joue les tests exportés.
 
 ## 3. Écrire le texte de départ
 
@@ -117,6 +119,16 @@ Sous PowerShell 7 : `$env:ZEPHYR_TOKEN = Read-Host -MaskInput 'Jeton'`. Le skill
 - **Préconditions** : signalées en tête du texte, non reprises ; jouez-les avant, ou reportez-les dans le texte.
 - **Refus** : un test Generic, en texte libre, ou qui appelle un autre cas, est refusé avec son motif ; écrivez-le en Cucumber, en BDD ou en pas à pas dans l'outil.
 - **Le même test, d'un export puis de l'API** : il retrouve son texte par sa clé ; `--comparer` et `--remplacer` s'y appliquent comme pour Jira.
+
+**Sans jeton, depuis les pages enregistrées.** Sur un poste d'où rien ne sort, ouvrez chaque test dans Xray, connecté comme d'habitude, attendez que ses pas s'affichent, puis enregistrez la page dans Chrome : Ctrl+S, type « Page Web, complète ». Chrome écrit `[ECR-80] Créer un client - Jira.html` et, à côté, le dossier `[ECR-80] Créer un client - Jira_files`, où il range aussi le cadre des pas de Xray Cloud : gardez-les ensemble, dans un dossier, par exemple `pages`. Puis, en CMD :
+
+```bat
+node %USERPROFILE%\.gemini\skills\scenario-playwright\scripts\importer.mjs pages --adresse https://recette.exemple.fr --dossier scenarios
+```
+
+- **Une page par test** : la clé vient du titre de la page ; les pas, en tableau (Data Center) ou en formulaire (Cloud), sont reconnus à leurs libellés Action, Données et Résultat attendu, en français ou en anglais, puis convertis comme par l'API ; la ligne « Source » du texte cite la page et son empreinte. Le même test, lu plus tard par l'API, retrouve son texte.
+- **Lecture seule** : le skill ne fait que lire les fichiers ; aucun script de la page n'est exécuté, aucune adresse n'est suivie, et seul un cadre rangé dans le dossier de la page est lu.
+- **Page refusée** (« aucun pas reconnu ») : `importer.mjs <page> --diagnostic` décrit sa structure, libellés trouvés, éléments qui les portent, tableaux et cadres, sans aucun texte, clé, adresse ni nom de fichier de la page. C'est cette sortie, et elle seule, qui se transmet pour signaler le problème.
 
 ## 6. Indexer le code du projet
 
@@ -222,12 +234,38 @@ node ~/.gemini/skills/scenario-playwright/scripts/jouer.mjs scenarios/creer-clie
 ```
 
 - Chrome s'ouvre sur le profil du scénario. À l'étape à la main, le message `À VOUS : je me connecte` s'affiche : connectez-vous dans la fenêtre ; la suite reprend seule. Le profil garde la session pour les fois suivantes.
-- Chaque étape s'affiche, `ok`, `KO` avec son message, ou `--` si elle n'a pas été jouée ; chaque appel de préparation aussi, à sa place (`p1.`), et de nettoyage, à la fin (`n1.`).
+- Chaque étape s'affiche, `ok`, `KO` avec son message, ou `--` si elle n'a pas été jouée ; chaque appel de préparation aussi, à sa place (`p1.`), et de nettoyage, à la fin (`n1.`). Après le bilan, le verdict : conforme, non conforme ou bloqué, avec sa cause (§ 11).
 - Le rapport est dans `scenarios/resultats/<horodatage>-creer-client/` : `rapport.md`, `rapport.json`, les captures, l'instantané ARIA de chaque échec, les fichiers téléchargés, et pour chaque vérification hors de l'écran son relevé (`requête POST …/api/clients → 201`). Ajoutez `resultats/` au `.gitignore` de votre projet.
 
 Options utiles : `--param ville=Nice`, `--jeu 2`, `--ralenti 300` pour une démonstration, `--sans-tete` sans étape à la main, `--trace` pour la trace de Playwright (elle contient vos cookies : elle ne se partage pas).
 
-## 11. Mettre le scénario dans les tests du projet
+## 11. Jouer une campagne et rendre la conformité
+
+Pour recetter un lot de tests, jouez-les en campagne : tous les scénarios d'un dossier, l'un après l'autre, dans une seule fenêtre. Dans Gemini CLI : `/scenario:jouer scenarios`. Sans l'agent :
+
+```bash
+node ~/.gemini/skills/scenario-playwright/scripts/jouer.mjs scenarios
+```
+
+- **Tout est contrôlé d'abord** : un seul scénario refusé, et rien n'est joué. Les scénarios partagent leur profil ; vous vous connectez une fois, au premier message `À VOUS`, et la session sert aux suivants. Ils se jouent dans l'ordre de leur nom : nommez d'abord celui qui se connecte (`a-connexion.toml`). Un scénario de préparation se range dans un sous-dossier, pour n'être joué que par celui qui le nomme.
+- **Un verdict par test** : **conforme** ; **non conforme**, une vérification a vu l'application s'écarter de l'attendu ; **bloqué**, une action ou une préparation n'a pu se faire, et le test n'est pas allé jusqu'à ses vérifications. Un test en échec n'arrête pas les suivants.
+- **Des copies d'écran** : à chaque vérification, à chaque échec, et l'écran à la fin de chaque test.
+- **Le rapport de campagne** : `scenarios/resultats/<horodatage>-campagne/campagne.md`, une ligne par test avec son verdict et sa cause, et le dossier de résultats de chaque test.
+
+Puis le rapport de conformité, prêt à coller dans Jira :
+
+```bash
+node ~/.gemini/skills/scenario-playwright/scripts/resultats.mjs scenarios/resultats/20261123-141503-campagne --format jira --preuves
+```
+
+- `conformite-jira.txt`, pour Jira Data Center : joignez d'abord au ticket les copies d'écran du dossier `captures-jira`, puis collez le texte dans un commentaire, en mode texte ; il les cite par leur nom, `ECR-80-02.png` pour l'étape 2 du test ECR-80, `ECR-80-fin.png` pour l'écran final.
+- `conformite.html`, pour Jira Cloud : ouvrez-le dans Chrome, Ctrl+A, Ctrl+C, puis collez dans le commentaire ou la description ; une copie d'écran que l'éditeur ne reprend pas se joint depuis `captures-jira`.
+- Sans `--preuves`, pas de copie d'écran : elles montrent vos écrans et leurs données.
+- Pour Xray, les résultats de toute la campagne s'écrivent en un fichier (§ 13).
+
+Rien n'est envoyé : vous collez, joignez et importez vous-même.
+
+## 12. Mettre le scénario dans les tests du projet
 
 Un scénario ratifié se rejoue aussi sans le skill, dans la CI de votre équipe, à côté de ses autres tests. Dans Gemini CLI : `/scenario:exporter scenarios/creer-client.toml dans e2e`. Sans l'agent :
 
@@ -243,25 +281,27 @@ node ~/.gemini/skills/scenario-playwright/scripts/exporter.mjs scenarios/creer-c
 
 Puis, comme vos autres tests : `npx playwright test e2e`. Un dossier imbriqué s'écrit avec des « / », sous Windows aussi : `npx playwright test tests/e2e` ; avec des « \ », Playwright n'y trouve aucun test, et `exporter.mjs` l'écrit donc ainsi.
 
-## 12. Rendre les résultats à Xray ou à Zephyr Scale
+## 13. Rendre les résultats à Xray ou à Zephyr Scale
 
-Après une exécution par le skill, pour un texte importé d'un test de Xray ou de Zephyr Scale (§ 5) :
+Après une exécution ou une campagne, pour des textes importés de tests de Xray ou de Zephyr Scale (§ 5) :
 
 ```bash
 node ~/.gemini/skills/scenario-playwright/scripts/resultats.mjs scenarios/resultats/20261122-081500-ECR-80 --format xray
 ```
 
-- `xray-ECR-80.json` s'écrit à côté du rapport, sous la clé du test retenue à l'import : son statut, un commentaire avec l'étape en échec et son message, un exemple par jeu, et pour un test manuel converti dont le texte n'a pas changé depuis l'import, le statut de chacun de ses pas. Importez-le dans Xray (Import Execution Results), ou faites-le importer par qui en a le droit.
+- `xray-ECR-80.json` s'écrit à côté du rapport, sous la clé du test retenue à l'import : le statut de son verdict (`PASSED`, `FAILED` ou `ABORTED` pour un test bloqué), un commentaire avec l'étape en échec et son message, un exemple par jeu, et pour un test manuel converti dont le texte n'a pas changé depuis l'import, le statut de chacun de ses pas. Importez-le dans Xray (Import Execution Results), ou faites-le importer par qui en a le droit.
+- **Une campagne** : `resultats.mjs scenarios/resultats/20261123-141503-campagne --format xray` écrit `xray-campagne.json`, un test par scénario ; `--execution ECR-100` les verse dans une exécution de test existante.
+- **Xray Data Center** : `--format xray-dc`, aux statuts `PASS`, `FAIL` et `ABORTED`.
 - Pour un cas de test de Zephyr Scale, `--format zephyr` écrit `zephyr-<scénario>.json` et son archive `.zip`, au format « custom », à importer avec les résultats d'automatisation.
 - Pour un scénario que vous avez écrit vous-même, donnez la clé du test : `--cle ECR-123` (Xray) ou `--cle ECR-T123` (Zephyr Scale).
-- Les captures des étapes en échec ne s'ajoutent qu'avec `--preuves`, pour Xray : elles montrent vos écrans et leurs données.
+- Les copies d'écran ne s'ajoutent qu'avec `--preuves`, pour Xray : celles d'un pas sur ce pas, les autres sur le test ; elles montrent vos écrans et leurs données.
 - Rien n'est envoyé : le skill écrit un fichier, il n'écrit jamais dans Jira, Xray ni Zephyr Scale.
 
-## 13. Une cible qu'on ne sait pas nommer
+## 14. Une cible qu'on ne sait pas nommer
 
 `/scenario:designer http://127.0.0.1:4200/clients`, ou `node <skill>/scripts/designer.mjs <adresse>` : cliquez l'élément dans la fenêtre, le skill rend sa cible, par exemple `cible = { role = "button", nom = "Supprimer", dans = { role = "row", nom = "Martin" } }`. Le clic de désignation ne déclenche rien dans la page.
 
-## 14. Ce qui ne se négocie pas
+## 15. Ce qui ne se négocie pas
 
 - Le skill ne voit aucun identifiant : vous vous connectez vous-même, dans la fenêtre, à l'application comme à Jira.
 - Le skill n'écrit jamais dans Jira, Xray ni Zephyr Scale ; d'une demande, il ne lit que la description, les champs de texte et, si vous le demandez, les commentaires.
@@ -273,17 +313,18 @@ node ~/.gemini/skills/scenario-playwright/scripts/resultats.mjs scenarios/result
 - Hors de votre poste, une étape, un appel ou un scénario de préparation qui modifie des données n'est joué qu'avec `--autoriser-mutations`, que l'agent ne passe qu'avec votre accord, pour une exécution.
 - Le skill ne rejoue aucune étape : un échec reste un échec, à examiner.
 - Dans votre projet, le skill n'écrit que ses tests, ses aides et la souche de connexion, dans le dossier que vous désignez, sans aucun identifiant ; il ne remplace ni un fichier qu'il n'a pas écrit, ni la connexion de votre équipe, et garde un test retouché avant de le régénérer.
-- Les résultats pour Xray et Zephyr Scale sont des fichiers : rien n'est envoyé.
-- Rapports, captures, téléchargements, pages Jira enregistrées et profils restent sur votre poste.
+- Une page de test enregistrée n'est que lue, sans rien exécuter ; son diagnostic ne contient aucune de ses valeurs.
+- Les résultats pour Xray et Zephyr Scale, et le rapport de conformité, sont des fichiers : rien n'est envoyé, vous les importez ou les collez vous-même.
+- Rapports, captures, téléchargements, pages Jira et Xray enregistrées, rapports de conformité et profils restent sur votre poste.
 
-## 15. Avec les autres skills
+## 16. Avec les autres skills
 
 - [`agent-tdd-jira`](../../specs/agent-tdd-jira/SKILL.md) : ses scénarios Gherkin donnent les étiquettes, et souvent les phrases, de vos textes de départ ; écrits dans la demande, ils s'importent, et la page MHTML qu'il lit s'importe aussi.
 - [`capture-sprint-jira`](../../specs/capture-sprint-jira/SKILL.md) : ses captures MHTML des tickets d'un sprint s'importent telles quelles, sans rouvrir Jira.
 - [`agent2test`](../../specs/agent2test/SKILL.md) : son navigateur partage le vocabulaire du scénario ; la remise d'un scénario ratifié à Agent2Test est réservée.
 - [`generateur-skill-ticket`](../../specs/generateur-skill-ticket/SKILL.md) : le parcours de son kit démo, joué par ce skill, est réservé.
 
-## 16. Dépannage
+## 17. Dépannage
 
 | Constat | Conduite |
 |---|---|
@@ -321,10 +362,19 @@ node ~/.gemini/skills/scenario-playwright/scripts/resultats.mjs scenarios/result
 | `non jouée : ${id_client} non obtenue` | la préparation qui gardait cette valeur a échoué : la corriger, son message dit l'attendu et l'obtenu |
 | `AVERTISSEMENT nettoyage 1 en échec` | une donnée de l'exécution peut rester : la supprimer si besoin ; le résultat du scénario n'en dépend pas |
 | `note : nettoyage d'une donnée fixe` | le nettoyage ne vise ni une valeur gardée ni `<unique>` : vérifier qu'il ne supprime pas une donnée d'avant l'exécution, avant de ratifier |
-| `connexion à écrire par l'équipe dans scenario-playwright.connexion` | le test exporté a une étape à la main : écrire la connexion dans ce fichier (§ 11) ; le skill ne le fera pas |
+| `connexion à écrire par l'équipe dans scenario-playwright.connexion` | le test exporté a une étape à la main : écrire la connexion dans ce fichier (§ 12) ; le skill ne le fera pas |
 | test exporté « skipped » : `SCENARIO_AUTORISER_MUTATIONS=1 pour l'autoriser` | le test modifie des données hors du poste : à décider par l'équipe, pour cet environnement |
 | `conflit  e2e/….spec.ts : ce fichier n'a pas été écrit par le skill` | un test de l'équipe porte le nom du scénario : renommer l'un ou l'autre |
 | `périmé : le scénario …, ou la version du skill, a changé` | `exporter.mjs … --comparer`, puis `--remplacer` |
 | `retouché à la main depuis l'export` | reporter la retouche dans le scénario, faire ratifier, puis `--remplacer` : la version retouchée est gardée à côté |
 | `aucune clé de test` | le texte n'a pas été importé d'un test : donner la clé par `--cle` |
 | `« ECR-80 » n'est pas une clé de cas de test Zephyr Scale` | la clé retenue est celle d'un test de Xray : `--format xray`, ou `--cle ECR-T80` |
+| `aucun pas reconnu … ; --diagnostic décrit sa structure` | réenregistrer la page une fois ses pas affichés, en « Page Web, complète » ; sinon transmettre la sortie de `--diagnostic`, qui ne contient aucune valeur de la page |
+| `clé du test introuvable` | enregistrer la page du test lui-même, ouverte à son adresse `…/browse/ECR-80` |
+| `même test, ECR-80, que la page …` | une seule page par test dans le dossier : retirer la copie |
+| `LIMITE … cadre non lu` | un cadre distant ou hors du dossier de la page : garder le dossier `…_files` à côté de la page ; si les pas manquent, réenregistrer |
+| `Campagne refusée : aucun scénario n'est joué` | corriger le scénario cité, puis relancer la campagne |
+| `les scénarios d'une campagne partagent leur profil` | jouer les scénarios de chaque profil en campagnes distinctes |
+| `BLOQUÉ` au bilan de campagne | l'action, l'attente ou la préparation en cause n'a pu se faire : la cible ou l'enchaînement est à revoir ; l'application n'est pas jugée |
+| tous les tests bloqués après le premier | la session s'est fermée : placer d'abord le scénario qui se connecte, ou rejouer la campagne à partir des tests bloqués |
+| `deux tests donneraient les mêmes noms de copies d'écran` | deux tests de même clé : les rendre en deux fois |

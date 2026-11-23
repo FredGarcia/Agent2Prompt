@@ -92,7 +92,7 @@ aucune requête /api/inexistant depuis l'étape 3 ; requêtes vues : POST http:/
 
 ## 7. Relevé dans le rapport
 
-Chaque vérification hors de l'écran a son relevé, le champ `hors_ecran` de son étape (module `preuves`, § 2), à la place d'une capture quand elle réussit ; à l'échec, elle a aussi la capture de la page et son instantané ARIA, comme tout échec (D8.INV-2).
+Chaque vérification hors de l'écran a son relevé, le champ `hors_ecran` de son étape (module `preuves`, § 2), et, depuis 1.6.0, la capture de la page à ce moment, réussie ou non, pour le rapport de conformité (D22.INV-2) ; à l'échec, elle a aussi l'instantané ARIA de la page, comme tout échec (D8.INV-2).
 
 | Critère | `hors_ecran` |
 |---|---|

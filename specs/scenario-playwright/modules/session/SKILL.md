@@ -1,6 +1,6 @@
 ---
 name: session
-description: Session et navigateur du poste (Chrome par défaut, Edge ou Chromium de Playwright par SCENARIO_PLAYWRIGHT_CANAL, lancé par playwright-core sans téléchargement ; compatibilité avec le Chromium de playwright-core et avertissement au-delà ; profil dédié réutilisé, un par application et un pour Jira, aucun identifiant vu ni saisi ; étape à la main, message, état attendu jusqua, délai, refus sans fenêtre ; fenêtre de 1 280 × 900, ralenti ; garde des origines posée sur le contexte), source de scripts/session.mjs. À lire pour choisir le navigateur, comprendre la session ou une étape à la main.
+description: Session et navigateur du poste (Chrome par défaut, Edge ou Chromium de Playwright par SCENARIO_PLAYWRIGHT_CANAL, lancé par playwright-core sans téléchargement ; compatibilité avec le Chromium de playwright-core et avertissement au-delà ; profil dédié réutilisé, un par application et un pour Jira, aucun identifiant vu ni saisi ; étape à la main, message, état attendu jusqua, délai, refus sans fenêtre ; fenêtre de 1 280 × 900, ralenti ; garde des origines posée sur le contexte, origines de chaque scénario d'une campagne), source de scripts/session.mjs. À lire pour choisir le navigateur, comprendre la session ou une étape à la main.
 dimensions: [D6]
 status: active
 ---
@@ -49,20 +49,21 @@ La suite reprend seule, dès l'état atteint ; au-delà du délai de l'étape, 3
 
 ## 5. Garde des origines
 
-`garderOrigines(contexte, origines)` pose sur le contexte du navigateur la garde du module `garde`, § 1 : une route pour toute requête, une route pour tout WebSocket, et le journal des origines bloquées et des navigations interrompues, que lisent le moteur et le rapport.
+`garderOrigines(contexte, origines)` pose sur le contexte du navigateur la garde du module `garde`, § 1 : une route pour toute requête, une route pour tout WebSocket, et le journal des origines bloquées et des navigations interrompues, que lisent le moteur et le rapport. Dans une campagne, les scénarios se jouent dans le même contexte, sur le même profil, et la session ouverte par une étape à la main sert aux suivants ; avant chaque scénario, `journal.permettre(origines)` remplace les origines permises par les siennes, et le journal repart à zéro (module `conformite`, § 2 ; D22.INV-1).
 
 ## 6. Contrôle de sortie
 
 - Réglages par défaut, variable vide, canal et délai invalides refusés (D1.INV-3, module `recette`, R11).
 - Une session ouverte dans un profil est retrouvée à l'exécution suivante ; un autre profil ne la voit pas (D6.INV-2).
 - Une étape à la main reprend à l'état atteint, échoue à son délai, et est refusée sans fenêtre (D6.INV-3).
+- Dans une campagne, la connexion ne se fait qu'une fois, et chaque scénario garde ses propres origines (D22.INV-1).
 - La version du navigateur, le Chromium de référence et l'avertissement figurent au rapport (D6.INV-1).
 
 ## 7. Source `scripts/session.mjs`
 
 <!-- fichier : scripts/session.mjs -->
 ```javascript
-// scenario-playwright 1.5.0 : réglages, navigateur du poste, profil dédié et garde des origines.
+// scenario-playwright 1.6.0 : réglages, navigateur du poste, profil dédié et garde des origines.
 //
 // Le navigateur est celui du poste, Chrome par défaut, piloté par playwright-core sans en télécharger
 // aucun (D1.INV-1, D6.INV-1). La session vit dans un profil dédié ; le skill ne voit aucun identifiant
@@ -158,11 +159,22 @@ export function origineHttp(adresse) {
 /**
  * Garde des origines (D7.INV-1) : toute requête, WebSocket compris, vers une origine non déclarée est
  * interrompue avant chargement et comptée. Les adresses data:, blob: et about: restent dans la page.
- * Rend le journal { bloquees: Map(origine → nombre), navigations: [{ url, quand }] }.
+ * Rend le journal { bloquees: Map(origine → nombre), navigations: [{ url, quand }], permettre(origines) } ;
+ * dans une campagne, permettre() remplace les origines déclarées par celles du scénario suivant et repart
+ * d'un journal vide (D22.INV-1).
  */
 export async function garderOrigines(contexte, origines) {
   const permises = new Set(origines);
-  const journal = { bloquees: new Map(), navigations: [] };
+  const journal = {
+    bloquees: new Map(),
+    navigations: [],
+    permettre(liste) {
+      permises.clear();
+      for (const o of liste) permises.add(o);
+      this.bloquees = new Map();
+      this.navigations = [];
+    },
+  };
   const noter = (adresse, navigation, page) => {
     const o = origineHttp(adresse) ?? adresse.split(':')[0];
     journal.bloquees.set(o, (journal.bloquees.get(o) ?? 0) + 1);
