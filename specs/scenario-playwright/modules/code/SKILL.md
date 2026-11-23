@@ -215,7 +215,7 @@ Lecteurs sans dépendance : texte, `.properties`, YAML minimal ; jetons JavaScri
 
 <!-- fichier : scripts/lecteurs.mjs -->
 ```javascript
-// scenario-playwright 1.6.0 : lecteurs du code du projet, pour l'index du code (D18).
+// scenario-playwright 1.6.1 : lecteurs du code du projet, pour l'index du code (D18).
 //
 // Chaque lecteur lit un texte sans jamais l'exécuter ni l'importer (D18.INV-1), et rend ce qu'un testeur
 // humain voit ou peut observer : éléments d'interface et leurs noms accessibles possibles, textes,
@@ -2088,7 +2088,7 @@ Parcours du projet, nature des fichiers, empreinte, construction et écriture de
 
 <!-- fichier : scripts/code.mjs -->
 ```javascript
-// scenario-playwright 1.6.0 : index du code du projet, produit sans IA et sans exécuter le code (D18).
+// scenario-playwright 1.6.1 : index du code du projet, produit sans IA et sans exécuter le code (D18).
 //
 // L'index relève dans le code front et back du projet ce qu'un testeur humain voit et ce que la page
 // échange : routes, éléments d'interface et leurs noms accessibles possibles, identifiants de test,
@@ -2104,7 +2104,7 @@ import { cibleToml, strategie } from './cibles.mjs';
 import * as L from './lecteurs.mjs';
 
 export const FORMAT_INDEX = 'scenario-playwright.index/1';
-export const VERSION = '1.6.0';
+export const VERSION = '1.6.1';
 export const DOSSIER_INDEX = 'index';
 export const LIMITES_INDEX = { fichiers: 20000, octets: 1048576, total: 209715200, profondeur: 40 };
 export const RE_LANGUE = /^[a-z]{2}(?:-[a-z]{2,4})?$/;
@@ -2731,7 +2731,7 @@ export function candidatsAppel(index, phrase) {
 <!-- fichier : scripts/indexer.mjs -->
 ```javascript
 #!/usr/bin/env node
-// scenario-playwright 1.6.0 : index du code du projet, sans IA et sans exécuter le code (D18).
+// scenario-playwright 1.6.1 : index du code du projet, sans IA et sans exécuter le code (D18).
 //
 // Usage : node <dossier du skill>/scripts/indexer.mjs <dossier du projet> [--dossier scenarios] [--langue fr]
 // Lit le code front et back du projet sans rien y écrire ni rien exécuter (D18.INV-1), et écrit

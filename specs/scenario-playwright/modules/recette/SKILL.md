@@ -134,28 +134,28 @@ Le projet de démonstration, `tests/projet-demo.mjs`, s'écrit dans un dossier t
 
 ## 4. Contrôle de la recette elle-même
 
-Cent cinquante-huit défauts, réintroduits un à un dans le code, font chacun échouer la recette par le scénario attendu (essai du 22 novembre 2026, Node 26.13.0, Chromium 159 : les cent cinquante-huit rejoués en 1.5.0, sur le code publié) :
+Cent quatre-vingt-dix défauts, réintroduits un à un dans le code, font chacun échouer la recette par le scénario attendu (essai du 23 novembre 2026, Node 26.13.0, Chromium 159 : les cent quatre-vingt-dix rejoués en 1.6.1, sur le code publié) :
 
 | ID | Défaut réintroduit | Scénarios en échec | Contrôles en échec |
 |---|---|---|---|
-| M1 | La garde des origines laisse passer toute requête | R7 | 2 |
+| M1 | La garde des origines laisse passer toute requête | R7, R40 | 3 |
 | M2 | Les WebSocket ne sont pas gardés | R7 | 3 |
 | M3 | Pas de refus avant le navigateur d'un scénario qui modifie des données hors du poste | R8, R30 | 2 |
 | M4 | Pas de garde à l'étape de mutation | R8 | 1 |
 | M5 | L'empreinte du texte n'est pas contrôlée | R3, R20, R35 | 4 |
 | M6 | Une ligne du texte peut rester sans étape | R3 | 1 |
 | M7 | Une marque de mutation du texte peut se perdre | R3 | 1 |
-| M8 | Une vérification échouée arrête les vérifications suivantes | R6, R28, R29, R36 | 10 |
-| M9 | Une étape échouée n'arrête pas la suite | R6, R7, R36 | 3 |
-| M10 | Délai de 30 s pour toute étape, sans tenir compte des réglages | R6, R9, R11 | 4 |
+| M8 | Une vérification échouée arrête les vérifications suivantes | R6, R28, R29, R36, R38, R41 | 12 |
+| M9 | Une étape échouée n'arrête pas la suite | R6, R7, R36, R41, R43 | 6 |
+| M10 | Délai de 30 s pour toute étape, sans tenir compte des réglages | R6, R9, R11, R40, R41 | 6 |
 | M11 | Une étape à la main est acceptée sans fenêtre | R9, R30 | 2 |
 | M12 | Une variable non déclarée est acceptée | R2, R30 | 2 |
 | M13 | --param ne l'emporte plus sur [parametres] ni sur le jeu | R2, R10, R30, R34 | 6 |
 | M14 | Un fichier absolu ou hors du dossier du scénario est accepté | R2, R30 | 3 |
-| M15 | Une cible ambiguë agit sur le premier élément | R5, R6, R29 | 13 |
-| M16 | Pas de capture pour une vérification | R5, R10, R34 | 3 |
+| M15 | Une cible ambiguë agit sur le premier élément | R5, R6, R29, R43 | 18 |
+| M16 | Pas de capture pour une vérification | R5, R10, R34, R38, R41, R42, R43 | 7 |
 | M17 | Navigateur ancien de trois versions accepté sans avertissement | R14 | 1 |
-| M18 | Champ origines_bloquees du rapport renommé | R5, R6, R7, R8, R9, R10, R11, R14, R16, R17, R20, R28, R29, R32, R33, R34, R36, R38 | 103 |
+| M18 | Champ origines_bloquees du rapport renommé | R5, R6, R7, R8, R9, R10, R11, R14, R16, R17, R20, R28, R29, R32, R33, R34, R36, R38, R40, R41, R42, R43 | 113 |
 | M19 | Une étape main est acceptée sur une ligne non marquée | R3 | 1 |
 | M20 | La désignation clique l'élément désigné | R13 | 3 |
 | M21 | Les commentaires de Jira Cloud sont lus sans --commentaires | R18, R20 | 8 |
@@ -173,7 +173,7 @@ Cent cinquante-huit défauts, réintroduits un à un dans le code, font chacun �
 | M33 | Le jeton passe dans l'adresse de la requête | R25 | 1 |
 | M34 | L'import écrit dans Jira : une étiquette ajoutée au test | R25 | 1 |
 | M35 | Une requête GraphQL de mutation part vers Xray Cloud | R25 | 1 |
-| M36 | Le résultat attendu d'un pas manuel est perdu | R23, R24, R36, R38 | 21 |
+| M36 | Le résultat attendu d'un pas manuel est perdu | R23, R24, R36, R38, R39, R43 | 25 |
 | M37 | L'étiquette @TestCaseKey= de Zephyr Scale n'est pas reconnue | R22 | 2 |
 | M38 | Une clé portée par des scénarios de titres différents devient leur identité | R22 | 5 |
 | M39 | Le même test, lu d'un autre chemin d'import, est en conflit avec son texte | R22, R23 | 5 |
@@ -239,12 +239,12 @@ Cent cinquante-huit défauts, réintroduits un à un dans le code, font chacun �
 | M99 | Un paramètre inconnu du scénario de préparation est accepté | R30 | 1 |
 | M100 | Tous les jeux d'une exécution reçoivent le même ${unique} | R30, R33 | 2 |
 | M101 | Le scénario de préparation ne reçoit pas le ${unique} du jeu | R30, R36 | 4 |
-| M102 | `<unique>` d'un exemple n'est pas remplacé | R30, R36, R38 | 7 |
+| M102 | <unique> d'un exemple n'est pas remplacé | R30, R36, R38 | 7 |
 | M103 | Aucune valeur n'est gardée de la réponse d'une préparation | R32, R33, R36 | 17 |
 | M104 | Un jeton du chemin d'un appel n'est pas masqué dans son résumé | R32 | 1 |
 | M105 | Une préparation peut suivre les étapes ordinaires | R30 | 1 |
 | M106 | La marque (nettoyage par l’API), à l'apostrophe typographique, n'est pas reconnue | R30 | 4 |
-| M107 | `<unique>` est accepté comme paramètre du texte | R30 | 1 |
+| M107 | <unique> est accepté comme paramètre du texte | R30 | 1 |
 | M108 | L'index garde toutes les classes, pas seulement celles des corps | R26, R31 | 3 |
 | M109 | Un endpoint proposé entre dans le squelette hors commentaire | R31 | 3 |
 | M110 | Un endpoint de lecture est proposé pour une préparation | R31 | 2 |
@@ -284,20 +284,52 @@ Cent cinquante-huit défauts, réintroduits un à un dans le code, font chacun �
 | M144 | Un nettoyage exporté dont une valeur gardée manque est joué | R37 | 1 |
 | M145 | Un appel exporté ne recopie pas le jeton anti-CSRF | R36 | 4 |
 | M146 | ${unique} est le même pour tous les jeux d'un test exporté | R36 | 3 |
-| M147 | `<unique>` d'un jeu n'est pas remplacé dans un test exporté | R36 | 3 |
+| M147 | <unique> d'un jeu n'est pas remplacé dans un test exporté | R36 | 3 |
 | M148 | Les pas d'un texte retouché depuis l'import ont un statut | R38 | 1 |
-| M149 | Les captures s'ajoutent sans --preuves | R38 | 1 |
+| M149 | Les captures s'ajoutent sans --preuves | R38, R43 | 3 |
 | M150 | --cle ne l'emporte pas sur la clé retenue à l'import | R38 | 1 |
 | M151 | La forme de la clé n'est pas contrôlée | R38 | 1 |
-| M152 | Zephyr Scale reçoit Passed pour une exécution en échec | R38 | 1 |
-| M153 | Le scénario joué n'est cherché que dans le dossier du rapport | R38 | 5 |
-| M154 | Chaque ligne du texte devient un pas de Xray | R38 | 2 |
+| M152 | Zephyr Scale reçoit Passed pour une exécution en échec | R38, R43 | 2 |
+| M153 | Le scénario joué n'est cherché que dans le dossier du rapport | R38, R43 | 10 |
+| M154 | Chaque ligne du texte devient un pas de Xray | R38, R43 | 4 |
 | M155 | Un test exporté ne masque pas un paramètre secret d'une adresse | R36 | 1 |
 | M156 | Un test exporté laisse passer tout WebSocket | R37 | 1 |
 | M157 | Deux scénarios qui donnent le même test sont exportés | R35 | 2 |
-| M158 | `<unique>` des paramètres d'un scénario de préparation n'est pas remplacé dans un test exporté | R36 | 6 |
+| M158 | <unique> des paramètres d'un scénario de préparation n'est pas remplacé dans un test exporté | R36 | 6 |
+| M159 | Le texte des éléments masqués d'une page enregistrée est lu | R39, R43 | 4 |
+| M160 | Un cadre hors du dossier de la page est lu | R39 | 2 |
+| M161 | Les pas en tableau ne sont pas reconnus | R39, R43 | 3 |
+| M162 | Les pas en mode formulaire ne sont pas reconnus | R39, R43 | 8 |
+| M163 | Le numéro du pas suivant entre dans le résultat attendu | R39 | 1 |
+| M164 | Des pas affichés deux fois sont gardés deux fois | R39 | 1 |
+| M165 | La clé n'est pas prise de l'adresse notée à l'enregistrement | R39, R43 | 4 |
+| M166 | Deux pages du même test sont toutes deux importées | R39 | 1 |
+| M167 | Le diagnostic dit la clé du test | R39 | 1 |
+| M168 | Un scénario refusé n'arrête que lui : la campagne joue les autres | R40 | 1 |
+| M169 | Des scénarios de profils différents se jouent dans une même campagne | R40 | 1 |
+| M170 | La garde d'une campagne garde les origines du premier scénario | R40 | 1 |
+| M171 | Une origine qu'un scénario déclare reste permise pour les suivants | R40 | 1 |
+| M172 | Un test en échec arrête la campagne | R40, R41, R42, R43 | 17 |
+| M173 | --jeu est accepté pour une campagne | R40 | 1 |
+| M174 | Campagne.json cite le chemin absolu du scénario | R40 | 2 |
+| M175 | Une vérification hors de l'écran réussie n'a pas de copie d'écran | R29 | 1 |
+| M176 | L'écran à la fin des étapes n'est pas copié | R38, R41, R42, R43 | 8 |
+| M177 | Une action en échec rend le test non conforme au lieu de bloqué | R40, R41, R42, R43 | 12 |
+| M178 | Une préparation en échec ne rend pas le test bloqué | R41 | 1 |
+| M179 | Un nettoyage en échec change le verdict | R41 | 1 |
+| M180 | Bloqué l'emporte sur non conforme | R40, R41 | 2 |
+| M181 | Resultats.mjs tire le verdict du statut : un test bloqué devient FAILED | R42, R43 | 5 |
+| M182 | Le balisage wiki n'échappe pas les caractères de mise en forme | R42 | 3 |
+| M183 | Les copies d'écran du rapport de conformité s'écrivent sans --preuves | R42 | 1 |
+| M184 | Les noms des copies d'écran d'un test à plusieurs jeux n'ont pas leur préfixe de jeu | R41 | 1 |
+| M185 | La page HTML n'échappe pas le texte des rapports | R42 | 1 |
+| M186 | L'exécution de test donnée par --execution n'est pas reprise | R43 | 1 |
+| M187 | Les copies d'écran des pas vont toutes sur le test | R43 | 2 |
+| M188 | Xray Data Center reçoit les statuts de Xray Cloud | R43 | 1 |
+| M189 | La session ne passe pas d'un scénario à l'autre de la campagne | R11, R32, R33, R40, R42 | 19 |
+| M190 | Une grille aux rôles ARIA n'est pas lue comme un tableau | R39 | 3 |
 
-Chaque défaut a été retiré après son essai ; la recette du code publié passe en entier.
+Chaque défaut a été retiré après son essai ; la recette du code publié passe en entier. Sous chacun, la recette est allée jusqu'au bout : un contrôle qui ne trouve pas ce qu'il lit échoue, sans arrêter les suivants.
 
 ## 5. Recette en intégration continue
 
@@ -309,7 +341,7 @@ Le workflow `.github/workflows/recette-scenario-playwright.yml` du dépôt Agent
 
 <!-- fichier : tests/application-demo.mjs -->
 ```javascript
-// scenario-playwright 1.6.0 : application de démonstration de la recette, servie sur 127.0.0.1 sans réseau.
+// scenario-playwright 1.6.1 : application de démonstration de la recette, servie sur 127.0.0.1 sans réseau.
 //
 // Deux origines : l'application, et une « autre » origine, que les scénarios ne déclarent pas, pour la
 // garde des origines. Les pages couvrent chaque action du jeu fermé : liste et formulaire de clients,
@@ -942,7 +974,7 @@ export function enZip(fichiers) {
 
 <!-- fichier : tests/projet-demo.mjs -->
 ```javascript
-// scenario-playwright 1.6.0 : projet de démonstration pour la recette de l'index du code (R26, R27).
+// scenario-playwright 1.6.1 : projet de démonstration pour la recette de l'index du code (R26, R27).
 //
 // Un petit projet front et back, écrit dans un dossier temporaire : Angular (routes, gabarits, gabarit en
 // ligne, ngx-translate), Vue (vue-router, vue-i18n), React (React Router, i18next, JSX), Spring en Java et
@@ -1283,7 +1315,7 @@ export function ecrireProjetDemo(dossier) {
 <!-- fichier : tests/run-tests.mjs -->
 ```javascript
 #!/usr/bin/env node
-// scenario-playwright 1.6.0 : recette du skill, scénarios R1 à R43, contre l'application de démonstration
+// scenario-playwright 1.6.1 : recette du skill, scénarios R1 à R43, contre l'application de démonstration
 // locale (tests/application-demo.mjs) et le projet de démonstration (tests/projet-demo.mjs), sans réseau ni compte. Le navigateur s'ouvre, visible, sur des
 // profils temporaires : les profils et les résultats du dossier du skill ne sont pas touchés. Les tests exportés
 // (R35 à R38) sont joués par @playwright/test 1.65.1, dépendance de développement, dans des projets temporaires.
@@ -1530,7 +1562,7 @@ async function principal() {
   const { base, autre, distante, jira: adresseJira, outils } = app;
   const sorties = [];
   const canal = session.lireReglages(ENV).reglages.canal;
-  console.log(`Recette de scenario-playwright 1.6.0 : Node ${process.versions.node}, navigateur ${canal}, application ${base}`);
+  console.log(`Recette de scenario-playwright 1.6.1 : Node ${process.versions.node}, navigateur ${canal}, application ${base}`);
   console.log(`Dossier temporaire : ${TMP}`);
   try {
     // ------------------------------------------------------------------------------------------
@@ -2434,7 +2466,7 @@ Fonctionnalité: Clients
       let r = await lancer('importer.mjs', [fX, '--adresse', base, '--dossier', d]);
       controle('export de Xray : un texte par test, nommé par la clé du test, code 0', r.code === 0 && JSON.stringify(etatsDe(r.sortie)) === '["écrit DEMO-32","écrit DEMO-33"]' && /^Fichier 1_DEMO-30\.feature : 2 scénarios$/m.test(r.sortie), r.sortie + r.erreurs);
       const t33 = lire(d, 'DEMO-33.scenario');
-      controle('provenance d\'un fichier : lot, scénario, source et son empreinte, contexte reporté (D17.INV-4)', t33.startsWith('# Importé d\'un fichier .feature par importer.mjs (scenario-playwright 1.6.0), sans IA : le scénario est recopié tel qu\'écrit dans le fichier.\n# Lot : fichier ../r22-sources/1_DEMO-30.feature\n# Scénario : @DEMO-33, 1_DEMO-30.feature\n') && t33.includes(`# Source : fichier ../r22-sources/1_DEMO-30.feature (sha256 ${sha(fX)})`) && /# Empreinte de la source : [0-9a-f]{64}\n/.test(t33) && t33.includes('# Contexte reporté en tête des étapes : 1 étape.'), t33);
+      controle('provenance d\'un fichier : lot, scénario, source et son empreinte, contexte reporté (D17.INV-4)', t33.startsWith('# Importé d\'un fichier .feature par importer.mjs (scenario-playwright 1.6.1), sans IA : le scénario est recopié tel qu\'écrit dans le fichier.\n# Lot : fichier ../r22-sources/1_DEMO-30.feature\n# Scénario : @DEMO-33, 1_DEMO-30.feature\n') && t33.includes(`# Source : fichier ../r22-sources/1_DEMO-30.feature (sha256 ${sha(fX)})`) && /# Empreinte de la source : [0-9a-f]{64}\n/.test(t33) && t33.includes('# Contexte reporté en tête des étapes : 1 étape.'), t33);
       const lu33 = texte.analyserTexte(t33);
       controle('scénario recopié : fonctionnalité, étiquettes, contexte en tête des étapes, colonnes d\'exemples adaptées', lu33.erreurs.length === 0 && lu33.scenario.fonctionnalite === 'Gérer les clients' && JSON.stringify(lu33.scenario.etiquettes) === '["DEMO-33","DEMO-30","TEST_DEMO-33","REQ_DEMO-30"]' && lu33.scenario.etapes[0].phrase === 'je suis sur la page des clients' && JSON.stringify(Object.keys(lu33.scenario.jeux?.[0] ?? {})) === '["nom_du_client"]', JSON.stringify(lu33.erreurs));
       const fZ = fichier('zephyr-export.feature', 'Feature: Export\n  @TestCaseKey=DEMO-T7 @export\n  Scenario: Exporter les clients\n    Given I am on the export page\n    When I click the link "Export as CSV"\n    Then the file "clients.csv" is downloaded\n');
@@ -2498,7 +2530,7 @@ Fonctionnalité: Clients
       controle('même clé de test, d\'un autre chemin d\'import : modifié, pas en conflit (D17.INV-4)', /modifié\s+@DEMO-12 .*changé dans Xray depuis l'import ; --remplacer/.test(r.sortie), r.sortie);
       controle('test Generic refusé avec son motif ; test introuvable avec la réponse de Xray (D17.INV-5)', /refusé\s+@DEMO-14\s+Relire les journaux : test Generic : définition en texte libre/.test(r.sortie) && /introuvable @DEMO-15\s+An issue with key 'DEMO-15' does not exist/.test(r.sortie), r.sortie);
       const t13 = lire(d, 'DEMO-13.scenario');
-      controle('test manuel : chaque pas en « Quand <action> », avec ses données, puis « Alors <résultat attendu> », signalé en tête (D17.INV-5)', t13.startsWith('# Importé de Xray par importer.mjs (scenario-playwright 1.6.0), sans IA : chaque pas du test manuel devient « Quand <action> », avec ses données, puis « Alors <résultat attendu> ».\n# Lot : xray DEMO-13\n# Scénario : @DEMO-13, test manuel DEMO-13\n') && t13.includes('\n@DEMO-13\nScénario: Exporter les clients\n') && t13.includes('  Quand Ouvrir la page « Export »\n  Alors La page « Export » s\'affiche\n  Quand Cliquer sur le lien « Exporter en CSV », avec « format CSV ; séparateur ; »\n  Alors Le fichier « clients.csv » est téléchargé\n'), t13);
+      controle('test manuel : chaque pas en « Quand <action> », avec ses données, puis « Alors <résultat attendu> », signalé en tête (D17.INV-5)', t13.startsWith('# Importé de Xray par importer.mjs (scenario-playwright 1.6.1), sans IA : chaque pas du test manuel devient « Quand <action> », avec ses données, puis « Alors <résultat attendu> ».\n# Lot : xray DEMO-13\n# Scénario : @DEMO-13, test manuel DEMO-13\n') && t13.includes('\n@DEMO-13\nScénario: Exporter les clients\n') && t13.includes('  Quand Ouvrir la page « Export »\n  Alors La page « Export » s\'affiche\n  Quand Cliquer sur le lien « Exporter en CSV », avec « format CSV ; séparateur ; »\n  Alors Le fichier « clients.csv » est téléchargé\n'), t13);
       const appel = await lancer('importer.mjs', ['xray:DEMO-17', '--api', outils, '--adresse', base, '--dossier', join(TMP, 'r23-appel')], { env });
       sorties.push(appel.sortie + appel.erreurs);
       controle('pas vide, l\'appel d\'un autre test peut-être : test refusé, rien n\'est deviné (D17.INV-5)', appel.code === 1 && JSON.stringify(etatsDe(appel.sortie)) === '["refusé DEMO-17"]' && /refusé\s+@DEMO-17\s+Exporter, puis rejouer un autre test : pas 2 vide/.test(appel.sortie) && !existsSync(join(TMP, 'r23-appel')), appel.sortie + appel.erreurs);
@@ -2604,7 +2636,7 @@ Fonctionnalité: Clients
       const fichierIndex = join(dossier, 'index', 'code.json');
       controle('index écrit, code 0 : bilan sur une ligne, code.json et code.md', x.code === 0 && /^index du code : 20 fichiers lus ; 13 routes, 27 éléments d'interface, 25 textes, 13 endpoints et appels, 3 classes de corps, 6 contraintes de validation ; 3 fichiers de traduction \(fr\)$/m.test(x.sortie) && existsSync(fichierIndex) && existsSync(join(dossier, 'index', 'code.md')), x.sortie + x.erreurs);
       const ix = existsSync(fichierIndex) ? JSON.parse(readFileSync(fichierIndex, 'utf8')) : { routes: [], elements: [], textes: [], endpoints: [], validations: [], modeles: [], limites: [] };
-      controle('format, version, projet noté relativement au dossier des scénarios, langue, empreinte', ix.format === code.FORMAT_INDEX && ix.version === '1.6.0' && ix.projet === '..' && ix.langue === 'fr' && /^[0-9a-f]{64}$/.test(ix.empreinte) && ix.partiel === false && ix.limites.length === 0, JSON.stringify(ix.limites));
+      controle('format, version, projet noté relativement au dossier des scénarios, langue, empreinte', ix.format === code.FORMAT_INDEX && ix.version === '1.6.1' && ix.projet === '..' && ix.langue === 'fr' && /^[0-9a-f]{64}$/.test(ix.empreinte) && ix.partiel === false && ix.limites.length === 0, JSON.stringify(ix.limites));
       controle('projet seulement lu : rien de créé ni de modifié hors du dossier des scénarios, qui ne reçoit que index/ (D18.INV-1)', arbre(projet, 'scenarios') === avant && JSON.stringify(readdirSync(dossier)) === '["index"]' && JSON.stringify(readdirSync(join(dossier, 'index')).sort()) === '["code.json","code.md"]');
       const routes = ix.routes.map((r) => [r.chemin, r.composant, r.redirection && `→ ${r.redirection}`, r.garde && 'garde'].filter(Boolean).join(' ')).sort();
       const routesAttendues = ['/ Accueil', '/ Accueil', '/ → /clients', '/** PageIntrouvableComponent', '/admin', '/admin AdminComponent', '/admin/utilisateurs UtilisateursComponent', '/clients ClientsComponent', '/clients/nouveau ClientFormComponent garde', '/commandes Commandes', '/commandes/:id Commande', '/factures Factures', '/factures/:id Facture'].sort();
@@ -3453,7 +3485,7 @@ nom = "export"
       controle('export : un test et les aides, dans le dossier désigné seulement ; rien d\'autre n\'est écrit dans le projet (D21.INV-2)', r.code === 0 && JSON.stringify(readdirSync(E).sort()) === '["creer.spec.mjs","scenario-playwright.aides.mjs"]' && arbre(P, 'e2e') === avant && r.sortie.includes('écrit    e2e/creer.spec.mjs : « Créer un client », 17 étapes, 2 jeux, nettoyage 1') && r.sortie.includes('écrit    e2e/scenario-playwright.aides.mjs : aides communes') && r.sortie.includes('Exporté : 1 test en JavaScript dans e2e ; npx playwright test e2e'), r.sortie + r.erreurs);
       controle('notes : origines à faire correspondre pour jouer ailleurs ; test qui modifie des données sauté hors du poste sans autorisation (D21.INV-3)', r.sortie.includes(`note : origines du scénario : ${base} ; pour jouer ailleurs, SCENARIO_ORIGINES="${base}=<origine jouée>,…"`) && r.sortie.includes('note : 1 test modifie des données : hors du poste, il est sauté sans SCENARIO_AUTORISER_MUTATIONS=1 (D21.INV-3)'), r.sortie);
       const lignes = contenu.split('\n');
-      controle('en-tête : test écrit sans IA depuis le scénario ratifié, à ne pas modifier, empreinte de son corps (D21.INV-1)', lignes[0] === '// Test écrit par scenario-playwright 1.6.0 (exporter.mjs), sans IA, depuis le scénario ratifié ../scenarios/creer.toml.' && lignes[1] === '// Ne pas le modifier à la main : exporter.mjs le régénère, et garde à côté un test retouché avant de le remplacer.' && lignes[2] === `// Empreinte : ${createHash('sha256').update(lignes.slice(3).join('\n')).digest('hex')}`, lignes.slice(0, 3).join(' | '));
+      controle('en-tête : test écrit sans IA depuis le scénario ratifié, à ne pas modifier, empreinte de son corps (D21.INV-1)', lignes[0] === '// Test écrit par scenario-playwright 1.6.1 (exporter.mjs), sans IA, depuis le scénario ratifié ../scenarios/creer.toml.' && lignes[1] === '// Ne pas le modifier à la main : exporter.mjs le régénère, et garde à côté un test retouché avant de le remplacer.' && lignes[2] === `// Empreinte : ${createHash('sha256').update(lignes.slice(3).join('\n')).digest('hex')}`, lignes.slice(0, 3).join(' | '));
       controle('traduction : un test par jeu dans test.describe, étiquettes en tags, cibles en localisateurs de Playwright, numéro et ligne de chaque étape (D21.INV-1)', [
         "test.describe('Créer un client', () => {",
         '  for (const [indice, jeu] of JEUX.entries()) {',
@@ -3490,7 +3522,7 @@ nom = "export"
       mkdirSync(join(Q, 'tests', 'e2e'), { recursive: true });
       writeFileSync(join(Q, 'tsconfig.json'), '{}\n');
       const rq = await lancer('exporter.mjs', [creer, '--dossier', join('tests', 'e2e')], { cwd: Q });
-      controle('TypeScript, par --langage ts ou d\'après le tsconfig.json du projet : // @ts-nocheck, imports sans extension ; en JavaScript, modules .mjs ; chemins de la sortie écrits avec des « / » (D21)', r.code === 0 && ts.startsWith('// @ts-nocheck\n// Test écrit par scenario-playwright 1.6.0') && ts.includes("import { ouvrir } from './scenario-playwright.aides';") && existsSync(join(P, 'e2e-ts', 'scenario-playwright.aides.ts')) && contenu.includes("import { ouvrir } from './scenario-playwright.aides.mjs';") && rq.code === 0 && existsSync(join(Q, 'tests', 'e2e', 'creer.spec.ts')) && rq.sortie.includes('écrit    tests/e2e/creer.spec.ts : ') && rq.sortie.includes('Exporté : 1 test en TypeScript dans tests/e2e ; npx playwright test tests/e2e'), r.sortie + rq.sortie);
+      controle('TypeScript, par --langage ts ou d\'après le tsconfig.json du projet : // @ts-nocheck, imports sans extension ; en JavaScript, modules .mjs ; chemins de la sortie écrits avec des « / » (D21)', r.code === 0 && ts.startsWith('// @ts-nocheck\n// Test écrit par scenario-playwright 1.6.1') && ts.includes("import { ouvrir } from './scenario-playwright.aides';") && existsSync(join(P, 'e2e-ts', 'scenario-playwright.aides.ts')) && contenu.includes("import { ouvrir } from './scenario-playwright.aides.mjs';") && rq.code === 0 && existsSync(join(Q, 'tests', 'e2e', 'creer.spec.ts')) && rq.sortie.includes('écrit    tests/e2e/creer.spec.ts : ') && rq.sortie.includes('Exporté : 1 test en TypeScript dans tests/e2e ; npx playwright test tests/e2e'), r.sortie + rq.sortie);
       const autre = ecrire('r35/scenarios', 'autre.toml', ECRAN('r35').replace('titre = "Créer un client"', 'titre = "Autre client"'));
       writeFileSync(join(E, 'autre.spec.mjs'), '// test écrit par l\'équipe\n');
       r = await exp([autre, '--dossier', 'e2e', '--remplacer']);
@@ -3753,7 +3785,7 @@ nom = "export"
       const corps21 = t21.split('\n').filter((l) => /^ {2}(Quand|Alors) /.test(l)).join('\n');
       controle('test manuel en mode formulaire : chaque pas en « Quand <action> », avec ses données, puis « Alors <résultat attendu> » ; numéros, menus, boutons, scripts et éléments masqués écartés (D17.INV-5, D17.INV-7)', corps21 === '  Quand Ouvrir la liste des clients\n  Alors La liste affiche « Dupont »\n  Quand Cliquer sur « Nouveau client », avec « Nom : Durand »\n  Alors Le formulaire « Nouveau client » s\'ouvre'
         && !/leurre|caché|TODO|PASSED|Modifier|Hors du dossier|Jamais lu/.test(t21), t21);
-      controle('provenance : lot et clé du test comme par l\'API, page enregistrée et son empreinte ; préconditions signalées ; cadres distant et hors du dossier non lus (D17.INV-4)', t21.startsWith('# Importé de Xray par importer.mjs (scenario-playwright 1.6.0), sans IA : chaque pas du test manuel devient')
+      controle('provenance : lot et clé du test comme par l\'API, page enregistrée et son empreinte ; préconditions signalées ; cadres distant et hors du dossier non lus (D17.INV-4)', t21.startsWith('# Importé de Xray par importer.mjs (scenario-playwright 1.6.1), sans IA : chaque pas du test manuel devient')
         && t21.includes('# Lot : xray DEMO-21\n# Scénario : @DEMO-21, test manuel DEMO-21\n') && new RegExp(`# Source : page enregistrée \\.\\./pages/\\[DEMO-21\\] Créer un client - Jira\\.html \\(sha256 ${sha(join(pages, '[DEMO-21] Créer un client - Jira.html'))}\\)`).test(t21)
         && t21.includes('# Préconditions affichées dans la page, non reprises') && imp.sortie.includes('LIMITE [DEMO-21] Créer un client - Jira.html : 2 cadres non lus : adresse distante, hors du dossier de la page, absent ou trop gros'), t21 + imp.sortie);
       const t22 = lire(S39, 'DEMO-22.scenario');
@@ -3823,7 +3855,7 @@ nom = "export"
       controle('six scénarios d\'un dossier, dans l\'ordre de leur nom ; avancement et verdict de chacun ; bilan de la campagne ; code 1 (D22.INV-1)', rc.code === 1 && rc.sortie.includes('Campagne : 6 scénarios, profil defaut ;') && rc.sortie.includes('[1/6] Connexion : 1 jeu, 3 étapes (a-connexion.toml)') && rc.sortie.includes('[6/6] Externe non déclaré : 1 jeu, 2 étapes (f-externe.toml)')
         && rc.sortie.includes('Campagne : 6 tests, 4 conformes, 1 non conforme, 1 bloqué') && /^ {2}NON CONFORME {2}Liste \(c-liste\.toml\) : étape 2 : attendu : 2 éléments ; obtenu : 1 élément$/m.test(rc.sortie) && /^ {2}BLOQUÉ {8}Bloqué \(d-bloque\.toml\) : étape 2 : délai de 2 s dépassé/m.test(rc.sortie), rc.sortie + rc.erreurs);
       controle('une seule fenêtre, une seule connexion : le message « À VOUS » une fois, la session éphémère gardée pour le test suivant (D22.INV-1)', (rc.sortie.match(/À VOUS/g) ?? []).length === 1 && rs[1]?.statut === 'reussi' && rs[1]?.jeux[0]?.etapes[1]?.statut === 'reussie', rc.sortie);
-      controle('campagne.json : chaque test, son scénario et son dossier relatifs à la campagne, son statut, son verdict et sa cause ; décompte des verdicts', c?.format === rapport.FORMAT_CAMPAGNE && c.version === '1.6.0' && c.tests.map((t) => `${t.fichier}:${t.verdict}`).join() === 'a-connexion.toml:conforme,b-session.toml:conforme,c-liste.toml:non_conforme,d-bloque.toml:bloque,e-externe.toml:conforme,f-externe.toml:conforme'
+      controle('campagne.json : chaque test, son scénario et son dossier relatifs à la campagne, son statut, son verdict et sa cause ; décompte des verdicts', c?.format === rapport.FORMAT_CAMPAGNE && c.version === '1.6.1' && c.tests.map((t) => `${t.fichier}:${t.verdict}`).join() === 'a-connexion.toml:conforme,b-session.toml:conforme,c-liste.toml:non_conforme,d-bloque.toml:bloque,e-externe.toml:conforme,f-externe.toml:conforme'
         && c.tests[0].scenario === '../../a-connexion.toml' && c.tests.every((t) => existsSync(join(dc, t.dossier, 'rapport.json'))) && c.tests[2].cause?.genre === 'verification' && c.tests[2].cause.numero === 2 && c.tests[3].cause?.genre === 'action'
         && JSON.stringify(c.bilan) === '{"tests":6,"conformes":4,"non_conformes":1,"bloques":1}' && c.verdict === 'non_conforme', JSON.stringify(c));
       const md = dc ? lire(dc, 'campagne.md') : '';
@@ -3862,8 +3894,8 @@ nom = "export"
         && JSON.stringify(fichiers(2)) === '["02-verifier.png","03-verifier.png","fin.png"]' && JSON.stringify(fichiers(3)) === '["02-cliquer-echec.png","fin.png"]' && rs.every((r) => r?.jeux.every((j) => j.capture_fin && existsSync(join(dc, c.tests[rs.indexOf(r)].dossier, j.capture_fin)))), JSON.stringify([cap(0), fichiers(2), fichiers(3)]));
       controle('verdict de chaque jeu et du test, avec sa cause : vérification en échec la première, non conforme ; action en échec, bloqué (D22.INV-3)', rs[0]?.verdict === 'conforme' && rs[0].jeux[0].cause === null && rs[2]?.verdict === 'non_conforme' && JSON.stringify(rs[2].jeux[0].cause) === JSON.stringify({ genre: 'verification', numero: 2, ligne: null, message: 'attendu : 2 éléments ; obtenu : 1 élément' })
         && rs[3]?.verdict === 'bloque' && rs[3].jeux[0].cause?.genre === 'action' && rs[3].jeux[0].cause.numero === 2, JSON.stringify(rs.map((r) => r && [r.verdict, r.jeux[0].cause])));
-      const md2 = dc && c ? lire(join(dc, c.tests[2].dossier), 'rapport.md') : '';
-      const md0 = dc && c ? lire(join(dc, c.tests[0].dossier), 'rapport.md') : '';
+      const md2 = dc && c?.tests[2] ? lire(join(dc, c.tests[2].dossier), 'rapport.md') : '';
+      const md0 = dc && c?.tests[0] ? lire(join(dc, c.tests[0].dossier), 'rapport.md') : '';
       controle('rapport.md : verdict et cause, écran final ; sortie : le verdict après le bilan', md2.includes('- Verdict : **non conforme** (étape 2 : attendu : 2 éléments ; obtenu : 1 élément)') && md0.includes('- Verdict : conforme\n') && md0.includes('Écran à la fin des étapes : capture `captures/fin.png`')
         && /Bilan : échec, 3 étapes, 1 réussies, 1 en échec, 1 non jouées\nVerdict : bloqué \(étape 2 : délai de 2 s dépassé/.test(sortie ?? ''), md2 + md0);
       const jeu = (etapes, preparation = [], nettoyage = []) => ({ etapes, preparation, nettoyage });
@@ -3896,19 +3928,22 @@ nom = "export"
         r = await res([dc, '--format', 'jira', '--preuves']);
         const wiki2 = lire(dc, 'conformite-jira.txt');
         const html2 = lire(dc, 'conformite.html');
-        const attendues = campagne40.rapports.flatMap((x, k) => conformite.capturesDuRapport(x, campagne40.campagne.tests[k].fichier.replace(/\.toml$/, '')).map((y) => ({ ...y, dossier: join(dc, campagne40.campagne.tests[k].dossier) })));
+        const attendues = campagne40.rapports.flatMap((x, k) => (!x || !campagne40.campagne?.tests[k] ? [] : conformite.capturesDuRapport(x, campagne40.campagne.tests[k].fichier.replace(/\.toml$/, ''))).map((y) => ({ ...y, dossier: join(dc, campagne40.campagne.tests[k].dossier) })));
         const copiees = existsSync(join(dc, 'captures-jira')) ? readdirSync(join(dc, 'captures-jira')).sort() : [];
         controle('--preuves : chaque copie d\'écran dans captures-jira, sous son nom stable, identique à sa capture ; citée dans le balisage (!nom|thumbnail!), incluse dans la page HTML (D22.INV-2, D22.INV-4)', r.code === 0 && JSON.stringify(copiees) === JSON.stringify(attendues.map((x) => x.nom).sort()) && attendues.length >= 12
-          && attendues.every((x) => readFileSync(join(dc, 'captures-jira', x.nom)).equals(readFileSync(join(x.dossier, x.chemin)))) && wiki2.includes('|vérifier 2 éléments getByRole(\'heading\', \\{ name: \'Clients\' \\})|(x) en échec|attendu : 2 éléments ; obtenu : 1 élément|!c-liste-02.png|thumbnail!|')
-          && wiki2.includes('Écran à la fin des étapes : !c-liste-fin.png|thumbnail!') && html2.includes(`src="data:image/png;base64,${readFileSync(join(dc, 'captures-jira', 'c-liste-02.png')).toString('base64')}"`) && r.sortie.includes(`${attendues.length} copies d'écran dans`), r.sortie + JSON.stringify(copiees));
+          && attendues.every((x) => { try { return readFileSync(join(dc, 'captures-jira', x.nom)).equals(readFileSync(join(x.dossier, x.chemin))); } catch { return false; } }) && wiki2.includes('|vérifier 2 éléments getByRole(\'heading\', \\{ name: \'Clients\' \\})|(x) en échec|attendu : 2 éléments ; obtenu : 1 élément|!c-liste-02.png|thumbnail!|')
+          && wiki2.includes('Écran à la fin des étapes : !c-liste-fin.png|thumbnail!') && html2.includes(`src="data:image/png;base64,${existsSync(join(dc, 'captures-jira', 'c-liste-02.png')) ? readFileSync(join(dc, 'captures-jira', 'c-liste-02.png')).toString('base64') : 'absente'}"`) && r.sortie.includes(`${attendues.length} copies d'écran dans`), r.sortie + JSON.stringify(copiees));
         await res([dc, '--format', 'jira', '--preuves']);
         controle('même rapport, même texte : le balisage et la page réécrits à l\'identique (D22.INV-4)', lire(dc, 'conformite-jira.txt') === wiki2 && lire(dc, 'conformite.html') === html2);
-        const d2 = join(dc, campagne40.campagne.tests[2].dossier);
+        // Un test absent de la campagne, sous un défaut, laisse les contrôles échouer sans arrêter la recette.
+        const d2 = join(dc, campagne40.campagne?.tests[2]?.dossier ?? 'test-absent');
         r = await res([d2, '--format', 'jira', '--cle', 'DEMO-40', '--preuves']);
         controle('un seul rapport : fichiers à côté de lui, sous la clé donnée par --cle', r.code === 0 && lire(d2, 'conformite-jira.txt').includes('\nh3. DEMO-40 : Liste (x) Non conforme\n') && existsSync(join(d2, 'captures-jira', 'DEMO-40-02.png')) && existsSync(join(d2, 'captures-jira', 'DEMO-40-fin.png')), r.sortie);
         const dDouble = join(TMP, 'r42', 'double');
-        cpSync(d2, join(dDouble, 'a'), { recursive: true });
-        cpSync(d2, join(dDouble, 'b'), { recursive: true });
+        if (existsSync(d2)) {
+          cpSync(d2, join(dDouble, 'a'), { recursive: true });
+          cpSync(d2, join(dDouble, 'b'), { recursive: true });
+        }
         const refus = await Promise.all([res([dc, '--format', 'jira', '--cle', 'DEMO-40']), res([d2, '--format', 'jira', '--cle', 'demo-40']), res([join(dDouble, 'a'), join(dDouble, 'b'), '--format', 'jira'])]);
         controle('refus, code 2 : --cle pour une campagne, clé mal formée, deux tests aux mêmes noms de copies d\'écran', refus.every((x) => x.code === 2) && refus[0].erreurs.includes('--cle ne vaut que pour un seul dossier de résultats') && refus[1].sortie.includes('« demo-40 » n\'est pas une clé de test (PROJET-123 ou PROJET-T123)') && refus[2].sortie.includes('deux tests donneraient les mêmes noms de copies d\'écran : c-liste'), refus.map((x) => x.sortie + x.erreurs).join(' | '));
         const sources = ['resultats.mjs', 'conformite.mjs'].map((f) => readFileSync(join(SKILL, 'scripts', f), 'utf8')).join('\n');
@@ -3947,13 +3982,13 @@ nom = "export"
         const noms = (l) => (l ?? []).map((y) => y.filename).join();
         controle('Xray Cloud : un fichier pour la campagne, dans son dossier ; clé de chaque test retenue à l\'import ; statut de son verdict, PASSED, FAILED ou ABORTED ; exécution de test donnée (D21.INV-4, D22.INV-3)', r.code === 0 && x?.testExecutionKey === 'DEMO-100' && x.info.summary === 'scenario-playwright : campagne, 4 tests'
           && x.tests.map((y) => `${y.testKey}:${y.status}`).join() === 'DEMO-21:PASSED,DEMO-22:FAILED,DEMO-26:ABORTED,DEMO-13:PASSED' && r.sortie.includes('pour l\'exécution DEMO-100'), r.sortie + JSON.stringify(x?.tests.map((y) => [y.testKey, y.status])));
-        controle('statut de chaque pas du test manuel converti, et ses copies d\'écran sur ce pas ; l\'écran final sur le test (D22.INV-2)', JSON.stringify(t('DEMO-21')?.steps.map((y) => [y.status, noms(y.evidence)])) === '[["PASSED","DEMO-21-02.png"],["PASSED","DEMO-21-05.png"]]' && noms(t('DEMO-21')?.evidence) === 'DEMO-21-fin.png'
-          && JSON.stringify(t('DEMO-22')?.steps.map((y) => [y.status, y.actualResult ?? null, noms(y.evidence)])) === '[["PASSED",null,"DEMO-22-02.png"],["FAILED","attendu : 0 élément ; obtenu : 1 élément","DEMO-22-04.png"]]'
-          && JSON.stringify(t('DEMO-26')?.steps.map((y) => [y.status, noms(y.evidence)])) === '[["FAILED","DEMO-26-02.png"]]' && t('DEMO-26')?.comment.startsWith('scénario : bloqué ; étape 2 (ligne '), JSON.stringify(x?.tests.map((y) => [y.testKey, y.steps?.map((s) => [s.status, s.actualResult, noms(s.evidence)]), noms(y.evidence)])));
+        controle('statut de chaque pas du test manuel converti, et ses copies d\'écran sur ce pas ; l\'écran final sur le test (D22.INV-2)', JSON.stringify(t('DEMO-21')?.steps?.map((y) => [y.status, noms(y.evidence)])) === '[["PASSED","DEMO-21-02.png"],["PASSED","DEMO-21-05.png"]]' && noms(t('DEMO-21')?.evidence) === 'DEMO-21-fin.png'
+          && JSON.stringify(t('DEMO-22')?.steps?.map((y) => [y.status, y.actualResult ?? null, noms(y.evidence)])) === '[["PASSED",null,"DEMO-22-02.png"],["FAILED","attendu : 0 élément ; obtenu : 1 élément","DEMO-22-04.png"]]'
+          && JSON.stringify(t('DEMO-26')?.steps?.map((y) => [y.status, noms(y.evidence)])) === '[["FAILED","DEMO-26-02.png"]]' && t('DEMO-26')?.comment?.startsWith('scénario : bloqué ; étape 2 (ligne '), JSON.stringify(x?.tests.map((y) => [y.testKey, y.steps?.map((s) => [s.status, s.actualResult, noms(s.evidence)]), noms(y.evidence)])));
         r = await res([dc, '--format', 'xray-dc', '--preuves']);
         const xdc = JSON.parse(lire(dc, 'xray-campagne.json') || 'null');
         controle('Xray Data Center : PASS, FAIL, ABORTED, et les pièces jointes en « evidences » (D21.INV-4)', r.code === 0 && !('testExecutionKey' in (xdc ?? {})) && xdc?.tests.map((y) => `${y.testKey}:${y.status}`).join() === 'DEMO-21:PASS,DEMO-22:FAIL,DEMO-26:ABORTED,DEMO-13:PASS'
-          && JSON.stringify(xdc.tests[1].steps.map((y) => y.status)) === '["PASS","FAIL"]' && xdc.tests.every((y) => !('evidence' in y) && (y.steps ?? []).every((s) => !('evidence' in s))) && noms(xdc.tests[0].evidences) === 'DEMO-21-fin.png' && r.sortie.includes('au format JSON de Xray Data Center'), r.sortie + JSON.stringify(xdc?.tests.map((y) => y.status)));
+          && JSON.stringify(xdc.tests[1]?.steps?.map((y) => y.status)) === '["PASS","FAIL"]' && xdc.tests.every((y) => !('evidence' in y) && (y.steps ?? []).every((s) => !('evidence' in s))) && noms(xdc.tests[0].evidences) === 'DEMO-21-fin.png' && r.sortie.includes('au format JSON de Xray Data Center'), r.sortie + JSON.stringify(xdc?.tests.map((y) => y.status)));
         r = await res([dc, '--format', 'xray']);
         const sans = JSON.parse(lire(dc, 'xray-campagne.json') || 'null');
         controle('sans --preuves : aucune copie d\'écran, ni sur le test ni sur ses pas (D21.INV-4)', r.code === 0 && sans?.tests.every((y) => !('evidence' in y) && (y.steps ?? []).every((s) => !('evidence' in s))));

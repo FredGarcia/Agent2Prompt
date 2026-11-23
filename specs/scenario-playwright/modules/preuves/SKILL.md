@@ -87,7 +87,7 @@ Dossier de résultats, verdict d'un jeu et de plusieurs, rapport JSON et Markdow
 
 <!-- fichier : scripts/rapport.mjs -->
 ```javascript
-// scenario-playwright 1.6.0 : rapport d'une exécution, en JSON (champs stables, E1) et en Markdown, et rapport
+// scenario-playwright 1.6.1 : rapport d'une exécution, en JSON (champs stables, E1) et en Markdown, et rapport
 // d'une campagne.
 //
 // Chaque exécution écrit son dossier de résultats horodaté : rapport.json, rapport.md, captures,
@@ -100,7 +100,7 @@ import { join } from 'node:path';
 
 export const FORMAT_RAPPORT = 'scenario-playwright.rapport/1';
 export const FORMAT_CAMPAGNE = 'scenario-playwright.campagne/1';
-export const VERSION_SKILL = '1.6.0';
+export const VERSION_SKILL = '1.6.1';
 
 const deux = (n) => String(n).padStart(2, '0');
 
