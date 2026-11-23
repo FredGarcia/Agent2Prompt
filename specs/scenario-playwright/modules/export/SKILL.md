@@ -1,6 +1,6 @@
 ---
 name: export
-description: Export d'un scénario ratifié en test @playwright/test du projet, et résultats d'une exécution aux formats d'import de Xray et de Zephyr Scale (exporter.mjs ; test écrit sans IA depuis le scénario valide, traduction contrôlée, même scénario même test ; un test par jeu, test.step numéroté par étape avec sa ligne, cibles en localisateurs de Playwright, étiquettes en tags ; aides communes qui reprennent la sémantique du moteur, vérifications qui se poursuivent, préparation à sa place, nettoyage dans un bloc finally ; souche de connexion pour l'équipe, aucun identifiant écrit ; dossier de tests désigné seulement, fichiers du skill reconnus à leur en-tête, conflit, test périmé, test retouché gardé à côté, --comparer, --remplacer ; TypeScript ou JavaScript ; SCENARIO_ORIGINES et SCENARIO_AUTORISER_MUTATIONS pour jouer ailleurs ; verifier.mjs sur un test exporté ; resultats.mjs, pour le JSON de Xray, statut par pas d'un test manuel converti, exemples des jeux, captures sur demande, format « custom » de Zephyr Scale en JSON et en archive .zip, clé retenue à l'import ou --cle, rien n'est envoyé ; sources de scripts/export.mjs, scripts/aides-export.mjs, scripts/exporter.mjs et scripts/resultats.mjs). À lire pour mettre un scénario dans les tests du projet et en rendre les résultats.
+description: Export d'un scénario ratifié en test @playwright/test du projet, et résultats d'une exécution aux formats d'import de Xray et de Zephyr Scale (exporter.mjs ; test écrit sans IA depuis le scénario valide, traduction contrôlée, même scénario même test ; un test par jeu, test.step numéroté par étape avec sa ligne, cibles en localisateurs de Playwright, étiquettes en tags ; aides communes qui reprennent la sémantique du moteur, vérifications qui se poursuivent, préparation à sa place, nettoyage dans un bloc finally ; souche de connexion pour l'équipe, aucun identifiant écrit ; dossier de tests désigné seulement, fichiers du skill reconnus à leur en-tête, conflit, test périmé, test retouché gardé à côté, --comparer, --remplacer ; TypeScript ou JavaScript ; SCENARIO_ORIGINES et SCENARIO_AUTORISER_MUTATIONS pour jouer ailleurs ; verifier.mjs sur un test exporté ; resultats.mjs, pour le JSON de Xray Cloud ou Data Center, d'une exécution ou d'une campagne, statut du verdict, statut par pas d'un test manuel converti, exemples des jeux, copies d'écran sur demande, sur leur pas, exécution de test existante, format « custom » de Zephyr Scale en JSON et en archive .zip, clé retenue à l'import ou --cle, rien n'est envoyé ; sources de scripts/export.mjs, scripts/aides-export.mjs, scripts/exporter.mjs et scripts/resultats.mjs). À lire pour mettre un scénario dans les tests du projet et en rendre les résultats.
 dimensions: [D21]
 status: active
 ---
@@ -130,15 +130,16 @@ Le scénario est la source du test. Quand il change, puis se fait ratifier, son 
 ## 8. Résultats pour Xray et Zephyr Scale (D21.INV-4)
 
 ```text
-node <skill>/scripts/resultats.mjs <dossier de résultats | rapport.json>... --format xray|zephyr [--cle CLÉ] [--preuves] [--sortie <dossier>]
+node <skill>/scripts/resultats.mjs <dossier de résultats | rapport.json | dossier de campagne>... --format xray|xray-dc|zephyr|jira [--cle CLÉ] [--execution CLÉ] [--preuves] [--sortie <dossier>]
 ```
 
-`resultats.mjs` lit le `rapport.json` d'une exécution de `jouer.mjs` (module `preuves`) et écrit un fichier, que la personne qui en a le droit importe dans l'outil. Rien n'est envoyé : le skill n'écrit jamais dans Jira, Xray ni Zephyr Scale (D17.INV-2).
+`resultats.mjs` lit le `rapport.json` d'une exécution de `jouer.mjs` (module `preuves`), ou ceux des tests d'une campagne, dans l'ordre de `campagne.json` (module `conformite`, § 2), et écrit un fichier, que la personne qui en a le droit importe dans l'outil ; `--format jira` écrit le rapport de conformité à coller dans Jira (module `conformite`, § 5). Rien n'est envoyé : le skill n'écrit jamais dans Jira, Xray ni Zephyr Scale (D17.INV-2).
 
-- **Clé du test** : celle que l'import du texte a retenue (module `cas-de-test`) : le scénario joué se retrouve à son empreinte, notée au rapport, dans le dossier du scénario, dont le rapport est par défaut un sous-dossier de `resultats/`, près du rapport ou dans le dossier courant ; puis son texte de départ et sa provenance. Un texte écrit à la main, ou dont l'étiquette a été attribuée par l'import, n'a pas de clé : `--cle PROJET-123` (Xray) ou `--cle PROJET-T123` (Zephyr Scale) la donne, pour un seul rapport. La forme de la clé est contrôlée.
-- **Xray**, `xray-<scénario>.json`, au format JSON d'import des résultats d'exécution de Xray (Import Execution Results) : `info` (résumé, début et fin) et un test par rapport, `testKey`, `start`, `finish`, `status` (`PASSED` ou `FAILED`), `comment` (chaque jeu, avec ses valeurs, sans `${unique}`, l'entrée de préparation, l'étape avec sa ligne et le nettoyage en échec, et leur message) ; un exemple par jeu (`examples`) pour un scénario à plusieurs jeux, comme un plan de scénario de Cucumber ; pour un test manuel converti dont le texte n'a changé ni depuis l'import ni depuis l'exécution, le statut de chacun de ses pas (`steps`) : un pas, ce sont sa ligne « Quand » et ses lignes « Alors » ; il échoue si l'une de leurs étapes échoue, avec son message, passe si toutes passent, reste à faire sinon. Un texte retouché depuis l'import ne donne que le statut du test, avec une note. Avec `--preuves`, et seulement avec elle, les captures des étapes en échec s'ajoutent (`evidence`), en PNG encodé en base64.
-- **Zephyr Scale**, `zephyr-<scénario>.json` et `zephyr-<scénario>.zip`, au format « custom » d'import des résultats d'automatisation : `version` 1 et une exécution par rapport, `source`, `result` (`Passed` ou `Failed`) et `testCase.key` ; l'archive, un seul fichier stocké et contrôlé par son CRC-32, est celle qui s'envoie. Ce format ne porte ni pas ni pièce jointe : `--preuves` y est refusé.
-- **Plusieurs rapports** : un fichier, un test ou une exécution par rapport, `xray-resultats.json` ou `zephyr-resultats.json`, dans le dossier de `--sortie`, sinon le dossier courant ; un seul rapport : à côté de lui.
+- **Clé du test** : celle que l'import du texte a retenue (module `cas-de-test`) : le scénario joué se retrouve à son empreinte, notée au rapport, dans le dossier que cite `campagne.json` pour un test d'une campagne, dans le dossier du scénario, dont le rapport est par défaut un sous-dossier de `resultats/`, près du rapport ou dans le dossier courant ; puis son texte de départ et sa provenance. Un texte écrit à la main, ou dont l'étiquette a été attribuée par l'import, n'a pas de clé : `--cle PROJET-123` (Xray) ou `--cle PROJET-T123` (Zephyr Scale) la donne, pour un seul rapport. La forme de la clé est contrôlée.
+- **Xray Cloud**, `--format xray`, `xray-<scénario>.json`, au format JSON d'import des résultats d'exécution de Xray (Import Execution Results) : `info` (résumé, début et fin) et un test par rapport, `testKey`, `start`, `finish`, `status`, celui du verdict du test (`PASSED` conforme, `FAILED` non conforme, `ABORTED` bloqué ; module `conformite`, § 4), `comment` (chaque jeu, avec ses valeurs, sans `${unique}`, son verdict, l'entrée de préparation, l'étape avec sa ligne et le nettoyage en échec, et leur message) ; un exemple par jeu (`examples`) pour un scénario à plusieurs jeux, comme un plan de scénario de Cucumber ; pour un test manuel converti dont le texte n'a changé ni depuis l'import ni depuis l'exécution, le statut de chacun de ses pas (`steps`) : un pas, ce sont sa ligne « Quand » et ses lignes « Alors » ; il échoue si l'une de leurs étapes échoue, avec son message, passe si toutes passent, reste à faire sinon. Un texte retouché depuis l'import ne donne que le statut du test, avec une note. Avec `--preuves`, et seulement avec elle, les copies d'écran du test s'ajoutent, en PNG encodé en base64, sous leur nom stable (module `conformite`, § 5) : celles des étapes d'un pas sur ce pas, quand les pas sont rendus, les autres, l'écran à la fin des étapes compris, sur le test (`evidence`). `--execution PROJET-123` verse les résultats dans une exécution de test existante (`testExecutionKey`) ; sans elle, Xray en crée une à l'import.
+- **Xray Data Center**, `--format xray-dc` : le même fichier, aux statuts de Xray Data Center, `PASS`, `FAIL`, `ABORTED` et `TODO`, les copies d'écran en `evidences`.
+- **Zephyr Scale**, `zephyr-<scénario>.json` et `zephyr-<scénario>.zip`, au format « custom » d'import des résultats d'automatisation : `version` 1 et une exécution par rapport, `source`, `result`, celui du verdict (`Passed`, `Failed` ou `Blocked`), et `testCase.key` ; l'archive, un seul fichier stocké et contrôlé par son CRC-32, est celle qui s'envoie. Ce format ne porte ni pas ni pièce jointe : `--preuves` et `--execution` y sont refusés.
+- **Plusieurs rapports** : un fichier, un test ou une exécution par rapport, `xray-resultats.json` ou `zephyr-resultats.json`, dans le dossier de `--sortie`, sinon le dossier courant ; une campagne : `xray-campagne.json` ou `zephyr-campagne.json`, dans son dossier ; un seul rapport : à côté de lui. `--cle` ne vaut que pour un seul rapport.
 
 Les messages viennent du rapport, où les secrets sont déjà masqués (D19.INV-2, D20.INV-2). Code 0 quand le fichier est écrit, 2 quand une option, un rapport ou une clé est refusé, et rien n'est alors écrit.
 
@@ -147,7 +148,7 @@ Les messages viennent du rapport, où les secrets sont déjà masqués (D19.INV-
 - Le même scénario donne le même test ; un scénario invalide, ou dont le texte a changé, n'est pas exporté (D21.INV-1).
 - Rien n'est écrit hors du dossier désigné ; un fichier qui n'est pas du skill n'est jamais remplacé ; un test périmé ne l'est qu'avec `--remplacer`, un test retouché est gardé à côté ; la connexion de l'équipe n'est jamais remplacée ; aucun identifiant n'est écrit (D21.INV-2).
 - Joués par `@playwright/test` contre l'application de démonstration, les tests exportés rendent, étape par étape, les résultats du skill ; la garde des origines et des mutations s'y applique après correspondance (D21.INV-3 ; module `recette`, R36 et R37).
-- Les résultats se lisent dans Xray et dans Zephyr Scale, la clé retenue à l'import, sans rien envoyer (D21.INV-4 ; module `recette`, R38).
+- Les résultats d'une exécution ou d'une campagne se lisent dans Xray Cloud, dans Xray Data Center et dans Zephyr Scale, la clé retenue à l'import, le statut du verdict, sans rien envoyer (D21.INV-4 ; module `recette`, R38 et R43).
 
 ## 10. Source `scripts/export.mjs`
 
@@ -155,7 +156,7 @@ Les messages viennent du rapport, où les secrets sont déjà masqués (D19.INV-
 
 <!-- fichier : scripts/export.mjs -->
 ```javascript
-// scenario-playwright 1.5.0 : export d'un scénario ratifié en test @playwright/test du projet (D21).
+// scenario-playwright 1.6.0 : export d'un scénario ratifié en test @playwright/test du projet (D21).
 //
 // Le test s'écrit sans IA depuis le scénario TOML valide, dont la traduction est contrôlée : même scénario,
 // même test. Chaque étape garde son numéro et sa ligne, chaque cible devient le même localisateur de
@@ -170,7 +171,7 @@ import { strategie } from './cibles.mjs';
 import { positionsPreparation } from './moteur.mjs';
 import { DELAI_DEFAUT, DELAI_MAIN_DEFAUT, lireScenario, mutationsDe, resumeEntree, resumeEtape } from './scenario.mjs';
 
-export const VERSION = '1.5.0';
+export const VERSION = '1.6.0';
 export const NOM_AIDES = 'scenario-playwright.aides';
 export const NOM_CONNEXION = 'scenario-playwright.connexion';
 const RE_EMPREINTE = /^\/\/ Empreinte : ([0-9a-f]{64})$/;
@@ -491,7 +492,7 @@ Les aides, telles qu'elles s'écrivent dans le projet, sous leur en-tête : ouve
 
 <!-- fichier : scripts/aides-export.mjs -->
 ```javascript
-// scenario-playwright 1.5.0 : aides des tests exportés, copiées dans le dossier de tests du projet (D21).
+// scenario-playwright 1.6.0 : aides des tests exportés, copiées dans le dossier de tests du projet (D21).
 //
 // Un test exporté ne dépend que de @playwright/test et de ce fichier. Les aides reprennent la sémantique du
 // moteur du skill : attentes bornées sur un état, aucune étape rejouée, vérifications qui se poursuivent après
@@ -1047,7 +1048,7 @@ class Jeu {
 <!-- fichier : scripts/exporter.mjs -->
 ```javascript
 #!/usr/bin/env node
-// scenario-playwright 1.5.0 : exporte des scénarios ratifiés en tests @playwright/test du projet (D21).
+// scenario-playwright 1.6.0 : exporte des scénarios ratifiés en tests @playwright/test du projet (D21).
 //
 // Usage : node <dossier du skill>/scripts/exporter.mjs <scénario.toml>... --dossier <dossier de tests du projet>
 //           [--langage ts|js] [--comparer] [--remplacer]
@@ -1151,34 +1152,51 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
 
 ## 13. Source `scripts/resultats.mjs`
 
+Lecture des rapports et des campagnes, clé du test, verdicts recalculés, JSON de Xray Cloud et Data Center, statut et copies d'écran des pas, format « custom » de Zephyr Scale et son archive, rapport de conformité (module `conformite`).
+
 <!-- fichier : scripts/resultats.mjs -->
 ```javascript
 #!/usr/bin/env node
-// scenario-playwright 1.5.0 : résultats d'une exécution aux formats d'import de Xray et de Zephyr Scale (D21).
+// scenario-playwright 1.6.0 : résultats d'une exécution ou d'une campagne aux formats d'import de Xray et de
+// Zephyr Scale (D21), et rapport de conformité à coller dans Jira (D22).
 //
-// Usage : node <dossier du skill>/scripts/resultats.mjs <dossier de résultats | rapport.json>... --format xray|zephyr
-//           [--cle CLÉ] [--preuves] [--sortie <dossier>]
-// Lit le rapport.json de chaque exécution et écrit un fichier, que la personne qui en a le droit importe dans
-// l'outil : le JSON de Xray (statut, commentaire, exemples, et pour un test manuel converti dont le texte n'a
-// pas changé depuis l'import, le statut de chacun de ses pas), ou le format « custom » de Zephyr Scale, en JSON
-// et en archive .zip pour l'envoi. La clé du test est celle retenue à l'import, ou --cle. Rien n'est envoyé :
-// le skill n'écrit jamais dans Jira, Xray ni Zephyr Scale ; aucune capture sans --preuves (D21.INV-4).
-// Code 0 si le fichier est écrit, 2 si une option, un rapport ou une clé est refusé.
+// Usage : node <dossier du skill>/scripts/resultats.mjs <dossier de résultats | rapport.json | dossier de campagne>...
+//           --format xray|xray-dc|zephyr|jira [--cle CLÉ] [--execution CLÉ] [--preuves] [--sortie <dossier>]
+// Lit le rapport.json de chaque exécution, ou ceux d'une campagne, et écrit des fichiers, que la personne qui en a
+// le droit importe ou colle elle-même. xray : le JSON de Xray Cloud ; xray-dc : celui de Xray Data Center ; pour
+// chaque test, le statut de son verdict (conforme, non conforme, bloqué : PASSED, FAILED, ABORTED ; PASS, FAIL,
+// ABORTED), un commentaire, un exemple par jeu, et pour un test manuel converti dont le texte n'a pas changé
+// depuis l'import, le statut de chacun de ses pas ; avec --preuves, les copies d'écran de chaque pas sur ce pas,
+// les autres sur le test ; --execution pour verser les résultats dans une exécution de test existante. zephyr :
+// le format « custom » de Zephyr Scale, en JSON et en archive .zip. jira : conformite-jira.txt, en balisage wiki
+// de Jira Data Center, et conformite.html, page à copier-coller dans Jira Cloud, avec, sur --preuves, les copies
+// d'écran sous leur nom stable dans captures-jira/. La clé du test est celle retenue à l'import, ou --cle. Rien
+// n'est envoyé : le skill n'écrit jamais dans Jira, Xray ni Zephyr Scale ; aucune capture sans --preuves
+// (D21.INV-4, D22.INV-4). Code 0 si les fichiers sont écrits, 2 si une option, un rapport ou une clé est refusé.
 import { Buffer } from 'node:buffer';
 import { createHash } from 'node:crypto';
-import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, relative, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { crc32 } from 'node:zlib';
+import { capturesDuRapport, rapportHtml, rapportWiki } from './conformite.mjs';
 import { lireProvenance } from './jira.mjs';
+import { FORMAT_CAMPAGNE, LIBELLES_VERDICT, verdictDe, verdictDuJeu } from './rapport.mjs';
 import { analyserTexte, empreinteTexte } from './texte.mjs';
 import { lireToml } from './toml.mjs';
 
-const USAGE = 'Usage : node scripts/resultats.mjs <dossier de résultats | rapport.json>... --format xray|zephyr [--cle CLÉ] [--preuves] [--sortie <dossier>]';
+const USAGE = 'Usage : node scripts/resultats.mjs <dossier de résultats | rapport.json | dossier de campagne>... --format xray|xray-dc|zephyr|jira [--cle CLÉ] [--execution CLÉ] [--preuves] [--sortie <dossier>]';
+const FORMATS = ['xray', 'xray-dc', 'zephyr', 'jira'];
 const RE_CLE_XRAY = /^[A-Z][A-Z0-9_]*-\d+$/;
 const RE_CLE_ZEPHYR = /^[A-Z][A-Z0-9_]*-T\d+$/;
 const RE_PROVENANCE = /^# Scénario : @(\S+), (test|cas de test) (.+) ([A-Z][A-Z0-9_]*-T?\d+)$/;
 const SOURCES_TESTS = ['Xray', 'Zephyr Scale', 'un fichier .feature', 'une archive .zip'];
+/** Statuts de Xray par verdict, et des pas : Cloud et Data Center. Le champ des pièces jointes diffère aussi. */
+const XRAY = {
+  xray: { conforme: 'PASSED', non_conforme: 'FAILED', bloque: 'ABORTED', reussi: 'PASSED', echec: 'FAILED', afaire: 'TODO', preuves: 'evidence', variante: 'Cloud' },
+  'xray-dc': { conforme: 'PASS', non_conforme: 'FAIL', bloque: 'ABORTED', reussi: 'PASS', echec: 'FAIL', afaire: 'TODO', preuves: 'evidences', variante: 'Data Center' },
+};
+const ZEPHYR = { conforme: 'Passed', non_conforme: 'Failed', bloque: 'Blocked' };
 
 /**
  * Provenance du texte d'un rapport : { cle, sorte, retouche } d'un test importé de Xray ou de Zephyr Scale,
@@ -1195,13 +1213,14 @@ export function provenanceTest(texte) {
 const sha256 = (b) => createHash('sha256').update(b).digest('hex');
 
 /**
- * Scénario joué d'un rapport : le fichier TOML de même empreinte, dans le dossier du scénario (le rapport est
- * par défaut dans son sous-dossier resultats/), près du rapport ou dans le dossier courant ; null sinon.
+ * Scénario joué d'un rapport : le fichier TOML de même empreinte, dans le dossier que cite sa campagne, dans
+ * le dossier du scénario (le rapport est par défaut dans son sous-dossier resultats/), près du rapport ou dans
+ * le dossier courant ; null sinon.
  */
-function scenarioDuRapport(dossier, r) {
+function scenarioDuRapport(dossier, r, ailleurs = []) {
   const nom = r.scenario?.fichier;
   if (typeof nom !== 'string' || !nom || basename(nom) !== nom || typeof r.scenario.empreinte !== 'string') return null;
-  for (const d of [resolve(dossier, '..', '..'), resolve(dossier, '..'), dossier, process.cwd()]) {
+  for (const d of [...ailleurs, resolve(dossier, '..', '..'), resolve(dossier, '..'), dossier, process.cwd()]) {
     try { if (sha256(readFileSync(join(d, nom))) === r.scenario.empreinte) return join(d, nom); } catch { /* absent */ }
   }
   return null;
@@ -1209,15 +1228,16 @@ function scenarioDuRapport(dossier, r) {
 
 /**
  * Rapport d'une exécution : son chemin, son contenu, le scénario joué et son texte de départ s'ils sont
- * retrouvés ; `pasFiables` dit si le texte est celui que le scénario traduisait lors de l'exécution.
+ * retrouvés ; `pasFiables` dit si le texte est celui que le scénario traduisait lors de l'exécution. Les
+ * verdicts sont recalculés des étapes (D22.INV-3).
  */
-function lireRapport(chemin) {
+function lireRapport(chemin, ailleurs = []) {
   const fichier = existsSync(chemin) && statSync(chemin).isDirectory() ? join(chemin, 'rapport.json') : chemin;
   let rapport;
   try { rapport = JSON.parse(readFileSync(fichier, 'utf8')); } catch { return { erreur: `${chemin} : rapport.json illisible` }; }
   if (rapport.format !== 'scenario-playwright.rapport/1' || !Array.isArray(rapport.jeux)) return { erreur: `${chemin} : pas un rapport de scenario-playwright` };
   const dossier = dirname(fichier);
-  const toml = scenarioDuRapport(dossier, rapport);
+  const toml = scenarioDuRapport(dossier, rapport, ailleurs);
   let texte = null;
   let pasFiables = false;
   if (toml && rapport.scenario.source) {
@@ -1226,26 +1246,58 @@ function lireRapport(chemin) {
       pasFiables = empreinteTexte(texte) === lireToml(readFileSync(toml, 'utf8')).empreinte_source;
     } catch { texte = null; }
   }
-  return { fichier, dossier, rapport, toml, texte, pasFiables };
+  const jeux = rapport.jeux.map((j) => ({ ...j, ...verdictDuJeu(j) }));
+  const verdict = verdictDe(jeux.map((j) => j.verdict));
+  const premier = jeux.find((j) => j.verdict === verdict && j.cause);
+  return { fichier, dossier, rapport, toml, texte, pasFiables, jeux, verdict, cause: premier?.cause ?? null, jeu: premier && jeux.length > 1 ? premier.numero : null };
 }
 
-/** Commentaire d'un test : chaque jeu, son étape en échec et son message, la préparation et le nettoyage en échec. */
-function commentaire(r) {
-  return r.jeux.map((j) => {
-    const nom = r.jeux.length > 1 ? `jeu ${j.numero}${Object.keys(j.valeurs ?? {}).length ? ` (${Object.entries(j.valeurs).filter(([k]) => k !== 'unique').map(([k, v]) => `${k} = ${v}`).join(', ')})` : ''}` : 'scénario';
+/**
+ * Entrées données : chaque dossier de résultats ou rapport.json, et chaque dossier de campagne, dont les
+ * tests sont lus dans l'ordre de campagne.json. Rend { lus, campagne, erreurs } ; `campagne` est le dossier de
+ * la campagne quand elle est la seule entrée.
+ */
+function lireEntrees(entrees) {
+  const lus = [];
+  const erreurs = [];
+  let campagnes = 0;
+  let dossierCampagne = null;
+  for (const e of entrees) {
+    const p = resolve(e);
+    if (existsSync(join(p, 'campagne.json'))) {
+      let c;
+      try { c = JSON.parse(readFileSync(join(p, 'campagne.json'), 'utf8')); } catch { erreurs.push(`${e} : campagne.json illisible`); continue; }
+      if (c.format !== FORMAT_CAMPAGNE || !Array.isArray(c.tests)) { erreurs.push(`${e} : pas une campagne de scenario-playwright`); continue; }
+      campagnes++;
+      dossierCampagne = p;
+      for (const t of c.tests) {
+        const dossier = typeof t.dossier === 'string' && basename(t.dossier) === t.dossier ? join(p, t.dossier) : null;
+        if (!dossier) { erreurs.push(`${e} : test sans dossier de résultats`); continue; }
+        const lu = lireRapport(dossier, typeof t.scenario === 'string' ? [resolve(p, dirname(t.scenario))] : []);
+        if (lu.erreur) erreurs.push(lu.erreur); else lus.push({ ...lu, entree: `${e}/${t.dossier}` });
+      }
+      continue;
+    }
+    const lu = lireRapport(p);
+    if (lu.erreur) erreurs.push(lu.erreur); else lus.push({ ...lu, entree: e });
+  }
+  return { lus, erreurs, campagne: campagnes === 1 && entrees.length === 1 ? dossierCampagne : null };
+}
+
+/** Commentaire d'un test : chaque jeu, son verdict, son étape en échec et son message, la préparation et le nettoyage en échec. */
+function commentaire(lu) {
+  return lu.jeux.map((j) => {
+    const nom = lu.jeux.length > 1 ? `jeu ${j.numero}${Object.keys(j.valeurs ?? {}).length ? ` (${Object.entries(j.valeurs).filter(([k]) => k !== 'unique').map(([k, v]) => `${k} = ${v}`).join(', ')})` : ''}` : 'scénario';
     const p = j.preparation?.find((e) => e.statut === 'echec');
     const e = j.etapes.find((x) => x.statut === 'echec');
     const n = (j.nettoyage ?? []).filter((x) => x.statut === 'echec');
     const parties = [p ? `préparation ${p.numero} en échec : ${p.message}` : null, e ? `étape ${e.numero}${e.ligne ? ` (ligne ${e.ligne})` : ''} en échec : ${e.message}` : null, ...n.map((x) => `nettoyage ${x.numero} en échec : ${x.message}`)].filter(Boolean);
-    return `${nom} : ${j.statut === 'reussi' ? 'réussi' : 'échec'}${parties.length ? ` ; ${parties.join(' ; ')}` : ''}`;
+    return `${nom} : ${LIBELLES_VERDICT[j.verdict]}${parties.length ? ` ; ${parties.join(' ; ')}` : ''}`;
   }).join('\n');
 }
 
-/**
- * Statut de chaque pas d'un test manuel converti : un pas, ce sont ses lignes « Quand » puis « Alors » du texte ;
- * le pas échoue si l'une de leurs étapes échoue, passe si toutes passent, reste à faire sinon.
- */
-export function statutsDesPas(texte, jeu) {
+/** Pas d'un test manuel converti : chacun, ce sont les lignes de son « Quand » et des étapes qui le suivent jusqu'au suivant. */
+export function groupesDesPas(texte) {
   const { scenario } = analyserTexte(texte);
   if (!scenario) return null;
   const pas = [];
@@ -1253,29 +1305,60 @@ export function statutsDesPas(texte, jeu) {
     if (/^quand$/i.test(e.motCle) || pas.length === 0) pas.push([e.ligne]);
     else pas.at(-1).push(e.ligne);
   }
-  return pas.map((lignes) => {
+  return pas;
+}
+
+/**
+ * Statut de chaque pas d'un test manuel converti : un pas, ce sont ses lignes « Quand » puis « Alors » du texte ;
+ * le pas échoue si l'une de leurs étapes échoue, passe si toutes passent, reste à faire sinon.
+ */
+export function statutsDesPas(texte, jeu, s = XRAY.xray) {
+  const groupes = groupesDesPas(texte);
+  if (!groupes) return null;
+  return groupes.map((lignes) => {
     const etapes = jeu.etapes.filter((x) => lignes.includes(x.ligne));
     const ko = etapes.find((x) => x.statut === 'echec');
-    if (ko) return { status: 'FAILED', actualResult: ko.message };
-    if (etapes.length && etapes.every((x) => x.statut === 'reussie')) return { status: 'PASSED' };
-    return { status: 'TODO' };
+    if (ko) return { status: s.echec, actualResult: ko.message };
+    if (etapes.length && etapes.every((x) => x.statut === 'reussie')) return { status: s.reussi };
+    return { status: s.afaire };
   });
 }
 
-/** Test au format JSON de Xray : { testKey, start, finish, status, comment, examples?, steps?, evidence? }. */
-function testXray(lu, cle, preuves) {
+/** Copie d'écran en pièce jointe de Xray, sous son nom stable ; null si le fichier manque. */
+function pieceJointe(lu, c) {
+  const chemin = join(lu.dossier, c.chemin);
+  if (!existsSync(chemin)) return null;
+  return { data: readFileSync(chemin).toString('base64'), filename: c.nom, contentType: 'image/png' };
+}
+
+/**
+ * Test au format JSON de Xray : { testKey, start, finish, status, comment, examples?, steps?, evidence? } ;
+ * avec preuves, la copie d'écran d'une étape va sur son pas quand les pas sont rendus, les autres sur le test.
+ */
+function testXray(lu, cle, base, preuves, s) {
   const r = lu.rapport;
-  const t = { testKey: cle, start: r.debut, finish: r.fin, status: r.statut === 'reussi' ? 'PASSED' : 'FAILED', comment: commentaire(r) };
+  const t = { testKey: cle, start: r.debut, finish: r.fin, status: s[lu.verdict], comment: commentaire(lu) };
   const p = lu.texte ? provenanceTest(lu.texte) : null;
-  if (r.jeux.length > 1) t.examples = r.jeux.map((j) => (j.statut === 'reussi' ? 'PASSED' : 'FAILED'));
+  const captures = preuves ? capturesDuRapport({ ...r, jeux: lu.jeux }, base) : [];
+  const surLesPas = new Set();
+  if (lu.jeux.length > 1) t.examples = lu.jeux.map((j) => s[j.verdict]);
   else if (p?.sorte === 'manuel' && p.retouche === false && lu.pasFiables) {
-    const pas = statutsDesPas(lu.texte, r.jeux[0]);
-    if (pas) t.steps = pas;
+    const groupes = groupesDesPas(lu.texte);
+    const pas = groupes ? statutsDesPas(lu.texte, lu.jeux[0], s) : null;
+    if (pas) {
+      t.steps = pas.map((x, k) => {
+        if (!preuves) return x;
+        const lignes = groupes[k];
+        const jointes = captures.filter((c) => c.ou.genre === 'etape' && lignes.includes(c.ou.ref.ligne));
+        for (const c of jointes) surLesPas.add(c);
+        const pj = jointes.map((c) => pieceJointe(lu, c)).filter(Boolean);
+        return pj.length ? { ...x, [s.preuves]: pj } : x;
+      });
+    }
   }
   if (preuves) {
-    const captures = r.jeux.flatMap((j) => [...(j.preparation ?? []), ...j.etapes, ...(j.nettoyage ?? [])].filter((x) => x.statut === 'echec' && x.capture).map((x) => x.capture));
-    const evidence = captures.filter((c) => existsSync(join(lu.dossier, c))).map((c) => ({ data: readFileSync(join(lu.dossier, c)).toString('base64'), filename: basename(c), contentType: 'image/png' }));
-    if (evidence.length) t.evidence = evidence;
+    const pj = captures.filter((c) => !surLesPas.has(c)).map((c) => pieceJointe(lu, c)).filter(Boolean);
+    if (pj.length) t[s.preuves] = pj;
   }
   return t;
 }
@@ -1301,65 +1384,106 @@ export function archiveZip(nom, contenu) {
   return Buffer.concat([local, n, donnees, central, n, fin]);
 }
 
+const souche = (fichier) => basename(String(fichier ?? 'scenario'), '.toml').replace(/[^A-Za-z0-9_-]+/g, '-') || 'scenario';
+
 export function main(args) {
   const entrees = [];
   let format = null;
   let cleImposee = null;
+  let execution = null;
   let preuves = false;
   let sortie = null;
   for (let i = 0; i < args.length; i++) {
     const a = args[i];
     if (a === '--format') format = args[++i] ?? '';
     else if (a === '--cle') cleImposee = args[++i] ?? '';
+    else if (a === '--execution') execution = args[++i] ?? '';
     else if (a === '--preuves') preuves = true;
     else if (a === '--sortie') sortie = args[++i] ?? '';
     else if (a.startsWith('-')) { console.error(`ERREUR option inconnue : ${a}\n${USAGE}`); return 2; }
     else entrees.push(a);
   }
   if (!entrees.length) { console.error(`ERREUR aucun dossier de résultats\n${USAGE}`); return 2; }
-  if (!['xray', 'zephyr'].includes(format)) { console.error(`ERREUR --format vaut xray ou zephyr\n${USAGE}`); return 2; }
-  if (cleImposee !== null && entrees.length > 1) { console.error('ERREUR --cle ne vaut que pour un seul dossier de résultats'); return 2; }
-  if (preuves && format === 'zephyr') { console.error('ERREUR --preuves ne vaut que pour Xray : le format « custom » de Zephyr Scale ne porte pas de pièce jointe'); return 2; }
-  const forme = format === 'xray' ? RE_CLE_XRAY : RE_CLE_ZEPHYR;
+  if (!FORMATS.includes(format)) { console.error(`ERREUR --format vaut xray, xray-dc, zephyr ou jira\n${USAGE}`); return 2; }
+  if (preuves && format === 'zephyr') { console.error('ERREUR --preuves ne vaut que pour Xray et pour Jira : le format « custom » de Zephyr Scale ne porte pas de pièce jointe'); return 2; }
+  if (execution !== null && !XRAY[format]) { console.error('ERREUR --execution ne vaut que pour xray et xray-dc'); return 2; }
+  if (execution !== null && !RE_CLE_XRAY.test(execution)) { console.error(`ERREUR --execution : « ${execution} » n'est pas une clé d'exécution de test Xray (PROJET-123)`); return 2; }
+  const { lus: tous, erreurs, campagne } = lireEntrees(entrees);
+  if (cleImposee !== null && (entrees.length > 1 || tous.length > 1)) { console.error('ERREUR --cle ne vaut que pour un seul dossier de résultats'); return 2; }
+  let refus = erreurs.length > 0;
+  for (const e of erreurs) console.log(`ERREUR ${e}`);
+  const forme = format === 'zephyr' ? RE_CLE_ZEPHYR : RE_CLE_XRAY;
   const lus = [];
-  let refus = false;
-  for (const e of entrees) {
-    const lu = lireRapport(resolve(e));
-    if (lu.erreur) { console.log(`ERREUR ${lu.erreur}`); refus = true; continue; }
+  for (const lu of tous) {
     const p = lu.texte ? provenanceTest(lu.texte) : null;
     const cle = cleImposee ?? p?.cle ?? null;
-    const outil = format === 'xray' ? 'Xray' : 'Zephyr Scale';
-    if (!cle) {
+    const outil = format === 'zephyr' ? 'Zephyr Scale' : 'Xray';
+    if (!cle && format !== 'jira') {
       const pourquoi = !lu.toml ? `le scénario ${lu.rapport.scenario?.fichier ?? ''} joué n'est pas retrouvé près du rapport, avec la même empreinte` : !lu.texte ? 'le scénario ne cite pas de texte de départ lisible' : `le texte de départ n'a pas été importé d'un test de ${outil}`;
-      console.log(`ERREUR ${e} : aucune clé de test, ${pourquoi} ; --cle la donne (D21.INV-4)`);
+      console.log(`ERREUR ${lu.entree} : aucune clé de test, ${pourquoi} ; --cle la donne (D21.INV-4)`);
       refus = true;
       continue;
     }
-    if (!forme.test(cle)) { console.log(`ERREUR ${e} : « ${cle} » n'est pas une clé de ${format === 'xray' ? 'test Xray (PROJET-123)' : 'cas de test Zephyr Scale (PROJET-T123)'}`); refus = true; continue; }
-    if (format === 'xray' && cleImposee === null && p?.sorte === 'manuel' && lu.rapport.jeux.length === 1 && !(p.retouche === false && lu.pasFiables)) {
+    if (cle && format !== 'jira' && !forme.test(cle)) { console.log(`ERREUR ${lu.entree} : « ${cle} » n'est pas une clé de ${format === 'zephyr' ? 'cas de test Zephyr Scale (PROJET-T123)' : 'test Xray (PROJET-123)'}`); refus = true; continue; }
+    if (cle && format === 'jira' && !RE_CLE_XRAY.test(cle) && !RE_CLE_ZEPHYR.test(cle)) { console.log(`ERREUR ${lu.entree} : « ${cle} » n'est pas une clé de test (PROJET-123 ou PROJET-T123)`); refus = true; continue; }
+    if (XRAY[format] && cleImposee === null && p?.sorte === 'manuel' && lu.jeux.length === 1 && !(p.retouche === false && lu.pasFiables)) {
       console.log(`note : ${cle} : ${p.retouche !== false ? 'texte retouché depuis l\'import' : 'texte changé depuis l\'exécution'}, les pas ne correspondent plus sûrement à ceux de Xray : statut du test seulement`);
     }
-    lus.push({ ...lu, cle });
+    lus.push({ ...lu, cle, base: cle ?? souche(lu.rapport.scenario?.fichier) });
   }
+  const bases = lus.map((l) => l.base);
+  const doublons = [...new Set(bases.filter((b, k) => bases.indexOf(b) !== k))];
+  if (format === 'jira' && doublons.length) { console.log(`ERREUR deux tests donneraient les mêmes noms de copies d'écran : ${doublons.join(', ')} ; les rendre en deux fois`); refus = true; }
   if (refus) { console.log('Rien n\'est écrit.'); return 2; }
-  const dossierSortie = resolve(sortie ?? (lus.length === 1 ? lus[0].dossier : '.'));
+  const dossierSortie = resolve(sortie ?? campagne ?? (lus.length === 1 ? lus[0].dossier : '.'));
   if (!existsSync(dossierSortie)) { console.log(`ERREUR dossier de sortie introuvable : ${sortie}`); return 2; }
-  const nomBase = lus.length === 1 ? basename(lus[0].rapport.scenario.fichier, '.toml') : 'resultats';
+  const nomBase = campagne ? 'campagne' : lus.length === 1 ? souche(lus[0].rapport.scenario.fichier) : 'resultats';
   const rel = (f) => relative(process.cwd(), f) || f;
-  if (format === 'xray') {
+
+  if (XRAY[format]) {
+    const s = XRAY[format];
     const debut = lus.map((l) => l.rapport.debut).sort()[0];
     const fin = lus.map((l) => l.rapport.fin).sort().at(-1);
     const xray = {
-      info: { summary: lus.length === 1 ? `scenario-playwright : ${lus[0].rapport.scenario.titre}` : `scenario-playwright : ${lus.length} scénarios`, description: 'Résultats écrits par scenario-playwright (resultats.mjs), à importer dans Xray par une personne qui en a le droit.', startDate: debut, finishDate: fin },
-      tests: lus.map((l) => testXray(l, l.cle, preuves)),
+      ...(execution ? { testExecutionKey: execution } : {}),
+      info: { summary: campagne ? `scenario-playwright : campagne, ${lus.length} test${lus.length > 1 ? 's' : ''}` : lus.length === 1 ? `scenario-playwright : ${lus[0].rapport.scenario.titre}` : `scenario-playwright : ${lus.length} scénarios`, description: 'Résultats écrits par scenario-playwright (resultats.mjs), à importer dans Xray par une personne qui en a le droit.', startDate: debut, finishDate: fin },
+      tests: lus.map((l) => testXray(l, l.cle, l.base, preuves, s)),
     };
     const chemin = join(dossierSortie, `xray-${nomBase}.json`);
     writeFileSync(chemin, `${JSON.stringify(xray, null, 2)}\n`);
-    for (const t of xray.tests) console.log(`ok  ${t.testKey} : ${t.status}${t.steps ? `, ${t.steps.length} pas` : ''}${t.examples ? `, ${t.examples.length} exemples` : ''}${t.evidence ? `, ${t.evidence.length} capture${t.evidence.length > 1 ? 's' : ''}` : ''}`);
-    console.log(`Écrit : ${rel(chemin)}, au format JSON de Xray ; à importer dans Xray (Import Execution Results), rien n'est envoyé par le skill (D21.INV-4)`);
+    for (const t of xray.tests) {
+      const pj = (t[s.preuves]?.length ?? 0) + (t.steps ?? []).reduce((n, x) => n + (x[s.preuves]?.length ?? 0), 0);
+      console.log(`ok  ${t.testKey} : ${t.status}${t.steps ? `, ${t.steps.length} pas` : ''}${t.examples ? `, ${t.examples.length} exemples` : ''}${pj ? `, ${pj} capture${pj > 1 ? 's' : ''}` : ''}`);
+    }
+    console.log(`Écrit : ${rel(chemin)}, au format JSON de Xray ${s.variante}${execution ? `, pour l'exécution ${execution}` : ''} ; à importer dans Xray (Import Execution Results), rien n'est envoyé par le skill (D21.INV-4)`);
     return 0;
   }
-  const zephyr = { version: 1, executions: lus.map((l) => ({ source: l.rapport.scenario.fichier, result: l.rapport.statut === 'reussi' ? 'Passed' : 'Failed', testCase: { key: l.cle } })) };
+
+  if (format === 'jira') {
+    const tests = lus.map((l) => ({ cle: l.cle, base: l.base, rapport: l.rapport, jeux: l.jeux, verdict: l.verdict, cause: l.cause, jeu: l.jeu, captures: capturesDuRapport({ ...l.rapport, jeux: l.jeux }, l.base), dossier: l.dossier }));
+    const image = (t, chemin) => (existsSync(join(t.dossier, chemin)) ? readFileSync(join(t.dossier, chemin)).toString('base64') : null);
+    const wiki = join(dossierSortie, 'conformite-jira.txt');
+    const html = join(dossierSortie, 'conformite.html');
+    writeFileSync(wiki, rapportWiki(tests, { preuves }));
+    writeFileSync(html, rapportHtml(tests, { preuves, image }));
+    let copiees = 0;
+    if (preuves) {
+      // Le dossier captures-jira est celui du skill : ses anciennes copies sont retirées, les nouvelles écrites.
+      const d = join(dossierSortie, 'captures-jira');
+      if (existsSync(d)) for (const f of readdirSync(d)) if (/\.png$/i.test(f)) rmSync(join(d, f));
+      mkdirSync(d, { recursive: true });
+      for (const t of tests) for (const c of t.captures) {
+        if (!existsSync(join(t.dossier, c.chemin))) continue;
+        copyFileSync(join(t.dossier, c.chemin), join(d, c.nom));
+        copiees++;
+      }
+    }
+    for (const t of tests) console.log(`ok  ${t.base} : ${LIBELLES_VERDICT[t.verdict]}${t.cause ? ` (${t.jeu ? `jeu ${t.jeu}, ` : ''}${t.cause.genre === 'preparation' ? 'préparation' : 'étape'} ${t.cause.numero})` : ''}`);
+    console.log(`Écrit : ${rel(wiki)} (balisage wiki de Jira Data Center) et ${rel(html)} (à ouvrir, puis à copier-coller dans Jira Cloud)${preuves ? ` ; ${copiees} copie${copiees > 1 ? 's' : ''} d'écran dans ${rel(join(dossierSortie, 'captures-jira'))}, à joindre au ticket` : ' ; sans copie d\'écran : --preuves les ajoute'} ; rien n'est envoyé par le skill (D22.INV-4)`);
+    return 0;
+  }
+
+  const zephyr = { version: 1, executions: lus.map((l) => ({ source: l.rapport.scenario.fichier, result: ZEPHYR[l.verdict], testCase: { key: l.cle } })) };
   const texte = `${JSON.stringify(zephyr, null, 2)}\n`;
   const json = join(dossierSortie, `zephyr-${nomBase}.json`);
   const zip = join(dossierSortie, `zephyr-${nomBase}.zip`);

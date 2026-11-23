@@ -80,7 +80,7 @@ Un scénario que le format texte n'exprime pas n'est pas écrit, et l'import dit
 ## 5. Le texte importé (D16.INV-4)
 
 ```text
-# Importé de Jira par importer.mjs (scenario-playwright 1.5.0), sans IA : le scénario est recopié tel qu'écrit dans Jira.
+# Importé de Jira par importer.mjs (scenario-playwright 1.6.0), sans IA : le scénario est recopié tel qu'écrit dans Jira.
 # Demande : DEMO-8, « Créer un client depuis Jira »
 # Scénario : @DEMO-8-S03, description
 # Source : https://jira.exemple.fr/browse/DEMO-8
@@ -172,7 +172,7 @@ Le lecteur, sans navigateur : MHTML, demande, lignes du HTML, scénarios, étiqu
 
 <!-- fichier : scripts/jira.mjs -->
 ```javascript
-// scenario-playwright 1.5.0 : scénarios Gherkin d'une demande Jira enregistrée en MHTML, lus sans IA.
+// scenario-playwright 1.6.0 : scénarios Gherkin d'une demande Jira enregistrée en MHTML, lus sans IA.
 //
 // Le décodage du MHTML (en-têtes, frontière, quoted-printable, base64, jeu de caractères) et les
 // marqueurs de Jira Cloud et de Jira Data Center sont repris d'agent-tdd-jira 1.3.4 (module
@@ -620,7 +620,7 @@ export function texteImporte(sc, { cle, resume, source, page = null, date, adres
   const jira = origine.nom === 'Jira';
   const facon = sc.manuel ? 'chaque pas du test manuel devient « Quand <action> », avec ses données, puis « Alors <résultat attendu> »' : `le scénario est recopié tel qu'écrit ${origine.dans}`;
   const entete = [
-    `# Importé ${origine.de} par importer.mjs (scenario-playwright 1.5.0), sans IA : ${facon}.`,
+    `# Importé ${origine.de} par importer.mjs (scenario-playwright 1.6.0), sans IA : ${facon}.`,
     jira ? `# Demande : ${cle}${resume ? `, « ${resume} »` : ''}` : `# Lot : ${lot}`,
     `# Scénario : @${sc.etiquette}, ${sc.provenance}`,
     `# Source : ${source}`,
@@ -726,17 +726,20 @@ La ligne de commande : options, genre de la source, page par l'adresse (capture)
 <!-- fichier : scripts/importer.mjs -->
 ```javascript
 #!/usr/bin/env node
-// scenario-playwright 1.5.0 : importe en textes de départ, sans IA, les scénarios Gherkin d'une demande Jira,
-// d'un fichier .feature ou d'une archive .zip d'un export, et les tests de Xray et de Zephyr Scale lus par
-// leur API.
+// scenario-playwright 1.6.0 : importe en textes de départ, sans IA, les scénarios Gherkin d'une demande Jira,
+// d'un fichier .feature ou d'une archive .zip d'un export, les tests de Xray et de Zephyr Scale lus par leur
+// API, et les pages de tests de Xray enregistrées en HTML complet.
 //
 // Usage, depuis n'importe quel dossier :
 //   node <dossier du skill>/scripts/importer.mjs <source> --adresse <url> [--origines o1,o2] [--profil nom]
 //     [--dossier dossier] [--remplacer] [options de la source]
 //   node <dossier du skill>/scripts/importer.mjs <source> --comparer [--dossier dossier] [options de la source]
+//   node <dossier du skill>/scripts/importer.mjs <page.html | dossier de pages> --diagnostic
 // Sources :
 //   page.mhtml | adresse de la demande  demande Jira (D16) ; options --commentaires, --profil-jira nom, --delai-connexion s
 //   fichier.feature | export.zip        scénarios d'un fichier .feature, ou des fichiers .feature d'une archive (D17)
+//   page.html | dossier de pages        pages de tests de Xray enregistrées en HTML complet, avec leurs cadres (D17.INV-7) ;
+//                                       --diagnostic en décrit la structure, sans aucune de leurs valeurs, et n'écrit rien
 //   xray:CLÉ[,CLÉ…]                     tests de Xray Cloud, avec XRAY_CLIENT_ID et XRAY_CLIENT_SECRET ; --api pour une autre région
 //   xray-dc:CLÉ[,CLÉ…]                  tests de Xray Data Center, avec JIRA_TOKEN ; --api <adresse de Jira>
 //   zephyr:CLÉ[,CLÉ…]                   cas de test de Zephyr Scale Cloud, avec ZEPHYR_TOKEN ; --api pour une autre région
@@ -750,23 +753,24 @@ La ligne de commande : options, genre de la source, page par l'adresse (capture)
 // 2 refus avant toute écriture de texte.
 import { Buffer } from 'node:buffer';
 import { createHash } from 'node:crypto';
-import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { basename, join, relative, resolve } from 'node:path';
 import { setTimeout as attendre } from 'node:timers/promises';
 import { pathToFileURL } from 'node:url';
 import { adresseApi, ErreurCas, identitesGherkin, lignesDe, lireJetons, lireSource, lireTests, lireZip, OUTILS, prefixeDe, scenariosDesTests } from './cas.mjs';
 import { attribuerEtiquettes, comparer, ErreurJira, extraireScenarios, lireDemande, lireMhtml, ORIGINES, texteImporte, textesImportes, verifierReglages } from './jira.mjs';
+import { diagnostic, ErreurPage, LIMITES_PAGES, lirePage, pagesDuDossier, testDePage } from './pages.mjs';
 import { dossierProfil, lireReglages, ouvrirNavigateur } from './session.mjs';
 import { origineDe, RE_PROFIL } from './texte.mjs';
 
-const USAGE = 'Usage : node scripts/importer.mjs <page.mhtml | adresse de la demande | fichier.feature | export.zip | xray:CLÉ,… | xray-dc:CLÉ,… | zephyr:CLÉ,… | zephyr-dc:CLÉ,…> --adresse <url> [--origines o1,o2] [--profil nom] [--dossier dossier] [--remplacer | --comparer] [--api url] [--commentaires] [--profil-jira nom] [--delai-connexion s]';
+const USAGE = 'Usage : node scripts/importer.mjs <page.mhtml | adresse de la demande | fichier.feature | export.zip | page.html | dossier de pages | xray:CLÉ,… | xray-dc:CLÉ,… | zephyr:CLÉ,… | zephyr-dc:CLÉ,…> --adresse <url> [--origines o1,o2] [--profil nom] [--dossier dossier] [--remplacer | --comparer | --diagnostic] [--api url] [--commentaires] [--profil-jira nom] [--delai-connexion s]';
 export const PROFIL_JIRA = 'jira';
 export const DELAI_CONNEXION = 300;
 const MARQUEURS = '[data-testid^="issue.views."], #summary-val, #description-val';
 
 /** Lit la ligne de commande ; rend { options } ou { erreur }. */
 export function lireArguments(args) {
-  const o = { source: null, adresse: null, origines: [], profil: null, dossier: 'scenarios', commentaires: false, remplacer: false, comparer: false, profilJira: PROFIL_JIRA, delaiConnexion: DELAI_CONNEXION, api: null, optionsJira: [] };
+  const o = { source: null, adresse: null, origines: [], profil: null, dossier: 'scenarios', commentaires: false, remplacer: false, comparer: false, diagnostic: false, profilJira: PROFIL_JIRA, delaiConnexion: DELAI_CONNEXION, api: null, optionsJira: [] };
   for (let i = 0; i < args.length; i++) {
     const a = args[i];
     const suivant = () => {
@@ -793,6 +797,7 @@ export function lireArguments(args) {
         o.commentaires = true;
       } else if (a === '--remplacer') o.remplacer = true;
       else if (a === '--comparer') o.comparer = true;
+      else if (a === '--diagnostic') o.diagnostic = true;
       else if (a.startsWith('-')) throw new Error(`option inconnue : ${a}`);
       else if (o.source !== null) throw new Error('une seule source à la fois');
       else o.source = a;
@@ -800,8 +805,9 @@ export function lireArguments(args) {
       return { erreur: e.message };
     }
   }
-  if (o.source === null) return { erreur: 'source manquante : page MHTML ou adresse d\'une demande Jira, fichier .feature, archive .zip, ou xray:, xray-dc:, zephyr:, zephyr-dc: suivi des clés des tests' };
+  if (o.source === null) return { erreur: 'source manquante : page MHTML ou adresse d\'une demande Jira, fichier .feature, archive .zip, page .html de Xray ou dossier de pages, ou xray:, xray-dc:, zephyr:, zephyr-dc: suivi des clés des tests' };
   if (o.remplacer && o.comparer) return { erreur: '--comparer n\'écrit rien : sans --remplacer' };
+  if (o.diagnostic && (o.remplacer || o.comparer)) return { erreur: '--diagnostic n\'écrit rien : sans --remplacer ni --comparer' };
   return { options: o };
 }
 
@@ -960,6 +966,62 @@ function lireFichier(o, source, dossier) {
   };
 }
 
+/**
+ * Pages de tests de Xray enregistrées en HTML complet, une page ou un dossier de pages (D17.INV-7) : lues sans
+ * rien exécuter, ni suivre d'adresse ; chaque page donne un test, identifié par sa clé comme par l'API.
+ * Avec --diagnostic, décrit la structure de chaque page sans aucune de ses valeurs et n'écrit rien.
+ */
+function lirePages(o, source, dossier) {
+  const cible = resolve(o.source);
+  let fichiers = [cible];
+  if (source.dossier) {
+    fichiers = pagesDuDossier(cible);
+    if (!fichiers.length) return { code: refus(`${o.source} : aucune page .html ni .htm dans le dossier`) };
+    if (fichiers.length > LIMITES_PAGES.pages) return { code: refus(`${o.source} : ${fichiers.length} pages, ${LIMITES_PAGES.pages} au plus par import`) };
+  }
+  if (o.diagnostic) {
+    console.log(`Diagnostic de ${compte(fichiers.length, 'page', 'pages')}, sans aucune de ${fichiers.length > 1 ? 'leurs' : 'ses'} valeurs : il peut se redire tel quel.`);
+    let lues = 0;
+    fichiers.forEach((f, k) => {
+      try {
+        for (const l of diagnostic(lirePage(f), k + 1)) console.log(l);
+        lues++;
+      } catch (e) {
+        if (!(e instanceof ErreurPage)) throw e;
+        console.log(`page ${k + 1} : ${e.message}`);
+      }
+    });
+    return { code: lues ? 0 : 2 };
+  }
+  const tests = [];
+  const refusees = [];
+  const vues = new Map();
+  for (const f of fichiers) {
+    const nom = basename(f);
+    let lu;
+    try {
+      lu = lirePage(f);
+    } catch (e) {
+      if (!(e instanceof ErreurPage)) throw e;
+      refusees.push({ nom, motif: e.message });
+      continue;
+    }
+    if (!lu.cle) { refusees.push({ nom, motif: 'clé du test introuvable, ni dans le titre de la page, ni dans l\'adresse notée à son enregistrement ; --diagnostic décrit sa structure' }); continue; }
+    if (vues.has(lu.cle)) { refusees.push({ nom, motif: `même test, ${lu.cle}, que la page ${vues.get(lu.cle)} : une page par test` }); continue; }
+    vues.set(lu.cle, nom);
+    const r = testDePage(lu, `page enregistrée ${chemin(dossier, f)} (sha256 ${lu.sha256})`);
+    const detail = r.test.genre === 'pas' ? `${compte(r.test.pas.length, 'pas', 'pas')}, mode ${r.mode}${r.document !== 'page' ? `, dans le ${r.document}` : ''}` : r.test.genre === 'gherkin' ? `scénario Gherkin${r.document !== 'page' ? `, dans le ${r.document}` : ''}` : 'rien de reconnu';
+    console.log(`Page ${nom} : ${lu.cle}${lu.variante ? ` (Xray ${lu.variante === 'cloud' ? 'Cloud' : 'Data Center'})` : ''}, ${detail}`);
+    for (const l of r.limites) console.log(`LIMITE ${nom} : ${l}`);
+    tests.push(r.test);
+  }
+  if (!tests.length && !refusees.length) return { code: refus(`${o.source} : aucune page lue`) };
+  return {
+    scenarios: scenariosDesTests(tests, 'page'), lots: new Set(tests.map((t) => `${OUTILS.page.lot} ${t.cle}`)), prefixe: OUTILS.page.lot, identite: (sc) => sc.cleTest ?? null,
+    origine: ORIGINES.xray, nomLot: 'ce scénario', contexte: {}, introuvables: [], refusees,
+  };
+}
+
 /** Tests de Xray ou de Zephyr Scale, lus par leur API, en lecture seule, avec le jeton de l'environnement (D17). */
 async function lireApi(o, source, env) {
   const outil = OUTILS[source.outil];
@@ -1003,6 +1065,7 @@ function ecrireTextes(o, lecture, dossier) {
   attribuerEtiquettes(lecture.scenarios, lecture.prefixe, importes, lecture.identite);
   const etats = comparer(lecture.scenarios, importes, existants.map((f) => f.fichier), textesImportes(existants, null));
   const introuvables = lecture.introuvables ?? [];
+  const refusees = lecture.refusees ?? [];
   const { dans } = lecture.origine;
   const titre = (e) => (e.sc ? e.sc.titre : '');
 
@@ -1017,7 +1080,8 @@ function ecrireTextes(o, lecture, dossier) {
       if (e.etat in n) n[e.etat]++; else n.autre++;
     }
     for (const i of introuvables) ligne('introuvable', i.cle, i.motif);
-    n.autre += introuvables.length;
+    for (const p of refusees) ligne('refuse', null, `${p.nom} : ${p.motif}`);
+    n.autre += introuvables.length + refusees.length;
     console.log(`Bilan : ${compte(n.identique, 'identique', 'identiques')}, ${compte(n.modifie, 'modifié', 'modifiés')}, ${compte(n.nouveau, 'nouveau', 'nouveaux')}, ${compte(n.disparu, 'disparu', 'disparus')}, ${compte(n.autre, 'non importable', 'non importables')}`);
     return n.modifie + n.nouveau + n.disparu + n.autre === 0 ? 0 : 1;
   }
@@ -1067,7 +1131,8 @@ function ecrireTextes(o, lecture, dossier) {
     }
   }
   for (const i of introuvables) ligne('introuvable', i.cle, i.motif);
-  n.nonEcrit += introuvables.length;
+  for (const p of refusees) ligne('refuse', null, `${p.nom} : ${p.motif}`);
+  n.nonEcrit += introuvables.length + refusees.length;
   console.log(`Bilan : ${compte(n.ecrit, 'écrit', 'écrits')}, ${compte(n.remplace, 'remplacé', 'remplacés')}, ${compte(n.inchange, 'inchangé', 'inchangés')}, ${compte(n.nonEcrit, 'non écrit', 'non écrits')}, ${compte(n.disparu, 'disparu', 'disparus')}`);
   if (n.ecrit + n.remplace > 0) console.log(`Dossier : ${dossier} ; ensuite, pour chaque texte écrit : verifier.mjs, puis la traduction et sa ratification.`);
   return n.nonEcrit === 0 ? 0 : 1;
@@ -1077,11 +1142,14 @@ export async function main(args, env = process.env) {
   const lu = lireArguments(args);
   if (lu.erreur) return refus([lu.erreur, USAGE]);
   const o = lu.options;
-  const source = lireSource(o.source);
+  const estDossier = existsSync(o.source) && statSync(o.source).isDirectory();
+  const source = estDossier ? { genre: 'page', dossier: true } : lireSource(o.source);
   if (source.erreur) return refus([source.erreur, USAGE]);
+  if (o.diagnostic && source.genre !== 'page') return refus('--diagnostic : pour une page .html de Xray ou un dossier de pages seulement');
+  if (source.genre === 'page' && !source.dossier && !existsSync(resolve(o.source))) return refus(`${o.source} : fichier introuvable`);
   if (source.genre !== 'jira' && o.optionsJira.length) return refus(`${[...new Set(o.optionsJira)].join(', ')} : pour une demande Jira seulement`);
   if (source.genre !== 'api' && o.api !== null) return refus('--api : pour xray:, xray-dc:, zephyr: et zephyr-dc: seulement');
-  if (!o.comparer) {
+  if (!o.comparer && !o.diagnostic) {
     const erreurs = verifierReglages(o);
     if (erreurs.length) return refus(erreurs);
   }
@@ -1091,6 +1159,7 @@ export async function main(args, env = process.env) {
   let lecture;
   if (source.genre === 'jira') lecture = await lireJira(o, source, { reglages, dossier });
   else if (source.genre === 'api') lecture = await lireApi(o, source, env);
+  else if (source.genre === 'page') lecture = lirePages(o, source, dossier);
   else lecture = lireFichier(o, source, dossier);
   if (lecture.code !== undefined) return lecture.code;
   return ecrireTextes(o, lecture, dossier);

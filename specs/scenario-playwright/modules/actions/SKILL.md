@@ -46,7 +46,7 @@ Chaque étape attend un état, jamais une durée : un élément actionnable pour
 
 Une vérification interroge l'état jusqu'à son délai. Son échec donne l'attendu et l'obtenu : `attendu : un texte qui contient « Fournisseurs » ; obtenu : texte « Clients »`, `attendu : 99 éléments ; obtenu : 3 éléments`. Chaque vérification à l'écran a sa capture, de la zone de la cible si elle est visible, sinon de la page (D8.INV-2).
 
-Hors de l'écran, `requete` observe les requêtes que la page a faites depuis la dernière action, `api` lit une ressource en GET sur une origine déclarée, avec la session du profil, et `fichier` lit un fichier téléchargé par une étape `telecharger` nommée : module `hors-ecran`. Ces vérifications ne prennent pas de cible ; elles ont leur relevé dans le rapport, et une capture à l'échec seulement.
+Hors de l'écran, `requete` observe les requêtes que la page a faites depuis la dernière action, `api` lit une ressource en GET sur une origine déclarée, avec la session du profil, et `fichier` lit un fichier téléchargé par une étape `telecharger` nommée : module `hors-ecran`. Ces vérifications ne prennent pas de cible ; elles ont leur relevé dans le rapport, et, depuis 1.6.0, la capture de la page, réussies ou non (D22.INV-2).
 
 Une adresse attendue (`verifier` et `url`, `attendre` et `url`, `jusqua.url`) se compare ainsi :
 
@@ -70,7 +70,7 @@ Une étape qui crée, modifie ou supprime des données porte `mutation` : sa lig
 
 ## 7. Point d'extension E3
 
-`jouerScenario(contexte, options)` joue des jeux préparés dans un contexte de navigateur ouvert, et rend la liste des jeux joués, chacun avec ses entrées de préparation et de nettoyage et ses étapes au format du rapport (module `preuves`, § 2). Options : `scenario` (validé), `jeux` (préparés par `preparerJeux` du module `scenario`), `resultats` (dossier), `journal` (rendu par `garderOrigines` du module `session`), `delai` (s), `autoriserMutations`, `surEvenement` (avancement : début d'un jeu, début et fin d'une étape, d'une étape d'un scénario de préparation et d'une entrée, étape à la main). La garde des appels hors du poste tient pour tout appelant (D20.INV-3). `jouer.mjs` en est le premier appelant ; la recette en est un second (R8).
+`jouerScenario(contexte, options)` joue des jeux préparés dans un contexte de navigateur ouvert, et rend la liste des jeux joués, chacun avec ses entrées de préparation et de nettoyage, ses étapes et la capture de l'écran à la fin de ses étapes, au format du rapport (module `preuves`, § 2). Options : `scenario` (validé), `jeux` (préparés par `preparerJeux` du module `scenario`), `resultats` (dossier), `journal` (rendu par `garderOrigines` du module `session`), `delai` (s), `autoriserMutations`, `surEvenement` (avancement : début d'un jeu, début et fin d'une étape, d'une étape d'un scénario de préparation et d'une entrée, étape à la main). La garde des appels hors du poste tient pour tout appelant (D20.INV-3). `jouer.mjs` en est le premier appelant, pour un scénario ou pour chaque scénario d'une campagne, dans le même contexte (module `conformite`, § 2) ; la recette en est un second (R8).
 
 ## 8. Contrôle de sortie
 
@@ -85,7 +85,7 @@ Une étape qui crée, modifie ou supprime des données porte `mutation` : sa lig
 
 <!-- fichier : scripts/moteur.mjs -->
 ```javascript
-// scenario-playwright 1.5.0 : moteur des étapes, jeu d'actions fermé, préparation et nettoyage des données.
+// scenario-playwright 1.6.0 : moteur des étapes, jeu d'actions fermé, préparation et nettoyage des données.
 //
 // Chaque étape agit comme une personne devant l'écran, sur une cible résolue côté utilisateur (D4).
 // Aucune étape n'exécute de code dans la page (D5.INV-1) ; les attentes portent sur un état, dans un
@@ -112,6 +112,7 @@ export const INTERVALLES_API = [250, 500, 1000, 2000];
 export const LIMITES_HORS_ECRAN = { corps: 65536, reponse: 262144, api: 1048576, fichier: 10485760, requetes: 500 };
 const TYPES_RELEVES = new Set(['document', 'xhr', 'fetch']);
 const ETAPES_SANS_ACTION = new Set(['verifier', 'attendre', 'capturer']);
+const HORS_ECRAN = new Set(['requete', 'api', 'fichier']);
 
 /** Texte comparé : espaces regroupés, bords retirés. */
 export const normaliserTexte = (s) => String(s ?? '').replace(/\s+/g, ' ').trim();
@@ -722,7 +723,7 @@ export async function jouerScenario(contexte, { scenario, jeux, resultats, journ
     const gardees = new Map();
     const prefixeJeu = plusieurs ? `j${jeu.numero}-` : '';
     const ctx = { scenario, resultats, journal, delai, autoriserMutations, surEvenement, reseau, telechargements: new Map(), gardees, numeroJeu: jeu.numero, seau, prefixeJeu };
-    const resultat = { numero: jeu.numero, valeurs: jeu.valeurs, statut: 'reussi', preparation: [], etapes: [], nettoyage: [], gardees: {}, nettoyage_en_echec: 0 };
+    const resultat = { numero: jeu.numero, valeurs: jeu.valeurs, statut: 'reussi', preparation: [], etapes: [], nettoyage: [], gardees: {}, nettoyage_en_echec: 0, capture_fin: null };
     surEvenement({ type: 'jeu', jeu: jeu.numero, valeurs: jeu.valeurs, plusieurs });
     const preparation = jeu.preparation ?? [];
     const positions = positionsPreparation(jeu.etapes, preparation);
@@ -739,6 +740,8 @@ export async function jouerScenario(contexte, { scenario, jeux, resultats, journ
     const suite = await jouerSuite(page, jeu.etapes, ctx, { avant, prefixe: (i) => `${prefixeJeu}${String(i + 1).padStart(2, '0')}` });
     resultat.etapes = suite.etapes;
     resultat.statut = suite.statut;
+    // L'écran à la fin des étapes, avant le nettoyage, réussite ou échec (D22.INV-2).
+    resultat.capture_fin = await captureFin(page, resultats, prefixeJeu);
     // Le nettoyage se joue après les étapes, même après un échec ; ses échecs ne changent pas le statut (D20.INV-4).
     for (const n of jeu.nettoyage ?? []) {
       const r = await jouerEntree(page, n, ctx, null);
@@ -768,6 +771,16 @@ async function preuvesEchec(page, resultats, prefixe, r, action = r.action) {
     writeFileSync(join(resultats, rel), `${arbre}\n`);
     r.aria = rel;
   } catch { /* pas d'instantané */ }
+}
+
+/** Copie de l'écran à la fin des étapes d'un jeu : captures/fin.png, ou j<n>-fin.png ; null si la page ne la permet pas. */
+async function captureFin(page, resultats, prefixeJeu) {
+  if (page.isClosed()) return null;
+  try {
+    return await capture(null, page, resultats, `captures/${prefixeJeu}fin.png`, { timeout: 10_000 });
+  } catch {
+    return null;
+  }
 }
 
 async function capture(cible, page, resultats, rel, options = {}) {
@@ -809,9 +822,14 @@ async function jouerEtape(page, e, { delaiMs, scenario, resultats, prefixe, r, s
     }
     case 'attendre': return attendre(page, e, delaiMs, scenario.url_base);
     case 'verifier':
-      if (e.critere === 'requete') return verifierRequete(e, { delaiMs, scenario, reseau, r });
-      if (e.critere === 'api') return verifierApi(page, e, { delaiMs, scenario, r });
-      if (e.critere === 'fichier') return verifierFichier(e, { telechargements, r });
+      if (HORS_ECRAN.has(e.critere)) {
+        if (e.critere === 'requete') await verifierRequete(e, { delaiMs, scenario, reseau, r });
+        else if (e.critere === 'api') await verifierApi(page, e, { delaiMs, scenario, r });
+        else verifierFichier(e, { telechargements, r });
+        // Une vérification hors de l'écran a aussi sa copie d'écran, celle de la page à ce moment (D22.INV-2).
+        r.capture = await capture(null, page, resultats, `captures/${prefixe}-verifier.png`, { timeout: 5000 }).catch(() => null);
+        return;
+      }
       try {
         await verifier(page, e, delaiMs, scenario.url_base);
       } finally {

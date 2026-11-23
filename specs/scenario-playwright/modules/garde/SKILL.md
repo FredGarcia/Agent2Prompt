@@ -23,6 +23,8 @@ Le scénario déclare ses origines : `origines`, sinon celle de `url_base`. Une 
 
 La fenêtre de Jira qu'ouvre l'import par l'adresse (module `jira`, § 2) ne joue aucun scénario : elle n'est pas gardée, et le skill n'y fait que naviguer vers l'adresse donnée (D16.INV-1).
 
+Dans une campagne, la garde suit les origines de chaque scénario : avant chaque scénario, elle prend celles qu'il déclare, et une origine qu'un autre scénario de la campagne déclare reste bloquée pour lui (module `conformite`, § 2 ; D22.INV-1).
+
 Un test exporté reprend cette garde par ses aides, là où il joue, après correspondance des origines par `SCENARIO_ORIGINES`, et la garde des mutations par `SCENARIO_AUTORISER_MUTATIONS` (module `export`, § 5 ; D21.INV-3).
 
 Une origine bloquée qui manque à l'application, une API, un fournisseur d'identité, un CDN de polices, s'ajoute au texte de départ par le développeur (`Origines :`). La traduction est alors périmée par l'empreinte : elle se refait, et se ratifie (D3.INV-2). La règle est celle du navigateur d'Agent2Test (`agent2test:D4.INV-2`).
@@ -33,7 +35,7 @@ Sont sur le poste les origines d'hôte `127.0.0.1`, `localhost` et `[::1]` ; tou
 
 - un scénario qui a une étape de mutation, un appel de préparation ou de nettoyage, ou un scénario de préparation qui modifie des données (D20.INV-3), et déclare une origine hors du poste, n'est joué qu'avec `--autoriser-mutations` ; sans cette option, `jouer.mjs` le refuse avec le code 2, avant d'ouvrir le navigateur, et cite les étapes et les origines en cause ;
 - à l'étape, une mutation sur une page hors du poste échoue sans agir quand l'autorisation manque, et un appel de préparation vers une origine hors du poste n'est pas fait : la garde tient aussi pour un autre appelant du moteur (E3) ;
-- l'autorisation vaut pour une exécution : l'agent la demande au développeur à chaque fois, et ne la donne jamais lui-même (D10.INV-2) ;
+- l'autorisation vaut pour une exécution, une campagne entière comprise : l'agent la demande au développeur à chaque fois, en citant les scénarios qui modifient des données, et ne la donne jamais lui-même (D10.INV-2) ;
 - `verifier.mjs` signale ces scénarios avant toute exécution.
 
 Une origine du poste qui relaie une API distante, comme un serveur de développement avec proxy, se déclare aussi : l'origine distante, déclarée, déclenche la garde.
