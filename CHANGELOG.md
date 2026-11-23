@@ -100,7 +100,7 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 - **scenario-playwright 1.6.1**, correctif de la recette et de la documentation de 1.6.0, fusionnée avant la fin de l'essai des défauts réintroduits.
   - Recette : sous un défaut qui arrête une campagne au premier test en échec (M172), R41 lisait un test absent de `campagne.json`, et la recette s'arrêtait avant la fin ; les contrôles de R41, R42 et R43 qui lisent un test, un pas ou une copie d'écran sans le trouver échouent désormais sans l'arrêter. Toujours 43 scénarios et 605 contrôles, sans échec, sous Node 26, 24 et 22.
-  - Essai des défauts : en cours sur le code de 1.6.1, cent quatre-vingt-dix défauts réintroduits, dont trente-deux nouveaux pour 1.6.0 ; la table du module recette suivra.
+  - Essai des défauts : cent quatre-vingt-dix défauts réintroduits un à un sur le code de 1.6.1, dont trente-deux nouveaux pour 1.6.0 (pages enregistrées, campagne, copies d'écran, verdict, rapport de conformité, résultats de campagne pour Xray) et quatre motifs de 1.5.0 adaptés au nouveau `resultats.mjs` (M149, M151 à M153) ; chacun relevé, la recette allant au bout pour chacun. Des cent cinquante-huit défauts de 1.5.0, douze sont relevés en plus par R38 à R43, aucun n'est perdu ; la table du module recette les donne tous.
   - L'entrée 1.6.0 du journal annonçait les défauts tous rejoués : elle dit désormais que leur essai, en cours à la publication, est rendu en 1.6.1 ; l'archive de 1.6.0 reste telle que publiée.
 - Mode d'emploi et README mis à jour.
 

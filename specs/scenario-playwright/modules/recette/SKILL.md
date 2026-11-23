@@ -134,28 +134,28 @@ Le projet de démonstration, `tests/projet-demo.mjs`, s'écrit dans un dossier t
 
 ## 4. Contrôle de la recette elle-même
 
-Cent cinquante-huit défauts, réintroduits un à un dans le code, font chacun échouer la recette par le scénario attendu (essai du 22 novembre 2026, Node 26.13.0, Chromium 159 : les cent cinquante-huit rejoués en 1.5.0, sur le code publié) :
+Cent quatre-vingt-dix défauts, réintroduits un à un dans le code, font chacun échouer la recette par le scénario attendu (essai du 23 novembre 2026, Node 26.13.0, Chromium 159 : les cent quatre-vingt-dix rejoués en 1.6.1, sur le code publié) :
 
 | ID | Défaut réintroduit | Scénarios en échec | Contrôles en échec |
 |---|---|---|---|
-| M1 | La garde des origines laisse passer toute requête | R7 | 2 |
+| M1 | La garde des origines laisse passer toute requête | R7, R40 | 3 |
 | M2 | Les WebSocket ne sont pas gardés | R7 | 3 |
 | M3 | Pas de refus avant le navigateur d'un scénario qui modifie des données hors du poste | R8, R30 | 2 |
 | M4 | Pas de garde à l'étape de mutation | R8 | 1 |
 | M5 | L'empreinte du texte n'est pas contrôlée | R3, R20, R35 | 4 |
 | M6 | Une ligne du texte peut rester sans étape | R3 | 1 |
 | M7 | Une marque de mutation du texte peut se perdre | R3 | 1 |
-| M8 | Une vérification échouée arrête les vérifications suivantes | R6, R28, R29, R36 | 10 |
-| M9 | Une étape échouée n'arrête pas la suite | R6, R7, R36 | 3 |
-| M10 | Délai de 30 s pour toute étape, sans tenir compte des réglages | R6, R9, R11 | 4 |
+| M8 | Une vérification échouée arrête les vérifications suivantes | R6, R28, R29, R36, R38, R41 | 12 |
+| M9 | Une étape échouée n'arrête pas la suite | R6, R7, R36, R41, R43 | 6 |
+| M10 | Délai de 30 s pour toute étape, sans tenir compte des réglages | R6, R9, R11, R40, R41 | 6 |
 | M11 | Une étape à la main est acceptée sans fenêtre | R9, R30 | 2 |
 | M12 | Une variable non déclarée est acceptée | R2, R30 | 2 |
 | M13 | --param ne l'emporte plus sur [parametres] ni sur le jeu | R2, R10, R30, R34 | 6 |
 | M14 | Un fichier absolu ou hors du dossier du scénario est accepté | R2, R30 | 3 |
-| M15 | Une cible ambiguë agit sur le premier élément | R5, R6, R29 | 13 |
-| M16 | Pas de capture pour une vérification | R5, R10, R34 | 3 |
+| M15 | Une cible ambiguë agit sur le premier élément | R5, R6, R29, R43 | 18 |
+| M16 | Pas de capture pour une vérification | R5, R10, R34, R38, R41, R42, R43 | 7 |
 | M17 | Navigateur ancien de trois versions accepté sans avertissement | R14 | 1 |
-| M18 | Champ origines_bloquees du rapport renommé | R5, R6, R7, R8, R9, R10, R11, R14, R16, R17, R20, R28, R29, R32, R33, R34, R36, R38 | 103 |
+| M18 | Champ origines_bloquees du rapport renommé | R5, R6, R7, R8, R9, R10, R11, R14, R16, R17, R20, R28, R29, R32, R33, R34, R36, R38, R40, R41, R42, R43 | 113 |
 | M19 | Une étape main est acceptée sur une ligne non marquée | R3 | 1 |
 | M20 | La désignation clique l'élément désigné | R13 | 3 |
 | M21 | Les commentaires de Jira Cloud sont lus sans --commentaires | R18, R20 | 8 |
@@ -173,7 +173,7 @@ Cent cinquante-huit défauts, réintroduits un à un dans le code, font chacun �
 | M33 | Le jeton passe dans l'adresse de la requête | R25 | 1 |
 | M34 | L'import écrit dans Jira : une étiquette ajoutée au test | R25 | 1 |
 | M35 | Une requête GraphQL de mutation part vers Xray Cloud | R25 | 1 |
-| M36 | Le résultat attendu d'un pas manuel est perdu | R23, R24, R36, R38 | 21 |
+| M36 | Le résultat attendu d'un pas manuel est perdu | R23, R24, R36, R38, R39, R43 | 25 |
 | M37 | L'étiquette @TestCaseKey= de Zephyr Scale n'est pas reconnue | R22 | 2 |
 | M38 | Une clé portée par des scénarios de titres différents devient leur identité | R22 | 5 |
 | M39 | Le même test, lu d'un autre chemin d'import, est en conflit avec son texte | R22, R23 | 5 |
@@ -239,12 +239,12 @@ Cent cinquante-huit défauts, réintroduits un à un dans le code, font chacun �
 | M99 | Un paramètre inconnu du scénario de préparation est accepté | R30 | 1 |
 | M100 | Tous les jeux d'une exécution reçoivent le même ${unique} | R30, R33 | 2 |
 | M101 | Le scénario de préparation ne reçoit pas le ${unique} du jeu | R30, R36 | 4 |
-| M102 | `<unique>` d'un exemple n'est pas remplacé | R30, R36, R38 | 7 |
+| M102 | <unique> d'un exemple n'est pas remplacé | R30, R36, R38 | 7 |
 | M103 | Aucune valeur n'est gardée de la réponse d'une préparation | R32, R33, R36 | 17 |
 | M104 | Un jeton du chemin d'un appel n'est pas masqué dans son résumé | R32 | 1 |
 | M105 | Une préparation peut suivre les étapes ordinaires | R30 | 1 |
 | M106 | La marque (nettoyage par l’API), à l'apostrophe typographique, n'est pas reconnue | R30 | 4 |
-| M107 | `<unique>` est accepté comme paramètre du texte | R30 | 1 |
+| M107 | <unique> est accepté comme paramètre du texte | R30 | 1 |
 | M108 | L'index garde toutes les classes, pas seulement celles des corps | R26, R31 | 3 |
 | M109 | Un endpoint proposé entre dans le squelette hors commentaire | R31 | 3 |
 | M110 | Un endpoint de lecture est proposé pour une préparation | R31 | 2 |
@@ -284,20 +284,52 @@ Cent cinquante-huit défauts, réintroduits un à un dans le code, font chacun �
 | M144 | Un nettoyage exporté dont une valeur gardée manque est joué | R37 | 1 |
 | M145 | Un appel exporté ne recopie pas le jeton anti-CSRF | R36 | 4 |
 | M146 | ${unique} est le même pour tous les jeux d'un test exporté | R36 | 3 |
-| M147 | `<unique>` d'un jeu n'est pas remplacé dans un test exporté | R36 | 3 |
+| M147 | <unique> d'un jeu n'est pas remplacé dans un test exporté | R36 | 3 |
 | M148 | Les pas d'un texte retouché depuis l'import ont un statut | R38 | 1 |
-| M149 | Les captures s'ajoutent sans --preuves | R38 | 1 |
+| M149 | Les captures s'ajoutent sans --preuves | R38, R43 | 3 |
 | M150 | --cle ne l'emporte pas sur la clé retenue à l'import | R38 | 1 |
 | M151 | La forme de la clé n'est pas contrôlée | R38 | 1 |
-| M152 | Zephyr Scale reçoit Passed pour une exécution en échec | R38 | 1 |
-| M153 | Le scénario joué n'est cherché que dans le dossier du rapport | R38 | 5 |
-| M154 | Chaque ligne du texte devient un pas de Xray | R38 | 2 |
+| M152 | Zephyr Scale reçoit Passed pour une exécution en échec | R38, R43 | 2 |
+| M153 | Le scénario joué n'est cherché que dans le dossier du rapport | R38, R43 | 10 |
+| M154 | Chaque ligne du texte devient un pas de Xray | R38, R43 | 4 |
 | M155 | Un test exporté ne masque pas un paramètre secret d'une adresse | R36 | 1 |
 | M156 | Un test exporté laisse passer tout WebSocket | R37 | 1 |
 | M157 | Deux scénarios qui donnent le même test sont exportés | R35 | 2 |
-| M158 | `<unique>` des paramètres d'un scénario de préparation n'est pas remplacé dans un test exporté | R36 | 6 |
+| M158 | <unique> des paramètres d'un scénario de préparation n'est pas remplacé dans un test exporté | R36 | 6 |
+| M159 | Le texte des éléments masqués d'une page enregistrée est lu | R39, R43 | 4 |
+| M160 | Un cadre hors du dossier de la page est lu | R39 | 2 |
+| M161 | Les pas en tableau ne sont pas reconnus | R39, R43 | 3 |
+| M162 | Les pas en mode formulaire ne sont pas reconnus | R39, R43 | 8 |
+| M163 | Le numéro du pas suivant entre dans le résultat attendu | R39 | 1 |
+| M164 | Des pas affichés deux fois sont gardés deux fois | R39 | 1 |
+| M165 | La clé n'est pas prise de l'adresse notée à l'enregistrement | R39, R43 | 4 |
+| M166 | Deux pages du même test sont toutes deux importées | R39 | 1 |
+| M167 | Le diagnostic dit la clé du test | R39 | 1 |
+| M168 | Un scénario refusé n'arrête que lui : la campagne joue les autres | R40 | 1 |
+| M169 | Des scénarios de profils différents se jouent dans une même campagne | R40 | 1 |
+| M170 | La garde d'une campagne garde les origines du premier scénario | R40 | 1 |
+| M171 | Une origine qu'un scénario déclare reste permise pour les suivants | R40 | 1 |
+| M172 | Un test en échec arrête la campagne | R40, R41, R42, R43 | 17 |
+| M173 | --jeu est accepté pour une campagne | R40 | 1 |
+| M174 | Campagne.json cite le chemin absolu du scénario | R40 | 2 |
+| M175 | Une vérification hors de l'écran réussie n'a pas de copie d'écran | R29 | 1 |
+| M176 | L'écran à la fin des étapes n'est pas copié | R38, R41, R42, R43 | 8 |
+| M177 | Une action en échec rend le test non conforme au lieu de bloqué | R40, R41, R42, R43 | 12 |
+| M178 | Une préparation en échec ne rend pas le test bloqué | R41 | 1 |
+| M179 | Un nettoyage en échec change le verdict | R41 | 1 |
+| M180 | Bloqué l'emporte sur non conforme | R40, R41 | 2 |
+| M181 | Resultats.mjs tire le verdict du statut : un test bloqué devient FAILED | R42, R43 | 5 |
+| M182 | Le balisage wiki n'échappe pas les caractères de mise en forme | R42 | 3 |
+| M183 | Les copies d'écran du rapport de conformité s'écrivent sans --preuves | R42 | 1 |
+| M184 | Les noms des copies d'écran d'un test à plusieurs jeux n'ont pas leur préfixe de jeu | R41 | 1 |
+| M185 | La page HTML n'échappe pas le texte des rapports | R42 | 1 |
+| M186 | L'exécution de test donnée par --execution n'est pas reprise | R43 | 1 |
+| M187 | Les copies d'écran des pas vont toutes sur le test | R43 | 2 |
+| M188 | Xray Data Center reçoit les statuts de Xray Cloud | R43 | 1 |
+| M189 | La session ne passe pas d'un scénario à l'autre de la campagne | R11, R32, R33, R40, R42 | 19 |
+| M190 | Une grille aux rôles ARIA n'est pas lue comme un tableau | R39 | 3 |
 
-Chaque défaut a été retiré après son essai ; la recette du code publié passe en entier.
+Chaque défaut a été retiré après son essai ; la recette du code publié passe en entier. Sous chacun, la recette est allée jusqu'au bout : un contrôle qui ne trouve pas ce qu'il lit échoue, sans arrêter les suivants.
 
 ## 5. Recette en intégration continue
 
