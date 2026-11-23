@@ -105,7 +105,7 @@ node <skill>/scripts/importer.mjs pages --diagnostic
 - **Lue sans rien exécuter** : la page et ses cadres se lisent comme du texte, en UTF-8, ou en Windows-1252 quand la page le déclare ; aucun script n'est exécuté, aucune adresse n'est suivie. Le texte des scripts, des styles, des menus de choix, des boutons, des dessins, de l'en-tête et des éléments masqués (`hidden`, `display: none`, `visibility: hidden`) n'est pas lu.
 - **Cadres** : un cadre n'est lu que s'il est un fichier `.html` du dossier de la page ou de ses sous-dossiers, sans lien symbolique, sur deux niveaux au plus ; un cadre à une adresse distante, hors du dossier, absent ou trop gros n'est pas lu, et une `LIMITE` le compte. Bornes : 20 Mio par page ou par cadre, 20 cadres, 60 Mio pour une page et ses cadres.
 - **Clé et résumé** : du titre de la page, `[DEMO-21] Créer un client - Jira`, le nom du site retiré ; sans clé dans le titre, la clé de l'adresse que Chrome note en tête de la page (`saved from url`), et le résumé du titre. Une page sans clé est refusée. La variante, Cloud ou Data Center, se reconnaît aux marqueurs de la page et de ses cadres ; elle n'est qu'indiquée.
-- **Pas** : reconnus à leurs libellés visibles, en français ou en anglais, sans tenir compte de la casse, des accents, ni des deux-points : Action (`Action`, `Step`, `Étape`, `Pas`…), Données (`Data`, `Test Data`, `Données`…), Résultat attendu (`Expected Result`, `Résultat attendu`…). En tableau, une colonne par libellé, une ligne par pas, l'en-tête répété écarté. En mode formulaire, chaque libellé Action ouvre un pas, et chaque libellé prend les textes qui le suivent, jusqu'au libellé suivant ; un numéro de pas (`Étape 2`, ou `2` juste avant un libellé Action) ou le libellé d'un autre champ (`Statut`, `Commentaire`, `Preuves`, `Anomalies`, `Préconditions`…) termine la valeur sans y entrer. Le tableau l'emporte sur le formulaire ; des pas affichés deux fois ne se gardent qu'une fois ; des pas dans plusieurs documents de la page : ceux du document qui en a le plus, chaque fois signalé par une `LIMITE`.
+- **Pas** : reconnus à leurs libellés visibles, en français ou en anglais, sans tenir compte de la casse, des accents, ni des deux-points : Action (`Action`, `Step`, `Étape`, `Pas`…), Données (`Data`, `Test Data`, `Données`…), Résultat attendu (`Expected Result`, `Résultat attendu`…). En tableau, un tableau HTML ou une grille aux rôles ARIA (`grid`, `row`, `columnheader`, `gridcell`), une colonne par libellé, une ligne par pas, l'en-tête répété écarté. En mode formulaire, chaque libellé Action ouvre un pas, et chaque libellé prend les textes qui le suivent, jusqu'au libellé suivant ; un numéro de pas (`Étape 2`, ou `2` juste avant un libellé Action) ou le libellé d'un autre champ (`Statut`, `Commentaire`, `Preuves`, `Anomalies`, `Préconditions`…) termine la valeur sans y entrer. Le tableau l'emporte sur le formulaire ; des pas affichés deux fois ne se gardent qu'une fois ; des pas dans plusieurs documents de la page : ceux du document qui en a le plus, chaque fois signalé par une `LIMITE`.
 - **Test Cucumber** : une page sans pas, dont un seul document porte un scénario Gherkin, donne ce scénario, recopié par le lecteur de Gherkin (module `jira`, § 4).
 - **Rien de reconnu** : la page est refusée, avec son motif, et `--diagnostic` décrit sa structure.
 
@@ -692,10 +692,10 @@ Lecture d'une page enregistrée et de ses cadres, sans rien exécuter : nœuds d
 // lus comme du texte : aucun script n'y est exécuté, aucune adresse n'est suivie, et un cadre n'est lu que
 // s'il est un fichier du dossier de la page, sans lien symbolique (D17.INV-7). Les pas sont reconnus à leurs
 // libellés visibles, Action, Données et Résultat attendu, en français ou en anglais, en mode formulaire
-// (chaque libellé suivi de sa valeur) ou en tableau (une colonne par libellé) ; une page sans pas peut porter
-// le scénario Gherkin d'un test Cucumber. La clé et le résumé du test viennent du titre de la page, ou de
-// l'adresse notée par Chrome à l'enregistrement. diagnostic() décrit la structure d'une page sans aucune de
-// ses valeurs : ni texte, ni adresse, ni clé, ni nom de fichier (D17.INV-7).
+// (chaque libellé suivi de sa valeur) ou en tableau (une colonne par libellé), tableau HTML ou grille aux rôles
+// ARIA ; une page sans pas peut porter le scénario Gherkin d'un test Cucumber. La clé et le résumé du test
+// viennent du titre de la page, ou de l'adresse notée par Chrome à l'enregistrement. diagnostic() décrit la
+// structure d'une page sans aucune de ses valeurs : ni texte, ni adresse, ni clé, ni nom de fichier (D17.INV-7).
 import { createHash } from 'node:crypto';
 import { existsSync, lstatSync, readdirSync, readFileSync } from 'node:fs';
 import { basename, dirname, extname, join, resolve, sep } from 'node:path';
@@ -747,6 +747,9 @@ const ECARTES = new Set(['script', 'style', 'xmp', 'title', 'noembed', 'noframes
 /** Fermetures implicites : ouvrir l'un de ces éléments ferme celui du même genre encore ouvert. */
 const FERME = { td: ['td', 'th'], th: ['td', 'th'], tr: ['tr', 'td', 'th'], li: ['li'], p: ['p'], dt: ['dt', 'dd'], dd: ['dt', 'dd'], option: ['option'] };
 const BORNES = new Set(['table', 'ul', 'ol', 'dl', 'body', 'html']);
+/** Rôles ARIA d'un tableau fait d'autres éléments que table, tr et td : grille de div d'une application. */
+const ROLES_TABLE = new Set(['table', 'grid', 'treegrid']);
+const ROLES_CELLULE = new Set(['cell', 'gridcell', 'columnheader', 'rowheader']);
 const RE_BALISE = /<!--[\s\S]*?(?:-->|$)|<!\[CDATA\[[\s\S]*?(?:\]\]>|$)|<![^>]*>|<\?[^>]*>|<(\/?)([A-Za-z][A-Za-z0-9:_-]*)((?:[^>"']|"[^"]*"|'[^']*')*)>/g;
 
 function attribut(attrs, nom) {
@@ -763,7 +766,8 @@ function decrireElement(el) {
 
 /**
  * Nœuds de texte d'un document HTML, dans l'ordre de la page : { texte, chemin, cellule } ; `cellule` situe un
- * texte dans un tableau : { table, ligne, colonne, entete }. Le texte des éléments écartés n'est pas lu.
+ * texte dans un tableau : { table, ligne, colonne, entete }, un tableau HTML ou une grille aux rôles ARIA (grid,
+ * row, columnheader, gridcell…). Le texte des éléments écartés n'est pas lu.
  */
 export function noeudsDe(html) {
   const noeuds = [];
@@ -785,8 +789,8 @@ export function noeudsDe(html) {
     if (k < 0) return;
     while (pile.length > k) {
       const e = pile.pop();
-      if (e.balise === 'table') tables.pop();
-      else if ((e.balise === 'td' || e.balise === 'th') && tables.at(-1)?.cellule === e.cellule) tables.at(-1).cellule = null;
+      if (e.table) tables.pop();
+      else if (e.cellule && tables.at(-1)?.cellule === e.cellule) tables.at(-1).cellule = null;
     }
   };
   RE_BALISE.lastIndex = 0;
@@ -819,19 +823,20 @@ export function noeudsDe(html) {
     if (VIDES.has(balise) || /\/\s*$/.test(attrs)) continue;
     const nus = attrs.replace(/=\s*(?:"[^"]*"|'[^']*'|[^\s"'>]+)/g, '');
     const masque = /(?:^|\s)hidden(?:\s|$)/i.test(nus) || /display\s*:\s*none|visibility\s*:\s*hidden/i.test(attribut(attrs, 'style') ?? '');
-    const el = { balise, classes: (attribut(attrs, 'class') ?? '').split(/\s+/).filter(Boolean), testid: attribut(attrs, 'data-testid'), ecarte: ECARTES.has(balise) || masque };
+    const role = (attribut(attrs, 'role') ?? '').trim().toLowerCase();
+    const el = { balise, classes: (attribut(attrs, 'class') ?? '').split(/\s+/).filter(Boolean), testid: attribut(attrs, 'data-testid'), ecarte: ECARTES.has(balise) || masque, table: balise === 'table' || ROLES_TABLE.has(role) };
     pile.push(el);
-    if (balise === 'table') tables.push({ id: ++compteurTables, ligne: -1, colonne: -1, cellule: null, dansEntete: false });
-    else if (balise === 'thead') { if (tables.at(-1)) tables.at(-1).dansEntete = true; } else if (balise === 'tbody' || balise === 'tfoot') { if (tables.at(-1)) tables.at(-1).dansEntete = false; } else if (balise === 'tr' && tables.at(-1)) {
+    if (el.table) tables.push({ id: ++compteurTables, ligne: -1, colonne: -1, cellule: null, dansEntete: false });
+    else if (balise === 'thead') { if (tables.at(-1)) tables.at(-1).dansEntete = true; } else if (balise === 'tbody' || balise === 'tfoot') { if (tables.at(-1)) tables.at(-1).dansEntete = false; } else if ((balise === 'tr' || role === 'row') && tables.at(-1)) {
       const t = tables.at(-1);
       t.ligne++;
       t.colonne = -1;
       t.enteteLigne = t.dansEntete;
-    } else if ((balise === 'td' || balise === 'th') && tables.at(-1)) {
+    } else if ((balise === 'td' || balise === 'th' || ROLES_CELLULE.has(role)) && tables.at(-1)) {
       const t = tables.at(-1);
-      const etendue = Math.max(1, Math.min(50, Number(attribut(attrs, 'colspan')) || 1));
+      const etendue = Math.max(1, Math.min(50, Number(attribut(attrs, 'colspan') ?? attribut(attrs, 'aria-colspan')) || 1));
       t.colonne++;
-      el.cellule = { colonne: t.colonne, entete: balise === 'th' || Boolean(t.enteteLigne) };
+      el.cellule = { colonne: t.colonne, entete: balise === 'th' || role === 'columnheader' || role === 'rowheader' || Boolean(t.enteteLigne) };
       t.colonne += etendue - 1;
       t.cellule = el.cellule;
     }

@@ -286,15 +286,16 @@ statut = [204, 404]
 
 La dernière étape vérifie hors de l'écran ce qu'un testeur lirait dans l'onglet réseau : la requête que le clic sur « Enregistrer » a fait partir, son statut et les champs de son corps (module `hors-ecran`). La ligne marquée « (nettoyage par l'API) » ne donne pas d'étape : son entrée `[[nettoyage]]` supprime le client créé par l'API, avec la session du navigateur, après les étapes, même si l'une a échoué ; `<unique>`, dans les noms des exemples, rend chaque client propre à l'exécution, et le nettoyage ne vise que lui ; une ligne « (par l'API) » préparerait de même, avant les étapes, des données dont une valeur, l'identifiant créé, peut servir aux étapes (module `donnees`). Si le code du projet est sur le poste, `indexer.mjs` l'a indexé avant la traduction, sans IA et sans rien exécuter (module `code`) : le squelette porte alors, sous chaque étape, en commentaire, les cibles de l'index dont le nom correspond aux libellés entre guillemets de la phrase, comme `cible = { role = "link", nom = "Nouveau client" }  # src/app/clients/clients.component.html:2`, et l'IA y lit les noms, les routes et les endpoints ; `verifier.mjs` note ensuite une cible absente de l'index, sans refuser le scénario.
 
-Le même texte peut venir de Jira, où le scénario est écrit dans la description ou un champ de texte de la demande (module `jira`) : `importer.mjs` le recopie sans IA dans `ECR-77-S01.scenario`, sous un en-tête de provenance, avec l'adresse donnée par `--adresse`. Il peut aussi venir d'un test de Xray ou de Zephyr Scale, exporté en `.feature` ou lu par l'API (module `cas-de-test`) : le texte se nomme alors par la clé du test, `ECR-80.scenario`, et un test manuel y devient, pas à pas, « Quand <action> » puis « Alors <résultat attendu> ».
+Le même texte peut venir de Jira, où le scénario est écrit dans la description ou un champ de texte de la demande (module `jira`) : `importer.mjs` le recopie sans IA dans `ECR-77-S01.scenario`, sous un en-tête de provenance, avec l'adresse donnée par `--adresse`. Il peut aussi venir d'un test de Xray ou de Zephyr Scale, exporté en `.feature`, lu par l'API ou depuis sa page enregistrée (module `cas-de-test`) : le texte se nomme alors par la clé du test, `ECR-80.scenario`, et un test manuel y devient, pas à pas, « Quand <action> » puis « Alors <résultat attendu> ».
 
 Ce que produit une exécution, dans le dossier `resultats/` à côté du scénario (module `preuves`) :
 
 ```text
 resultats/20261120-141503-creer-client/
-  rapport.json                 champs stables (E1) : scénario, navigateur, options, chaque jeu et chaque étape
+  rapport.json                 champs stables (E1) : scénario, navigateur, options, chaque jeu et chaque étape, verdict
   rapport.md                   le même rapport, lisible
   captures/j1-06-verifier.png  une capture par vérification, par capture demandée et par échec
+  captures/j1-fin.png          l'écran à la fin des étapes de chaque jeu
   aria/j2-05-cliquer.yml       l'instantané ARIA de la page, à chaque échec
   telechargements/…            les fichiers téléchargés, avec leur empreinte dans le rapport
   trace.zip                    seulement avec --trace
@@ -482,7 +483,7 @@ Points d'extension, actifs depuis la version indiquée :
 - **D17.INV-4** : la clé du test est l'identité de son scénario : clé demandée à l'API ; dans un fichier, étiquette `@TestCaseKey=` de Zephyr Scale, sinon première étiquette propre au scénario qui est une clé de Jira, préfixe `TEST_` retiré, sauf si un scénario d'un autre titre la porte aussi, sinon étiquette `<CLÉ>-Snn` ; à défaut, une étiquette `<fichier>-Snn` est reprise par le titre ou attribuée comme en D16.INV-4. Un texte importé d'une autre source sous la même identité est celui du même scénario : il se compare et se remplace selon D16.INV-5, jamais en conflit.
 - **D17.INV-5** : un test Cucumber ou BDD est recopié tel qu'écrit, sous un titre formé de son résumé quand ses étapes n'en ont pas ; un test manuel devient, pas à pas, « Quand <action> », avec ses données, puis « Alors <résultat attendu> », une partie de plusieurs lignes jointe par « ; », une partie vide omise, la conversion dite dès la première ligne du texte ; un test générique, en texte libre, qui appelle un autre cas, sans résumé, sans pas ou avec un pas vide est refusé avec son motif ; les préconditions sont signalées en tête du texte, non reprises.
 - **D17.INV-6** : un texte importé hors de Jira commence par sa provenance : l'outil ou le fichier dont il vient et ce que l'import en a fait, recopie ou conversion d'un test manuel ; son lot (fichier, archive ou test) ; l'étiquette et la provenance du scénario ; l'adresse de l'API qui l'a rendu, ou le chemin du fichier ou de l'archive et son empreinte sha256 ; la date ; l'empreinte de la source et celle du texte importé ; puis ses notes ; un même test donne le même texte et la même empreinte par Xray Cloud ou Data Center, par sa page enregistrée, par Zephyr Scale Cloud ou Data Center.
-- **D17.INV-7** : une page de test de Xray enregistrée par Chrome en HTML complet, ou chaque page `.html` d'un dossier, 200 au plus, se lit sans IA, comme du texte : aucun script n'est exécuté, aucune adresse n'est suivie ; le texte des scripts, des styles, des menus de choix, des boutons et des éléments masqués n'est pas lu ; un cadre n'est lu que s'il est un fichier du dossier de la page, sans lien symbolique, sur deux niveaux au plus, en taille et en nombre bornés, un autre cadre étant compté sans être lu ; la clé vient du titre de la page ou de l'adresse notée à son enregistrement, une page sans clé et une seconde page du même test sont refusées ; les pas se reconnaissent à leurs libellés Action, Données et Résultat attendu, en français ou en anglais, en tableau ou en mode formulaire, sinon le scénario Gherkin d'un seul document, sinon la page est refusée avec son motif ; le test suit D17.INV-4 à D17.INV-6, sous le lot de sa clé ; `--diagnostic` décrit la structure de chaque page sans aucune de ses valeurs, ni texte, ni clé, ni adresse, ni nom de fichier, et n'écrit rien.
+- **D17.INV-7** : une page de test de Xray enregistrée par Chrome en HTML complet, ou chaque page `.html` d'un dossier, 200 au plus, se lit sans IA, comme du texte : aucun script n'est exécuté, aucune adresse n'est suivie ; le texte des scripts, des styles, des menus de choix, des boutons et des éléments masqués n'est pas lu ; un cadre n'est lu que s'il est un fichier du dossier de la page, sans lien symbolique, sur deux niveaux au plus, en taille et en nombre bornés, un autre cadre étant compté sans être lu ; la clé vient du titre de la page ou de l'adresse notée à son enregistrement, une page sans clé et une seconde page du même test sont refusées ; les pas se reconnaissent à leurs libellés Action, Données et Résultat attendu, en français ou en anglais, en tableau, HTML ou aux rôles ARIA, ou en mode formulaire, sinon le scénario Gherkin d'un seul document, sinon la page est refusée avec son motif ; le test suit D17.INV-4 à D17.INV-6, sous le lot de sa clé ; `--diagnostic` décrit la structure de chaque page sans aucune de ses valeurs, ni texte, ni clé, ni adresse, ni nom de fichier, et n'écrit rien.
 
 **D18 : index du code du projet**
 
@@ -747,7 +748,7 @@ Les options, la sortie et les codes de `indexer.mjs` sont au module `code`, § 2
 | `scripts/jira.mjs` | `jira`, § 9 | `5de199562fb88d76a25abc86706cfa9d6c6c20461ff9930690404d844b629f9a` |
 | `scripts/importer.mjs` | `jira`, § 10 | `af5085648e44e1f6f57a6b8eb9332d395303ddb552287646d0c86953e5d62481` |
 | `scripts/cas.mjs` | `cas-de-test`, § 11 | `26647346439f04f8978df92dae04a6b668b21541f4e18eebc2fa221d692b2c00` |
-| `scripts/pages.mjs` | `cas-de-test`, § 12 | `c60934d7d2376c2bba15642ec23af3f0f10e0ad0285c12808f674ecad399c3f4` |
+| `scripts/pages.mjs` | `cas-de-test`, § 12 | `7b75ddb96e7df3092edde68cf62c9c88b66441d282a925fb22a8d573a6de6f2e` |
 | `scripts/lecteurs.mjs` | `code`, § 11 | `ba1b740bbe32cf22b1a9aeddc31c8daa3cb6a95f6d1771490d9dc729eace699a` |
 | `scripts/code.mjs` | `code`, § 12 | `c76026ea2860b2790667c339671049ee42d880e566d3150ee75c4ae1c77b743f` |
 | `scripts/indexer.mjs` | `code`, § 13 | `4e99417aee5e00b79a089689ecddfe6dbd75986874a7a2b774b98587ea320e21` |
@@ -773,12 +774,12 @@ Les options, la sortie et les codes de `indexer.mjs` sont au module `code`, § 2
 | `commandes/scenario/resultats.toml` | `agent`, § 7 | `482b40e5161a35c1b321f1342fb2de3591db349daf2695df431ac12131a87857` |
 | `tests/application-demo.mjs` | `recette`, § 6 | `620a1fb83bc86da85235a9f54315af24e969450373b571affb2d50586c4f288d` |
 | `tests/projet-demo.mjs` | `recette`, § 6 | `1199b29f45aa6d72f6ce8acc614425789b2ef1627381ae01e7fc9d5e864b982c` |
-| `tests/run-tests.mjs` | `recette`, § 6 | `389c779500991165bb7fc3675c68e277d80412778cd850afafb8165903d8813a` |
+| `tests/run-tests.mjs` | `recette`, § 6 | `8f6462d538ec1bcd5cf2769c796906684edd7d96ee0ee1d10ee24ce0304ac440` |
 
 Depuis le dossier du skill, cette commande d'une ligne écrit les trente-sept fichiers, compare leurs empreintes à celles du tableau et sort avec le code 1 au moindre écart. Elle ne contient ni `$`, ni accent grave, ni `!`, ni `%`, ni guillemet intérieur : elle se colle telle quelle dans bash, zsh, CMD ou PowerShell, et dans un fichier `.cmd`. Elle lit aussi des modules aux fins de ligne CRLF.
 
 ```text
-node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'package.json': 'c2eca393a577d626934087633c7f709b14a6039e0c51358049601813f32bdddb', 'package-lock.json': '74d64990985a7a008b4ce61cb22e40839e1cc9ac7a1171a20a749abc713b171c', '.gitignore': '03bf7f97f17a0d1abb005b6480ec3b0f06a0b9c29c1d1f83131209b52b888a7e', 'scripts/jouer.mjs': '45db460454a28d622568c45ba35f63d438299d99e29509df6298ea1906019818', 'scripts/verifier.mjs': '7ae8aba352aa3baac8527a5a54acab9bb67323c039b3eaf873558608a96a8aff', 'scripts/traduire.mjs': '8a99813c6abee6b0a36fca3140712e8be5d6b36f5ff5946c0fa724ba154757a5', 'scripts/texte.mjs': 'd0618c387370c04003ab4a3218ad68451ebb310a02bac225b30de504d590f216', 'scripts/jira.mjs': '5de199562fb88d76a25abc86706cfa9d6c6c20461ff9930690404d844b629f9a', 'scripts/importer.mjs': 'af5085648e44e1f6f57a6b8eb9332d395303ddb552287646d0c86953e5d62481', 'scripts/cas.mjs': '26647346439f04f8978df92dae04a6b668b21541f4e18eebc2fa221d692b2c00', 'scripts/pages.mjs': 'c60934d7d2376c2bba15642ec23af3f0f10e0ad0285c12808f674ecad399c3f4', 'scripts/lecteurs.mjs': 'ba1b740bbe32cf22b1a9aeddc31c8daa3cb6a95f6d1771490d9dc729eace699a', 'scripts/code.mjs': 'c76026ea2860b2790667c339671049ee42d880e566d3150ee75c4ae1c77b743f', 'scripts/indexer.mjs': '4e99417aee5e00b79a089689ecddfe6dbd75986874a7a2b774b98587ea320e21', 'scripts/toml.mjs': 'f9cd1cdf7532ee7e9cb47644b31a2e0a22ec3394e8c8b5989113d4517784f2f9', 'scripts/scenario.mjs': '6286c628dc82498f9a3cf50577198b2b2bf62b73a1b5527502030b1672bffe5c', 'scripts/cibles.mjs': '1a8053c9a28adfe25e21fa650b92986b41e6b73732f27fff3f1452dcfe86abd6', 'scripts/moteur.mjs': 'af359463dd57f3c5c7a08cd18e6ef1d8f19530b3df98d138ceb561a2ee132c9f', 'scripts/session.mjs': '53a5250bf4071485136237960e7a407d007c885162ddefcee21a263effc533e8', 'scripts/rapport.mjs': 'a0cb9a221b21a79e4ada6aa01b3f3949011cd972e095f85122e347f74b51e94d', 'scripts/designer.mjs': 'fc17df256d18659cecb4523e3e6aaa0097be21d0b203c1ec63ccb512ad222d3a', 'scripts/export.mjs': 'e0740384769fbb9b0514738783307f556c507b12119c6afd1f27f733d4fef2bb', 'scripts/aides-export.mjs': 'e9c9891b8bd76c2099419f34d37d23f2d013053ea5d115dbcd7a1de6e787de7b', 'scripts/exporter.mjs': '0555c4086a360fdbf10737f46d635fc2e0dd07146c0fa66d8b21caf58fdbd0cb', 'scripts/resultats.mjs': '431784ea3ba2bd5cee032da02e17f2eb0c4cd946dc91c85f332f96814bca45cb', 'scripts/conformite.mjs': 'e9ac9d528e8fbbda63951642c0b8a8b29eba631f01493e54bac5116cd4b47eb9', 'agent/pilote-scenario.md': '651ddfa724e4838b56681af1409d0901dbeb7b1ca01f0373e2e96eb9663cf9f2', 'commandes/scenario/importer.toml': '50f8aa813ed98e9a598f57e4869822275bb13d4149d6b845c15d6afd34b92fb9', 'commandes/scenario/indexer.toml': 'fbd2fec14af90f697e3ac24ab2a74d2d76061c8e052070b2d70b9c155e4f1a11', 'commandes/scenario/traduire.toml': '837c9010e0bee25a7b9de020aea84e950a699c8796ff8f6a5a24391a865f4818', 'commandes/scenario/jouer.toml': 'c8073c24ddef0008cade0ac2d9721e35ca6dd07faf6c94da1967f4d911ba339e', 'commandes/scenario/designer.toml': '0e4965f346a1944e0321f5ab524cd47f95c137f5bf77882e9fcc2e40b4b296d9', 'commandes/scenario/exporter.toml': '5231548b7e125145256d6a7b3d62c6f2cd41e7b79af99a0ea3ac05f897738ba4', 'commandes/scenario/resultats.toml': '482b40e5161a35c1b321f1342fb2de3591db349daf2695df431ac12131a87857', 'tests/application-demo.mjs': '620a1fb83bc86da85235a9f54315af24e969450373b571affb2d50586c4f288d', 'tests/projet-demo.mjs': '1199b29f45aa6d72f6ce8acc614425789b2ef1627381ae01e7fc9d5e864b982c', 'tests/run-tests.mjs': '389c779500991165bb7fc3675c68e277d80412778cd850afafb8165903d8813a' }; const vus = new Set(); let ecarts = 0; for (const module of ['modules/execution/SKILL.md', 'modules/texte/SKILL.md', 'modules/jira/SKILL.md', 'modules/cas-de-test/SKILL.md', 'modules/code/SKILL.md', 'modules/scenario/SKILL.md', 'modules/cibles/SKILL.md', 'modules/actions/SKILL.md', 'modules/session/SKILL.md', 'modules/preuves/SKILL.md', 'modules/designer/SKILL.md', 'modules/export/SKILL.md', 'modules/conformite/SKILL.md', 'modules/agent/SKILL.md', 'modules/recette/SKILL.md']) { const texte = fs.readFileSync(module, 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); vus.add(m[1]); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (conforme === false) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } } for (const f of Object.keys(attendu)) if (vus.has(f) === false) { ecarts++; console.log('ABSENT    ' + f); } if (ecarts > 0) process.exitCode = 1;"
+node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'package.json': 'c2eca393a577d626934087633c7f709b14a6039e0c51358049601813f32bdddb', 'package-lock.json': '74d64990985a7a008b4ce61cb22e40839e1cc9ac7a1171a20a749abc713b171c', '.gitignore': '03bf7f97f17a0d1abb005b6480ec3b0f06a0b9c29c1d1f83131209b52b888a7e', 'scripts/jouer.mjs': '45db460454a28d622568c45ba35f63d438299d99e29509df6298ea1906019818', 'scripts/verifier.mjs': '7ae8aba352aa3baac8527a5a54acab9bb67323c039b3eaf873558608a96a8aff', 'scripts/traduire.mjs': '8a99813c6abee6b0a36fca3140712e8be5d6b36f5ff5946c0fa724ba154757a5', 'scripts/texte.mjs': 'd0618c387370c04003ab4a3218ad68451ebb310a02bac225b30de504d590f216', 'scripts/jira.mjs': '5de199562fb88d76a25abc86706cfa9d6c6c20461ff9930690404d844b629f9a', 'scripts/importer.mjs': 'af5085648e44e1f6f57a6b8eb9332d395303ddb552287646d0c86953e5d62481', 'scripts/cas.mjs': '26647346439f04f8978df92dae04a6b668b21541f4e18eebc2fa221d692b2c00', 'scripts/pages.mjs': '7b75ddb96e7df3092edde68cf62c9c88b66441d282a925fb22a8d573a6de6f2e', 'scripts/lecteurs.mjs': 'ba1b740bbe32cf22b1a9aeddc31c8daa3cb6a95f6d1771490d9dc729eace699a', 'scripts/code.mjs': 'c76026ea2860b2790667c339671049ee42d880e566d3150ee75c4ae1c77b743f', 'scripts/indexer.mjs': '4e99417aee5e00b79a089689ecddfe6dbd75986874a7a2b774b98587ea320e21', 'scripts/toml.mjs': 'f9cd1cdf7532ee7e9cb47644b31a2e0a22ec3394e8c8b5989113d4517784f2f9', 'scripts/scenario.mjs': '6286c628dc82498f9a3cf50577198b2b2bf62b73a1b5527502030b1672bffe5c', 'scripts/cibles.mjs': '1a8053c9a28adfe25e21fa650b92986b41e6b73732f27fff3f1452dcfe86abd6', 'scripts/moteur.mjs': 'af359463dd57f3c5c7a08cd18e6ef1d8f19530b3df98d138ceb561a2ee132c9f', 'scripts/session.mjs': '53a5250bf4071485136237960e7a407d007c885162ddefcee21a263effc533e8', 'scripts/rapport.mjs': 'a0cb9a221b21a79e4ada6aa01b3f3949011cd972e095f85122e347f74b51e94d', 'scripts/designer.mjs': 'fc17df256d18659cecb4523e3e6aaa0097be21d0b203c1ec63ccb512ad222d3a', 'scripts/export.mjs': 'e0740384769fbb9b0514738783307f556c507b12119c6afd1f27f733d4fef2bb', 'scripts/aides-export.mjs': 'e9c9891b8bd76c2099419f34d37d23f2d013053ea5d115dbcd7a1de6e787de7b', 'scripts/exporter.mjs': '0555c4086a360fdbf10737f46d635fc2e0dd07146c0fa66d8b21caf58fdbd0cb', 'scripts/resultats.mjs': '431784ea3ba2bd5cee032da02e17f2eb0c4cd946dc91c85f332f96814bca45cb', 'scripts/conformite.mjs': 'e9ac9d528e8fbbda63951642c0b8a8b29eba631f01493e54bac5116cd4b47eb9', 'agent/pilote-scenario.md': '651ddfa724e4838b56681af1409d0901dbeb7b1ca01f0373e2e96eb9663cf9f2', 'commandes/scenario/importer.toml': '50f8aa813ed98e9a598f57e4869822275bb13d4149d6b845c15d6afd34b92fb9', 'commandes/scenario/indexer.toml': 'fbd2fec14af90f697e3ac24ab2a74d2d76061c8e052070b2d70b9c155e4f1a11', 'commandes/scenario/traduire.toml': '837c9010e0bee25a7b9de020aea84e950a699c8796ff8f6a5a24391a865f4818', 'commandes/scenario/jouer.toml': 'c8073c24ddef0008cade0ac2d9721e35ca6dd07faf6c94da1967f4d911ba339e', 'commandes/scenario/designer.toml': '0e4965f346a1944e0321f5ab524cd47f95c137f5bf77882e9fcc2e40b4b296d9', 'commandes/scenario/exporter.toml': '5231548b7e125145256d6a7b3d62c6f2cd41e7b79af99a0ea3ac05f897738ba4', 'commandes/scenario/resultats.toml': '482b40e5161a35c1b321f1342fb2de3591db349daf2695df431ac12131a87857', 'tests/application-demo.mjs': '620a1fb83bc86da85235a9f54315af24e969450373b571affb2d50586c4f288d', 'tests/projet-demo.mjs': '1199b29f45aa6d72f6ce8acc614425789b2ef1627381ae01e7fc9d5e864b982c', 'tests/run-tests.mjs': '8f6462d538ec1bcd5cf2769c796906684edd7d96ee0ee1d10ee24ce0304ac440' }; const vus = new Set(); let ecarts = 0; for (const module of ['modules/execution/SKILL.md', 'modules/texte/SKILL.md', 'modules/jira/SKILL.md', 'modules/cas-de-test/SKILL.md', 'modules/code/SKILL.md', 'modules/scenario/SKILL.md', 'modules/cibles/SKILL.md', 'modules/actions/SKILL.md', 'modules/session/SKILL.md', 'modules/preuves/SKILL.md', 'modules/designer/SKILL.md', 'modules/export/SKILL.md', 'modules/conformite/SKILL.md', 'modules/agent/SKILL.md', 'modules/recette/SKILL.md']) { const texte = fs.readFileSync(module, 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); vus.add(m[1]); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (conforme === false) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } } for (const f of Object.keys(attendu)) if (vus.has(f) === false) { ecarts++; console.log('ABSENT    ' + f); } if (ecarts > 0) process.exitCode = 1;"
 ```
 
 Puis, depuis le même dossier : `npm ci`, et la recette, `npm test` (sous Linux sans écran, `xvfb-run -a npm test`).
@@ -3135,7 +3136,7 @@ node <skill>/scripts/importer.mjs pages --diagnostic
 - **Lue sans rien exécuter** : la page et ses cadres se lisent comme du texte, en UTF-8, ou en Windows-1252 quand la page le déclare ; aucun script n'est exécuté, aucune adresse n'est suivie. Le texte des scripts, des styles, des menus de choix, des boutons, des dessins, de l'en-tête et des éléments masqués (`hidden`, `display: none`, `visibility: hidden`) n'est pas lu.
 - **Cadres** : un cadre n'est lu que s'il est un fichier `.html` du dossier de la page ou de ses sous-dossiers, sans lien symbolique, sur deux niveaux au plus ; un cadre à une adresse distante, hors du dossier, absent ou trop gros n'est pas lu, et une `LIMITE` le compte. Bornes : 20 Mio par page ou par cadre, 20 cadres, 60 Mio pour une page et ses cadres.
 - **Clé et résumé** : du titre de la page, `[DEMO-21] Créer un client - Jira`, le nom du site retiré ; sans clé dans le titre, la clé de l'adresse que Chrome note en tête de la page (`saved from url`), et le résumé du titre. Une page sans clé est refusée. La variante, Cloud ou Data Center, se reconnaît aux marqueurs de la page et de ses cadres ; elle n'est qu'indiquée.
-- **Pas** : reconnus à leurs libellés visibles, en français ou en anglais, sans tenir compte de la casse, des accents, ni des deux-points : Action (`Action`, `Step`, `Étape`, `Pas`…), Données (`Data`, `Test Data`, `Données`…), Résultat attendu (`Expected Result`, `Résultat attendu`…). En tableau, une colonne par libellé, une ligne par pas, l'en-tête répété écarté. En mode formulaire, chaque libellé Action ouvre un pas, et chaque libellé prend les textes qui le suivent, jusqu'au libellé suivant ; un numéro de pas (`Étape 2`, ou `2` juste avant un libellé Action) ou le libellé d'un autre champ (`Statut`, `Commentaire`, `Preuves`, `Anomalies`, `Préconditions`…) termine la valeur sans y entrer. Le tableau l'emporte sur le formulaire ; des pas affichés deux fois ne se gardent qu'une fois ; des pas dans plusieurs documents de la page : ceux du document qui en a le plus, chaque fois signalé par une `LIMITE`.
+- **Pas** : reconnus à leurs libellés visibles, en français ou en anglais, sans tenir compte de la casse, des accents, ni des deux-points : Action (`Action`, `Step`, `Étape`, `Pas`…), Données (`Data`, `Test Data`, `Données`…), Résultat attendu (`Expected Result`, `Résultat attendu`…). En tableau, un tableau HTML ou une grille aux rôles ARIA (`grid`, `row`, `columnheader`, `gridcell`), une colonne par libellé, une ligne par pas, l'en-tête répété écarté. En mode formulaire, chaque libellé Action ouvre un pas, et chaque libellé prend les textes qui le suivent, jusqu'au libellé suivant ; un numéro de pas (`Étape 2`, ou `2` juste avant un libellé Action) ou le libellé d'un autre champ (`Statut`, `Commentaire`, `Preuves`, `Anomalies`, `Préconditions`…) termine la valeur sans y entrer. Le tableau l'emporte sur le formulaire ; des pas affichés deux fois ne se gardent qu'une fois ; des pas dans plusieurs documents de la page : ceux du document qui en a le plus, chaque fois signalé par une `LIMITE`.
 - **Test Cucumber** : une page sans pas, dont un seul document porte un scénario Gherkin, donne ce scénario, recopié par le lecteur de Gherkin (module `jira`, § 4).
 - **Rien de reconnu** : la page est refusée, avec son motif, et `--diagnostic` décrit sa structure.
 
@@ -3722,10 +3723,10 @@ Lecture d'une page enregistrée et de ses cadres, sans rien exécuter : nœuds d
 // lus comme du texte : aucun script n'y est exécuté, aucune adresse n'est suivie, et un cadre n'est lu que
 // s'il est un fichier du dossier de la page, sans lien symbolique (D17.INV-7). Les pas sont reconnus à leurs
 // libellés visibles, Action, Données et Résultat attendu, en français ou en anglais, en mode formulaire
-// (chaque libellé suivi de sa valeur) ou en tableau (une colonne par libellé) ; une page sans pas peut porter
-// le scénario Gherkin d'un test Cucumber. La clé et le résumé du test viennent du titre de la page, ou de
-// l'adresse notée par Chrome à l'enregistrement. diagnostic() décrit la structure d'une page sans aucune de
-// ses valeurs : ni texte, ni adresse, ni clé, ni nom de fichier (D17.INV-7).
+// (chaque libellé suivi de sa valeur) ou en tableau (une colonne par libellé), tableau HTML ou grille aux rôles
+// ARIA ; une page sans pas peut porter le scénario Gherkin d'un test Cucumber. La clé et le résumé du test
+// viennent du titre de la page, ou de l'adresse notée par Chrome à l'enregistrement. diagnostic() décrit la
+// structure d'une page sans aucune de ses valeurs : ni texte, ni adresse, ni clé, ni nom de fichier (D17.INV-7).
 import { createHash } from 'node:crypto';
 import { existsSync, lstatSync, readdirSync, readFileSync } from 'node:fs';
 import { basename, dirname, extname, join, resolve, sep } from 'node:path';
@@ -3777,6 +3778,9 @@ const ECARTES = new Set(['script', 'style', 'xmp', 'title', 'noembed', 'noframes
 /** Fermetures implicites : ouvrir l'un de ces éléments ferme celui du même genre encore ouvert. */
 const FERME = { td: ['td', 'th'], th: ['td', 'th'], tr: ['tr', 'td', 'th'], li: ['li'], p: ['p'], dt: ['dt', 'dd'], dd: ['dt', 'dd'], option: ['option'] };
 const BORNES = new Set(['table', 'ul', 'ol', 'dl', 'body', 'html']);
+/** Rôles ARIA d'un tableau fait d'autres éléments que table, tr et td : grille de div d'une application. */
+const ROLES_TABLE = new Set(['table', 'grid', 'treegrid']);
+const ROLES_CELLULE = new Set(['cell', 'gridcell', 'columnheader', 'rowheader']);
 const RE_BALISE = /<!--[\s\S]*?(?:-->|$)|<!\[CDATA\[[\s\S]*?(?:\]\]>|$)|<![^>]*>|<\?[^>]*>|<(\/?)([A-Za-z][A-Za-z0-9:_-]*)((?:[^>"']|"[^"]*"|'[^']*')*)>/g;
 
 function attribut(attrs, nom) {
@@ -3793,7 +3797,8 @@ function decrireElement(el) {
 
 /**
  * Nœuds de texte d'un document HTML, dans l'ordre de la page : { texte, chemin, cellule } ; `cellule` situe un
- * texte dans un tableau : { table, ligne, colonne, entete }. Le texte des éléments écartés n'est pas lu.
+ * texte dans un tableau : { table, ligne, colonne, entete }, un tableau HTML ou une grille aux rôles ARIA (grid,
+ * row, columnheader, gridcell…). Le texte des éléments écartés n'est pas lu.
  */
 export function noeudsDe(html) {
   const noeuds = [];
@@ -3815,8 +3820,8 @@ export function noeudsDe(html) {
     if (k < 0) return;
     while (pile.length > k) {
       const e = pile.pop();
-      if (e.balise === 'table') tables.pop();
-      else if ((e.balise === 'td' || e.balise === 'th') && tables.at(-1)?.cellule === e.cellule) tables.at(-1).cellule = null;
+      if (e.table) tables.pop();
+      else if (e.cellule && tables.at(-1)?.cellule === e.cellule) tables.at(-1).cellule = null;
     }
   };
   RE_BALISE.lastIndex = 0;
@@ -3849,19 +3854,20 @@ export function noeudsDe(html) {
     if (VIDES.has(balise) || /\/\s*$/.test(attrs)) continue;
     const nus = attrs.replace(/=\s*(?:"[^"]*"|'[^']*'|[^\s"'>]+)/g, '');
     const masque = /(?:^|\s)hidden(?:\s|$)/i.test(nus) || /display\s*:\s*none|visibility\s*:\s*hidden/i.test(attribut(attrs, 'style') ?? '');
-    const el = { balise, classes: (attribut(attrs, 'class') ?? '').split(/\s+/).filter(Boolean), testid: attribut(attrs, 'data-testid'), ecarte: ECARTES.has(balise) || masque };
+    const role = (attribut(attrs, 'role') ?? '').trim().toLowerCase();
+    const el = { balise, classes: (attribut(attrs, 'class') ?? '').split(/\s+/).filter(Boolean), testid: attribut(attrs, 'data-testid'), ecarte: ECARTES.has(balise) || masque, table: balise === 'table' || ROLES_TABLE.has(role) };
     pile.push(el);
-    if (balise === 'table') tables.push({ id: ++compteurTables, ligne: -1, colonne: -1, cellule: null, dansEntete: false });
-    else if (balise === 'thead') { if (tables.at(-1)) tables.at(-1).dansEntete = true; } else if (balise === 'tbody' || balise === 'tfoot') { if (tables.at(-1)) tables.at(-1).dansEntete = false; } else if (balise === 'tr' && tables.at(-1)) {
+    if (el.table) tables.push({ id: ++compteurTables, ligne: -1, colonne: -1, cellule: null, dansEntete: false });
+    else if (balise === 'thead') { if (tables.at(-1)) tables.at(-1).dansEntete = true; } else if (balise === 'tbody' || balise === 'tfoot') { if (tables.at(-1)) tables.at(-1).dansEntete = false; } else if ((balise === 'tr' || role === 'row') && tables.at(-1)) {
       const t = tables.at(-1);
       t.ligne++;
       t.colonne = -1;
       t.enteteLigne = t.dansEntete;
-    } else if ((balise === 'td' || balise === 'th') && tables.at(-1)) {
+    } else if ((balise === 'td' || balise === 'th' || ROLES_CELLULE.has(role)) && tables.at(-1)) {
       const t = tables.at(-1);
-      const etendue = Math.max(1, Math.min(50, Number(attribut(attrs, 'colspan')) || 1));
+      const etendue = Math.max(1, Math.min(50, Number(attribut(attrs, 'colspan') ?? attribut(attrs, 'aria-colspan')) || 1));
       t.colonne++;
-      el.cellule = { colonne: t.colonne, entete: balise === 'th' || Boolean(t.enteteLigne) };
+      el.cellule = { colonne: t.colonne, entete: balise === 'th' || role === 'columnheader' || role === 'rowheader' || Boolean(t.enteteLigne) };
       t.colonne += etendue - 1;
       t.cellule = el.cellule;
     }
@@ -11907,7 +11913,7 @@ flowchart LR
 node <skill>/scripts/jouer.mjs <dossier de scénarios | scénario.toml>... [--param nom=valeur]... [--resultats dossier] [--sans-tete] [--ralenti ms] [--autoriser-mutations]
 ```
 
-Deux scénarios ou plus font une campagne : un dossier donne ses scénarios `.toml`, dans l'ordre de leur nom, ses sous-dossiers non parcourus ; des fichiers se jouent dans l'ordre donné. Un scénario de préparation (module `donnees`) se range donc hors du dossier de la campagne, dans un sous-dossier par exemple, pour n'être joué que par le scénario qui le nomme.
+Deux scénarios ou plus font une campagne : un dossier donne ses scénarios `.toml`, dans l'ordre de leur nom, ses sous-dossiers non parcourus ; des fichiers se jouent dans l'ordre donné ; un dossier d'un seul scénario le joue seul, comme une exécution ordinaire. Un scénario de préparation (module `donnees`) se range donc hors du dossier de la campagne, dans un sous-dossier par exemple, pour n'être joué que par le scénario qui le nomme.
 
 - **Tout est contrôlé avant la première action** : chaque scénario est lu, validé et contrôlé comme pour une exécution seule, sa traduction comprise, avec la garde des mutations hors du poste ; un seul refus refuse la campagne, avec le code 2, sans ouvrir le navigateur ni créer de dossier de résultats. Un scénario désigné deux fois, un dossier sans scénario, `--jeu` et `--trace` sont refusés de même.
 - **Un profil** : les scénarios d'une campagne partagent leur profil, celui où se fait la connexion ; des profils mêlés sont refusés, à jouer en campagnes distinctes.
@@ -11922,7 +11928,7 @@ Sortie, au fil de l'eau, puis le bilan :
 Campagne : 4 scénarios, profil defaut ; chrome 158.0.8127.65
 [1/4] Connexion : 1 jeu, 3 étapes (a-connexion.toml)
 À VOUS : Connectez-vous — la suite reprend dès que l'adresse /accueil-connecte est atteinte (20 s au plus).
-  ok    1. naviguer /connexion
+  ok   1. naviguer /connexion
   …
 Verdict : conforme
 [2/4] …
@@ -11931,7 +11937,7 @@ Verdict : conforme
   NON CONFORME  Liste (c-liste.toml) : étape 2 : attendu : 2 éléments ; obtenu : 1 élément
   BLOQUÉ        Bloqué (d-bloque.toml) : étape 2 : délai de 2 s dépassé
 Campagne : 4 tests, 2 conformes, 1 non conforme, 1 bloqué
-Rapport de campagne : scenarios/resultats/20261123-141503-campagne/campagne.md
+Rapport de campagne : …/scenarios/resultats/20261123-141503-campagne/campagne.md
 ```
 
 Ce que la campagne écrit, dans le dossier de résultats (`resultats/` à côté du premier scénario, ou `--resultats`) :
@@ -12624,7 +12630,7 @@ Il sert enfin, sur une quatrième origine, un Xray et un Zephyr Scale factices, 
 | `JETONS_FACTICES` | les valeurs des variables d'environnement des jetons, qu'aucune sortie ni aucun texte ne doit contenir | garde des jetons |
 | `enZip(fichiers)` | une archive comme celle d'un export : deflate ou stockée, noms en UTF-8, CRC-32 qu'on peut abîmer, fichier marqué chiffré | lecture des archives |
 
-R39 écrit des pages de tests de Xray comme Chrome les enregistre en « Page Web, complète », chacune avec un script leurre, des menus de choix, des boutons et un pas masqué : une page de Xray Cloud dont les pas, en mode formulaire, sont dans un cadre de son dossier de ressources, avec un cadre distant et un cadre hors du dossier ; une page de Data Center aux pas en tableau, en anglais ; un test Cucumber ; une page sans pas ; des pas affichés deux fois ; une page dont le titre n'a pas de clé, notée dans l'adresse d'enregistrement ; une seconde page du même test.
+R39 écrit des pages de tests de Xray comme Chrome les enregistre en « Page Web, complète », chacune avec un script leurre, des menus de choix, des boutons et un pas masqué : une page de Xray Cloud dont les pas, en mode formulaire, sont dans un cadre de son dossier de ressources, avec un cadre distant et un cadre hors du dossier ; une page de Data Center aux pas en tableau, en anglais ; une grille de div aux rôles ARIA ; un test Cucumber ; une page sans pas ; des pas affichés deux fois ; une page dont le titre n'a pas de clé, notée dans l'adresse d'enregistrement ; une seconde page du même test.
 
 Les tests exportés (R35 à R38) jouent dans des projets temporaires, comme ceux d'une équipe : `package.json`, `playwright.config.mjs` (rapport JSON, navigateur de `SCENARIO_PLAYWRIGHT_CANAL`, fenêtre visible, un seul worker), dossiers `scenarios/` et `e2e/`, et `node_modules` lié à celui du skill par une jonction ; R37 y ajoute un `tsconfig.json`. La connexion de l'équipe y est une fonction qui note son appel : la page `/connexion?auto=…` se connecte d'elle-même. `@playwright/test` y est lancé par la recette, avec les seules variables `SCENARIO_ORIGINES` et `SCENARIO_AUTORISER_MUTATIONS` que chaque contrôle donne, et son rapport JSON se lit test par test, étape par étape.
 
@@ -12681,7 +12687,7 @@ Le projet de démonstration, `tests/projet-demo.mjs`, s'écrit dans un dossier t
 | R36 | Tests exportés joués par `@playwright/test` 1.65.1 : test DEMO-13 importé de Xray, traduit et exporté ; sept scénarios joués par le skill, puis exportés et joués, huit tests ; pour chaque jeu, le statut du skill à chaque étape et à chaque entrée de préparation et de nettoyage : dix-sept étapes de l'écran sur deux jeux, vérification en échec suivie d'une autre, action en échec, dernière vérification en échec, étape à la main par la connexion de l'équipe et préparation par l'API, scénario de préparation, téléchargement et fichier ; même message d'échec ; requêtes vues, adresse masquée, aucun jeton dans le rapport de Playwright ; préparation à sa place ; appels avec la session et le jeton anti-CSRF recopié ; étapes d'un scénario de préparation sous son entrée ; nettoyage en échec annoté sans changer le résultat ; `<unique>` propre à chaque jeu ; fichier téléchargé, capture et tags ; aucune donnée laissée | D21.INV-1, D21.INV-3, D21.INV-5, D5.INV-3, D5.INV-4, D20.INV-4, D20.INV-5, D20.INV-6 |
 | R37 | Tests exportés en TypeScript, d'après le `tsconfig.json` du projet : souche de connexion qui échoue en disant ce qui manque, préparation et nettoyage non joués, aucun appel ; `SCENARIO_ORIGINES` : origine du scénario injoignable mise en correspondance, adresses, vérification d'adresse, API et WebSocket compris, l'autre origine bloquée, WebSocket compris ; correspondance mal formée ; test qui modifie des données hors du poste, déclaré ou par correspondance, sauté sans `SCENARIO_AUTORISER_MUTATIONS=1`, joué avec elle et nettoyé | D21.INV-2, D21.INV-3, D7.INV-1, D7.INV-2 |
 | R38 | Résultats : Xray, clé retenue à l'import, statut de chaque pas du test manuel converti, fichier à côté du rapport ; pas en échec avec le message de son étape, commentaire avec le verdict de chaque jeu ; texte retouché depuis l'import : statut du test seul, avec une note ; plusieurs jeux en exemples, `--cle` ; copies d'écran seulement avec `--preuves`, chacune sous son nom stable, en PNG encodé en base64 ; sept refus ; Zephyr Scale au format « custom », JSON et archive .zip lisible, résultat en échec ; plusieurs rapports dans un fichier ; rien n'est envoyé | D21.INV-4, D21.INV-5, D22.INV-3 |
-| R39 | Pages de tests de Xray enregistrées en HTML complet : dossier de sept pages, une par test ; Xray Cloud, pas en mode formulaire dans un cadre du dossier de la page, cadres distant et hors du dossier non lus ; Xray Data Center, pas en tableau, en anglais, résultat de deux paragraphes ; test Cucumber recopié ; page sans pas et seconde page du même test refusées, code 1 ; numéros, menus, boutons, scripts et éléments masqués écartés ; provenance comme par l'API, page et son empreinte, préconditions signalées ; pas affichés deux fois gardés une fois ; clé de l'adresse notée par Chrome ; le test lu par l'API puis par sa page : même texte ; réimport et `--comparer` ; `--diagnostic` sans aucune valeur, rien d'écrit ; quatre refus ; `pages.mjs` sans réseau, processus ni évaluation de code | D17.INV-7, D17.INV-4, D17.INV-5 |
+| R39 | Pages de tests de Xray enregistrées en HTML complet : dossier de huit pages, une par test ; Xray Cloud, pas en mode formulaire dans un cadre du dossier de la page, cadres distant et hors du dossier non lus ; Xray Data Center, pas en tableau, en anglais, résultat de deux paragraphes ; grille de div aux rôles ARIA ; test Cucumber recopié ; page sans pas et seconde page du même test refusées, code 1 ; numéros, menus, boutons, scripts et éléments masqués écartés ; provenance comme par l'API, page et son empreinte, préconditions signalées ; pas affichés deux fois gardés une fois ; clé de l'adresse notée par Chrome ; le test lu par l'API puis par sa page, en mode formulaire sans champ Statut, chaque numéro de pas écarté : même texte ; réimport et `--comparer` ; `--diagnostic` sans aucune valeur, rien d'écrit ; quatre refus ; `pages.mjs` sans réseau, processus ni évaluation de code | D17.INV-7, D17.INV-4, D17.INV-5 |
 | R40 | Campagne : six scénarios d'un dossier, dans l'ordre de leur nom, code 1 ; avancement et verdict de chacun, bilan des verdicts ; une seule fenêtre, une seule connexion, la session éphémère gardée pour le test suivant ; `campagne.json` et `campagne.md` ; un test en échec n'arrête pas les suivants ; garde des origines de chaque scénario ; refus avant toute action, sans dossier de campagne : scénario invalide, profils mêlés, `--jeu`, `--trace`, dossier sans scénario | D22.INV-1, D7.INV-1, D1.INV-4 |
 | R41 | Copies d'écran et verdict : chaque vérification, réussie ou non, chaque échec, l'écran à la fin des étapes ; verdict et cause de chaque jeu et du test ; `rapport.md` et sortie ; règle du verdict : préparation, attente ou étape à la main en échec, bloqué ; nettoyage en échec seul, conforme ; non conforme avant bloqué, bloqué avant conforme ; noms stables des copies d'écran | D22.INV-2, D22.INV-3, D20.INV-4 |
 | R42 | Rapport de conformité de la campagne de R40 : balisage wiki et page HTML sans `--preuves`, aucune copie d'écran ; caractères du wiki et HTML échappés ; avec `--preuves`, chaque copie d'écran dans `captures-jira/`, sous son nom stable, identique à sa capture, citée dans le balisage et incluse dans la page ; même rapport, même texte ; un seul rapport, sous la clé de `--cle` ; trois refus ; ni réseau ni processus | D22.INV-4, D22.INV-2 |
@@ -16295,13 +16301,15 @@ nom = "export"
       writeFileSync(join(pages, 'DEMO-24.html'), page('[DEMO-24] Sans pas - Jira', '<p>Rien à jouer ici.</p><p>Action</p>'));
       writeFileSync(join(pages, 'DEMO-25.html'), page('[DEMO-25] Deux fois - Jira', `<div>${pas(1, 'Ouvrir la liste', '', 'La liste s\'affiche')}</div><div>${pas(1, 'Ouvrir la liste', '', 'La liste s\'affiche')}</div>`));
       writeFileSync(join(pages, 'DEMO-26.html'), page('Ouvrir l\'accueil - Jira', `<h1>Ouvrir l'accueil</h1>${pas(1, 'Ouvrir l\'accueil', '', 'Le titre « Démonstration » s\'affiche')}`, 'https://exemple.atlassian.net/browse/DEMO-26'));
+      // Une grille de div aux rôles ARIA, comme en dessine une application : en-têtes, puis une ligne par pas.
+      writeFileSync(join(pages, 'DEMO-27.html'), page('[DEMO-27] Supprimer un client - Jira', '<div data-testid="issue.views.issue-base.foundation.summary.heading"><h1>Supprimer un client</h1></div><div role="grid" class="steps"><div role="row"><div role="columnheader">Action</div><div role="columnheader">Données</div><div role="columnheader">Résultat attendu</div></div><div role="row"><div role="gridcell">Ouvrir la liste des clients</div><div role="gridcell"></div><div role="gridcell">La liste s\'affiche</div></div><div role="row"><div role="gridcell">Cliquer sur « Supprimer »</div><div role="gridcell">Dupont</div><div role="gridcell">Dupont disparaît de la liste</div></div></div>'));
       writeFileSync(join(pages, 'zz-copie-DEMO-22.html'), page('[DEMO-22] Rechercher un client - JIRA Démo', '<p>Copie</p>'));
       const imp = await lancer('importer.mjs', [pages, '--adresse', base, '--dossier', S39]);
       controle('dossier de pages : une page par test, le cadre de Xray Cloud lu dans le dossier de la page, tableau de Xray Data Center, test Cucumber ; page sans pas et doublon refusés, code 1 (D17.INV-7)', imp.code === 1
         && imp.sortie.includes('Page [DEMO-21] Créer un client - Jira.html : DEMO-21 (Xray Cloud), 2 pas, mode formulaire, dans le cadre 1')
-        && imp.sortie.includes('Page DEMO-22.html : DEMO-22 (Xray Data Center), 2 pas, mode tableau') && imp.sortie.includes('Page DEMO-23.html : DEMO-23, scénario Gherkin')
+        && imp.sortie.includes('Page DEMO-22.html : DEMO-22 (Xray Data Center), 2 pas, mode tableau') && imp.sortie.includes('Page DEMO-23.html : DEMO-23, scénario Gherkin') && imp.sortie.includes('Page DEMO-27.html : DEMO-27 (Xray Cloud), 2 pas, mode tableau')
         && imp.sortie.includes('aucun pas reconnu (libellés Action, Données, Résultat attendu) ni scénario Gherkin dans la page ni dans ses cadres ; --diagnostic décrit sa structure, sans ses valeurs')
-        && imp.sortie.includes('zz-copie-DEMO-22.html : même test, DEMO-22, que la page DEMO-22.html : une page par test') && /Bilan : 5 écrits, 0 remplacé, 0 inchangé, 2 non écrits, 0 disparu/.test(imp.sortie), imp.sortie + imp.erreurs);
+        && imp.sortie.includes('zz-copie-DEMO-22.html : même test, DEMO-22, que la page DEMO-22.html : une page par test') && /Bilan : 6 écrits, 0 remplacé, 0 inchangé, 2 non écrits, 0 disparu/.test(imp.sortie), imp.sortie + imp.erreurs);
       const t21 = lire(S39, 'DEMO-21.scenario');
       const corps21 = t21.split('\n').filter((l) => /^ {2}(Quand|Alors) /.test(l)).join('\n');
       controle('test manuel en mode formulaire : chaque pas en « Quand <action> », avec ses données, puis « Alors <résultat attendu> » ; numéros, menus, boutons, scripts et éléments masqués écartés (D17.INV-5, D17.INV-7)', corps21 === '  Quand Ouvrir la liste des clients\n  Alors La liste affiche « Dupont »\n  Quand Cliquer sur « Nouveau client », avec « Nom : Durand »\n  Alors Le formulaire « Nouveau client » s\'ouvre'
@@ -16310,7 +16318,9 @@ nom = "export"
         && t21.includes('# Lot : xray DEMO-21\n# Scénario : @DEMO-21, test manuel DEMO-21\n') && new RegExp(`# Source : page enregistrée \\.\\./pages/\\[DEMO-21\\] Créer un client - Jira\\.html \\(sha256 ${sha(join(pages, '[DEMO-21] Créer un client - Jira.html'))}\\)`).test(t21)
         && t21.includes('# Préconditions affichées dans la page, non reprises') && imp.sortie.includes('LIMITE [DEMO-21] Créer un client - Jira.html : 2 cadres non lus : adresse distante, hors du dossier de la page, absent ou trop gros'), t21 + imp.sortie);
       const t22 = lire(S39, 'DEMO-22.scenario');
-      controle('tableau, en anglais : colonnes Action, Data, Expected Result ; un résultat de deux paragraphes sur une ligne, séparés par « ; »', t22.includes('\n  Quand Open the customers page\n  Alors The list is shown\n  Quand Point at the name, avec « Martin »\n  Alors Martin is listed ; Dupont is hidden\n') && t22.includes('# Scénario : @DEMO-22, test manuel DEMO-22'), t22);
+      const t27 = lire(S39, 'DEMO-27.scenario');
+      controle('tableau, en anglais : colonnes Action, Data, Expected Result ; un résultat de deux paragraphes sur une ligne, séparés par « ; » ; grille de div aux rôles grid, row, columnheader et gridcell (D17.INV-7)', t22.includes('\n  Quand Open the customers page\n  Alors The list is shown\n  Quand Point at the name, avec « Martin »\n  Alors Martin is listed ; Dupont is hidden\n') && t22.includes('# Scénario : @DEMO-22, test manuel DEMO-22')
+        && t27.includes('\n  Quand Ouvrir la liste des clients\n  Alors La liste s\'affiche\n  Quand Cliquer sur « Supprimer », avec « Dupont »\n  Alors Dupont disparaît de la liste\n'), t22 + t27);
       const t23 = lire(S39, 'DEMO-23.scenario');
       const t25 = lire(S39, 'DEMO-25.scenario');
       const t26 = lire(S39, 'DEMO-26.scenario');
@@ -16330,13 +16340,13 @@ nom = "export"
       const cmp = await lancer('importer.mjs', [pages, '--comparer', '--dossier', S39]);
       writeFileSync(join(pages, 'DEMO-22.html'), lire(pages, 'DEMO-22.html').replace('The list is shown', 'The whole list is shown'));
       const cmp2 = await lancer('importer.mjs', [pages, '--comparer', '--dossier', S39]);
-      controle('réimport : --comparer dit les textes identiques, puis le test changé dans sa page ; rien n\'est écrit', /Bilan : 5 identiques, 0 modifié, 0 nouveau, 0 disparu, 2 non importables/.test(cmp.sortie) && cmp2.code === 1 && cmp2.sortie.includes('modifié    @DEMO-22  Rechercher un client (DEMO-22.scenario) : changé dans Xray depuis l\'import') && arbre(S39) === avant, cmp.sortie + cmp2.sortie);
+      controle('réimport : --comparer dit les textes identiques, puis le test changé dans sa page ; rien n\'est écrit', /Bilan : 6 identiques, 0 modifié, 0 nouveau, 0 disparu, 2 non importables/.test(cmp.sortie) && cmp2.code === 1 && cmp2.sortie.includes('modifié    @DEMO-22  Rechercher un client (DEMO-22.scenario) : changé dans Xray depuis l\'import') && arbre(S39) === avant, cmp.sortie + cmp2.sortie);
       const diag = await lancer('importer.mjs', [pages, '--diagnostic']);
-      const valeurs = ['DEMO-2', 'Créer un client', 'Ouvrir la liste', 'Dupont', 'Durand', 'Rechercher', 'Open the', 'Martin', 'exemple.atlassian.net', 'Jira_files', 'Exporter la liste', 'accueil', 'leurre', 'Jira.html', 'copie'];
-      controle('--diagnostic : structure de chaque page, libellés trouvés et éléments qui les portent, cadres, ce qui est reconnu ; aucune valeur de la page, ni clé, ni adresse, ni nom de fichier ; rien n\'est écrit (D17.INV-7)', diag.code === 0 && diag.sortie.startsWith('Diagnostic de 7 pages, sans aucune de leurs valeurs')
-        && diag.sortie.includes('page 6 : titre présent, clé reconnue, résumé présent, adresse d\'enregistrement présente ; variante Cloud ; extension .html') && diag.sortie.includes('  cadres : 1 lu, 2 non lus (adresse distante, hors du dossier, absent ou trop gros)')
+      const valeurs = ['DEMO-2', 'Créer un client', 'Ouvrir la liste', 'Dupont', 'Durand', 'Rechercher', 'Open the', 'Martin', 'exemple.atlassian.net', 'Jira_files', 'Exporter la liste', 'accueil', 'leurre', 'Jira.html', 'copie', 'Supprimer'];
+      controle('--diagnostic : structure de chaque page, libellés trouvés et éléments qui les portent, cadres, ce qui est reconnu ; aucune valeur de la page, ni clé, ni adresse, ni nom de fichier ; rien n\'est écrit (D17.INV-7)', diag.code === 0 && diag.sortie.startsWith('Diagnostic de 8 pages, sans aucune de leurs valeurs')
+        && diag.sortie.includes('page 7 : titre présent, clé reconnue, résumé présent, adresse d\'enregistrement présente ; variante Cloud ; extension .html') && diag.sortie.includes('  cadres : 1 lu, 2 non lus (adresse distante, hors du dossier, absent ou trop gros)')
         && diag.sortie.includes('    libellé « Action » dans div.steps-form > div.step > label.lbl : 2') && diag.sortie.includes('    reconnu : 2 pas, mode formulaire ; champs remplis : action 2, données 1, résultat attendu 2 ; scénarios Gherkin : 0')
-        && diag.sortie.includes('    libellé « Résultat attendu » en en-tête de cellule dans thead > tr > th : 1') && diag.sortie.includes('    reconnu : aucun pas ; scénarios Gherkin : 1')
+        && diag.sortie.includes('    libellé « Résultat attendu » en en-tête de cellule dans thead > tr > th : 1') && diag.sortie.includes('    libellé « Action » en en-tête de cellule dans div.steps > div > div : 1') && diag.sortie.includes('    reconnu : aucun pas ; scénarios Gherkin : 1')
         && valeurs.every((v) => !diag.sortie.includes(v)) && arbre(S39) === avant, diag.sortie);
       const refus = await Promise.all([
         lancer('importer.mjs', [join(d39, 'absente.html'), '--adresse', base, '--dossier', S39]),
@@ -16697,11 +16707,11 @@ Le développeur fera une fois, dans la fenêtre, les gestes d'un parcours ; D15 
 Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichiers ont été matérialisés.
 
     3eb114e7b0ed8cb924a58f655ae3be675ea1e58aa86c9d5876f8282c9cc08d40  manifest.json
-    331b748feaef46f13b0a45bbb2bed67ea45de46c73adb5ec0c2b2de59b125d21  SKILL.md
-    e0c4943223eb7cd91b2e2697ed6b50daa861cd004ff9ac77c71716537cd42d5b  modules/execution/SKILL.md
+    9baae86f0f7cfee02be9f273c42da74b5d6db5436884ae473b439fcf1b1b85c2  SKILL.md
+    120029172a4006069ef1a3d9a64c1cab0f87532cb8efa48fafb9f87840af7dfa  modules/execution/SKILL.md
     3cc99932e382fb35c887fcaa699b94e5c2d336fe7bfe57dadabaaf39dfa3df57  modules/texte/SKILL.md
     8a4abc1128189031632e4dc7c03c4a2cee021880db296d2312ca9cfe18c68be0  modules/jira/SKILL.md
-    9e33bd3b53573cb43528d3e04bd45ba34529df55e826877bcbf0315e3e6164b3  modules/cas-de-test/SKILL.md
+    5539115138709c457cc0eae02b14bd1d9d3bdbc66b2081364d5d1c5745c7f3c2  modules/cas-de-test/SKILL.md
     15a9eb6cbac0f46094d4af7ff1e6436aea4b0798021d3e3e388670edeb640c1c  modules/code/SKILL.md
     af957ac4ed70c4d372294b4e926a8741add89574d97ee6fa52f7a813f8a5ff25  modules/scenario/SKILL.md
     d68265d527e3ed28c0723d4b0811549ed474e6e7f327e77f82d1766e926aa517  modules/cibles/SKILL.md
@@ -16713,9 +16723,9 @@ Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichier
     f24177fe382ae80ae30dd1deeddd58cc2213704672c57ed28b4146b7e511554c  modules/preuves/SKILL.md
     5322b05cf6aa3d414bf840cf73b9a346d30191b0a487f80a36b75f540b2df675  modules/designer/SKILL.md
     5ec18ebb6eee6c0efb93398afdb9cfb990e966c472d7133848790aa866786293  modules/export/SKILL.md
-    35d114f7e5589c3d66812380cc426a32e1749823fccaf83ebec16aefda61518f  modules/conformite/SKILL.md
+    dd3bd413252c20d9a10929f4779b1d2d366f49f94655443426eea230397a3dbd  modules/conformite/SKILL.md
     5cf7f7647c34f7bca6613db129dfb08d3c75397e181525f855e92160dc73ef27  modules/agent/SKILL.md
-    a02cbff0bef2c7270506423e754545ff39ad500a76ffd3bf59ce3e4d16798a15  modules/recette/SKILL.md
+    4d32543b21762939084c8cc6f97d7b1b8643065dbabcd203bcab573b85dcdebe  modules/recette/SKILL.md
     4966e366878732544faa9f20e65580a7348426d4e4c2a2b5f789dee4d59ce079  modules/traduction-auto/SKILL.md
     9dd5d57ca1b658cb15c7c1999ccfd94cb41491e0af15bbe151812f07d45929fc  modules/demo/SKILL.md
     4a202c9718112813a20437b56e250422013bebdfceee7f971922d246a4d2d606  modules/remise/SKILL.md

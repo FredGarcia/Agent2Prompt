@@ -31,7 +31,7 @@ flowchart LR
 node <skill>/scripts/jouer.mjs <dossier de scénarios | scénario.toml>... [--param nom=valeur]... [--resultats dossier] [--sans-tete] [--ralenti ms] [--autoriser-mutations]
 ```
 
-Deux scénarios ou plus font une campagne : un dossier donne ses scénarios `.toml`, dans l'ordre de leur nom, ses sous-dossiers non parcourus ; des fichiers se jouent dans l'ordre donné. Un scénario de préparation (module `donnees`) se range donc hors du dossier de la campagne, dans un sous-dossier par exemple, pour n'être joué que par le scénario qui le nomme.
+Deux scénarios ou plus font une campagne : un dossier donne ses scénarios `.toml`, dans l'ordre de leur nom, ses sous-dossiers non parcourus ; des fichiers se jouent dans l'ordre donné ; un dossier d'un seul scénario le joue seul, comme une exécution ordinaire. Un scénario de préparation (module `donnees`) se range donc hors du dossier de la campagne, dans un sous-dossier par exemple, pour n'être joué que par le scénario qui le nomme.
 
 - **Tout est contrôlé avant la première action** : chaque scénario est lu, validé et contrôlé comme pour une exécution seule, sa traduction comprise, avec la garde des mutations hors du poste ; un seul refus refuse la campagne, avec le code 2, sans ouvrir le navigateur ni créer de dossier de résultats. Un scénario désigné deux fois, un dossier sans scénario, `--jeu` et `--trace` sont refusés de même.
 - **Un profil** : les scénarios d'une campagne partagent leur profil, celui où se fait la connexion ; des profils mêlés sont refusés, à jouer en campagnes distinctes.
@@ -46,7 +46,7 @@ Sortie, au fil de l'eau, puis le bilan :
 Campagne : 4 scénarios, profil defaut ; chrome 158.0.8127.65
 [1/4] Connexion : 1 jeu, 3 étapes (a-connexion.toml)
 À VOUS : Connectez-vous — la suite reprend dès que l'adresse /accueil-connecte est atteinte (20 s au plus).
-  ok    1. naviguer /connexion
+  ok   1. naviguer /connexion
   …
 Verdict : conforme
 [2/4] …
@@ -55,7 +55,7 @@ Verdict : conforme
   NON CONFORME  Liste (c-liste.toml) : étape 2 : attendu : 2 éléments ; obtenu : 1 élément
   BLOQUÉ        Bloqué (d-bloque.toml) : étape 2 : délai de 2 s dépassé
 Campagne : 4 tests, 2 conformes, 1 non conforme, 1 bloqué
-Rapport de campagne : scenarios/resultats/20261123-141503-campagne/campagne.md
+Rapport de campagne : …/scenarios/resultats/20261123-141503-campagne/campagne.md
 ```
 
 Ce que la campagne écrit, dans le dossier de résultats (`resultats/` à côté du premier scénario, ou `--resultats`) :
