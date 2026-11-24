@@ -1,10 +1,10 @@
 ---
 name: generateur-skill-ticket
 description: Générateur de skills de ticket C7E, qui fait résoudre un ticket par un arbre de skills produits pour lui. Il décompose le ticket en sous-tickets, assemble pour chaque nœud un skill depuis le référentiel des méso-contrats de l'orchestrateur C7E, l'installe et le lance dans Gemini CLI, nœud par nœud ; chaque skill s'observe dans un champ partagé et voit le ticket augmenté ; chaque ticket entraîne le générateur, qui s'observe lui-même et propose ses évolutions au développeur. À utiliser depuis un clone du dépôt Agent2Prompt.
-version: 1.1.1
+version: 1.2.0
 ---
 
-# Générateur de skills de ticket C7E, version 1.1.1
+# Générateur de skills de ticket C7E, version 1.2.0
 
 Ce document est le point d'entrée du générateur. Un ticket n'y est plus résolu directement par l'orchestrateur C7E : il l'est par un **arbre de skills de ticket**, un par nœud, produits pour lui sur le même modèle fractal et récursif. Le générateur fait qualifier et décomposer le ticket, vérifie l'arbre, assemble chaque skill depuis les blocs ratifiés du référentiel des méso-contrats, l'installe dans Gemini CLI et le lance ; ensuite, chaque nœud se résout dans sa propre session, par son skill et ses agents. Chaque skill s'observe par rapport aux retours du développeur, ses choix et ses corrections, dans un champ d'observation partagé, et chaque niveau voit le ticket augmenté des observations des autres. L'arbre suit la composition récursive imbriquée (CRI) de la méthode C7E : le ticket et son US au niveau macro, la composition au niveau des méso-contrats, les tâches au niveau des méso-composants, les commits de la branche au niveau micro ; le besoin y descend, les preuves y remontent. Chaque ticket est aussi une recette et un cycle d'apprentissage : le générateur s'observe lui-même, classe ce qu'il apprend par profondeur, et propose ses évolutions au développeur, qui seul les promeut. Les règles détaillées sont dans `modules/`.
 
@@ -14,7 +14,7 @@ Le générateur dépend de l'orchestrateur C7E, à une version épinglée, et ne
 
 1. Ce document, en entier.
 2. `manifest.json` : modules, et versions des skills du dépôt dont héritent les skills de ticket.
-3. Les modules, dans l'ordre du déroulé : `arbre`, `assemblage`, `installation` ; pour suivre un arbre installé, `documents-kits`, `champ` et `vue` ; `mesure` pour mesurer le contexte d'un arbre ; `apprentissage` pour qualifier un ticket et clore un arbre.
+3. Les modules, dans l'ordre du déroulé : `arbre`, `assemblage`, `installation` ; pour suivre un arbre installé, `documents-kits`, `champ` et `vue` ; `mesure` pour mesurer le contexte d'un arbre ; `apprentissage` pour qualifier un ticket et clore un arbre ; `observation`, réservé, seulement pour comprendre le point d'extension E4.
 4. Dans le clone du dépôt, pour qualifier un ticket : les modules `qualification` et `referentiel` de l'orchestrateur, `<dépôt>/specs/orchestrateur-c7e/modules/qualification/SKILL.md` et `<dépôt>/specs/orchestrateur-c7e/modules/referentiel/SKILL.md`.
 
 ## 2. Ce que fait le générateur
@@ -87,7 +87,7 @@ Clause de second ordre : un niveau agit sur la manière d'observer du niveau inf
 
 ## 6. Registre des dimensions
 
-| ID | Dimension | Introduite | Statut 1.1.0 | Dépend de | Module |
+| ID | Dimension | Introduite | Statut 1.2.0 | Dépend de | Module |
 |---|---|---|---|---|---|
 | D1 | Arbre de tickets | 1.0 | active | orchestrateur-c7e | `arbre` |
 | D2 | Assemblage et transmission des skills de ticket | 1.0 | active | D1 | `assemblage` |
@@ -97,16 +97,21 @@ Clause de second ordre : un niveau agit sur la manière d'observer du niveau inf
 | D6 | Vue augmentée | 1.0 | active | D4, D5 | `vue` |
 | D7 | Contexte chargé | 1.0 | active | D2 | `mesure` |
 | D8 | Apprentissage permanent | 1.1 | active | D1, D5 | `apprentissage` |
+| D9 | Export vers le socle d'observation | 1.2 | reserved | D5, D8, socle d'observation | `observation` |
 
 ## 7. Contrat de version et points d'extension
 
-Le générateur suit le contrat de version de `EVOLUTION.md` du dépôt Agent2Prompt. Les skills du dépôt dont héritent les skills de ticket sont référencés dans `manifest.json` à la version qu'épinglent leurs sources : l'orchestrateur épingle le socle back-front, les référentiels Java et Angular et agent-tdd-jira ; agent-tdd-jira épingle Agent2Test ; le générateur épingle analyse-projet et sonarqube. Une nouvelle version de l'un d'eux arrête la génération, jusqu'à ce que le générateur la reprenne dans une version à lui. Chaque skill de ticket cite le générateur et sa version (D2.INV-4) ; les transmissions attendues et les rapports de mesure des exemples se régénèrent quand une source change, et la recette le signale.
+Le générateur suit le contrat de version de `EVOLUTION.md` du dépôt Agent2Prompt. Les skills du dépôt dont héritent les skills de ticket sont référencés dans `manifest.json` à la version qu'épinglent leurs sources : l'orchestrateur épingle le socle back-front, les référentiels Java et Angular et agent-tdd-jira ; agent-tdd-jira épingle Agent2Test ; le générateur épingle analyse-projet et sonarqube. Le socle d'observation est référencé à la version qu'épingle l'orchestrateur, pour la dimension réservée D9 ; les skills de ticket n'en héritent pas. Une nouvelle version de l'un d'eux arrête la génération, jusqu'à ce que le générateur la reprenne dans une version à lui. Chaque skill de ticket cite le générateur et sa version (D2.INV-4) ; les transmissions attendues et les rapports de mesure des exemples se régénèrent quand une source change, et la recette le signale.
 
 Points d'extension, actifs dès 1.0.0 :
 
 - **E1** : fabriques par pile. La fabrique abstraite produit la famille de fichiers d'un nœud et laisse à une fabrique concrète les crochets de la pile : référentiels, agents de couche, commandes de test. La 1.0.0 n'a que la fabrique `java-angular-postgresql` ; une autre pile s'ajoute par une fabrique concrète, sans toucher au Monteur. La fabrique abstraite seule ne produit rien.
 - **E2** : exécuteur. La 1.0.0 lance chaque nœud dans Gemini CLI 0.67.0 ; la place d'un autre exécuteur, le binôme Agent2Dev et Agent2Test ou n8n, est réservée : l'installateur n'en accepte aucun autre.
-- **E3** : formats propres au générateur. Le champ (`skill-ticket.observation/1`), la vue (`skill-ticket.vue/1`), les kits (`skill-ticket.kit/1`), le rattachement des critères (`skill-ticket.rattachement/1`), le relevé d'installation (`skill-ticket.installation/1`), la mesure du contexte (`skill-ticket.contexte/1`), le relevé d'apprentissage (`generateur.releve/1`) et le registre d'apprentissage (`generateur.apprentissage/1`) sont des formats versionnés, fermés pour ceux qu'on dépose ; ils sont prêts à devenir un socle d'observation partagé, inclus et épinglé comme le socle back-front.
+- **E3** : formats propres au générateur. Le champ (`skill-ticket.observation/1`), la vue (`skill-ticket.vue/1`), les kits (`skill-ticket.kit/1`), le rattachement des critères (`skill-ticket.rattachement/1`), le relevé d'installation (`skill-ticket.installation/1`), la mesure du contexte (`skill-ticket.contexte/1`), le relevé d'apprentissage (`generateur.releve/1`) et le registre d'apprentissage (`generateur.apprentissage/1`) sont des formats versionnés, fermés pour ceux qu'on dépose ; le champ, le relevé et le registre d'apprentissage ont leurs correspondances vers l'enveloppe du socle `socle-observation` (E4).
+
+Point d'extension, actif dès 1.2.0 :
+
+- **E4** : export vers le socle d'observation. Le champ, le relevé et le registre d'apprentissage pourront s'exporter dans l'enveloppe `socle-observation.enveloppe/1` du socle `socle-observation` 1.0.0, selon ses correspondances, sans changer leurs formats. En 1.2, aucun outil n'exporte, et aucun skill de ticket ne porte le module `observation`.
 
 ## 8. Règles globales
 
@@ -191,6 +196,8 @@ Chaque module donne, pour chacun de ses invariants, les tests qui le prouvent.
 - **D8.INV-4** : les arbres d'exemple sont des tests de non-régression, figés ; aucun ne se modifie pour qu'un relevé ou une recette passe.
 
 ## 11. Journal de révision
+
+**1.2.0** (2026-11-24) : dimension D9 réservée, l'export vers le socle d'observation, décidé par le développeur pour le passage du dépôt au troisième ordre (`EVOLUTION.md`, section 10) : le champ, le relevé et le registre d'apprentissage pourront s'exporter dans l'enveloppe du socle `socle-observation` 1.0.0, référencé par le manifeste ; point d'extension E4 ; module `observation`. Référence à orchestrateur-c7e 3.6.0, qui réserve de même l'export de ses registres ; aucune section recopiée dans les skills de ticket ne change, seules les versions qu'ils citent. Un test de la recette vérifie l'inertie. Aucun invariant ajouté ni modifié. Archive : `archives/SKILL-v1.1.1.md`.
 
 **1.1.1** (2026-11-17) : correctif, ce qu'a relevé la revérification de la 1.1.0, ratifié par le développeur. Un ticket sans sous-ticket verse aussi son apprentissage à sa clôture, dans sa remise ; la clôture d'apprentissage vient après le contrôle des kits et l'ouverture de la campagne d'Agent2Test, et le développeur versionne ensuite le relevé et le registre. `clore` ne compte que les commits du ticket, et un commit planifié réalisé sur plusieurs slots n'est plus un écart. Un scénario peut dire les couches qu'il touche, `couches` : `arbre.mjs proposer` ne le croise qu'avec les thèmes de ces couches, la vérification refuse un commit d'une autre couche, et `verifier-documents.mjs` contrôle leurs étiquettes dans le fichier Gherkin. Des scénarios hors de la racine, et des thèmes sur un nœud composé, sont refusés au lieu d'être ignorés. D1.INV-5 est remplacé par un invariant plus fort, qui ajoute ces règles sans en retirer aucune. Les protocoles sur le poste de l'installation et de la mesure portent sur le ticket en cours, et non plus sur les arbres d'exemple. Archive : `archives/SKILL-v1.1.0.md`.
 

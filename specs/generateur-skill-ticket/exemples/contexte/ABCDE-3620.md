@@ -8,11 +8,11 @@ Mesure statique et déterministe (generateur-skill-ticket, critère P7), produit
 
 | Borne | Taille |
 |---|---|
-| à l'activation | 90 246 car., 22 562 tokens |
-| au plus | 250 904 car., 62 726 tokens |
+| à l'activation | 92 514 car., 23 129 tokens |
+| au plus | 253 172 car., 63 293 tokens |
 
 - `orchestrateur-c7e : nom et description` : 1 137 car., chargés au démarrage de Gemini CLI
-- `orchestrateur-c7e/SKILL.md` : 89 109 car., corps du skill, à son activation
+- `orchestrateur-c7e/SKILL.md` : 91 377 car., corps du skill, à son activation
 - `projet/docs/c7e/meso-contrats.md` : 15 638 car., copie du projet du fichier d'invariants, lue au démarrage
 - `orchestrateur-c7e/modules/qualification/SKILL.md` : 19 330 car., lu à l'ouverture et à l'analyse de chaque ticket
 - `orchestrateur-c7e/modules/referentiel/SKILL.md` : 45 516 car., lu à l'ouverture et à l'analyse de chaque ticket
@@ -28,9 +28,9 @@ Mesure statique et déterministe (generateur-skill-ticket, critère P7), produit
 
 | Feuille | Session, activation | Session, au plus | Plus grand contexte | Somme des contextes |
 |---|---|---|---|---|
-| ABCDE-3620-1.1 | 4 070 tokens, 18 % | 18 748 tokens, 30 % | 21 028 tokens, 34 % | 61 215 tokens, 98 % |
-| ABCDE-3620-1.2 | 4 314 tokens, 19 % | 20 155 tokens, 32 % | 23 400 tokens, 37 % | 65 470 tokens, 104 % |
-| ABCDE-3620-2 | 4 216 tokens, 19 % | 19 194 tokens, 31 % | 21 566 tokens, 34 % | 62 418 tokens, 100 % |
+| ABCDE-3620-1.1 | 4 070 tokens, 18 % | 18 748 tokens, 30 % | 21 028 tokens, 33 % | 61 215 tokens, 97 % |
+| ABCDE-3620-1.2 | 4 314 tokens, 19 % | 20 155 tokens, 32 % | 23 400 tokens, 37 % | 65 470 tokens, 103 % |
+| ABCDE-3620-2 | 4 216 tokens, 18 % | 19 194 tokens, 30 % | 21 566 tokens, 34 % | 62 418 tokens, 99 % |
 
 Les pourcentages rapportent chaque taille à celle du point d'entrée de l'orchestrateur, à la même borne pour l'activation, au plus pour le reste. La somme réunit les contextes qui travaillent pour la feuille : sa session, ses agents de couche, ses sous-agents de rôle.
 
@@ -39,13 +39,13 @@ Les pourcentages rapportent chaque taille à celle du point d'entrée de l'orche
 | Mesure | Au plus |
 |---|---|
 | plus grand contexte de l'arbre, session du skill ticket-abcde-3620 | 27 702 tokens, 44 % |
-| somme des 20 contextes des 5 nœuds et des observateurs | 275 715 tokens, 440 % |
+| somme des 20 contextes des 5 nœuds et des observateurs | 275 715 tokens, 436 % |
 
 Aucun contexte de l'arbre ne charge plus que le pourcentage du plus grand ; la somme dit ce que l'arbre lit en tout, quand chaque contexte relit ce qu'il lui faut, au plus.
 
 ## Relectures
 
-Sur la somme des contextes de l'arbre, 131 664 tokens (48 %) viennent de fichiers lus dans plusieurs contextes ; lus une seule fois chacun, les fichiers de l'arbre feraient 144 051 tokens, 230 % du point d'entrée de l'orchestrateur.
+Sur la somme des contextes de l'arbre, 131 664 tokens (48 %) viennent de fichiers lus dans plusieurs contextes ; lus une seule fois chacun, les fichiers de l'arbre feraient 144 051 tokens, 228 % du point d'entrée de l'orchestrateur.
 
 | Fichier | Contextes qui le lisent | Relu, au plus |
 |---|---|---|
@@ -87,7 +87,7 @@ Ils coordonnent leurs sous-tickets, ratifient et, pour la racine, font rédiger 
 
 | Nœud | Session, au plus | Somme des contextes |
 |---|---|---|
-| ABCDE-3620, racine | 27 702 tokens, 44 % | 53 699 tokens, 86 % |
+| ABCDE-3620, racine | 27 702 tokens, 44 % | 53 699 tokens, 85 % |
 | ABCDE-3620-1, composé | 15 496 tokens, 25 % | 15 496 tokens, 25 % |
 
 ## Observateurs de l'arbre, sur attente
