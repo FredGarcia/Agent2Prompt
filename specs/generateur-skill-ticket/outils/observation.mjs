@@ -10,8 +10,9 @@
 // docs/c7e/observations.jsonl : en ajout seul, chaque ligne chaînée à l'empreinte de la précédente, la tête
 // docs/c7e/observations.tete portant le numéro et l'empreinte de la dernière (SO2). Aucun texte libre ne
 // sort, et toute référence du projet sort par son empreinte salée (SO3) : le sel de l'instance, tiré à la
-// première exportation, se garde dans le répertoire Git commun du projet, <git-common-dir>/agent2prompt/sel,
-// que partagent ses worktrees ; il n'est jamais versionné, affiché ni exporté. Un enregistrement déjà
+// première exportation du projet, de quelque système qu'elle soit, se garde dans le répertoire Git commun du
+// projet, <git-common-dir>/agent2prompt/sel, que partagent ses worktrees et les systèmes qui y exportent ; il
+// n'est jamais versionné, affiché ni exporté. Un enregistrement déjà
 // exporté ne l'est pas deux fois ; une source altérée ou une enveloppe mal formée arrêtent l'export, sans
 // rien écrire. Le développeur versionne le journal et sa tête avec le projet ; l'outil ne commite rien.
 //
@@ -422,9 +423,30 @@ export function lireSel(projet = '.') {
 const refus = (erreurs) => ({ erreurs, ajoutees: 0, total: null, selTire: false });
 
 /**
+ * Journaux d'enveloppes non vides du projet, de tous les systèmes qui y exportent sous le sel de l'instance,
+ * `docs/c7e/observations*.jsonl`, avec l'instance de leur première ligne.
+ */
+function journauxDeLInstance(projet) {
+  const dossier = join(projet, 'docs', 'c7e');
+  if (!existsSync(dossier)) return [];
+  return readdirSync(dossier).filter((n) => /^observations.*\.jsonl$/.test(n)).sort(parCodePoint).flatMap((n) => {
+    const [premiere] = lignesDe(join(dossier, n));
+    if (premiere === undefined) return [];
+    let instance = null;
+    try {
+      instance = JSON.parse(premiere).instance ?? null;
+    } catch {
+      instance = null;
+    }
+    return [{ journal: `docs/c7e/${n}`, instance }];
+  });
+}
+
+/**
  * Exporte les enregistrements nouveaux du projet ; renvoie { erreurs, ajoutees, total, selTire }. Tout ou
- * rien : un journal ou une source altérés, un sel absent pour un journal existant, une enveloppe mal formée
- * arrêtent l'export, et rien n'est écrit. Les options `sel` et `version` ne servent qu'aux tests : la ligne
+ * rien : un journal ou une source altérés, un sel absent alors qu'un journal d'enveloppes du projet existe, le
+ * sien ou celui d'un autre système, un sel étranger à l'un d'eux, une enveloppe mal formée arrêtent l'export,
+ * et rien n'est écrit. Les options `sel` et `version` ne servent qu'aux tests : la ligne
  * de commande ne prend jamais le sel en argument, et la version est celle du manifeste.
  */
 export function exporter({ projet = '.', sel, version = versionDuSysteme() } = {}) {
@@ -436,18 +458,23 @@ export function exporter({ projet = '.', sel, version = versionDuSysteme() } = {
 
   let chemin = null;
   let selTire = false;
+  const journaux = journauxDeLInstance(projet);
   if (sel === undefined) {
     const lu = lireSel(projet);
     if (lu.erreur) return refus([lu.erreur]);
     ({ chemin, sel } = lu);
     if (sel === null) {
-      if (lignes.length > 0) return refus([`sel de l'instance absent de <git-common-dir>/${SEL} alors que ${JOURNAL} existe : un nouveau sel changerait l'identité de l'instance au milieu de son journal ; recopie dans ce clone, à cet emplacement, le sel du clone qui a commencé le journal`]);
+      if (journaux.length > 0) {
+        const plusieurs = journaux.length > 1;
+        return refus([`sel de l'instance absent de <git-common-dir>/${SEL} alors que ${journaux.map((j) => j.journal).join(', ')} existe${plusieurs ? 'nt' : ''} : un nouveau sel changerait l'identité de l'instance au milieu de ${plusieurs ? 'ses journaux' : 'son journal'} ; recopie dans ce clone, à cet emplacement, le sel du clone qui ${plusieurs ? 'les a commencés' : 'a commencé le journal'}`]);
+      }
       sel = randomBytes(32).toString('hex');
       selTire = true;
     }
   }
   const instance = sha256(sel);
-  if (enveloppes.length > 0 && enveloppes[0].instance !== instance) return refus([`le sel de ce clone n'est pas celui de l'instance du journal ${JOURNAL} : rien n'est exporté`]);
+  const etranger = journaux.find((j) => j.instance !== instance);
+  if (etranger) return refus([`le sel de ce clone n'est pas celui de l'instance du journal ${etranger.journal} : rien n'est exporté`]);
 
   const numeros = new Map(enveloppes.map((x) => [cleSource(x.source), x.numero]));
   const ordre = fusionner(aExporter(sources.journaux, sel, numeros));

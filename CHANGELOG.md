@@ -96,6 +96,14 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-11-24 : orchestrateur-c7e 3.7.0, observatoire 1.1.0, generateur-skill-ticket 1.3.1
+
+- **orchestrateur-c7e 3.7.0** : dimension D12 active, l'export de ses registres vers le socle d'observation, jalon J1c du passage au troisième ordre. Premier outil de l'orchestrateur, `outils/observation.mjs`, lancé par le développeur depuis le clone (`exporter`, `verifier`, `etat`) : l'IA en donne la commande sans l'exécuter, et la transmission ne le porte pas. Les événements du registre des concepts se lisent dans l'historique Git de `docs/c7e/concepts.json`, au premier parent de la branche d'intégration ; une entrée ajoutée par un commit `[É7-C7E]`, retrouvé à travers la fusion qui l'apporte, sort au niveau N2. Les lignes décidées du registre des écarts sortent avec l'invariant du dépôt qu'elles concernent ; une ligne sans décision, ou une dérogation sans le nom qui la valide, attend. Journal propre, `docs/c7e/observations-orchestrateur-c7e.jsonl`, en ajout seul et chaîné, avec sa tête, sous le sel de l'instance que partage le générateur ; une ligne ou un historique réécrits depuis l'export l'arrêtent. Socle 1.1.0 inclus, épinglé et référencé, ses correspondances précisées dans le module `observation` sans être redéfinies ; invariants D12.INV-1 à D12.INV-3, trente-six invariants ; scénario R23, point d'extension E6 et emplacement du journal à jour. Recette de douze tests, qui construit l'historique Git de ses projets d'épreuve.
+- **observatoire 1.1.0** : dimension D6 active, la confrontation entre systèmes. Il relève aussi le journal de l'orchestrateur et reconnaît en clair les identifiants de concepts `C_<DOMAINE>_<NNN>`. Une sorte de candidat de plus, l'invariant : un même invariant du dépôt, cité par des écarts distincts de deux systèmes ou de deux instances, proposé à la spécification qui le définit ; le désaccord que constate le générateur et que le développeur décide au registre des écarts de l'orchestrateur est un seul écart, compté une fois. Module `systemes`, invariants D6.INV-1 et D6.INV-2 ; D4.INV-1 étendu aux deux clés d'une proposition par invariant, l'invariant et les systèmes, identifiants du dépôt ; références qui nomment le système de chaque enveloppe ; onze invariants. Recette de dix-huit tests.
+- **generateur-skill-ticket 1.3.1** : correctif. Référence à orchestrateur-c7e 3.7.0 : les skills de ticket recopient ses trois invariants de plus ; transmissions d'exemple et rapports de contexte régénérés. Défaut corrigé : l'export ne regardait que son propre journal pour refuser un sel absent ou étranger ; il regarde tout journal d'enveloppes du projet. D9.INV-2 renforcé ; les tests qui comptaient trente-trois invariants de l'orchestrateur les comptent dans son point d'entrée. La recette passe ses 345 tests (un attend Gemini CLI).
+- Les trois versions se référencent et se publient dans un même commit (`EVOLUTION.md`, section 7). `EVOLUTION.md`, section 10 : le couplage 1 confronte deux systèmes, par les invariants du dépôt. README, modes d'emploi, glossaire et transmissions à jour.
+- Décisions ratifiées avant la rédaction (plan du jalon J1c) : outil propre à l'orchestrateur (C1) ; événements du registre des concepts lus dans l'historique Git, niveau N2 pour un commit `[É7-C7E]` (C2) ; journal propre, sel partagé (C3) ; confrontation par invariant dans l'observatoire (C4).
+
 ### 2026-11-24 : observatoire 1.0.0
 
 - **observatoire 1.0.0**, nouvelle spécification, transmissible et outillée comme le générateur, jalon J2 du passage au troisième ordre : l'observatoire de l'écosystème, sur le poste. L'outil `observatoire.mjs`, lancé depuis le clone (`inscrire`, `relever`, `etat`, `confronter`, `proposer`, `suivre`, `verifier`), relève, vérifiés selon le socle, les journaux d'enveloppes des projets inscrits dans un magasin local, sous le répertoire Git commun du clone, jamais versionné ; il confronte les instances, observe l'état de l'écosystème, écrit des propositions minimisées dans `observatoire/propositions/`, au format `observatoire.proposition/1`, et suit l'effet des propositions ratifiées. Il propose et n'applique jamais : il ne commite ni ne publie, et rien d'une instance n'entre dans le dépôt que les valeurs minimisées d'une proposition.
@@ -869,6 +877,10 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
   - la publication, dans ce dépôt public, d'un argumentaire destiné à un client, sans nom de client ni de mission.
 
 ## Outils
+
+### 2026-11-24 : recette de l'orchestrateur C7E
+
+- **Workflows** : `recette-orchestrateur-c7e.yml`, nouveau, Linux et Windows, Node 22 et 24 : la recette de l'export de l'orchestrateur, qui suit aussi le socle d'observation, l'export du générateur et le champ de l'arbre d'exemple, les spécifications dont elle cite les invariants et l'outil de transmission. La recette de l'observatoire suit aussi l'orchestrateur et le référentiel Java, dont ses instances d'épreuve exportent ou citent les invariants.
 
 ### 2026-11-24 : propositions de l'observatoire vérifiées
 

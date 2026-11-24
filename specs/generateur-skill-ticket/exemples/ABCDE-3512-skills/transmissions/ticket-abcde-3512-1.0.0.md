@@ -48,13 +48,13 @@ Suis `SKILL.md` à partir de sa section 4. Rien n'est modifié avant la ratifica
       {
         "path": "modules/invariants/SKILL.md",
         "from": "specs/orchestrateur-c7e/SKILL.md",
-        "version": "3.6.1",
-        "invariants": 33
+        "version": "3.7.0",
+        "invariants": 36
       },
       {
         "path": "modules/methode/SKILL.md",
         "from": "specs/orchestrateur-c7e/SKILL.md",
-        "version": "3.6.1",
+        "version": "3.7.0",
         "sections": [
           "2",
           "5.1",
@@ -242,9 +242,9 @@ Suis `SKILL.md` à partir de sa section 4. Rien n'est modifié avant la ratifica
     ],
     "genere_par": {
       "generateur": "generateur-skill-ticket",
-      "version": "1.3.0",
+      "version": "1.3.1",
       "fabrique": "java-angular-postgresql",
-      "orchestrateur": "3.6.1"
+      "orchestrateur": "3.7.0"
     }
   },
   "modules": [
@@ -536,7 +536,7 @@ version: 1.0.0
 
 # Skill de ticket ABCDE-3512
 
-> Produit par generateur-skill-ticket 1.3.0, fabrique `java-angular-postgresql`, référentiel des méso-contrats 3.3.0, orchestrateur-c7e 3.6.1. Ce skill remplace la fiche de transformation comme objet ratifié avant toute modification ; il reste identique à sa transmission. Si tu y relèves une ambiguïté ou une contradiction, signale-la au développeur ; ne corrige pas le skill toi-même.
+> Produit par generateur-skill-ticket 1.3.1, fabrique `java-angular-postgresql`, référentiel des méso-contrats 3.3.0, orchestrateur-c7e 3.7.0. Ce skill remplace la fiche de transformation comme objet ratifié avant toute modification ; il reste identique à sa transmission. Si tu y relèves une ambiguïté ou une contradiction, signale-la au développeur ; ne corrige pas le skill toi-même.
 
 ## 1. Place dans l'arbre
 
@@ -1728,12 +1728,12 @@ node .gemini/skills/ticket-abcde-3512/outils/vue.mjs verifier docs/demandes/ABCD
 <<<FICHIER modules/methode/SKILL.md>>>
 ---
 name: methode
-description: Sections de la méthode de l'orchestrateur C7E 3.6.1 dont le skill de ticket ABCDE-3512 a besoin, recopiées mot pour mot (§ 2, § 5.1, § 5.2, § 6, § 7.1, § 7.2, § 8, § 11.5).
+description: Sections de la méthode de l'orchestrateur C7E 3.7.0 dont le skill de ticket ABCDE-3512 a besoin, recopiées mot pour mot (§ 2, § 5.1, § 5.2, § 6, § 7.1, § 7.2, § 8, § 11.5).
 ---
 
 # Méthode C7E pour ABCDE-3512
 
-Sections recopiées mot pour mot de l'orchestrateur C7E 3.6.1 : § 2, § 5.1, § 5.2, § 6, § 7.1, § 7.2, § 8, § 11.5. La fiche dont elles parlent est ce skill, avec son analyse et sa remise (module `invariants`, correspondances). Un renvoi à un paragraphe absent de ce module est informatif.
+Sections recopiées mot pour mot de l'orchestrateur C7E 3.7.0 : § 2, § 5.1, § 5.2, § 6, § 7.1, § 7.2, § 8, § 11.5. La fiche dont elles parlent est ce skill, avec son analyse et sa remise (module `invariants`, correspondances). Un renvoi à un paragraphe absent de ce module est informatif.
 
 ## 2. Matrice d'activation (mixage paramétrique par défaut)
 
@@ -1922,7 +1922,7 @@ Une contradiction entre deux niveaux se signale et s'inscrit au registre des éc
 <<<FICHIER modules/invariants/SKILL.md>>>
 ---
 name: invariants
-description: Invariants dont hérite le skill de ticket ABCDE-3512, sans affaiblissement, avec ceux de l'orchestrateur C7E 3.6.1 recopiés mot pour mot et leurs correspondances dans un skill de ticket.
+description: Invariants dont hérite le skill de ticket ABCDE-3512, sans affaiblissement, avec ceux de l'orchestrateur C7E 3.7.0 recopiés mot pour mot et leurs correspondances dans un skill de ticket.
 ---
 
 # Invariants hérités par ABCDE-3512
@@ -1934,7 +1934,7 @@ Ce skill hérite, sans affaiblissement :
 - du référentiel `references/java.md` (java 1.1.1), pour ses sections « Versions cibles » et « Invariants », sans adopter son mode de travail ;
 - du référentiel `references/angular.md` (angular 1.0.1), pour ses sections « Versions cibles » et « Invariants », sans adopter son mode de travail ;
 - des skills dont les sous-agents de rôle appliquent la méthode, recopiés dans `references/` et `outils/` à leur version épinglée (agent-tdd-jira 1.3.4, agent2test 1.3.1, java 1.1.1, angular 1.0.1, analyse-projet 1.0.2, sonarqube 1.1.0) : leurs invariants s'appliquent au travail fait avec eux, cités avec le nom de leur skill (`agent-tdd-jira:D10.INV-1`) ;
-- des invariants de l'orchestrateur C7E 3.6.1, ci-dessous, mot pour mot.
+- des invariants de l'orchestrateur C7E 3.7.0, ci-dessous, mot pour mot.
 
 Un invariant ne s'affaiblit jamais. Une contradiction entre deux niveaux suit la précédence du module `methode` (§ 11.5) ; un écart s'inscrit au registre des écarts, avec sa décision (D6.INV-3).
 
@@ -1954,7 +1954,7 @@ Les invariants de l'orchestrateur parlent de sa fiche de transformation. Dans un
 | la qualification et la confirmation de la composition (D10.INV-1, D11) | faites avant la génération de ce skill ; si l'analyse montre que la demande sort des empreintes, ce skill remonte au parent, sans changer de composition (D11.INV-4) |
 | un paragraphe de l'orchestrateur (§ n) | le texte recopié dans le module `methode` s'il y figure ; sinon un renvoi informatif |
 
-## Invariants de l'orchestrateur C7E 3.6.1
+## Invariants de l'orchestrateur C7E 3.7.0
 
 - **D1.INV-1** : chaque modification du ticket est rattachée à un slot (É1 à É7) et à une profondeur (d=0 à d=3), dans la fiche et dans le message de son commit.
 - **D1.INV-2** : les slots É1 à É7 portent les sept termes de l'Axiome 7E, dans leur ordre ; É0, l'Outillage, est une précondition hors axiome, qui ne livre rien.
@@ -1989,6 +1989,9 @@ Les invariants de l'orchestrateur parlent de sa fiche de transformation. Dans un
 - **D11.INV-4** : `ticket.toml` garde la demande remplie, avec ses sources, et la composition confirmée ; si l'analyse montre ensuite que la demande sort des empreintes, l'IA revient à la qualification et fait confirmer une autre composition, sans en changer d'elle-même.
 - **D11.INV-5** : les possibilités du modèle se fondent sur l'analyse de l'application : à l'installation, l'IA propose celles qui s'appliquent, avec leurs repères, celles à retirer et celles qui manquent, rattachées à une couche et à une option ; le développeur seul les écrit dans le référentiel.
 - **D11.INV-6** : chaque complément se justifie par au moins une possibilité à `oui` que le principal ne porte pas ; les compléments sont en plus petit nombre possible, et la qualification nomme pour chacun les possibilités qui le justifient ; un ticket que le principal porte en entier n'a aucun complément.
+- **D12.INV-1** : l'export lit le registre des concepts, dans son historique Git au premier parent de la branche d'intégration, et le registre des écarts, sans rien modifier, ni registre ni historique ; il n'écrit dans le projet que le journal d'enveloppes de l'orchestrateur, `docs/c7e/observations-orchestrateur-c7e.jsonl`, et sa tête ; chaque événement du registre des concepts et chaque ligne décidée du registre des écarts y devient une enveloppe, selon les correspondances du socle d'observation et les précisions du module `observation` ; l'outil reste dans le clone du dépôt Agent2Prompt : l'IA n'exporte pas d'elle-même, elle donne la commande au développeur, qui la lance.
+- **D12.INV-2** : l'orchestrateur exporte avec le sel de l'instance, gardé dans le répertoire Git commun du projet et partagé avec les autres systèmes qui y exportent, comme le générateur de skills de ticket : une instance, une identité ; sans ce sel, tout journal d'enveloppes du projet arrête l'export, comme un sel étranger à l'un d'eux, au lieu qu'un nouveau sel change l'identité de l'instance ; le sel n'est jamais versionné, affiché, exporté ni passé en argument.
+- **D12.INV-3** : l'export est incrémental et idempotent : un événement ou une ligne déjà exportés, reconnus par leur format et leur numéro, ne le sont pas une seconde fois, et un export sans nouveauté laisse le journal et sa tête identiques, octet pour octet ; une ligne d'écart ou un historique du registre des concepts réécrits depuis leur export l'arrêtent, sans rien écrire.
 <<<FIN modules/invariants/SKILL.md>>>
 
 <<<FICHIER socle/SKILL.md>>>
@@ -9052,8 +9055,8 @@ Lis d'abord la vue entière de l'arbre, `node .gemini/skills/ticket-abcde-3512/o
 
 Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichiers ont été matérialisés.
 
-    e576c373c604ebe9d4fbd3db61b240f7116d4d414f8c8bd0d6e1f288b7969130  manifest.json
-    179cd07786f78866d871a559e5e69b4fc973a5161f7478a3ab6ae9dc9f5b0c48  SKILL.md
+    b1dce63a7f503d900783611ed3e0652edf9c2dc34a63c44773ab0e9fa77ee36c  manifest.json
+    61a8e427e02a28e38ea56e40bc6a596e0cbe75fddf7abfadade0eb087b646704  SKILL.md
     7a6a452a94a9da17762e361f2cc5786f4cc8f5758f46aaf139cb1d4b75d779e6  ticket.toml
     ce951fe7a03b3fd6647efe36561f87ab4543d7e5099967afcf303072cb3d77cd  modules/meso-contrats/SKILL.md
     c61356a0950ba6abfaffc1a04cedb652fa78cf73df8891cd319d64012e154a69  modules/option-persistance-schema/SKILL.md
@@ -9070,8 +9073,8 @@ Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichier
     f7de880ba006f18417cd898e3494bb2800dd9a290463ea840d933b3a977c4f7e  modules/champ/SKILL.md
     719a3172164c5f91ee4d9d3b710b2e6efa204bb0f9534d9a7e95469b896fd70d  modules/champ-depot/SKILL.md
     631c8bce8352636564d26f1c8e0de5389460f2f4fb22dc933eb01ce11a771158  modules/vue/SKILL.md
-    0a8813e38299230e341d7c1890bf7e5c503a9c9783bf7112935257d154208050  modules/methode/SKILL.md
-    6bd393eba30ae61c884f6e98928bd035220f2d3a05883a9f79ef12bd0d2a615a  modules/invariants/SKILL.md
+    a3badb13eaa6189b08c489a4372de2ec5eee8639b16007862707c6951efc35a8  modules/methode/SKILL.md
+    b92fcfbab37e5a771b6eb8c0558aac53ae41605f2dbd229d7c25642e7c68700a  modules/invariants/SKILL.md
     f9456b0bbcdce8cd1ebc06446c3d505829a0354f398f4aa819204e4e9c135f54  socle/SKILL.md
     4bb52253c4504f4a804460442b1711a9caab8e364528171f2afb9ba7d5acfccf  references/java.md
     28e0a697773aaf205f024e3fa0a0d99c43bbaf86fb7a56c954c9964e67d22d16  references/angular.md

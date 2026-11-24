@@ -1,8 +1,9 @@
-// Recette de l'observatoire (observatoire 1.0.0, D1 à D5), sur des instances d'épreuve dont les journaux
+// Recette de l'observatoire (observatoire 1.1.0, D1 à D6), sur des instances d'épreuve dont les journaux
 // sont produits par l'export du générateur de skills de ticket : A, le champ de l'arbre d'exemple ABCDE-3620
 // et un registre d'apprentissage dont une proposition, qui vise le générateur, est retenue ; B et C, des
-// champs écrits pour l'épreuve. Le magasin et le dépôt d'épreuve sont temporaires : la recette n'écrit ni dans
-// le répertoire Git commun du clone, ni dans ses propositions.
+// champs écrits pour l'épreuve ; et, pour la confrontation entre systèmes, par l'export de l'orchestrateur C7E,
+// depuis un registre des écarts commité dans ces projets. Le magasin et le dépôt d'épreuve sont temporaires :
+// la recette n'écrit ni dans le répertoire Git commun du clone, ni dans ses propositions.
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -14,6 +15,7 @@ import { fileURLToPath } from 'node:url';
 import { clore, decider, noter, proposer as proposerAuRegistre } from '../../generateur-skill-ticket/outils/apprentissage.mjs';
 import { FORMAT, canonique as canoniqueChamp } from '../../generateur-skill-ticket/outils/champ.mjs';
 import { exporter } from '../../generateur-skill-ticket/outils/observation.mjs';
+import { exporter as exporterOrchestrateur } from '../../orchestrateur-c7e/outils/observation.mjs';
 import {
   MAGASIN, PROPOSITIONS, SEUIL_ENVELOPPES, confronter, controlerEnveloppe, controlerProposition, etat, inscrire, lirePropositions, magasinParDefaut,
   principal, proposer, relever, repertoireGitCommun, sha256, suivre, verifier,
@@ -27,6 +29,13 @@ const SELS = { A: 'a'.repeat(64), B: 'b'.repeat(64), C: 'c'.repeat(64), D: 'd'.r
 const PREFIXE = Object.fromEntries(Object.entries(SELS).map(([k, sel]) => [k, sha256(sel).slice(0, 8)]));
 const PAR = 'Développeur d\'exemple';
 const RESUME = 'commit hors du plan, chez le client Dupont';
+const ORCHESTRATEUR = join(RACINE, 'specs', 'orchestrateur-c7e');
+const DEPART = /Registre de départ[\s\S]*?```json\n([\s\S]*?)\n```/.exec(readFileSync(join(ORCHESTRATEUR, 'SKILL.md'), 'utf8').replace(/\r\n/g, '\n'))[1];
+const MODELE = /```markdown\n(# Registre des écarts[\s\S]*?)\n```/.exec(readFileSync(join(ORCHESTRATEUR, 'meso-contrats.md'), 'utf8').replace(/\r\n/g, '\n'))[1];
+const JOURNAL_ORCHESTRATEUR = 'docs/c7e/observations-orchestrateur-c7e.jsonl';
+// Le désaccord du champ de l'arbre d'exemple, que champ.mjs inscrit au registre des écarts, décidé par le développeur.
+const DESACCORD = ['2026-11-05', 'ABCDE-3620', 'désaccord entre nœuds (D6.INV-3)', 'la date-heure reçue par le canal des lignes arrive sans fuseau', 'respecter : le canal porte le fuseau'];
+const AUTRE_DESACCORD = ['2026-11-06', 'ABCDE-3621', 'D6.INV-3', 'deux nœuds contraires sur le contrat de pagination', 'respecter : un seul contrat'];
 
 const git = (cwd, ...args) => execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
 const sansCR = (texte) => texte.replace(/\r\n/g, '\n');
@@ -116,9 +125,35 @@ function depot({ courante = '1.3.0' } = {}) {
   const anciennes = ['1.0.0', '1.1.0', '1.1.1', '1.2.0', '1.3.0'].filter((v) => v !== courante);
   mkdirSync(join(d, 'specs', 'generateur-skill-ticket'), { recursive: true });
   writeFileSync(join(d, 'specs', 'generateur-skill-ticket', 'manifest.json'), JSON.stringify({ ...manifeste, version: courante, previousVersions: anciennes.map((version) => ({ version, file: `archives/SKILL-v${version}.md` })) }));
-  for (const nom of ['orchestrateur-c7e', 'socle-observation']) cpSync(join(RACINE, 'specs', nom, 'manifest.json'), join(d, 'specs', nom, 'manifest.json'));
+  for (const nom of ['orchestrateur-c7e', 'socle-observation', 'java']) {
+    for (const f of ['manifest.json', 'SKILL.md']) cpSync(join(RACINE, 'specs', nom, f), join(d, 'specs', nom, f));
+  }
+  // Le socle back-front, connu du dépôt d'épreuve, sans son point d'entrée : ses invariants n'y sont pas définis.
+  cpSync(join(RACINE, 'specs', 'socle-back-front', 'manifest.json'), join(d, 'specs', 'socle-back-front', 'manifest.json'));
   return d;
 }
+
+/**
+ * Les registres de l'orchestrateur dans le projet, qui devient un dépôt Git : le registre des concepts, celui de
+ * départ par défaut, et le registre des écarts, avec ses lignes ; commités, puis exportés avec le sel de
+ * l'instance `nom`. Rappelé, il commite les registres donnés et exporte ce qui est nouveau.
+ */
+function orchestrateur(p, nom, lignes, { concepts = `${DEPART}\n`, date = '2026-11-20 09:00:00' } = {}) {
+  if (!existsSync(join(p, '.git'))) {
+    git(p, 'init', '-q');
+    for (const [k, v] of [['user.name', 'Epreuve'], ['user.email', 'epreuve@exemple.invalid'], ['commit.gpgsign', 'false'], ['core.autocrlf', 'false']]) git(p, 'config', k, v);
+  }
+  mkdirSync(join(p, 'docs', 'c7e'), { recursive: true });
+  writeFileSync(join(p, 'docs', 'c7e', 'concepts.json'), concepts);
+  writeFileSync(join(p, 'docs', 'c7e', 'registre-ecarts.md'), `${MODELE}\n${lignes.map((l) => `| ${l.join(' | ')} |`).join('\n')}\n`);
+  git(p, 'add', '--', 'docs/c7e/concepts.json', 'docs/c7e/registre-ecarts.md');
+  execFileSync('git', ['commit', '-q', '--allow-empty', '-F', '-'], { cwd: p, input: 'Registres de l\'orchestrateur', env: { ...process.env, GIT_AUTHOR_DATE: `${date} +0000`, GIT_COMMITTER_DATE: `${date} +0000` }, stdio: ['pipe', 'pipe', 'ignore'] });
+  const r = exporterOrchestrateur({ projet: p, sel: SELS[nom] });
+  assert.deepStrictEqual(r.erreurs, [], `export de l'orchestrateur, instance ${nom}`);
+}
+
+/** Numéro, dans le journal du générateur d'un projet, de l'enveloppe qui cite `invariant`. */
+const numeroDuGenerateur = (p, invariant) => sansCR(readFileSync(join(p, JOURNAL), 'utf8')).trim().split('\n').map((l) => JSON.parse(l)).find((x) => x.invariant === invariant).numero;
 
 /** Un observatoire d'épreuve : magasin et dépôt temporaires, projets inscrits. */
 function observatoire(projets, options = {}) {
@@ -238,6 +273,29 @@ test('D1 : une enveloppe d\'un système ou d\'une version inconnus du dépôt es
   assert.deepStrictEqual(e.instances.find((i) => i.instance === PREFIXE.D).systemes.map((s) => [s.nom, s.derniere, s.ecart]), [['generateur-skill-ticket', '9.9.9', 'inconnue']]);
 });
 
+test('D1 : les journaux de chaque système d\'une instance se relèvent, chacun dans son miroir ; une instance aux journaux de sels différents n\'est pas inscrite', () => {
+  const a = INSTANCES.A();
+  orchestrateur(a, 'A', [DESACCORD]);
+  orchestrateur(a, 'A', [DESACCORD], { concepts: `${JSON.stringify({ ...JSON.parse(DEPART), concepts: JSON.parse(DEPART).concepts.filter((c) => c.id !== 'C_PEDAGOGIE_001') }, null, 2)}\n`, date: '2026-11-21 09:00:00' });
+  const lieux = observatoire([a]);
+  const r = relever(lieux);
+  assert.deepStrictEqual([r.erreurs, r.releves.map((x) => [x.journal, x.ajoutees])], [[], [[JOURNAL.split(sep).join('/'), 24], [JOURNAL_ORCHESTRATEUR, 2]]], 'le désaccord décidé, et le retrait d\'un concept du registre de départ');
+  const dossier = join(lieux.magasin, 'instances', sha256(SELS.A));
+  assert.deepStrictEqual(readdirSync(dossier).sort(), ['observations-orchestrateur-c7e.jsonl', 'observations-orchestrateur-c7e.tete', 'observations.jsonl', 'observations.tete']);
+  const xs = readFileSync(join(dossier, 'observations-orchestrateur-c7e.jsonl'), 'utf8').trim().split('\n').map((l) => JSON.parse(l));
+  for (const x of xs) assert.deepStrictEqual(controlerEnveloppe(x), []);
+  const retrait = xs.find((x) => x.ancre.nature === 'concept');
+  assert.deepStrictEqual([retrait.type, retrait.nature, retrait.ancre.ref], ['decision', 'retire', 'C_PEDAGOGIE_001'], 'un concept du registre de départ, en clair');
+  assert.ok(controlerEnveloppe({ ...retrait, ancre: { nature: 'concept', ref: 'c-pedagogie-001' } }).some((e) => /^ancre\.ref : /.test(e)), 'un identifiant de concept d\'une autre forme est refusé');
+  assert.deepStrictEqual(etat(lieux).instances[0].systemes.map((s) => [s.nom, s.derniere, s.ecart]), [['generateur-skill-ticket', '1.3.0', 'a-jour'], ['orchestrateur-c7e', '3.7.0', 'a-jour']]);
+
+  const b = INSTANCES.B();
+  const autre = projet('autre-sel');
+  orchestrateur(autre, 'C', [['2026-11-10', 'FGHIJ-100', 'java:D4.INV-1', 'changeset modifié en place', 'respecter : un nouveau changeset']]);
+  for (const f of [JOURNAL_ORCHESTRATEUR, JOURNAL_ORCHESTRATEUR.replace(/\.jsonl$/, '.tete')]) cpSync(join(autre, f), join(b, f));
+  assert.match(inscrire(b, observatoire([])).erreurs[0], /ses journaux viennent d'instances différentes$/);
+});
+
 // ---- D2 : confrontation ----
 
 test('D2 : une récurrence compte des instances distinctes : un même motif, à la même profondeur, pour un même système, dans au moins deux instances', () => {
@@ -270,6 +328,71 @@ test('D2 : un retour remonte dès une instance : une proposition qui vise la sp�
   registre(refusee, 'refusee');
   exporterInstance(refusee, 'E');
   assert.deepStrictEqual(confronter(observatoire([refusee])).candidats, [], 'une proposition refusée par l\'instance ne remonte pas');
+});
+
+// ---- D6 : confrontation entre systèmes ----
+
+test('D6 : un même invariant du dépôt, relevé par des écarts distincts de deux systèmes, ou dans deux instances, est un candidat ; un même écart ne compte qu\'une fois', () => {
+  const a = INSTANCES.A();
+  orchestrateur(a, 'A', [DESACCORD]);
+  const seul = confronter(observatoire([a]));
+  assert.deepStrictEqual(seul.candidats.map(cle), ['retour generateur-skill-ticket commit-hors-plan-back micro'], 'le désaccord du champ et sa ligne décidée au registre des écarts : un seul écart, compté une fois');
+  orchestrateur(a, 'A', [DESACCORD, AUTRE_DESACCORD], { date: '2026-11-21 09:00:00' });
+  const deux = confronter(observatoire([a]));
+  const c = deux.candidats.find((x) => x.sorte === 'invariant');
+  assert.deepStrictEqual({ ...c, references: undefined }, {
+    sorte: 'invariant', systeme: 'orchestrateur-c7e', motif: 'ecart-orchestrateur-c7e-d6-inv-3', invariant: 'orchestrateur-c7e:D6.INV-3', systemes: ['generateur-skill-ticket', 'orchestrateur-c7e'],
+    versions: ['3.7.0'], instances: 1, ecarts: 2, enveloppes: 3, references: undefined,
+  }, 'deux écarts distincts, deux systèmes : le candidat va à la spécification qui définit l\'invariant, à sa version courante');
+  assert.deepStrictEqual(c.references, [`${PREFIXE.A}:generateur-skill-ticket:${numeroDuGenerateur(a, 'orchestrateur-c7e:D6.INV-3')}`, `${PREFIXE.A}:orchestrateur-c7e:1`, `${PREFIXE.A}:orchestrateur-c7e:2`]);
+
+  // B et C : l'orchestrateur seul, un même invariant de java dans deux instances ; un invariant de l'orchestrateur
+  // sur deux tickets de B, un seul système dans une seule instance ; un invariant que le dépôt d'épreuve ne définit pas.
+  const [b, d] = [INSTANCES.B(), INSTANCES.C()];
+  const sansDefinition = (cle) => ['2026-11-10', cle, 'SC2.INV-1', 'contrat changé sans version', 'respecter : une version 2'];
+  orchestrateur(b, 'B', [
+    ['2026-11-10', 'FGHIJ-100', 'java:D4.INV-1', 'changeset modifié en place', 'respecter : un nouveau changeset'],
+    ['2026-11-10', 'FGHIJ-100', 'D8.INV-2', 'contradiction avec le socle', 'respecter : le socle l\'emporte'],
+    ['2026-11-11', 'FGHIJ-101', 'D8.INV-2', 'contradiction avec le socle', 'respecter : le socle l\'emporte'],
+    sansDefinition('FGHIJ-100'),
+  ]);
+  orchestrateur(d, 'C', [['2026-11-12', 'KLMNO-7', 'java:D4.INV-1', 'changeset modifié en place', `dérogation validée par ${PAR}`], sansDefinition('KLMNO-7')]);
+  const r = confronter(observatoire([b, d]));
+  assert.deepStrictEqual(r.candidats.filter((x) => x.sorte === 'invariant').map((x) => [x.invariant, x.systeme, x.motif, x.systemes, x.versions, x.instances, x.ecarts, x.enveloppes]), [
+    ['java:D4.INV-1', 'java', 'ecart-java-d4-inv-1', ['orchestrateur-c7e'], ['1.1.1'], 2, 2, 2],
+  ], 'java : deux instances ; D8.INV-2 : deux écarts, un système, une instance ; SC2.INV-1 : non défini par le dépôt d\'épreuve');
+});
+
+test('D6 : un candidat par invariant se propose à la spécification qui le définit, avec les systèmes qui l\'ont relevé, et ses références nomment le système de chaque enveloppe', () => {
+  const a = INSTANCES.A();
+  orchestrateur(a, 'A', [DESACCORD, AUTRE_DESACCORD]);
+  const lieux = observatoire([a]);
+  const sortie = lancer(lieux, 'confronter').sortie;
+  assert.match(sortie, /^ {2}invariant {2}orchestrateur-c7e, ecart-orchestrateur-c7e-d6-inv-3 : orchestrateur-c7e:D6\.INV-3, 2 systèmes, 1 instance, 3 enveloppes$/m);
+  assert.match(sortie, /^moins de 2 instances : aucune récurrence possible ; seuls remontent les retours, et les invariants relevés par deux systèmes$/m);
+  const r = proposer({ ...lieux, date: '2026-11-24' });
+  const fichier = `${PROPOSITIONS}/2026-11-24-orchestrateur-c7e-ecart-orchestrateur-c7e-d6-inv-3.md`;
+  assert.ok(r.ecrites.includes(fichier), r.ecrites.join(' ; '));
+  const texte = readFileSync(join(lieux.depot, fichier), 'utf8');
+  const { entete, erreurs } = controlerProposition(texte);
+  assert.deepStrictEqual(erreurs, []);
+  assert.deepStrictEqual([entete.sorte, entete.systeme, entete.invariant, entete.systemes, entete.versions, entete.profondeur, entete.instances, entete.enveloppes], ['invariant', 'orchestrateur-c7e', 'orchestrateur-c7e:D6.INV-3', ['generateur-skill-ticket', 'orchestrateur-c7e'], ['3.7.0'], undefined, 1, 3]);
+  for (const v of ['ABCDE', 'fuseau', 'pagination', PAR, ...Object.values(SELS), sha256(SELS.A)]) assert.ok(!texte.includes(v), `« ${v} » en clair`);
+  const cas = [
+    [texte.replace('systeme: orchestrateur-c7e', 'systeme: java'), /invariant : l'identifiant d'un invariant du dépôt, préfixé par la spécification visée/],
+    [texte.replace(/^systemes: .*\n/m, ''), /systemes : la liste des systèmes/],
+    [texte.replace(/^references: \[([0-9a-f]{8}):generateur-skill-ticket:/m, 'references: [$1:'), /references : une liste de références tronquées, instance:systeme:numero/],
+    [texte.replace(/^references: \[([0-9a-f]{8}):generateur-skill-ticket:/m, 'references: [$1:java:'), /references : .* d'un système de la liste/],
+    [texte.replace('statut: ouverte', 'profondeur: micro\nstatut: ouverte'), /profondeur : aucune pour une proposition par invariant/],
+    [texte.replace(/^motif: .*$/m, 'motif: desaccord-entre-noeuds'), /motif « desaccord-entre-noeuds » : ecart-orchestrateur-c7e-d6-inv-3/],
+    [texte.replace('sorte: invariant', 'sorte: recurrence'), /invariant, systemes : seulement pour une proposition par invariant/],
+  ];
+  for (const [mute, motif] of cas) assert.ok(controlerProposition(mute).erreurs.some((e) => motif.test(e)), `${motif} : ${controlerProposition(mute).erreurs.join(' ; ')}`);
+  assert.deepStrictEqual(proposer({ ...lieux, date: '2026-11-25' }).ignorees.map((i) => i.raison.split(' : ')[0]), ['déjà proposée, ouverte', 'déjà proposée, ouverte']);
+
+  ecrireStatut(lieux.depot, fichier, 'statut: ratifiee\nversion: 3.8.0\npr: 90');
+  const s = suivre(lieux).suivis.find((x) => x.fichier === fichier);
+  assert.deepStrictEqual([s.sorte, s.invariant, s.effet, s.avant, s.apres], ['invariant', 'orchestrateur-c7e:D6.INV-3', 'indecidable', { motif: 2, enveloppes: 2 }, { motif: 0, enveloppes: 0 }], 'les écarts qui citent l\'invariant, parmi les enveloppes de la spécification qui le définit');
 });
 
 // ---- D3 : état de l'écosystème ----

@@ -1,9 +1,9 @@
 {
   "name": "observatoire",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "specSchema": 1,
   "language": "fr",
-  "description": "Observatoire de l'écosystème Agent2Prompt, sur le poste : relève les journaux d'enveloppes des projets selon le socle d'observation, les confronte entre instances, observe l'état de l'écosystème, écrit des propositions minimisées que le développeur apporte au dépôt par pull request, et suit l'effet des propositions ratifiées ; premier couplage du troisième ordre, il propose et n'applique jamais.",
+  "description": "Observatoire de l'écosystème Agent2Prompt, sur le poste : relève les journaux d'enveloppes des projets selon le socle d'observation, les confronte entre instances, et entre systèmes par les invariants du dépôt que citent leurs écarts, observe l'état de l'écosystème, écrit des propositions minimisées que le développeur apporte au dépôt par pull request, et suit l'effet des propositions ratifiées ; premier couplage du troisième ordre, il propose et n'applique jamais.",
   "entry": "SKILL.md",
   "shared": [
     { "path": "socle-observation/SKILL.md", "from": "specs/socle-observation/SKILL.md", "version": "1.1.0" }
@@ -14,10 +14,13 @@
   "modules": [
     { "id": "releve", "path": "modules/releve/SKILL.md", "dimensions": ["D1"], "status": "active" },
     { "id": "confrontation", "path": "modules/confrontation/SKILL.md", "dimensions": ["D2"], "status": "active" },
+    { "id": "systemes", "path": "modules/systemes/SKILL.md", "dimensions": ["D6"], "status": "active" },
     { "id": "etat", "path": "modules/etat/SKILL.md", "dimensions": ["D3"], "status": "active" },
     { "id": "propositions", "path": "modules/propositions/SKILL.md", "dimensions": ["D4"], "status": "active" },
     { "id": "suivi", "path": "modules/suivi/SKILL.md", "dimensions": ["D5"], "status": "active" }
   ],
   "extensionPoints": ["E1", "E2", "E3"],
-  "previousVersions": []
+  "previousVersions": [
+    { "version": "1.0.0", "file": "archives/SKILL-v1.0.0.md" }
+  ]
 }

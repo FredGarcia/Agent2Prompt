@@ -11,7 +11,7 @@ Une proposition est ce qui remonte d'un candidat jusqu'au dépôt : un fichier, 
 
 ## 1. Fichier
 
-`proposer` écrit une proposition par candidat nouveau dans `observatoire/propositions/`, à la racine du clone, sous le nom `AAAA-MM-JJ-<système>-<motif>-<profondeur>.md`. Le développeur la relit, rédige sous « Ce qui change » la règle à changer et pourquoi, la commite et ouvre la pull request ; l'observatoire ne commite, ne pousse ni ne publie rien, et n'écrit dans le dépôt que ces fichiers (D4.INV-2).
+`proposer` écrit une proposition par candidat nouveau dans `observatoire/propositions/`, à la racine du clone, sous le nom `AAAA-MM-JJ-<système>-<motif>-<profondeur>.md`, sans profondeur pour un candidat qui n'en a pas, comme un candidat par invariant. Le développeur la relit, rédige sous « Ce qui change » la règle à changer et pourquoi, la commite et ouvre la pull request ; l'observatoire ne commite, ne pousse ni ne publie rien, et n'écrit dans le dépôt que ces fichiers (D4.INV-2).
 
 ## 2. En-tête
 
@@ -22,26 +22,28 @@ L'en-tête, entre deux lignes `---`, suit le format `observatoire.proposition/1`
 | `format` | `observatoire.proposition/1` |
 | `date` | le jour de la proposition, AAAA-MM-JJ |
 | `systeme` | le nom de la spécification visée |
-| `versions` | les versions du système vues dans les enveloppes, entre crochets |
-| `sorte` | `retour` ou `recurrence` |
-| `motif` | le motif, en minuscules et tirets |
-| `profondeur` | `macro`, `meso-contrats`, `meso-composants` ou `micro` ; facultative |
+| `versions` | les versions du système vues dans les enveloppes, entre crochets ; pour une proposition par invariant, la version courante de la spécification qui le définit |
+| `sorte` | `retour`, `recurrence` ou `invariant` |
+| `motif` | le motif, en minuscules et tirets ; pour une proposition par invariant, `ecart-` suivi de l'invariant |
+| `invariant` | pour une proposition par invariant seulement : l'invariant du dépôt, préfixé par la spécification visée |
+| `systemes` | pour une proposition par invariant seulement : les systèmes dont les écarts citent l'invariant, entre crochets |
+| `profondeur` | `macro`, `meso-contrats`, `meso-composants` ou `micro` ; facultative, absente d'une proposition par invariant |
 | `instances`, `enveloppes` | des nombres |
-| `references` | les références tronquées des enveloppes, `<8 caractères de l'instance>:<numéro>`, entre crochets |
+| `references` | les références tronquées des enveloppes, `<8 caractères de l'instance>:<numéro>`, entre crochets ; pour une proposition par invariant, `<8 caractères de l'instance>:<système>:<numéro>`, d'un système de `systemes` |
 | `statut` | `ouverte`, `ratifiee` ou `refusee` |
 | `version` | pour une proposition ratifiée seulement : la version du système qui la porte |
 | `pr` | pour une proposition décidée : le numéro de la pull request qui l'a décidée |
 
-Toute autre clé, toute valeur hors de ces formes, refusent la proposition. Aucun texte, chemin, clé de ticket ni nom d'une instance n'entre dans l'en-tête ; le corps, rédigé par le développeur, n'en contient pas davantage.
+Toute autre clé, toute valeur hors de ces formes, refusent la proposition. L'invariant et les systèmes sont des identifiants du dépôt, comme le système et le motif. Aucun texte, chemin, clé de ticket ni nom d'une instance n'entre dans l'en-tête ; le corps, rédigé par le développeur, n'en contient pas davantage.
 
 ## 3. Statut et répétition
 
 - La pull request de ratification inscrit le statut dans l'en-tête : `statut: ratifiee`, avec `version` et `pr`, ou `statut: refusee`, avec `pr`. C'est ce statut que suit le module `suivi`.
-- Une proposition ouverte ou ratifiée ne se répète pas ; une proposition refusée ne revient qu'avec une instance nouvelle, absente de ses références (D4.INV-2).
+- Une proposition ouverte ou ratifiée ne se répète pas ; une proposition refusée ne revient qu'avec une instance nouvelle, absente de ses références (D4.INV-2). Une proposition se reconnaît à son système, son motif et sa profondeur ; une proposition par invariant, à son système et à son motif, et ne se confond avec aucune autre sorte.
 
 ## 4. Recette
 
 | Invariant | Tests |
 |---|---|
-| D4.INV-1 | `tests/observatoire.test.mjs` : « D4 : une proposition ne porte que des valeurs minimisées, et aucun texte, chemin ni nom d'une instance n'entre dans le dépôt » ; `tests/specification.test.mjs` : « spécification : chaque proposition du dépôt suit le format observatoire.proposition/1, et leur dossier a son README » |
+| D4.INV-1 | `tests/observatoire.test.mjs` : « D4 : une proposition ne porte que des valeurs minimisées, et aucun texte, chemin ni nom d'une instance n'entre dans le dépôt » ; « D6 : un candidat par invariant se propose à la spécification qui le définit, avec les systèmes qui l'ont relevé, et ses références nomment le système de chaque enveloppe » ; `tests/specification.test.mjs` : « spécification : chaque proposition du dépôt suit le format observatoire.proposition/1, et leur dossier a son README » |
 | D4.INV-2 | `tests/observatoire.test.mjs` : « D4 : l'observatoire n'écrit dans le dépôt que des propositions, sans toucher aux projets ; une ouverte ou une ratifiée ne se répète pas, une refusée ne revient qu'avec une instance nouvelle » ; « Ligne de commande : codes de sortie ; le magasin d'épreuve seul est écrit » |

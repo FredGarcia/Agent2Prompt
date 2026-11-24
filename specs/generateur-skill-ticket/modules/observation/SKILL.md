@@ -19,14 +19,14 @@ Le champ et l'apprentissage font du générateur un système de second ordre, bo
 
 ## 2. Le sel de l'instance
 
-Le sel, 32 octets aléatoires écrits en hexadécimal, est tiré à la première exportation et gardé dans le répertoire Git commun du projet, `<git-common-dir>/agent2prompt/sel`, lisible de son seul propriétaire : hors de l'arbre de travail, donc jamais versionné, et partagé par les worktrees du projet. Il n'est jamais affiché, exporté ni passé en argument (D9.INV-2). Un autre clone du projet a besoin du même sel pour continuer le journal : le développeur l'y recopie lui-même, au même emplacement. Sans lui, un journal existant arrête l'export, comme un sel qui n'est pas celui du journal : un nouveau sel changerait l'identité de l'instance au milieu de son journal.
+Le sel, 32 octets aléatoires écrits en hexadécimal, est tiré à la première exportation du projet, de quelque système qu'elle soit, et gardé dans le répertoire Git commun du projet, `<git-common-dir>/agent2prompt/sel`, lisible de son seul propriétaire : hors de l'arbre de travail, donc jamais versionné, et partagé par les worktrees du projet et par les systèmes qui y exportent, comme l'orchestrateur C7E, dans son propre journal. Il n'est jamais affiché, exporté ni passé en argument (D9.INV-2). Un autre clone du projet a besoin du même sel pour continuer les journaux : le développeur l'y recopie lui-même, au même emplacement. Sans lui, un journal d'enveloppes du projet, celui du générateur ou celui d'un autre système, arrête l'export, comme un sel qui n'est pas celui de l'un d'eux : un nouveau sel changerait l'identité de l'instance au milieu de ses journaux.
 
 ## 3. Export incrémental
 
 - Un enregistrement déjà exporté, reconnu par son format, son journal, l'empreinte salée de la clé de son ticket pour le champ, et son numéro, ne l'est pas une seconde fois ; deux exports sans enregistrement nouveau laissent le journal et sa tête identiques, octet pour octet (D9.INV-3).
 - Les enregistrements nouveaux se fusionnent par date, sans changer l'ordre d'un même journal ; à date égale, les champs passent dans l'ordre de leur clé, puis le registre d'apprentissage.
 - Un enregistrement arrivé après d'autres, plus récents, par exemple d'une branche fusionnée plus tard, prend la date de la dernière enveloppe : le journal reste dans l'ordre du temps (`socle-observation:SO2.INV-1`).
-- Tout ou rien : un journal ou une source altérés, un sel absent ou étranger au journal, une enveloppe mal formée arrêtent l'export, et rien n'est écrit, ni journal, ni tête, ni sel (`socle-observation:SO1.INV-1`).
+- Tout ou rien : un journal ou une source altérés, un sel absent ou étranger à un journal du projet, une enveloppe mal formée arrêtent l'export, et rien n'est écrit, ni journal, ni tête, ni sel (`socle-observation:SO1.INV-1`).
 - L'export se lance sur la branche d'intégration du projet, où se rejoignent les branches des tickets : un journal en ajout seul et chaîné ne se fusionne pas.
 
 ## 4. Commandes
@@ -52,7 +52,7 @@ Depuis le projet, avec Node 20 ou plus récent :
 | Invariant | Tests |
 |---|---|
 | D9.INV-1 | `tests/observation.test.mjs` : « D9 : l'export lit le champ de chaque ticket et le registre d'apprentissage sans les modifier, et n'écrit que le journal d'enveloppes, sa tête et le sel » ; « D9 : ligne de commande, codes de sortie » ; `tests/specification.test.mjs` : « 1.3.0 : l'export ne passe pas par les skills de ticket : ni l'outil, ni le module, ni le socle n'y entrent » |
-| D9.INV-2 | `tests/observation.test.mjs` : « D9 : le sel de l'instance est tiré une fois, dans le répertoire Git commun, partagé par les worktrees, jamais versionné, affiché ni exporté » ; « D9 : sans le sel, un journal existant arrête l'export, rien n'est écrit » ; « SO3 : aucun nom, aucune clé, aucun chemin du projet ne sort en clair, et le sel jamais » |
+| D9.INV-2 | `tests/observation.test.mjs` : « D9 : le sel de l'instance est tiré une fois, dans le répertoire Git commun, partagé par les worktrees, jamais versionné, affiché ni exporté » ; « D9 : sans le sel, un journal existant arrête l'export, rien n'est écrit » ; « D9 : le journal d'un autre système du projet compte aussi : sans le sel, il arrête l'export, comme un sel qui n'est pas le sien » ; « SO3 : aucun nom, aucune clé, aucun chemin du projet ne sort en clair, et le sel jamais » |
 | D9.INV-3 | `tests/observation.test.mjs` : « D9 : l'export est incrémental et idempotent : un enregistrement exporté ne l'est pas deux fois, et deux exports sans nouveauté laissent le journal identique, octet pour octet » ; « D9 : un enregistrement arrivé après d'autres, plus récents, prend la date de la dernière enveloppe, et chaque journal source garde son ordre » |
 
 Les invariants du socle, appliqués au générateur :

@@ -1,4 +1,4 @@
-// Recette de l'export vers le socle d'observation (generateur-skill-ticket 1.3.0, D9 ; socle-observation
+// Recette de l'export vers le socle d'observation (generateur-skill-ticket 1.3.1, D9 ; socle-observation
 // 1.1.0, SO1 à SO4) : ce que l'export lit et écrit, le sel de l'instance, l'export incrémental et
 // idempotent, puis les sept invariants du socle appliqués au générateur, sur le champ de l'arbre d'exemple
 // ABCDE-3620, un registre d'apprentissage et des champs écrits pour l'épreuve.
@@ -15,6 +15,7 @@ import { FORMAT, canonique as canoniqueChamp, lireChamp, sha256 } from '../outil
 import {
   JOURNAL, SCHEMA, SEL, TETE, controlerEnveloppe, empreinteSalee, exporter, lireJournal, lireSel, principal, repertoireGitCommun, verifierJournal,
 } from '../outils/observation.mjs';
+import { JOURNAL as JOURNAL_ORCHESTRATEUR, exporter as exporterOrchestrateur } from '../../orchestrateur-c7e/outils/observation.mjs';
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const SPEC = join(ICI, '..');
@@ -195,6 +196,29 @@ test('D9 : sans le sel, un journal existant arrête l\'export, rien n\'est écri
   assert.equal(r3.code, 1);
   assert.match(r3.erreur, /n'est pas dans un dépôt Git : le sel de l'instance se garde dans son répertoire Git commun/);
   assert.equal(existsSync(join(horsDepot, JOURNAL)), false);
+});
+
+test('D9 : le journal d\'un autre système du projet compte aussi : sans le sel, il arrête l\'export, comme un sel qui n\'est pas le sien', () => {
+  const p = projet();
+  const registre = '# Registre des écarts\n\n| Date | Ticket | Invariant concerné | Écart constaté | Décision (respecter, ou dérogation validée par) |\n|---|---|---|---|---|\n| 2026-11-04 | ABCDE-3620 | java:D4.INV-1 | changeset modifié en place | respecter : un nouveau changeset |\n';
+  mkdirSync(join(p, 'docs', 'c7e'), { recursive: true });
+  writeFileSync(join(p, 'docs', 'c7e', 'registre-ecarts.md'), registre);
+  git(p, 'add', '--', 'docs/c7e/registre-ecarts.md');
+  git(p, '-c', 'user.name=Epreuve', '-c', 'user.email=epreuve@exemple.invalid', '-c', 'commit.gpgsign=false', 'commit', '-q', '-m', 'registre des ecarts');
+  const selOrchestrateur = 'e'.repeat(64);
+  assert.deepStrictEqual(exporterOrchestrateur({ projet: p, sel: selOrchestrateur }).erreurs, [], 'l\'orchestrateur a exporté d\'abord, avec le sel d\'un autre clone');
+  const r = lancer('exporter', '--projet', p);
+  assert.equal(r.code, 1);
+  assert.match(r.erreur, /^REFUS {2}sel de l'instance absent de <git-common-dir>\/agent2prompt\/sel alors que docs\/c7e\/observations-orchestrateur-c7e\.jsonl existe : un nouveau sel changerait l'identité de l'instance/m);
+  assert.deepStrictEqual([existsSync(join(p, JOURNAL)), existsSync(join(repertoireGitCommun(p), SEL))], [false, false], 'ni journal, ni sel tiré');
+  mkdirSync(dirname(join(repertoireGitCommun(p), SEL)), { recursive: true });
+  writeFileSync(join(repertoireGitCommun(p), SEL), `${'f'.repeat(64)}\n`);
+  assert.match(lancer('exporter', '--projet', p).erreur, /le sel de ce clone n'est pas celui de l'instance du journal docs\/c7e\/observations-orchestrateur-c7e\.jsonl : rien n'est exporté/);
+  assert.equal(existsSync(join(p, JOURNAL)), false);
+  writeFileSync(join(repertoireGitCommun(p), SEL), `${selOrchestrateur}\n`);
+  assert.equal(lancer('exporter', '--projet', p).code, 0, 'avec le sel recopié, l\'export reprend');
+  assert.deepStrictEqual([enveloppes(p)[0].instance, lireJournal(p).enveloppes.length > 0], [sha256(selOrchestrateur), true]);
+  assert.equal(JSON.parse(texteDe(p, JOURNAL_ORCHESTRATEUR).split('\n')[0]).instance, sha256(selOrchestrateur), 'une instance, une identité : les deux journaux');
 });
 
 test('D9 : l\'export est incrémental et idempotent : un enregistrement exporté ne l\'est pas deux fois, et deux exports sans nouveauté laissent le journal identique, octet pour octet', () => {

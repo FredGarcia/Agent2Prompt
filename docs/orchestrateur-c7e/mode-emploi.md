@@ -1,6 +1,6 @@
 # Mode d'emploi : lancer l'orchestrateur C7E dans Gemini CLI
 
-Ce mode d'emploi installe la spécification [`orchestrateur-c7e`](../../specs/orchestrateur-c7e/SKILL.md) 3.6.1 dans un projet et la fait appeler au démarrage de l'IA locale, Gemini CLI. Le skill ne s'applique qu'au choix du développeur, selon l'un de deux chargements :
+Ce mode d'emploi installe la spécification [`orchestrateur-c7e`](../../specs/orchestrateur-c7e/SKILL.md) 3.7.0 dans un projet et la fait appeler au démarrage de l'IA locale, Gemini CLI. Le skill ne s'applique qu'au choix du développeur, selon l'un de deux chargements :
 
 | Chargement | Le choix se fait | Au démarrage, le contexte contient |
 |---|---|---|
@@ -17,7 +17,7 @@ Une fois l'orchestrateur choisi, chaque ticket est d'abord **qualifié**, à son
 
 - Gemini CLI, lancé à la racine du projet.
 - Pour le chargement au choix, la prise en charge des skills : la commande `/skills list` doit répondre.
-- Un clone du dépôt Agent2Prompt, pour l'installateur `tools/installer.mjs`. À défaut, la transmission seule : [`transmissions/orchestrateur-c7e-3.6.1.md`](../../transmissions/orchestrateur-c7e-3.6.1.md).
+- Un clone du dépôt Agent2Prompt, pour l'installateur `tools/installer.mjs`. À défaut, la transmission seule : [`transmissions/orchestrateur-c7e-3.7.0.md`](../../transmissions/orchestrateur-c7e-3.7.0.md).
 - Node 20 ou plus récent, pour l'installateur et pour extraire le référentiel, et `sha256sum`, fourni par Git Bash sous Windows, pour vérifier les fichiers.
 
 Deux dépôts interviennent :
@@ -112,7 +112,7 @@ Tous ces fichiers sont versionnés avec le projet, images comprises : une comman
    ```
 
 2. Si ce fichier ne s'appelle pas `GEMINI.md`, le déclarer dans `.gemini/settings.json` (voir § 6).
-3. Lancer `gemini`, puis `/memory show` : le texte du skill doit apparaître, en commençant par « Orchestrateur fractal C7E, version 3.6.1 ».
+3. Lancer `gemini`, puis `/memory show` : le texte du skill doit apparaître, en commençant par « Orchestrateur fractal C7E, version 3.7.0 ».
 
 Les lignes `@` ne sont développées que dans un fichier de contexte. Si le fichier est envoyé comme message, l'IA ne voit que le texte des lignes, sans le contenu des fichiers. Le référentiel n'est pas importé : l'IA le lit à l'analyse de chaque ticket.
 
@@ -230,6 +230,17 @@ La demande remplie à la qualification signale déjà des options ; l'analyse le
 
 Si l'IA signale qu'aucune catégorie ne couvre le ticket, choisir la plus proche ou ajouter la catégorie au référentiel ; l'IA ne l'ajoute pas elle-même.
 
+### Exporter les registres vers le socle d'observation
+
+Le registre des concepts et le registre des écarts du projet s'exportent, minimisés, dans le journal d'enveloppes de l'orchestrateur, que l'observatoire de l'écosystème relève (module `observation` du skill). L'outil reste dans le clone d'Agent2Prompt : l'IA ne l'exécute pas, elle vous en donne la commande. Depuis la racine du projet, sur sa branche d'intégration, après la fusion des tickets :
+
+```bash
+node <dépôt>/specs/orchestrateur-c7e/outils/observation.mjs exporter
+node <dépôt>/specs/orchestrateur-c7e/outils/observation.mjs etat
+```
+
+`exporter` lit l'historique Git de `docs/c7e/concepts.json` et les lignes décidées de `docs/c7e/registre-ecarts.md`, sans rien modifier, et ajoute au journal `docs/c7e/observations-orchestrateur-c7e.jsonl` et à sa tête ce qui est nouveau ; versionnez-les avec le projet. Une entrée proposée par un commit `[É7-C7E]` sort au niveau N2 ; une ligne sans décision attend. Le sel de l'instance est celui du répertoire Git commun du projet, partagé avec l'export du générateur de skills de ticket : jamais versionné, affiché ni exporté. `verifier` contrôle le journal ; `etat` le résume.
+
 ## 9. Limites connues
 
 - **Activation spontanée.** Gemini CLI peut proposer d'activer le skill dès qu'un ticket apparaît. Refuser la confirmation sans choix préalable ; le skill interdit aussi de s'activer de lui-même.
@@ -258,6 +269,9 @@ Si l'IA signale qu'aucune catégorie ne couvre le ticket, choisir la plus proche
 | la qualification dit prendre le modèle de la demande du skill | référentiel installé avant la 3.3.0, sans section `[modele_demande]` | copier la section 0 du modèle (module `referentiel`, § 6) dans le référentiel du projet, et changer `meta.version` |
 | un ticket de variante de représentation ne trouve pas de catégorie | référentiel installé avant la 3.4.0, sans M04 | copier du modèle (module `referentiel`, § 6) le bloc M04, les options `representations` et `evenements`, les possibilités `variante_representation` et `temps_reel` et la règle de choix sur les possibilités requises, et changer `meta.version` ; pour le temps réel, renseigner le courtier dans la section 2 du fichier d'invariants |
 | un ticket temps réel sans variante de représentation ne trouve pas de catégorie | seul M04 permet l'option `evenements` | permettre `evenements` dans une autre catégorie de votre référentiel, ou en créer une |
+| l'export refuse : sel de l'instance absent alors qu'un journal existe | autre clone du projet, ou sel supprimé | recopier, au même emplacement, `<git-common-dir>/agent2prompt/sel` du clone qui a commencé les journaux |
+| l'export refuse : registre des écarts réécrit | une ligne exportée a changé, ou n'est plus décidée | la rétablir telle qu'elle a été exportée ; une décision nouvelle s'inscrit sur une ligne nouvelle |
+| l'export refuse : historique du registre des concepts réécrit | historique de la branche réécrit, ou export lancé depuis une autre branche | exporter depuis la branche d'intégration, celle où le journal a été commencé |
 | l'IA refuse le remplacement de la réponse actuelle | version d'API publiée : retirer un champ y est cassant (socle, SC1.INV-2) | choisir le paramètre de vue ou la négociation de contenu, ou une version `v2` |
 | l'IA retient une option refusée par la catégorie | règle de validation ignorée | la refuser à la validation ; le skill la rejette (scénario R13) |
 | l'image n'est pas analysée | fichier absent, non versionné, ou pas en PNG | déposer le PNG dans `maquettes/`, le versionner, renseigner `image_objectif` et `analyse_image` |
