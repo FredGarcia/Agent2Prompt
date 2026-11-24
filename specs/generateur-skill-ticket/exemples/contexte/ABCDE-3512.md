@@ -8,11 +8,11 @@ Mesure statique et déterministe (generateur-skill-ticket, critère P7), produit
 
 | Borne | Taille |
 |---|---|
-| à l'activation | 100 293 car., 25 074 tokens |
-| au plus | 256 582 car., 64 146 tokens |
+| à l'activation | 103 373 car., 25 844 tokens |
+| au plus | 259 662 car., 64 916 tokens |
 
 - `orchestrateur-c7e : nom et description` : 1 227 car., chargés au démarrage de Gemini CLI
-- `orchestrateur-c7e/SKILL.md` : 99 066 car., corps du skill, à son activation
+- `orchestrateur-c7e/SKILL.md` : 102 146 car., corps du skill, à son activation
 - `projet/docs/c7e/meso-contrats.md` : 15 638 car., copie du projet du fichier d'invariants, lue au démarrage
 - `orchestrateur-c7e/modules/qualification/SKILL.md` : 19 330 car., lu à l'ouverture et à l'analyse de chaque ticket
 - `orchestrateur-c7e/modules/referentiel/SKILL.md` : 45 516 car., lu à l'ouverture et à l'analyse de chaque ticket
@@ -26,7 +26,7 @@ Mesure statique et déterministe (generateur-skill-ticket, critère P7), produit
 
 | Feuille | Session, activation | Session, au plus | Plus grand contexte | Somme des contextes |
 |---|---|---|---|---|
-| ABCDE-3512 | 6 431 tokens, 26 % | 29 494 tokens, 46 % | 29 494 tokens, 46 % | 143 727 tokens, 224 % |
+| ABCDE-3512 | 6 431 tokens, 25 % | 29 494 tokens, 45 % | 29 494 tokens, 45 % | 143 877 tokens, 222 % |
 
 Les pourcentages rapportent chaque taille à celle du point d'entrée de l'orchestrateur, à la même borne pour l'activation, au plus pour le reste. La somme réunit les contextes qui travaillent pour la feuille : sa session, ses agents de couche, ses sous-agents de rôle.
 
@@ -34,14 +34,14 @@ Les pourcentages rapportent chaque taille à celle du point d'entrée de l'orche
 
 | Mesure | Au plus |
 |---|---|
-| plus grand contexte de l'arbre, session du skill ticket-abcde-3512 | 29 494 tokens, 46 % |
-| somme des 10 contextes du nœud et des observateurs | 160 706 tokens, 251 % |
+| plus grand contexte de l'arbre, session du skill ticket-abcde-3512 | 29 494 tokens, 45 % |
+| somme des 10 contextes du nœud et des observateurs | 160 855 tokens, 248 % |
 
 Aucun contexte de l'arbre ne charge plus que le pourcentage du plus grand ; la somme dit ce que l'arbre lit en tout, quand chaque contexte relit ce qu'il lui faut, au plus.
 
 ## Relectures
 
-Sur la somme des contextes de l'arbre, 71 831 tokens (45 %) viennent de fichiers lus dans plusieurs contextes ; lus une seule fois chacun, les fichiers de l'arbre feraient 88 875 tokens, 139 % du point d'entrée de l'orchestrateur.
+Sur la somme des contextes de l'arbre, 71 831 tokens (45 %) viennent de fichiers lus dans plusieurs contextes ; lus une seule fois chacun, les fichiers de l'arbre feraient 89 024 tokens, 137 % du point d'entrée de l'orchestrateur.
 
 | Fichier | Contextes qui le lisent | Relu, au plus |
 |---|---|---|
@@ -79,7 +79,7 @@ Invoqués par le skill d'un nœud quand le champ attend une observation d'ordre 
 | agent ticket-abcde-3512-persistance | 4 694 car., 1 174 tokens | 86 733 car., 21 684 tokens |
 | agent ticket-abcde-3512-back | 4 835 car., 1 209 tokens | 87 201 car., 21 801 tokens |
 | agent ticket-abcde-3512-front | 5 201 car., 1 301 tokens | 88 887 car., 22 222 tokens |
-| sous-agent ticket-abcde-3512-redacteur | 2 831 car., 708 tokens | 92 139 car., 23 035 tokens |
+| sous-agent ticket-abcde-3512-redacteur | 2 831 car., 708 tokens | 92 736 car., 23 184 tokens |
 | sous-agent ticket-abcde-3512-analyste | 1 890 car., 473 tokens | 23 193 car., 5 799 tokens |
 | sous-agent ticket-abcde-3512-relecteur | 1 714 car., 429 tokens | 38 424 car., 9 606 tokens |
 | sous-agent ticket-abcde-3512-qualite | 1 809 car., 453 tokens | 40 356 car., 10 089 tokens |
@@ -148,7 +148,7 @@ Lu par sous-agent ticket-abcde-3512-redacteur :
 
 - `ticket-abcde-3512/agents/ticket-abcde-3512-redacteur.md` : 2 831 car., corps de l'agent, à son invocation
 - `ticket-abcde-3512/modules/documents/SKILL.md` : 7 167 car., module `documents`
-- `ticket-abcde-3512/references/agent-tdd-jira.md` : 26 099 car., `.gemini/skills/ticket-abcde-3512/references/agent-tdd-jira.md`
+- `ticket-abcde-3512/references/agent-tdd-jira.md` : 26 696 car., `.gemini/skills/ticket-abcde-3512/references/agent-tdd-jira.md`
 - `ticket-abcde-3512/references/agent-tdd-jira/ingestion-jira.md` : 15 829 car., `.gemini/skills/ticket-abcde-3512/references/agent-tdd-jira/ingestion-jira.md`
 - `ticket-abcde-3512/references/agent-tdd-jira/us-criteres.md` : 22 037 car., `.gemini/skills/ticket-abcde-3512/references/agent-tdd-jira/us-criteres.md`
 - `ticket-abcde-3512/references/agent-tdd-jira/analyse-demande.md` : 9 698 car., `.gemini/skills/ticket-abcde-3512/references/agent-tdd-jira/analyse-demande.md`

@@ -98,7 +98,7 @@ Le résultat est une liste d'écarts `{ chemin, regle, message }`. Une liste non
 ```json
 {
   "version": "1.0.0",
-  "methode": { "skill": "agent-tdd-jira", "version": "1.3.4" },
+  "methode": { "skill": "agent-tdd-jira", "version": "1.3.5" },
   "invariants": ["D1.INV-1", "D1.INV-2"],
   "points": ["V0", "V1", "V2", "V3", "V4", "V5", "CP-4"],
   "reglesModifiables": [
@@ -120,6 +120,7 @@ La liste complète des règles modifiables et de leurs bornes est au module `ref
 - L'empreinte est le SHA-256 de la constitution sérialisée en JSON canonique (clés triées, sans espace).
 - Au démarrage, le noyau compare cette empreinte à la dernière entrée `constitution.publiee` du grand livre. Un écart, ou l'absence d'entrée, empêche le démarrage avec le message « constitution non publiée ou modifiée : publier par `npm run constitution:publier` ».
 - La publication est une commande humaine, hors du bus : `npm run constitution:publier` inscrit l'empreinte au grand livre. Aucun agent ne l'appelle.
+- Le champ `acceptable` est réservé à la dimension D26 (point E5) : il épinglera le noyau du socle de l'acceptable, nom et version du socle et empreinte de son bloc `noyau`. En 1.x, une constitution qui le porte est refusée au démarrage, publiée ou non, avec le motif « dimension réservée : acceptable partagé (D26) ».
 
 Garde d'écriture des fichiers d'Agent2Dev : le noyau expose `ecriture.autoriser(chemin, agent)`. Seuls sont permis :
 
@@ -173,6 +174,7 @@ Le refus est présenté au développeur ; la demande ne démarre pas.
 | NO10 | D1.INV-5 | un fichier qui n'est pas un MHTML de Jira est refusé à l'entrée |
 | NO11 | D1.INV-6 | une tentative d'écriture d'un agent dans `constitution/`, dans la configuration humaine ou dans la transmission du skill est refusée `ECRITURE_INTERDITE` |
 | NO12 | D1.INV-6 | le `profil` crée `v2.json` à une ratification ; une réécriture de `v1.json`, ou une écriture d'un autre agent sous `profils/`, est refusée `ECRITURE_INTERDITE` |
+| NO13 | point E5 | une constitution qui porte le champ réservé `acceptable` est refusée au démarrage, publiée ou non, avec le motif « dimension réservée : acceptable partagé (D26) » ; la constitution et les fichiers restent inchangés |
 
 ## 10. Fichiers à produire
 

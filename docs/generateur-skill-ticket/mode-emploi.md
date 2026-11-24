@@ -1,6 +1,6 @@
 # Mode d'emploi : le générateur de skills de ticket
 
-Ce mode d'emploi fait résoudre un ticket par un arbre de skills de ticket, avec le générateur [`generateur-skill-ticket`](../../specs/generateur-skill-ticket/SKILL.md) 1.3.1. Le ticket est qualifié et décomposé avec l'IA du développeur ; les outils du générateur, lancés depuis un clone d'Agent2Prompt, vérifient l'arbre, assemblent un skill par nœud depuis le référentiel des méso-contrats de l'orchestrateur C7E, l'installent et le lancent dans Gemini CLI. Ensuite, chaque nœud se résout dans sa propre session, par son skill et ses agents, et chaque niveau voit le ticket augmenté des observations des autres. L'orchestrateur n'est pas modifié : le skill de ticket tient lieu de fiche de transformation. Ce que les skills et le générateur observent s'exporte enfin, minimisé, vers le socle d'observation du dépôt.
+Ce mode d'emploi fait résoudre un ticket par un arbre de skills de ticket, avec le générateur [`generateur-skill-ticket`](../../specs/generateur-skill-ticket/SKILL.md) 1.4.0. Le ticket est qualifié et décomposé avec l'IA du développeur ; les outils du générateur, lancés depuis un clone d'Agent2Prompt, vérifient l'arbre, assemblent un skill par nœud depuis le référentiel des méso-contrats de l'orchestrateur C7E, l'installent et le lancent dans Gemini CLI. Ensuite, chaque nœud se résout dans sa propre session, par son skill et ses agents, et chaque niveau voit le ticket augmenté des observations des autres. L'orchestrateur n'est pas modifié : le skill de ticket tient lieu de fiche de transformation. Ce que les skills et le générateur observent s'exporte enfin, minimisé, vers le socle d'observation du dépôt.
 
 ```mermaid
 flowchart LR
@@ -27,7 +27,7 @@ flowchart LR
 node <dépôt>/tools/installer.mjs generateur-skill-ticket
 ```
 
-Le générateur s'installe comme les autres skills, dans `.gemini/skills/generateur-skill-ticket/`, masqué à Git : il ne remplace aucun skill ni aucun agent déjà installé. Sa transmission porte sa consigne, ses modules et le socle d'observation ; ses outils restent dans le clone, où ils lisent les sources dont héritent les skills de ticket, à leurs versions épinglées. Sans Gemini CLI, la transmission seule suffit : [`transmissions/generateur-skill-ticket-1.3.1.md`](../../transmissions/generateur-skill-ticket-1.3.1.md).
+Le générateur s'installe comme les autres skills, dans `.gemini/skills/generateur-skill-ticket/`, masqué à Git : il ne remplace aucun skill ni aucun agent déjà installé. Sa transmission porte sa consigne, ses modules et le socle d'observation ; ses outils restent dans le clone, où ils lisent les sources dont héritent les skills de ticket, à leurs versions épinglées. Sans Gemini CLI, la transmission seule suffit : [`transmissions/generateur-skill-ticket-1.4.0.md`](../../transmissions/generateur-skill-ticket-1.4.0.md).
 
 ## 3. Faire résoudre un ticket
 

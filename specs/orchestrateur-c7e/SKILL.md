@@ -1,10 +1,10 @@
 ---
 name: orchestrateur-c7e
 description: Orchestrateur fractal C7E, qui pilote la résolution d'un ticket full-stack comme la transformation maîtrisée d'un système vivant (cycle de l'Axiome 7E, déclinaison récursive imbriquée sur quatre profondeurs, concepts paramétrables, qualification de chaque ticket à son ouverture par un modèle générique de la demande et des questions, méso-contrat principal et compléments confirmés avant tout le reste, options par couche rattachées au méso-contrat qui les permet et leurs paramètres au choix par ticket, variantes de représentation d'une ressource et leur mise à jour en temps réel, analyse des images PNG de l'objectif, fiche de transformation validée avant toute modification, tests déduits des risques, traçabilité Git compatible avec le kit des agents parallèles, boucle de second ordre bornée par un registre, registres exportés vers le socle d'observation par une commande que lance le développeur, valeur annoncée comme une hypothèse tant qu'elle n'est pas mesurée), avec le fichier des invariants du projet, meso-contrats. Adaptateur par défaut Java, Spring Boot, PostgreSQL, Liquibase et Angular. À activer au démarrage de l'IA locale, sur choix du développeur, pour les tickets qu'il lui confie.
-version: 3.7.0
+version: 3.8.0
 ---
 
-# Orchestrateur fractal C7E, version 3.7.0
+# Orchestrateur fractal C7E, version 3.8.0
 
 Ce document est le point d'entrée du skill et contient la méthode. Il s'active au démarrage de l'IA locale, sur choix du développeur (§ 11.4), avec le fichier des invariants du projet, copie remplie du modèle `meso-contrats.md`. Ces deux fichiers suffisent au démarrage ; le référentiel des méso-contrats se lit à l'ouverture de chaque ticket, pour le qualifier, puis à son analyse, et les autres fichiers quand un ticket touche leur domaine.
 
@@ -18,7 +18,8 @@ Fichiers du skill :
 - `modules/qualification/SKILL.md` : dimension D11, la qualification de chaque ticket à son ouverture : modèle générique de la demande, questions complémentaires, méso-contrat confirmé avant tout le reste ;
 - `modules/referentiel/SKILL.md` : dimension D10, le référentiel des méso-contrats : modèle générique de la demande, catégories de tickets (dont M04, variante de représentation d'une ressource), options au choix par couche et leurs paramètres, analyse des images de l'objectif, modèle à installer dans le projet ;
 - `modules/mesure/SKILL.md` : dimension réservée D9, à lire seulement pour comprendre le point d'extension E1 ;
-- `modules/observation/SKILL.md` : dimension D12, l'export du registre des concepts et du registre des écarts vers le socle d'observation, par un outil qui reste dans le clone du dépôt Agent2Prompt et que lance le développeur ; à lire quand il demande cet export.
+- `modules/observation/SKILL.md` : dimension D12, l'export du registre des concepts et du registre des écarts vers le socle d'observation, par un outil qui reste dans le clone du dépôt Agent2Prompt et que lance le développeur ; à lire quand il demande cet export ;
+- `modules/acceptable/SKILL.md` : dimension réservée D13, l'acceptable partagé, à lire seulement pour comprendre le point d'extension E7.
 
 Ordre de lecture au premier lancement : ce document en entier ; la copie du projet du fichier d'invariants ; `modules/qualification/SKILL.md` ; `modules/referentiel/SKILL.md` ; `socle/SKILL.md` ; les sections « Versions cibles » et « Invariants » des deux référentiels. Aux lancements suivants, ce document et la copie du projet suffisent ; les modules `qualification` et `referentiel`, et le référentiel du projet, se lisent à l'ouverture et à l'analyse de chaque ticket, le socle et les référentiels quand un ticket touche leur domaine, le module `observation` et le socle d'observation quand le développeur demande l'export des registres.
 
@@ -524,7 +525,7 @@ Une contradiction entre deux niveaux se signale et s'inscrit au registre des éc
 
 ## 12. Registre des dimensions
 
-| ID | Dimension | Introduite | Statut 3.7.0 | Dépend de | Où |
+| ID | Dimension | Introduite | Statut 3.8.0 | Dépend de | Où |
 |---|---|---|---|---|---|
 | D1 | Ontologie : cycle 7E, profondeurs du CRI, concepts paramétrables | 3.1 | active | | `SKILL.md`, § 1 |
 | D2 | Configuration : matrice d'activation, modes de modulation, choix du démarrage | 3.1 | active | D1 | § 2, § 7.1, § 11.4 |
@@ -538,12 +539,13 @@ Une contradiction entre deux niveaux se signale et s'inscrit au registre des éc
 | D10 | Référentiel des méso-contrats : catégories de tickets, options par couche, analyse des images de l'objectif | 3.2 | active | D3, D5, D8 | `modules/referentiel/SKILL.md` |
 | D11 | Qualification de la demande : modèle générique, questions complémentaires, méso-contrat confirmé à l'ouverture du ticket | 3.3 | active | D3, D10 | `modules/qualification/SKILL.md` |
 | D12 | Observation partagée : registre des concepts et registre des écarts exportés vers le socle d'observation | 3.6 | active | D6, socle d'observation | `modules/observation/SKILL.md` |
+| D13 | Acceptable partagé : actions confrontées au noyau du socle de l'acceptable, refus qui citent leur règle, écriture par les kits | 3.8 | reserved | D3, D4, D6, socle de l'acceptable | `modules/acceptable/SKILL.md` |
 
-La méthode tient en un seul fichier pour se charger au démarrage : D1 à D7 sont décrites dans ce document plutôt que dans des modules séparés ; D8 est le modèle du fichier d'invariants du projet ; D10 et D11, qui se lisent à l'ouverture et à l'analyse de chaque ticket, sont des modules, comme la dimension réservée D9 et la dimension D12, qui ne se lit qu'à la demande d'un export.
+La méthode tient en un seul fichier pour se charger au démarrage : D1 à D7 sont décrites dans ce document plutôt que dans des modules séparés ; D8 est le modèle du fichier d'invariants du projet ; D10 et D11, qui se lisent à l'ouverture et à l'analyse de chaque ticket, sont des modules, comme les dimensions réservées D9 et D13, et la dimension D12, qui ne se lit qu'à la demande d'un export.
 
 ## 13. Contrat de version et points d'extension
 
-Le skill suit le contrat de version de `EVOLUTION.md` du dépôt Agent2Prompt. La version 3.0.0, remise par le développeur, est archivée telle quelle avec son fichier d'invariants (`archives/`), comme les versions 3.1.0, 3.2.0, 3.2.1, 3.3.0, 3.4.0, 3.5.0 et suivantes, et le modèle de référentiel remis en 2.0.0. Le socle, le socle d'observation et les deux référentiels sont épinglés dans `manifest.json` ; le socle d'observation y est aussi référencé, à la même version.
+Le skill suit le contrat de version de `EVOLUTION.md` du dépôt Agent2Prompt. La version 3.0.0, remise par le développeur, est archivée telle quelle avec son fichier d'invariants (`archives/`), comme les versions 3.1.0, 3.2.0, 3.2.1, 3.3.0, 3.4.0, 3.5.0 et suivantes, et le modèle de référentiel remis en 2.0.0. Le socle, le socle d'observation et les deux référentiels sont épinglés dans `manifest.json` ; le socle d'observation y est aussi référencé, à la même version. Le socle de l'acceptable y est référencé, sans être inclus, tant que D13 est réservée.
 
 Points d'extension, actifs dès 3.1.0 :
 
@@ -562,6 +564,10 @@ Point d'extension, actif dès 3.5.0 :
 Point d'extension, actif dès 3.6.0 :
 
 - **E6** : les événements du registre des concepts et les lignes décidées du registre des écarts s'exportent dans l'enveloppe `socle-observation.enveloppe/1` du socle `socle-observation` 1.1.0, selon ses correspondances, que le module `observation` précise pour ces deux registres, sans changer ni ces registres ni leurs droits (D6.INV-2). Un registre de plus à exporter attend sa correspondance dans une version du socle. Inerte en 3.6, l'export est actif depuis 3.7.0 (D12, scénario R23).
+
+Point d'extension, actif dès 3.8.0 :
+
+- **E7** : les actions à effet extérieur d'un ticket se confronteront, avant leur exécution, au noyau du socle `socle-acceptable` 1.0.0, épinglé, et aux invariants du projet ; un refus citera sa règle, une dérogation validée par un nom s'inscrira au registre des écarts, et l'écriture passera par les kits dev, test et démo, avec retour arrière. En 3.8, rien de cela n'est appliqué : les refus restent ceux de la méthode, aucune modification avant la fiche validée (D3.INV-1) et aucune opération Git distante (D4.INV-3) ; une demande qui toucherait l'acceptable partagé reçoit la réponse « dimension D13 réservée » (scénario R24).
 
 ## 14. Invariants
 
@@ -663,10 +669,11 @@ Rejoués avec le développeur à l'installation, puis à chaque version du skill
 | R21 | Ticket `ABCDE-3655` : celui de R19, avec un critère de plus, le résumé réservé au rôle COMMERCIAL | M04 principal, il porte six des sept possibilités à `oui` ; M01, qui en porte cinq, écarté comme principal ; M01 seul complément, pour `regle`, que M04 ne permet pas ; la qualification présente la composition et ce qui justifie le complément ; après confirmation, `ticket.toml` nomme M04 et `complements = ["M01"]`, et la règle d'habilitation est rattachée à M01 ; preuves de toutes les options, transverses des couches de toute la composition | D10.INV-1, D10.INV-2, D11.INV-3, D11.INV-6 |
 | R22 | « Afficher en temps réel, sur l'écran de suivi, les commandes qui arrivent », sans variante de représentation | `temps_reel` n'est porté par aucun méso-contrat : M04, seul à permettre `evenements`, requiert `variante_representation` ; l'IA le signale, propose M03 pour le reste, suggère de permettre `evenements` dans une catégorie du référentiel ou d'en créer une, n'écrit pas le référentiel et ne commence pas l'analyse | D10.INV-1, D10.INV-5, D11.INV-6 |
 | R23 | « Exporte le registre des concepts vers le socle d'observation » | l'IA n'exporte pas elle-même : elle donne au développeur la commande `node <dépôt>/specs/orchestrateur-c7e/outils/observation.mjs exporter --projet <dossier du projet>`, à lancer depuis la branche d'intégration du projet, `<dépôt>` étant son clone d'Agent2Prompt, et lui rappelle de versionner le journal et sa tête ; elle n'écrit aucun fichier ; `docs/c7e/concepts.json` et le registre des écarts inchangés | D12.INV-1, D6.INV-2 |
+| R24 | « Applique le socle de l'acceptable à ce ticket » | réponse « dimension D13 réservée » (point d'extension E7) ; le socle n'est ni installé ni appliqué ; aucun fichier écrit ; le fichier d'invariants du projet et le registre des écarts inchangés ; les refus de la méthode s'appliquent comme avant | D3.INV-1, D4.INV-3 |
 
 Critères d'acceptation du skill :
 
-- R1 à R23 rejoués avec le développeur, à l'installation et à chaque version ;
+- R1 à R24 rejoués avec le développeur, à l'installation et à chaque version ;
 - le modèle du référentiel se lit en TOML, sa commande d'extraction redonne l'empreinte publiée, et les exemples d'instance respectent ses règles de validation ;
 - les exemples de branches et de commits de ce skill passent les hooks du kit `agents-paralleles-gitlab` (vérifié à la publication, section 16) ;
 - `docs/c7e/concepts.json` est un JSON valide, de `schemaVersion` 1 ;
@@ -848,6 +855,10 @@ Décisions du développeur, le 24 novembre 2026, jalon J1c du passage du dépôt
 
 L'outil reste dans le clone : la transmission ne le porte pas, et l'IA donne la commande au développeur (R23). Un enregistrement exporté qui change ensuite arrête l'export : une décision nouvelle s'inscrit sur une ligne nouvelle du registre des écarts.
 
+### Acceptable partagé réservé, en 3.8.0
+
+Décisions du développeur, le 24 novembre 2026, jalon J3a du passage du dépôt au troisième ordre (`EVOLUTION.md`, section 10) : l'acceptable devient un modèle explicite, versionné et commun aux systèmes, le socle `socle-acceptable`, noyau de ce que tous refusent, chaque règle un invariant que cite le refus (A1 à A3) ; l'orchestrateur est l'un des quatre systèmes qui en réservent l'application, avec Agent2Dev, Agent2Test et le générateur de skills de ticket (A4) ; l'écriture passera par des kits dev, test et démo, avec retour arrière, appliqués par l'hôte d'IA, et les règles du socle se disent dès maintenant hors d'un kit (A5, A6). La version 3.8.0 pose la place de cette application, la dimension D13 et le point d'extension E7, sans rien changer à la méthode : aucun invariant ajouté ni modifié, aucune section recopiée par les skills de ticket modifiée. Le socle est référencé par le manifeste, sans être inclus. Le scénario R24 vérifie l'inertie.
+
 ## 17. Journal de révision
 
 **3.0.0** : version remise par le développeur le 31 octobre 2026, hors dépôt, avec son fichier `meso-contrats.md`. Archives : `archives/SKILL-v3.0.0.md` et `archives/meso-contrats-v3.0.0.md`.
@@ -875,3 +886,5 @@ L'outil reste dans le clone : la transmission ne le porte pas, et l'IA donne la 
 **3.6.1** (2026-11-24) : correctif. Référence au socle `socle-observation` 1.1.0, qui ajoute le champ facultatif `source.journal` pour désigner sans ambiguïté l'enregistrement source d'une enveloppe, et que le générateur de skills de ticket inclut désormais ; les correspondances du registre des concepts et du registre des écarts ne changent pas, et le socle précise seulement la date d'un événement du registre des concepts, celle du commit qui le porte. D12 reste réservée ; aucune dimension ni aucun invariant modifié. Archive : `archives/SKILL-v3.6.0.md`.
 
 **3.7.0** (2026-11-24) : dimension D12 active, l'observation partagée, jalon J1c du passage du dépôt au troisième ordre (section 16). Outil `outils/observation.mjs`, lancé par le développeur depuis le clone du dépôt Agent2Prompt : `exporter`, `verifier`, `etat` ; il traduit les événements du registre des concepts, lus dans son historique Git, et les lignes décidées du registre des écarts dans le journal d'enveloppes de l'orchestrateur, `docs/c7e/observations-orchestrateur-c7e.jsonl`, en ajout seul et chaîné, avec sa tête, sans texte ni référence en clair, avec le sel de l'instance que partage le générateur de skills de ticket. Le socle `socle-observation` 1.1.0 est inclus dans la transmission, épinglé, et toujours référencé ; ses sept invariants entrent en vigueur dans l'orchestrateur, prouvés par sa recette, avec D12.INV-1 à D12.INV-3 ; trente-six invariants. Module `observation` réécrit, avec les précisions des correspondances ; point d'extension E6, scénario R23 et emplacement du journal (§ 11.2) à jour ; recette `tests/observation.test.mjs` et sa CI. Les skills de ticket recopient les trois invariants de plus ; aucune section de la méthode qu'ils recopient ne change. Décisions ratifiées avant la rédaction : outil propre (C1), événements lus dans l'historique Git (C2), journal propre et sel partagé (C3), confrontation par invariant dans l'observatoire (C4). Archive : `archives/SKILL-v3.6.1.md`.
+
+**3.8.0** (2026-11-24) : dimension D13 réservée, l'acceptable partagé, jalon J3a du passage du dépôt au troisième ordre (section 16) : les actions à effet extérieur d'un ticket se confronteront au noyau du socle `socle-acceptable` 1.0.0, référencé par le manifeste ; point d'extension E7 ; module `acceptable`. Scénario R24, qui vérifie l'inertie. Référence à agent-tdd-jira 1.3.5, dont seule la référence à Agent2Test change ; les conventions Git et la numérotation des critères reprises par l'orchestrateur sont identiques. Aucun invariant ajouté ni modifié ; trente-six invariants. Archive : `archives/SKILL-v3.7.0.md`.

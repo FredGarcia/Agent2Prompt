@@ -10,8 +10,8 @@ name: Recette du générateur de skills de ticket
 # d'entrée de l'orchestrateur. Le contrat avec Gemini CLI 0.67.0 vérifie que ses skills sont découverts
 # et ses agents chargés. Il suit aussi les sources dont héritent les skills de ticket : l'orchestrateur,
 # le socle, les référentiels Java et Angular, les skills de la boîte à outils de la racine (agent-tdd-jira,
-# Agent2Test, analyse-projet, sonarqube), le socle d'observation, que le générateur inclut pour son export, et les
-# outils de transmission et d'installation. La structure
+# Agent2Test, analyse-projet, sonarqube), le socle d'observation, que le générateur inclut pour son export, le socle
+# de l'acceptable, qu'il référence pour sa dimension réservée, et les outils de transmission et d'installation. La structure
 # de la spécification elle-même est vérifiée, avec toutes les autres, par tools/verifier.mjs.
 
 on:
@@ -27,6 +27,7 @@ on:
       - 'specs/analyse-projet/**'
       - 'specs/sonarqube/**'
       - 'specs/socle-observation/**'
+      - 'specs/socle-acceptable/**'
       - 'tools/bundle.mjs'
       - 'tools/installer.mjs'
       - '.github/workflows/recette-generateur-skill-ticket.yml'
@@ -43,6 +44,7 @@ on:
       - 'specs/analyse-projet/**'
       - 'specs/sonarqube/**'
       - 'specs/socle-observation/**'
+      - 'specs/socle-acceptable/**'
       - 'tools/bundle.mjs'
       - 'tools/installer.mjs'
       - '.github/workflows/recette-generateur-skill-ticket.yml'

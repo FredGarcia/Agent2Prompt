@@ -111,6 +111,7 @@ La liste complète des règles modifiables et de leurs bornes est au module `ref
 - L'empreinte est le SHA-256 de la constitution sérialisée en JSON canonique (clés triées, sans espace).
 - Au démarrage, le noyau compare cette empreinte à la dernière entrée `constitution.publiee` du grand livre. Un écart, ou l'absence d'entrée, empêche le démarrage avec le message « constitution non publiée ou modifiée : publier par `npm run constitution:publier` ».
 - La publication est une commande humaine, hors du bus : `npm run constitution:publier` inscrit l'empreinte au grand livre. Aucun agent ne l'appelle.
+- Le champ `acceptable` est réservé à la dimension D26 (point E6) : il épinglera le noyau du socle de l'acceptable, nom et version du socle et empreinte de son bloc `noyau`. En 1.x, une constitution qui le porte est refusée au démarrage, publiée ou non, avec le motif « dimension réservée : acceptable partagé (D26) ».
 
 Garde d'écriture : le noyau expose `ecriture.autoriser(chemin, agent)`. Seuls sont permis le dossier des preuves (`navigateur`, `journal`), le fichier de session (`navigateur`) et les exports du journal de tests (`journal`). Toute autre écriture, et en particulier `constitution/`, `src/`, `migrations/`, `fiches/` et `configuration/`, est refusée avec l'erreur `ECRITURE_INTERDITE`.
 
@@ -147,6 +148,7 @@ Le noyau définit l'interface et choisit l'adaptateur d'après la configuration 
 | NO8 | D1.INV-4 | sans entrée `constitution.publiee` au grand livre, le démarrage est refusé |
 | NO9 | D1.INV-5 | une demande « corriger le code du composant » est refusée « hors périmètre » ; une demande de test est acceptée |
 | NO10 | D1.INV-6 | une tentative d'écriture d'un agent dans `constitution/` ou `configuration/` est refusée `ECRITURE_INTERDITE` |
+| NO11 | point E6 | une constitution qui porte le champ réservé `acceptable` est refusée au démarrage, publiée ou non, avec le motif « dimension réservée : acceptable partagé (D26) » ; la constitution et les fichiers restent inchangés |
 
 ## 10. Fichiers à produire
 

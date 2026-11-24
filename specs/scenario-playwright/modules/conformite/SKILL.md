@@ -153,7 +153,7 @@ Copies d'écran d'un rapport et leurs noms stables, rapport de conformité en ba
 
 <!-- fichier : scripts/conformite.mjs -->
 ```javascript
-// scenario-playwright 1.6.1 : rapport de conformité à coller dans Jira, écrit depuis les rapports d'exécution (D22).
+// scenario-playwright 1.6.2 : rapport de conformité à coller dans Jira, écrit depuis les rapports d'exécution (D22).
 //
 // Pour chaque test : son verdict (conforme, non conforme, bloqué), l'étape en cause et son message, le statut
 // de chaque étape, et ses copies d'écran, sous un nom stable : <clé>-<n° de l'étape>.png, <clé>-fin.png,

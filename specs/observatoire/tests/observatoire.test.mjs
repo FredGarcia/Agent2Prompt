@@ -33,6 +33,9 @@ const ORCHESTRATEUR = join(RACINE, 'specs', 'orchestrateur-c7e');
 const DEPART = /Registre de départ[\s\S]*?```json\n([\s\S]*?)\n```/.exec(readFileSync(join(ORCHESTRATEUR, 'SKILL.md'), 'utf8').replace(/\r\n/g, '\n'))[1];
 const MODELE = /```markdown\n(# Registre des écarts[\s\S]*?)\n```/.exec(readFileSync(join(ORCHESTRATEUR, 'meso-contrats.md'), 'utf8').replace(/\r\n/g, '\n'))[1];
 const JOURNAL_ORCHESTRATEUR = 'docs/c7e/observations-orchestrateur-c7e.jsonl';
+// Version courante de l'orchestrateur, celle qu'exporte son outil, et une version publiée plus tard, pour une ratification.
+const VERSION_ORCHESTRATEUR = JSON.parse(readFileSync(join(ORCHESTRATEUR, 'manifest.json'), 'utf8')).version;
+const ORCHESTRATEUR_SUIVANT = VERSION_ORCHESTRATEUR.replace(/^(\d+)\.(\d+)\.\d+$/, (_, a, b) => `${a}.${Number(b) + 1}.0`);
 // Le désaccord du champ de l'arbre d'exemple, que champ.mjs inscrit au registre des écarts, décidé par le développeur.
 const DESACCORD = ['2026-11-05', 'ABCDE-3620', 'désaccord entre nœuds (D6.INV-3)', 'la date-heure reçue par le canal des lignes arrive sans fuseau', 'respecter : le canal porte le fuseau'];
 const AUTRE_DESACCORD = ['2026-11-06', 'ABCDE-3621', 'D6.INV-3', 'deux nœuds contraires sur le contrat de pagination', 'respecter : un seul contrat'];
@@ -287,7 +290,7 @@ test('D1 : les journaux de chaque système d\'une instance se relèvent, chacun 
   const retrait = xs.find((x) => x.ancre.nature === 'concept');
   assert.deepStrictEqual([retrait.type, retrait.nature, retrait.ancre.ref], ['decision', 'retire', 'C_PEDAGOGIE_001'], 'un concept du registre de départ, en clair');
   assert.ok(controlerEnveloppe({ ...retrait, ancre: { nature: 'concept', ref: 'c-pedagogie-001' } }).some((e) => /^ancre\.ref : /.test(e)), 'un identifiant de concept d\'une autre forme est refusé');
-  assert.deepStrictEqual(etat(lieux).instances[0].systemes.map((s) => [s.nom, s.derniere, s.ecart]), [['generateur-skill-ticket', '1.3.0', 'a-jour'], ['orchestrateur-c7e', '3.7.0', 'a-jour']]);
+  assert.deepStrictEqual(etat(lieux).instances[0].systemes.map((s) => [s.nom, s.derniere, s.ecart]), [['generateur-skill-ticket', '1.3.0', 'a-jour'], ['orchestrateur-c7e', VERSION_ORCHESTRATEUR, 'a-jour']]);
 
   const b = INSTANCES.B();
   const autre = projet('autre-sel');
@@ -342,7 +345,7 @@ test('D6 : un même invariant du dépôt, relevé par des écarts distincts de d
   const c = deux.candidats.find((x) => x.sorte === 'invariant');
   assert.deepStrictEqual({ ...c, references: undefined }, {
     sorte: 'invariant', systeme: 'orchestrateur-c7e', motif: 'ecart-orchestrateur-c7e-d6-inv-3', invariant: 'orchestrateur-c7e:D6.INV-3', systemes: ['generateur-skill-ticket', 'orchestrateur-c7e'],
-    versions: ['3.7.0'], instances: 1, ecarts: 2, enveloppes: 3, references: undefined,
+    versions: [VERSION_ORCHESTRATEUR], instances: 1, ecarts: 2, enveloppes: 3, references: undefined,
   }, 'deux écarts distincts, deux systèmes : le candidat va à la spécification qui définit l\'invariant, à sa version courante');
   assert.deepStrictEqual(c.references, [`${PREFIXE.A}:generateur-skill-ticket:${numeroDuGenerateur(a, 'orchestrateur-c7e:D6.INV-3')}`, `${PREFIXE.A}:orchestrateur-c7e:1`, `${PREFIXE.A}:orchestrateur-c7e:2`]);
 
@@ -376,7 +379,7 @@ test('D6 : un candidat par invariant se propose à la spécification qui le déf
   const texte = readFileSync(join(lieux.depot, fichier), 'utf8');
   const { entete, erreurs } = controlerProposition(texte);
   assert.deepStrictEqual(erreurs, []);
-  assert.deepStrictEqual([entete.sorte, entete.systeme, entete.invariant, entete.systemes, entete.versions, entete.profondeur, entete.instances, entete.enveloppes], ['invariant', 'orchestrateur-c7e', 'orchestrateur-c7e:D6.INV-3', ['generateur-skill-ticket', 'orchestrateur-c7e'], ['3.7.0'], undefined, 1, 3]);
+  assert.deepStrictEqual([entete.sorte, entete.systeme, entete.invariant, entete.systemes, entete.versions, entete.profondeur, entete.instances, entete.enveloppes], ['invariant', 'orchestrateur-c7e', 'orchestrateur-c7e:D6.INV-3', ['generateur-skill-ticket', 'orchestrateur-c7e'], [VERSION_ORCHESTRATEUR], undefined, 1, 3]);
   for (const v of ['ABCDE', 'fuseau', 'pagination', PAR, ...Object.values(SELS), sha256(SELS.A)]) assert.ok(!texte.includes(v), `« ${v} » en clair`);
   const cas = [
     [texte.replace('systeme: orchestrateur-c7e', 'systeme: java'), /invariant : l'identifiant d'un invariant du dépôt, préfixé par la spécification visée/],
@@ -390,7 +393,7 @@ test('D6 : un candidat par invariant se propose à la spécification qui le déf
   for (const [mute, motif] of cas) assert.ok(controlerProposition(mute).erreurs.some((e) => motif.test(e)), `${motif} : ${controlerProposition(mute).erreurs.join(' ; ')}`);
   assert.deepStrictEqual(proposer({ ...lieux, date: '2026-11-25' }).ignorees.map((i) => i.raison.split(' : ')[0]), ['déjà proposée, ouverte', 'déjà proposée, ouverte']);
 
-  ecrireStatut(lieux.depot, fichier, 'statut: ratifiee\nversion: 3.8.0\npr: 90');
+  ecrireStatut(lieux.depot, fichier, `statut: ratifiee\nversion: ${ORCHESTRATEUR_SUIVANT}\npr: 90`);
   const s = suivre(lieux).suivis.find((x) => x.fichier === fichier);
   assert.deepStrictEqual([s.sorte, s.invariant, s.effet, s.avant, s.apres], ['invariant', 'orchestrateur-c7e:D6.INV-3', 'indecidable', { motif: 2, enveloppes: 2 }, { motif: 0, enveloppes: 0 }], 'les écarts qui citent l\'invariant, parmi les enveloppes de la spécification qui le définit');
 });

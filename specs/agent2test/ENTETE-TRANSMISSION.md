@@ -23,7 +23,7 @@ Les chemins internes à la spécification (`modules/...`, `SKILL.md`) sont relat
 
 1. Lis `spec/SKILL.md` en entier, puis `spec/manifest.json`.
 2. Lis les modules actifs dans l'ordre de `SKILL.md`, section 1.
-3. Ne lis `spec/modules/accessibilite/SKILL.md` et `spec/modules/profil-recette/SKILL.md` que pour comprendre les points d'extension E2 à E4. Ne les implémente pas : leur statut est `reserved`.
+3. Ne lis `spec/modules/accessibilite/SKILL.md`, `spec/modules/profil-recette/SKILL.md` et `spec/modules/acceptable/SKILL.md` que pour comprendre les points d'extension E2 à E4 et E6. Ne les implémente pas : leur statut est `reserved`.
 
 ## Étape 2 : plan, sans code
 
