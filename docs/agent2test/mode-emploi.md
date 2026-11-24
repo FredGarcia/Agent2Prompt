@@ -1,6 +1,6 @@
 # Mode d'emploi : construire et utiliser Agent2Test
 
-[`agent2test`](../../specs/agent2test/SKILL.md) 1.4.0 est la **spécification d'un système à construire**, pas un skill qu'on installe. Une IA la reçoit dans un projet séparé de l'application et l'implémente par lots, sous votre validation.
+[`agent2test`](../../specs/agent2test/SKILL.md) 1.5.0 est la **spécification d'un système à construire**, pas un skill qu'on installe. Une IA la reçoit dans un projet séparé de l'application et l'implémente par lots, sous votre validation.
 
 Agent2Test choisit, prépare et joue avec Playwright les tests essentiels d'une demande sur l'application Angular **que vous avez lancée**, et rend **un verdict prouvé par critère d'acceptation**. Son plan vient d'[`agent-tdd-jira`](../agent-tdd-jira/mode-emploi.md) : US, critères numérotés, scénarios Gherkin. Il travaille en binôme avec [Agent2Dev](../agent2dev/mode-emploi.md) ou avec l'agent TDD.
 
@@ -20,7 +20,7 @@ flowchart LR
 - Node 22.13 ou plus récent (26.13.0 recommandé), Playwright 1.63 ou plus récent ; les données tiennent dans un fichier SQLite, par `node:sqlite` : aucun serveur de base de données.
 - L'application Angular lancée par vous sur votre poste, et un navigateur du côté de la session SSO.
 - Docker Compose seulement pour un moteur local souverain (Ollama).
-- La transmission : [`transmissions/agent2test-1.4.0.md`](../../transmissions/agent2test-1.4.0.md).
+- La transmission : [`transmissions/agent2test-1.5.0.md`](../../transmissions/agent2test-1.5.0.md).
 
 L'installateur d'Agent2Prompt refuse cette spécification : elle se matérialise dans `spec/` de son propre projet.
 
@@ -57,6 +57,7 @@ Entre deux points, les agents avancent seuls ; à chaque point, un humain décid
 | **CP-3** Verdicts | échecs, indéterminés, scénarios bloqués, avec le témoignage de chaque vérification | le testeur : confirmer, contester (le désaccord est consigné), demander une réparation |
 | **CP-4** Gouvernance | leçon, recalibrage, quarantaine proposés par le système | le référent qualité, depuis le tableau de bord seulement ; effet à la campagne suivante |
 | **CP-5** Préalable | scénario qui exige un batch Java | le développeur, qui lance le batch lui-même, ou déclare le scénario non joué |
+| **Refus** | une demande, une écriture ou une leçon refusée, avec sa règle | le testeur ou le référent qualité : « faux refus », avec un motif, si la règle ne visait pas ce cas, et rien ne s'exécute ; « déroger » seulement pour une règle propre à Agent2Test déclarée dérogeable, jamais pour une règle du socle de l'acceptable |
 
 Le niveau d'autonomie de chaque point se fixe dans `configuration/humaine.json`, que le système lit et n'écrit jamais.
 
@@ -76,6 +77,7 @@ Le niveau d'autonomie de chaque point se fixe dans `configuration/humaine.json`,
 - Le moteur ne produit que des données validées ; aucun code qu'il produit n'est exécuté ni injecté dans une page.
 - Aucun verdict sans preuve, aucun verdict réécrit ; journal et grand livre en ajout seul.
 - Tout tourne en local ; les interfaces n'écoutent que sur `127.0.0.1`.
+- La constitution reprend le noyau du socle de l'acceptable, à la version épinglée : chaque refus cite sa règle, et aucune règle du noyau ne se déroge.
 
 ## 5. Faire évoluer
 
@@ -92,5 +94,6 @@ Une nouvelle version arrive par une nouvelle transmission : remplacez `spec/` à
 | Parcours refusé : « référence de pictogramme » | pictogramme demandé sans référence ratifiée, ou référence modifiée depuis | désigner l'élément, faire capturer la référence et la ratifier en CP-2 |
 | Constat « non constatable » | zone non vue (page d'erreur, chargement non terminé), ou tableau sans ligne | lire ce que le témoignage dit avoir vu à la place ; faire attendre la fin du chargement au parcours, ou fournir des données |
 | Étape `INSTABILITE`, regards discordants | la page bouge pendant qu'il la regarde | faire attendre au parcours l'état final de l'écran |
+| Démarrage refusé « acceptable non conforme » | constitution qui ne reprend pas le noyau épinglé, ou empreinte du socle fausse | republier la constitution de la version, sans retirer d'entrée du noyau |
 
 L'accessibilité automatisée et le profil de recette partagé sont des dimensions réservées, non appliquées en 1.3 : le navigateur rend compte de ce que perçoit une personne, il ne rend pas de verdict de conformité RGAA ou WCAG.

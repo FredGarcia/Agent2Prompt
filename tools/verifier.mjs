@@ -30,7 +30,10 @@
  *   et doit être défini dans son point d'entrée ;
  * - le socle de l'acceptable porte un seul bloc `noyau`, au schéma fermé `socle-acceptable.noyau/1` :
  *   six listes non vides, des entrées aux seules clés de leur liste, sans doublon, des motifs qui sont des
- *   expressions régulières valides, et des règles qui sont des invariants du socle.
+ *   expressions régulières valides, et des règles qui sont des invariants du socle ;
+ * - une constitution d'exemple qui épingle ce noyau (champ `acceptable`) le fait à la version que la
+ *   spécification inclut, avec l'empreinte de son bloc `noyau` en JSON canonique, et reprend chacune de ses
+ *   entrées à l'identique, aucune marquée `derogeable` (`socle-acceptable:SA7.INV-1`).
  *
  * Pour le dépôt :
  *
@@ -52,6 +55,7 @@
  */
 import { Buffer } from 'node:buffer';
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -114,9 +118,14 @@ const LISTES_DU_NOYAU = {
 };
 const estObjet = (valeur) => valeur !== null && typeof valeur === 'object' && !Array.isArray(valeur);
 
+const blocsJson = (texte) => [...texte.matchAll(/^```json\n([\s\S]*?)\n```$/gm)].map((m) => m[1]);
+// JSON canonique : clés triées, sans espace ; c'est la forme que hache l'empreinte d'un bloc `noyau`.
+const canonique = (v) =>
+  Array.isArray(v) ? `[${v.map(canonique).join(',')}]` : estObjet(v) ? `{${Object.keys(v).sort().map((k) => `${JSON.stringify(k)}:${canonique(v[k])}`).join(',')}}` : JSON.stringify(v);
+
 /** Le bloc `noyau` du socle de l'acceptable : un seul, au schéma fermé, qui ne cite que des invariants du socle. */
 function verifierNoyau(texte, definisLocaux, erreur) {
-  const blocs = [...texte.matchAll(/^```json\n([\s\S]*?)\n```$/gm)].map((m) => m[1]).filter((b) => b.includes(`"${SCHEMA_NOYAU}"`));
+  const blocs = blocsJson(texte).filter((b) => b.includes(`"${SCHEMA_NOYAU}"`));
   if (blocs.length !== 1) {
     erreur(`bloc noyau : ${blocs.length} blocs JSON au schéma ${SCHEMA_NOYAU}, un seul attendu`);
     return;
@@ -240,6 +249,57 @@ function verifierTransmission(dossier, manifeste, nomDossier, erreur) {
   if (ecarts.length > 0) erreur(`${rel(chemin)} n'est plus fidèle aux fichiers (${ecarts.join(', ')}) : ${consigne}`);
 }
 
+/**
+ * Constitutions d'exemple qui épinglent le noyau du socle de l'acceptable (champ `acceptable`) : à la version
+ * que la spécification inclut, avec l'empreinte de son bloc `noyau`, et, pour une constitution qui porte ses
+ * listes, chaque entrée du noyau reprise à l'identique, aucune marquée `derogeable` (`socle-acceptable:SA7.INV-1`).
+ */
+function verifierEpinglages(manifeste, textes, erreur) {
+  const epinglages = [];
+  for (const texte of textes) {
+    for (const bloc of blocsJson(texte)) {
+      let objet;
+      try {
+        objet = JSON.parse(bloc);
+      } catch {
+        continue;
+      }
+      if (!estObjet(objet) || !estObjet(objet.acceptable) || objet.acceptable.socle !== SOCLE_ACCEPTABLE) continue;
+      // Un épinglage porte son empreinte, ou des listes de constitution ; une rubrique de livrable, ni l'une ni les autres.
+      const listes = Object.keys(LISTES_DU_NOYAU).some((nom) => objet[nom] !== undefined || objet.commandes?.[nom] !== undefined);
+      if (Object.hasOwn(objet.acceptable, 'empreinte') || listes) epinglages.push(objet);
+    }
+  }
+  if (epinglages.length === 0) return;
+  const partage = (manifeste.shared ?? []).find((p) => p.from === `specs/${SOCLE_ACCEPTABLE}/SKILL.md`);
+  if (!partage) {
+    erreur(`une constitution épingle ${SOCLE_ACCEPTABLE}, que la spécification n'inclut pas (shared)`);
+    return;
+  }
+  let noyau;
+  try {
+    const bloc = blocsJson(lire(sourcePartagee(partage, manifeste.name))).find((b) => b.includes(`"${SCHEMA_NOYAU}"`));
+    noyau = JSON.parse(bloc);
+  } catch {
+    erreur(`bloc noyau de ${SOCLE_ACCEPTABLE} ${partage.version} illisible`);
+    return;
+  }
+  const empreinte = createHash('sha256').update(canonique(noyau)).digest('hex');
+  for (const constitution of epinglages) {
+    const { version, empreinte: epinglee } = constitution.acceptable;
+    if (version !== partage.version) erreur(`constitution : acceptable.version ${version}, la spécification inclut ${SOCLE_ACCEPTABLE} ${partage.version}`);
+    else if (epinglee !== empreinte) erreur(`constitution : acceptable.empreinte ${String(epinglee).slice(0, 12)}…, le bloc noyau de ${SOCLE_ACCEPTABLE} ${version} a l'empreinte ${empreinte.slice(0, 12)}…`);
+    const listeDe = (nom) => constitution[nom] ?? constitution.commandes?.[nom];
+    if (!Object.keys(LISTES_DU_NOYAU).some((nom) => listeDe(nom) !== undefined)) continue;
+    for (const [nom, cle] of Object.entries(LISTES_DU_NOYAU)) {
+      const reprises = new Set((Array.isArray(listeDe(nom)) ? listeDe(nom) : []).map(canonique));
+      for (const entree of noyau[nom] ?? []) {
+        if (!reprises.has(canonique(entree))) erreur(`constitution : ${nom}, l'entrée du noyau ${entree[cle]} n'est pas reprise à l'identique`);
+      }
+    }
+  }
+}
+
 function verifierSpec(dossier) {
   const nomDossier = dossier.split('/').pop();
   const erreur = (message) => erreurs.push(`${nomDossier} : ${message}`);
@@ -361,6 +421,7 @@ function verifierSpec(dossier) {
   // Invariants : couverture et citations.
   const definisLocaux = definitions(texteEntree);
   if (manifeste.name === SOCLE_ACCEPTABLE) verifierNoyau(texteEntree, definisLocaux, erreur);
+  verifierEpinglages(manifeste, [texteEntree, ...textesModules], erreur);
   if (textesModules.length > 0) {
     const corpusModules = textesModules.join('\n');
     for (const id of definisLocaux) {

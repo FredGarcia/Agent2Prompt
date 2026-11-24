@@ -38,6 +38,7 @@ Sans cette autorisation, `a2t_tache_suivante` ne rend aucune tâche de rédactio
 | `a2t_tache_suivante` | rend la prochaine rédaction attendue (rôle, consignes, leçons, schéma de sortie, contexte borné), ou le point de contrôle à présenter à l'opérateur |
 | `a2t_soumettre` | soumet une sortie ; rend les écarts de validation, ou l'acceptation |
 | `a2t_decider` | relaie la décision explicite de l'opérateur pour CP-0, CP-1, CP-2, CP-3 et CP-5 |
+| `a2t_repondre_refus` | relaie la réponse explicite du testeur ou du référent qualité à un refus : déroger ou faux refus, avec son motif (module `acceptable`, section 4) |
 | `a2t_suspendre` | arrêt d'urgence d'une campagne |
 | `a2t_etat`, `a2t_journal`, `a2t_rapport`, `a2t_carte` | lecture seule ; `a2t_etat` rend aussi les remises reçues et leur état |
 
@@ -88,6 +89,7 @@ Avec `moteur.adaptateur = compatible-openai` sur `127.0.0.1`, une campagne compl
 | MC9 | D16.INV-1 | le transport stdio expose les mêmes outils que le transport HTTP |
 | MC10 | D16.INV-4 | une sortie non conforme soumise par `a2t_soumettre` reçoit la liste de ses écarts ; au quatrième envoi, l'échec part en CP-2 |
 | MC11 | D16.INV-1 | un `tools/call` posté sans `initialize` préalable, avec un jeton valide, est servi, et la réponse ne porte aucun en-tête `Mcp-Session-Id` ; sans jeton, il est refusé |
+| MC12 | D26.INV-3 | `a2t_repondre_refus` « déroger » sur un refus du noyau rend `NON_DEROGEABLE` ; la réponse porte l'auteur du jeton et le canal `mcp` ; aucun outil ne permet au moteur de répondre à un refus |
 
 ## 10. Fichiers à produire
 

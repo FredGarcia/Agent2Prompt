@@ -72,7 +72,7 @@ Les versions réelles sont comparées aux cibles du skill, données à la sectio
 
 ## 3. Commandes refusées (D4.INV-4)
 
-Une commande dont le programme figure dans `commandes.programmesInterdits` de la constitution, ou dont un argument contient un motif de `commandes.argumentsInterdits`, est refusée dès la proposition, et le profil ne peut pas être ratifié tant qu'elle y figure. Sont ainsi exclus le démarrage de l'application (`spring-boot:run`, scripts de Tomcat), son déploiement (`deploy`, `kubectl`, `oc`, `helm`, `ansible`), la base ou les conteneurs (`docker`), et les batchs lancés par `exec:java`. C'est le développeur qui lance l'application et les batchs (`agent-tdd-jira:D7.INV-4`).
+Une commande dont le programme figure dans `commandes.programmesInterdits` de la constitution, ou dont un argument contient un argument de `commandes.argumentsInterdits`, est refusée dès la proposition, avec les règles des entrées qui l'arrêtent (module `acceptable`, section 3), et le profil ne peut pas être ratifié tant qu'elle y figure. Sont ainsi exclus le démarrage de l'application (`spring-boot:run`, scripts de Tomcat), son déploiement (`deploy`, `kubectl`, `oc`, `helm`, `ansible`), la base ou les conteneurs (`docker`), et les batchs lancés par `exec:java`. C'est le développeur qui lance l'application et les batchs (`agent-tdd-jira:D7.INV-4`).
 
 ## 4. Plateforme
 
@@ -96,7 +96,7 @@ V0 présente le profil proposé, ses sources, ses marques « à renseigner », l
 | PF2 | D4.INV-1 | un `pom.xml` modifié depuis la ratification rouvre V0 au début de la demande suivante |
 | PF3 | D4.INV-2 | sur le projet de démonstration, chaque valeur proposée cite fichier et ligne ; le mode d'authentification absent est « à renseigner » et bloque la ratification |
 | PF4 | D4.INV-3 | Spring Boot 3.4 dans le `pom.xml` est présenté comme écart à la cible 3.5, avec sa question |
-| PF5 | D4.INV-4 | une commande `./mvnw spring-boot:run` ou `docker compose up` est refusée à la proposition comme à la ratification |
+| PF5 | D4.INV-4 | une commande `./mvnw spring-boot:run` ou `docker compose up` est refusée à la proposition comme à la ratification, avec la règle SA2.INV-1 |
 | PF6 | D4.INV-4 | une commande `./mvnw exec:java` est refusée |
 | PF7 | D4.INV-2 | un projet sans contrat généré n'a pas de commande `regenerer-contrat`, et aucune n'est inventée |
 | PF8 | D6.INV-1 | sous Windows natif, la ratification est refusée « exécuter Agent2Dev sous WSL2 » |

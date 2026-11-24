@@ -24,27 +24,27 @@ La colonne « Repris dans » cite les modules de la spécification qui reprennen
 
 | Spécification | Version | Dimensions actives | Dimensions réservées | Invariants |
 |---|---|---|---|---|
-| [`agent-tdd-jira`](#agent-tdd-jira-135) | 1.3.5 | 9 | 1 | 43 |
-| [`agent2dev`](#agent2dev-120) | 1.2.0 | 21 | 3 | 96 |
-| [`agent2test`](#agent2test-140) | 1.4.0 | 20 | 3 | 116 |
+| [`agent-tdd-jira`](#agent-tdd-jira-136) | 1.3.6 | 9 | 1 | 43 |
+| [`agent2dev`](#agent2dev-130) | 1.3.0 | 22 | 2 | 100 |
+| [`agent2test`](#agent2test-150) | 1.5.0 | 21 | 2 | 120 |
 | [`agents-paralleles-gitlab`](#agents-paralleles-gitlab-101) | 1.0.1 | 5 | 2 | 20 |
 | [`analyse-projet`](#analyse-projet-102) | 1.0.2 | 5 | 1 | 16 |
 | [`angular`](#angular-101) | 1.0.1 | 8 | 2 | 30 |
 | [`capture-sprint-jira`](#capture-sprint-jira-122) | 1.2.2 | 9 | 2 | 39 |
 | [`explication-hote-ia`](#explication-hote-ia-110) | 1.1.0 | 10 | 2 | 37 |
-| [`generateur-skill-ticket`](#generateur-skill-ticket-140) | 1.4.0 | 9 | 1 | 32 |
+| [`generateur-skill-ticket`](#generateur-skill-ticket-141) | 1.4.1 | 9 | 1 | 32 |
 | [`java`](#java-111) | 1.1.1 | 7 | 1 | 29 |
 | [`observatoire`](#observatoire-110) | 1.1.0 | 6 | 0 | 11 |
-| [`orchestrateur-c7e`](#orchestrateur-c7e-380) | 3.8.0 | 11 | 2 | 36 |
-| [`scenario-playwright`](#scenario-playwright-162) | 1.6.2 | 17 | 5 | 76 |
+| [`orchestrateur-c7e`](#orchestrateur-c7e-381) | 3.8.1 | 11 | 2 | 36 |
+| [`scenario-playwright`](#scenario-playwright-163) | 1.6.3 | 17 | 5 | 76 |
 | [`skill4appli`](#skill4appli-111) | 1.1.1 | 9 | 3 | 34 |
-| [`socle-acceptable`](#socle-acceptable-100) | 1.0.0 | 7 | 0 | 12 |
+| [`socle-acceptable`](#socle-acceptable-101) | 1.0.1 | 7 | 0 | 12 |
 | [`socle-back-front`](#socle-back-front-110) | 1.1.0 | 7 | 0 | 21 |
 | [`socle-observation`](#socle-observation-110) | 1.1.0 | 4 | 0 | 7 |
 | [`sonarqube`](#sonarqube-110) | 1.1.0 | 8 | 2 | 34 |
 | [`tension-dashboard-gitlab-agent`](#tension-dashboard-gitlab-agent-220) | 2.2.0 | 7 | 3 | 17 |
 
-## agent-tdd-jira 1.3.5
+## agent-tdd-jira 1.3.6
 
 Agent de développement TDD : demande Jira en MHTML, analyse avec commentaires, US et critères d'acceptation numérotés, scénarios Gherkin par critère, variantes back Java et front Angular, cycle rouge, vert, remanié scénario par scénario, traçabilité ; binôme avec Agent2Test, verdict d'acceptation par critère ; mode parallèle dans un worktree géré par agents-paralleles-gitlab. Point d'entrée : [`specs/agent-tdd-jira/SKILL.md`](specs/agent-tdd-jira/SKILL.md).
 
@@ -86,7 +86,7 @@ Agent de développement TDD : demande Jira en MHTML, analyse avec commentaires, 
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D5.INV-1** | aucun code de production n'est écrit pour un scénario avant qu'un test étiqueté de ce scénario ait échoué pour la raison attendue. | `cycle-tdd`, `agent2dev`, `agent2dev/apprenant` |
+| **D5.INV-1** | aucun code de production n'est écrit pour un scénario avant qu'un test étiqueté de ce scénario ait échoué pour la raison attendue. | `cycle-tdd`, `agent2dev`, `agent2dev/noyau`, `agent2dev/apprenant` |
 | **D5.INV-2** | la phase verte se limite au code nécessaire pour faire passer le test, et la suite de tests du module concerné reste verte. | `cycle-tdd` |
 | **D5.INV-3** | le remaniement ne change pas le comportement, garde toutes les suites vertes et applique les invariants des référentiels. | `cycle-tdd` |
 | **D5.INV-4** | un seul scénario est réalisé à la fois, et le suivant ne commence qu'après acceptation du précédent. | `cycle-tdd`, `parallele`, `agent2dev`, `agent2dev/realisation`, `agent2dev/autonomie` |
@@ -140,7 +140,7 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 | **D10.INV-6** | un critère d'acceptation n'entre en réalisation (choix des variantes V3, cycle TDD V4) que s'il est validé, décliné en scénarios validés, et qu'aucune question ouverte ne le concerne. | `us-criteres`, `variantes`, `agent2dev/cadrage` |
 | **D10.INV-7** | la matrice de traçabilité relie chaque US à ses critères d'acceptation, et chaque critère à ses scénarios, tests et commits, ou à un statut « non réalisé » avec sa raison ; le rapport final donne l'état de chaque critère. | `us-criteres`, `tracabilite`, `agent2dev`, `agent2dev/tracabilite` |
 
-## agent2dev 1.2.0
+## agent2dev 1.3.0
 
 Agent2Dev : système multi-agents de développement qui applique le skill agent-tdd-jira comme méthode, de la demande Jira en MHTML jusqu'au rapport, en cycle TDD scénario par scénario et en binôme avec Agent2Test ; le moteur rédige, des agents déterministes écrivent et exécutent, le développeur valide à chaque point ; journal chaîné, apprentissage sous gouvernance, un fichier SQLite unique ouvert par un agent médiateur, binôme à la main ou par un échange par dossiers facultatif, exécution locale. Point d'entrée : [`specs/agent2dev/SKILL.md`](specs/agent2dev/SKILL.md).
 
@@ -151,7 +151,7 @@ Agent2Dev : système multi-agents de développement qui applique le skill agent-
 | **D1.INV-1** | le cycle 7E se déroule en sept phases, dans l'ordre, aux quatre échelles Système, Demande, Scénario et Pas ; l'E3 d'une échelle est la suite des cycles de l'échelle inférieure, et l'E7 d'un cycle enfant est versé à l'E4 de son parent. | `noyau`, `orchestrateur`, `observateur` |
 | **D1.INV-2** | tout appel ou événement que son contrat ne déclare pas est refusé par le bus ; aucun agent n'importe le code d'un autre agent. | `noyau` |
 | **D1.INV-3** | le moteur ne produit que des données ; une sortie qui s'écarte de son schéma fermé ou échoue à un contrôle nommé n'est jamais consommée. | `noyau`, `journal` |
-| **D1.INV-4** | la constitution est vérifiée par son empreinte au démarrage ; modifiée ou non publiée, Agent2Dev ne démarre pas ; sa publication est une commande humaine. | `noyau`, `referentiel` |
+| **D1.INV-4** | la constitution est vérifiée par son empreinte au démarrage ; modifiée ou non publiée, Agent2Dev ne démarre pas ; sa publication est une commande humaine. | `noyau`, `referentiel`, `acceptable` |
 | **D1.INV-5** | Agent2Dev ne traite qu'une demande Jira exportée en MHTML, pour le projet d'un profil ratifié ; toute intention de démarrer, d'arrêter ou de déployer l'application, de lancer un batch, d'administrer un environnement, d'écrire en base ou dans Jira est refusée avec le motif « hors périmètre ». | `noyau`, `orchestrateur`, `acceptable`, `socle-acceptable` |
 | **D1.INV-6** | aucun agent n'écrit la constitution, le code ou les schémas d'Agent2Dev, la configuration humaine ni la transmission du skill, et aucun ne réécrit un profil ratifié : le `profil` en crée seulement une version nouvelle, à la décision V0. | `noyau`, `profil`, `referentiel`, `exploitation`, `acceptable`, `socle-acceptable` |
 
@@ -171,7 +171,7 @@ Agent2Dev : système multi-agents de développement qui applique le skill agent-
 | **D3.INV-2** | les consignes d'une fiche reprennent les sections du skill telles quelles : rien n'y est réécrit, résumé, traduit ni complété, hors des leçons ratifiées, ajoutées à part. | `methode` |
 | **D3.INV-3** | les trois scripts du skill sont extraits tels quels de leur module et exécutés par l'`executant` ; ni Agent2Dev ni le moteur n'en écrivent d'autre version. | `methode` |
 | **D3.INV-4** | chaque module actif du skill est appliqué par au moins une étape d'Agent2Dev, selon la table de correspondance, vérifiée au démarrage contre le manifeste du skill. | `methode` |
-| **D3.INV-5** | un prompt composé qui dépasse le plafond de contexte n'est jamais tronqué : le pas s'arrête et se présente au développeur. | `methode`, `apprenant`, `mcp` |
+| **D3.INV-5** | un prompt composé qui dépasse le plafond de contexte n'est jamais tronqué : le pas s'arrête et se présente au développeur. | `noyau`, `methode`, `apprenant`, `mcp` |
 
 ### D4 : Profil du projet (active)
 
@@ -189,7 +189,7 @@ Agent2Dev : système multi-agents de développement qui applique le skill agent-
 | **D5.INV-1** | seul le `depot` écrit dans un arbre du projet, et seulement dans l'arbre de travail de la demande et, en mode parallèle, dans le dossier `travail/` de son worktree, sous leur racine, hors des fichiers protégés (`.git`, secrets, CI, fichiers du kit) ; un chemin qui sort de la racine, y compris par lien symbolique, est refusé. | `profil`, `depot`, `tracabilite` |
 | **D5.INV-2** | une modification ne s'applique que si chaque bloc « avant » apparaît exactement une fois dans le fichier courant ; sinon rien n'est appliqué, et l'écart revient au moteur dans son budget. | `depot` |
 | **D5.INV-3** | toute écriture dans l'arbre de travail qui ne vient pas du `depot`, par l'IDE ou par un autre outil, est détectée avant le pas suivant et arrête la demande jusqu'à la décision du développeur. | `noyau`, `depot`, `mcp` |
-| **D5.INV-4** | dans l'arbre de la demande, un commit n'est fait qu'après l'acceptation du scénario à V4, si le développeur l'accepte, avec le message `<CLÉ> Snn : …`, ou `<CLÉ> : …` hors scénario, et le `depot` ne fusionne pas, ne rebase pas, ne change pas de branche et ne réécrit aucun historique (`agent-tdd-jira:D9.INV-2`) ; dans la copie de travail, chaque scénario accepté est commité avec ce message pour former son patch ; le `depot` ne pousse jamais. | `depot`, `apprenant` |
+| **D5.INV-4** | dans l'arbre de la demande, un commit n'est fait qu'après l'acceptation du scénario à V4, si le développeur l'accepte, avec le message `<CLÉ> Snn : …`, ou `<CLÉ> : …` hors scénario, et le `depot` ne fusionne pas, ne rebase pas, ne change pas de branche et ne réécrit aucun historique (`agent-tdd-jira:D9.INV-2`) ; dans la copie de travail, chaque scénario accepté est commité avec ce message pour former son patch ; le `depot` ne pousse jamais. | `noyau`, `depot`, `apprenant` |
 | **D5.INV-5** | une dépendance nouvelle, une modification de la chaîne de construction, la modification d'un test existant ou la suppression d'un fichier attend une validation explicite du développeur avant d'être appliquée (`agent-tdd-jira:D5.INV-6`). | `depot` |
 | **D5.INV-6** | un changeset de migration existant n'est jamais modifié ni supprimé ; un schéma évolue par un changeset nouveau. | `depot` |
 | **D5.INV-7** | sans l'autorisation d'écrire le code, donnée dans la configuration humaine, l'arbre de travail est une copie de travail : Agent2Dev n'écrit rien dans l'arbre de la demande, hors des fichiers de travail que le kit exclut du dépôt, et remet pour chaque scénario accepté un patch que le développeur applique lui-même. | `depot`, `realisation`, `tableau-de-bord` |
@@ -199,7 +199,7 @@ Agent2Dev : système multi-agents de développement qui applique le skill agent-
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
 | **D6.INV-1** | seules s'exécutent les commandes nommées du profil ratifié, les trois scripts du skill et les commandes git de la liste fermée du `depot`, en vecteur d'arguments, sans shell, avec leur répertoire et leur délai, dans l'arbre de travail ; dans l'arbre de la demande, sans autorisation d'écrire le code, seuls s'exécutent les scripts du skill qui lisent, `controler-criteres` et `lire-acceptation` ; les seuls paramètres substitués sont un identifiant de scénario validé par motif et des chemins sous la racine de l'arbre ou sous les données d'Agent2Dev. | `profil`, `depot`, `executant`, `orchestrateur` |
-| **D6.INV-2** | aucune commande ne démarre, n'arrête ni ne déploie l'application, ni ne lance un batch (`agent-tdd-jira:D7.INV-4`). | `executant`, `apprenant`, `exploitation` |
+| **D6.INV-2** | aucune commande ne démarre, n'arrête ni ne déploie l'application, ni ne lance un batch (`agent-tdd-jira:D7.INV-4`). | `noyau`, `executant`, `apprenant`, `exploitation` |
 | **D6.INV-3** | la sortie d'une commande est masquée et bornée avant d'être journalisée ou transmise au moteur ; les échecs de compilation et de test reviennent structurés : fichier, ligne, test, message. | `executant` |
 | **D6.INV-4** | les échecs présents avant le premier scénario forment la ligne de base de la demande ; ils ne sont imputés à aucun scénario et figurent au rapport. | `executant`, `orchestrateur` |
 
@@ -227,7 +227,7 @@ Agent2Dev : système multi-agents de développement qui applique le skill agent-
 | **D9.INV-1** | un seul scénario est réalisé à la fois, et le suivant attend l'acceptation du précédent à V4 (`agent-tdd-jira:D5.INV-4`). | `realisation` |
 | **D9.INV-2** | aucun code de production n'est appliqué pour un scénario avant que l'`executant` ait constaté l'échec d'un test étiqueté de ce scénario pour la raison attendue : une assertion, pas une erreur de compilation ni de configuration ; seule une signature minimale, sans logique, peut précéder ce constat quand le test ne compile pas (`agent-tdd-jira:D5.INV-1`). | `realisation`, `reflexif` |
 | **D9.INV-3** | un scénario n'est présenté à V4 qu'après les suites complètes back et front vertes, ligne de base exclue, constatées par l'`executant`. | `realisation` |
-| **D9.INV-4** | aucun pas n'affaiblit les tests : retirer un test ou une assertion, ajouter `@Disabled`, `fit`, `fdescribe` ou `xit` est refusé par contrôle nommé. | `realisation`, `apprenant`, `reflexif` |
+| **D9.INV-4** | aucun pas n'affaiblit les tests : retirer un test ou une assertion, ajouter `@Disabled`, `fit`, `fdescribe` ou `xit` est refusé par contrôle nommé. | `noyau`, `realisation`, `apprenant`, `reflexif`, `acceptable` |
 | **D9.INV-5** | quand un scénario touche le contrat d'API, le pas `contrat` précède les tests du back, puis ceux du front (`agent-tdd-jira:D5.INV-5`). | `realisation` |
 | **D9.INV-6** | la présentation V4 est rendue depuis le journal, au format du skill : rouge avec son message d'échec, vert, remanié, suites, fichiers, commit proposé. | `realisation` |
 
@@ -252,7 +252,7 @@ Agent2Dev : système multi-agents de développement qui applique le skill agent-
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D12.INV-1** | aucun point de validation n'est sauté, supprimé ni décidé par le système ; aucune étape ne consomme une sortie qui attend une décision. | `orchestrateur`, `apprenant` |
+| **D12.INV-1** | aucun point de validation n'est sauté, supprimé ni décidé par le système ; aucune étape ne consomme une sortie qui attend une décision. | `noyau`, `orchestrateur`, `apprenant` |
 | **D12.INV-2** | une instance d'Agent2Dev porte une demande à la fois ; les suivantes attendent en file. | `orchestrateur`, `exploitation` |
 | **D12.INV-3** | un pas qui épuise son budget s'arrête et se présente au développeur ; aucune boucle ne se relance sans budget. | `orchestrateur` |
 | **D12.INV-4** | l'arrêt d'urgence est lu entre deux pas ; la reprise est une décision humaine ; après un redémarrage du processus, la demande reprend au début du pas interrompu. | `depot`, `orchestrateur` |
@@ -363,11 +363,16 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 | **D25.INV-3** | un journal relevé par l'échange est copié par le `depot` dans le dossier de travail de la demande, et `lire-acceptation.mjs` le lit comme un journal déposé à la main. | `echange` |
 | **D25.INV-4** | une remise publiée porte le format `agent2test.remise/1`, sans contenu de fichier ni secret ; elle s'écrit par un fichier provisoire renommé ensuite, et n'est jamais réécrite ; l'échange ne décide rien et n'ouvre aucune campagne. | `echange` |
 
-### D26 : Acceptable partagé : noyau du socle de l'acceptable, refus et kit dev (reserved)
+### D26 : Acceptable partagé : noyau du socle de l'acceptable, refus, dérogations et faux refus (active)
 
-Dimension réservée : aucun invariant en vigueur dans cette version.
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D26.INV-1** | la constitution épingle le noyau du socle de l'acceptable inclus, par son nom, sa version et l'empreinte de son bloc `noyau`, et en reprend chaque entrée à l'identique, aucune dérogeable ; un écart empêche le démarrage. | `noyau`, `acceptable` |
+| **D26.INV-2** | chaque refus d'une garde, de périmètre, d'écriture, de commandes ou des leçons, cite les règles des entrées qui l'arrêtent, celles du noyau en tête ; il est journalisé et présenté au développeur ; tant que le contrat des kits n'est pas décrit, une entrée `horsKit` vaut partout. | `acceptable` |
+| **D26.INV-3** | seuls le développeur et le référent répondent à un refus, depuis le tableau de bord ou par MCP, avec leur motif ; une dérogation n'est admise que si chaque entrée qui a refusé est propre à Agent2Dev et déclarée dérogeable, jamais pour une entrée du noyau, et n'exécute l'action qu'une fois ; un faux refus n'exécute rien ; ni le moteur, ni un agent, ni l'échange ne répondent à un refus. | `mcp`, `tableau-de-bord`, `acceptable` |
+| **D26.INV-4** | le livrable d'une demande touchée par un refus porte la rubrique `acceptable` : chaque refus avec sa garde, ses règles et sa réponse, sans motif en clair. | `acceptable` |
 
-## agent2test 1.4.0
+## agent2test 1.5.0
 
 Agent2Test : système multi-agents qui choisit, prépare, exécute et journalise les tests essentiels d'une application Angular pour une demande, en pilotant Playwright comme une bibliothèque depuis Node, dans un projet séparé de l'application ; plan importé d'agent-tdd-jira, verdict par critère d'acceptation, navigateur qui regarde comme une personne et rend compte de ce qu'il voit et ne voit pas, points de contrôle humains, cybernétique de premier et de second ordre, un fichier SQLite unique ouvert par un agent médiateur, remise d'Agent2Dev en fichier ou par un échange par dossiers facultatif, exécution locale. Point d'entrée : [`specs/agent2test/SKILL.md`](specs/agent2test/SKILL.md).
 
@@ -378,9 +383,9 @@ Agent2Test : système multi-agents qui choisit, prépare, exécute et journalise
 | **D1.INV-1** | chaque cycle déroule les sept phases E1 à E7, dans l'ordre, à chacune des quatre échelles (Système, Campagne, Scénario, Étape) ; l'E3 d'une échelle est la suite des cycles complets de l'échelle inférieure, et chaque ligne de journal porte son échelle et sa phase. | `noyau`, `orchestrateur`, `journal`, `observateur`, `agent2dev/noyau` |
 | **D1.INV-2** | les agents ne communiquent que par le bus ; le bus refuse tout appel ou événement absent du contrat déclaré de l'agent, et aucun agent n'importe un autre agent. | `noyau` |
 | **D1.INV-3** | toute sortie du moteur est validée contre un schéma fermé et des contrôles nommés avant d'être consommée ; une sortie non conforme n'est jamais utilisée. | `noyau`, `preparateur` |
-| **D1.INV-4** | au démarrage, une constitution dont l'empreinte SHA-256 diffère de celle inscrite au grand livre empêche le démarrage, avec un message explicite. | `noyau` |
+| **D1.INV-4** | au démarrage, une constitution dont l'empreinte SHA-256 diffère de celle inscrite au grand livre empêche le démarrage, avec un message explicite. | `noyau`, `acceptable` |
 | **D1.INV-5** | toute demande étrangère aux tests (modifier le code, déployer, administrer) est refusée avec le motif « hors périmètre ». | `noyau`, `plan`, `acceptable`, `socle-acceptable` |
-| **D1.INV-6** | aucune action d'agent n'écrit la constitution, le code, les schémas du journal ou du grand livre, ni la configuration humaine. | `noyau`, `referentiel`, `exploitation`, `socle-acceptable` |
+| **D1.INV-6** | aucune action d'agent n'écrit la constitution, le code, les schémas du journal ou du grand livre, ni la configuration humaine. | `noyau`, `referentiel`, `exploitation`, `acceptable`, `socle-acceptable` |
 
 ### D2 : Données isolées par agent, sur PostgreSQL (superseded)
 
@@ -610,9 +615,14 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 | **D25.INV-7** | chaque étape `verifier` à attendu perceptif rend un témoignage, réussie ou non : portée regardée, canaux, règle de comparaison, ce qui a été vu, ce qui ne l'a pas été, et les preuves ; un canal déclaré mais non perçu rend le constat « non constatable » ; ce qu'un canal non déclaré voit autrement est rapporté en remarque, sans décider ; une étape `verifier` échouée n'empêche pas les `verifier` suivantes d'être jouées. | `navigateur`, `preparateur`, `journal`, `agent-tdd-jira`, `agent-tdd-jira/binome-agent2test`, `agent2dev` |
 | **D25.INV-8** | un constat « vu » n'est retenu qu'après un second regard qui rend le même constat ; un regard pendant lequel la géométrie de la zone change ne vaut rien ; des regards discordants classent l'étape `INSTABILITE`, jamais « réussie ». | `navigateur`, `verdict` |
 
-### D26 : Acceptable partagé : noyau du socle de l'acceptable, refus, leçons interdites et kit test (reserved)
+### D26 : Acceptable partagé : noyau du socle de l'acceptable, refus, leçons interdites, dérogations et faux refus (active)
 
-Dimension réservée : aucun invariant en vigueur dans cette version.
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D26.INV-1** | la constitution épingle le noyau du socle de l'acceptable inclus, par son nom, sa version et l'empreinte de son bloc `noyau`, et en reprend chaque entrée à l'identique, aucune dérogeable ; un écart empêche le démarrage. | `noyau`, `acceptable` |
+| **D26.INV-2** | chaque refus d'une garde, de périmètre, d'écriture ou des leçons, cite les règles des entrées qui l'arrêtent, celles du noyau en tête ; il est journalisé et présenté au testeur ; une leçon candidate qui correspond à un motif de `leconsInterdites` n'est pas proposée ; tant que le contrat des kits n'est pas décrit, une entrée `horsKit` vaut partout. | `apprenant`, `acceptable` |
+| **D26.INV-3** | seuls le testeur et le référent qualité répondent à un refus, depuis le tableau de bord ou par MCP, avec leur motif ; une dérogation n'est admise que si chaque entrée qui a refusé est propre à Agent2Test et déclarée dérogeable, jamais pour une entrée du noyau, et n'exécute l'action qu'une fois ; un faux refus n'exécute rien ; ni le moteur, ni un agent, ni l'échange ne répondent à un refus. | `mcp`, `tableau-de-bord`, `acceptable` |
+| **D26.INV-4** | le journal de tests d'une campagne touchée par un refus porte la rubrique `acceptable` : chaque refus avec sa garde, ses règles et sa réponse, sans motif en clair ; le format garde son nom, et sa lecture par agent-tdd-jira ne change pas. | `acceptable` |
 
 ## agents-paralleles-gitlab 1.0.1
 
@@ -1002,7 +1012,7 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 | **D12.INV-4** | hors du dossier du skill, rien ne s'écrit sans la demande du développeur : le sous-agent et les commandes s'installent par une commande qu'il lance ou qu'il approuve, une commande de retrait les supprime, et, avec `gemini skills uninstall`, rien ne reste. | `agent`, `diffusion` |
 | **D12.INV-5** | le dépôt où le skill est maintenu se nomme comme son origine et le lieu de sa vérification, jamais comme une étape ; le contrat de version, les règles et la recette du skill sont écrits dans le skill. | `recette`, `diffusion` |
 
-## generateur-skill-ticket 1.4.0
+## generateur-skill-ticket 1.4.1
 
 Générateur de skills de ticket C7E : décompose un ticket en arbre de sous-tickets, produit pour chaque nœud un skill assemblé depuis le référentiel des méso-contrats, l'installe et le lance dans Gemini CLI ; chaque skill s'observe dans un champ partagé, et chaque niveau voit le ticket augmenté ; chaque ticket entraîne le générateur, qui propose ses évolutions au développeur ; ses observations s'exportent, minimisées, vers le socle d'observation du dépôt. Point d'entrée : [`specs/generateur-skill-ticket/SKILL.md`](specs/generateur-skill-ticket/SKILL.md).
 
@@ -1204,7 +1214,7 @@ Observatoire de l'écosystème Agent2Prompt, sur le poste : relève les journaux
 | **D6.INV-1** | un même invariant du dépôt, cité par des écarts ou des dérogations, fait un candidat quand ses écarts distincts sont au moins deux et viennent de deux instances ou de deux systèmes ; un écart se désigne par son instance et son ticket, et les enveloppes d'un même écart, celle du système qui le constate et celle du registre où il est décidé, ne comptent qu'une fois ; un invariant que le dépôt ne définit pas ne fait pas de candidat. | `systemes` |
 | **D6.INV-2** | un candidat par invariant se propose à la spécification qui définit l'invariant, à sa version courante, avec les systèmes qui l'ont relevé ; ses références désignent chaque enveloppe par son instance tronquée, son système et son numéro, puisque chaque système tient son journal. | `systemes` |
 
-## orchestrateur-c7e 3.8.0
+## orchestrateur-c7e 3.8.1
 
 Orchestrateur fractal C7E : résolution d'un ticket full-stack comme transformation maîtrisée d'un système vivant, avec le cycle de l'Axiome 7E, quatre profondeurs de déclinaison, des concepts paramétrables, la qualification de chaque ticket à son ouverture par un modèle générique de la demande et des questions complémentaires, un méso-contrat principal et au besoin des compléments, confirmés avant tout le reste, des options par couche rattachées au méso-contrat qui les permet avec leurs paramètres au choix par ticket, des variantes de représentation d'une ressource et leur mise à jour en temps réel, l'analyse des images PNG de l'objectif, une fiche validée avant toute modification, des tests déduits des risques, des conventions Git compatibles avec le kit des agents parallèles, une boucle de second ordre bornée par un registre et un fichier d'invariants du projet, des registres exportés vers le socle d'observation par une commande que lance le développeur ; activé au démarrage de l'IA locale, sur choix du développeur. Point d'entrée : [`specs/orchestrateur-c7e/SKILL.md`](specs/orchestrateur-c7e/SKILL.md).
 
@@ -1307,7 +1317,7 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 
 Dimension réservée : aucun invariant en vigueur dans cette version.
 
-## scenario-playwright 1.6.2
+## scenario-playwright 1.6.3
 
 Scénarios côté utilisateur joués dans le Chrome du poste par Playwright : texte de départ inspiré de Gherkin, en français ou en anglais, écrit par le développeur ou importé sans IA d'une demande Jira (page enregistrée en MHTML ou adresse ouverte dans le navigateur du poste, connexion à la main ; Jira Cloud et Data Center ; description et champs de texte, commentaires sur demande), d'un fichier .feature ou d'une archive .zip d'un export, des tests de Xray et de Zephyr Scale lus par leur API REST, Cloud et Data Center, en lecture seule, jeton par variable d'environnement seulement, ou des pages de tests de Xray enregistrées par Chrome en HTML complet, lues sans rien exécuter, cadres compris, pas reconnus à leurs libellés en mode formulaire ou en tableau, diagnostic sans aucune valeur (test Cucumber ou BDD recopié, test manuel converti pas à pas en Quand puis Alors, clé du test pour identité ; provenance, étiquettes, comparaison et remplacement sur demande au réimport) ; traduction en scénario TOML exécutable par l'IA, sur un squelette produit sans IA, ratifiée par le développeur et contrôlée sans IA (empreinte, structure, lignes, marques, variables) ; jeu fermé de treize actions commun avec le navigateur d'Agent2Test, cibles par rôle et nom accessible, aucun code exécuté dans la page, attentes bornées, aucune étape rejouée ; origines gardées, mutations hors du poste sur autorisation explicite, connexion à la main dans un profil dédié ; rapport JSON et Markdown avec captures, instantanés ARIA et erreurs relevées ; index sans IA du code front et back du projet, sans rien exécuter (routes d'Angular, de Vue Router et de React Router, éléments d'interface et leurs noms accessibles possibles, identifiants de test, libellés traduits, endpoints de Spring et d'OpenAPI et appels du front, classes de leurs corps et leurs champs, contraintes de validation et leurs messages, chacun avec sa source ; lecture seule, empreinte et index périmé, bornes), lu par l'IA à la traduction, propositions en commentaire dans le squelette et notes du contrôle ; vérifications hors de l'écran : requêtes de la page (méthode, chemin, statut, champs JSON du corps et de la réponse), API en GET sur une origine déclarée avec la session du navigateur, sans redirection suivie, fichiers téléchargés (texte, lignes, colonne CSV), sans en-tête, cookie ni jeton relevé ; préparation et nettoyage des données depuis des lignes marquées du texte, hors du jeu d'actions : appels d'écriture vers une origine déclarée avec la session du navigateur et le jeton anti-CSRF recopié de son cookie, une fois, sans redirection suivie, valeurs gardées de la réponse et ${unique}, ou scénario ratifié joué dans le même onglet ; préparation à sa place, nettoyage même après un échec, garde des mutations ; export du scénario ratifié en test @playwright/test du projet, sans IA, dans le seul dossier de tests désigné, sans identifiant (un test par jeu, une étape par test.step avec son numéro et sa ligne, cibles en localisateurs de Playwright, étiquettes en tags, aides communes qui reprennent la sémantique du moteur, connexion laissée à l'équipe, garde des origines et des mutations là où le test joue, SCENARIO_ORIGINES, test périmé ou retouché, TypeScript ou JavaScript) ; campagne de plusieurs scénarios, contrôlés avant la première action, dans une seule fenêtre avec une seule connexion, un test en échec n'arrêtant pas les suivants ; copie d'écran à chaque vérification, à chaque échec et à la fin de chaque test ; verdict de chaque test, conforme, non conforme ou bloqué, avec sa cause ; rapport de conformité à coller dans Jira, en balisage wiki de Data Center et en page HTML pour Cloud, copies d'écran sous un nom stable sur demande ; résultats d'une exécution ou d'une campagne au format d'import de Xray Cloud ou Data Center (statut du verdict, statut et copies d'écran par pas d'un test manuel converti, exemples des jeux, exécution de test existante) ou de Zephyr Scale (format custom, JSON et archive .zip), sous la clé retenue à l'import, sans rien envoyer ; désignation d'une cible à la souris ; agent pilote-scenario et commandes /scenario:importer, /scenario:indexer, /scenario:traduire, /scenario:jouer, /scenario:designer, /scenario:exporter et /scenario:resultats. Point d'entrée : [`specs/scenario-playwright/SKILL.md`](specs/scenario-playwright/SKILL.md).
 
@@ -1587,7 +1597,7 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 | **D12.INV-4** | les fins de ligne de la plateforme (CRLF de `core.autocrlf`) ne faussent ni le compte et les numéros de ligne, ni les extraits de `search`, ni le verdict de `status`. | `parite`, `ingestion`, `recette` |
 | **D12.INV-5** | lancé dans WSL sur un worktree du système de fichiers Windows, le skill le signale par l'avertissement `depot_windows_depuis_wsl` dans `status` et `config`, sans refuser la commande. | `execution`, `parite`, `fraicheur`, `agent`, `recette` |
 
-## socle-acceptable 1.0.0
+## socle-acceptable 1.0.1
 
 Socle de l'acceptable : le noyau commun de ce que les systèmes du dépôt refusent, au sens du troisième couplage du troisième ordre (EVOLUTION.md, section 10) ; intentions refusées, actions interdites, écritures interdites, secrets et leçons interdites, chaque règle un invariant que cite le refus ; écriture par les kits dev, test et démo, avec retour arrière ; refus, dérogations et faux refus ; épinglage par les constitutions, sans retrait ni affaiblissement. Point d'entrée : [`specs/socle-acceptable/SKILL.md`](specs/socle-acceptable/SKILL.md).
 
@@ -1595,41 +1605,41 @@ Socle de l'acceptable : le noyau commun de ce que les systèmes du dépôt refus
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **SA1.INV-1** | une demande de déployer ou d'administrer un environnement, ou d'écrire dans une base de données, hors d'un kit dev, test ou démo, est refusée « hors périmètre », avant tout traitement ; aucun kit n'atteint la production. Contrôle : scénario du système, une demande « redémarrer l'application en recette » refusée, comme NO9 d'Agent2Dev. | — |
+| **SA1.INV-1** | une demande de déployer ou d'administrer un environnement, ou d'écrire dans une base de données, hors d'un kit dev, test ou démo, est refusée « hors périmètre », avant tout traitement ; aucun kit n'atteint la production. Contrôle : scénario du système, une demande « redémarrer l'application en recette » refusée, comme NO9 d'Agent2Dev. | `agent2dev/noyau`, `agent2dev/acceptable`, `agent2test/noyau`, `agent2test/acceptable` |
 
 ### SA2 : Actions interdites, et le retour arrière des actions d'un kit (active)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **SA2.INV-1** | aucun agent ne lance, hors d'un kit, un programme de déploiement ou d'orchestration d'environnement, ni une commande qui démarre ou déploie l'application. Contrôle : garde des commandes du système, un programme ou un argument de la liste refusé. | — |
-| **SA2.INV-2** | aucun agent, kit compris, ne pousse en force, ne réécrit un historique publié ni ne contourne un hook. Contrôle : garde du système et hooks du dépôt du projet. | `orchestrateur-c7e/acceptable` |
-| **SA2.INV-3** | une action dans un kit ne s'exécute qu'avec son retour arrière préparé ; un échec se défait par lui, et le retour arrière se journalise. Contrôle : contrat des kits (point d'extension E1), dès qu'il est décrit. | `agent2dev/acceptable`, `agent2test/acceptable`, `generateur-skill-ticket/acceptable`, `orchestrateur-c7e/acceptable` |
+| **SA2.INV-1** | aucun agent ne lance, hors d'un kit, un programme de déploiement ou d'orchestration d'environnement, ni une commande qui démarre ou déploie l'application. Contrôle : garde des commandes du système, un programme ou un argument de la liste refusé. | `agent2dev/noyau`, `agent2dev/profil`, `agent2dev/acceptable`, `agent2test/noyau`, `agent2test/acceptable` |
+| **SA2.INV-2** | aucun agent, kit compris, ne pousse en force, ne réécrit un historique publié ni ne contourne un hook. Contrôle : garde du système et hooks du dépôt du projet. | `agent2dev/noyau`, `agent2dev/acceptable`, `agent2test/noyau`, `agent2test/acceptable`, `orchestrateur-c7e/acceptable` |
+| **SA2.INV-3** | une action dans un kit ne s'exécute qu'avec son retour arrière préparé ; un échec se défait par lui, et le retour arrière se journalise. Contrôle : contrat des kits (point d'extension E1), dès qu'il est décrit. | `generateur-skill-ticket/acceptable`, `orchestrateur-c7e/acceptable` |
 
 ### SA3 : Écritures interdites : ce qu'un agent ne modifie jamais, et rien avant la validation humaine (active)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **SA3.INV-1** | aucun agent, même dans un kit, n'écrit dans la constitution de son système, dans les sources du système lui-même, dans ses fiches, dans la configuration humaine ni dans la transmission de son skill. Contrôle : garde d'écriture du système, une écriture dans chaque lieu refusée `ECRITURE_INTERDITE`. | — |
+| **SA3.INV-1** | aucun agent, même dans un kit, n'écrit dans la constitution de son système, dans les sources du système lui-même, dans ses fiches, dans la configuration humaine ni dans la transmission de son skill. Contrôle : garde d'écriture du système, une écriture dans chaque lieu refusée `ECRITURE_INTERDITE`. | `agent2dev/noyau`, `agent2dev/acceptable`, `agent2test/noyau`, `agent2test/acceptable` |
 | **SA3.INV-2** | aucune écriture dans un projet, code, schéma ou configuration, avant qu'un humain ait validé ce qui sera fait ; un kit ne se produit et ne s'applique qu'après cette validation. Contrôle : scénario du système, une écriture tentée avant la validation refusée. | — |
 
 ### SA4 : Secrets : ce qui ne s'écrit nulle part (active)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **SA4.INV-1** | aucun secret, jeton, mot de passe, clé ou certificat n'entre dans un journal, un livrable, un kit, un commit, un export ni une URL. Contrôle : recherche des motifs de secrets dans ce que le système écrit, et hooks du dépôt du projet. | — |
+| **SA4.INV-1** | aucun secret, jeton, mot de passe, clé ou certificat n'entre dans un journal, un livrable, un kit, un commit, un export ni une URL. Contrôle : recherche des motifs de secrets dans ce que le système écrit, et hooks du dépôt du projet. | `agent2dev/noyau`, `agent2dev/acceptable`, `agent2test/noyau`, `agent2test/acceptable` |
 
 ### SA5 : Leçons interdites : ce qu'un système n'apprend pas (active)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **SA5.INV-1** | aucune leçon ne s'apprend qui désactiverait un test, sauterait un point de contrôle ou de validation, contournerait une règle du noyau ou tronquerait le skill : elle est refusée par contrôle, avec la règle qu'elle contredirait. Contrôle : scénario du système, la consigne « ajouter @Disabled au test instable » refusée, comme AP6 d'Agent2Dev. | `agent2test/acceptable` |
+| **SA5.INV-1** | aucune leçon ne s'apprend qui désactiverait un test, sauterait un point de contrôle ou de validation, contournerait une règle du noyau ou tronquerait le skill : elle est refusée par contrôle, avec la règle qu'elle contredirait. Contrôle : scénario du système, la consigne « ajouter @Disabled au test instable » refusée, comme AP6 d'Agent2Dev. | `agent2dev/noyau`, `agent2dev/apprenant`, `agent2dev/acceptable`, `agent2test/noyau`, `agent2test/apprenant`, `agent2test/acceptable` |
 
 ### SA6 : Application : confrontation avant l'action, refus, dérogations, faux refus (active)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **SA6.INV-1** | toute action à effet extérieur est confrontée, avant son exécution, à la version épinglée du noyau et de la constitution du système, par le kit qui l'exécute ou, sans kit, par la garde du système ; un refus cite sa règle. Contrôle : scénarios du système, chaque refus avec sa règle. | `agent2dev/acceptable`, `agent2test/acceptable`, `generateur-skill-ticket/acceptable`, `orchestrateur-c7e/acceptable` |
-| **SA6.INV-2** | seul un humain déroge, d'un rôle nommé et avec son motif ; un refus levé comme infondé est un faux refus, consigné avec sa règle ; refus, dérogations, faux refus et retours arrière se journalisent. Contrôle : journal du système après une dérogation et un faux refus. | `agent2dev/acceptable`, `agent2test/acceptable`, `generateur-skill-ticket/acceptable`, `orchestrateur-c7e/acceptable` |
+| **SA6.INV-1** | toute action à effet extérieur est confrontée, avant son exécution, à la version épinglée du noyau et de la constitution du système, par le kit qui l'exécute ou, sans kit, par la garde du système ; un refus cite sa règle. Contrôle : scénarios du système, chaque refus avec sa règle. | `generateur-skill-ticket/acceptable`, `orchestrateur-c7e/acceptable` |
+| **SA6.INV-2** | seul un humain déroge, d'un rôle nommé et avec son motif, et seulement à une règle propre à la constitution qu'elle déclare dérogeable : aucune règle du noyau ne se déroge ; un refus déclaré infondé est un faux refus, consigné avec sa règle, sans que l'action s'exécute ; refus, dérogations, faux refus et retours arrière se journalisent. Contrôle : journal du système après une dérogation et un faux refus ; une dérogation demandée sur une règle du noyau, refusée. | `agent2dev/acceptable`, `agent2test/acceptable`, `generateur-skill-ticket/acceptable`, `orchestrateur-c7e/acceptable` |
 
 ### SA7 : Épinglage par les constitutions, et révision du noyau (active)
 

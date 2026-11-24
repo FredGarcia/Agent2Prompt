@@ -20,8 +20,8 @@ L'IHM du développeur et du référent. Elle montre l'état des demandes et recu
 
 | Rôle | Décisions | Vues |
 |---|---|---|
-| développeur | V0 à V5, attentes, soumission d'une demande, journal de tests, synchronisation annoncée, reprise | demandes, points et attentes, patchs, journal en arbre 7E, livrable |
-| référent | CP-4, depuis le tableau de bord seulement : ratifier, amender dans les bornes, refuser | gouvernance : leçons candidates, propositions, suspensions, grand livre, effets mesurés, échappements, dérives, alertes |
+| développeur | V0 à V5, attentes, soumission d'une demande, journal de tests, synchronisation annoncée, reprise, réponses aux refus | demandes, points et attentes, refus, patchs, journal en arbre 7E, livrable |
+| référent | CP-4, depuis le tableau de bord seulement : ratifier, amender dans les bornes, refuser ; réponses aux refus | gouvernance : leçons candidates, propositions, suspensions, grand livre, effets mesurés, échappements, dérives, alertes, faux refus par règle |
 
 - La configuration humaine associe chaque utilisateur à un ou plusieurs rôles ; en local, une même personne peut tenir les deux.
 - Une décision envoyée par un rôle qui n'y a pas droit est refusée `DROIT_INSUFFISANT`.
@@ -40,6 +40,7 @@ Chaque point présente ce qui est à décider, à gauche, et ses preuves, à dro
 | V4 | présentation du scénario au format du skill | diff, sorties des commandes du rouge, du vert et des suites, avertissements de la garde statique |
 | V5 | matrice et rapport | projet de commentaire Jira, sorties des scripts, patchs manquants |
 | attente | ce qui est à trancher | preuves de l'agent qui l'a ouverte |
+| refus | l'objet refusé, la garde ; « déroger », proposé seulement si chaque entrée est dérogeable, et « faux refus », avec le motif obligatoire | chaque règle citée et son énoncé, l'entrée de la constitution, les entrées du noyau marquées comme telles (module `acceptable`) |
 
 - Sous l'objet : les boutons de décision et le champ de commentaire, obligatoire quand la décision l'exige (module `orchestrateur`, section 4).
 - **Patchs** : chaque patch remis, avec son scénario, son état (appliqué, en attente), son téléchargement, et la commande `git am -3` à copier (module `depot`, section 2).
@@ -78,6 +79,7 @@ Les textes de l'IHM, les messages et les livrables sont en français ; les ident
 | TB7 | D19.INV-3 | les contrastes calculés depuis les jetons de couleur atteignent 4,5 pour 1 ; le diff marque ajouts et suppressions par leurs signes |
 | TB8 | D19.INV-1 | l'arrêt d'urgence est présent et opérant sur chaque vue, pour chaque rôle |
 | TB9 | D5.INV-7 | la vue des patchs liste chaque patch avec son état et la commande `git am -3` ; le téléchargement rend le fichier octet pour octet |
+| TB10 | D26.INV-3 | sur un refus de `docker`, la vue ne propose que « faux refus » ; une réponse sans motif n'est pas envoyée ; une réponse envoyée par un utilisateur sans rôle développeur ni référent est refusée `DROIT_INSUFFISANT` |
 
 ## 8. Fichiers à produire
 

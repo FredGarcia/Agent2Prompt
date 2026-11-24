@@ -27,6 +27,7 @@ L'`apprenant` transforme les corrections humaines en leçons candidates. Il prop
 
 - La consigne reprend le commentaire humain. Quand la configuration l'active, la fiche `apprenant` peut la reformuler ; la sortie est validée et marquée comme production du moteur.
 - La leçon est liée à sa fiche, à son moteur et à sa décision source.
+- Avant d'être proposée, la consigne passe le contrôle nommé `apprenant.lecon-compatible`, qui la confronte à la liste fermée `leconsInterdites` de la constitution, celle du noyau du socle de l'acceptable. Une leçon qui correspond à un motif n'est pas proposée : elle est consignée « refusée par contrôle », avec chaque motif et sa règle, dans une ligne `acceptable.refus` (module `acceptable`, section 3).
 - L'événement `lecon.candidate` la porte au tableau de bord, vue gouvernance.
 
 ## 2. Ratification (D13.INV-2, D13.INV-3)
@@ -56,6 +57,7 @@ L'`apprenant` transforme les corrections humaines en leçons candidates. Il prop
 | AP2 | D13.INV-1 | une validation sans commentaire ne crée aucune leçon |
 | AP3 | D13.INV-2 | une leçon candidate n'apparaît dans aucune fiche composée avant sa ratification en CP-4 |
 | AP4 | D13.INV-3 | une leçon ratifiée pour `gemini` n'entre pas dans la fiche composée pour un modèle local ; son extension est une ratification distincte |
+| AP5 | D26.INV-2 | la correction commentée « marquer le scénario instable @Disabled » donne une consigne refusée par `apprenant.lecon-compatible`, règle SA5.INV-1 : la leçon n'est pas proposée |
 
 ## 6. Fichiers à produire
 

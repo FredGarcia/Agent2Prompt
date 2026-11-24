@@ -8,11 +8,11 @@ Mesure statique et déterministe (generateur-skill-ticket, critère P7), produit
 
 | Borne | Taille |
 |---|---|
-| à l'activation | 103 373 car., 25 844 tokens |
-| au plus | 264 031 car., 66 008 tokens |
+| à l'activation | 103 968 car., 25 992 tokens |
+| au plus | 264 626 car., 66 157 tokens |
 
 - `orchestrateur-c7e : nom et description` : 1 227 car., chargés au démarrage de Gemini CLI
-- `orchestrateur-c7e/SKILL.md` : 102 146 car., corps du skill, à son activation
+- `orchestrateur-c7e/SKILL.md` : 102 741 car., corps du skill, à son activation
 - `projet/docs/c7e/meso-contrats.md` : 15 638 car., copie du projet du fichier d'invariants, lue au démarrage
 - `orchestrateur-c7e/modules/qualification/SKILL.md` : 19 330 car., lu à l'ouverture et à l'analyse de chaque ticket
 - `orchestrateur-c7e/modules/referentiel/SKILL.md` : 45 516 car., lu à l'ouverture et à l'analyse de chaque ticket
@@ -39,13 +39,13 @@ Les pourcentages rapportent chaque taille à celle du point d'entrée de l'orche
 | Mesure | Au plus |
 |---|---|
 | plus grand contexte de l'arbre, session du skill ticket-abcde-3620 | 28 086 tokens, 43 % |
-| somme des 20 contextes des 5 nœuds et des observateurs | 278 932 tokens, 423 % |
+| somme des 20 contextes des 5 nœuds et des observateurs | 279 088 tokens, 422 % |
 
 Aucun contexte de l'arbre ne charge plus que le pourcentage du plus grand ; la somme dit ce que l'arbre lit en tout, quand chaque contexte relit ce qu'il lui faut, au plus.
 
 ## Relectures
 
-Sur la somme des contextes de l'arbre, 132 814 tokens (48 %) viennent de fichiers lus dans plusieurs contextes ; lus une seule fois chacun, les fichiers de l'arbre feraient 146 118 tokens, 221 % du point d'entrée de l'orchestrateur.
+Sur la somme des contextes de l'arbre, 132 814 tokens (48 %) viennent de fichiers lus dans plusieurs contextes ; lus une seule fois chacun, les fichiers de l'arbre feraient 146 274 tokens, 221 % du point d'entrée de l'orchestrateur.
 
 | Fichier | Contextes qui le lisent | Relu, au plus |
 |---|---|---|
@@ -87,7 +87,7 @@ Ils coordonnent leurs sous-tickets, ratifient et, pour la racine, font rédiger 
 
 | Nœud | Session, au plus | Somme des contextes |
 |---|---|---|
-| ABCDE-3620, racine | 28 086 tokens, 43 % | 54 232 tokens, 82 % |
+| ABCDE-3620, racine | 28 086 tokens, 43 % | 54 388 tokens, 82 % |
 | ABCDE-3620-1, composé | 15 880 tokens, 24 % | 15 880 tokens, 24 % |
 
 ## Observateurs de l'arbre, sur attente
@@ -106,7 +106,7 @@ Invoqués par le skill d'un nœud quand le champ attend une observation d'ordre 
 | Contexte | À l'activation | Au plus |
 |---|---|---|
 | session du skill ticket-abcde-3620 | 21 531 car., 5 383 tokens | 112 342 car., 28 086 tokens |
-| sous-agent ticket-abcde-3620-redacteur | 2 831 car., 708 tokens | 104 585 car., 26 147 tokens |
+| sous-agent ticket-abcde-3620-redacteur | 2 831 car., 708 tokens | 105 210 car., 26 303 tokens |
 
 Lu par session du skill ticket-abcde-3620 :
 
@@ -130,7 +130,7 @@ Lu par sous-agent ticket-abcde-3620-redacteur :
 
 - `ticket-abcde-3620/agents/ticket-abcde-3620-redacteur.md` : 2 831 car., corps de l'agent, à son invocation
 - `ticket-abcde-3620/modules/documents/SKILL.md` : 7 917 car., module `documents`
-- `ticket-abcde-3620/references/agent-tdd-jira.md` : 26 696 car., `.gemini/skills/ticket-abcde-3620/references/agent-tdd-jira.md`
+- `ticket-abcde-3620/references/agent-tdd-jira.md` : 27 321 car., `.gemini/skills/ticket-abcde-3620/references/agent-tdd-jira.md`
 - `ticket-abcde-3620/references/agent-tdd-jira/ingestion-jira.md` : 15 829 car., `.gemini/skills/ticket-abcde-3620/references/agent-tdd-jira/ingestion-jira.md`
 - `ticket-abcde-3620/references/agent-tdd-jira/us-criteres.md` : 22 037 car., `.gemini/skills/ticket-abcde-3620/references/agent-tdd-jira/us-criteres.md`
 - `ticket-abcde-3620/references/agent-tdd-jira/analyse-demande.md` : 9 698 car., `.gemini/skills/ticket-abcde-3620/references/agent-tdd-jira/analyse-demande.md`
