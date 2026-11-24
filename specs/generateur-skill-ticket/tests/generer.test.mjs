@@ -119,8 +119,10 @@ test('P3 : chaque transmission attendue passe le contrôle d\'intégrité et d\'
   for (const nom of NOMS) assert.deepStrictEqual(verifierTransmission(attendue(nom)).erreurs, [], nom);
 });
 
-test('P3 : les 33 invariants de l\'orchestrateur, mot pour mot, dans chaque skill', () => {
-  assert.equal(S.orchestrateur.invariants.length, 33);
+test('P3 : tous les invariants de l\'orchestrateur, mot pour mot, dans chaque skill', () => {
+  const definis = [...lireTexte(join(RACINE_DEPOT, 'specs', 'orchestrateur-c7e', 'SKILL.md')).matchAll(/^- \*\*D\d+\.INV-\d+\*\* : /gm)].length;
+  assert.ok(definis >= 33, `${definis} invariants dans le point d'entrée de l'orchestrateur`);
+  assert.equal(S.orchestrateur.invariants.length, definis, 'chacun, à la version épinglée');
   for (const nom of NOMS) {
     const invariants = fichiersDe(attendue(nom)).get('modules/invariants/SKILL.md').split('\n');
     for (const l of S.orchestrateur.invariants) assert.ok(invariants.includes(l), `${nom} : ${l.slice(0, 20)}`);
@@ -186,7 +188,7 @@ const transmissionsAlterees = [
     const m = fichier(fs, 'modules/invariants/SKILL.md');
     m.contenu = m.contenu.replace("l'IA ne pousse pas, ne fusionne pas", "l'IA ne pousse pas, fusionne");
   }, /invariant omis ou altéré : D4\.INV-3 /],
-  ['nombre d\'invariants déclaré faux', (fs) => majManifeste(fs, (j) => { j.ticket.herites[0].invariants = 32; }), /32 invariants déclarés, 33 dans/],
+  ['nombre d\'invariants déclaré faux', (fs) => majManifeste(fs, (j) => { j.ticket.herites[0].invariants = S.orchestrateur.invariants.length - 1; }), new RegExp(`${S.orchestrateur.invariants.length - 1} invariants déclarés, ${S.orchestrateur.invariants.length} dans`)],
   ['section de la méthode altérée', (fs) => {
     const m = fichier(fs, 'modules/methode/SKILL.md');
     m.contenu = m.contenu.replace('avant toute implémentation de niveau d=2 (D3.INV-2)', 'si possible avant l\'implémentation');
@@ -390,7 +392,7 @@ test('le Monteur construit un nœud isolé comme un ticket sans sous-ticket', ()
   const { nom, fichiers } = monteur.construire(feuille);
   assert.equal(nom, 'ticket-abcde-3620-1-1');
   assert.deepStrictEqual(verifierHeritage(new Map(fichiers.map((f) => [f.rel, f.contenu]))), []);
-  assert.equal(lignesInvariants(fichiers.find((f) => f.rel === 'modules/invariants/SKILL.md').contenu).length, 33);
+  assert.equal(lignesInvariants(fichiers.find((f) => f.rel === 'modules/invariants/SKILL.md').contenu).length, S.orchestrateur.invariants.length);
 });
 
 // ---- Lot 4 : boîte à outils de la racine, documents, kits, sous-agents de rôle ----
@@ -864,7 +866,7 @@ test('ligne de commande : generer, puis verifier, codes de sortie', () => {
   const sortie = temporaire('skills-cli-');
   const g = lancer('generer', EXEMPLE, '--sortie', sortie);
   assert.equal(g.status, 0, g.stderr);
-  assert.match(g.stdout, /5 skills de ticket dans .* orchestrateur-c7e \d+\.\d+\.\d+ \(33 invariants\)/);
+  assert.match(g.stdout, new RegExp(`5 skills de ticket dans .* orchestrateur-c7e \\d+\\.\\d+\\.\\d+ \\(${S.orchestrateur.invariants.length} invariants\\)`));
   const v = lancer('verifier', join(sortie, 'transmissions'));
   assert.equal(v.status, 0, v.stderr);
   assert.equal(v.stdout.trim().split('\n').length, 5);

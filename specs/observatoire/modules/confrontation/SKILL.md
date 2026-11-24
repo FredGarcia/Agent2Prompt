@@ -7,7 +7,7 @@ status: active
 
 # Module `confrontation` (D2)
 
-Aucun système ne se juge seul (`EVOLUTION.md`, section 10.3) : ce qu'une instance relève prend un autre poids quand une autre instance le relève aussi, et ce qu'une instance a décidé pour la spécification doit pouvoir remonter jusqu'au dépôt. La confrontation tire des enveloppes de toutes les instances deux sortes de candidats.
+Aucun système ne se juge seul (`EVOLUTION.md`, section 10.3) : ce qu'une instance relève prend un autre poids quand une autre instance le relève aussi, et ce qu'une instance a décidé pour la spécification doit pouvoir remonter jusqu'au dépôt. La confrontation tire des enveloppes de toutes les instances deux sortes de candidats, pour un même système ; la confrontation entre systèmes, par les invariants du dépôt, en ajoute une troisième (module `systemes`).
 
 ## 1. Signaux
 
@@ -23,7 +23,7 @@ Un retour est une proposition d'une instance, de type `proposition` et de cible 
 
 ## 4. Candidats
 
-Un candidat est identifié par son système, son motif et sa profondeur : un retour et une récurrence de même clé font un seul candidat, de sorte `retour`. Il porte les versions du système qu'il a vues, le nombre d'instances, le nombre d'enveloppes et leurs références tronquées, les huit premiers caractères de l'instance et le numéro de l'enveloppe : de quoi retrouver les enveloppes dans le magasin, et rien de plus. `confronter` les liste ; `proposer` les écrit.
+Un candidat est identifié par son système, son motif et sa profondeur : un retour et une récurrence de même clé font un seul candidat, de sorte `retour`. Il porte les versions du système qu'il a vues, le nombre d'instances, le nombre d'enveloppes et leurs références tronquées, les huit premiers caractères de l'instance et le numéro de l'enveloppe : de quoi retrouver les enveloppes dans le magasin, et rien de plus. `confronter` les liste, avant les candidats par invariant du module `systemes` ; `proposer` les écrit. Les enveloppes de l'orchestrateur ne portent pas de profondeur : elles ne font ni retour ni récurrence, et ne se confrontent que par les invariants que citent ses écarts.
 
 ## 5. Recette
 

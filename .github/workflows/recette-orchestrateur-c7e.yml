@@ -1,0 +1,56 @@
+name: Recette de l'orchestrateur C7E
+
+# orchestrateur-c7e : l'export de ses registres vers le socle d'observation (D12). Ce workflow joue sa
+# recette sous Linux et sous Windows, sur des projets d'épreuve dont elle construit l'historique Git :
+# événements du registre des concepts lus au premier parent de la branche d'intégration, fusions comprises,
+# lignes décidées du registre des écarts, journal d'enveloppes en ajout seul et chaîné, minimisation, sel de
+# l'instance partagé avec l'export du générateur de skills de ticket ; puis la transmission, qui ne porte pas
+# l'outil. Il suit aussi ses sources : le socle d'observation, l'export du générateur et le champ de l'arbre
+# d'exemple, les spécifications dont la recette cite les invariants, et l'outil de transmission. La structure
+# de la spécification est vérifiée, avec toutes les autres, par tools/verifier.mjs.
+
+on:
+  pull_request:
+    paths:
+      - 'specs/orchestrateur-c7e/**'
+      - 'specs/socle-observation/**'
+      - 'specs/socle-back-front/**'
+      - 'specs/java/**'
+      - 'specs/generateur-skill-ticket/outils/**'
+      - 'specs/generateur-skill-ticket/exemples/ABCDE-3620-champ/**'
+      - 'specs/generateur-skill-ticket/manifest.json'
+      - 'tools/bundle.mjs'
+      - '.github/workflows/recette-orchestrateur-c7e.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'specs/orchestrateur-c7e/**'
+      - 'specs/socle-observation/**'
+      - 'specs/socle-back-front/**'
+      - 'specs/java/**'
+      - 'specs/generateur-skill-ticket/outils/**'
+      - 'specs/generateur-skill-ticket/exemples/ABCDE-3620-champ/**'
+      - 'specs/generateur-skill-ticket/manifest.json'
+      - 'tools/bundle.mjs'
+      - '.github/workflows/recette-orchestrateur-c7e.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  recette:
+    name: recette (${{ matrix.os }}, Node ${{ matrix.node }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node: [22, 24]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Recette de l'export de l'orchestrateur
+        run: node --test "specs/orchestrateur-c7e/tests/*.test.mjs"

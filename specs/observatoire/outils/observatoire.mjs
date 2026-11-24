@@ -1,10 +1,11 @@
 #!/usr/bin/env node
-// Observatoire de l'écosystème Agent2Prompt (observatoire 1.0.0) : le premier couplage du troisième ordre,
+// Observatoire de l'écosystème Agent2Prompt (observatoire 1.1.0) : le premier couplage du troisième ordre,
 // entre systèmes (EVOLUTION.md, section 10.3). Il se lance depuis le clone du dépôt, sur le poste.
 //
-// Il relève, vérifiés selon le socle d'observation, les journaux d'enveloppes des projets inscrits dans un
-// magasin local, gardé dans le répertoire Git commun du clone, <git-common-dir>/agent2prompt/observatoire/ :
-// jamais versionné, publié ni exporté. Il les confronte entre instances, observe l'état de l'écosystème,
+// Il relève, vérifiés selon le socle d'observation, les journaux d'enveloppes des projets inscrits, un par
+// système qui exporte, dans un magasin local, gardé dans le répertoire Git commun du clone,
+// <git-common-dir>/agent2prompt/observatoire/ : jamais versionné, publié ni exporté. Il les confronte entre
+// instances, et entre systèmes par les invariants du dépôt que citent leurs écarts, observe l'état de l'écosystème,
 // écrit des propositions minimisées dans observatoire/propositions/, que le développeur apporte au dépôt par
 // une pull request, et suit l'effet de celles que la ratification a fait entrer dans une version. Il propose
 // et n'applique jamais : il ne modifie aucune spécification, ne commite ni ne publie.
@@ -30,7 +31,8 @@ import { fileURLToPath } from 'node:url';
 export const SCHEMA = 'socle-observation.enveloppe/1';
 export const FORMAT_PROJETS = 'observatoire.projets/1';
 export const FORMAT_PROPOSITION = 'observatoire.proposition/1';
-export const JOURNAUX = ['docs/c7e/observations.jsonl']; // journaux d'enveloppes d'un projet, un par système qui exporte
+// Journaux d'enveloppes d'un projet, un par système qui exporte : le générateur de skills de ticket, l'orchestrateur C7E.
+export const JOURNAUX = ['docs/c7e/observations.jsonl', 'docs/c7e/observations-orchestrateur-c7e.jsonl'];
 export const PROPOSITIONS = 'observatoire/propositions';
 export const MAGASIN = 'agent2prompt/observatoire'; // sous le répertoire Git commun du clone
 export const SEUIL_INSTANCES = 2; // une récurrence : au moins deux instances distinctes
@@ -39,6 +41,7 @@ export const SEUIL_ENVELOPPES = 20; // un effet : au moins vingt enveloppes du s
 // ni l'autre ne fait une récurrence.
 export const MOTIFS_GENERIQUES = ['conforme', 'ecart', 'correction', 'choix', 'proposition', 'ratifie', 'non-ratifie', 'fondee', 'infondee', 'veille', 'bilan', 'ecart-invariant-projet'];
 const NATURES_NEUTRES = ['conforme', 'fondee', 'infondee', 'bilan'];
+const TYPES_ECART = ['ecart', 'derogation']; // ce qui cite un invariant du dépôt dans la confrontation entre systèmes
 const RACINE = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 
 // ---- Schéma fermé de l'enveloppe (socle, section 3), pour tout système qui exporte ----
@@ -79,7 +82,12 @@ const AGENT = /^agent:[a-z][a-z0-9-]*$/;
 const NOM = /^[a-z][a-z0-9-]*$/;
 const VERSION = /^\d+\.\d+\.\d+$/;
 const FORMAT_SOURCE = /^[a-z0-9][a-z0-9.-]*\/\d+$/;
+// Référence tronquée d'une enveloppe : son instance, le système qui l'exporte quand une proposition en réunit
+// plusieurs, son numéro dans le journal de ce système.
 const REFERENCE = /^[0-9a-f]{8}:[1-9]\d*$/;
+const REFERENCE_SYSTEME = /^[0-9a-f]{8}:[a-z][a-z0-9-]*:[1-9]\d*$/;
+const ID_CONCEPT = /^C_[A-Z0-9]+(?:_[A-Z0-9]+)*_\d{3}$/; // concept du registre de départ de l'orchestrateur
+const DEFINITION = /\*\*((?:D|SC|SO)\d+\.INV-\d+)\*\*/g;
 
 const estObjet = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
 const chaine = (v, motif) => typeof v === 'string' && motif.test(v);
@@ -122,7 +130,7 @@ export function canonique(x) {
  * Écarts d'une enveloppe au socle : schéma fermé et listes (SO1.INV-1), ordres et niveaux (SO1.INV-2),
  * minimisation (SO3.INV-1, SO3.INV-2). La règle vaut pour tout système qui exporte : un format source, une
  * nature, se reconnaissent à leur forme ; une référence est une empreinte, des numéros, ou l'identifiant
- * d'un concept, seul défini par une spécification du dépôt.
+ * d'un concept, C_<DOMAINE>_<NNN>, seul défini par une spécification du dépôt.
  */
 export function controlerEnveloppe(x) {
   if (!estObjet(x)) return ['objet JSON attendu'];
@@ -161,7 +169,7 @@ export function controlerEnveloppe(x) {
   if (x.invariant !== undefined && !chaine(x.invariant, INVARIANT)) err.push(`invariant « ${x.invariant} » : l'identifiant d'un invariant du dépôt, préfixé par sa spécification`);
   if (x.ancre !== undefined) {
     dansLaListe('ancre.nature', x.ancre.nature, LISTES.ancre);
-    if (!chaine(x.ancre.ref, EMPREINTE) && !(x.ancre.nature === 'concept' && chaine(x.ancre.ref, MOTIF))) err.push('ancre.ref : une empreinte salée, ou l\'identifiant d\'un concept');
+    if (!chaine(x.ancre.ref, EMPREINTE) && !(x.ancre.nature === 'concept' && chaine(x.ancre.ref, ID_CONCEPT))) err.push('ancre.ref : une empreinte salée, ou l\'identifiant d\'un concept, C_<DOMAINE>_<NNN>');
   }
   if (x.preuve !== undefined) {
     dansLaListe('preuve.nature', x.preuve.nature, LISTES.preuve);
@@ -232,6 +240,19 @@ export function systemesConnus(depot = RACINE) {
     connus.set(manifeste.name ?? d.name, { courante: manifeste.version, versions });
   }
   return connus;
+}
+
+/** Invariants que définissent les spécifications du dépôt, préfixés par leur nom : `java:D4.INV-1`. */
+export function invariantsDuDepot(depot = RACINE) {
+  const ids = new Set();
+  const specs = join(depot, 'specs');
+  if (!existsSync(specs)) return ids;
+  for (const d of readdirSync(specs, { withFileTypes: true })) {
+    const entree = join(specs, d.name, 'SKILL.md');
+    if (!d.isDirectory() || !existsSync(entree)) continue;
+    for (const [, id] of lire(entree).matchAll(DEFINITION)) ids.add(`${d.name}:${id}`);
+  }
+  return ids;
 }
 
 // ---- Magasin local ----
@@ -404,20 +425,68 @@ function chargerMagasin(magasin, depot) {
   return { parInstance, toutes, ecartees, connus };
 }
 
-// ---- D2 : confrontation ----
+// ---- D2 : confrontation entre instances ; D6 : entre systèmes ----
 
 const estSignal = (x) => x.type !== 'decision' && !NATURES_NEUTRES.includes(x.nature) && !MOTIFS_GENERIQUES.includes(x.motif) && x.profondeur !== undefined;
 const cleDe = (systeme, motif, profondeur) => `${systeme}|${motif}|${profondeur ?? ''}`;
+/** Clé d'une proposition : un candidat par invariant ne se confond avec aucun retour ni aucune récurrence. */
+const cleDeProposition = (sorte, systeme, motif, profondeur) => (sorte === 'invariant' ? `invariant|${systeme}|${motif}` : cleDe(systeme, motif, profondeur));
+/** Motif d'un candidat par invariant : `ecart-` suivi de l'invariant, en minuscules et tirets. */
+export const motifDInvariant = (invariant) => `ecart-${invariant.toLowerCase().replace(/[:.]/g, '-')}`;
+/**
+ * Un écart se désigne par son instance et son ticket : l'ancre de l'enveloppe quand c'est un ticket, sinon son
+ * journal source, qui pour le champ du générateur est le ticket ; à défaut, par sa source. Le même écart,
+ * constaté par un système et décidé dans le registre d'un autre, a ainsi la même désignation.
+ */
+const ecartDe = (x, instance) => {
+  const ticket = x.ancre?.nature === 'ticket' ? x.ancre.ref : x.source.journal;
+  return ticket ? `${instance}|${ticket}` : `${instance}|${x.systeme.nom}|${x.source.format}|${x.source.numero}`;
+};
+const triReferences = (a, b) => {
+  const [x, y] = [a, b].map((r) => r.split(':'));
+  return parCodePoint(x[0], y[0]) || parCodePoint(x.length === 3 ? x[1] : '', y.length === 3 ? y[1] : '') || Number(x.at(-1)) - Number(y.at(-1));
+};
 
 /**
- * Retours et récurrences candidats. Un retour : une proposition d'instance qui vise une spécification, qu'une
- * décision humaine de l'instance a retenue, dès une instance. Une récurrence : un même motif, à la même
- * profondeur, pour un même système, dans au moins deux instances distinctes.
+ * Candidats par invariant (D6) : un même invariant du dépôt, cité par des écarts ou des dérogations, quand ses
+ * écarts distincts sont au moins deux et viennent de deux instances ou de deux systèmes. Il se propose à la
+ * spécification qui le définit, à sa version courante.
+ */
+function parInvariant(parInstance, depot, connus) {
+  const definis = invariantsDuDepot(depot);
+  const groupes = new Map();
+  for (const [instance, xs] of parInstance) {
+    for (const x of xs) {
+      if (!TYPES_ECART.includes(x.type) || x.invariant === undefined || !definis.has(x.invariant) || !connus.has(x.invariant.split(':')[0])) continue;
+      const g = groupes.get(x.invariant) ?? { ecarts: new Set(), instances: new Set(), systemes: new Set(), references: new Set() };
+      g.ecarts.add(ecartDe(x, instance));
+      g.instances.add(instance);
+      g.systemes.add(x.systeme.nom);
+      g.references.add(`${court(instance)}:${x.systeme.nom}:${x.numero}`);
+      groupes.set(x.invariant, g);
+    }
+  }
+  return [...groupes]
+    .filter(([, g]) => g.instances.size >= SEUIL_INSTANCES || (g.ecarts.size >= 2 && g.systemes.size >= 2))
+    .map(([invariant, g]) => {
+      const systeme = invariant.split(':')[0];
+      return {
+        sorte: 'invariant', systeme, motif: motifDInvariant(invariant), invariant, systemes: [...g.systemes].sort(parCodePoint), versions: [connus.get(systeme).courante],
+        instances: g.instances.size, ecarts: g.ecarts.size, enveloppes: g.references.size, references: [...g.references].sort(triReferences),
+      };
+    });
+}
+
+/**
+ * Retours, récurrences et invariants candidats. Un retour : une proposition d'instance qui vise une
+ * spécification, qu'une décision humaine de l'instance a retenue, dès une instance. Une récurrence : un même
+ * motif, à la même profondeur, pour un même système, dans au moins deux instances distinctes. Un invariant : un
+ * même invariant du dépôt, relevé par des écarts distincts de deux systèmes ou de deux instances.
  */
 export function confronter({ magasin = magasinParDefaut(), depot = RACINE } = {}) {
   const r = relever({ magasin });
   if (r.altere || !magasin) return { erreurs: r.erreurs, avertissements: [], candidats: [], ecartees: 0, instances: 0 };
-  const { parInstance, ecartees } = chargerMagasin(magasin, depot);
+  const { parInstance, ecartees, connus } = chargerMagasin(magasin, depot);
   const groupes = new Map();
   const ajouter = (x, instance, retour, ...refs) => {
     const cle = cleDe(x.systeme.nom, x.motif, x.profondeur);
@@ -438,14 +507,14 @@ export function confronter({ magasin = magasinParDefaut(), depot = RACINE } = {}
       }
     }
   }
-  const tri = (a, b) => parCodePoint(a.split(':')[0], b.split(':')[0]) || Number(a.split(':')[1]) - Number(b.split(':')[1]);
   const candidats = [...groupes.values()]
     .filter((g) => g.retour || g.instances.size >= SEUIL_INSTANCES)
     .map((g) => ({
       sorte: g.retour ? 'retour' : 'recurrence', systeme: g.systeme, motif: g.motif, profondeur: g.profondeur,
-      versions: [...g.versions].sort(comparerVersions), instances: g.instances.size, enveloppes: g.references.size, references: [...g.references].sort(tri),
+      versions: [...g.versions].sort(comparerVersions), instances: g.instances.size, enveloppes: g.references.size, references: [...g.references].sort(triReferences),
     }))
     .sort((a, b) => parCodePoint(cleDe(a.systeme, a.motif, a.profondeur), cleDe(b.systeme, b.motif, b.profondeur)));
+  candidats.push(...parInvariant(parInstance, depot, connus).sort((a, b) => parCodePoint(a.invariant, b.invariant)));
   return { erreurs: r.erreurs, avertissements: r.avertissements, candidats, ecartees: ecartees.length, instances: parInstance.size };
 }
 
@@ -476,12 +545,13 @@ export function etat({ magasin = magasinParDefaut(), depot = RACINE } = {}) {
 
 // ---- D4 : propositions ----
 
-const CLES_PROPOSITION = ['format', 'date', 'systeme', 'versions', 'sorte', 'motif', 'profondeur', 'instances', 'enveloppes', 'references', 'statut', 'version', 'pr'];
-const LISTES_PROPOSITION = ['versions', 'references'];
+const CLES_PROPOSITION = ['format', 'date', 'systeme', 'versions', 'sorte', 'motif', 'invariant', 'systemes', 'profondeur', 'instances', 'enveloppes', 'references', 'statut', 'version', 'pr'];
+const LISTES_PROPOSITION = ['versions', 'systemes', 'references'];
 
 /**
  * En-tête d'une proposition et ses écarts au format `observatoire.proposition/1` (D4.INV-1) : rien que des
- * valeurs minimisées, système, versions, sorte, motif, profondeur, nombres, références tronquées, statut.
+ * valeurs minimisées, système, versions, sorte, motif, profondeur, nombres, références tronquées, statut ;
+ * pour une proposition par invariant, l'invariant du dépôt et les systèmes qui l'ont relevé.
  */
 export function controlerProposition(texte) {
   const lignes = texte.replace(/^﻿/, '').replace(/\r\n/g, '\n').split('\n');
@@ -511,11 +581,21 @@ export function controlerProposition(texte) {
   if (!chaine(entete.date, JOUR)) erreurs.push(`date « ${entete.date} » : AAAA-MM-JJ`);
   if (!chaine(entete.systeme, NOM)) erreurs.push(`systeme « ${entete.systeme} » : le nom d'une spécification`);
   if (!Array.isArray(entete.versions) || entete.versions.length === 0 || !entete.versions.every((v) => VERSION.test(v))) erreurs.push('versions : une liste de versions x.y.z');
-  if (!['retour', 'recurrence'].includes(entete.sorte)) erreurs.push(`sorte « ${entete.sorte} » : retour ou recurrence`);
+  if (!['retour', 'recurrence', 'invariant'].includes(entete.sorte)) erreurs.push(`sorte « ${entete.sorte} » : retour, recurrence ou invariant`);
   if (!chaine(entete.motif, MOTIF)) erreurs.push(`motif « ${entete.motif} » : minuscules et tirets`);
   if (entete.profondeur !== undefined && !LISTES.profondeur.includes(entete.profondeur)) erreurs.push(`profondeur « ${entete.profondeur} » hors de la liste`);
   for (const k of ['instances', 'enveloppes']) if (!entier(entete[k])) erreurs.push(`${k} : un entier, à partir de 1`);
-  if (!Array.isArray(entete.references) || entete.references.length === 0 || !entete.references.every((r) => REFERENCE.test(r))) erreurs.push('references : une liste de références tronquées, instance:numero');
+  const parInvariant = entete.sorte === 'invariant';
+  if (parInvariant) {
+    if (!chaine(entete.invariant, INVARIANT) || entete.invariant.split(':')[0] !== entete.systeme) erreurs.push('invariant : l\'identifiant d\'un invariant du dépôt, préfixé par la spécification visée');
+    else if (entete.motif !== motifDInvariant(entete.invariant)) erreurs.push(`motif « ${entete.motif} » : ${motifDInvariant(entete.invariant)}, celui de l'invariant`);
+    if (!Array.isArray(entete.systemes) || entete.systemes.length === 0 || !entete.systemes.every((s) => NOM.test(s))) erreurs.push('systemes : la liste des systèmes qui ont relevé l\'invariant');
+    if (entete.profondeur !== undefined) erreurs.push('profondeur : aucune pour une proposition par invariant');
+  } else if (entete.invariant !== undefined || entete.systemes !== undefined) erreurs.push('invariant, systemes : seulement pour une proposition par invariant');
+  const references = Array.isArray(entete.references) && entete.references.length > 0;
+  if (!references || !entete.references.every((r) => (parInvariant ? REFERENCE_SYSTEME.test(r) && entete.systemes?.includes(r.split(':')[1]) : REFERENCE.test(r)))) {
+    erreurs.push(parInvariant ? 'references : une liste de références tronquées, instance:systeme:numero, d\'un système de la liste' : 'references : une liste de références tronquées, instance:numero');
+  }
   if (!['ouverte', 'ratifiee', 'refusee'].includes(entete.statut)) erreurs.push(`statut « ${entete.statut} » : ouverte, ratifiee ou refusee`);
   if (entete.statut === 'ratifiee' && !chaine(entete.version, VERSION)) erreurs.push('version : la version du système qui porte la proposition ratifiée');
   if (entete.statut !== 'ratifiee' && entete.version !== undefined) erreurs.push('version : seulement pour une proposition ratifiée');
@@ -546,6 +626,7 @@ function texteDeProposition(c, date) {
     `versions: [${c.versions.join(', ')}]`,
     `sorte: ${c.sorte}`,
     `motif: ${c.motif}`,
+    ...(c.sorte === 'invariant' ? [`invariant: ${c.invariant}`, `systemes: [${c.systemes.join(', ')}]`] : []),
     ...(c.profondeur ? [`profondeur: ${c.profondeur}`] : []),
     `instances: ${c.instances}`,
     `enveloppes: ${c.enveloppes}`,
@@ -553,12 +634,15 @@ function texteDeProposition(c, date) {
     'statut: ouverte',
     '---',
   ];
-  const sorte = c.sorte === 'retour'
-    ? `une proposition retenue par le développeur d'une instance, et qui vise la spécification${c.instances > 1 ? `, son motif relevé dans ${c.instances} instances` : ''}`
-    : `le même motif, à la même profondeur, relevé dans ${c.instances} instances`;
+  const sortes = {
+    retour: () => `une proposition retenue par le développeur d'une instance, et qui vise la spécification${c.instances > 1 ? `, son motif relevé dans ${c.instances} instances` : ''}`,
+    recurrence: () => `le même motif, à la même profondeur, relevé dans ${c.instances} instances`,
+    invariant: () => `l'invariant \`${c.invariant}\`, que définit la spécification, cité par des écarts de ${pluriel(c.systemes.length, 'système')}, ${c.systemes.join(', ')}, dans ${pluriel(c.instances, 'instance')}`,
+  };
+  const sorte = sortes[c.sorte]();
   return `${entete.join('\n')}
 
-# Proposition : ${c.motif}${c.profondeur ? `, ${c.profondeur}` : ''}, ${c.systeme}
+# Proposition : ${c.sorte === 'invariant' ? c.invariant : `${c.motif}${c.profondeur ? `, ${c.profondeur}` : ''}, ${c.systeme}`}
 
 Proposée par l'observatoire le ${date} : ${sorte}. Elle ne s'applique pas d'elle-même : le développeur la relit, la complète et l'apporte au dépôt par une pull request, que la ratification décide.
 
@@ -587,7 +671,8 @@ export function proposer({ magasin = magasinParDefaut(), depot = RACINE, date = 
   const ignorees = [];
   for (const candidat of c.candidats) {
     const nom = `${candidat.systeme}, ${candidat.motif}${candidat.profondeur ? `, ${candidat.profondeur}` : ''}`;
-    const memes = propositions.filter(({ entete: e }) => cleDe(e.systeme, e.motif, e.profondeur) === cleDe(candidat.systeme, candidat.motif, candidat.profondeur));
+    const cle = cleDeProposition(candidat.sorte, candidat.systeme, candidat.motif, candidat.profondeur);
+    const memes = propositions.filter(({ entete: e }) => cleDeProposition(e.sorte, e.systeme, e.motif, e.profondeur) === cle);
     const ouverte = memes.find((p) => p.entete.statut === 'ouverte');
     const ratifiee = memes.find((p) => p.entete.statut === 'ratifiee');
     const refusees = memes.filter((p) => p.entete.statut === 'refusee');
@@ -623,10 +708,15 @@ export function suivre({ magasin = magasinParDefaut(), depot = RACINE } = {}) {
   const { propositions, erreurs } = lirePropositions(depot);
   const toutes = [...parInstance.values()].flat();
   const suivis = propositions.map(({ fichier, entete: e }) => {
-    const base = { fichier, systeme: e.systeme, motif: e.motif, profondeur: e.profondeur ?? null, sorte: e.sorte, statut: e.statut };
+    const base = { fichier, systeme: e.systeme, motif: e.motif, profondeur: e.profondeur ?? null, sorte: e.sorte, ...(e.invariant ? { invariant: e.invariant } : {}), statut: e.statut };
     if (e.statut !== 'ratifiee') return { ...base, effet: null };
     const xs = toutes.filter((x) => x.systeme.nom === e.systeme);
-    const compter = (ys) => ({ motif: ys.filter((x) => estSignal(x) && x.motif === e.motif && x.profondeur === e.profondeur).length, enveloppes: ys.length });
+    // Pour une proposition par invariant, le motif est celui des écarts qui citent l'invariant, dans les enveloppes
+    // de la spécification qui le définit : indécidable si elle n'exporte pas.
+    const duMotif = e.sorte === 'invariant'
+      ? (x) => TYPES_ECART.includes(x.type) && x.invariant === e.invariant
+      : (x) => estSignal(x) && x.motif === e.motif && x.profondeur === e.profondeur;
+    const compter = (ys) => ({ motif: ys.filter(duMotif).length, enveloppes: ys.length });
     const avant = compter(xs.filter((x) => comparerVersions(x.systeme.version, e.version) < 0));
     const apres = compter(xs.filter((x) => comparerVersions(x.systeme.version, e.version) >= 0));
     let effet = 'indecidable';
@@ -724,8 +814,11 @@ export function principal(argv, sortie = console.log, erreur = console.error, co
     if (options.json) sortie(JSON.stringify(r, null, 2));
     else {
       sortie(`${pluriel(r.instances, 'instance')} confrontée${r.instances > 1 ? 's' : ''} : ${pluriel(r.candidats.length, 'candidat')}`);
-      for (const c of r.candidats) sortie(`  ${c.sorte}  ${c.systeme}, ${c.motif}${c.profondeur ? `, ${c.profondeur}` : ''} : ${pluriel(c.instances, 'instance')}, ${pluriel(c.enveloppes, 'enveloppe')}`);
-      if (r.instances < SEUIL_INSTANCES) sortie(`moins de ${SEUIL_INSTANCES} instances : aucune récurrence possible, seuls les retours remontent`);
+      for (const c of r.candidats) {
+        const systemes = c.sorte === 'invariant' ? `${c.invariant}, ${pluriel(c.systemes.length, 'système')}, ` : '';
+        sortie(`  ${c.sorte}  ${c.systeme}, ${c.motif}${c.profondeur ? `, ${c.profondeur}` : ''} : ${systemes}${pluriel(c.instances, 'instance')}, ${pluriel(c.enveloppes, 'enveloppe')}`);
+      }
+      if (r.instances < SEUIL_INSTANCES) sortie(`moins de ${SEUIL_INSTANCES} instances : aucune récurrence possible ; seuls remontent les retours, et les invariants relevés par deux systèmes`);
     }
     return rendre(r);
   }

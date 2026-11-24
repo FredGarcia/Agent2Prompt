@@ -45,18 +45,19 @@ function registre() {
   return new Map(lignes.slice(2).map(cellules).map((c) => [c[0], { statut: c[i('Statut')], ordre: c[i('Ordre')], module: c[i('Module')].replace(/`/g, '') }]));
 }
 
-test('spécification : version du point d\'entrée, de son titre et du manifeste ; cinq dimensions actives, un module chacune, et leur ordre déclaré', () => {
+test('spécification : version du point d\'entrée, de son titre et du manifeste ; six dimensions actives, un module chacune, et leur ordre déclaré', () => {
   assert.match(ENTREE, new RegExp(`^version: ${MANIFESTE.version.replace(/\./g, '\\.')}$`, 'm'));
   assert.match(ENTREE, new RegExp(`^# Observatoire de l'écosystème, version ${MANIFESTE.version.replace(/\./g, '\\.')}$`, 'm'));
   assert.match(ENTREE, new RegExp(`\\| ID \\| Dimension \\| Introduite \\| Statut ${MANIFESTE.version.replace(/\./g, '\\.')} \\| Ordre \\|`));
   const r = registre();
-  assert.deepStrictEqual([...r.keys()], ['D1', 'D2', 'D3', 'D4', 'D5']);
-  assert.deepStrictEqual([...r.values()].map((d) => d.ordre), ['OC1', 'OC3', 'OC3', 'OC3', 'OC3'], 'D1 régule l\'entrée du magasin ; D2 à D5 font la boucle du troisième ordre');
+  assert.deepStrictEqual([...r.keys()], ['D1', 'D2', 'D3', 'D4', 'D5', 'D6']);
+  assert.deepStrictEqual([...r.values()].map((d) => d.ordre), ['OC1', 'OC3', 'OC3', 'OC3', 'OC3', 'OC3'], 'D1 régule l\'entrée du magasin ; D2 à D6 font la boucle du troisième ordre');
   for (const m of MANIFESTE.modules) {
     assert.equal(m.status, 'active', m.id);
     assert.deepStrictEqual(m.dimensions.map((d) => r.get(d).module), [m.id]);
   }
-  assert.equal(DEFINITIONS.length, 9);
+  assert.equal(DEFINITIONS.length, 11);
+  assert.deepStrictEqual(MANIFESTE.previousVersions.map((p) => p.version), ['1.0.0'], 'la version précédente, archivée');
 });
 
 test('spécification : chaque invariant a sa ligne de recette dans son module, et chaque test cité existe sous ce titre', () => {

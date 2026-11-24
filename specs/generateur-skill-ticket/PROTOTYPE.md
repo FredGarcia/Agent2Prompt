@@ -140,7 +140,7 @@ Le skill du nœud `ABCDE-3620-1.2` s'appelle `ticket-abcde-3620-1-2` (référenc
 | `modules/recette/` | critères à prouver ; preuves des options, exigences des transverses, commandes de la pile pour une feuille ; preuve par agrégation pour un nœud composé | tous |
 | `modules/sous-tickets/` | sous-arbre, ordre de résolution du sous-arbre, préalables extérieurs, règles de coordination et de clôture | nœuds composés |
 | `modules/methode/` | sections de l'orchestrateur recopiées mot pour mot : § 2, 5.1, 5.2, 6, 7.1, 8 et 11.5 pour une feuille, § 11.5 pour un nœud composé ; depuis le lot 5, § 6, 7.2 et 11.5 pour la racine, où sont les observateurs, et § 7.2 en plus pour un ticket sans sous-ticket | tous |
-| `modules/invariants/` | ce dont le skill hérite, les correspondances entre la fiche de l'orchestrateur et le skill, et les 33 invariants de l'orchestrateur mot pour mot | tous |
+| `modules/invariants/` | ce dont le skill hérite, les correspondances entre la fiche de l'orchestrateur et le skill, et tous les invariants de l'orchestrateur, mot pour mot | tous |
 | `socle/SKILL.md` | socle back-front à la version qu'épingle l'orchestrateur | tous |
 | `references/java.md`, `references/angular.md` | référentiels de la pile des couches touchées | feuilles |
 | `projet/meso-contrats.md` | invariants du projet dans l'état où le skill a été produit ; au démarrage, la copie du projet fait foi | tous |

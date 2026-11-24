@@ -12,7 +12,7 @@ Le premier couplage du troisième ordre observe aussi l'état de l'écosystème 
 ## 1. Ce que dit `etat`
 
 - Pour chaque instance : ses projets inscrits, le nombre de ses enveloppes et la date de la dernière.
-- Pour chaque système qu'elle exporte : les versions vues, la dernière, la version publiée par le dépôt, et l'écart : à jour, en retard, ou inconnue quand le dépôt n'a pas publié cette version (D3.INV-1).
+- Pour chaque système qu'elle exporte, le générateur et l'orchestrateur chacun par son journal : les versions vues, la dernière, la version publiée par le dépôt, et l'écart : à jour, en retard, ou inconnue quand le dépôt n'a pas publié cette version (D3.INV-1).
 - Le nombre d'enveloppes écartées, d'un système ou d'une version inconnus (module `releve`).
 - Les propositions du dépôt, par statut : ouvertes, ratifiées, refusées.
 

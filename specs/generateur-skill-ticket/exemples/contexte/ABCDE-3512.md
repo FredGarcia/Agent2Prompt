@@ -8,11 +8,11 @@ Mesure statique et déterministe (generateur-skill-ticket, critère P7), produit
 
 | Borne | Taille |
 |---|---|
-| à l'activation | 93 076 car., 23 269 tokens |
-| au plus | 249 365 car., 62 342 tokens |
+| à l'activation | 100 293 car., 25 074 tokens |
+| au plus | 256 582 car., 64 146 tokens |
 
-- `orchestrateur-c7e : nom et description` : 1 137 car., chargés au démarrage de Gemini CLI
-- `orchestrateur-c7e/SKILL.md` : 91 939 car., corps du skill, à son activation
+- `orchestrateur-c7e : nom et description` : 1 227 car., chargés au démarrage de Gemini CLI
+- `orchestrateur-c7e/SKILL.md` : 99 066 car., corps du skill, à son activation
 - `projet/docs/c7e/meso-contrats.md` : 15 638 car., copie du projet du fichier d'invariants, lue au démarrage
 - `orchestrateur-c7e/modules/qualification/SKILL.md` : 19 330 car., lu à l'ouverture et à l'analyse de chaque ticket
 - `orchestrateur-c7e/modules/referentiel/SKILL.md` : 45 516 car., lu à l'ouverture et à l'analyse de chaque ticket
@@ -26,7 +26,7 @@ Mesure statique et déterministe (generateur-skill-ticket, critère P7), produit
 
 | Feuille | Session, activation | Session, au plus | Plus grand contexte | Somme des contextes |
 |---|---|---|---|---|
-| ABCDE-3512 | 6 431 tokens, 28 % | 29 111 tokens, 47 % | 29 111 tokens, 47 % | 142 193 tokens, 228 % |
+| ABCDE-3512 | 6 431 tokens, 26 % | 29 494 tokens, 46 % | 29 494 tokens, 46 % | 143 727 tokens, 224 % |
 
 Les pourcentages rapportent chaque taille à celle du point d'entrée de l'orchestrateur, à la même borne pour l'activation, au plus pour le reste. La somme réunit les contextes qui travaillent pour la feuille : sa session, ses agents de couche, ses sous-agents de rôle.
 
@@ -34,20 +34,20 @@ Les pourcentages rapportent chaque taille à celle du point d'entrée de l'orche
 
 | Mesure | Au plus |
 |---|---|
-| plus grand contexte de l'arbre, session du skill ticket-abcde-3512 | 29 111 tokens, 47 % |
-| somme des 10 contextes du nœud et des observateurs | 159 172 tokens, 255 % |
+| plus grand contexte de l'arbre, session du skill ticket-abcde-3512 | 29 494 tokens, 46 % |
+| somme des 10 contextes du nœud et des observateurs | 160 706 tokens, 251 % |
 
 Aucun contexte de l'arbre ne charge plus que le pourcentage du plus grand ; la somme dit ce que l'arbre lit en tout, quand chaque contexte relit ce qu'il lui faut, au plus.
 
 ## Relectures
 
-Sur la somme des contextes de l'arbre, 70 681 tokens (44 %) viennent de fichiers lus dans plusieurs contextes ; lus une seule fois chacun, les fichiers de l'arbre feraient 88 491 tokens, 142 % du point d'entrée de l'orchestrateur.
+Sur la somme des contextes de l'arbre, 71 831 tokens (45 %) viennent de fichiers lus dans plusieurs contextes ; lus une seule fois chacun, les fichiers de l'arbre feraient 88 875 tokens, 139 % du point d'entrée de l'orchestrateur.
 
 | Fichier | Contextes qui le lisent | Relu, au plus |
 |---|---|---|
 | `projet/docs/c7e/meso-contrats.md` | 4 | 11 729 tokens |
+| `ticket-abcde-3512/modules/invariants/SKILL.md` | 4 | 9 774 tokens |
 | `ticket-abcde-3512/socle/SKILL.md` | 3 | 9 295 tokens |
-| `ticket-abcde-3512/modules/invariants/SKILL.md` | 4 | 8 623 tokens |
 | `ticket-abcde-3512/modules/methode/SKILL.md` | 3 | 6 930 tokens |
 | `ticket-abcde-3512/references/java.md` | 3 | 6 866 tokens |
 | `ticket-abcde-3512/ticket.toml` | 6 | 5 898 tokens |
@@ -75,10 +75,10 @@ Invoqués par le skill d'un nœud quand le champ attend une observation d'ordre 
 
 | Contexte | À l'activation | Au plus |
 |---|---|---|
-| session du skill ticket-abcde-3512 | 25 721 car., 6 431 tokens | 116 441 car., 29 111 tokens |
-| agent ticket-abcde-3512-persistance | 4 694 car., 1 174 tokens | 85 199 car., 21 300 tokens |
-| agent ticket-abcde-3512-back | 4 835 car., 1 209 tokens | 85 667 car., 21 417 tokens |
-| agent ticket-abcde-3512-front | 5 201 car., 1 301 tokens | 87 353 car., 21 839 tokens |
+| session du skill ticket-abcde-3512 | 25 721 car., 6 431 tokens | 117 975 car., 29 494 tokens |
+| agent ticket-abcde-3512-persistance | 4 694 car., 1 174 tokens | 86 733 car., 21 684 tokens |
+| agent ticket-abcde-3512-back | 4 835 car., 1 209 tokens | 87 201 car., 21 801 tokens |
+| agent ticket-abcde-3512-front | 5 201 car., 1 301 tokens | 88 887 car., 22 222 tokens |
 | sous-agent ticket-abcde-3512-redacteur | 2 831 car., 708 tokens | 92 139 car., 23 035 tokens |
 | sous-agent ticket-abcde-3512-analyste | 1 890 car., 473 tokens | 23 193 car., 5 799 tokens |
 | sous-agent ticket-abcde-3512-relecteur | 1 714 car., 429 tokens | 38 424 car., 9 606 tokens |
@@ -95,7 +95,7 @@ Lu par session du skill ticket-abcde-3512 :
 - `ticket-abcde-3512/modules/methode/SKILL.md` : 13 859 car., module `methode`
 - `ticket-abcde-3512/modules/recette/SKILL.md` : 4 368 car., module `recette`
 - `ticket-abcde-3512/modules/kits/SKILL.md` : 7 830 car., module `kits`
-- `ticket-abcde-3512/modules/invariants/SKILL.md` : 11 497 car., module `invariants`
+- `ticket-abcde-3512/modules/invariants/SKILL.md` : 13 031 car., module `invariants`
 - `projet/docs/c7e/meso-contrats.md` : 15 638 car., `docs/c7e/meso-contrats.md`
 - `ticket-abcde-3512/ticket.toml` : 4 718 car., `ticket.toml`
 - `ticket-abcde-3512/references/agent-tdd-jira/tracabilite.md` : 6 697 car., `references/agent-tdd-jira/tracabilite.md`
@@ -110,7 +110,7 @@ Lu par agent ticket-abcde-3512-persistance :
 - `ticket-abcde-3512/modules/option-persistance-schema/SKILL.md` : 1 013 car., `.gemini/skills/ticket-abcde-3512/modules/option-persistance-schema/SKILL.md`
 - `ticket-abcde-3512/modules/option-persistance-crud/SKILL.md` : 1 251 car., `.gemini/skills/ticket-abcde-3512/modules/option-persistance-crud/SKILL.md`
 - `ticket-abcde-3512/references/agent-tdd-jira/cycle-tdd.md` : 7 359 car., `.gemini/skills/ticket-abcde-3512/references/agent-tdd-jira/cycle-tdd.md`
-- `ticket-abcde-3512/modules/invariants/SKILL.md` : 11 497 car., `.gemini/skills/ticket-abcde-3512/modules/invariants/SKILL.md`
+- `ticket-abcde-3512/modules/invariants/SKILL.md` : 13 031 car., `.gemini/skills/ticket-abcde-3512/modules/invariants/SKILL.md`
 - `ticket-abcde-3512/socle/SKILL.md` : 18 589 car., `.gemini/skills/ticket-abcde-3512/socle/SKILL.md`
 - `ticket-abcde-3512/references/java.md` : 13 731 car., `.gemini/skills/ticket-abcde-3512/references/java.md`
 - `projet/docs/c7e/meso-contrats.md` : 15 638 car., copie du projet du fichier d'invariants
@@ -125,7 +125,7 @@ Lu par agent ticket-abcde-3512-back :
 - `ticket-abcde-3512/modules/option-backend-fonctionnalites/SKILL.md` : 746 car., `.gemini/skills/ticket-abcde-3512/modules/option-backend-fonctionnalites/SKILL.md`
 - `ticket-abcde-3512/modules/option-backend-endpoints/SKILL.md` : 965 car., `.gemini/skills/ticket-abcde-3512/modules/option-backend-endpoints/SKILL.md`
 - `ticket-abcde-3512/references/agent-tdd-jira/cycle-tdd.md` : 7 359 car., `.gemini/skills/ticket-abcde-3512/references/agent-tdd-jira/cycle-tdd.md`
-- `ticket-abcde-3512/modules/invariants/SKILL.md` : 11 497 car., `.gemini/skills/ticket-abcde-3512/modules/invariants/SKILL.md`
+- `ticket-abcde-3512/modules/invariants/SKILL.md` : 13 031 car., `.gemini/skills/ticket-abcde-3512/modules/invariants/SKILL.md`
 - `ticket-abcde-3512/socle/SKILL.md` : 18 589 car., `.gemini/skills/ticket-abcde-3512/socle/SKILL.md`
 - `ticket-abcde-3512/references/java.md` : 13 731 car., `.gemini/skills/ticket-abcde-3512/references/java.md`
 - `projet/docs/c7e/meso-contrats.md` : 15 638 car., copie du projet du fichier d'invariants
@@ -139,7 +139,7 @@ Lu par agent ticket-abcde-3512-front :
 - `ticket-abcde-3512/modules/option-frontend-elements_graphiques/SKILL.md` : 1 842 car., `.gemini/skills/ticket-abcde-3512/modules/option-frontend-elements_graphiques/SKILL.md`
 - `ticket-abcde-3512/modules/option-frontend-fonctionnalites/SKILL.md` : 1 885 car., `.gemini/skills/ticket-abcde-3512/modules/option-frontend-fonctionnalites/SKILL.md`
 - `ticket-abcde-3512/references/agent-tdd-jira/cycle-tdd.md` : 7 359 car., `.gemini/skills/ticket-abcde-3512/references/agent-tdd-jira/cycle-tdd.md`
-- `ticket-abcde-3512/modules/invariants/SKILL.md` : 11 497 car., `.gemini/skills/ticket-abcde-3512/modules/invariants/SKILL.md`
+- `ticket-abcde-3512/modules/invariants/SKILL.md` : 13 031 car., `.gemini/skills/ticket-abcde-3512/modules/invariants/SKILL.md`
 - `ticket-abcde-3512/socle/SKILL.md` : 18 589 car., `.gemini/skills/ticket-abcde-3512/socle/SKILL.md`
 - `ticket-abcde-3512/references/angular.md` : 13 915 car., `.gemini/skills/ticket-abcde-3512/references/angular.md`
 - `projet/docs/c7e/meso-contrats.md` : 15 638 car., copie du projet du fichier d'invariants

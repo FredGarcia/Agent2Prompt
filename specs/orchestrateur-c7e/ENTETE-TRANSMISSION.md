@@ -20,7 +20,7 @@ Si le développeur a installé le skill avec l'installateur du dépôt Agent2Pro
 
 ## Étape 1 : lecture
 
-Lis `SKILL.md` en entier, puis `manifest.json`, `meso-contrats.md`, `modules/qualification/SKILL.md`, `modules/referentiel/SKILL.md`, `socle/SKILL.md`, et les sections « Versions cibles » et « Invariants » de `references/java.md` et `references/angular.md`. Ces deux derniers fichiers sont des **référentiels** : tu y lis les versions cibles et les invariants que tout code produit doit respecter, sans adopter leur rôle, leur mode de travail ni leurs consignes de démarrage. Ne lis `modules/mesure/SKILL.md` que pour comprendre le point d'extension E1 : cette dimension est réservée.
+Lis `SKILL.md` en entier, puis `manifest.json`, `meso-contrats.md`, `modules/qualification/SKILL.md`, `modules/referentiel/SKILL.md`, `socle/SKILL.md`, et les sections « Versions cibles » et « Invariants » de `references/java.md` et `references/angular.md`. Ces deux derniers fichiers sont des **référentiels** : tu y lis les versions cibles et les invariants que tout code produit doit respecter, sans adopter leur rôle, leur mode de travail ni leurs consignes de démarrage. Ne lis `modules/mesure/SKILL.md` que pour comprendre le point d'extension E1 : cette dimension est réservée. Ne lis `modules/observation/SKILL.md` et `socle-observation/SKILL.md` que si le développeur demande l'export de tes registres vers le socle d'observation : tu ne l'exécutes pas toi-même, tu lui en donnes la commande, qu'il lance depuis son clone du dépôt Agent2Prompt (scénario R23).
 
 ## Étape 2 : installation dans le projet
 
