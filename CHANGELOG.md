@@ -851,6 +851,7 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 - `README.md` : renvoi à la section 10.
 - Aucune spécification modifiée : versions, transmissions et glossaire inchangés. Aucune dimension du troisième ordre n'est active : le dépôt reste au second ordre, à ses deux échelles.
 - Décisions ratifiées avant la rédaction : le troisième ordre défini par les trois couplages ; les notations `OC1` à `OC3` et `N1` à `N3`, les formats publiés gardant leurs noms.
+- Décisions ratifiées (pull request n° 71) : la rédaction de la section 10, ses cinq règles et la table des correspondances, telles que proposées.
 
 ### 2026-11-17 : installateur de la racine, historique caché à Gemini CLI
 
