@@ -32,7 +32,7 @@ const transmission = (nom, version) => relire(lf(readFileSync(cheminTransmission
 const INSTALLABLES = readdirSync(join(RACINE, 'specs'))
   .filter((d) => existsSync(join(RACINE, 'specs', d, 'manifest.json')))
   .map((d) => manifeste(d))
-  .filter((m) => m.transmissible !== false && !SYSTEMES.includes(m.name) && m.name !== 'analyse-projet')
+  .filter((m) => m.transmissible !== false && !SYSTEMES.includes(m.name) && !['analyse-projet', 'observatoire'].includes(m.name))
   .map((m) => m.name)
   .sort();
 

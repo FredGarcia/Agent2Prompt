@@ -1,0 +1,57 @@
+name: Recette de l'observatoire
+
+# observatoire : l'observatoire de l'écosystème, sur le poste du développeur. Ce workflow joue sa recette
+# sous Linux et sous Windows : inscription et relevé des journaux d'enveloppes, confrontation des
+# instances, état de l'écosystème, propositions et suivi de leur effet, sur des instances d'épreuve que
+# produit l'export du générateur de skills de ticket, avec un magasin et un dépôt temporaires ; puis la
+# vérification des propositions du dépôt, au format observatoire.proposition/1. Il suit aussi ses sources :
+# le socle d'observation, l'export du générateur et ses outils de champ et d'apprentissage, le champ de
+# l'arbre d'exemple, et l'outil de transmission. La structure de la spécification est vérifiée, avec toutes
+# les autres, par tools/verifier.mjs.
+
+on:
+  pull_request:
+    paths:
+      - 'specs/observatoire/**'
+      - 'observatoire/**'
+      - 'specs/socle-observation/**'
+      - 'specs/generateur-skill-ticket/outils/**'
+      - 'specs/generateur-skill-ticket/exemples/ABCDE-3620-champ/**'
+      - 'specs/generateur-skill-ticket/manifest.json'
+      - 'tools/bundle.mjs'
+      - '.github/workflows/recette-observatoire.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'specs/observatoire/**'
+      - 'observatoire/**'
+      - 'specs/socle-observation/**'
+      - 'specs/generateur-skill-ticket/outils/**'
+      - 'specs/generateur-skill-ticket/exemples/ABCDE-3620-champ/**'
+      - 'specs/generateur-skill-ticket/manifest.json'
+      - 'tools/bundle.mjs'
+      - '.github/workflows/recette-observatoire.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  recette:
+    name: recette (${{ matrix.os }}, Node ${{ matrix.node }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node: [22, 24]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Recette de l'observatoire
+        run: node --test "specs/observatoire/tests/*.test.mjs"
+
+      - name: Magasin du clone et propositions du dépôt, vérifiés
+        run: node specs/observatoire/outils/observatoire.mjs verifier

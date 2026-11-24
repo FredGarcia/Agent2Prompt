@@ -34,7 +34,7 @@
  *    livrerait que son `SKILL.md` à l'activation, et ses modules resteraient illisibles.
  *
  * Il refuse les spécifications de systèmes à construire, que leur consigne matérialise dans `spec/`
- * de leur propre projet, et n'installe `analyse-projet` qu'au niveau utilisateur.
+ * de leur propre projet, et n'installe `analyse-projet` et `observatoire` qu'au niveau utilisateur.
  * Node 20 ou plus récent, modules natifs, et git pour le masquage. Ses fonctions servent aussi à
  * l'installateur de la racine du dépôt (`installer.mjs`), qui installe tous les skills et leurs agents.
  */
@@ -58,6 +58,7 @@ const SUPPRIMER = { recursive: true, force: true, maxRetries: 10, retryDelay: 10
 const UTILISATEUR_SEUL = new Map([
   ['analyse-projet', "sa consigne interdit d'écrire dans le projet analysé"],
   ['expert-analyse-projet', "sa consigne interdit d'écrire dans le projet analysé"],
+  ['observatoire', "il observe plusieurs projets depuis le clone d'Agent2Prompt, sans écrire dans aucun"],
 ]);
 
 class Erreur extends Error {}

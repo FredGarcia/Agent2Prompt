@@ -179,8 +179,8 @@ Filiation : ces couplages reprennent trois lectures du troisième ordre, l'envir
 
 1. Un troisième ordre ne s'obtient jamais par un niveau d'observation de plus : il n'existe pas de N4, et OC3 n'en est pas un.
 2. « Premier ordre », « second ordre » et « troisième ordre » s'emploient au sens de cette section. Un « ordre n » d'un format publié garde son sens de niveau d'observation, sans renommage.
-3. Le troisième ordre ne se revendique que pour une boucle fermée avec sa preuve : une dimension OC3 suit le cycle de vie de la section 3, réservée, puis active quand ses invariants ont leurs tests.
+3. Le troisième ordre ne se revendique que pour une boucle fermée avec sa preuve : une dimension OC3 se déclare comme telle dans le registre de sa spécification, colonne « Ordre », et suit le cycle de vie de la section 3, réservée, puis active quand ses invariants ont leurs tests.
 4. Une boucle OC3 ne retire aucune ratification humaine, ne fait jamais appeler le second ordre par le premier et ne lève aucun point fixe d'OC2 : elle en rend la dérive observable. Un point fixe ne change que par une version publiée et ratifiée, jamais par un agent.
 5. `OC` et `N`, suivis d'un chiffre, sont réservés à ces notations (section 2).
 
-Tant qu'aucune dimension OC3 n'est active, le dépôt est OC2 à ses deux échelles, la sienne (section 5) et celle de ses systèmes ; les couplages du troisième ordre y sont en germe.
+Le premier couplage a sa boucle OC3 active, dans l'observatoire (`observatoire`, dimensions D2 à D5, depuis 1.0.0) : les instances d'un même système s'y confrontent, leurs retours et leurs récurrences remontent au dépôt par pull request, et l'effet des propositions ratifiées se suit dans les enveloppes des versions qui les portent. Elle est fermée dans ses limites déclarées : un seul système exporte, le générateur de skills de ticket, et un seul sujet ratifie. Les couplages 2 et 3 restent en germe ; partout ailleurs, le dépôt est OC2 à ses deux échelles, la sienne (section 5) et celle de ses systèmes.

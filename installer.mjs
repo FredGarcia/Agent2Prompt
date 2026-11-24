@@ -26,7 +26,7 @@
  * installation (node_modules, fichiers de travail) restent. Modifié, il reste tel quel : la nouvelle
  * version est déposée dans agent2prompt/a-fusionner/skills/<nom>-<version>/, avec ses écarts, et
  * --fusionne <nom>, une fois la fusion faite à la main, en fait la base de l'installation. Les systèmes
- * à construire ne s'installent pas ; analyse-projet ne s'installe qu'au niveau utilisateur.
+ * à construire ne s'installent pas ; analyse-projet et observatoire ne s'installent qu'au niveau utilisateur.
  *
  * Agents et commandes : ceux que porte chaque skill installé, agent/*.md et commandes/<groupe>/*.toml,
  * copiés dans agents/ et commands/<groupe>/. La copie s'adapte à Gemini CLI, jamais le fichier du skill,
