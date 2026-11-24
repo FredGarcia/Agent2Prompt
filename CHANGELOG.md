@@ -844,6 +844,12 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Outils
 
+### 2026-11-24 : préfixe SO des invariants du socle d'observation
+
+- **`tools/verifier.mjs`** : les identifiants `SOn.INV-k` sont reconnus dans les définitions, les citations et les citations préfixées par un nom de spécification, comme `Dn.INV-k` et `SCn.INV-k`. Un identifiant `SO` cité sans définition était jusqu'ici ignoré.
+- **`tools/glossaire.mjs`** : dimensions et invariants `SO` lus comme ceux des autres espaces ; notations `SOn`, `OCn` et `Nn` dans « Lire un identifiant ». Glossaire régénéré, 670 invariants, inchangés.
+- Vérifications : trois défauts introduits volontairement, tous relevés : `SO1.INV-1` cité sans définition, et `socle-observation:SO1.INV-1` cité sans le socle, que la version précédente laissait passer ; glossaire non régénéré.
+
 ### 2026-11-24 : ordres cybernétiques
 
 - **`EVOLUTION.md`, section 10 « Ordres cybernétiques »** : le vocabulaire commun des ordres cybernétiques, `OC1` à `OC3`, et des niveaux d'observation, `N1` à `N3`, à ne jamais confondre ; le troisième ordre défini par trois couplages, entre systèmes, entre description et pratique, avec les valeurs ; la correspondance avec les termes des spécifications ; cinq règles, dont la première : un troisième ordre ne s'obtient jamais par un niveau d'observation de plus.

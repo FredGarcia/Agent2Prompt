@@ -9,8 +9,11 @@ Ce fichier détaille chaque invariant de chaque spécification du dépôt : son 
 | `Dn` | dimension n d'une spécification : un axe, avec ses invariants et ses tests | `D4` de `tension-dashboard-gitlab-agent` : effecteur GitLab à garde-fous |
 | `Dn.INV-k` | invariant k de la dimension n : une propriété qui doit toujours tenir, vérifiée par au moins un test ou un contrôle | `D4.INV-3` : la procédure n'emploie ni `--force` ni `--force-with-lease` |
 | `SCn`, `SCn.INV-k` | dimension et invariant du socle back-front, inclus à l'identique dans plusieurs skills | `SC1.INV-2` : aucun changement cassant dans une version d'API publiée |
+| `SOn`, `SOn.INV-k` | dimension et invariant du socle d'observation : l'enveloppe commune des observations, référencée ou incluse par les systèmes qui les exportent | `socle-observation:SO3.INV-1` : aucune enveloppe ne porte de texte libre |
 | `<spécification>:Dn.INV-k` | invariant d'une autre spécification, cité avec le nom de celle-ci | `java:D4.INV-2` |
 | `En` | point d'extension : emplacement réservé, inerte, pour une dimension future | `E2` |
+| `OCn` | ordre cybernétique d'une boucle (`EVOLUTION.md`, section 10) : `OC1` régulation, `OC2` observation de l'observation, `OC3` régulation de l'écosystème | `OC2` : la boucle d'évolution du dépôt |
+| `Nn` | niveau d'observation dans un système, de `N1` à `N3`, l'humain au-dessus ; un niveau n'est pas un ordre (`EVOLUTION.md`, section 10) | `N3` : l'observateur d'ordre 3 du générateur de skills de ticket |
 
 Un identifiant n'a de sens qu'avec sa spécification : `D6.INV-3` existe dans plusieurs d'entre elles. Statut d'une dimension : `active` (invariants en vigueur et vérifiés), `reserved` (place posée, aucun invariant en vigueur), `superseded` (remplacée). Un invariant ne s'affaiblit jamais ; il peut être remplacé par un invariant plus fort, signalé dans le journal de révision de sa spécification (`EVOLUTION.md`, section 4).
 

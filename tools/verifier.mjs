@@ -24,7 +24,7 @@
  * - les points d'extension du manifeste (`extensionPoints`) sont ceux que définit le
  *   point d'entrée (`- **En**`) ;
  * - chaque bloc de code Markdown est fermé ;
- * - chaque invariant défini dans le point d'entrée (`**Dn.INV-k**`, `**SCn.INV-k**`) est
+ * - chaque invariant défini dans le point d'entrée (`**Dn.INV-k**`, `**SCn.INV-k**`, `**SOn.INV-k**`) est
  *   repris dans au moins un module, et chaque invariant cité est défini ; un identifiant
  *   préfixé par un nom de skill, comme `java:D4.INV-2`, désigne un autre skill du dépôt
  *   et doit être défini dans son point d'entrée.
@@ -85,11 +85,12 @@ function fichiersMarkdown(dossier) {
   return resultat;
 }
 
-const DEFINITION = /\*\*((?:D|SC)\d+\.INV-\d+)\*\*/g;
+// Espaces d'identifiants : `Dn` d'une spécification, `SCn` du socle back-front, `SOn` du socle d'observation.
+const DEFINITION = /\*\*((?:D|SC|SO)\d+\.INV-\d+)\*\*/g;
 // Identifiant non précédé d'un préfixe de skill (`nom-du-skill:`) ni d'un autre caractère d'identifiant.
-const CITATION = /(?<![\w:-])((?:D|SC)\d+\.INV-\d+)/g;
-// Identifiant d'un autre skill, préfixé par son nom : `java:D4.INV-2`.
-const CITATION_EXTERNE = /(?<![\w-])([a-z][a-z0-9-]*):((?:D|SC)\d+\.INV-\d+)/g;
+const CITATION = /(?<![\w:-])((?:D|SC|SO)\d+\.INV-\d+)/g;
+// Identifiant d'un autre skill, préfixé par son nom : `java:D4.INV-2`, `socle-observation:SO1.INV-1`.
+const CITATION_EXTERNE = /(?<![\w-])([a-z][a-z0-9-]*):((?:D|SC|SO)\d+\.INV-\d+)/g;
 
 function definitions(texte) {
   return new Set([...texte.matchAll(DEFINITION)].map((m) => m[1]));
@@ -220,7 +221,7 @@ function verifierSpec(dossier) {
       erreur(e.message);
       continue;
     }
-    // Seuls les identifiants hors de l'espace local `Dn` sont importés (ceux du socle, `SCn`) :
+    // Seuls les identifiants hors de l'espace local `Dn` sont importés (ceux des socles, `SCn` et `SOn`) :
     // un référentiel d'expert inclus définit aussi des `Dn`, qui masqueraient une faute de frappe locale.
     for (const id of definitions(texte)) if (!id.startsWith('D')) definis.add(id);
   }

@@ -22,7 +22,8 @@ export const CHEMIN_GLOSSAIRE = join(racine, 'glossaire.md');
 // Fins de ligne : une extraction Windows (core.autocrlf) écrit des CRLF ; tout se lit en LF, comme le dépôt les stocke.
 const lire = (chemin) => readFileSync(chemin, 'utf8').replace(/\r\n/g, '\n');
 
-const DEFINITION = /^- \*\*((?:D|SC)\d+\.INV-\d+)\*\* : (.+)$/gm;
+// Espaces d'identifiants : `Dn` d'une spécification, `SCn` du socle back-front, `SOn` du socle d'observation.
+const DEFINITION = /^- \*\*((?:D|SC|SO)\d+\.INV-\d+)\*\* : (.+)$/gm;
 const cellules = (ligne) => ligne.replace(/^\||\|$/g, '').split('|').map((c) => c.trim());
 const echapper = (texte) => texte.replaceAll('|', '\\|');
 const ancre = (titre) => titre.toLowerCase().replace(/[^\p{L}\p{N} -]/gu, '').replaceAll(' ', '-');
@@ -36,7 +37,7 @@ function registre(texte) {
   return lignes
     .slice(2)
     .map(cellules)
-    .filter((c) => /^(?:D|SC)\d+$/.test(c[0]))
+    .filter((c) => /^(?:D|SC|SO)\d+$/.test(c[0]))
     .map((c) => ({ id: c[0], nom: c[1], statut: c[iStatut] }));
 }
 
@@ -79,7 +80,7 @@ function reprises(specs) {
       for (const autre of specs) {
         if (autre === spec) continue;
         const prefixe = new RegExp(`(?<![\\w-])${spec.nom}:${id.replace('.', '\\.')}(?!\\d)`);
-        const inclutSocle = id.startsWith('SC') && autre.partages.includes(`specs/${spec.nom}/SKILL.md`);
+        const inclutSocle = /^S[CO]\d/.test(id) && autre.partages.includes(`specs/${spec.nom}/SKILL.md`);
         if (prefixe.test(autre.entree) || (inclutSocle && local(id).test(autre.entree))) {
           ajouter(`${spec.nom}:${id}`, `\`${autre.nom}\``);
         }
@@ -110,8 +111,11 @@ Ce fichier détaille chaque invariant de chaque spécification du dépôt : son 
 | \`Dn\` | dimension n d'une spécification : un axe, avec ses invariants et ses tests | \`D4\` de \`tension-dashboard-gitlab-agent\` : effecteur GitLab à garde-fous |
 | \`Dn.INV-k\` | invariant k de la dimension n : une propriété qui doit toujours tenir, vérifiée par au moins un test ou un contrôle | \`D4.INV-3\` : la procédure n'emploie ni \`--force\` ni \`--force-with-lease\` |
 | \`SCn\`, \`SCn.INV-k\` | dimension et invariant du socle back-front, inclus à l'identique dans plusieurs skills | \`SC1.INV-2\` : aucun changement cassant dans une version d'API publiée |
+| \`SOn\`, \`SOn.INV-k\` | dimension et invariant du socle d'observation : l'enveloppe commune des observations, référencée ou incluse par les systèmes qui les exportent | \`socle-observation:SO3.INV-1\` : aucune enveloppe ne porte de texte libre |
 | \`<spécification>:Dn.INV-k\` | invariant d'une autre spécification, cité avec le nom de celle-ci | \`java:D4.INV-2\` |
 | \`En\` | point d'extension : emplacement réservé, inerte, pour une dimension future | \`E2\` |
+| \`OCn\` | ordre cybernétique d'une boucle (\`EVOLUTION.md\`, section 10) : \`OC1\` régulation, \`OC2\` observation de l'observation, \`OC3\` régulation de l'écosystème | \`OC2\` : la boucle d'évolution du dépôt |
+| \`Nn\` | niveau d'observation dans un système, de \`N1\` à \`N3\`, l'humain au-dessus ; un niveau n'est pas un ordre (\`EVOLUTION.md\`, section 10) | \`N3\` : l'observateur d'ordre 3 du générateur de skills de ticket |
 
 Un identifiant n'a de sens qu'avec sa spécification : \`D6.INV-3\` existe dans plusieurs d'entre elles. Statut d'une dimension : \`active\` (invariants en vigueur et vérifiés), \`reserved\` (place posée, aucun invariant en vigueur), \`superseded\` (remplacée). Un invariant ne s'affaiblit jamais ; il peut être remplacé par un invariant plus fort, signalé dans le journal de révision de sa spécification (\`EVOLUTION.md\`, section 4).
 
@@ -152,6 +156,6 @@ La colonne « Repris dans » cite les modules de la spécification qui reprennen
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const texte = genererGlossaire();
   writeFileSync(CHEMIN_GLOSSAIRE, texte, 'utf8');
-  const nb = (texte.match(/^\| \*\*(?:D|SC)\d+\.INV-\d+\*\* \|/gm) ?? []).length;
+  const nb = (texte.match(/^\| \*\*(?:D|SC|SO)\d+\.INV-\d+\*\* \|/gm) ?? []).length;
   console.log(`glossaire.md : ${nb} invariants, ${texte.split('\n').length - 1} lignes`);
 }
