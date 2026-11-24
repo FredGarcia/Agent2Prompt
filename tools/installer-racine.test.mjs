@@ -276,13 +276,15 @@ test('une mise à jour en place interrompue se reprend au lancement suivant', (t
   assert.equal(existsSync(join(dossier, '.agent2prompt-mise-a-jour')), false);
 });
 
-test("niveau d'un projet : skills masqués, agents, commandes et état exclus de Git, analyse-projet écarté ; --retirer nettoie", (t) => {
+test("niveau d'un projet : skills masqués, agents, commandes et état exclus de Git, analyse-projet et observatoire écartés ; --retirer nettoie", (t) => {
   const b = bac(t);
   const ws = b.depot();
   let r = b.lancer('--workspace', ws);
   assert.equal(r.code, 0, r.erreur);
   assert.match(r.sortie, /analyse-projet : non installé, niveau utilisateur seul/);
   assert.equal(existsSync(join(ws, '.gemini', 'skills', 'analyse-projet')), false);
+  assert.match(r.sortie, /observatoire : non installé, niveau utilisateur seul \(il observe plusieurs projets depuis le clone d'Agent2Prompt, sans écrire dans aucun\)/);
+  assert.equal(existsSync(join(ws, '.gemini', 'skills', 'observatoire')), false);
   assert.equal(b.statut(ws), '');
   assert.match(r.sortie, /11 skills masqués à Git, lisibles par Gemini CLI/);
   const exclusion = readFileSync(join(ws, '.git', 'info', 'exclude'), 'utf8');

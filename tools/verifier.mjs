@@ -35,6 +35,9 @@
  *   et son schéma ne montre aucune version périmée ; ses liens vers `specs/` et
  *   `transmissions/` aboutissent ;
  * - `glossaire.md` est exactement celui que génère `tools/glossaire.mjs` ;
+ * - chaque proposition de l'observatoire, dans `observatoire/propositions/`, suit le format
+ *   `observatoire.proposition/1` (spécification `observatoire`, module `propositions`) : rien que des valeurs
+ *   minimisées ; le magasin local de l'observatoire, lui, reste sur le poste et n'est pas vérifié ici ;
  * - les noms d'un autre hôte d'IA et de son éditeur ne figurent dans aucun fichier suivi, hors de
  *   l'historique figé que `.geminiignore` cache à Gemini CLI : archives des versions publiées et
  *   anciennes transmissions ; et `.geminiignore` ne cache rien d'autre, aucune version courante.
@@ -51,6 +54,7 @@ import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { assembler, relire, sourcePartagee } from './bundle.mjs';
 import { CHEMIN_GLOSSAIRE, genererGlossaire } from './glossaire.mjs';
+import { PROPOSITIONS, lirePropositions } from '../specs/observatoire/outils/observatoire.mjs';
 
 const racine = dirname(dirname(fileURLToPath(import.meta.url)));
 const dossierSpecs = join(racine, 'specs');
@@ -396,6 +400,11 @@ let glossaireAJour = false;
 if (!existsSync(CHEMIN_GLOSSAIRE)) erreurs.push('glossaire.md : absent, lancer node tools/glossaire.mjs');
 else if (lire(CHEMIN_GLOSSAIRE) !== genererGlossaire()) erreurs.push("glossaire.md : n'est plus à jour, lancer node tools/glossaire.mjs");
 else glossaireAJour = true;
+// Propositions de l'observatoire : chacune au format observatoire.proposition/1.
+const avantPropositions = erreurs.length;
+const propositions = lirePropositions(racine);
+erreurs.push(...propositions.erreurs);
+const propositionsConformes = erreurs.length === avantPropositions;
 const avantHistorique = erreurs.length;
 const versionsCourantes = new Map(
   readdirSync(dossierSpecs)
@@ -413,6 +422,7 @@ const motifsCaches = verifierHistoriqueCache(versionsCourantes);
 for (const { bilan } of specs) console.log(`ok  ${bilan}`);
 if (readmeAJour) console.log('ok  README.md à jour');
 if (glossaireAJour) console.log('ok  glossaire.md à jour');
+if (propositionsConformes) console.log(`ok  ${PROPOSITIONS}/ : ${propositions.propositions.length} proposition${propositions.propositions.length > 1 ? 's' : ''} au format observatoire.proposition/1`);
 if (erreurs.length === avantHistorique) console.log(`ok  historique caché à Gemini CLI (${motifsCaches} motifs de .geminiignore), aucun nom d'un autre hôte d'IA ailleurs`);
 const uniques = [...new Set(erreurs)];
 for (const message of uniques) console.error(`ERREUR  ${message}`);

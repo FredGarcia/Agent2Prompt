@@ -96,6 +96,13 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-11-24 : observatoire 1.0.0
+
+- **observatoire 1.0.0**, nouvelle spécification, transmissible et outillée comme le générateur, jalon J2 du passage au troisième ordre : l'observatoire de l'écosystème, sur le poste. L'outil `observatoire.mjs`, lancé depuis le clone (`inscrire`, `relever`, `etat`, `confronter`, `proposer`, `suivre`, `verifier`), relève, vérifiés selon le socle, les journaux d'enveloppes des projets inscrits dans un magasin local, sous le répertoire Git commun du clone, jamais versionné ; il confronte les instances, observe l'état de l'écosystème, écrit des propositions minimisées dans `observatoire/propositions/`, au format `observatoire.proposition/1`, et suit l'effet des propositions ratifiées. Il propose et n'applique jamais : il ne commite ni ne publie, et rien d'une instance n'entre dans le dépôt que les valeurs minimisées d'une proposition.
+- Dimensions D1 à D5, actives, et neuf invariants ; le registre déclare l'ordre de chaque dimension, D1 en OC1, D2 à D5 en OC3 : la première boucle du troisième ordre du dépôt, entre systèmes. Socle `socle-observation` 1.1.0 inclus et référencé. Recette de quinze tests, dont les instances d'épreuve sont produites par l'export du générateur ; workflow de recette, Linux et Windows.
+- `observatoire/propositions/`, nouveau dossier, avec son README ; `EVOLUTION.md`, section 10 : la règle 3 nomme la colonne « Ordre », et la dernière phrase dit le couplage 1 fermé dans ses limites déclarées, un seul système qui exporte et un seul sujet qui ratifie. README, mode d'emploi, glossaire et transmission à jour.
+- Décisions ratifiées avant la rédaction (plan du jalon J2) : spécification `observatoire`, transmissible et outillée (O1) ; magasin dans le répertoire Git commun du clone (O2) ; retours dès une instance, récurrences dans au moins deux (O3) ; propositions versionnées, leur statut inscrit par la pull request de ratification (O4).
+
 ### 2026-11-24 : socle-observation 1.1.0, orchestrateur-c7e 3.6.1, generateur-skill-ticket 1.3.0
 
 - **socle-observation 1.1.0** : lacune corrigée, un projet ayant un champ d'observation par ticket, numéroté à partir de 1 dans chacun : champ facultatif `source.journal`, l'empreinte salée de la clé du journal source, pour un format qui tient plusieurs journaux dans une instance ; SO4.INV-1 renforcé, l'enveloppe désigne sans ambiguïté l'enregistrement dont elle provient. Précisions : forme du sel dans les empreintes ; tête du journal, qui relève une dernière ligne réécrite ou supprimée ; date d'une enveloppe, celle de son enregistrement, ou celle de la ligne précédente si elle est plus récente, et fusion des journaux sources à l'export ; numéros sans espace ; preuve sans extrait ; motifs d'une ratification ; ancre d'un retour sur une action ; preuve d'une proposition et décision du registre d'apprentissage. Inclus par le générateur, référencé par l'orchestrateur.
@@ -860,6 +867,12 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
   - la publication, dans ce dépôt public, d'un argumentaire destiné à un client, sans nom de client ni de mission.
 
 ## Outils
+
+### 2026-11-24 : propositions de l'observatoire vérifiées
+
+- **`tools/verifier.mjs`** : chaque proposition de `observatoire/propositions/` suit le format `observatoire.proposition/1`, lu par l'outil de la spécification `observatoire` ; le magasin local de l'observatoire reste sur le poste, hors de la vérification. Vérification : une proposition à clé inconnue et sans ses clés requises, relevée.
+- **`tools/installer.mjs`**, **`installer.mjs`** : `observatoire` ne s'installe qu'au niveau utilisateur, comme `analyse-projet` : il observe plusieurs projets depuis le clone, sans écrire dans aucun. Recettes de l'installateur à jour.
+- **Workflows** : `recette-observatoire.yml`, Linux et Windows, Node 22 et 24 ; la recette du générateur suit aussi le socle d'observation, qu'il inclut.
 
 ### 2026-11-24 : préfixe SO des invariants du socle d'observation
 
