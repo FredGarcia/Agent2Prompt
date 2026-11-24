@@ -9,8 +9,11 @@ Ce fichier détaille chaque invariant de chaque spécification du dépôt : son 
 | `Dn` | dimension n d'une spécification : un axe, avec ses invariants et ses tests | `D4` de `tension-dashboard-gitlab-agent` : effecteur GitLab à garde-fous |
 | `Dn.INV-k` | invariant k de la dimension n : une propriété qui doit toujours tenir, vérifiée par au moins un test ou un contrôle | `D4.INV-3` : la procédure n'emploie ni `--force` ni `--force-with-lease` |
 | `SCn`, `SCn.INV-k` | dimension et invariant du socle back-front, inclus à l'identique dans plusieurs skills | `SC1.INV-2` : aucun changement cassant dans une version d'API publiée |
+| `SOn`, `SOn.INV-k` | dimension et invariant du socle d'observation : l'enveloppe commune des observations, référencée ou incluse par les systèmes qui les exportent | `socle-observation:SO3.INV-1` : aucune enveloppe ne porte de texte libre |
 | `<spécification>:Dn.INV-k` | invariant d'une autre spécification, cité avec le nom de celle-ci | `java:D4.INV-2` |
 | `En` | point d'extension : emplacement réservé, inerte, pour une dimension future | `E2` |
+| `OCn` | ordre cybernétique d'une boucle (`EVOLUTION.md`, section 10) : `OC1` régulation, `OC2` observation de l'observation, `OC3` régulation de l'écosystème | `OC2` : la boucle d'évolution du dépôt |
+| `Nn` | niveau d'observation dans un système, de `N1` à `N3`, l'humain au-dessus ; un niveau n'est pas un ordre (`EVOLUTION.md`, section 10) | `N3` : l'observateur d'ordre 3 du générateur de skills de ticket |
 
 Un identifiant n'a de sens qu'avec sa spécification : `D6.INV-3` existe dans plusieurs d'entre elles. Statut d'une dimension : `active` (invariants en vigueur et vérifiés), `reserved` (place posée, aucun invariant en vigueur), `superseded` (remplacée). Un invariant ne s'affaiblit jamais ; il peut être remplacé par un invariant plus fort, signalé dans le journal de révision de sa spécification (`EVOLUTION.md`, section 4).
 
@@ -28,12 +31,13 @@ La colonne « Repris dans » cite les modules de la spécification qui reprennen
 | [`angular`](#angular-101) | 1.0.1 | 8 | 2 | 30 |
 | [`capture-sprint-jira`](#capture-sprint-jira-122) | 1.2.2 | 9 | 2 | 39 |
 | [`explication-hote-ia`](#explication-hote-ia-110) | 1.1.0 | 10 | 2 | 37 |
-| [`generateur-skill-ticket`](#generateur-skill-ticket-111) | 1.1.1 | 8 | 0 | 29 |
+| [`generateur-skill-ticket`](#generateur-skill-ticket-120) | 1.2.0 | 8 | 1 | 29 |
 | [`java`](#java-111) | 1.1.1 | 7 | 1 | 29 |
-| [`orchestrateur-c7e`](#orchestrateur-c7e-353) | 3.5.3 | 10 | 1 | 33 |
+| [`orchestrateur-c7e`](#orchestrateur-c7e-360) | 3.6.0 | 10 | 2 | 33 |
 | [`scenario-playwright`](#scenario-playwright-161) | 1.6.1 | 17 | 5 | 76 |
 | [`skill4appli`](#skill4appli-111) | 1.1.1 | 9 | 3 | 34 |
 | [`socle-back-front`](#socle-back-front-110) | 1.1.0 | 7 | 0 | 21 |
+| [`socle-observation`](#socle-observation-100) | 1.0.0 | 4 | 0 | 7 |
 | [`sonarqube`](#sonarqube-110) | 1.1.0 | 8 | 2 | 34 |
 | [`tension-dashboard-gitlab-agent`](#tension-dashboard-gitlab-agent-220) | 2.2.0 | 7 | 3 | 17 |
 
@@ -987,7 +991,7 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 | **D12.INV-4** | hors du dossier du skill, rien ne s'écrit sans la demande du développeur : le sous-agent et les commandes s'installent par une commande qu'il lance ou qu'il approuve, une commande de retrait les supprime, et, avec `gemini skills uninstall`, rien ne reste. | `agent`, `diffusion` |
 | **D12.INV-5** | le dépôt où le skill est maintenu se nomme comme son origine et le lieu de sa vérification, jamais comme une étape ; le contrat de version, les règles et la recette du skill sont écrits dans le skill. | `recette`, `diffusion` |
 
-## generateur-skill-ticket 1.1.1
+## generateur-skill-ticket 1.2.0
 
 Générateur de skills de ticket C7E : décompose un ticket en arbre de sous-tickets, produit pour chaque nœud un skill assemblé depuis le référentiel des méso-contrats, l'installe et le lance dans Gemini CLI ; chaque skill s'observe dans un champ partagé, et chaque niveau voit le ticket augmenté ; chaque ticket entraîne le générateur, qui propose ses évolutions au développeur. Point d'entrée : [`specs/generateur-skill-ticket/SKILL.md`](specs/generateur-skill-ticket/SKILL.md).
 
@@ -1059,6 +1063,10 @@ Générateur de skills de ticket C7E : décompose un ticket en arbre de sous-tic
 | **D8.INV-2** | rien n'entre dans le référentiel ni dans les consignes sans la décision explicite du développeur : le script ne modifie que le relevé et le registre ; un motif relevé dans deux tickets devient une proposition, retenue ou refusée par le développeur seul, et deux refus le mettent en veille. | `apprentissage` |
 | **D8.INV-3** | le registre d'apprentissage du projet est en ajout seul, chaque ligne numérotée et chaînée à l'empreinte de la précédente ; un relevé versé au registre est clos ; un registre altéré se signale, sans versement ni proposition. | `apprentissage` |
 | **D8.INV-4** | les arbres d'exemple sont des tests de non-régression, figés ; aucun ne se modifie pour qu'un relevé ou une recette passe. | `installation`, `apprentissage` |
+
+### D9 : Export vers le socle d'observation (reserved)
+
+Dimension réservée : aucun invariant en vigueur dans cette version.
 
 ## java 1.1.1
 
@@ -1132,7 +1140,7 @@ Expert Java 21, Spring Boot 3.5 et PostgreSQL : produire et relire du code confo
 
 Dimension réservée : aucun invariant en vigueur dans cette version.
 
-## orchestrateur-c7e 3.5.3
+## orchestrateur-c7e 3.6.0
 
 Orchestrateur fractal C7E : résolution d'un ticket full-stack comme transformation maîtrisée d'un système vivant, avec le cycle de l'Axiome 7E, quatre profondeurs de déclinaison, des concepts paramétrables, la qualification de chaque ticket à son ouverture par un modèle générique de la demande et des questions complémentaires, un méso-contrat principal et au besoin des compléments, confirmés avant tout le reste, des options par couche rattachées au méso-contrat qui les permet avec leurs paramètres au choix par ticket, des variantes de représentation d'une ressource et leur mise à jour en temps réel, l'analyse des images PNG de l'objectif, une fiche validée avant toute modification, des tests déduits des risques, des conventions Git compatibles avec le kit des agents parallèles, une boucle de second ordre bornée par un registre et un fichier d'invariants du projet ; activé au démarrage de l'IA locale, sur choix du développeur. Point d'entrée : [`specs/orchestrateur-c7e/SKILL.md`](specs/orchestrateur-c7e/SKILL.md).
 
@@ -1180,8 +1188,8 @@ Orchestrateur fractal C7E : résolution d'un ticket full-stack comme transformat
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
 | **D6.INV-1** | une correction du logiciel tirée d'une observation (premier ordre) est un commit de rétroaction qui cite cette observation ; une adaptation de la méthode (second ordre) est une entrée `proposed` du registre des concepts, qui cite l'observation qui la fonde. | `meso-contrats` |
-| **D6.INV-2** | l'IA ne promeut, ne modifie ni ne retire aucune entrée du registre des concepts, et ne modifie jamais le fichier d'invariants du projet ; seul le développeur le fait, par une revue documentée. | `meso-contrats` |
-| **D6.INV-3** | tout écart à un invariant s'inscrit au registre des écarts, avec sa décision (respecter, ou dérogation validée par un nom) ; aucun écart n'est corrigé ni toléré en silence. | `meso-contrats` |
+| **D6.INV-2** | l'IA ne promeut, ne modifie ni ne retire aucune entrée du registre des concepts, et ne modifie jamais le fichier d'invariants du projet ; seul le développeur le fait, par une revue documentée. | `meso-contrats`, `observation` |
+| **D6.INV-3** | tout écart à un invariant s'inscrit au registre des écarts, avec sa décision (respecter, ou dérogation validée par un nom) ; aucun écart n'est corrigé ni toléré en silence. | `meso-contrats`, `socle-observation` |
 
 ### D7 : Valeur annoncée et indicateurs (active)
 
@@ -1222,6 +1230,10 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 | **D11.INV-4** | `ticket.toml` garde la demande remplie, avec ses sources, et la composition confirmée ; si l'analyse montre ensuite que la demande sort des empreintes, l'IA revient à la qualification et fait confirmer une autre composition, sans en changer d'elle-même. | `referentiel`, `qualification` |
 | **D11.INV-5** | les possibilités du modèle se fondent sur l'analyse de l'application : à l'installation, l'IA propose celles qui s'appliquent, avec leurs repères, celles à retirer et celles qui manquent, rattachées à une couche et à une option ; le développeur seul les écrit dans le référentiel. | `qualification` |
 | **D11.INV-6** | chaque complément se justifie par au moins une possibilité à `oui` que le principal ne porte pas ; les compléments sont en plus petit nombre possible, et la qualification nomme pour chacun les possibilités qui le justifient ; un ticket que le principal porte en entier n'a aucun complément. | `qualification` |
+
+### D12 : Observation partagée : registre des concepts et registre des écarts exportés vers le socle d'observation (reserved)
+
+Dimension réservée : aucun invariant en vigueur dans cette version.
 
 ## scenario-playwright 1.6.1
 
@@ -1562,6 +1574,37 @@ Socle commun back-front : contrat OpenAPI, erreurs RFC 9457, formats de données
 | **SC7.INV-4** | le client reste juste après une déconnexion, un doublon ou un trou : abonnement avant l'instantané, événements de séquence inférieure ou égale à l'`ETag` ignorés, instantané relu à chaque trou ou reconnexion. Contrôle : test du service client avec déconnexion, doublon et trou simulés. | `orchestrateur-c7e`, `orchestrateur-c7e/referentiel` |
 | **SC7.INV-5** | aucun jeton dans l'URL de connexion ; chaque abonnement vérifie le droit de lecture de la ressource ; origines explicites. Contrôle : test d'abonnement refusé (`ERROR` avec un Problem Details 403) et test de connexion depuis une origine non autorisée. | `orchestrateur-c7e`, `orchestrateur-c7e/referentiel` |
 | **SC7.INV-6** | toute mise à jour reçue en temps réel est annoncée par une région `aria-live="polite"`, sans déplacer le focus. Contrôle : test de composant et revue RGAA (critère 7.5). | `orchestrateur-c7e/referentiel` |
+
+## socle-observation 1.0.0
+
+Socle d'observation : l'enveloppe commune des observations, propositions, décisions et écarts qu'un système de second ordre du dépôt rend observables aux autres, au sens du troisième ordre (EVOLUTION.md, section 10) ; schéma fermé, journal en ajout seul et chaîné, minimisation, correspondances avec les formats existants. Point d'entrée : [`specs/socle-observation/SKILL.md`](specs/socle-observation/SKILL.md).
+
+### SO1 : Enveloppe : schéma fermé, ordres et niveaux (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **SO1.INV-1** | une observation qui sort d'un système le fait dans une enveloppe `socle-observation.enveloppe/1`, au schéma fermé ; un champ inconnu, une valeur hors liste ou un champ requis absent la fait refuser, et rien n'est écrit. Contrôle : test de l'export du système, sur des enveloppes mal formées. | — |
+| **SO1.INV-2** | chaque enveloppe déclare son ordre et son niveau selon la table de la section 3.2 : le niveau `N1` avec l'ordre `OC1`, les niveaux `N2` et `N3` avec l'ordre `OC2` ; aucun niveau ne dépasse `N3`, et aucun système n'émet l'ordre `OC3`. Contrôle : test de l'export, sur chaque type d'enregistrement source. | — |
+
+### SO2 : Chaînage : journal en ajout seul (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **SO2.INV-1** | un journal d'enveloppes est en ajout seul : chaque ligne porte son numéro, consécutif, sa date en UTC, jamais antérieure à la précédente, et l'empreinte de la ligne précédente sous sa forme canonique ; une ligne réécrite, insérée ou supprimée se relève, et un journal rompu refuse tout ajout. Contrôle : test de l'export sur un journal altéré à la main. | — |
+
+### SO3 : Minimisation : ce qui peut sortir d'une instance (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **SO3.INV-1** | aucune enveloppe ne porte de texte libre, ni code, ni texte de ticket, ni commentaire, ni secret : seulement un motif en minuscules et tirets, des valeurs de listes fermées, des numéros, des identifiants définis par une spécification du dépôt et des empreintes. Contrôle : test de l'export, qui confronte chaque enveloppe produite à cette liste. | `generateur-skill-ticket/observation`, `orchestrateur-c7e/observation` |
+| **SO3.INV-2** | aucune enveloppe ne nomme une personne, un client ou un projet : l'instance se désigne par l'empreinte de son sel, le sujet par un rôle, et toute référence propre à l'instance par son empreinte salée ; le sel ne sort jamais. Contrôle : test de l'export sur des sources qui portent noms, clés et chemins. | `generateur-skill-ticket/observation`, `orchestrateur-c7e/observation` |
+
+### SO4 : Correspondances avec les formats du générateur et de l'orchestrateur (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **SO4.INV-1** | une correspondance traduit un format source sans le modifier : il garde ses champs, sa version et son emplacement, et chaque enveloppe cite le format et le numéro de l'enregistrement dont elle provient. Contrôle : test de l'export, qui compare les sources avant et après. | `generateur-skill-ticket/observation`, `orchestrateur-c7e/observation` |
+| **SO4.INV-2** | la même entrée source, avec le même sel d'instance, donne la même enveloppe, octet pour octet. Contrôle : test de l'export rejoué deux fois sur les exemples du système. | — |
 
 ## sonarqube 1.1.0
 

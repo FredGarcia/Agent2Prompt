@@ -96,6 +96,14 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-11-24 : socle-observation 1.0.0, orchestrateur-c7e 3.6.0, generateur-skill-ticket 1.2.0
+
+- **socle-observation 1.0.0**, nouveau socle, non transmissible : le milieu commun du couplage entre systèmes du troisième ordre (`EVOLUTION.md`, section 10). Enveloppe `socle-observation.enveloppe/1` au schéma fermé (SO1), ordre cybernétique et niveau d'observation déclarés par chaque enveloppe ; journal en ajout seul, chaîné par l'empreinte de la ligne précédente (SO2) ; minimisation par sel d'instance et empreintes salées, aucun texte libre ni nom de personne, de client ou de projet (SO3) ; correspondances avec le champ et le registre d'apprentissage du générateur, le registre des concepts et le registre des écarts de l'orchestrateur, sans changer ces formats (SO4). Invariants SO1.INV-1 à SO4.INV-2. Aucun système ne l'applique encore.
+- **orchestrateur-c7e 3.6.0** : dimension D12 réservée, l'observation partagée de ses registres ; point d'extension E6 ; module `observation` ; scénario R23, qui vérifie l'inertie ; socle d'observation référencé. Aucun invariant ajouté ni modifié, aucune section recopiée par les skills de ticket modifiée.
+- **generateur-skill-ticket 1.2.0** : dimension D9 réservée, l'export de ses observations vers le socle ; point d'extension E4 ; module `observation` ; références à orchestrateur-c7e 3.6.0 et au socle d'observation, à la version qu'épingle l'orchestrateur ; test d'inertie dans la recette, qui passe ses 328 tests (un attend Gemini CLI). Les transmissions des skills de ticket d'exemple et les rapports de contexte sont régénérés : seules les versions qu'ils citent changent.
+- Les trois versions se référencent et se publient dans un même commit (`EVOLUTION.md`, section 7). README, `EVOLUTION.md` (section 8), modes d'emploi et glossaire à jour ; transmissions orchestrateur-c7e 3.6.0 et generateur-skill-ticket 1.2.0.
+- Décisions ratifiées avant la rédaction (plan du jalon J1) : périmètre pilote, le générateur et l'orchestrateur (R3) ; socle non transmissible (R4) ; préfixe `SO`, enveloppe sans texte libre, référence sans inclusion tant que les dimensions sont réservées, dimensions D12 et D9 avec leurs points d'extension, livraison en deux commits (P1 à P5).
+
 ### 2026-11-23 : scenario-playwright 1.6.1
 
 - **scenario-playwright 1.6.1**, correctif de la recette et de la documentation de 1.6.0, fusionnée avant la fin de l'essai des défauts réintroduits.
@@ -843,6 +851,12 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
   - la publication, dans ce dépôt public, d'un argumentaire destiné à un client, sans nom de client ni de mission.
 
 ## Outils
+
+### 2026-11-24 : préfixe SO des invariants du socle d'observation
+
+- **`tools/verifier.mjs`** : les identifiants `SOn.INV-k` sont reconnus dans les définitions, les citations et les citations préfixées par un nom de spécification, comme `Dn.INV-k` et `SCn.INV-k`. Un identifiant `SO` cité sans définition était jusqu'ici ignoré.
+- **`tools/glossaire.mjs`** : dimensions et invariants `SO` lus comme ceux des autres espaces ; notations `SOn`, `OCn` et `Nn` dans « Lire un identifiant ». Glossaire régénéré, 670 invariants, inchangés.
+- Vérifications : trois défauts introduits volontairement, tous relevés : `SO1.INV-1` cité sans définition, et `socle-observation:SO1.INV-1` cité sans le socle, que la version précédente laissait passer ; glossaire non régénéré.
 
 ### 2026-11-24 : ordres cybernétiques
 

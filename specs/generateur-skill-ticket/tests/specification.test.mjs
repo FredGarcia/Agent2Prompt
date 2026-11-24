@@ -7,7 +7,7 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { lireTexte } from '../outils/referentiel.mjs';
@@ -36,13 +36,30 @@ function recette(texte) {
   return lignes;
 }
 
-test('spécification : version du point d\'entrée, de son titre et du manifeste ; huit dimensions actives, un module chacune', () => {
+test('spécification : version du point d\'entrée, de son titre et du manifeste ; huit dimensions actives et une réservée, un module chacune', () => {
   assert.equal(MANIFESTE.name, 'generateur-skill-ticket');
   assert.match(ENTREE, new RegExp(`^version: ${MANIFESTE.version.replace(/\./g, '\\.')}$`, 'm'));
   assert.match(ENTREE, new RegExp(`^# Générateur de skills de ticket C7E, version ${MANIFESTE.version.replace(/\./g, '\\.')}$`, 'm'));
-  assert.deepStrictEqual(MANIFESTE.modules.map((m) => m.dimensions.join()), ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8']);
-  assert.ok(MANIFESTE.modules.every((m) => m.status === 'active'));
+  assert.deepStrictEqual(MANIFESTE.modules.map((m) => m.dimensions.join()), ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8', 'D9']);
+  assert.deepStrictEqual(MANIFESTE.modules.filter((m) => m.status !== 'active').map((m) => `${m.id}:${m.status}`), ['observation:reserved']);
   assert.equal(DEFINITIONS.length, 29);
+});
+
+test('1.2.0 : D9 réservée, inerte : aucun outil n\'exporte vers le socle d\'observation, et aucun skill de ticket ne porte le module observation', () => {
+  const observation = MANIFESTE.modules.find((m) => m.id === 'observation');
+  assert.match(texteDe(observation), /^status: reserved$/m);
+  assert.ok(!DEFINITIONS.some((d) => d.dimension === 'D9'), 'une dimension réservée n\'a aucun invariant en vigueur');
+  for (const nom of readdirSync(join(SPEC, 'outils'))) {
+    assert.doesNotMatch(sourceDe(`outils/${nom}`), /socle-observation|enveloppe\/1/, `outils/${nom} : aucun export`);
+  }
+  for (const cle of ['ABCDE-3620', 'ABCDE-3512']) {
+    const dossier = join(SPEC, 'exemples', `${cle}-skills`, 'transmissions');
+    const transmissions = readdirSync(dossier).filter((nom) => nom.endsWith('.md'));
+    assert.ok(transmissions.length > 0, `${cle} : transmissions d'exemple`);
+    for (const nom of transmissions) {
+      assert.doesNotMatch(readFileSync(join(dossier, nom), 'utf8'), /modules\/observation\/|socle-observation/, `${cle}, ${nom} : ni le module ni le socle`);
+    }
+  }
 });
 
 test('spécification : chaque invariant a sa ligne de recette dans le module de sa dimension, et chaque test cité existe sous ce titre', () => {
@@ -85,9 +102,14 @@ test('1.1.1 : les protocoles sur le poste portent sur le ticket en cours, sans a
 
 test('spécification : les skills référencés sont ceux dont héritent les skills de ticket, aux versions qu\'épinglent leurs sources', () => {
   const S = chargerSources();
+  // Le socle d'observation, que référence la dimension réservée D9, à la version qu'épingle l'orchestrateur (1.2.0).
+  const orchestrateur = JSON.parse(readFileSync(join(SPEC, '..', 'orchestrateur-c7e', 'manifest.json'), 'utf8'));
+  const socleObservation = orchestrateur.references.find((r) => r.name === 'socle-observation');
+  assert.ok(socleObservation, 'l\'orchestrateur référence le socle d\'observation');
   const attendu = {
     'orchestrateur-c7e': S.orchestrateur.version,
     'socle-back-front': S.socle.version,
+    'socle-observation': socleObservation.version,
     ...S.boite.versions,
   };
   assert.deepStrictEqual(Object.fromEntries(MANIFESTE.references.map((r) => [r.name, r.version])), Object.fromEntries(Object.keys(attendu).sort().map((k) => [k, attendu[k]])));
