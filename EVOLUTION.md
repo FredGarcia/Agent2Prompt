@@ -27,7 +27,7 @@ Trois conséquences :
 | Transmission | texte unique destiné à l'IA qui implémente | `transmissions/<nom>-X.Y.Z.md` | `tension-dashboard-gitlab-agent-2.2.0.md` |
 | Scénario | cas de test nommé, rattaché à un invariant | lettre + numéro | `T3`, `M7`, `G1` |
 
-Les lettres de scénarios ne réutilisent jamais un préfixe déjà pris par une autre unité. `E` désigne exclusivement les points d'extension.
+Les lettres de scénarios ne réutilisent jamais un préfixe déjà pris par une autre unité. `E` désigne exclusivement les points d'extension. `OC` et `N`, suivis d'un chiffre, désignent exclusivement les ordres cybernétiques et les niveaux d'observation (section 10).
 
 ## 3. Cycle de vie d'une dimension
 
@@ -135,3 +135,52 @@ flowchart LR
 2. Reprendre dans son `SKILL.md` un registre des dimensions, un contrat de version conforme à la section 4, la liste des invariants et les points d'extension.
 3. Écrire l'en-tête de transmission avec `{{VERSION}}` dans son titre ; il contient la consigne propre à cette spécification.
 4. Générer la première transmission et régénérer le glossaire, puis ajouter la spécification au tableau du `README.md` et à `CHANGELOG.md`.
+
+## 10. Ordres cybernétiques
+
+Les spécifications de ce dépôt parlent d'ordres cybernétiques depuis leurs premières versions : clauses de second ordre, boucle de la section 5, ordres 1 et 2 de l'orchestrateur C7E, couples O1 et O2 d'Agent2Dev et d'Agent2Test, ordres d'observation du générateur de skills de ticket. Cette section fixe leur vocabulaire commun et définit le troisième ordre. Elle ne change le comportement d'aucune spécification : chacune garde ses mécanismes, et emploie ces termes au sens défini ici.
+
+### 10.1 Ordre cybernétique et niveau d'observation
+
+Deux notions, à ne jamais confondre :
+
+| Notion | Notation | Ce qu'elle désigne |
+|---|---|---|
+| Ordre cybernétique | `OC1`, `OC2`, `OC3` | la nature d'une boucle : ce qu'elle observe, et ce qu'elle peut changer |
+| Niveau d'observation | `N1`, `N2`, `N3` | la place d'un observateur dans un système : ce qu'il observe, d'autres observateurs compris |
+
+Empiler des observateurs dans un même système ne change pas d'ordre : un observateur d'observateurs reste du second ordre. Un système n'observe pas au-delà de N3 ; l'humain est au-dessus.
+
+### 10.2 Les trois ordres
+
+- **OC1, régulation** : une boucle observe un système, le corrige ou alerte, sans observer sa propre manière d'observer. Exemples : le vérificateur, les recettes, les tests déduits des risques, l'observabilité de premier ordre d'Agent2Dev et d'Agent2Test.
+- **OC2, observation de l'observation** : l'observateur fait partie de la boucle. Il observe sa propre manière d'observer, de concevoir ou d'apprendre, et en propose l'adaptation, qu'un humain ratifie. Exemples : la boucle d'évolution de la section 5, le registre des concepts de l'orchestrateur C7E, l'apprentissage et la réflexivité d'Agent2Dev et d'Agent2Test, le champ et l'apprentissage du générateur. La régression s'y arrête à des points fixes : constitution, skill, invariants, gouvernance humaine.
+- **OC3, régulation de l'écosystème** : les systèmes OC2 du dépôt et leurs environnements humains se régulent ensemble, sans niveau d'observation supplémentaire. Trois couplages le constituent (section 10.3).
+
+### 10.3 Les trois couplages du troisième ordre
+
+1. **Entre systèmes.** Chaque système OC2 se rend observable aux autres dans un milieu commun ; aucun ne se juge seul ; l'état de l'écosystème, versions épinglées, registres et écarts, est lui-même observé.
+2. **Entre description et pratique.** Le dépôt observe ce que ses spécifications, ses mesures et ses vues font aux personnes qui s'en servent ; ce retour devient la matière des versions suivantes.
+3. **Avec les valeurs.** L'acceptable est un modèle explicite, versionné et épinglé, appliqué avant l'action, observé dans ses refus et ses dérogations, et révisé par une conversation entre sujets distincts, jamais par un agent.
+
+Filiation : ces couplages reprennent trois lectures du troisième ordre, l'environnement poly-sujet à observateur distribué (V. Lepskiy, 2018), la cybernétique des systèmes conceptuels et la réflexivité des systèmes sociaux (S. Umpleby, 1997), le régulateur à troisième modèle, celui de l'acceptable (M. Ashby, 2022). L'objection de H. von Foerster et de R. Glanville, pour qui un troisième ordre retomberait dans les précédents, vaut contre l'empilement d'observateurs : elle fonde la règle 1 de la section 10.5.
+
+### 10.4 Correspondances
+
+| Terme d'une spécification | Où | Sens dans cette section |
+|---|---|---|
+| « Ordre 1 », « Ordre 2 » | `orchestrateur-c7e`, sections 0 et 6 | OC1, OC2 |
+| O1, O2 | `agent2dev`, `agent2test` | OC1, OC2 |
+| « ordre 1 », « ordre 2 », « ordre 3 » ; champ `ordre` de `skill-ticket.observation/1` | `generateur-skill-ticket`, module `champ` | N1, N2, N3, dans un système OC2 ; les formats publiés gardent leurs noms |
+| « clause de second ordre » | quatorze points d'entrée | OC2 ; une clause qui décrit l'effet d'un outil sur des personnes ou sur une organisation prépare en outre le couplage 2 du troisième ordre, sans changer de texte |
+| « effets de second ordre » | `sonarqube`, module `gouvernance`, section 6 | signaux du couplage 2 du troisième ordre, déjà mesurés |
+
+### 10.5 Règles
+
+1. Un troisième ordre ne s'obtient jamais par un niveau d'observation de plus : il n'existe pas de N4, et OC3 n'en est pas un.
+2. « Premier ordre », « second ordre » et « troisième ordre » s'emploient au sens de cette section. Un « ordre n » d'un format publié garde son sens de niveau d'observation, sans renommage.
+3. Le troisième ordre ne se revendique que pour une boucle fermée avec sa preuve : une dimension OC3 suit le cycle de vie de la section 3, réservée, puis active quand ses invariants ont leurs tests.
+4. Une boucle OC3 ne retire aucune ratification humaine, ne fait jamais appeler le second ordre par le premier et ne lève aucun point fixe d'OC2 : elle en rend la dérive observable. Un point fixe ne change que par une version publiée et ratifiée, jamais par un agent.
+5. `OC` et `N`, suivis d'un chiffre, sont réservés à ces notations (section 2).
+
+Tant qu'aucune dimension OC3 n'est active, le dépôt est OC2 à ses deux échelles, la sienne (section 5) et celle de ses systèmes ; les couplages du troisième ordre y sont en germe.

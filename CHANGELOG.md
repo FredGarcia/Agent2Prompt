@@ -844,6 +844,14 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Outils
 
+### 2026-11-24 : ordres cybernétiques
+
+- **`EVOLUTION.md`, section 10 « Ordres cybernétiques »** : le vocabulaire commun des ordres cybernétiques, `OC1` à `OC3`, et des niveaux d'observation, `N1` à `N3`, à ne jamais confondre ; le troisième ordre défini par trois couplages, entre systèmes, entre description et pratique, avec les valeurs ; la correspondance avec les termes des spécifications ; cinq règles, dont la première : un troisième ordre ne s'obtient jamais par un niveau d'observation de plus.
+- Section 2 : `OC` et `N`, suivis d'un chiffre, réservés à ces notations ; aucune unité ne les prenait.
+- `README.md` : renvoi à la section 10.
+- Aucune spécification modifiée : versions, transmissions et glossaire inchangés. Aucune dimension du troisième ordre n'est active : le dépôt reste au second ordre, à ses deux échelles.
+- Décisions ratifiées avant la rédaction : le troisième ordre défini par les trois couplages ; les notations `OC1` à `OC3` et `N1` à `N3`, les formats publiés gardant leurs noms.
+
 ### 2026-11-17 : installateur de la racine, historique caché à Gemini CLI
 
 - **`installer.mjs`**, à la racine du dépôt, avec **`installer.cmd`** (ASCII, pour CMD) : installe ou met à jour dans Gemini CLI tous les skills installables et les agents qu'ils portent, au niveau utilisateur par défaut (`~/.gemini/`), ou d'un projet (`--workspace`).
