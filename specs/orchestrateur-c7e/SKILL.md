@@ -1,10 +1,10 @@
 ---
 name: orchestrateur-c7e
 description: Orchestrateur fractal C7E, qui pilote la résolution d'un ticket full-stack comme la transformation maîtrisée d'un système vivant (cycle de l'Axiome 7E, déclinaison récursive imbriquée sur quatre profondeurs, concepts paramétrables, qualification de chaque ticket à son ouverture par un modèle générique de la demande et des questions, méso-contrat principal et compléments confirmés avant tout le reste, options par couche rattachées au méso-contrat qui les permet et leurs paramètres au choix par ticket, variantes de représentation d'une ressource et leur mise à jour en temps réel, analyse des images PNG de l'objectif, fiche de transformation validée avant toute modification, tests déduits des risques, traçabilité Git compatible avec le kit des agents parallèles, boucle de second ordre bornée par un registre, valeur annoncée comme une hypothèse tant qu'elle n'est pas mesurée), avec le fichier des invariants du projet, meso-contrats. Adaptateur par défaut Java, Spring Boot, PostgreSQL, Liquibase et Angular. À activer au démarrage de l'IA locale, sur choix du développeur, pour les tickets qu'il lui confie.
-version: 3.6.0
+version: 3.6.1
 ---
 
-# Orchestrateur fractal C7E, version 3.6.0
+# Orchestrateur fractal C7E, version 3.6.1
 
 Ce document est le point d'entrée du skill et contient la méthode. Il s'active au démarrage de l'IA locale, sur choix du développeur (§ 11.4), avec le fichier des invariants du projet, copie remplie du modèle `meso-contrats.md`. Ces deux fichiers suffisent au démarrage ; le référentiel des méso-contrats se lit à l'ouverture de chaque ticket, pour le qualifier, puis à son analyse, et les autres fichiers quand un ticket touche leur domaine.
 
@@ -522,7 +522,7 @@ Une contradiction entre deux niveaux se signale et s'inscrit au registre des éc
 
 ## 12. Registre des dimensions
 
-| ID | Dimension | Introduite | Statut 3.6.0 | Dépend de | Où |
+| ID | Dimension | Introduite | Statut 3.6.1 | Dépend de | Où |
 |---|---|---|---|---|---|
 | D1 | Ontologie : cycle 7E, profondeurs du CRI, concepts paramétrables | 3.1 | active | | `SKILL.md`, § 1 |
 | D2 | Configuration : matrice d'activation, modes de modulation, choix du démarrage | 3.1 | active | D1 | § 2, § 7.1, § 11.4 |
@@ -559,7 +559,7 @@ Point d'extension, actif dès 3.5.0 :
 
 Point d'extension, actif dès 3.6.0 :
 
-- **E6** : les événements du registre des concepts et les lignes du registre des écarts pourront s'exporter dans l'enveloppe `socle-observation.enveloppe/1` du socle `socle-observation` 1.0.0, selon ses correspondances, sans changer ni ces registres ni leurs droits (D6.INV-2). En 3.6, aucune enveloppe n'est produite : une demande d'export reçoit la réponse « dimension D12 réservée » (scénario R23).
+- **E6** : les événements du registre des concepts et les lignes du registre des écarts pourront s'exporter dans l'enveloppe `socle-observation.enveloppe/1` du socle `socle-observation` 1.1.0, selon ses correspondances, sans changer ni ces registres ni leurs droits (D6.INV-2). En 3.6, aucune enveloppe n'est produite : une demande d'export reçoit la réponse « dimension D12 réservée » (scénario R23).
 
 ## 14. Invariants
 
@@ -848,3 +848,5 @@ Décisions du développeur, le 24 novembre 2026, pour le passage du dépôt au t
 **3.5.3** (2026-11-07) : correctif. Référence à agent-tdd-jira 1.3.4, dont seule la référence à agent2test change ; les conventions Git et la numérotation des critères reprises par l'orchestrateur sont identiques. Aucune dimension ni aucun invariant modifié. Archive : `archives/SKILL-v3.5.2.md`.
 
 **3.6.0** (2026-11-24) : dimension D12 réservée, l'observation partagée (section 16) : le registre des concepts et le registre des écarts pourront s'exporter dans l'enveloppe du socle `socle-observation` 1.0.0, référencé par le manifeste ; point d'extension E6 ; module `observation`. Scénario R23, qui vérifie l'inertie. Aucun invariant ajouté ni modifié ; trente-trois invariants. Archive : `archives/SKILL-v3.5.3.md`.
+
+**3.6.1** (2026-11-24) : correctif. Référence au socle `socle-observation` 1.1.0, qui ajoute le champ facultatif `source.journal` pour désigner sans ambiguïté l'enregistrement source d'une enveloppe, et que le générateur de skills de ticket inclut désormais ; les correspondances du registre des concepts et du registre des écarts ne changent pas, et le socle précise seulement la date d'un événement du registre des concepts, celle du commit qui le porte. D12 reste réservée ; aucune dimension ni aucun invariant modifié. Archive : `archives/SKILL-v3.6.0.md`.
