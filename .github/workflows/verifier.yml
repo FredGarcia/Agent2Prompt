@@ -22,6 +22,10 @@ jobs:
           node-version: ${{ matrix.node }}
       - name: Spécifications, transmissions, README et glossaire
         run: node tools/verifier.mjs
+      # Le vérificateur, lancé sur une copie altérée du dépôt, et le glossaire : espaces d'identifiants des socles,
+      # dont le préfixe SA du socle de l'acceptable, et bloc noyau au schéma fermé.
+      - name: Recette du vérificateur et du glossaire
+        run: node --test tools/verifier.test.mjs tools/glossaire.test.mjs
       # Une extraction Windows (core.autocrlf) écrit des CRLF : le vérificateur doit donner le même résultat.
       # Elle se fait dans un worktree à part, sans toucher à l'extraction du dépôt ni à sa configuration.
       - name: Même vérification sur une extraction en fins de ligne CRLF

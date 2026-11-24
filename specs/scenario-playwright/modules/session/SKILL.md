@@ -63,7 +63,7 @@ La suite reprend seule, dès l'état atteint ; au-delà du délai de l'étape, 3
 
 <!-- fichier : scripts/session.mjs -->
 ```javascript
-// scenario-playwright 1.6.1 : réglages, navigateur du poste, profil dédié et garde des origines.
+// scenario-playwright 1.6.2 : réglages, navigateur du poste, profil dédié et garde des origines.
 //
 // Le navigateur est celui du poste, Chrome par défaut, piloté par playwright-core sans en télécharger
 // aucun (D1.INV-1, D6.INV-1). La session vit dans un profil dédié ; le skill ne voit aucun identifiant

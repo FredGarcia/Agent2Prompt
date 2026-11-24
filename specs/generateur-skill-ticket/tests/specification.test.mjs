@@ -40,12 +40,12 @@ function recette(texte, motif = /^\| (D\d+\.INV-\d+) \| (.+) \|$/gm) {
   return lignes;
 }
 
-test('spécification : version du point d\'entrée, de son titre et du manifeste ; neuf dimensions actives, un module chacune', () => {
+test('spécification : version du point d\'entrée, de son titre et du manifeste ; neuf dimensions actives et une réservée, un module chacune', () => {
   assert.equal(MANIFESTE.name, 'generateur-skill-ticket');
   assert.match(ENTREE, new RegExp(`^version: ${MANIFESTE.version.replace(/\./g, '\\.')}$`, 'm'));
   assert.match(ENTREE, new RegExp(`^# Générateur de skills de ticket C7E, version ${MANIFESTE.version.replace(/\./g, '\\.')}$`, 'm'));
-  assert.deepStrictEqual(MANIFESTE.modules.map((m) => m.dimensions.join()), ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8', 'D9']);
-  assert.deepStrictEqual(MANIFESTE.modules.filter((m) => m.status !== 'active').map((m) => `${m.id}:${m.status}`), []);
+  assert.deepStrictEqual(MANIFESTE.modules.map((m) => m.dimensions.join()), ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8', 'D9', 'D10']);
+  assert.deepStrictEqual(MANIFESTE.modules.filter((m) => m.status !== 'active').map((m) => `${m.id}:${m.status}`), ['acceptable:reserved']);
   assert.equal(DEFINITIONS.length, 32);
 });
 
@@ -70,6 +70,25 @@ test('1.3.0 : l\'export ne passe pas par les skills de ticket : ni l\'outil, ni 
   const partage = MANIFESTE.shared.find((s) => s.from === 'specs/socle-observation/SKILL.md');
   assert.deepStrictEqual(fichiers.filter((f) => /observation/.test(f.rel)).map((f) => f.rel), [partage.path, observation.path]);
   assert.equal(fichiers.find((f) => f.rel === partage.path).contenu.replace(/\n$/, ''), resoudre(partage).replace(/\r\n/g, '\n').replace(/\n$/, ''));
+});
+
+test('1.4.0 : D10 réservée, inerte : aucun outil ne lit le socle de l\'acceptable, et aucun skill de ticket ne porte ni le module acceptable ni le socle', () => {
+  const acceptable = MANIFESTE.modules.find((m) => m.id === 'acceptable');
+  assert.match(texteDe(acceptable), /^status: reserved$/m);
+  assert.ok(!DEFINITIONS.some((d) => d.dimension === 'D10'), 'une dimension réservée n\'a aucun invariant en vigueur');
+  assert.ok(!MANIFESTE.shared.some((s) => s.from === 'specs/socle-acceptable/SKILL.md'), 'le socle de l\'acceptable est référencé, pas inclus');
+  for (const nom of readdirSync(join(SPEC, 'outils'))) {
+    assert.doesNotMatch(sourceDe(`outils/${nom}`), /socle-acceptable|acceptable\.noyau/, `outils/${nom} : aucun outil ne lit le socle de l'acceptable`);
+  }
+  assert.ok(!BOITE.some((f) => /acceptable/.test(`${f.path} ${f.outil ?? ''}`)), 'la boîte à outils du skill racine ne porte pas l\'acceptable partagé');
+  for (const cle of ['ABCDE-3620', 'ABCDE-3512']) {
+    const dossier = join(SPEC, 'exemples', `${cle}-skills`, 'transmissions');
+    const transmissions = readdirSync(dossier).filter((nom) => nom.endsWith('.md'));
+    assert.ok(transmissions.length > 0, `${cle} : transmissions d'exemple`);
+    for (const nom of transmissions) {
+      assert.doesNotMatch(readFileSync(join(dossier, nom), 'utf8'), /modules\/acceptable\/|socle-acceptable/, `${cle}, ${nom} : ni le module ni le socle de l'acceptable`);
+    }
+  }
 });
 
 test('spécification : chaque invariant du socle d\'observation épinglé a sa ligne de recette dans le module observation, et chaque test cité existe sous ce titre', () => {
@@ -133,11 +152,15 @@ test('spécification : les skills référencés sont ceux dont héritent les ski
   const orchestrateur = JSON.parse(readFileSync(join(SPEC, '..', 'orchestrateur-c7e', 'manifest.json'), 'utf8'));
   const socleObservation = orchestrateur.references.find((r) => r.name === 'socle-observation');
   assert.ok(socleObservation, 'l\'orchestrateur référence le socle d\'observation');
+  // Le socle de l'acceptable, que réserve la dimension D10, à la version que référence l'orchestrateur (1.4.0).
+  const socleAcceptable = orchestrateur.references.find((r) => r.name === 'socle-acceptable');
+  assert.ok(socleAcceptable, 'l\'orchestrateur référence le socle de l\'acceptable');
   assert.deepStrictEqual(MANIFESTE.shared, [{ path: 'socle-observation/SKILL.md', from: 'specs/socle-observation/SKILL.md', version: socleObservation.version }]);
   const attendu = {
     'orchestrateur-c7e': S.orchestrateur.version,
     'socle-back-front': S.socle.version,
     'socle-observation': socleObservation.version,
+    'socle-acceptable': socleAcceptable.version,
     ...S.boite.versions,
   };
   assert.deepStrictEqual(Object.fromEntries(MANIFESTE.references.map((r) => [r.name, r.version])), Object.fromEntries(Object.keys(attendu).sort().map((k) => [k, attendu[k]])));

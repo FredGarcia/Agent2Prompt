@@ -85,7 +85,7 @@ Une étape qui crée, modifie ou supprime des données porte `mutation` : sa lig
 
 <!-- fichier : scripts/moteur.mjs -->
 ```javascript
-// scenario-playwright 1.6.1 : moteur des étapes, jeu d'actions fermé, préparation et nettoyage des données.
+// scenario-playwright 1.6.2 : moteur des étapes, jeu d'actions fermé, préparation et nettoyage des données.
 //
 // Chaque étape agit comme une personne devant l'écran, sur une cible résolue côté utilisateur (D4).
 // Aucune étape n'exécute de code dans la page (D5.INV-1) ; les attentes portent sur un état, dans un

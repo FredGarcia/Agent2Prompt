@@ -1,0 +1,13 @@
+{
+  "name": "socle-acceptable",
+  "version": "1.0.0",
+  "specSchema": 1,
+  "language": "fr",
+  "description": "Socle de l'acceptable : le noyau commun de ce que les systèmes du dépôt refusent, au sens du troisième couplage du troisième ordre (EVOLUTION.md, section 10) ; intentions refusées, actions interdites, écritures interdites, secrets et leçons interdites, chaque règle un invariant que cite le refus ; écriture par les kits dev, test et démo, avec retour arrière ; refus, dérogations et faux refus ; épinglage par les constitutions, sans retrait ni affaiblissement.",
+  "entry": "SKILL.md",
+  "transmissible": false,
+  "usedBy": ["agent2dev", "agent2test", "orchestrateur-c7e", "generateur-skill-ticket"],
+  "extensionPoints": ["E1", "E2"],
+  "modules": [],
+  "previousVersions": []
+}

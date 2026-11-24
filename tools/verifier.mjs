@@ -24,10 +24,13 @@
  * - les points d'extension du manifeste (`extensionPoints`) sont ceux que définit le
  *   point d'entrée (`- **En**`) ;
  * - chaque bloc de code Markdown est fermé ;
- * - chaque invariant défini dans le point d'entrée (`**Dn.INV-k**`, `**SCn.INV-k**`, `**SOn.INV-k**`) est
- *   repris dans au moins un module, et chaque invariant cité est défini ; un identifiant
+ * - chaque invariant défini dans le point d'entrée (`**Dn.INV-k**`, `**SCn.INV-k**`, `**SOn.INV-k**`,
+ *   `**SAn.INV-k**`) est repris dans au moins un module, et chaque invariant cité est défini ; un identifiant
  *   préfixé par un nom de skill, comme `java:D4.INV-2`, désigne un autre skill du dépôt
- *   et doit être défini dans son point d'entrée.
+ *   et doit être défini dans son point d'entrée ;
+ * - le socle de l'acceptable porte un seul bloc `noyau`, au schéma fermé `socle-acceptable.noyau/1` :
+ *   six listes non vides, des entrées aux seules clés de leur liste, sans doublon, des motifs qui sont des
+ *   expressions régulières valides, et des règles qui sont des invariants du socle.
  *
  * Pour le dépôt :
  *
@@ -89,12 +92,88 @@ function fichiersMarkdown(dossier) {
   return resultat;
 }
 
-// Espaces d'identifiants : `Dn` d'une spécification, `SCn` du socle back-front, `SOn` du socle d'observation.
-const DEFINITION = /\*\*((?:D|SC|SO)\d+\.INV-\d+)\*\*/g;
+// Espaces d'identifiants : `Dn` d'une spécification, `SCn` du socle back-front, `SOn` du socle d'observation,
+// `SAn` du socle de l'acceptable.
+const DEFINITION = /\*\*((?:D|SC|SO|SA)\d+\.INV-\d+)\*\*/g;
 // Identifiant non précédé d'un préfixe de skill (`nom-du-skill:`) ni d'un autre caractère d'identifiant.
-const CITATION = /(?<![\w:-])((?:D|SC|SO)\d+\.INV-\d+)/g;
+const CITATION = /(?<![\w:-])((?:D|SC|SO|SA)\d+\.INV-\d+)/g;
 // Identifiant d'un autre skill, préfixé par son nom : `java:D4.INV-2`, `socle-observation:SO1.INV-1`.
-const CITATION_EXTERNE = /(?<![\w-])([a-z][a-z0-9-]*):((?:D|SC|SO)\d+\.INV-\d+)/g;
+const CITATION_EXTERNE = /(?<![\w-])([a-z][a-z0-9-]*):((?:D|SC|SO|SA)\d+\.INV-\d+)/g;
+
+// Bloc `noyau` du socle de l'acceptable : la forme lisible par machine que reprennent les constitutions.
+const SOCLE_ACCEPTABLE = 'socle-acceptable';
+const SCHEMA_NOYAU = 'socle-acceptable.noyau/1';
+// Clé propre à chaque liste du noyau ; une entrée porte cette clé, sa règle et, au besoin, `horsKit`.
+const LISTES_DU_NOYAU = {
+  intentionsRefusees: 'intention',
+  programmesInterdits: 'programme',
+  argumentsInterdits: 'argument',
+  ecrituresInterdites: 'lieu',
+  secrets: 'motif',
+  leconsInterdites: 'motif',
+};
+const estObjet = (valeur) => valeur !== null && typeof valeur === 'object' && !Array.isArray(valeur);
+
+/** Le bloc `noyau` du socle de l'acceptable : un seul, au schéma fermé, qui ne cite que des invariants du socle. */
+function verifierNoyau(texte, definisLocaux, erreur) {
+  const blocs = [...texte.matchAll(/^```json\n([\s\S]*?)\n```$/gm)].map((m) => m[1]).filter((b) => b.includes(`"${SCHEMA_NOYAU}"`));
+  if (blocs.length !== 1) {
+    erreur(`bloc noyau : ${blocs.length} blocs JSON au schéma ${SCHEMA_NOYAU}, un seul attendu`);
+    return;
+  }
+  let noyau;
+  try {
+    noyau = JSON.parse(blocs[0]);
+  } catch (e) {
+    erreur(`bloc noyau : JSON illisible (${e.message})`);
+    return;
+  }
+  if (!estObjet(noyau)) {
+    erreur("bloc noyau : ce n'est pas un objet JSON");
+    return;
+  }
+  if (noyau.schema !== SCHEMA_NOYAU) erreur(`bloc noyau : schema ${noyau.schema}, ${SCHEMA_NOYAU} attendu`);
+  for (const cle of Object.keys(noyau)) {
+    if (cle !== 'schema' && !Object.hasOwn(LISTES_DU_NOYAU, cle)) erreur(`bloc noyau : clé ${cle}, hors du schéma ${SCHEMA_NOYAU}`);
+  }
+  for (const [liste, cle] of Object.entries(LISTES_DU_NOYAU)) {
+    const entrees = noyau[liste];
+    if (!Array.isArray(entrees) || entrees.length === 0) {
+      erreur(`bloc noyau : liste ${liste} absente ou vide`);
+      continue;
+    }
+    const vues = new Set();
+    entrees.forEach((entree, i) => {
+      const lieu = `bloc noyau : ${liste}[${i}]`;
+      if (!estObjet(entree)) {
+        erreur(`${lieu} n'est pas un objet`);
+        return;
+      }
+      for (const k of Object.keys(entree)) {
+        if (![cle, 'horsKit', 'regle'].includes(k)) erreur(`${lieu} : clé ${k}, hors de ${cle}, horsKit et regle`);
+      }
+      const valeur = entree[cle];
+      if (typeof valeur !== 'string' || valeur === '') erreur(`${lieu} : ${cle} absent ou vide`);
+      else if (vues.has(valeur)) erreur(`${lieu} : ${cle} ${valeur} en double`);
+      else {
+        vues.add(valeur);
+        if (cle === 'motif') {
+          try {
+            new RegExp(valeur);
+          } catch (e) {
+            erreur(`${lieu} : motif invalide (${e.message})`);
+          }
+        }
+      }
+      if (Object.hasOwn(entree, 'horsKit') && entree.horsKit !== true) erreur(`${lieu} : horsKit, s'il figure, vaut true`);
+      if (typeof entree.regle !== 'string' || !/^SA\d+\.INV-\d+$/.test(entree.regle)) {
+        erreur(`${lieu} : regle ${entree.regle}, un invariant SAn.INV-k attendu`);
+      } else if (!definisLocaux.has(entree.regle)) {
+        erreur(`${lieu} : regle ${entree.regle}, qui n'est pas définie dans le socle`);
+      }
+    });
+  }
+}
 
 function definitions(texte) {
   return new Set([...texte.matchAll(DEFINITION)].map((m) => m[1]));
@@ -225,7 +304,7 @@ function verifierSpec(dossier) {
       erreur(e.message);
       continue;
     }
-    // Seuls les identifiants hors de l'espace local `Dn` sont importés (ceux des socles, `SCn` et `SOn`) :
+    // Seuls les identifiants hors de l'espace local `Dn` sont importés (ceux des socles, `SCn`, `SOn` et `SAn`) :
     // un référentiel d'expert inclus définit aussi des `Dn`, qui masqueraient une faute de frappe locale.
     for (const id of definitions(texte)) if (!id.startsWith('D')) definis.add(id);
   }
@@ -281,6 +360,7 @@ function verifierSpec(dossier) {
 
   // Invariants : couverture et citations.
   const definisLocaux = definitions(texteEntree);
+  if (manifeste.name === SOCLE_ACCEPTABLE) verifierNoyau(texteEntree, definisLocaux, erreur);
   if (textesModules.length > 0) {
     const corpusModules = textesModules.join('\n');
     for (const id of definisLocaux) {

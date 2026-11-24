@@ -10,6 +10,7 @@ Ce fichier détaille chaque invariant de chaque spécification du dépôt : son 
 | `Dn.INV-k` | invariant k de la dimension n : une propriété qui doit toujours tenir, vérifiée par au moins un test ou un contrôle | `D4.INV-3` : la procédure n'emploie ni `--force` ni `--force-with-lease` |
 | `SCn`, `SCn.INV-k` | dimension et invariant du socle back-front, inclus à l'identique dans plusieurs skills | `SC1.INV-2` : aucun changement cassant dans une version d'API publiée |
 | `SOn`, `SOn.INV-k` | dimension et invariant du socle d'observation : l'enveloppe commune des observations, référencée ou incluse par les systèmes qui les exportent | `socle-observation:SO3.INV-1` : aucune enveloppe ne porte de texte libre |
+| `SAn`, `SAn.INV-k` | dimension et invariant du socle de l'acceptable : le noyau commun de ce que tous les systèmes refusent, référencé par ceux qui le prévoient, inclus par ceux qui l'appliquent ; un refus cite sa règle | `socle-acceptable:SA2.INV-2` : aucun agent, kit compris, ne pousse en force |
 | `<spécification>:Dn.INV-k` | invariant d'une autre spécification, cité avec le nom de celle-ci | `java:D4.INV-2` |
 | `En` | point d'extension : emplacement réservé, inerte, pour une dimension future | `E2` |
 | `OCn` | ordre cybernétique d'une boucle (`EVOLUTION.md`, section 10) : `OC1` régulation, `OC2` observation de l'observation, `OC3` régulation de l'écosystème | `OC2` : la boucle d'évolution du dépôt |
@@ -23,26 +24,27 @@ La colonne « Repris dans » cite les modules de la spécification qui reprennen
 
 | Spécification | Version | Dimensions actives | Dimensions réservées | Invariants |
 |---|---|---|---|---|
-| [`agent-tdd-jira`](#agent-tdd-jira-134) | 1.3.4 | 9 | 1 | 43 |
-| [`agent2dev`](#agent2dev-113) | 1.1.3 | 21 | 2 | 96 |
-| [`agent2test`](#agent2test-131) | 1.3.1 | 20 | 2 | 116 |
+| [`agent-tdd-jira`](#agent-tdd-jira-135) | 1.3.5 | 9 | 1 | 43 |
+| [`agent2dev`](#agent2dev-120) | 1.2.0 | 21 | 3 | 96 |
+| [`agent2test`](#agent2test-140) | 1.4.0 | 20 | 3 | 116 |
 | [`agents-paralleles-gitlab`](#agents-paralleles-gitlab-101) | 1.0.1 | 5 | 2 | 20 |
 | [`analyse-projet`](#analyse-projet-102) | 1.0.2 | 5 | 1 | 16 |
 | [`angular`](#angular-101) | 1.0.1 | 8 | 2 | 30 |
 | [`capture-sprint-jira`](#capture-sprint-jira-122) | 1.2.2 | 9 | 2 | 39 |
 | [`explication-hote-ia`](#explication-hote-ia-110) | 1.1.0 | 10 | 2 | 37 |
-| [`generateur-skill-ticket`](#generateur-skill-ticket-131) | 1.3.1 | 9 | 0 | 32 |
+| [`generateur-skill-ticket`](#generateur-skill-ticket-140) | 1.4.0 | 9 | 1 | 32 |
 | [`java`](#java-111) | 1.1.1 | 7 | 1 | 29 |
 | [`observatoire`](#observatoire-110) | 1.1.0 | 6 | 0 | 11 |
-| [`orchestrateur-c7e`](#orchestrateur-c7e-370) | 3.7.0 | 11 | 1 | 36 |
-| [`scenario-playwright`](#scenario-playwright-161) | 1.6.1 | 17 | 5 | 76 |
+| [`orchestrateur-c7e`](#orchestrateur-c7e-380) | 3.8.0 | 11 | 2 | 36 |
+| [`scenario-playwright`](#scenario-playwright-162) | 1.6.2 | 17 | 5 | 76 |
 | [`skill4appli`](#skill4appli-111) | 1.1.1 | 9 | 3 | 34 |
+| [`socle-acceptable`](#socle-acceptable-100) | 1.0.0 | 7 | 0 | 12 |
 | [`socle-back-front`](#socle-back-front-110) | 1.1.0 | 7 | 0 | 21 |
 | [`socle-observation`](#socle-observation-110) | 1.1.0 | 4 | 0 | 7 |
 | [`sonarqube`](#sonarqube-110) | 1.1.0 | 8 | 2 | 34 |
 | [`tension-dashboard-gitlab-agent`](#tension-dashboard-gitlab-agent-220) | 2.2.0 | 7 | 3 | 17 |
 
-## agent-tdd-jira 1.3.4
+## agent-tdd-jira 1.3.5
 
 Agent de développement TDD : demande Jira en MHTML, analyse avec commentaires, US et critères d'acceptation numérotés, scénarios Gherkin par critère, variantes back Java et front Angular, cycle rouge, vert, remanié scénario par scénario, traçabilité ; binôme avec Agent2Test, verdict d'acceptation par critère ; mode parallèle dans un worktree géré par agents-paralleles-gitlab. Point d'entrée : [`specs/agent-tdd-jira/SKILL.md`](specs/agent-tdd-jira/SKILL.md).
 
@@ -138,7 +140,7 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 | **D10.INV-6** | un critère d'acceptation n'entre en réalisation (choix des variantes V3, cycle TDD V4) que s'il est validé, décliné en scénarios validés, et qu'aucune question ouverte ne le concerne. | `us-criteres`, `variantes`, `agent2dev/cadrage` |
 | **D10.INV-7** | la matrice de traçabilité relie chaque US à ses critères d'acceptation, et chaque critère à ses scénarios, tests et commits, ou à un statut « non réalisé » avec sa raison ; le rapport final donne l'état de chaque critère. | `us-criteres`, `tracabilite`, `agent2dev`, `agent2dev/tracabilite` |
 
-## agent2dev 1.1.3
+## agent2dev 1.2.0
 
 Agent2Dev : système multi-agents de développement qui applique le skill agent-tdd-jira comme méthode, de la demande Jira en MHTML jusqu'au rapport, en cycle TDD scénario par scénario et en binôme avec Agent2Test ; le moteur rédige, des agents déterministes écrivent et exécutent, le développeur valide à chaque point ; journal chaîné, apprentissage sous gouvernance, un fichier SQLite unique ouvert par un agent médiateur, binôme à la main ou par un échange par dossiers facultatif, exécution locale. Point d'entrée : [`specs/agent2dev/SKILL.md`](specs/agent2dev/SKILL.md).
 
@@ -150,8 +152,8 @@ Agent2Dev : système multi-agents de développement qui applique le skill agent-
 | **D1.INV-2** | tout appel ou événement que son contrat ne déclare pas est refusé par le bus ; aucun agent n'importe le code d'un autre agent. | `noyau` |
 | **D1.INV-3** | le moteur ne produit que des données ; une sortie qui s'écarte de son schéma fermé ou échoue à un contrôle nommé n'est jamais consommée. | `noyau`, `journal` |
 | **D1.INV-4** | la constitution est vérifiée par son empreinte au démarrage ; modifiée ou non publiée, Agent2Dev ne démarre pas ; sa publication est une commande humaine. | `noyau`, `referentiel` |
-| **D1.INV-5** | Agent2Dev ne traite qu'une demande Jira exportée en MHTML, pour le projet d'un profil ratifié ; toute intention de démarrer, d'arrêter ou de déployer l'application, de lancer un batch, d'administrer un environnement, d'écrire en base ou dans Jira est refusée avec le motif « hors périmètre ». | `noyau`, `orchestrateur` |
-| **D1.INV-6** | aucun agent n'écrit la constitution, le code ou les schémas d'Agent2Dev, la configuration humaine ni la transmission du skill, et aucun ne réécrit un profil ratifié : le `profil` en crée seulement une version nouvelle, à la décision V0. | `noyau`, `profil`, `referentiel`, `exploitation` |
+| **D1.INV-5** | Agent2Dev ne traite qu'une demande Jira exportée en MHTML, pour le projet d'un profil ratifié ; toute intention de démarrer, d'arrêter ou de déployer l'application, de lancer un batch, d'administrer un environnement, d'écrire en base ou dans Jira est refusée avec le motif « hors périmètre ». | `noyau`, `orchestrateur`, `acceptable`, `socle-acceptable` |
+| **D1.INV-6** | aucun agent n'écrit la constitution, le code ou les schémas d'Agent2Dev, la configuration humaine ni la transmission du skill, et aucun ne réécrit un profil ratifié : le `profil` en crée seulement une version nouvelle, à la décision V0. | `noyau`, `profil`, `referentiel`, `exploitation`, `acceptable`, `socle-acceptable` |
 
 ### D2 : Données par agent, en SQLite (superseded)
 
@@ -279,7 +281,7 @@ Agent2Dev : système multi-agents de développement qui applique le skill agent-
 |---|---|---|
 | **D15.INV-1** | chaque correction ou ajustement commenté à V2, V3, V4 ou V5, et chaque défaut confirmé par Agent2Test après une acceptation V4, produit une leçon candidate, liée à sa fiche, à son moteur et à sa source. | `apprenant` |
 | **D15.INV-2** | une leçon n'a d'effet qu'après ratification en CP-4, depuis le tableau de bord, et seulement pour le moteur sur lequel elle a été apprise. | `apprenant`, `referentiel` |
-| **D15.INV-3** | une leçon qui contredit une règle du skill ou de la constitution est refusée par contrôle nommé avant d'être proposée. | `apprenant` |
+| **D15.INV-3** | une leçon qui contredit une règle du skill ou de la constitution est refusée par contrôle nommé avant d'être proposée. | `apprenant`, `socle-acceptable` |
 
 ### D16 : Réflexivité de second ordre (active)
 
@@ -361,7 +363,11 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 | **D25.INV-3** | un journal relevé par l'échange est copié par le `depot` dans le dossier de travail de la demande, et `lire-acceptation.mjs` le lit comme un journal déposé à la main. | `echange` |
 | **D25.INV-4** | une remise publiée porte le format `agent2test.remise/1`, sans contenu de fichier ni secret ; elle s'écrit par un fichier provisoire renommé ensuite, et n'est jamais réécrite ; l'échange ne décide rien et n'ouvre aucune campagne. | `echange` |
 
-## agent2test 1.3.1
+### D26 : Acceptable partagé : noyau du socle de l'acceptable, refus et kit dev (reserved)
+
+Dimension réservée : aucun invariant en vigueur dans cette version.
+
+## agent2test 1.4.0
 
 Agent2Test : système multi-agents qui choisit, prépare, exécute et journalise les tests essentiels d'une application Angular pour une demande, en pilotant Playwright comme une bibliothèque depuis Node, dans un projet séparé de l'application ; plan importé d'agent-tdd-jira, verdict par critère d'acceptation, navigateur qui regarde comme une personne et rend compte de ce qu'il voit et ne voit pas, points de contrôle humains, cybernétique de premier et de second ordre, un fichier SQLite unique ouvert par un agent médiateur, remise d'Agent2Dev en fichier ou par un échange par dossiers facultatif, exécution locale. Point d'entrée : [`specs/agent2test/SKILL.md`](specs/agent2test/SKILL.md).
 
@@ -373,8 +379,8 @@ Agent2Test : système multi-agents qui choisit, prépare, exécute et journalise
 | **D1.INV-2** | les agents ne communiquent que par le bus ; le bus refuse tout appel ou événement absent du contrat déclaré de l'agent, et aucun agent n'importe un autre agent. | `noyau` |
 | **D1.INV-3** | toute sortie du moteur est validée contre un schéma fermé et des contrôles nommés avant d'être consommée ; une sortie non conforme n'est jamais utilisée. | `noyau`, `preparateur` |
 | **D1.INV-4** | au démarrage, une constitution dont l'empreinte SHA-256 diffère de celle inscrite au grand livre empêche le démarrage, avec un message explicite. | `noyau` |
-| **D1.INV-5** | toute demande étrangère aux tests (modifier le code, déployer, administrer) est refusée avec le motif « hors périmètre ». | `noyau`, `plan` |
-| **D1.INV-6** | aucune action d'agent n'écrit la constitution, le code, les schémas du journal ou du grand livre, ni la configuration humaine. | `noyau`, `referentiel`, `exploitation` |
+| **D1.INV-5** | toute demande étrangère aux tests (modifier le code, déployer, administrer) est refusée avec le motif « hors périmètre ». | `noyau`, `plan`, `acceptable`, `socle-acceptable` |
+| **D1.INV-6** | aucune action d'agent n'écrit la constitution, le code, les schémas du journal ou du grand livre, ni la configuration humaine. | `noyau`, `referentiel`, `exploitation`, `socle-acceptable` |
 
 ### D2 : Données isolées par agent, sur PostgreSQL (superseded)
 
@@ -604,6 +610,10 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 | **D25.INV-7** | chaque étape `verifier` à attendu perceptif rend un témoignage, réussie ou non : portée regardée, canaux, règle de comparaison, ce qui a été vu, ce qui ne l'a pas été, et les preuves ; un canal déclaré mais non perçu rend le constat « non constatable » ; ce qu'un canal non déclaré voit autrement est rapporté en remarque, sans décider ; une étape `verifier` échouée n'empêche pas les `verifier` suivantes d'être jouées. | `navigateur`, `preparateur`, `journal`, `agent-tdd-jira`, `agent-tdd-jira/binome-agent2test`, `agent2dev` |
 | **D25.INV-8** | un constat « vu » n'est retenu qu'après un second regard qui rend le même constat ; un regard pendant lequel la géométrie de la zone change ne vaut rien ; des regards discordants classent l'étape `INSTABILITE`, jamais « réussie ». | `navigateur`, `verdict` |
 
+### D26 : Acceptable partagé : noyau du socle de l'acceptable, refus, leçons interdites et kit test (reserved)
+
+Dimension réservée : aucun invariant en vigueur dans cette version.
+
 ## agents-paralleles-gitlab 1.0.1
 
 Plusieurs agents en parallèle sur un dépôt GitLab, une demande Jira par worktree : isolation, hooks communs, script agt, garde-fous GitLab, recette de 44 contrôles. Point d'entrée : [`specs/agents-paralleles-gitlab/SKILL.md`](specs/agents-paralleles-gitlab/SKILL.md).
@@ -623,9 +633,9 @@ Plusieurs agents en parallèle sur un dépôt GitLab, une demande Jira par workt
 |---|---|---|
 | **D2.INV-1** | aucun commit sur `main`, `master`, `develop`, `release/*`, en HEAD détachée, ni sur une branche dont la clé n'est pas celle du worktree. | `hooks`, `recette` |
 | **D2.INV-2** | tout commit, hors commit de fusion, commence par `<CLÉ> Snn : ` ou `<CLÉ> : `, de sorte que `git log --grep='^<CLÉ> '` retrouve tous les commits de la demande. | `hooks`, `recette`, `agent2dev/depot`, `orchestrateur-c7e` |
-| **D2.INV-3** | aucun fichier interdit n'est commité, même forcé dans l'index : `.env`, clés et certificats, `*.mht`, `*.mhtml`, `.skills/`, `travail/`. | `hooks`, `recette`, `agent2dev/depot` |
+| **D2.INV-3** | aucun fichier interdit n'est commité, même forcé dans l'index : `.env`, clés et certificats, `*.mht`, `*.mhtml`, `.skills/`, `travail/`. | `hooks`, `recette`, `agent2dev/depot`, `socle-acceptable` |
 | **D2.INV-4** | un worktree ne pousse que vers la branche de sa demande ou une branche `fix/tension-*`, et ne supprime aucune branche distante. | `hooks`, `recette` |
-| **D2.INV-5** | aucun push ne réécrit une branche distante, avec ou sans `--force` ou `--force-with-lease`. | `hooks`, `recette`, `agent-tdd-jira/parallele` |
+| **D2.INV-5** | aucun push ne réécrit une branche distante, avec ou sans `--force` ou `--force-with-lease`. | `hooks`, `recette`, `agent-tdd-jira/parallele`, `socle-acceptable` |
 
 ### D3 : Orchestration : script `agt` (active)
 
@@ -634,7 +644,7 @@ Plusieurs agents en parallèle sur un dépôt GitLab, une demande Jira par workt
 | **D3.INV-1** | `agt reset` ne réécrit aucun commit publié et crée une sauvegarde `backup/<CLÉ>-<horodatage>` avant toute écriture. | `orchestration`, `recette` |
 | **D3.INV-2** | `agt sync` refuse un worktree non propre, rebase une branche jamais publiée et fusionne la base dans une branche publiée. | `orchestration`, `distribution`, `recette` |
 | **D3.INV-3** | `agt done` ne supprime une branche que si elle est contenue dans la base distante, sauf `--abandon` explicite, et archive `travail/` avant de supprimer le worktree. | `orchestration`, `recette` |
-| **D3.INV-4** | `agt ls` signale des hooks inactifs et toute URL de distant qui contient un identifiant ou un jeton. | `hooks`, `orchestration`, `gitlab`, `recette` |
+| **D3.INV-4** | `agt ls` signale des hooks inactifs et toute URL de distant qui contient un identifiant ou un jeton. | `hooks`, `orchestration`, `gitlab`, `recette`, `socle-acceptable` |
 | **D3.INV-5** | `agt` n'appelle pas GitLab et ne pousse rien. | `orchestration`, `recette` |
 
 ### D4 : Garde-fous GitLab (active)
@@ -992,7 +1002,7 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 | **D12.INV-4** | hors du dossier du skill, rien ne s'écrit sans la demande du développeur : le sous-agent et les commandes s'installent par une commande qu'il lance ou qu'il approuve, une commande de retrait les supprime, et, avec `gemini skills uninstall`, rien ne reste. | `agent`, `diffusion` |
 | **D12.INV-5** | le dépôt où le skill est maintenu se nomme comme son origine et le lieu de sa vérification, jamais comme une étape ; le contrat de version, les règles et la recette du skill sont écrits dans le skill. | `recette`, `diffusion` |
 
-## generateur-skill-ticket 1.3.1
+## generateur-skill-ticket 1.4.0
 
 Générateur de skills de ticket C7E : décompose un ticket en arbre de sous-tickets, produit pour chaque nœud un skill assemblé depuis le référentiel des méso-contrats, l'installe et le lance dans Gemini CLI ; chaque skill s'observe dans un champ partagé, et chaque niveau voit le ticket augmenté ; chaque ticket entraîne le générateur, qui propose ses évolutions au développeur ; ses observations s'exportent, minimisées, vers le socle d'observation du dépôt. Point d'entrée : [`specs/generateur-skill-ticket/SKILL.md`](specs/generateur-skill-ticket/SKILL.md).
 
@@ -1029,7 +1039,7 @@ Générateur de skills de ticket C7E : décompose un ticket en arbre de sous-tic
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
 | **D4.INV-1** | les documents de la clé, `demande.json`, `us.md` et le fichier Gherkin, passent `controler-criteres.mjs` d'agent-tdd-jira et `verifier-documents.mjs` sans écart ; chaque critère de la racine y devient un critère `<CLÉ>-CAnn`, mot pour mot, et chaque critère d'un sous-ticket s'y rattache par ses soutiens et se prouve par au moins un scénario, de sa couche pour une feuille. | `documents-kits` |
-| **D4.INV-2** | chaque kit, dev, test et démo, est un manifeste fermé, complet, chaque fichier cité avec son empreinte ; la remise suit le schéma fermé `agent2test.remise/1` ; avec le dépôt, la branche et les commits du kit dev s'y retrouvent. | `arbre`, `documents-kits` |
+| **D4.INV-2** | chaque kit, dev, test et démo, est un manifeste fermé, complet, chaque fichier cité avec son empreinte ; la remise suit le schéma fermé `agent2test.remise/1` ; avec le dépôt, la branche et les commits du kit dev s'y retrouvent. | `arbre`, `documents-kits`, `acceptable`, `socle-acceptable` |
 | **D4.INV-3** | la boîte à outils de l'arbre est sur la racine seule, chaque fichier identique à sa source à sa version épinglée ; chaque sous-agent de rôle travaille dans son propre contexte, l'analyste, le relecteur et la qualité sans outil d'écriture, le rédacteur n'écrivant que dans le dossier de la clé. | `documents-kits` |
 
 ### D5 : Champ d'observation (active)
@@ -1072,6 +1082,10 @@ Générateur de skills de ticket C7E : décompose un ticket en arbre de sous-tic
 | **D9.INV-1** | l'export lit le champ de chaque ticket du projet et son registre d'apprentissage sans les modifier, ne traduit ni les actions ni aucun texte, et n'écrit dans le projet que le journal d'enveloppes `docs/c7e/observations.jsonl` et sa tête ; chaque enveloppe suit le socle épinglé, à la version du générateur qui l'exporte ; aucun skill de ticket ne porte l'outil ni le module. | `observation` |
 | **D9.INV-2** | le sel de l'instance est tiré une seule fois, à la première exportation du projet, de quelque système qu'elle soit, et gardé dans le répertoire Git commun du projet, que partagent ses worktrees et les systèmes qui y exportent ; il n'est jamais versionné, affiché, exporté ni passé en argument ; sans lui, un journal d'enveloppes du projet, celui du générateur ou celui d'un autre système, arrête l'export, comme un sel étranger à l'un d'eux, au lieu qu'un nouveau sel change l'identité de l'instance. | `observation` |
 | **D9.INV-3** | l'export est incrémental et idempotent : un enregistrement déjà exporté, reconnu par son format, son journal et son numéro, ne l'est pas une seconde fois, et un export sans enregistrement nouveau laisse le journal et sa tête identiques, octet pour octet ; un enregistrement arrivé après d'autres, plus récents, prend la date de la dernière enveloppe, sans que son journal source change d'ordre. | `observation` |
+
+### D10 : Acceptable partagé : kits et actions confrontés au noyau du socle de l'acceptable (reserved)
+
+Dimension réservée : aucun invariant en vigueur dans cette version.
 
 ## java 1.1.1
 
@@ -1190,7 +1204,7 @@ Observatoire de l'écosystème Agent2Prompt, sur le poste : relève les journaux
 | **D6.INV-1** | un même invariant du dépôt, cité par des écarts ou des dérogations, fait un candidat quand ses écarts distincts sont au moins deux et viennent de deux instances ou de deux systèmes ; un écart se désigne par son instance et son ticket, et les enveloppes d'un même écart, celle du système qui le constate et celle du registre où il est décidé, ne comptent qu'une fois ; un invariant que le dépôt ne définit pas ne fait pas de candidat. | `systemes` |
 | **D6.INV-2** | un candidat par invariant se propose à la spécification qui définit l'invariant, à sa version courante, avec les systèmes qui l'ont relevé ; ses références désignent chaque enveloppe par son instance tronquée, son système et son numéro, puisque chaque système tient son journal. | `systemes` |
 
-## orchestrateur-c7e 3.7.0
+## orchestrateur-c7e 3.8.0
 
 Orchestrateur fractal C7E : résolution d'un ticket full-stack comme transformation maîtrisée d'un système vivant, avec le cycle de l'Axiome 7E, quatre profondeurs de déclinaison, des concepts paramétrables, la qualification de chaque ticket à son ouverture par un modèle générique de la demande et des questions complémentaires, un méso-contrat principal et au besoin des compléments, confirmés avant tout le reste, des options par couche rattachées au méso-contrat qui les permet avec leurs paramètres au choix par ticket, des variantes de représentation d'une ressource et leur mise à jour en temps réel, l'analyse des images PNG de l'objectif, une fiche validée avant toute modification, des tests déduits des risques, des conventions Git compatibles avec le kit des agents parallèles, une boucle de second ordre bornée par un registre et un fichier d'invariants du projet, des registres exportés vers le socle d'observation par une commande que lance le développeur ; activé au démarrage de l'IA locale, sur choix du développeur. Point d'entrée : [`specs/orchestrateur-c7e/SKILL.md`](specs/orchestrateur-c7e/SKILL.md).
 
@@ -1206,14 +1220,14 @@ Orchestrateur fractal C7E : résolution d'un ticket full-stack comme transformat
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
 | **D2.INV-1** | la fiche déclare le mode, les concepts activés avec leurs poids et leurs paramètres, la profondeur et le niveau de preuve, et justifie cette configuration par la criticité du ticket, selon la grille du fichier d'invariants du projet. | `meso-contrats` |
-| **D2.INV-2** | dans tous les modes, les invariants du projet, du socle et des référentiels s'appliquent ; un mode ne règle que des paramètres opérationnels. | `meso-contrats` |
+| **D2.INV-2** | dans tous les modes, les invariants du projet, du socle et des référentiels s'appliquent ; un mode ne règle que des paramètres opérationnels. | `meso-contrats`, `acceptable` |
 | **D2.INV-3** | le skill ne s'applique qu'au choix du développeur : en chargement permanent, par l'import de son fichier de démarrage ; en chargement au choix, par sa réponse au menu ou par la commande `/c7e`. Sans ce choix, l'IA n'applique aucune règle du skill et ne l'active pas d'elle-même. | `referentiel` |
 
 ### D3 : Pipeline par slot et fiche de transformation (active)
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D3.INV-1** | aucune modification du code, du schéma ni de la configuration du projet avant que le développeur ait validé la fiche : objectif, critères, invariants, configuration, cartographie d'impact, stratégie et tests déduits. | `meso-contrats`, `referentiel`, `generateur-skill-ticket`, `generateur-skill-ticket/installation` |
+| **D3.INV-1** | aucune modification du code, du schéma ni de la configuration du projet avant que le développeur ait validé la fiche : objectif, critères, invariants, configuration, cartographie d'impact, stratégie et tests déduits. | `meso-contrats`, `referentiel`, `acceptable`, `generateur-skill-ticket`, `generateur-skill-ticket/installation`, `generateur-skill-ticket/acceptable`, `socle-acceptable` |
 | **D3.INV-2** | les contrats de niveau d=1, schéma exposé (É1) et contrat OpenAPI (É3), sont validés avant toute implémentation de niveau d=2 ou d=3. | `meso-contrats` |
 | **D3.INV-3** | à la remise, la fiche est complète (modifications, dossier de preuves, écarts, boucle, capitalisation, indicateurs) et rangée à son emplacement. | `meso-contrats` |
 
@@ -1223,7 +1237,7 @@ Orchestrateur fractal C7E : résolution d'un ticket full-stack comme transformat
 |---|---|---|
 | **D4.INV-1** | un ticket a une seule branche, au format du projet, par défaut `<type>/<CLÉ>-<slug>` (agents-paralleles-gitlab:D1.INV-1) ; aucune branche par slot. | `meso-contrats` |
 | **D4.INV-2** | chaque commit commence par `<CLÉ> : ` ou `<CLÉ> Snn : ` (agents-paralleles-gitlab:D2.INV-2), suivi de l'étiquette `[É<n>-<DOMAINE>]` de son unique slot. | `meso-contrats` |
-| **D4.INV-3** | l'IA ne pousse pas, ne fusionne pas, ne rebase pas, ne réécrit pas l'historique et ne pose aucun tag ; un refus d'un hook l'arrête et se cite au développeur, sans contournement. | `meso-contrats` |
+| **D4.INV-3** | l'IA ne pousse pas, ne fusionne pas, ne rebase pas, ne réécrit pas l'historique et ne pose aucun tag ; un refus d'un hook l'arrête et se cite au développeur, sans contournement. | `meso-contrats`, `acceptable`, `generateur-skill-ticket/acceptable`, `socle-acceptable` |
 
 ### D5 : Gates et tests déduits des risques (active)
 
@@ -1239,7 +1253,7 @@ Orchestrateur fractal C7E : résolution d'un ticket full-stack comme transformat
 |---|---|---|
 | **D6.INV-1** | une correction du logiciel tirée d'une observation (premier ordre) est un commit de rétroaction qui cite cette observation ; une adaptation de la méthode (second ordre) est une entrée `proposed` du registre des concepts, qui cite l'observation qui la fonde. | `meso-contrats`, `observation` |
 | **D6.INV-2** | l'IA ne promeut, ne modifie ni ne retire aucune entrée du registre des concepts, et ne modifie jamais le fichier d'invariants du projet ; seul le développeur le fait, par une revue documentée. | `meso-contrats`, `observation` |
-| **D6.INV-3** | tout écart à un invariant s'inscrit au registre des écarts, avec sa décision (respecter, ou dérogation validée par un nom) ; aucun écart n'est corrigé ni toléré en silence. | `meso-contrats`, `observation`, `observatoire/systemes`, `socle-observation` |
+| **D6.INV-3** | tout écart à un invariant s'inscrit au registre des écarts, avec sa décision (respecter, ou dérogation validée par un nom) ; aucun écart n'est corrigé ni toléré en silence. | `meso-contrats`, `observation`, `acceptable`, `observatoire/systemes`, `socle-observation` |
 
 ### D7 : Valeur annoncée et indicateurs (active)
 
@@ -1253,7 +1267,7 @@ Orchestrateur fractal C7E : résolution d'un ticket full-stack comme transformat
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
 | **D8.INV-1** | la copie du projet du fichier d'invariants est lue avant chaque ticket ; une valeur `ADAPTER` restée telle est signalée au développeur avant la fiche, jamais devinée. | `meso-contrats` |
-| **D8.INV-2** | le fichier d'invariants précise le socle et les référentiels sans les contredire ; une contradiction se signale et s'inscrit au registre des écarts, et le socle l'emporte jusqu'à la décision du développeur. | `meso-contrats` |
+| **D8.INV-2** | le fichier d'invariants précise le socle et les référentiels sans les contredire ; une contradiction se signale et s'inscrit au registre des écarts, et le socle l'emporte jusqu'à la décision du développeur. | `meso-contrats`, `acceptable` |
 
 ### D9 : Campagne de mesure de la valeur (reserved)
 
@@ -1289,7 +1303,11 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 | **D12.INV-2** | l'orchestrateur exporte avec le sel de l'instance, gardé dans le répertoire Git commun du projet et partagé avec les autres systèmes qui y exportent, comme le générateur de skills de ticket : une instance, une identité ; sans ce sel, tout journal d'enveloppes du projet arrête l'export, comme un sel étranger à l'un d'eux, au lieu qu'un nouveau sel change l'identité de l'instance ; le sel n'est jamais versionné, affiché, exporté ni passé en argument. | `observation` |
 | **D12.INV-3** | l'export est incrémental et idempotent : un événement ou une ligne déjà exportés, reconnus par leur format et leur numéro, ne le sont pas une seconde fois, et un export sans nouveauté laisse le journal et sa tête identiques, octet pour octet ; une ligne d'écart ou un historique du registre des concepts réécrits depuis leur export l'arrêtent, sans rien écrire. | `observation`, `generateur-skill-ticket` |
 
-## scenario-playwright 1.6.1
+### D13 : Acceptable partagé : actions confrontées au noyau du socle de l'acceptable, refus qui citent leur règle, écriture par les kits (reserved)
+
+Dimension réservée : aucun invariant en vigueur dans cette version.
+
+## scenario-playwright 1.6.2
 
 Scénarios côté utilisateur joués dans le Chrome du poste par Playwright : texte de départ inspiré de Gherkin, en français ou en anglais, écrit par le développeur ou importé sans IA d'une demande Jira (page enregistrée en MHTML ou adresse ouverte dans le navigateur du poste, connexion à la main ; Jira Cloud et Data Center ; description et champs de texte, commentaires sur demande), d'un fichier .feature ou d'une archive .zip d'un export, des tests de Xray et de Zephyr Scale lus par leur API REST, Cloud et Data Center, en lecture seule, jeton par variable d'environnement seulement, ou des pages de tests de Xray enregistrées par Chrome en HTML complet, lues sans rien exécuter, cadres compris, pas reconnus à leurs libellés en mode formulaire ou en tableau, diagnostic sans aucune valeur (test Cucumber ou BDD recopié, test manuel converti pas à pas en Quand puis Alors, clé du test pour identité ; provenance, étiquettes, comparaison et remplacement sur demande au réimport) ; traduction en scénario TOML exécutable par l'IA, sur un squelette produit sans IA, ratifiée par le développeur et contrôlée sans IA (empreinte, structure, lignes, marques, variables) ; jeu fermé de treize actions commun avec le navigateur d'Agent2Test, cibles par rôle et nom accessible, aucun code exécuté dans la page, attentes bornées, aucune étape rejouée ; origines gardées, mutations hors du poste sur autorisation explicite, connexion à la main dans un profil dédié ; rapport JSON et Markdown avec captures, instantanés ARIA et erreurs relevées ; index sans IA du code front et back du projet, sans rien exécuter (routes d'Angular, de Vue Router et de React Router, éléments d'interface et leurs noms accessibles possibles, identifiants de test, libellés traduits, endpoints de Spring et d'OpenAPI et appels du front, classes de leurs corps et leurs champs, contraintes de validation et leurs messages, chacun avec sa source ; lecture seule, empreinte et index périmé, bornes), lu par l'IA à la traduction, propositions en commentaire dans le squelette et notes du contrôle ; vérifications hors de l'écran : requêtes de la page (méthode, chemin, statut, champs JSON du corps et de la réponse), API en GET sur une origine déclarée avec la session du navigateur, sans redirection suivie, fichiers téléchargés (texte, lignes, colonne CSV), sans en-tête, cookie ni jeton relevé ; préparation et nettoyage des données depuis des lignes marquées du texte, hors du jeu d'actions : appels d'écriture vers une origine déclarée avec la session du navigateur et le jeton anti-CSRF recopié de son cookie, une fois, sans redirection suivie, valeurs gardées de la réponse et ${unique}, ou scénario ratifié joué dans le même onglet ; préparation à sa place, nettoyage même après un échec, garde des mutations ; export du scénario ratifié en test @playwright/test du projet, sans IA, dans le seul dossier de tests désigné, sans identifiant (un test par jeu, une étape par test.step avec son numéro et sa ligne, cibles en localisateurs de Playwright, étiquettes en tags, aides communes qui reprennent la sémantique du moteur, connexion laissée à l'équipe, garde des origines et des mutations là où le test joue, SCENARIO_ORIGINES, test périmé ou retouché, TypeScript ou JavaScript) ; campagne de plusieurs scénarios, contrôlés avant la première action, dans une seule fenêtre avec une seule connexion, un test en échec n'arrêtant pas les suivants ; copie d'écran à chaque vérification, à chaque échec et à la fin de chaque test ; verdict de chaque test, conforme, non conforme ou bloqué, avec sa cause ; rapport de conformité à coller dans Jira, en balisage wiki de Data Center et en page HTML pour Cloud, copies d'écran sous un nom stable sur demande ; résultats d'une exécution ou d'une campagne au format d'import de Xray Cloud ou Data Center (statut du verdict, statut et copies d'écran par pas d'un test manuel converti, exemples des jeux, exécution de test existante) ou de Zephyr Scale (format custom, JSON et archive .zip), sous la clé retenue à l'import, sans rien envoyer ; désignation d'une cible à la souris ; agent pilote-scenario et commandes /scenario:importer, /scenario:indexer, /scenario:traduire, /scenario:jouer, /scenario:designer, /scenario:exporter et /scenario:resultats. Point d'entrée : [`specs/scenario-playwright/SKILL.md`](specs/scenario-playwright/SKILL.md).
 
@@ -1569,6 +1587,57 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 | **D12.INV-4** | les fins de ligne de la plateforme (CRLF de `core.autocrlf`) ne faussent ni le compte et les numéros de ligne, ni les extraits de `search`, ni le verdict de `status`. | `parite`, `ingestion`, `recette` |
 | **D12.INV-5** | lancé dans WSL sur un worktree du système de fichiers Windows, le skill le signale par l'avertissement `depot_windows_depuis_wsl` dans `status` et `config`, sans refuser la commande. | `execution`, `parite`, `fraicheur`, `agent`, `recette` |
 
+## socle-acceptable 1.0.0
+
+Socle de l'acceptable : le noyau commun de ce que les systèmes du dépôt refusent, au sens du troisième couplage du troisième ordre (EVOLUTION.md, section 10) ; intentions refusées, actions interdites, écritures interdites, secrets et leçons interdites, chaque règle un invariant que cite le refus ; écriture par les kits dev, test et démo, avec retour arrière ; refus, dérogations et faux refus ; épinglage par les constitutions, sans retrait ni affaiblissement. Point d'entrée : [`specs/socle-acceptable/SKILL.md`](specs/socle-acceptable/SKILL.md).
+
+### SA1 : Intentions refusées : ce qu'une demande ne peut pas viser (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **SA1.INV-1** | une demande de déployer ou d'administrer un environnement, ou d'écrire dans une base de données, hors d'un kit dev, test ou démo, est refusée « hors périmètre », avant tout traitement ; aucun kit n'atteint la production. Contrôle : scénario du système, une demande « redémarrer l'application en recette » refusée, comme NO9 d'Agent2Dev. | — |
+
+### SA2 : Actions interdites, et le retour arrière des actions d'un kit (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **SA2.INV-1** | aucun agent ne lance, hors d'un kit, un programme de déploiement ou d'orchestration d'environnement, ni une commande qui démarre ou déploie l'application. Contrôle : garde des commandes du système, un programme ou un argument de la liste refusé. | — |
+| **SA2.INV-2** | aucun agent, kit compris, ne pousse en force, ne réécrit un historique publié ni ne contourne un hook. Contrôle : garde du système et hooks du dépôt du projet. | `orchestrateur-c7e/acceptable` |
+| **SA2.INV-3** | une action dans un kit ne s'exécute qu'avec son retour arrière préparé ; un échec se défait par lui, et le retour arrière se journalise. Contrôle : contrat des kits (point d'extension E1), dès qu'il est décrit. | `agent2dev/acceptable`, `agent2test/acceptable`, `generateur-skill-ticket/acceptable`, `orchestrateur-c7e/acceptable` |
+
+### SA3 : Écritures interdites : ce qu'un agent ne modifie jamais, et rien avant la validation humaine (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **SA3.INV-1** | aucun agent, même dans un kit, n'écrit dans la constitution de son système, dans les sources du système lui-même, dans ses fiches, dans la configuration humaine ni dans la transmission de son skill. Contrôle : garde d'écriture du système, une écriture dans chaque lieu refusée `ECRITURE_INTERDITE`. | — |
+| **SA3.INV-2** | aucune écriture dans un projet, code, schéma ou configuration, avant qu'un humain ait validé ce qui sera fait ; un kit ne se produit et ne s'applique qu'après cette validation. Contrôle : scénario du système, une écriture tentée avant la validation refusée. | — |
+
+### SA4 : Secrets : ce qui ne s'écrit nulle part (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **SA4.INV-1** | aucun secret, jeton, mot de passe, clé ou certificat n'entre dans un journal, un livrable, un kit, un commit, un export ni une URL. Contrôle : recherche des motifs de secrets dans ce que le système écrit, et hooks du dépôt du projet. | — |
+
+### SA5 : Leçons interdites : ce qu'un système n'apprend pas (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **SA5.INV-1** | aucune leçon ne s'apprend qui désactiverait un test, sauterait un point de contrôle ou de validation, contournerait une règle du noyau ou tronquerait le skill : elle est refusée par contrôle, avec la règle qu'elle contredirait. Contrôle : scénario du système, la consigne « ajouter @Disabled au test instable » refusée, comme AP6 d'Agent2Dev. | `agent2test/acceptable` |
+
+### SA6 : Application : confrontation avant l'action, refus, dérogations, faux refus (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **SA6.INV-1** | toute action à effet extérieur est confrontée, avant son exécution, à la version épinglée du noyau et de la constitution du système, par le kit qui l'exécute ou, sans kit, par la garde du système ; un refus cite sa règle. Contrôle : scénarios du système, chaque refus avec sa règle. | `agent2dev/acceptable`, `agent2test/acceptable`, `generateur-skill-ticket/acceptable`, `orchestrateur-c7e/acceptable` |
+| **SA6.INV-2** | seul un humain déroge, d'un rôle nommé et avec son motif ; un refus levé comme infondé est un faux refus, consigné avec sa règle ; refus, dérogations, faux refus et retours arrière se journalisent. Contrôle : journal du système après une dérogation et un faux refus. | `agent2dev/acceptable`, `agent2test/acceptable`, `generateur-skill-ticket/acceptable`, `orchestrateur-c7e/acceptable` |
+
+### SA7 : Épinglage par les constitutions, et révision du noyau (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **SA7.INV-1** | une constitution inclut tout le noyau, à une version épinglée par son empreinte, et n'en retire ni n'en affaiblit aucune règle ; elle peut en ajouter. Contrôle : au démarrage du système, l'empreinte du bloc épinglé, et chaque entrée du noyau présente dans la constitution. | `agent2dev/acceptable`, `agent2test/acceptable`, `orchestrateur-c7e/acceptable` |
+| **SA7.INV-2** | le noyau ne change que par une version de ce socle publiée par un humain ; aucun agent ne le modifie, et aucune règle de sûreté ne s'affaiblit. Contrôle : vérificateur du dépôt, bloc `noyau` au schéma fermé ; revue de la pull request. | — |
+
 ## socle-back-front 1.1.0
 
 Socle commun back-front : contrat OpenAPI, erreurs RFC 9457, formats de données, sécurité, traçabilité, accessibilité, événements temps réel par WebSocket STOMP (AsyncAPI, CloudEvents). Point d'entrée : [`specs/socle-back-front/SKILL.md`](specs/socle-back-front/SKILL.md).
@@ -1601,7 +1670,7 @@ Socle commun back-front : contrat OpenAPI, erreurs RFC 9457, formats de données
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **SC4.INV-1** | aucun secret ni jeton dans le code du front, dans une URL ou dans un journal. Contrôle : recherche de motifs de secrets et revue de la configuration de journalisation. | `agent-tdd-jira/variantes`, `angular`, `angular/donnees-http`, `angular/routage-securite`, `java`, `java/securite`, `orchestrateur-c7e/meso-contrats`, `sonarqube/triage`, `sonarqube/correction` |
+| **SC4.INV-1** | aucun secret ni jeton dans le code du front, dans une URL ou dans un journal. Contrôle : recherche de motifs de secrets et revue de la configuration de journalisation. | `agent-tdd-jira/variantes`, `angular`, `angular/donnees-http`, `angular/routage-securite`, `java`, `java/securite`, `orchestrateur-c7e/meso-contrats`, `socle-acceptable`, `sonarqube/triage`, `sonarqube/correction` |
 | **SC4.INV-2** | chaque endpoint non public est protégé par une règle d'autorisation côté back. Contrôle : test d'accès anonyme refusé sur chaque endpoint protégé. | `agent-tdd-jira/variantes`, `angular/routage-securite`, `java/securite`, `orchestrateur-c7e` |
 | **SC4.INV-3** | CORS n'autorise jamais `*` avec identifiants. Contrôle : revue de la configuration CORS par environnement. | `analyse-projet/rapport`, `java/securite`, `sonarqube/triage` |
 
@@ -1650,7 +1719,7 @@ Socle d'observation : l'enveloppe commune des observations, propositions, décis
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **SO3.INV-1** | aucune enveloppe ne porte de texte libre, ni code, ni texte de ticket, ni commentaire, ni secret : seulement un motif en minuscules et tirets, des valeurs de listes fermées, des numéros, des identifiants définis par une spécification du dépôt et des empreintes. Contrôle : test de l'export, qui confronte chaque enveloppe produite à cette liste. | `generateur-skill-ticket/observation`, `orchestrateur-c7e/observation` |
+| **SO3.INV-1** | aucune enveloppe ne porte de texte libre, ni code, ni texte de ticket, ni commentaire, ni secret : seulement un motif en minuscules et tirets, des valeurs de listes fermées, des numéros, des identifiants définis par une spécification du dépôt et des empreintes. Contrôle : test de l'export, qui confronte chaque enveloppe produite à cette liste. | `generateur-skill-ticket/observation`, `orchestrateur-c7e/observation`, `socle-acceptable` |
 | **SO3.INV-2** | aucune enveloppe ne nomme une personne, un client ou un projet : l'instance se désigne par l'empreinte de son sel, le sujet par un rôle, et toute référence propre à l'instance par son empreinte salée ; le sel ne sort jamais. Contrôle : test de l'export sur des sources qui portent noms, clés et chemins. | `generateur-skill-ticket/observation`, `orchestrateur-c7e/observation` |
 
 ### SO4 : Correspondances avec les formats du générateur et de l'orchestrateur (active)
