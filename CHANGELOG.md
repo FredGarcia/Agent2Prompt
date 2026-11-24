@@ -103,6 +103,7 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 - **generateur-skill-ticket 1.2.0** : dimension D9 réservée, l'export de ses observations vers le socle ; point d'extension E4 ; module `observation` ; références à orchestrateur-c7e 3.6.0 et au socle d'observation, à la version qu'épingle l'orchestrateur ; test d'inertie dans la recette, qui passe ses 328 tests (un attend Gemini CLI). Les transmissions des skills de ticket d'exemple et les rapports de contexte sont régénérés : seules les versions qu'ils citent changent.
 - Les trois versions se référencent et se publient dans un même commit (`EVOLUTION.md`, section 7). README, `EVOLUTION.md` (section 8), modes d'emploi et glossaire à jour ; transmissions orchestrateur-c7e 3.6.0 et generateur-skill-ticket 1.2.0.
 - Décisions ratifiées avant la rédaction (plan du jalon J1) : périmètre pilote, le générateur et l'orchestrateur (R3) ; socle non transmissible (R4) ; préfixe `SO`, enveloppe sans texte libre, référence sans inclusion tant que les dimensions sont réservées, dimensions D12 et D9 avec leurs points d'extension, livraison en deux commits (P1 à P5).
+- Décisions ratifiées (pull request n° 73) : les deux précisions du socle, les références propres à l'instance sorties par empreinte salée et les champs facultatifs `nature`, `cible` et `invariant` ; le reste tel que proposé.
 
 ### 2026-11-23 : scenario-playwright 1.6.1
 
