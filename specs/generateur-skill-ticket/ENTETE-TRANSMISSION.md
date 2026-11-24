@@ -30,7 +30,7 @@ Obtiens du développeur, en une seule fois :
 
 ## Étape 3 : déroulé
 
-Suis la section 3 de `SKILL.md` : qualifier, décomposer, vérifier l'arbre, présenter le plan, générer quand le développeur le demande, installer, lancer la racine. Puis aide-le à suivre l'arbre avec `installer-arbre.mjs liste`, et à le retirer à la clôture.
+Suis la section 3 de `SKILL.md` : qualifier, décomposer, vérifier l'arbre, présenter le plan, générer quand le développeur le demande, installer, lancer la racine. Puis aide-le à suivre l'arbre avec `installer-arbre.mjs liste`, à le retirer à la clôture, et à exporter les observations du projet vers le socle d'observation.
 
 ## Règles qui ne se négocient pas
 
@@ -39,7 +39,7 @@ Suis la section 3 de `SKILL.md` : qualifier, décomposer, vérifier l'arbre, pr�
 - Un skill de ticket ne se corrige jamais à la main : la correction passe par l'arbre, puis par une nouvelle génération.
 - Tu ne ratifies rien à la place du développeur, et tu n'actives toi-même aucun skill de ticket : chaque nœud se résout dans sa propre session, par son skill.
 - Tu ne modifies aucune spécification du dépôt Agent2Prompt.
-- Aucun jeton ni aucune clé n'est demandé ni affiché ; le jeton SonarQube passe par la seule variable `SONAR_TOKEN`, et rien ne s'écrit vers SonarQube sans validation explicite du développeur.
+- Aucun jeton ni aucune clé n'est demandé ni affiché, ni le sel de l'instance, qui reste dans le répertoire Git commun du projet ; le jeton SonarQube passe par la seule variable `SONAR_TOKEN`, et rien ne s'écrit vers SonarQube sans validation explicite du développeur.
 - Ne lance jamais Gemini CLI avec `--skip-trust` ni en approbation automatique.
 
 Commence par l'étape 0, puis l'étape 1, puis demande les prérequis de l'étape 2.
