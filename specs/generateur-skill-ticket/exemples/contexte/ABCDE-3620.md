@@ -8,11 +8,11 @@ Mesure statique et déterministe (generateur-skill-ticket, critère P7), produit
 
 | Borne | Taille |
 |---|---|
-| à l'activation | 105 825 car., 26 457 tokens |
-| au plus | 266 483 car., 66 621 tokens |
+| à l'activation | 106 508 car., 26 627 tokens |
+| au plus | 267 166 car., 66 792 tokens |
 
 - `orchestrateur-c7e : nom et description` : 1 227 car., chargés au démarrage de Gemini CLI
-- `orchestrateur-c7e/SKILL.md` : 104 598 car., corps du skill, à son activation
+- `orchestrateur-c7e/SKILL.md` : 105 281 car., corps du skill, à son activation
 - `projet/docs/c7e/meso-contrats.md` : 15 638 car., copie du projet du fichier d'invariants, lue au démarrage
 - `orchestrateur-c7e/modules/qualification/SKILL.md` : 19 330 car., lu à l'ouverture et à l'analyse de chaque ticket
 - `orchestrateur-c7e/modules/referentiel/SKILL.md` : 45 516 car., lu à l'ouverture et à l'analyse de chaque ticket
@@ -39,7 +39,7 @@ Les pourcentages rapportent chaque taille à celle du point d'entrée de l'orche
 | Mesure | Au plus |
 |---|---|
 | plus grand contexte de l'arbre, session du skill ticket-abcde-3620 | 28 086 tokens, 42 % |
-| somme des 20 contextes des 5 nœuds et des observateurs | 279 609 tokens, 420 % |
+| somme des 20 contextes des 5 nœuds et des observateurs | 279 609 tokens, 419 % |
 
 Aucun contexte de l'arbre ne charge plus que le pourcentage du plus grand ; la somme dit ce que l'arbre lit en tout, quand chaque contexte relit ce qu'il lui faut, au plus.
 

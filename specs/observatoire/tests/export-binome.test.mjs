@@ -1,7 +1,7 @@
-// Recette de l'export du binôme (observatoire 1.3.0, D7 ; socle-observation 1.3.0, sections 6.5 et 6.6), sur des
+// Recette de l'export du binôme (observatoire 1.4.0, D7 ; socle-observation 1.4.0, sections 6.5 à 6.7), sur des
 // projets d'épreuve, dépôts Git temporaires, et des livrables d'Agent2Dev et des journaux de tests d'Agent2Test
-// écrits pour l'épreuve, avec refus, dérogations et faux refus, et des kits, remis, validés, appliqués ou en échec,
-// défaits. Le sel est donné à l'outil, sauf pour l'épreuve du sel tiré ;
+// écrits pour l'épreuve, avec refus, dérogations et faux refus, des kits, remis, validés, appliqués ou en échec,
+// défaits, et les points de validation d'Agent2Dev, présentés et décidés. Le sel est donné à l'outil, sauf pour l'épreuve du sel tiré ;
 // la recette n'écrit ni dans le clone, ni dans le magasin de l'observatoire.
 
 import { test } from 'node:test';
@@ -38,7 +38,7 @@ const REFUS_PERIMETRE = { n: 2110, date: '2026-10-21T14:10:00Z', garde: 'perimet
 const REFUS_ESSAI = { n: 2120, date: '2026-10-21T15:00:00Z', garde: 'commandes', objet: '--essai-derogeable', regles: ['D6.INV-2'], reponse: { decision: 'deroger', role: 'referent', n: 2121, date: '2026-10-21T15:01:00Z' } };
 
 /** Livrable d'Agent2Dev d'une demande, avec sa rubrique acceptable si des refus l'ont touchée. */
-function livrable(refus, { cle = 'ECR-77', version = '1.3.1', kits } = {}) {
+function livrable(refus, { cle = 'ECR-77', version = '1.3.1', kits, points } = {}) {
   return {
     format: 'agent2dev.livrable/1',
     demande: { cle, titre: 'Export des retours d\'expérience en CSV, chez le client Dupont', source: 'e'.repeat(64) },
@@ -49,11 +49,12 @@ function livrable(refus, { cle = 'ECR-77', version = '1.3.1', kits } = {}) {
     productions: [{ id: 'P-12', fiche: 'vert@1.0.0+agent-tdd-jira@1.3.7+L1', moteur: 'gemini', adaptateur: 'externe', empreintePrompt: 'd'.repeat(64), decision: 'DEC-118' }],
     ...(refus ? { acceptable: { socle: 'socle-acceptable', version: '1.0.1', refus } } : {}),
     ...(kits ? { kits } : {}),
+    ...(points ? { points } : {}),
   };
 }
 
 /** Journal de tests d'Agent2Test d'une campagne, avec sa rubrique acceptable, et sa rubrique kits s'il en a. */
-function journalDeTests(refus, { campagne = 'C-20261021-001', cle = 'ECR-77', version = '1.5.1', kits } = {}) {
+function journalDeTests(refus, { campagne = 'C-20261021-001', cle = 'ECR-77', version = '1.5.1', kits, points } = {}) {
   return {
     format: 'agent2test.journal-de-tests/1',
     campagne,
@@ -65,6 +66,7 @@ function journalDeTests(refus, { campagne = 'C-20261021-001', cle = 'ECR-77', ve
     desaccords: [],
     ...(refus ? { acceptable: { socle: 'socle-acceptable', version: '1.0.1', refus } } : {}),
     ...(kits ? { kits } : {}),
+    ...(points ? { points } : {}),
   };
 }
 
@@ -79,6 +81,13 @@ const etape = (n, date, role, resultat) => ({ n, date, role, ...(resultat ? { re
 const KIT_DEFAIT = { n: 2131, date: '2026-10-21T15:31:10Z', scenario: 'ECR-77-S02', environnement: 'dev', empreinte: PATCHS.S02, validation: etape(2133, '2026-10-21T15:33:00Z', 'developpeur'), application: etape(2140, '2026-10-21T15:40:00Z', 'developpeur', 'applique'), retourArriere: etape(2150, '2026-10-21T16:30:00Z', 'developpeur') };
 const KIT_ECHEC = { n: 2160, date: '2026-10-21T17:00:00Z', scenario: 'ECR-77-S03', environnement: 'dev', empreinte: PATCHS.S03, validation: etape(2161, '2026-10-21T17:01:00Z', 'developpeur'), application: etape(2162, '2026-10-21T17:05:00Z', 'developpeur', 'echec'), retourArriere: null };
 const KIT_TEST = { n: 830, date: '2026-10-21T10:28:00Z', scenarios: ['ECR-77-S04'], environnement: 'test', empreinte: PATCHS.test, validation: etape(834, '2026-10-21T10:32:00Z', 'testeur'), application: etape(840, '2026-10-21T10:35:00Z', 'developpeur', 'applique'), retourArriere: null };
+
+// Points de validation d'Agent2Dev : chaque présentation à sa ligne point.ouvert, sa décision à sa ligne point.decide.
+const POINTS = [
+  { n: 2040, date: '2026-10-21T13:40:00Z', point: 'V2', decision: { n: 2046, date: '2026-10-21T13:52:30Z', valeur: 'corriger', role: 'developpeur', canal: 'tableau-de-bord', commentaire: 'le critère 3 vise l\'export, chez Dupont' } },
+  { n: 2050, date: '2026-10-21T13:55:00Z', point: 'V2', decision: { n: 2051, date: '2026-10-21T13:57:00Z', valeur: 'valider', role: 'developpeur', canal: 'mcp', commentaire: '' } },
+  { n: 2060, date: '2026-10-21T14:00:00Z', point: 'V3', decision: null },
+];
 
 /** Écrit des sources d'épreuve dans un dossier hors du projet, comme la sortie d'Agent2Dev et le projet d'Agent2Test. */
 function sources(...contenus) {
@@ -327,4 +336,59 @@ test('D7 : la rubrique kits devient des enveloppes : remise, validation qui vise
   const r3 = exporter({ projet: projet('kit-test-referent'), fichiers: sources(journalDeTests(null, { kits: [{ ...KIT_TEST, application: { ...KIT_TEST.application, role: 'referent-qualite' } }] })), sel: SELS.A });
   assert.ok(r3.erreurs.some((e) => /application : mal formée : numéro, date, rôle testeur ou developpeur/.test(e)), r3.erreurs.join(' ; '));
   assert.deepStrictEqual(lireSource(fichiers[0]).source.enregistrements.map((x) => [x.sorte, x.etape ?? null, x.n]).slice(5), [['kit', 'remise', 2131], ['kit', 'validation', 2133], ['kit', 'application', 2140], ['kit', 'retour', 2150], ['kit', 'remise', 2160], ['kit', 'validation', 2161], ['kit', 'application', 2162]]);
+});
+
+test('D7 : la rubrique points d\'Agent2Dev devient des enveloppes : la présentation, puis sa décision, qui la vise avec sa valeur et porte le délai de décision calculé à la source, juste même quand la date est avancée ; rien en clair', () => {
+  const p = projet('points');
+  const fichier = sources(livrable([REFUS_DOCKER], { points: POINTS }))[0];
+  const r = sansErreur(exporter({ projet: p, fichiers: [fichier], sel: SELS.A }));
+  assert.deepStrictEqual(r.journaux.map((j) => [j.journal, j.ajoutees]), [[J2D, 7]]);
+  const salee = (ref) => sha256(`${SELS.A}:${ref}`);
+  const d = enveloppes(p, J2D);
+  for (const x of d) assert.deepStrictEqual(controlerEnveloppe(x), [], JSON.stringify(x));
+  assert.deepStrictEqual(d.map((x) => [x.numero, x.type, x.nature, x.motif, x.niveau, x.sujet, x.source.numero, x.decision ?? null, x.mesure ?? null]), [
+    [1, 'observation', 'presente', 'point-v2', 'N1', 'agent:agent2dev', 2040, null, null],
+    [2, 'decision', 'corriger', 'point-v2', 'humain', 'developpeur', 2046, { valeur: 'amendee', vise: 1 }, { nom: 'delai-decision', valeur: 750 }],
+    [3, 'observation', 'presente', 'point-v2', 'N1', 'agent:agent2dev', 2050, null, null],
+    [4, 'decision', 'valider', 'point-v2', 'humain', 'developpeur', 2051, { valeur: 'retenue', vise: 3 }, { nom: 'delai-decision', valeur: 120 }],
+    [5, 'observation', 'presente', 'point-v3', 'N1', 'agent:agent2dev', 2060, null, null],
+    [6, 'refus', 'commandes', 'refus-commandes', 'N1', 'agent:agent2dev', 2107, null, null],
+    [7, 'decision', 'faux-refus', 'refus-commandes', 'humain', 'developpeur', 2109, { valeur: 'refusee', vise: 6 }, null],
+  ], 'points et refus d\'une même source, dans l\'ordre de leur numéro ; une présentation en attente n\'a que son enveloppe');
+  for (const x of d.slice(0, 5)) assert.deepStrictEqual([x.ordre, x.cible, x.invariant, x.ancre], ['OC1', 'instance', undefined, { nature: 'ticket', ref: salee('ECR-77') }]);
+  for (const v of ['Dupont', 'tableau-de-bord', 'mcp', 'critère', 'ECR-77']) assert.ok(!texte(p, J2D).includes(v), `« ${v} » en clair`);
+
+  // Une décision venue plus tard s'ajoute et vise sa présentation ; une décision exportée ne change plus.
+  const decidee = sources(livrable([REFUS_DOCKER], { points: [POINTS[0], POINTS[1], { ...POINTS[2], decision: { n: 2066, date: '2026-10-21T14:03:00Z', valeur: 'choisir', role: 'developpeur' } }] }))[0];
+  const deux = sansErreur(exporter({ projet: p, fichiers: [decidee], sel: SELS.A }));
+  assert.deepStrictEqual(deux.journaux.map((j) => j.ajoutees), [1]);
+  assert.deepStrictEqual([enveloppes(p, J2D)[7]].map((x) => [x.nature, x.decision, x.mesure, x.date]), [['choisir', { valeur: 'retenue', vise: 5 }, { nom: 'delai-decision', valeur: 180 }, REFUS_DOCKER.reponse.date]], 'la décision venue plus tard vise sa présentation ; sa date est avancée, son délai non');
+  const intact = texte(p, J2D);
+  const refuse = (points, motif, options = {}) => {
+    const r2 = exporter({ projet: p, fichiers: sources(livrable(options.refus ?? [REFUS_DOCKER], { points, cle: options.cle ?? 'ECR-77' })), sel: SELS.A });
+    assert.ok(r2.erreurs.length > 0 && r2.erreurs.some((e) => motif.test(e)), `${motif} : ${r2.erreurs.join(' ; ')}`);
+    assert.equal(texte(p, J2D), intact, 'rien n\'est écrit');
+  };
+  const v3 = { ...POINTS[2], decision: { n: 2066, date: '2026-10-21T14:03:00Z', valeur: 'choisir', role: 'developpeur' } };
+  refuse([{ ...POINTS[0], decision: { ...POINTS[0].decision, valeur: 'valider' } }, POINTS[1], v3], /l'enregistrement 2046 a changé depuis son export/);
+  refuse([{ ...POINTS[0], decision: { ...POINTS[0].decision, date: '2026-10-21T13:54:00Z' } }, POINTS[1], v3], /l'enregistrement 2046 a changé depuis son export/);
+  refuse([POINTS[0], POINTS[1], POINTS[2]], /l'enregistrement 2066, exporté, n'est plus dans sa rubrique/);
+  const autre = { cle: 'ECR-92', refus: null };
+  refuse([{ ...POINTS[0], point: 'V6' }], /point « V6 », hors de la liste : V0, V1, V2, V3, V4, V5/, autre);
+  refuse([{ ...POINTS[0], decision: { ...POINTS[0].decision, valeur: 'accepter' } }], /décision mal formée : numéro, date, valeur valider ou repondre ou corriger ou rejeter, rôle developpeur/, autre);
+  refuse([{ ...POINTS[0], decision: { ...POINTS[0].decision, role: 'referent' } }], /décision mal formée/, autre);
+  refuse([{ ...POINTS[0], decision: { ...POINTS[0].decision, n: 2039 } }], /décision : postérieure à la présentation, par son numéro et par sa date/, autre);
+  refuse([{ ...POINTS[0], decision: { ...POINTS[0].decision, n: REFUS_DOCKER.n } }], /numéro 2107 déjà pris dans la source/, { cle: 'ECR-92', refus: [{ ...REFUS_DOCKER, reponse: null }] });
+  refuse({ V2: POINTS[0] }, /rubrique points mal formée : la liste des présentations/, autre);
+
+  // Une demande exportée après une plus récente : sa date est avancée, son délai ne l'est pas.
+  const q = projet('points-dans-le-desordre');
+  sansErreur(exporter({ projet: q, fichiers: sources(livrable([{ ...REFUS_PERIMETRE, n: 3000, date: '2026-10-22T09:00:00Z' }], { cle: 'ECR-95' })), sel: SELS.A }));
+  sansErreur(exporter({ projet: q, fichiers: sources(livrable(null, { points: POINTS.slice(0, 1) })), sel: SELS.A }));
+  const xs = enveloppes(q, J2D);
+  assert.deepStrictEqual(xs.slice(1).map((x) => [x.date, x.mesure?.valeur ?? null]), [['2026-10-22T09:00:00Z', null], ['2026-10-22T09:00:00Z', 750]], 'les deux dates avancées, le délai intact');
+
+  // Agent2Test n'a pas de rubrique points dans le socle : une telle rubrique n'exporte rien.
+  const t2 = sansErreur(exporter({ projet: projet('points-a2t'), fichiers: sources(journalDeTests(null, { points: POINTS })), sel: SELS.A }));
+  assert.deepStrictEqual(t2.journaux.map((j) => [j.journal, j.ajoutees]), [[J2T, 0]]);
 });

@@ -1,10 +1,11 @@
-// Recette de l'observatoire (observatoire 1.3.0, D1 à D6, D8 et D9), sur des instances d'épreuve dont les journaux
+// Recette de l'observatoire (observatoire 1.4.0, D1 à D6, D8 à D10), sur des instances d'épreuve dont les journaux
 // sont produits par l'export du générateur de skills de ticket : A, le champ de l'arbre d'exemple ABCDE-3620
 // et un registre d'apprentissage dont une proposition, qui vise le générateur, est retenue ; B et C, des
 // champs écrits pour l'épreuve ; pour la confrontation entre systèmes, par l'export de l'orchestrateur C7E,
 // depuis un registre des écarts commité dans ces projets ; et, pour la confrontation de l'acceptable, par
 // l'export du binôme, depuis des livrables d'Agent2Dev et des journaux de tests d'Agent2Test écrits pour
-// l'épreuve, avec leurs refus et, pour la confrontation des kits, leurs kits. Le magasin et le dépôt d'épreuve sont temporaires : la recette n'écrit ni dans le répertoire Git
+// l'épreuve, avec leurs refus et, pour la confrontation des kits et des signaux, leurs kits et leurs points de
+// validation. Le magasin et le dépôt d'épreuve sont temporaires : la recette n'écrit ni dans le répertoire Git
 // commun du clone, ni dans ses propositions.
 
 import { test } from 'node:test';
@@ -165,7 +166,10 @@ function orchestrateur(p, nom, lignes, { concepts = `${DEPART}\n`, date = '2026-
 /** Un refus d'une rubrique acceptable, et sa réponse. */
 const refusDe = (n, date, garde, regles, reponse = null) => ({ n, date, garde, objet: 'objet-d-epreuve', regles, reponse });
 const reponseDe = (decision, role, n, date) => ({ decision, role, n, date });
-const livrableA2D = (cle, refus, kits) => ({ format: 'agent2dev.livrable/1', demande: { cle, titre: 'Demande d\'épreuve, chez le client Dupont', source: 'e'.repeat(64) }, versions: { specification: VERSION_A2D }, acceptable: { socle: 'socle-acceptable', version: VERSION_SA, refus }, ...(kits ? { kits } : {}) });
+const livrableA2D = (cle, refus, kits, points) => ({ format: 'agent2dev.livrable/1', demande: { cle, titre: 'Demande d\'épreuve, chez le client Dupont', source: 'e'.repeat(64) }, versions: { specification: VERSION_A2D }, acceptable: { socle: 'socle-acceptable', version: VERSION_SA, refus }, ...(kits ? { kits } : {}), ...(points ? { points } : {}) });
+/** Une présentation d'un point de validation, et sa décision, ou null tant qu'elle attend. */
+const pointDe = (n, date, point, decision = null) => ({ n, date, point, decision });
+const decisionDe = (n, date, valeur) => ({ n, date, valeur, role: 'developpeur', canal: 'tableau-de-bord', commentaire: 'chez le client Dupont' });
 const journalA2T = (campagne, cle, refus, kits) => ({ format: 'agent2test.journal-de-tests/1', campagne, demande: { cle, texte: 'Demande d\'épreuve' }, versions: { specification: VERSION_A2T }, acceptable: { socle: 'socle-acceptable', version: VERSION_SA, refus }, ...(kits ? { kits } : {}) });
 /** Un kit d'une rubrique kits : sa remise, puis ses étapes, chacune à sa ligne de journal, avec son rôle. */
 const kitDe = (n, date, environnement, empreinte, etapes = {}) => ({ n, date, environnement, empreinte, validation: null, application: null, retourArriere: null, ...etapes });
@@ -570,6 +574,39 @@ test('D9 : les kits se comptent par système et par environnement, remis, valid�
   const instances = etat(lieux).instances;
   const systemesDe = (nom) => instances.find((i) => i.instance === PREFIXE[nom]).systemes.map((s) => [s.nom, s.ecart]);
   assert.deepStrictEqual([systemesDe('A'), systemesDe('B')], [[['agent2dev', 'a-jour'], ['agent2test', 'a-jour']], [['agent2dev', 'a-jour']]], 'les kits comptent dans l\'état de l\'écosystème comme toute enveloppe');
+});
+
+test('D10 : les décisions aux points de validation se comptent par système et par point, retenues, amendées, refusées, en attente, avec leurs délais médian et maximal et leurs instances ; aucun candidat', () => {
+  const [a, b] = [projet('A'), projet('B')];
+  binome(a, 'A', livrableA2D('ECR-1', [], null, [
+    pointDe(100, '2026-11-20T09:00:00Z', 'V2', decisionDe(101, '2026-11-20T09:30:00Z', 'corriger')),
+    pointDe(102, '2026-11-20T10:00:00Z', 'V2', decisionDe(103, '2026-11-20T10:10:00Z', 'valider')),
+    pointDe(104, '2026-11-20T10:20:00Z', 'V3'),
+  ]));
+  // Chez B, la décision arrive après une présentation plus récente : la date de son enveloppe est avancée, son délai non.
+  const [p200, p202] = [pointDe(200, '2026-11-21T09:00:00Z', 'V2'), pointDe(202, '2026-11-21T12:00:00Z', 'V2')];
+  binome(b, 'B', livrableA2D('FGH-2', [], null, [p200, p202]));
+  binome(b, 'B', livrableA2D('FGH-2', [], null, [{ ...p200, decision: decisionDe(201, '2026-11-21T11:00:00Z', 'rejeter') }, p202]));
+  const lieux = observatoire([a, b]);
+  const r = confronter(lieux);
+  assert.deepStrictEqual(r.erreurs, []);
+  assert.deepStrictEqual(r.signaux, [
+    { systeme: 'agent2dev', point: 'V2', presentes: 4, retenues: 1, amendees: 1, refusees: 1, enAttente: 1, delaiMedian: 1800, delaiMax: 7200, instances: 2 },
+    { systeme: 'agent2dev', point: 'V3', presentes: 1, retenues: 0, amendees: 0, refusees: 0, enAttente: 1, delaiMedian: null, delaiMax: null, instances: 1 },
+  ], 'le délai vient de la mesure de chaque décision : 1 800, 600 et 7 200 secondes, et non des dates de ses enveloppes, qui en donneraient 10 800 chez B');
+  assert.deepStrictEqual([r.candidats, r.acceptable, r.kits], [[], [], []], 'une décision retenue sur une présentation n\'est pas un retour, ni une récurrence, ni un écart : des comptes seulement');
+  assert.deepStrictEqual(proposer({ ...lieux, date: '2026-11-25' }).ecrites, [], 'rien à proposer');
+  const sortie = lancer(lieux, 'confronter').sortie;
+  assert.match(sortie, /^signaux des points de validation : des comptes, sans candidat$/m);
+  assert.match(sortie, /^ {2}agent2dev, point V2 : 4 présentations, 1 retenue, 1 amendée, 1 refusée, 1 en attente ; délai médian 30 min, maximal 2,0 h ; 2 instances$/m);
+  assert.match(sortie, /^ {2}agent2dev, point V3 : 1 présentation, 0 retenue, 0 amendée, 0 refusée, 1 en attente ; aucun délai ; 1 instance$/m);
+  assert.deepStrictEqual(JSON.parse(lancer(lieux, 'confronter', '--json').sortie).signaux, r.signaux);
+  // Une enveloppe à la mesure mal formée n'entre pas : le schéma fermé du socle la refuse.
+  const x = sansCR(readFileSync(join(b, 'docs', 'c7e', 'observations-agent2dev.jsonl'), 'utf8')).trim().split('\n').map((l) => JSON.parse(l))[2];
+  assert.deepStrictEqual([x.type, x.date, x.mesure], ['decision', '2026-11-21T12:00:00Z', { nom: 'delai-decision', valeur: 7200 }], 'la décision de B : date avancée, délai intact');
+  assert.deepStrictEqual(controlerEnveloppe(x), []);
+  assert.match(controlerEnveloppe({ ...x, mesure: { nom: 'Délai', valeur: -1 } }).join(' ; '), /mesure\.nom « Délai » : le nom que définit une correspondance.*mesure\.valeur -1 : un entier positif ou nul/);
+  assert.match(controlerEnveloppe({ ...x, mesure: { nom: 'delai-decision', valeur: 7200, unite: 's' } }).join(' ; '), /champ inconnu mesure\.unite/);
 });
 
 test('D3 : chaque instance est comparée aux versions publiées des systèmes qu\'elle exporte : à jour, en retard, ou inconnue', () => {

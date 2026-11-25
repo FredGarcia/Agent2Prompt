@@ -1,10 +1,10 @@
 ---
 name: generateur-skill-ticket
 description: Générateur de skills de ticket C7E, qui fait résoudre un ticket par un arbre de skills produits pour lui. Il décompose le ticket en sous-tickets, assemble pour chaque nœud un skill depuis le référentiel des méso-contrats de l'orchestrateur C7E, l'installe et le lance dans Gemini CLI, nœud par nœud ; chaque skill s'observe dans un champ partagé et voit le ticket augmenté ; chaque ticket entraîne le générateur, qui s'observe lui-même et propose ses évolutions au développeur ; ses observations s'exportent, minimisées, vers le socle d'observation du dépôt. À utiliser depuis un clone du dépôt Agent2Prompt.
-version: 1.4.4
+version: 1.4.5
 ---
 
-# Générateur de skills de ticket C7E, version 1.4.4
+# Générateur de skills de ticket C7E, version 1.4.5
 
 Ce document est le point d'entrée du générateur. Un ticket n'y est plus résolu directement par l'orchestrateur C7E : il l'est par un **arbre de skills de ticket**, un par nœud, produits pour lui sur le même modèle fractal et récursif. Le générateur fait qualifier et décomposer le ticket, vérifie l'arbre, assemble chaque skill depuis les blocs ratifiés du référentiel des méso-contrats, l'installe dans Gemini CLI et le lance ; ensuite, chaque nœud se résout dans sa propre session, par son skill et ses agents. Chaque skill s'observe par rapport aux retours du développeur, ses choix et ses corrections, dans un champ d'observation partagé, et chaque niveau voit le ticket augmenté des observations des autres. L'arbre suit la composition récursive imbriquée (CRI) de la méthode C7E : le ticket et son US au niveau macro, la composition au niveau des méso-contrats, les tâches au niveau des méso-composants, les commits de la branche au niveau micro ; le besoin y descend, les preuves y remontent. Chaque ticket est aussi une recette et un cycle d'apprentissage : le générateur s'observe lui-même, classe ce qu'il apprend par profondeur, et propose ses évolutions au développeur, qui seul les promeut. Ce que les skills et le générateur observent s'exporte enfin, sans texte ni référence en clair, dans l'enveloppe commune du socle d'observation, où d'autres systèmes du dépôt peuvent s'y confronter. Les règles détaillées sont dans `modules/`.
 
@@ -90,7 +90,7 @@ Clause de second ordre : un niveau agit sur la manière d'observer du niveau inf
 
 ## 6. Registre des dimensions
 
-| ID | Dimension | Introduite | Statut 1.4.4 | Dépend de | Module |
+| ID | Dimension | Introduite | Statut 1.4.5 | Dépend de | Module |
 |---|---|---|---|---|---|
 | D1 | Arbre de tickets | 1.0 | active | orchestrateur-c7e | `arbre` |
 | D2 | Assemblage et transmission des skills de ticket | 1.0 | active | D1 | `assemblage` |
@@ -115,7 +115,7 @@ Points d'extension, actifs dès 1.0.0 :
 
 Point d'extension, actif dès 1.2.0 :
 
-- **E4** : export vers le socle d'observation. Depuis 1.3.0, le champ de chaque ticket et le registre d'apprentissage, où chaque relevé est versé à sa clôture, s'exportent dans l'enveloppe `socle-observation.enveloppe/1` du socle `socle-observation` 1.3.0, selon ses correspondances, sans changer leurs formats (D9). Un nouveau format à exporter s'ajoute par une correspondance du socle, dans une version de celui-ci, sans toucher aux formats du générateur ; aucun skill de ticket ne porte l'outil ni le module `observation`.
+- **E4** : export vers le socle d'observation. Depuis 1.3.0, le champ de chaque ticket et le registre d'apprentissage, où chaque relevé est versé à sa clôture, s'exportent dans l'enveloppe `socle-observation.enveloppe/1` du socle `socle-observation` 1.4.0, selon ses correspondances, sans changer leurs formats (D9). Un nouveau format à exporter s'ajoute par une correspondance du socle, dans une version de celui-ci, sans toucher aux formats du générateur ; aucun skill de ticket ne porte l'outil ni le module `observation`.
 
 Point d'extension, actif dès 1.4.0 :
 
@@ -211,6 +211,8 @@ Chaque module donne, pour chacun de ses invariants, les tests qui le prouvent.
 - **D9.INV-3** : l'export est incrémental et idempotent : un enregistrement déjà exporté, reconnu par son format, son journal et son numéro, ne l'est pas une seconde fois, et un export sans enregistrement nouveau laisse le journal et sa tête identiques, octet pour octet ; un enregistrement arrivé après d'autres, plus récents, prend la date de la dernière enveloppe, sans que son journal source change d'ordre.
 
 ## 11. Journal de révision
+
+**1.4.5** (2026-11-25) : correctif, jalon J4 réduit du passage du dépôt au troisième ordre (`EVOLUTION.md`, section 10). Socle `socle-observation` 1.4.0, inclus et référencé à la version qu'épingle l'orchestrateur : il ajoute le champ facultatif `mesure` et la correspondance de la rubrique `points` des livrables d'Agent2Dev, que l'observatoire exporte pour le binôme, sans changer celles du champ et du registre d'apprentissage, ni ses invariants ; l'export du générateur (D9) ne change pas, ni son outil, qui n'émet aucune mesure, et dont seul l'en-tête cite la 1.4.0. Référence à orchestrateur-c7e 3.8.5. Aucune section recopiée dans les skills de ticket ne change, seules les versions qu'ils citent ; skills de ticket d'exemple et rapports de contexte régénérés. Aucune dimension ni aucun invariant modifié. Archive : `archives/SKILL-v1.4.4.md`.
 
 **1.4.4** (2026-11-25) : correctif, jalon J3e du passage du dépôt au troisième ordre (`EVOLUTION.md`, section 10). Socle `socle-observation` 1.3.0, inclus et référencé à la version qu'épingle l'orchestrateur : il ajoute la correspondance des rubriques `kits` du binôme, que l'observatoire exporte pour lui, et la nature d'ancre `kit`, sans changer celles du champ et du registre d'apprentissage, ni ses invariants ; l'export du générateur (D9) ne change pas, ni son outil, dont seul l'en-tête cite la 1.3.0. Références à orchestrateur-c7e 3.8.4, à agent-tdd-jira 1.3.9 et à agent2test 1.6.1, qui consigne le rôle de qui déclare l'application d'un kit test ; D10 reste réservée. Aucune section recopiée dans les skills de ticket ne change, seules les versions qu'ils citent ; skills de ticket d'exemple et rapports de contexte régénérés. Aucune dimension ni aucun invariant modifié. Archive : `archives/SKILL-v1.4.3.md`.
 

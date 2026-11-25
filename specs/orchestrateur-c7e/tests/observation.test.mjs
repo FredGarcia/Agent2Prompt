@@ -290,6 +290,7 @@ test('SO1 : une enveloppe au schéma ouvert, hors liste ou incomplète est refus
     [{ ...x, ancre: { nature: 'concept', ref: 'C_PERFORMANCE_001' } }, /ancre\.ref : une empreinte salée, ou l'identifiant d'un concept du registre de départ/],
     [{ ...x, source: { ...x.source, journal: 'a'.repeat(64) } }, /source\.journal : absent/],
     [{ ...x, preuve: { nature: 'commit', ref: 'a'.repeat(64) } }, /preuve : aucune correspondance de l'orchestrateur n'en porte/],
+    [{ ...x, mesure: { nom: 'delai-decision', valeur: 60 } }, /mesure : aucune correspondance de l'orchestrateur n'en porte/],
     [{ ...x, ordre: 'OC3' }, /aucun système n'émet OC3/],
   ];
   for (const [y, motif] of cas) assert.ok(controlerEnveloppe(y).some((e) => motif.test(e)), `${motif} : ${controlerEnveloppe(y).join(' ; ')}`);

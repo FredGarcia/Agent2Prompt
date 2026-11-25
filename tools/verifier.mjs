@@ -46,6 +46,10 @@
  *   et son schéma ne montre aucune version périmée ; ses liens vers `specs/` et
  *   `transmissions/` aboutissent ;
  * - `glossaire.md` est exactement celui que génère `tools/glossaire.mjs` ;
+ * - le catalogue des signaux d'`EVOLUTION.md`, section 10.6, a une ligne par clause de second ordre des points
+ *   d'entrée, et aucune autre : sa nature dans la liste ; pour un effet sur des personnes, un signal, un statut
+ *   de la liste, un lieu, invariant défini ou fichier du dépôt, sauf pour un signal non mesuré, et ce avec quoi il
+ *   se lit ; pour une autre nature, aucun signal (règle 6 de la section 10.5) ;
  * - chaque proposition de l'observatoire, dans `observatoire/propositions/`, suit le format
  *   `observatoire.proposition/1` (spécification `observatoire`, module `propositions`) : rien que des valeurs
  *   minimisées ; le magasin local de l'observatoire, lui, reste sur le poste et n'est pas vérifié ici ;
@@ -570,6 +574,90 @@ function verifierSpec(dossier) {
 }
 
 /** Le README affiche chaque spécification à sa version courante, et ses liens aboutissent. */
+// Catalogue des signaux du deuxième couplage (EVOLUTION.md, section 10.6 ; règle 6 de la section 10.5).
+const NATURES_DE_CLAUSE = ['effet sur des personnes', 'structure du second ordre', "effet sur l'observateur", "précaution d'observateur"];
+const STATUTS_DE_SIGNAL = ['exporté', 'mesuré', 'disponible', 'non mesuré'];
+const CLAUSE = /^Clause de second ordre : /m;
+
+/**
+ * Catalogue des signaux : une ligne par clause de second ordre d'un point d'entrée, et aucune autre. Renvoie le
+ * nombre de clauses classées. Une ligne d'effet sur des personnes porte un signal, un statut de la liste, un lieu
+ * qui existe, sauf pour un signal non mesuré, et ce avec quoi il se lit ; une autre nature n'a pas de signal.
+ */
+function verifierCatalogue() {
+  const erreur = (message) => erreurs.push(`EVOLUTION.md : catalogue des signaux : ${message}`);
+  const chemin = join(racine, 'EVOLUTION.md');
+  if (!existsSync(chemin)) {
+    erreurs.push('EVOLUTION.md absent');
+    return 0;
+  }
+  const section = /^### 10\.6 [^\n]*\n([\s\S]*?)(?=\n### |\n## |(?![\s\S]))/m.exec(lire(chemin));
+  if (!section) {
+    erreur('section 10.6 absente');
+    return 0;
+  }
+  const clauses = new Set(
+    readdirSync(dossierSpecs)
+      .filter((nom) => existsSync(join(dossierSpecs, nom, 'manifest.json')))
+      .filter((nom) => {
+        try {
+          const manifeste = JSON.parse(lire(join(dossierSpecs, nom, 'manifest.json')));
+          return CLAUSE.test(lire(join(dossierSpecs, nom, manifeste.entry ?? 'SKILL.md')));
+        } catch {
+          return false;
+        }
+      }),
+  );
+  const cellules = (ligne) => ligne.slice(1, -1).split('|').map((c) => c.trim());
+  // Le tableau du catalogue : sous son en-tête, les lignes qui le suivent sans interruption.
+  const texte = section[1].split('\n');
+  const debut = texte.findIndex((l) => /^\| Spécification \| Nature \|/.test(l));
+  if (debut === -1) {
+    erreur('tableau absent : en-tête « | Spécification | Nature | … »');
+    return 0;
+  }
+  const lignes = [];
+  for (let i = debut + 2; i < texte.length && texte[i].startsWith('|'); i++) lignes.push(texte[i]);
+  const vues = new Set();
+  for (const ligne of lignes) {
+    const c = cellules(ligne);
+    const nom = c[0].replace(/`/g, '');
+    if (c.length !== 6) {
+      erreur(`${nom} : six colonnes attendues, spécification, nature, signal, statut, lieu et lu avec`);
+      continue;
+    }
+    const [, nature, signal, statut, lieu, avec] = c;
+    if (vues.has(nom)) erreur(`${nom} : deux lignes`);
+    vues.add(nom);
+    if (!clauses.has(nom)) erreur(`${nom} : aucune clause de second ordre dans son point d'entrée`);
+    if (!NATURES_DE_CLAUSE.includes(nature)) {
+      erreur(`${nom} : nature « ${nature} », hors de la liste : ${NATURES_DE_CLAUSE.join(', ')}`);
+      continue;
+    }
+    if (nature !== 'effet sur des personnes') {
+      if ([signal, statut, lieu, avec].some((v) => v !== '—')) erreur(`${nom} : une clause de nature « ${nature} » n'a pas de signal, « — » dans chaque colonne`);
+      continue;
+    }
+    if (signal === '' || signal === '—') erreur(`${nom} : effet sur des personnes sans signal`);
+    if (!STATUTS_DE_SIGNAL.includes(statut)) erreur(`${nom} : statut « ${statut} », hors de la liste : ${STATUTS_DE_SIGNAL.join(', ')}`);
+    if (avec === '' || avec === '—') erreur(`${nom} : signal lu seul, sans ce avec quoi il se lit`);
+    if (statut === 'non mesuré') {
+      if (lieu !== '—') erreur(`${nom} : un signal non mesuré n'a pas de lieu, « — »`);
+      continue;
+    }
+    const m = /^`([^`]+)`$/.exec(lieu);
+    const reference = m?.[1] ?? '';
+    const invariant = /^([a-z][a-z0-9-]*):((?:D|SC|SO|SA)\d+\.INV-\d+)$/.exec(reference);
+    if (invariant) {
+      if (!definitionsDe(invariant[1])?.has(invariant[2])) erreur(`${nom} : lieu ${reference}, invariant qui n'est pas défini`);
+    } else if (!reference.startsWith('specs/') || !existsSync(join(racine, reference))) {
+      erreur(`${nom} : lieu « ${lieu} », un invariant préfixé par sa spécification ou un fichier du dépôt attendu`);
+    }
+  }
+  for (const nom of clauses) if (!vues.has(nom)) erreur(`${nom} : sa clause de second ordre n'a pas de ligne`);
+  return vues.size;
+}
+
 function verifierReadme(specs) {
   const chemin = join(racine, 'README.md');
   if (!existsSync(chemin)) {
@@ -655,6 +743,9 @@ for (const nom of readdirSync(dossierSpecs).sort()) {
   }
 }
 const readmeAJour = verifierReadme(specs);
+const avantCatalogue = erreurs.length;
+const clausesCataloguees = verifierCatalogue();
+const catalogueAJour = erreurs.length === avantCatalogue;
 // Glossaire : il doit être exactement celui que génère tools/glossaire.mjs.
 let glossaireAJour = false;
 if (!existsSync(CHEMIN_GLOSSAIRE)) erreurs.push('glossaire.md : absent, lancer node tools/glossaire.mjs');
@@ -682,6 +773,7 @@ const motifsCaches = verifierHistoriqueCache(versionsCourantes);
 for (const { bilan } of specs) console.log(`ok  ${bilan}`);
 if (readmeAJour) console.log('ok  README.md à jour');
 if (glossaireAJour) console.log('ok  glossaire.md à jour');
+if (catalogueAJour) console.log(`ok  EVOLUTION.md : catalogue des signaux, ${clausesCataloguees} clauses de second ordre classées`);
 if (propositionsConformes) console.log(`ok  ${PROPOSITIONS}/ : ${propositions.propositions.length} proposition${propositions.propositions.length > 1 ? 's' : ''} au format observatoire.proposition/1`);
 if (erreurs.length === avantHistorique) console.log(`ok  historique caché à Gemini CLI (${motifsCaches} motifs de .geminiignore), aucun nom d'un autre hôte d'IA ailleurs`);
 const uniques = [...new Set(erreurs)];

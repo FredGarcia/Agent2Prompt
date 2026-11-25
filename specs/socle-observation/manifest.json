@@ -1,6 +1,6 @@
 {
   "name": "socle-observation",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "specSchema": 1,
   "language": "fr",
   "description": "Socle d'observation : l'enveloppe commune des observations, propositions, décisions et écarts qu'un système de second ordre du dépôt rend observables aux autres, au sens du troisième ordre (EVOLUTION.md, section 10) ; schéma fermé, journal en ajout seul et chaîné, minimisation, correspondances avec les formats existants.",
@@ -11,6 +11,7 @@
   "previousVersions": [
     { "version": "1.0.0", "file": "archives/SKILL-v1.0.0.md" },
     { "version": "1.1.0", "file": "archives/SKILL-v1.1.0.md" },
-    { "version": "1.2.0", "file": "archives/SKILL-v1.2.0.md" }
+    { "version": "1.2.0", "file": "archives/SKILL-v1.2.0.md" },
+    { "version": "1.3.0", "file": "archives/SKILL-v1.3.0.md" }
   ]
 }

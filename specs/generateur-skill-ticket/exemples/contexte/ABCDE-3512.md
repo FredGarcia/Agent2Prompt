@@ -8,11 +8,11 @@ Mesure statique et déterministe (generateur-skill-ticket, critère P7), produit
 
 | Borne | Taille |
 |---|---|
-| à l'activation | 105 825 car., 26 457 tokens |
-| au plus | 262 114 car., 65 529 tokens |
+| à l'activation | 106 508 car., 26 627 tokens |
+| au plus | 262 797 car., 65 700 tokens |
 
 - `orchestrateur-c7e : nom et description` : 1 227 car., chargés au démarrage de Gemini CLI
-- `orchestrateur-c7e/SKILL.md` : 104 598 car., corps du skill, à son activation
+- `orchestrateur-c7e/SKILL.md` : 105 281 car., corps du skill, à son activation
 - `projet/docs/c7e/meso-contrats.md` : 15 638 car., copie du projet du fichier d'invariants, lue au démarrage
 - `orchestrateur-c7e/modules/qualification/SKILL.md` : 19 330 car., lu à l'ouverture et à l'analyse de chaque ticket
 - `orchestrateur-c7e/modules/referentiel/SKILL.md` : 45 516 car., lu à l'ouverture et à l'analyse de chaque ticket
@@ -26,7 +26,7 @@ Mesure statique et déterministe (generateur-skill-ticket, critère P7), produit
 
 | Feuille | Session, activation | Session, au plus | Plus grand contexte | Somme des contextes |
 |---|---|---|---|---|
-| ABCDE-3512 | 6 431 tokens, 24 % | 29 494 tokens, 45 % | 29 494 tokens, 45 % | 144 553 tokens, 221 % |
+| ABCDE-3512 | 6 431 tokens, 24 % | 29 494 tokens, 45 % | 29 494 tokens, 45 % | 144 553 tokens, 220 % |
 
 Les pourcentages rapportent chaque taille à celle du point d'entrée de l'orchestrateur, à la même borne pour l'activation, au plus pour le reste. La somme réunit les contextes qui travaillent pour la feuille : sa session, ses agents de couche, ses sous-agents de rôle.
 
@@ -35,7 +35,7 @@ Les pourcentages rapportent chaque taille à celle du point d'entrée de l'orche
 | Mesure | Au plus |
 |---|---|
 | plus grand contexte de l'arbre, session du skill ticket-abcde-3512 | 29 494 tokens, 45 % |
-| somme des 10 contextes du nœud et des observateurs | 161 532 tokens, 247 % |
+| somme des 10 contextes du nœud et des observateurs | 161 532 tokens, 246 % |
 
 Aucun contexte de l'arbre ne charge plus que le pourcentage du plus grand ; la somme dit ce que l'arbre lit en tout, quand chaque contexte relit ce qu'il lui faut, au plus.
 
