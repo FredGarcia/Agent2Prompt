@@ -30,7 +30,7 @@ Une règle que le dépôt définit, déclarée infondée par des faux refus dans
 
 Des faux refus d'une seule instance ne font que se compter : son référent les lit dans sa vue de gouvernance. `confronter` liste les candidats par faux refus après les autres ; `proposer` les écrit comme eux (module `propositions`).
 
-La ratification décide de ce qui change, dans une version de la spécification visée et selon son contrat : une règle de sûreté ne s'affaiblit jamais, et aucune entrée du noyau ne se retire (`socle-acceptable:SA7.INV-2`). La réponse à une règle trop large est donc une précision de la règle, ou de l'entrée de constitution qui l'applique, un chemin par un kit, quand le socle en décrira le contrat, ou le refus de la proposition. La révision du noyau par au moins deux sujets distincts attend la pluralité des sujets (point E2).
+La ratification décide de ce qui change, dans une version de la spécification visée et selon son contrat : une règle de sûreté ne s'affaiblit jamais, et aucune entrée du noyau ne se retire (`socle-acceptable:SA7.INV-2`). La réponse à une règle trop large est donc une précision de la règle, ou de l'entrée de constitution qui l'applique, un chemin par un kit, selon le contrat que le socle en décrit depuis sa version 1.1.0, ou le refus de la proposition. La révision du noyau par au moins deux sujets distincts attend la pluralité des sujets (point E2).
 
 ## 4. Effet
 

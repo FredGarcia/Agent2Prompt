@@ -1,17 +1,19 @@
 #!/usr/bin/env node
-// Export des refus du binôme Agent2Dev et Agent2Test vers le socle d'observation (observatoire, D7, depuis 1.2.0 ;
-// socle-observation 1.2.0, section 6.5). Il se lance depuis le clone du dépôt Agent2Prompt ; l'IA de l'observatoire
-// ne l'exécute pas d'elle-même : elle en donne la commande au développeur.
+// Export des refus et des kits du binôme Agent2Dev et Agent2Test vers le socle d'observation (observatoire, D7,
+// depuis 1.2.0, les kits depuis 1.3.0 ; socle-observation 1.3.0, sections 6.5 et 6.6). Il se lance depuis le clone
+// du dépôt Agent2Prompt ; l'IA de l'observatoire ne l'exécute pas d'elle-même : elle en donne la commande au
+// développeur.
 //
 // Le binôme n'a pas d'outil dans le dépôt, qui tient sa spécification et ses formats, pas son code : cet outil agit
 // pour lui, à la source, dans le projet de l'application. Il lit, sans les modifier, les livrables d'Agent2Dev
 // (agent2dev.livrable/1) et les journaux de tests d'Agent2Test (agent2test.journal-de-tests/1) qu'on lui désigne :
-// chaque refus de leur rubrique acceptable, et chaque réponse à un refus, dérogation ou faux refus, devient une
-// enveloppe socle-observation.enveloppe/1, datée par la rubrique, au nom et à la version du système qui l'a
-// produite, ajoutée au journal de ce système dans le projet, docs/c7e/observations-agent2dev.jsonl ou
+// chaque refus de leur rubrique acceptable, chaque réponse à un refus, dérogation ou faux refus, et chaque étape
+// d'un kit de leur rubrique kits, remise, validation, application ou échec, retour arrière, devient une enveloppe
+// socle-observation.enveloppe/1, datée par la rubrique, au nom et à la version du système qui l'a produite, ajoutée au journal de ce système dans le projet, docs/c7e/observations-agent2dev.jsonl ou
 // docs/c7e/observations-agent2test.jsonl : en ajout seul, chaque ligne chaînée à l'empreinte de la précédente, la
 // tête portant le numéro et l'empreinte de la dernière (SO2). Aucun texte ne sort, ni l'objet refusé, ni le motif
-// d'une réponse, ni le nom de qui l'a donnée, et toute référence du projet sort par son empreinte salée (SO3) : le
+// d'une réponse, ni le nom de qui l'a donnée, ni le commentaire d'un échec, et toute référence du projet, demande,
+// campagne, empreinte d'un patch, sort par son empreinte salée (SO3) : le
 // sel de l'instance, partagé avec les autres systèmes qui exportent dans le projet, est gardé dans son répertoire
 // Git commun, <git-common-dir>/agent2prompt/sel ; il n'est jamais versionné, affiché ni exporté. Un enregistrement
 // déjà exporté ne l'est pas deux fois ; une rubrique réécrite depuis son export, comme une enveloppe mal formée,
@@ -34,15 +36,18 @@ import { SCHEMA, canonique, controlerEnveloppe, repertoireGitCommun, sha256, ver
 
 export const SEL = 'agent2prompt/sel'; // sous le répertoire Git commun du projet, partagé par les systèmes de l'instance
 // Les deux formats que traduit l'export, chacun avec son système, son journal d'enveloppes, la clé qui désigne une
-// source dans l'instance, ses gardes et les rôles qui répondent à un refus, avec leur sujet dans le socle.
+// source dans l'instance, ses gardes, les rôles qui répondent à un refus, l'environnement de ses kits et les rôles
+// qui valident un kit ou déclarent son application, avec leur sujet dans le socle.
 export const FORMATS = {
   'agent2dev.livrable/1': {
     systeme: 'agent2dev', journal: 'docs/c7e/observations-agent2dev.jsonl', nomCle: 'demande.cle', cleDe: (x) => x.demande?.cle,
     gardes: ['perimetre', 'ecriture', 'commandes', 'lecons'], roles: { developpeur: 'developpeur', referent: 'referent' },
+    environnement: 'dev', rolesKit: { developpeur: 'developpeur' },
   },
   'agent2test.journal-de-tests/1': {
     systeme: 'agent2test', journal: 'docs/c7e/observations-agent2test.jsonl', nomCle: 'campagne', cleDe: (x) => x.campagne,
     gardes: ['perimetre', 'ecriture', 'lecons'], roles: { testeur: 'testeur', 'referent-qualite': 'referent' },
+    environnement: 'test', rolesKit: { testeur: 'testeur', developpeur: 'developpeur' },
   },
 };
 export const JOURNAUX = Object.values(FORMATS).map((f) => f.journal);
@@ -51,6 +56,8 @@ const REPONSES = {
   deroger: { type: 'derogation', nature: 'derogation', valeur: 'amendee' },
   'faux-refus': { type: 'decision', nature: 'faux-refus', valeur: 'refusee' },
 };
+// Résultats d'une application déclarée ; un échec comprend le retour arrière que la fabrication a fait (socle, 6.6).
+const RESULTATS = ['applique', 'echec'];
 // Préfixe d'une règle citée sans le sien : `D` est une règle du système qui refuse.
 const PREFIXES = { SA: 'socle-acceptable', SC: 'socle-back-front', SO: 'socle-observation' };
 const REGLE = /^(?:([a-z][a-z0-9-]*):)?((D|SC|SO|SA)\d+\.INV-\d+)$/;
@@ -87,9 +94,10 @@ export function prefixer(regle, systeme) {
 // ---- Sources : la rubrique acceptable d'un livrable ou d'un journal de tests ----
 
 /**
- * Lit un fichier désigné et sa rubrique acceptable. Renvoie { erreurs, source } : la source porte son format, sa
- * clé, sa demande, la version du système, et ses enregistrements, refus et réponses, dans l'ordre de leur numéro.
- * Le fichier n'est que lu. Une rubrique absente ne donne aucun enregistrement : aucun refus n'a touché la source.
+ * Lit un fichier désigné, sa rubrique acceptable et sa rubrique kits. Renvoie { erreurs, source } : la source porte
+ * son format, sa clé, sa demande, la version du système, et ses enregistrements, refus, réponses et étapes des
+ * kits, dans l'ordre de leur numéro, chacun celui de sa ligne de journal, unique dans la source. Le fichier n'est
+ * que lu. Une rubrique absente ne donne aucun enregistrement : aucun refus ni aucun kit n'a touché la source.
  */
 export function lireSource(chemin) {
   let x;
@@ -109,17 +117,18 @@ export function lireSource(chemin) {
   if (typeof demande !== 'string' || demande === '') erreurs.push(`${chemin} : demande.cle absent`);
   if (typeof version !== 'string' || !VERSION.test(version)) erreurs.push(`${chemin} : versions.specification, la version x.y.z du système, absente`);
   const enregistrements = [];
+  // Un numéro est celui d'une ligne du journal du système : les deux rubriques n'en partagent aucun.
+  const numeros = new Set();
+  const numero = (n, ici) => {
+    if (!entier(n)) erreurs.push(`${ici} : n, le numéro de sa ligne de journal`);
+    else if (numeros.has(n)) erreurs.push(`${ici} : numéro ${n} déjà pris dans la source`);
+    else numeros.add(n);
+  };
   const a = x.acceptable;
   if (a !== undefined) {
     if (!estObjet(a) || a.socle !== 'socle-acceptable' || typeof a.version !== 'string' || !VERSION.test(a.version) || !Array.isArray(a.refus)) {
       erreurs.push(`${chemin} : rubrique acceptable mal formée : le socle socle-acceptable, sa version et la liste des refus`);
     } else {
-      const numeros = new Set();
-      const numero = (n, ici) => {
-        if (!entier(n)) erreurs.push(`${ici} : n, le numéro de sa ligne de journal`);
-        else if (numeros.has(n)) erreurs.push(`${ici} : numéro ${n} déjà pris dans la rubrique`);
-        else numeros.add(n);
-      };
       a.refus.forEach((r, i) => {
         const ici = `${chemin}, refus ${i + 1}`;
         if (!estObjet(r)) {
@@ -145,14 +154,79 @@ export function lireSource(chemin) {
       });
     }
   }
+  const k = x.kits;
+  if (k !== undefined) {
+    if (!Array.isArray(k)) erreurs.push(`${chemin} : rubrique kits mal formée : la liste des kits`);
+    else k.forEach((kit, i) => lireKit(kit, `${chemin}, kit ${i + 1}`, f, numero, erreurs, enregistrements));
+  }
   if (erreurs.length > 0) return { erreurs };
   enregistrements.sort((p, q) => p.n - q.n);
   return { erreurs: [], source: { chemin, format: x.format, cle, demande, version, enregistrements } };
 }
 
-/** Enveloppe partielle d'un enregistrement, selon la correspondance du socle (section 6.5), sans numéro ni chaînage. */
+/**
+ * Un kit de la rubrique kits : sa remise, puis sa validation, son application ou son échec, son retour arrière,
+ * chaque étape à sa ligne de journal, avec son rôle, chacune postérieure à la précédente par son numéro et par sa
+ * date. Un kit ne s'applique qu'après sa validation ; un échec comprend son retour arrière, et seul un kit appliqué
+ * se défait ensuite. Ajoute ses étapes aux enregistrements, ou ses écarts aux erreurs.
+ */
+function lireKit(kit, ici, f, numero, erreurs, enregistrements) {
+  if (!estObjet(kit)) {
+    erreurs.push(`${ici} : objet attendu`);
+    return;
+  }
+  const avant = erreurs.length;
+  if (!entier(kit.n)) erreurs.push(`${ici} : n, le numéro de sa ligne de journal`);
+  if (typeof kit.date !== 'string' || !DATE.test(kit.date)) erreurs.push(`${ici} : date, AAAA-MM-JJTHH:MM:SSZ, en UTC`);
+  if (kit.environnement !== f.environnement) erreurs.push(`${ici} : environnement « ${kit.environnement} », ${f.environnement} attendu pour ${f.systeme}`);
+  if (typeof kit.empreinte !== 'string' || !EMPREINTE.test(kit.empreinte)) erreurs.push(`${ici} : empreinte, celle du patch, 64 caractères hexadécimaux`);
+  const etape = (nom, e, resultat) => {
+    if (e === null || e === undefined) return null;
+    if (!estObjet(e) || !entier(e.n) || typeof e.date !== 'string' || !DATE.test(e.date) || !(e.role in f.rolesKit) || (resultat && !RESULTATS.includes(e.resultat))) {
+      erreurs.push(`${ici}, ${nom} : mal formée : numéro, date, rôle ${Object.keys(f.rolesKit).join(' ou ')}${resultat ? `, résultat ${RESULTATS.join(' ou ')}` : ''}`);
+      return null;
+    }
+    return e;
+  };
+  const v = etape('validation', kit.validation, false);
+  const a = etape('application', kit.application, true);
+  const r = etape('retour arrière', kit.retourArriere, false);
+  if (erreurs.length > avant) return;
+  if (a && !v) erreurs.push(`${ici} : application sans validation : un kit ne s'applique qu'après sa validation`);
+  if (r && a?.resultat !== 'applique') erreurs.push(`${ici} : retour arrière sans application réussie : un échec comprend son retour arrière`);
+  const suite = [['remise', kit], ['validation', v], ['application', a], ['retour arrière', r]].filter(([, e]) => e);
+  for (let j = 1; j < suite.length; j++) {
+    const [nom, e] = suite[j];
+    const [nomAvant, eAvant] = suite[j - 1];
+    if (e.n <= eAvant.n || e.date < eAvant.date) erreurs.push(`${ici}, ${nom} : postérieure à la ${nomAvant}, par son numéro et par sa date`);
+  }
+  if (erreurs.length > avant) return;
+  for (const [nom, e] of suite) numero(e.n, nom === 'remise' ? ici : `${ici}, ${nom}`);
+  if (erreurs.length > avant) return;
+  const commun = { sorte: 'kit', environnement: kit.environnement, empreinte: kit.empreinte, remise: kit.n };
+  enregistrements.push({ ...commun, etape: 'remise', n: kit.n, date: kit.date });
+  if (v) enregistrements.push({ ...commun, etape: 'validation', n: v.n, date: v.date, role: v.role });
+  if (a) enregistrements.push({ ...commun, etape: 'application', n: a.n, date: a.date, role: a.role, resultat: a.resultat });
+  if (r) enregistrements.push({ ...commun, etape: 'retour', n: r.n, date: r.date, role: r.role });
+}
+
+/** Enveloppe partielle d'un enregistrement, selon la correspondance du socle (sections 6.5 et 6.6), sans numéro ni chaînage. */
 export function traduire(e, source, sel) {
   const f = FORMATS[source.format];
+  if (e.sorte === 'kit') {
+    // Un kit n'éprouve aucune règle : ni invariant ni cible de spécification ; l'ancre relie ses étapes.
+    const kit = {
+      date: e.date,
+      source: { format: source.format, journal: empreinteSalee(sel, source.cle), numero: e.n },
+      cible: 'instance',
+      ancre: { nature: 'kit', ref: empreinteSalee(sel, e.empreinte) },
+      ordre: 'OC1',
+      motif: `kit-${e.environnement}`,
+    };
+    if (e.etape === 'remise') return { ...kit, niveau: 'N1', type: 'observation', sujet: `agent:${f.systeme}`, nature: 'remis' };
+    if (e.etape === 'validation') return { ...kit, niveau: 'humain', type: 'decision', sujet: f.rolesKit[e.role], nature: 'validation', decision: { valeur: 'retenue', vise: null } };
+    return { ...kit, niveau: 'humain', type: 'observation', sujet: f.rolesKit[e.role], nature: e.etape === 'application' ? e.resultat : 'retour-arriere' };
+  }
   const commun = {
     date: e.date,
     source: { format: source.format, journal: empreinteSalee(sel, source.cle), numero: e.n },
@@ -264,7 +338,8 @@ export function exporter({ projet = '.', fichiers = [], sel } = {}) {
       return s.enregistrements.map((e) => ({
         s, e,
         cle: cleSource({ format, journal, numero: e.n }),
-        cleDuRefus: e.sorte === 'reponse' ? cleSource({ format, journal, numero: e.refus }) : null,
+        // Ce que vise une décision : le refus d'une réponse, la remise d'une validation de kit.
+        cleVisee: e.sorte === 'reponse' ? cleSource({ format, journal, numero: e.refus }) : e.etape === 'validation' ? cleSource({ format, journal, numero: e.remise }) : null,
         partielle: traduire(e, s, sel),
       }));
     });
@@ -304,9 +379,9 @@ export function exporter({ projet = '.', fichiers = [], sel } = {}) {
       const numero = lignes.length + ajout.length + 1;
       const partielle = { ...r.partielle };
       if (partielle.decision) {
-        const vise = numeros.get(r.cleDuRefus);
+        const vise = numeros.get(r.cleVisee);
         if (!vise) {
-          erreurs.push(`${r.s.chemin}, enregistrement ${r.e.n} : son refus, ${r.e.refus}, n'a pas d'enveloppe`);
+          erreurs.push(`${r.s.chemin}, enregistrement ${r.e.n} : ${r.e.sorte === 'kit' ? `sa remise, ${r.e.remise}` : `son refus, ${r.e.refus}`}, n'a pas d'enveloppe`);
           continue;
         }
         partielle.decision = { valeur: partielle.decision.valeur, vise };

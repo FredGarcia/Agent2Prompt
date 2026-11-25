@@ -190,7 +190,7 @@ Scenario Outline: Create a client
 
 <!-- fichier : scripts/texte.mjs -->
 ```javascript
-// scenario-playwright 1.6.5 : lecteur du texte de départ d'un scénario (fichier .scenario), sans dépendance.
+// scenario-playwright 1.6.6 : lecteur du texte de départ d'un scénario (fichier .scenario), sans dépendance.
 //
 // Le texte, inspiré de Gherkin, décrit un seul scénario : étiquettes, titre, réglages (adresse, origines,
 // profil, paramètres), étapes introduites par un mot-clé de Gherkin, en français ou en anglais, et au plus

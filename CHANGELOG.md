@@ -96,6 +96,15 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-11-25 : socle-observation 1.3.0, observatoire 1.3.0, agent2dev 1.4.1, agent2test 1.6.1, agent-tdd-jira 1.3.9, scenario-playwright 1.6.6, orchestrateur-c7e 3.8.4, generateur-skill-ticket 1.4.4
+
+- **socle-observation 1.3.0** : jalon J3e du passage au troisième ordre, l'export des kits du binôme. Correspondance nouvelle, section 6.6 : la rubrique `kits` des livrables d'Agent2Dev et des journaux de tests d'Agent2Test ; la remise, la validation, qui vise la remise, l'application ou son échec, et le retour arrière d'un kit font chacun une enveloppe, motif `kit-dev` ou `kit-test`, reliées par l'ancre de nature `kit`, valeur ajoutée à sa liste fermée ; un échec, une seule enveloppe ; ni invariant ni cible de spécification. Invariants inchangés, leur section devenue 6.7.
+- **observatoire 1.3.0** : D7 étendue, `export-binome.mjs` traduit aussi la rubrique `kits`, dans les mêmes journaux, sous le même sel, tout ou rien comme avant ; une étape exportée ne change plus, une étape nouvelle s'ajoute. Dimension D9, module `kits` : les kits comptés par système et par environnement, remis, validés, appliqués, en échec, défaits, en attente d'application, kits test sans nettoyage déclaré, avec leurs instances ; des comptes seulement, sans candidat. D7.INV-1 à D7.INV-3 étendus aux kits ; dix-sept invariants ; recette de vingt-six tests, dont un de l'export des kits et un de leur confrontation.
+- **agent2dev 1.4.1** et **agent2test 1.6.1** : correctifs. L'application d'un kit porte le rôle qui la déclare, que l'enveloppe exige comme sujet ; un échec, déclaré avec son retour arrière, ne remplit que l'application ; D27.INV-3 renforcé. Méthode et lecture par agent-tdd-jira 1.3.9 ; exemples du journal aux versions 1.4.1 et 1.6.1.
+- **agent-tdd-jira 1.3.9**, **scenario-playwright 1.6.6**, **orchestrateur-c7e 3.8.4**, **generateur-skill-ticket 1.4.4** : correctifs de références ; l'orchestrateur et le générateur incluent le socle d'observation 1.3.0, leurs exports inchangés ; skills de ticket d'exemple et rapports de contexte régénérés, seules les versions citées changent.
+- Les huit versions se référencent et se publient dans un même commit (`EVOLUTION.md`, section 7). `EVOLUTION.md`, section 10 : les kits du binôme observés dans la boucle du troisième couplage, en comptes. README, modes d'emploi, glossaire et transmissions à jour.
+- Décisions ratifiées avant la rédaction (plan du jalon J3e) : les quatre étapes d'un kit exportées (Y1) ; des comptes, sans proposition (Y2) ; correctif du binôme pour le rôle de qui déclare l'application (Y3).
+
 ### 2026-11-25 : socle-acceptable 1.1.0, agent2dev 1.4.0, agent2test 1.6.0, agent-tdd-jira 1.3.8, scenario-playwright 1.6.5, orchestrateur-c7e 3.8.3, generateur-skill-ticket 1.4.3
 
 - **socle-acceptable 1.1.0** : jalon J3d du passage au troisième ordre, le contrat des kits, décrit sur la fabrication existante de l'hôte, qui ne change pas. Dimension SA8 active, ancien point d'extension E1 : un kit est un patch, avec son application et son retour arrière, que la fabrication exécute sur l'environnement de son nom, dev, test ou démo, jamais en production. Le système qui le produit le confronte, avant de le remettre, à la version épinglée du noyau et de sa constitution, fichiers écrits, secrets et commandes ; un kit qui contient une action refusée n'est pas remis, et le refus cite sa règle. Le kit porte un manifeste fermé, `socle-acceptable.kit/1` : système, environnement, empreinte du patch, version et empreinte du noyau confronté, retour arrière préparé et, quand il peut l'être, vérifié. Un humain le valide à son empreinte ; un patch modifié après sa confrontation n'est plus le kit validé ; l'application et le retour arrière, déclarés par un humain, se consignent dans le journal du système producteur. SA6.INV-1 précisé, sans affaiblissement ; SA8.INV-1 et SA8.INV-2 ; E2 récrit : les refus s'exportent depuis l'observatoire 1.2.0, les applications et les retours arrière attendent leur correspondance. Bloc `noyau` inchangé, à la même empreinte.
@@ -921,6 +930,13 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
   - la publication, dans ce dépôt public, d'un argumentaire destiné à un client, sans nom de client ni de mission.
 
 ## Outils
+
+### 2026-11-25 : export et confrontation des kits
+
+- **`specs/observatoire/outils/export-binome.mjs`** : la rubrique `kits` lue et traduite, chaque étape à sa ligne de journal, avec son rôle ; un numéro n'est pris qu'une fois dans une source, refus et kits confondus ; une validation vise l'enveloppe de la remise de son kit.
+- **`specs/observatoire/outils/observatoire.mjs`** : nature d'ancre `kit` reconnue ; `confronter` rend la rubrique `kits`, par système et par environnement.
+- **`tools/verifier.test.mjs`** : la version d'Agent2Test lue dans son manifeste, pour que les tests suivent les versions sans être réécrits.
+- Vérifications : vingt et un défauts introduits volontairement dans l'export et la confrontation des kits, tous relevés : validation qui ne retient pas, remise au nom d'un rôle, échec traduit en succès, kit qui vise la spécification, empreinte du patch en clair, motif sans environnement, application sans validation, retour arrière après un échec, environnement ou rôle libres, étapes dans le désordre, numéros non partagés, validation qui se vise elle-même, rubrique non lue, empreinte non contrôlée, échec compté défait ou en attente, kit dev compté à nettoyer, instances comptées par kit, ancre `kit` refusée, kits non rendus.
 
 ### 2026-11-25 : manifestes de kit
 

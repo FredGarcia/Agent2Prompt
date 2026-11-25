@@ -139,7 +139,7 @@ Un élément s'y décrit par sa balise, deux de ses classes et son `data-testid`
 ## 8. Le texte importé (D17.INV-6)
 
 ```text
-# Importé de Xray par importer.mjs (scenario-playwright 1.6.5), sans IA : chaque pas du test manuel devient « Quand <action> », avec ses données, puis « Alors <résultat attendu> ».
+# Importé de Xray par importer.mjs (scenario-playwright 1.6.6), sans IA : chaque pas du test manuel devient « Quand <action> », avec ses données, puis « Alors <résultat attendu> ».
 # Lot : xray DEMO-13
 # Scénario : @DEMO-13, test manuel DEMO-13
 # Source : https://xray.cloud.getxray.app/api/v2/graphql, test DEMO-13
@@ -184,7 +184,7 @@ Désignation de la source, lecteur d'archive, lignes d'un fichier, identité des
 
 <!-- fichier : scripts/cas.mjs -->
 ```javascript
-// scenario-playwright 1.6.5 : cas de test de Xray et de Zephyr Scale, et fichiers .feature, lus sans IA.
+// scenario-playwright 1.6.6 : cas de test de Xray et de Zephyr Scale, et fichiers .feature, lus sans IA.
 //
 // Sources (D17.INV-1) : fichier .feature, exporté de Xray ou de Zephyr Scale ou pris dans le dépôt ; archive
 // .zip d'un export ; API REST de Xray (Cloud, Data Center) et de Zephyr Scale (Cloud, Data Center), en
@@ -685,7 +685,7 @@ Lecture d'une page enregistrée et de ses cadres, sans rien exécuter : nœuds d
 
 <!-- fichier : scripts/pages.mjs -->
 ```javascript
-// scenario-playwright 1.6.5 : pages de tests de Xray enregistrées en HTML complet, lues sans IA (D17).
+// scenario-playwright 1.6.6 : pages de tests de Xray enregistrées en HTML complet, lues sans IA (D17).
 //
 // Chrome enregistre une page « complète » en un fichier .html et un dossier de ressources à côté, où il range
 // aussi les cadres de la page : Xray Cloud affiche les pas d'un test dans un cadre. La page et ses cadres sont

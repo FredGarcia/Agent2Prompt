@@ -45,7 +45,7 @@ Depuis le projet, avec Node 20 ou plus récent :
 
 | Point | Règle active en 1.3 |
 |---|---|
-| E4 | le champ et le registre d'apprentissage s'exportent selon les correspondances du socle `socle-observation` 1.2.0 ; un nouveau format à exporter attend sa correspondance dans une version du socle ; aucun skill de ticket ne porte l'outil ni le module |
+| E4 | le champ et le registre d'apprentissage s'exportent selon les correspondances du socle `socle-observation` 1.3.0 ; un nouveau format à exporter attend sa correspondance dans une version du socle ; aucun skill de ticket ne porte l'outil ni le module |
 
 ## 6. Recette
 
