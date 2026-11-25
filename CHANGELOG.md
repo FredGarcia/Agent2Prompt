@@ -96,6 +96,15 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-11-25 : socle-observation 1.2.0, observatoire 1.2.0, agent2dev 1.3.1, agent2test 1.5.1, agent-tdd-jira 1.3.7, scenario-playwright 1.6.4, orchestrateur-c7e 3.8.2, generateur-skill-ticket 1.4.2
+
+- **socle-observation 1.2.0** : jalon J3c du passage au troisième ordre, export des refus du binôme. Correspondance nouvelle, section 6.5 : la rubrique `acceptable` des livrables d'Agent2Dev et des journaux de tests d'Agent2Test ; un refus devient une enveloppe `refus`, une dérogation une enveloppe `derogation`, un faux refus une décision, qui visent l'enveloppe du refus avec les valeurs `amendee` et `refusee` ; la première règle citée sort préfixée, dont le préfixe `SA` ; ni l'objet refusé ni le motif d'une réponse ne sortent. Le type `refus` est produit ; valeur `testeur` ajoutée au sujet. Invariants inchangés, leur section devenue 6.6.
+- **observatoire 1.2.0** : dimensions D7 et D8 actives. Outil `export-binome.mjs`, lancé par le développeur depuis le clone (`exporter`, `verifier`, `etat`) : il traduit les rubriques qu'on lui désigne dans un journal par système du projet de l'application, `docs/c7e/observations-agent2dev.jsonl` et `docs/c7e/observations-agent2test.jsonl`, en ajout seul, chaîné, sous le sel de l'instance ; une rubrique qui change ou retire un enregistrement exporté arrête l'export ; l'outil agit à la source, à part du magasin. L'observatoire relève ces deux journaux, reconnaît le préfixe `SA` et le sujet `testeur`, et confronte les refus par règle : refus, dérogations et faux refus comptés par système et par instance ; une règle déclarée infondée par des faux refus dans au moins deux instances fait un candidat de sorte `faux-refus`, une règle trop large, proposée à la spécification qui la définit, le socle de l'acceptable pour une règle `SA`, sans qu'aucune règle de sûreté puisse s'affaiblir. Modules `export-binome` et `acceptable` ; D4.INV-1 étendu à la proposition par faux refus ; D6.INV-1 précisé, une réponse à un refus n'est pas un écart ; seize invariants. Défaut corrigé : une décision visait, par son numéro, une enveloppe de n'importe quel journal de son instance ; elle vise celle du journal de son système. Recette de vingt-quatre tests, dont trois de l'export du binôme.
+- **agent2dev 1.3.1** et **agent2test 1.5.1** : correctifs. La rubrique `acceptable` date chaque refus et chaque réponse de l'horodatage de leur ligne de journal, à la seconde ; ses valeurs fermées sont précisées, garde, décision et rôle d'une réponse ; D26.INV-4 renforcé. Méthode et entrée agent-tdd-jira 1.3.7 ; exemples du journal aux versions 1.3.1 et 1.5.1.
+- **agent-tdd-jira 1.3.7**, **scenario-playwright 1.6.4**, **orchestrateur-c7e 3.8.2**, **generateur-skill-ticket 1.4.2** : correctifs de références ; l'orchestrateur et le générateur incluent le socle d'observation 1.2.0, leurs exports inchangés ; scenario-playwright porte son numéro de version dans ses scripts, et leurs empreintes ; skills de ticket d'exemple et rapports de contexte régénérés, seules les versions citées changent. La recette du générateur passe ses 346 tests (un attend Gemini CLI).
+- Les huit versions se référencent et se publient dans un même commit (`EVOLUTION.md`, section 7). `EVOLUTION.md`, section 10 : le troisième couplage a sa boucle OC3, fermée dans ses limites déclarées. README, modes d'emploi, glossaire et transmissions à jour.
+- Décisions ratifiées avant la rédaction (plan du jalon J3c) : outil de référence porté par l'observatoire (X1) ; refus d'Agent2Test dans l'instance de l'application (X2) ; seuls les faux refus récurrents font une proposition (X3) ; kits en jalon à part, J3d (X4) ; et, apparu à la réalisation, refus et réponses datés par un correctif du binôme (X5).
+
 ### 2026-11-24 : socle-acceptable 1.0.1, agent2dev 1.3.0, agent2test 1.5.0, agent-tdd-jira 1.3.6, scenario-playwright 1.6.3, orchestrateur-c7e 3.8.1, generateur-skill-ticket 1.4.1
 
 - **socle-acceptable 1.0.1** : correctif, jalon J3b du passage au troisième ordre. SA6.INV-2 renforcé : aucune règle du noyau ne se déroge, seule une version du socle la change ; une règle propre à une constitution ne se déroge que si la constitution la déclare dérogeable (`derogeable: true`), ce qu'une entrée du noyau ne porte jamais ; un faux refus ne fait pas exécuter l'action.
@@ -901,6 +910,11 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
   - la publication, dans ce dépôt public, d'un argumentaire destiné à un client, sans nom de client ni de mission.
 
 ## Outils
+
+### 2026-11-25 : recette de l'observatoire et export du binôme
+
+- **Workflows** : la recette de l'observatoire suit aussi Agent2Dev, Agent2Test et le socle de l'acceptable, dont les règles définissent les invariants que citent les refus de ses instances d'épreuve.
+- Vérifications : quatorze défauts introduits volontairement dans l'observatoire et son export, tous relevés par la recette : décision qui vise une enveloppe d'un autre journal, réponse à un refus comptée comme écart, faux refus d'une seule instance, ou sur une règle que le dépôt ne définit pas, proposés, faux refus non reconnu, motif d'une proposition par faux refus non contrôlé, rubrique réécrite ou enregistrement retiré non relevés, date non bornée, sources non triées, sel lisible par tous ou absent toléré, rôle du référent qualité non traduit, règle sans le préfixe du système.
 
 ### 2026-11-24 : constitutions qui épinglent le noyau de l'acceptable
 

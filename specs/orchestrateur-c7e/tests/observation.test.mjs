@@ -1,5 +1,5 @@
 // Recette de l'export de l'orchestrateur vers le socle d'observation (orchestrateur-c7e 3.7.0, D12 ; socle-observation
-// 1.1.0, SO1 à SO4), sur un projet d'épreuve dont la recette construit l'historique Git : installation avec le
+// 1.2.0, SO1 à SO4), sur un projet d'épreuve dont la recette construit l'historique Git : installation avec le
 // registre de départ, une entrée proposée par un commit de second ordre, des écarts inscrits, une revue qui promeut,
 // propose et retire. Les dates des commits sont fixées : deux projets construits de même donnent le même journal.
 

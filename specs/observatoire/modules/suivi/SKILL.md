@@ -12,7 +12,7 @@ Une proposition ratifiée entre dans une version, qui descend vers les projets p
 ## 1. Mesure
 
 - Pour une proposition ratifiée en version V du système S : les enveloppes de S, toutes instances confondues, se partagent entre les versions antérieures à V et les versions V et suivantes.
-- De chaque côté, la part du motif est le nombre de signaux de ce motif, à la profondeur de la proposition, rapporté au nombre d'enveloppes de S (module `confrontation`, pour les signaux). Pour une proposition par invariant, S est la spécification qui le définit, et le motif, celui de ses écarts et de ses dérogations qui citent l'invariant (module `systemes`) ; si S n'exporte pas, l'effet reste indécidable.
+- De chaque côté, la part du motif est le nombre de signaux de ce motif, à la profondeur de la proposition, rapporté au nombre d'enveloppes de S (module `confrontation`, pour les signaux). Pour une proposition par invariant, S est la spécification qui le définit, et le motif, celui de ses écarts et de ses dérogations qui citent l'invariant, hors réponse à un refus (module `systemes`) ; pour une proposition par faux refus, S est la spécification qui définit la règle, et le motif, celui des faux refus qui la citent (module `acceptable`) ; si S n'exporte pas, comme le socle de l'acceptable, l'effet reste indécidable.
 - L'effet est observé si la part recule après V, non observé sinon ; il ne se déclare qu'avec au moins vingt enveloppes de S de part et d'autre, sinon il est indécidable (D5.INV-1).
 - Une proposition ouverte ou refusée n'a pas d'effet à mesurer : `suivre` dit son statut.
 
@@ -22,4 +22,4 @@ Un effet non observé n'invalide pas la ratification : il la rouvre à la conver
 
 | Invariant | Tests |
 |---|---|
-| D5.INV-1 | `tests/observatoire.test.mjs` : « D5 : l'effet d'une proposition ratifiée se mesure avant et après sa version : observé, non observé, ou indécidable sous vingt enveloppes » ; « D6 : un candidat par invariant se propose à la spécification qui le définit, avec les systèmes qui l'ont relevé, et ses références nomment le système de chaque enveloppe » ; « Ligne de commande : codes de sortie ; le magasin d'épreuve seul est écrit » |
+| D5.INV-1 | `tests/observatoire.test.mjs` : « D5 : l'effet d'une proposition ratifiée se mesure avant et après sa version : observé, non observé, ou indécidable sous vingt enveloppes » ; « D6 : un candidat par invariant se propose à la spécification qui le définit, avec les systèmes qui l'ont relevé, et ses références nomment le système de chaque enveloppe » ; « D8 : une règle déclarée infondée par des faux refus dans deux instances est proposée, trop large, à la spécification qui la définit ; des faux refus d'une seule instance ne font que se compter » ; « Ligne de commande : codes de sortie ; le magasin d'épreuve seul est écrit » |

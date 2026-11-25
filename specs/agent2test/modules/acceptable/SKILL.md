@@ -70,12 +70,12 @@ Le journal de tests `agent2test.journal-de-tests/1` porte une rubrique `acceptab
 { "acceptable": {
     "socle": "socle-acceptable", "version": "1.0.1",
     "refus": [
-      { "n": 812, "garde": "perimetre", "objet": "modifier-du-code", "regles": ["D1.INV-5"], "reponse": null }
+      { "n": 812, "date": "2026-10-21T10:02:14Z", "garde": "perimetre", "objet": "modifier-du-code", "regles": ["D1.INV-5"], "reponse": null }
     ]
 } }
 ```
 
-Le format garde son nom : la rubrique est facultative, et `lire-acceptation.mjs` d'agent-tdd-jira ne la lit pas. Les motifs des réponses restent dans le journal, après le masque du noyau, et ne sont pas recopiés. La rubrique est la source de l'export des refus vers le socle d'observation, à venir.
+Chaque refus et chaque réponse portent leur numéro de ligne de journal, `n`, et sa date, `date`, son horodatage à la seconde, en UTC (`AAAA-MM-JJTHH:MM:SSZ`). `garde` vaut `perimetre`, `ecriture` ou `lecons` ; `reponse` vaut `null` tant que personne n'a répondu, sinon elle porte sa décision, `deroger` ou `faux-refus`, et le rôle qui a répondu, `testeur` ou `referent-qualite`. Le format garde son nom : la rubrique est facultative, et `lire-acceptation.mjs` d'agent-tdd-jira ne la lit pas. Les motifs des réponses restent dans le journal, après le masque du noyau, et ne sont pas recopiés. La rubrique est la source de l'export des refus vers le socle d'observation, par l'outil d'export du binôme que porte l'observatoire du dépôt Agent2Prompt : il date chaque enveloppe par elle.
 
 ## 6. Pièges connus
 
@@ -98,7 +98,7 @@ Jeu d'essai : la constitution d'exemple, des copies altérées, et une constitut
 | AC6 | D26.INV-3 | une dérogation demandée sur le refus de `constitution/` est refusée `NON_DEROGEABLE` et journalisée ; l'écriture reste refusée |
 | AC7 | D26.INV-3 | avec la constitution d'essai, le testeur déroge au refus d'une écriture dans `essai/`, avec son motif : la ligne `acceptable.derogation` cite le refus, la règle, le rôle et le motif, et l'écriture se fait une fois |
 | AC8 | D26.INV-3 | un faux refus déclaré sur le refus de « redéployer l'application de recette », avec son motif : ligne `acceptable.faux-refus`, la campagne ne s'ouvre pas, et le faux refus paraît dans la vue de gouvernance, sous sa règle ; une réponse sans motif, une deuxième réponse, une réponse par l'échange ou par un rôle sans droit sont refusées |
-| AC9 | D26.INV-4 | le journal de tests d'une campagne qui a connu un refus porte la rubrique `acceptable`, sans motif en clair, et `lire-acceptation.mjs` d'agent-tdd-jira le lit comme avant |
+| AC9 | D26.INV-4 | le journal de tests d'une campagne qui a connu un refus porte la rubrique `acceptable`, le refus et sa réponse datés de leur ligne de journal, sans motif en clair, et `lire-acceptation.mjs` d'agent-tdd-jira le lit comme avant |
 | AC10 | point E6 | une demande « déployer sur l'environnement de test » est refusée, règle SA1.INV-1 : aucun kit n'existe, l'entrée `horsKit` vaut partout ; aucun kit n'est produit |
 
 ## 8. Fichiers à produire

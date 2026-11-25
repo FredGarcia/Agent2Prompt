@@ -1,9 +1,11 @@
-// Recette de l'observatoire (observatoire 1.1.0, D1 à D6), sur des instances d'épreuve dont les journaux
+// Recette de l'observatoire (observatoire 1.2.0, D1 à D6 et D8), sur des instances d'épreuve dont les journaux
 // sont produits par l'export du générateur de skills de ticket : A, le champ de l'arbre d'exemple ABCDE-3620
 // et un registre d'apprentissage dont une proposition, qui vise le générateur, est retenue ; B et C, des
-// champs écrits pour l'épreuve ; et, pour la confrontation entre systèmes, par l'export de l'orchestrateur C7E,
-// depuis un registre des écarts commité dans ces projets. Le magasin et le dépôt d'épreuve sont temporaires :
-// la recette n'écrit ni dans le répertoire Git commun du clone, ni dans ses propositions.
+// champs écrits pour l'épreuve ; pour la confrontation entre systèmes, par l'export de l'orchestrateur C7E,
+// depuis un registre des écarts commité dans ces projets ; et, pour la confrontation de l'acceptable, par
+// l'export du binôme, depuis des livrables d'Agent2Dev et des journaux de tests d'Agent2Test écrits pour
+// l'épreuve. Le magasin et le dépôt d'épreuve sont temporaires : la recette n'écrit ni dans le répertoire Git
+// commun du clone, ni dans ses propositions.
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -16,8 +18,9 @@ import { clore, decider, noter, proposer as proposerAuRegistre } from '../../gen
 import { FORMAT, canonique as canoniqueChamp } from '../../generateur-skill-ticket/outils/champ.mjs';
 import { exporter } from '../../generateur-skill-ticket/outils/observation.mjs';
 import { exporter as exporterOrchestrateur } from '../../orchestrateur-c7e/outils/observation.mjs';
+import { exporter as exporterBinome } from '../outils/export-binome.mjs';
 import {
-  MAGASIN, PROPOSITIONS, SEUIL_ENVELOPPES, confronter, controlerEnveloppe, controlerProposition, etat, inscrire, lirePropositions, magasinParDefaut,
+  MAGASIN, PROPOSITIONS, SEUIL_ENVELOPPES, canonique, confronter, controlerEnveloppe, controlerProposition, etat, inscrire, lirePropositions, magasinParDefaut,
   principal, proposer, relever, repertoireGitCommun, sha256, suivre, verifier,
 } from '../outils/observatoire.mjs';
 
@@ -39,6 +42,10 @@ const ORCHESTRATEUR_SUIVANT = VERSION_ORCHESTRATEUR.replace(/^(\d+)\.(\d+)\.\d+$
 // Le désaccord du champ de l'arbre d'exemple, que champ.mjs inscrit au registre des écarts, décidé par le développeur.
 const DESACCORD = ['2026-11-05', 'ABCDE-3620', 'désaccord entre nœuds (D6.INV-3)', 'la date-heure reçue par le canal des lignes arrive sans fuseau', 'respecter : le canal porte le fuseau'];
 const AUTRE_DESACCORD = ['2026-11-06', 'ABCDE-3621', 'D6.INV-3', 'deux nœuds contraires sur le contrat de pagination', 'respecter : un seul contrat'];
+// Versions courantes du binôme et du socle de l'acceptable, celles des livrables d'épreuve et des propositions.
+const versionDe = (nom) => JSON.parse(readFileSync(join(RACINE, 'specs', nom, 'manifest.json'), 'utf8')).version;
+const [VERSION_A2D, VERSION_A2T, VERSION_SA] = ['agent2dev', 'agent2test', 'socle-acceptable'].map(versionDe);
+const suivante = (version) => version.replace(/^(\d+)\.(\d+)\.\d+$/, (_, a, b) => `${a}.${Number(b) + 1}.0`);
 
 const git = (cwd, ...args) => execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
 const sansCR = (texte) => texte.replace(/\r\n/g, '\n');
@@ -128,7 +135,7 @@ function depot({ courante = '1.3.0' } = {}) {
   const anciennes = ['1.0.0', '1.1.0', '1.1.1', '1.2.0', '1.3.0'].filter((v) => v !== courante);
   mkdirSync(join(d, 'specs', 'generateur-skill-ticket'), { recursive: true });
   writeFileSync(join(d, 'specs', 'generateur-skill-ticket', 'manifest.json'), JSON.stringify({ ...manifeste, version: courante, previousVersions: anciennes.map((version) => ({ version, file: `archives/SKILL-v${version}.md` })) }));
-  for (const nom of ['orchestrateur-c7e', 'socle-observation', 'java']) {
+  for (const nom of ['orchestrateur-c7e', 'socle-observation', 'java', 'agent2dev', 'agent2test', 'socle-acceptable']) {
     for (const f of ['manifest.json', 'SKILL.md']) cpSync(join(RACINE, 'specs', nom, f), join(d, 'specs', nom, f));
   }
   // Le socle back-front, connu du dépôt d'épreuve, sans son point d'entrée : ses invariants n'y sont pas définis.
@@ -153,6 +160,39 @@ function orchestrateur(p, nom, lignes, { concepts = `${DEPART}\n`, date = '2026-
   execFileSync('git', ['commit', '-q', '--allow-empty', '-F', '-'], { cwd: p, input: 'Registres de l\'orchestrateur', env: { ...process.env, GIT_AUTHOR_DATE: `${date} +0000`, GIT_COMMITTER_DATE: `${date} +0000` }, stdio: ['pipe', 'pipe', 'ignore'] });
   const r = exporterOrchestrateur({ projet: p, sel: SELS[nom] });
   assert.deepStrictEqual(r.erreurs, [], `export de l'orchestrateur, instance ${nom}`);
+}
+
+/** Un refus d'une rubrique acceptable, et sa réponse. */
+const refusDe = (n, date, garde, regles, reponse = null) => ({ n, date, garde, objet: 'objet-d-epreuve', regles, reponse });
+const reponseDe = (decision, role, n, date) => ({ decision, role, n, date });
+const livrableA2D = (cle, refus) => ({ format: 'agent2dev.livrable/1', demande: { cle, titre: 'Demande d\'épreuve, chez le client Dupont', source: 'e'.repeat(64) }, versions: { specification: VERSION_A2D }, acceptable: { socle: 'socle-acceptable', version: VERSION_SA, refus } });
+const journalA2T = (campagne, cle, refus) => ({ format: 'agent2test.journal-de-tests/1', campagne, demande: { cle, texte: 'Demande d\'épreuve' }, versions: { specification: VERSION_A2T }, acceptable: { socle: 'socle-acceptable', version: VERSION_SA, refus } });
+
+/** Exporte, par l'outil d'export du binôme, des livrables et des journaux de tests dans le projet, sous le sel de l'instance `nom`. */
+function binome(p, nom, ...contenus) {
+  if (!existsSync(join(p, '.git'))) {
+    git(p, 'init', '-q');
+    for (const [k, v] of [['user.name', 'Epreuve'], ['user.email', 'epreuve@exemple.invalid'], ['commit.gpgsign', 'false'], ['core.autocrlf', 'false']]) git(p, 'config', k, v);
+  }
+  const d = temporaire('livrables');
+  const fichiers = contenus.map((c, i) => {
+    const f = join(d, `source-${i + 1}.json`);
+    writeFileSync(f, JSON.stringify(c));
+    return f;
+  });
+  const r = exporterBinome({ projet: p, fichiers, sel: SELS[nom] });
+  assert.deepStrictEqual(r.erreurs, [], `export du binôme, instance ${nom}`);
+}
+
+/** Écrit un journal d'enveloppes chaîné, avec sa tête, à partir d'enveloppes partielles, sous le sel de l'instance `nom`. */
+function ecrireJournal(p, journal, nom, partielles) {
+  const lignes = [];
+  for (const [i, x] of partielles.entries()) {
+    lignes.push(JSON.stringify(canonique({ schema: 'socle-observation.enveloppe/1', numero: i + 1, instance: sha256(SELS[nom]), ...x, precedent: i === 0 ? null : sha256(lignes[i - 1]) })));
+  }
+  mkdirSync(join(p, 'docs', 'c7e'), { recursive: true });
+  writeFileSync(join(p, journal), `${lignes.join('\n')}\n`);
+  writeFileSync(join(p, journal.replace(/\.jsonl$/, '.tete')), `${JSON.stringify({ schema: 'socle-observation.enveloppe/1', numero: lignes.length, empreinte: sha256(lignes.at(-1)) })}\n`);
 }
 
 /** Numéro, dans le journal du générateur d'un projet, de l'enveloppe qui cite `invariant`. */
@@ -372,7 +412,7 @@ test('D6 : un candidat par invariant se propose à la spécification qui le déf
   const lieux = observatoire([a]);
   const sortie = lancer(lieux, 'confronter').sortie;
   assert.match(sortie, /^ {2}invariant {2}orchestrateur-c7e, ecart-orchestrateur-c7e-d6-inv-3 : orchestrateur-c7e:D6\.INV-3, 2 systèmes, 1 instance, 3 enveloppes$/m);
-  assert.match(sortie, /^moins de 2 instances : aucune récurrence possible ; seuls remontent les retours, et les invariants relevés par deux systèmes$/m);
+  assert.match(sortie, /^moins de 2 instances : aucune récurrence ni règle trop large possible ; seuls remontent les retours, et les invariants relevés par deux systèmes$/m);
   const r = proposer({ ...lieux, date: '2026-11-24' });
   const fichier = `${PROPOSITIONS}/2026-11-24-orchestrateur-c7e-ecart-orchestrateur-c7e-d6-inv-3.md`;
   assert.ok(r.ecrites.includes(fichier), r.ecrites.join(' ; '));
@@ -396,6 +436,103 @@ test('D6 : un candidat par invariant se propose à la spécification qui le déf
   ecrireStatut(lieux.depot, fichier, `statut: ratifiee\nversion: ${ORCHESTRATEUR_SUIVANT}\npr: 90`);
   const s = suivre(lieux).suivis.find((x) => x.fichier === fichier);
   assert.deepStrictEqual([s.sorte, s.invariant, s.effet, s.avant, s.apres], ['invariant', 'orchestrateur-c7e:D6.INV-3', 'indecidable', { motif: 2, enveloppes: 2 }, { motif: 0, enveloppes: 0 }], 'les écarts qui citent l\'invariant, parmi les enveloppes de la spécification qui le définit');
+});
+
+test('D2 : une décision vise une enveloppe du journal de son propre système : la décision d\'un système ne retient pas la proposition d\'un autre', () => {
+  // Le générateur propose, pour sa spécification, sans décision ; l'orchestrateur promeut un concept proposé dans son
+  // propre journal. Les deux enveloppes visées portent le même numéro, 1, chacune dans son journal.
+  const p = projet('index');
+  const date = '2026-11-20T09:00:00Z';
+  ecrireJournal(p, JOURNAL.split(sep).join('/'), 'A', [
+    { date, systeme: { nom: 'generateur-skill-ticket', version: '1.3.0' }, ordre: 'OC2', niveau: 'N2', type: 'proposition', motif: 'commit-hors-plan-back', sujet: 'agent:generateur-skill-ticket', source: { format: 'generateur.apprentissage/1', numero: 3 }, nature: 'recurrence', profondeur: 'micro', cible: 'specification', ancre: { nature: 'ticket', ref: sha256('ticket') } },
+  ]);
+  const concept = { nature: 'concept', ref: sha256('concept') };
+  ecrireJournal(p, JOURNAL_ORCHESTRATEUR, 'A', [
+    { date, systeme: { nom: 'orchestrateur-c7e', version: VERSION_ORCHESTRATEUR }, ordre: 'OC2', niveau: 'humain', type: 'proposition', motif: 'concept-observabilite', sujet: 'developpeur', source: { format: 'orchestrateur.concepts/1', numero: 1 }, nature: 'proposed', cible: 'instance', ancre: concept },
+    { date, systeme: { nom: 'orchestrateur-c7e', version: VERSION_ORCHESTRATEUR }, ordre: 'OC2', niveau: 'humain', type: 'decision', motif: 'concept-observabilite', sujet: 'referent', source: { format: 'orchestrateur.concepts/1', numero: 2 }, nature: 'experimental', cible: 'instance', ancre: concept, decision: { valeur: 'retenue', vise: 1 } },
+  ]);
+  const r = confronter(observatoire([p]));
+  assert.deepStrictEqual(r.erreurs, []);
+  assert.deepStrictEqual(r.candidats, [], 'la promotion d\'un concept de l\'orchestrateur ne retient pas la proposition du générateur de même numéro');
+});
+
+// ---- D8 : confrontation de l'acceptable ----
+
+test('D8 : les refus se confrontent par règle : refus, dérogations et faux refus comptés par système et par instance ; aucun ne fait de retour, de récurrence ni de candidat par invariant', () => {
+  const [a, b] = [projet('A'), projet('B')];
+  binome(a, 'A', livrableA2D('ECR-1', [
+    refusDe(100, '2026-11-20T09:00:00Z', 'perimetre', ['SA1.INV-1']),
+    refusDe(110, '2026-11-20T09:10:00Z', 'commandes', ['D6.INV-2'], reponseDe('deroger', 'referent', 111, '2026-11-20T09:11:00Z')),
+  ]));
+  binome(b, 'B', livrableA2D('FGH-2', [refusDe(200, '2026-11-21T09:00:00Z', 'commandes', ['D6.INV-2'], reponseDe('deroger', 'developpeur', 201, '2026-11-21T09:01:00Z'))]),
+    journalA2T('C-1', 'FGH-2', [refusDe(300, '2026-11-21T10:00:00Z', 'perimetre', ['SA1.INV-1', 'D1.INV-5'], reponseDe('faux-refus', 'testeur', 301, '2026-11-21T10:01:00Z'))]));
+  const lieux = observatoire([a, b]);
+  const r = confronter(lieux);
+  assert.deepStrictEqual(r.erreurs, []);
+  assert.deepStrictEqual(r.candidats, [], 'deux dérogations d\'une même règle dans deux instances ne font pas de candidat par invariant ; un faux refus d\'une seule instance ne fait pas de règle trop large');
+  assert.deepStrictEqual(r.acceptable, [
+    { invariant: 'agent2dev:D6.INV-2', refus: 2, derogations: 2, fauxRefus: 0, systemes: ['agent2dev'], instances: 2 },
+    { invariant: 'socle-acceptable:SA1.INV-1', refus: 2, derogations: 0, fauxRefus: 1, systemes: ['agent2dev', 'agent2test'], instances: 2 },
+  ]);
+  const sortie = lancer(lieux, 'confronter').sortie;
+  assert.match(sortie, /^acceptable : 2 règles citées par des refus$/m);
+  assert.match(sortie, /^ {2}socle-acceptable:SA1\.INV-1 : 2 refus, 0 dérogation, 1 faux refus ; agent2dev, agent2test ; 2 instances$/m);
+  assert.deepStrictEqual(etat(lieux).instances.find((i) => i.instance === PREFIXE.B).systemes.map((s) => [s.nom, s.derniere, s.ecart]), [['agent2dev', VERSION_A2D, 'a-jour'], ['agent2test', VERSION_A2T, 'a-jour']]);
+  assert.deepStrictEqual(proposer({ ...lieux, date: '2026-11-25' }).ecrites, [], 'rien à proposer');
+});
+
+test('D8 : une règle déclarée infondée par des faux refus dans deux instances est proposée, trop large, à la spécification qui la définit ; des faux refus d\'une seule instance ne font que se compter', () => {
+  const [a, b] = [projet('A'), projet('B')];
+  // Une règle que le dépôt ne définit pas, venue d'un système plus récent que le clone : elle se compte, sans candidat.
+  const inconnue = (n, date) => refusDe(n, date, 'commandes', ['D99.INV-9'], reponseDe('faux-refus', 'developpeur', n + 1, date));
+  binome(a, 'A',
+    livrableA2D('ECR-1', [refusDe(100, '2026-11-20T09:00:00Z', 'perimetre', ['SA1.INV-1'], reponseDe('faux-refus', 'developpeur', 101, '2026-11-20T09:01:00Z'))]),
+    livrableA2D('ECR-2', [refusDe(120, '2026-11-20T10:00:00Z', 'perimetre', ['D1.INV-5'], reponseDe('faux-refus', 'referent', 121, '2026-11-20T10:01:00Z')), inconnue(130, '2026-11-20T11:00:00Z')]));
+  const seule = confronter(observatoire([a]));
+  assert.deepStrictEqual(seule.candidats, [], 'une seule instance : les faux refus se comptent');
+  assert.deepStrictEqual(seule.acceptable.map((x) => [x.invariant, x.fauxRefus, x.instances]), [['agent2dev:D1.INV-5', 1, 1], ['agent2dev:D99.INV-9', 1, 1], ['socle-acceptable:SA1.INV-1', 1, 1]]);
+  binome(b, 'B',
+    journalA2T('C-7', 'KLM-3', [refusDe(400, '2026-11-22T09:00:00Z', 'perimetre', ['SA1.INV-1'], reponseDe('faux-refus', 'referent-qualite', 401, '2026-11-22T09:01:00Z'))]),
+    livrableA2D('KLM-3', [refusDe(500, '2026-11-22T10:00:00Z', 'perimetre', ['D1.INV-5'], reponseDe('faux-refus', 'developpeur', 501, '2026-11-22T10:01:00Z')), inconnue(510, '2026-11-22T11:00:00Z')]));
+  const lieux = observatoire([a, b]);
+  const r = confronter(lieux);
+  assert.deepStrictEqual(r.erreurs, []);
+  assert.deepStrictEqual(r.candidats.map((c) => [c.sorte, c.systeme, c.motif, c.invariant, c.systemes, c.versions, c.instances, c.enveloppes]), [
+    ['faux-refus', 'agent2dev', 'faux-refus-agent2dev-d1-inv-5', 'agent2dev:D1.INV-5', ['agent2dev'], [VERSION_A2D], 2, 2],
+    ['faux-refus', 'socle-acceptable', 'faux-refus-socle-acceptable-sa1-inv-1', 'socle-acceptable:SA1.INV-1', ['agent2dev', 'agent2test'], [VERSION_SA], 2, 2],
+  ], 'la règle du noyau va au socle de l\'acceptable, la règle de la constitution à Agent2Dev, chacune à sa version courante ; D99.INV-9, que le dépôt ne définit pas, n\'en fait pas');
+  assert.deepStrictEqual(r.acceptable.find((x) => x.invariant === 'agent2dev:D99.INV-9'), { invariant: 'agent2dev:D99.INV-9', refus: 2, derogations: 0, fauxRefus: 2, systemes: ['agent2dev'], instances: 2 });
+  assert.deepStrictEqual(r.candidats[1].references.slice().sort(), [`${PREFIXE.A}:agent2dev:2`, `${PREFIXE.B}:agent2test:2`].sort(), 'les faux refus, par instance, système et numéro');
+  assert.match(lancer(lieux, 'confronter').sortie, /^ {2}faux-refus {2}socle-acceptable, faux-refus-socle-acceptable-sa1-inv-1 : socle-acceptable:SA1\.INV-1, 2 systèmes, 2 instances, 2 enveloppes$/m);
+
+  const ecrites = proposer({ ...lieux, date: '2026-11-25' }).ecrites;
+  const fichier = `${PROPOSITIONS}/2026-11-25-socle-acceptable-faux-refus-socle-acceptable-sa1-inv-1.md`;
+  assert.deepStrictEqual(ecrites, [`${PROPOSITIONS}/2026-11-25-agent2dev-faux-refus-agent2dev-d1-inv-5.md`, fichier]);
+  const texte = readFileSync(join(lieux.depot, fichier), 'utf8');
+  const { entete, erreurs } = controlerProposition(texte);
+  assert.deepStrictEqual(erreurs, []);
+  assert.deepStrictEqual([entete.sorte, entete.systeme, entete.invariant, entete.systemes, entete.versions, entete.profondeur, entete.instances, entete.enveloppes], ['faux-refus', 'socle-acceptable', 'socle-acceptable:SA1.INV-1', ['agent2dev', 'agent2test'], [VERSION_SA], undefined, 2, 2]);
+  assert.match(texte, /^# Proposition : règle trop large, socle-acceptable:SA1\.INV-1$/m);
+  for (const v of ['ECR-', 'KLM-', 'C-7', 'Dupont', 'objet-d-epreuve', ...Object.values(SELS), sha256(SELS.A)]) assert.ok(!texte.includes(v), `« ${v} » en clair`);
+  const cas = [
+    [texte.replace(/^motif: .*$/m, 'motif: ecart-socle-acceptable-sa1-inv-1'), /motif « ecart-socle-acceptable-sa1-inv-1 » : faux-refus-socle-acceptable-sa1-inv-1/],
+    [texte.replace('sorte: faux-refus', 'sorte: invariant'), /motif « faux-refus-socle-acceptable-sa1-inv-1 » : ecart-socle-acceptable-sa1-inv-1/],
+    [texte.replace('statut: ouverte', 'profondeur: micro\nstatut: ouverte'), /profondeur : aucune pour une proposition par invariant ou par faux refus/],
+    [texte.replace('sorte: faux-refus', 'sorte: recurrence'), /invariant, systemes : seulement pour une proposition par invariant ou par faux refus/],
+    [texte.replace('sorte: faux-refus', 'sorte: refus'), /sorte « refus » : retour, recurrence, invariant ou faux-refus/],
+    [texte.replace('systeme: socle-acceptable', 'systeme: agent2dev'), /invariant : l'identifiant d'un invariant du dépôt, préfixé par la spécification visée/],
+  ];
+  for (const [mute, motif] of cas) assert.ok(controlerProposition(mute).erreurs.some((e) => motif.test(e)), `${motif} : ${controlerProposition(mute).erreurs.join(' ; ')}`);
+  assert.deepStrictEqual(proposer({ ...lieux, date: '2026-11-26' }).ignorees.map((i) => i.raison.split(' : ')[0]), ['déjà proposée, ouverte', 'déjà proposée, ouverte']);
+
+  // Ratifiées : l'effet se mesure sur les faux refus qui citent la règle, dans les enveloppes de la spécification qui
+  // la définit ; le socle de l'acceptable n'exporte pas : indécidable.
+  ecrireStatut(lieux.depot, fichier, `statut: ratifiee\nversion: ${suivante(VERSION_SA)}\npr: 95`);
+  ecrireStatut(lieux.depot, ecrites[0], `statut: ratifiee\nversion: ${suivante(VERSION_A2D)}\npr: 96`);
+  const suivis = suivre(lieux).suivis;
+  const s = (f) => suivis.find((x) => x.fichier === f);
+  assert.deepStrictEqual([s(fichier).sorte, s(fichier).effet, s(fichier).avant, s(fichier).apres], ['faux-refus', 'indecidable', { motif: 0, enveloppes: 0 }, { motif: 0, enveloppes: 0 }]);
+  assert.deepStrictEqual([s(ecrites[0]).effet, s(ecrites[0]).avant, s(ecrites[0]).apres], ['indecidable', { motif: 2, enveloppes: 10 }, { motif: 0, enveloppes: 0 }], 'deux faux refus de la règle parmi les dix enveloppes d\'Agent2Dev');
 });
 
 // ---- D3 : état de l'écosystème ----
