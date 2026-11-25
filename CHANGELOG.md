@@ -96,6 +96,16 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-11-25 : socle-observation 1.4.0, observatoire 1.4.0, agent2dev 1.4.2, orchestrateur-c7e 3.8.5, generateur-skill-ticket 1.4.5
+
+- **Dépôt, `EVOLUTION.md`** : jalon J4 réduit du passage au troisième ordre, le deuxième couplage s'ouvre. Section 10.6, le catalogue des signaux : les quatorze clauses de second ordre du dépôt, classées par leur nature, et, pour les sept qui décrivent un effet sur des personnes, leur signal, son statut, exporté, mesuré, disponible ou non mesuré, son lieu et ce avec quoi il se lit. Règle 6 de la section 10.5 : toute clause a sa ligne au catalogue ; un signal ne se lit jamais seul et ne classe jamais des personnes.
+- **socle-observation 1.4.0** : champ facultatif `mesure`, `{ nom, valeur }`, une valeur entière que définit une correspondance, calculée à la source ; règle de minimisation des mesures, SO3.INV-1 précisé, sans rien relâcher. Correspondance nouvelle, section 6.7 : la rubrique `points` des livrables d'Agent2Dev ; la présentation d'un point de validation et sa décision, qui la vise avec la valeur `retenue`, `amendee` ou `refusee` et porte le délai de décision en secondes. Invariants en section 6.8.
+- **observatoire 1.4.0** : D7 étendue, `export-binome.mjs` traduit la rubrique `points` ; le délai se calcule sur les dates de la rubrique, et reste juste quand la date d'une enveloppe est avancée. Dimension D10, module `signaux` : décisions comptées par système et par point, retenues, amendées, refusées, en attente, délais médian et maximal, avec leurs instances ; des comptes seulement, sans candidat. Champ `mesure` reconnu ; point d'extension E4 ; dix-huit invariants ; recette de vingt-huit tests.
+- **agent2dev 1.4.2** : correctif. La rubrique `points` du livrable, en JSON : chaque présentation d'un point V0 à V5 et sa décision, avec le numéro et la date de leurs lignes, sa valeur et son rôle ; D13.INV-3 renforcé, scénario JO9.
+- **orchestrateur-c7e 3.8.5**, **generateur-skill-ticket 1.4.5** : socle d'observation 1.4.0 inclus ; l'outil de l'orchestrateur connaît le champ `mesure` et le refuse dans ses propres enveloppes ; exports inchangés ; skills de ticket d'exemple et rapports de contexte régénérés.
+- Les cinq versions se référencent et se publient dans un même commit (`EVOLUTION.md`, section 7). README, modes d'emploi, glossaire et transmissions à jour.
+- Décisions ratifiées avant la rédaction (plan du jalon J4 réduit) : catalogue dans `EVOLUTION.md`, sans version de skill (Z1) ; signaux disponibles nommés, et les décisions et les délais de décision du binôme exportés et comptés (Z2) ; toutes les clauses classées (Z3) ; correctif d'Agent2Dev pour la rubrique des points (Z4) ; champ `mesure` du socle pour le délai (Z5).
+
 ### 2026-11-25 : socle-observation 1.3.0, observatoire 1.3.0, agent2dev 1.4.1, agent2test 1.6.1, agent-tdd-jira 1.3.9, scenario-playwright 1.6.6, orchestrateur-c7e 3.8.4, generateur-skill-ticket 1.4.4
 
 - **socle-observation 1.3.0** : jalon J3e du passage au troisième ordre, l'export des kits du binôme. Correspondance nouvelle, section 6.6 : la rubrique `kits` des livrables d'Agent2Dev et des journaux de tests d'Agent2Test ; la remise, la validation, qui vise la remise, l'application ou son échec, et le retour arrière d'un kit font chacun une enveloppe, motif `kit-dev` ou `kit-test`, reliées par l'ancre de nature `kit`, valeur ajoutée à sa liste fermée ; un échec, une seule enveloppe ; ni invariant ni cible de spécification. Invariants inchangés, leur section devenue 6.7.
@@ -930,6 +940,13 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
   - la publication, dans ce dépôt public, d'un argumentaire destiné à un client, sans nom de client ni de mission.
 
 ## Outils
+
+### 2026-11-25 : catalogue des signaux et signaux du binôme
+
+- **`tools/verifier.mjs`** : le catalogue des signaux d'`EVOLUTION.md`, section 10.6, confronté aux clauses de second ordre des points d'entrée : une ligne par clause, aucune autre, sa nature dans la liste ; pour un effet sur des personnes, un signal, un statut de la liste, un lieu, invariant défini ou fichier du dépôt, sauf pour un signal non mesuré, et ce avec quoi il se lit ; pour une autre nature, aucun signal.
+- **`tools/verifier.test.mjs`** : un test de plus, onze altérations du catalogue et des clauses, toutes relevées ; la copie du dépôt porte `EVOLUTION.md`.
+- **`specs/observatoire/outils/export-binome.mjs`** : la rubrique `points` lue et traduite, le délai calculé à la source ; **`specs/observatoire/outils/observatoire.mjs`** : champ `mesure` au schéma fermé ; `confronter` rend la rubrique `signaux`.
+- **`specs/orchestrateur-c7e/outils/observation.mjs`** : le champ `mesure` connu, et refusé dans les enveloppes de l'orchestrateur.
 
 ### 2026-11-25 : export et confrontation des kits
 

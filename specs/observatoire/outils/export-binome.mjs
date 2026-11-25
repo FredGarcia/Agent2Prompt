@@ -1,18 +1,20 @@
 #!/usr/bin/env node
-// Export des refus et des kits du binôme Agent2Dev et Agent2Test vers le socle d'observation (observatoire, D7,
-// depuis 1.2.0, les kits depuis 1.3.0 ; socle-observation 1.3.0, sections 6.5 et 6.6). Il se lance depuis le clone
-// du dépôt Agent2Prompt ; l'IA de l'observatoire ne l'exécute pas d'elle-même : elle en donne la commande au
-// développeur.
+// Export des refus, des kits et des points de validation du binôme Agent2Dev et Agent2Test vers le socle
+// d'observation (observatoire, D7, depuis 1.2.0, les kits depuis 1.3.0, les points depuis 1.4.0 ; socle-observation
+// 1.4.0, sections 6.5 à 6.7). Il se lance depuis le clone du dépôt Agent2Prompt ; l'IA de l'observatoire ne
+// l'exécute pas d'elle-même : elle en donne la commande au développeur.
 //
 // Le binôme n'a pas d'outil dans le dépôt, qui tient sa spécification et ses formats, pas son code : cet outil agit
 // pour lui, à la source, dans le projet de l'application. Il lit, sans les modifier, les livrables d'Agent2Dev
 // (agent2dev.livrable/1) et les journaux de tests d'Agent2Test (agent2test.journal-de-tests/1) qu'on lui désigne :
 // chaque refus de leur rubrique acceptable, chaque réponse à un refus, dérogation ou faux refus, et chaque étape
-// d'un kit de leur rubrique kits, remise, validation, application ou échec, retour arrière, devient une enveloppe
-// socle-observation.enveloppe/1, datée par la rubrique, au nom et à la version du système qui l'a produite, ajoutée au journal de ce système dans le projet, docs/c7e/observations-agent2dev.jsonl ou
+// d'un kit de leur rubrique kits, remise, validation, application ou échec, retour arrière, et, pour Agent2Dev,
+// chaque présentation d'un point de validation et sa décision, avec le délai de décision calculé à la source,
+// devient une enveloppe socle-observation.enveloppe/1, datée par la rubrique, au nom et à la version du système
+// qui l'a produite, ajoutée au journal de ce système dans le projet, docs/c7e/observations-agent2dev.jsonl ou
 // docs/c7e/observations-agent2test.jsonl : en ajout seul, chaque ligne chaînée à l'empreinte de la précédente, la
 // tête portant le numéro et l'empreinte de la dernière (SO2). Aucun texte ne sort, ni l'objet refusé, ni le motif
-// d'une réponse, ni le nom de qui l'a donnée, ni le commentaire d'un échec, et toute référence du projet, demande,
+// d'une réponse, ni le nom de qui l'a donnée, ni le commentaire d'un échec ou d'une décision, et toute référence du projet, demande,
 // campagne, empreinte d'un patch, sort par son empreinte salée (SO3) : le
 // sel de l'instance, partagé avec les autres systèmes qui exportent dans le projet, est gardé dans son répertoire
 // Git commun, <git-common-dir>/agent2prompt/sel ; il n'est jamais versionné, affiché ni exporté. Un enregistrement
@@ -43,6 +45,12 @@ export const FORMATS = {
     systeme: 'agent2dev', journal: 'docs/c7e/observations-agent2dev.jsonl', nomCle: 'demande.cle', cleDe: (x) => x.demande?.cle,
     gardes: ['perimetre', 'ecriture', 'commandes', 'lecons'], roles: { developpeur: 'developpeur', referent: 'referent' },
     environnement: 'dev', rolesKit: { developpeur: 'developpeur' },
+    // Points de validation et leurs valeurs (agent2dev, module journal, section 4.1) ; seul le développeur y décide.
+    points: {
+      V0: ['valider', 'corriger', 'rejeter'], V1: ['confirmer', 'corriger'], V2: ['valider', 'repondre', 'corriger', 'rejeter'],
+      V3: ['choisir', 'corriger'], V4: ['accepter', 'ajuster'], V5: ['accepter', 'corriger', 'recalculer'],
+    },
+    rolesPoint: { developpeur: 'developpeur' },
   },
   'agent2test.journal-de-tests/1': {
     systeme: 'agent2test', journal: 'docs/c7e/observations-agent2test.jsonl', nomCle: 'campagne', cleDe: (x) => x.campagne,
@@ -58,6 +66,12 @@ const REPONSES = {
 };
 // Résultats d'une application déclarée ; un échec comprend le retour arrière que la fabrication a fait (socle, 6.6).
 const RESULTATS = ['applique', 'echec'];
+// Valeur de la décision sur une présentation, selon la valeur prise au point (socle, 6.7).
+const DECISION_DE_POINT = {
+  valider: 'retenue', confirmer: 'retenue', choisir: 'retenue', accepter: 'retenue',
+  corriger: 'amendee', repondre: 'amendee', ajuster: 'amendee', recalculer: 'amendee',
+  rejeter: 'refusee',
+};
 // Préfixe d'une règle citée sans le sien : `D` est une règle du système qui refuse.
 const PREFIXES = { SA: 'socle-acceptable', SC: 'socle-back-front', SO: 'socle-observation' };
 const REGLE = /^(?:([a-z][a-z0-9-]*):)?((D|SC|SO|SA)\d+\.INV-\d+)$/;
@@ -154,6 +168,11 @@ export function lireSource(chemin) {
       });
     }
   }
+  const pts = x.points;
+  if (pts !== undefined && f.points) {
+    if (!Array.isArray(pts)) erreurs.push(`${chemin} : rubrique points mal formée : la liste des présentations`);
+    else pts.forEach((pt, i) => lirePoint(pt, `${chemin}, point ${i + 1}`, f, numero, erreurs, enregistrements));
+  }
   const k = x.kits;
   if (k !== undefined) {
     if (!Array.isArray(k)) erreurs.push(`${chemin} : rubrique kits mal formée : la liste des kits`);
@@ -210,9 +229,56 @@ function lireKit(kit, ici, f, numero, erreurs, enregistrements) {
   if (r) enregistrements.push({ ...commun, etape: 'retour', n: r.n, date: r.date, role: r.role });
 }
 
-/** Enveloppe partielle d'un enregistrement, selon la correspondance du socle (sections 6.5 et 6.6), sans numéro ni chaînage. */
+/**
+ * Une présentation de la rubrique points : un point de validation, sa ligne et sa date ; sa décision, postérieure par
+ * son numéro et par sa date, avec une valeur de la liste du point et son rôle, ou `null` tant qu'elle attend. Le
+ * délai de décision, en secondes entières, se calcule sur les dates de la rubrique. Ajoute la présentation et sa
+ * décision aux enregistrements, ou leurs écarts aux erreurs.
+ */
+function lirePoint(pt, ici, f, numero, erreurs, enregistrements) {
+  if (!estObjet(pt)) {
+    erreurs.push(`${ici} : objet attendu`);
+    return;
+  }
+  const avant = erreurs.length;
+  if (!entier(pt.n)) erreurs.push(`${ici} : n, le numéro de sa ligne point.ouvert`);
+  if (typeof pt.date !== 'string' || !DATE.test(pt.date)) erreurs.push(`${ici} : date, AAAA-MM-JJTHH:MM:SSZ, en UTC`);
+  const valeurs = f.points[pt.point];
+  if (!valeurs) erreurs.push(`${ici} : point « ${pt.point} », hors de la liste : ${Object.keys(f.points).join(', ')}`);
+  const d = pt.decision;
+  if (d !== null && d !== undefined && valeurs && (!estObjet(d) || !entier(d.n) || typeof d.date !== 'string' || !DATE.test(d.date) || !valeurs.includes(d.valeur) || !(d.role in f.rolesPoint))) {
+    erreurs.push(`${ici}, décision mal formée : numéro, date, valeur ${valeurs.join(' ou ')}, rôle ${Object.keys(f.rolesPoint).join(' ou ')}`);
+  }
+  if (erreurs.length > avant) return;
+  if (estObjet(d) && (d.n <= pt.n || d.date < pt.date)) erreurs.push(`${ici}, décision : postérieure à la présentation, par son numéro et par sa date`);
+  if (erreurs.length > avant) return;
+  numero(pt.n, ici);
+  if (estObjet(d)) numero(d.n, `${ici}, décision`);
+  if (erreurs.length > avant) return;
+  const commun = { sorte: 'point', point: pt.point, presentation: pt.n };
+  enregistrements.push({ ...commun, etape: 'presentation', n: pt.n, date: pt.date });
+  if (estObjet(d)) {
+    const delai = Math.round((Date.parse(d.date) - Date.parse(pt.date)) / 1000);
+    enregistrements.push({ ...commun, etape: 'decision', n: d.n, date: d.date, valeur: d.valeur, role: d.role, delai });
+  }
+}
+
+/** Enveloppe partielle d'un enregistrement, selon la correspondance du socle (sections 6.5 à 6.7), sans numéro ni chaînage. */
 export function traduire(e, source, sel) {
   const f = FORMATS[source.format];
+  if (e.sorte === 'point') {
+    // Un point de validation n'éprouve aucune règle : ni invariant ni cible de spécification ; l'ancre est la demande.
+    const point = {
+      date: e.date,
+      source: { format: source.format, journal: empreinteSalee(sel, source.cle), numero: e.n },
+      cible: 'instance',
+      ancre: { nature: 'ticket', ref: empreinteSalee(sel, source.demande) },
+      ordre: 'OC1',
+      motif: `point-${e.point.toLowerCase()}`,
+    };
+    if (e.etape === 'presentation') return { ...point, niveau: 'N1', type: 'observation', sujet: `agent:${f.systeme}`, nature: 'presente' };
+    return { ...point, niveau: 'humain', type: 'decision', sujet: f.rolesPoint[e.role], nature: e.valeur, decision: { valeur: DECISION_DE_POINT[e.valeur], vise: null }, mesure: { nom: 'delai-decision', valeur: e.delai } };
+  }
   if (e.sorte === 'kit') {
     // Un kit n'éprouve aucune règle : ni invariant ni cible de spécification ; l'ancre relie ses étapes.
     const kit = {
@@ -239,7 +305,7 @@ export function traduire(e, source, sel) {
   return { ...commun, ordre: 'OC1', niveau: 'humain', type: r.type, motif: `refus-${e.garde}`, sujet: f.roles[e.role], nature: r.nature, decision: { valeur: r.valeur, vise: null } };
 }
 
-const empreinteDeTraduction = (x) => JSON.stringify([x.type, x.nature, x.motif, x.niveau, x.sujet, x.invariant ?? null, x.ancre?.ref ?? null, x.decision?.valeur ?? null]);
+const empreinteDeTraduction = (x) => JSON.stringify([x.type, x.nature, x.motif, x.niveau, x.sujet, x.invariant ?? null, x.ancre?.ref ?? null, x.decision?.valeur ?? null, x.mesure?.valeur ?? null]);
 
 // ---- Journaux et sel ----
 
@@ -339,7 +405,9 @@ export function exporter({ projet = '.', fichiers = [], sel } = {}) {
         s, e,
         cle: cleSource({ format, journal, numero: e.n }),
         // Ce que vise une décision : le refus d'une réponse, la remise d'une validation de kit.
-        cleVisee: e.sorte === 'reponse' ? cleSource({ format, journal, numero: e.refus }) : e.etape === 'validation' ? cleSource({ format, journal, numero: e.remise }) : null,
+        cleVisee: e.sorte === 'reponse' ? cleSource({ format, journal, numero: e.refus })
+          : e.etape === 'validation' ? cleSource({ format, journal, numero: e.remise })
+            : e.sorte === 'point' && e.etape === 'decision' ? cleSource({ format, journal, numero: e.presentation }) : null,
         partielle: traduire(e, s, sel),
       }));
     });
@@ -381,7 +449,8 @@ export function exporter({ projet = '.', fichiers = [], sel } = {}) {
       if (partielle.decision) {
         const vise = numeros.get(r.cleVisee);
         if (!vise) {
-          erreurs.push(`${r.s.chemin}, enregistrement ${r.e.n} : ${r.e.sorte === 'kit' ? `sa remise, ${r.e.remise}` : `son refus, ${r.e.refus}`}, n'a pas d'enveloppe`);
+          const visee = { kit: `sa remise, ${r.e.remise}`, point: `sa présentation, ${r.e.presentation}` }[r.e.sorte] ?? `son refus, ${r.e.refus}`;
+          erreurs.push(`${r.s.chemin}, enregistrement ${r.e.n} : ${visee}, n'a pas d'enveloppe`);
           continue;
         }
         partielle.decision = { valeur: partielle.decision.valeur, vise };

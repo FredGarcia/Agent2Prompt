@@ -4,8 +4,9 @@
  * Le vérificateur se lance, comme en CI, sur une copie du dépôt, dans un dossier temporaire hors de Git :
  * il y lit le disque à la place de `git ls-files`. Chaque test altère des fichiers de la copie, lance le
  * vérificateur, attend les erreurs nommées, puis rend les fichiers. La recette porte sur le préfixe `SA` du
- * socle de l'acceptable, sur son bloc `noyau`, sur les constitutions qui l'épinglent et sur les manifestes de
- * kit `socle-acceptable.kit/1` ; elle tourne dans `.github/workflows/verifier.yml`.
+ * socle de l'acceptable, sur son bloc `noyau`, sur les constitutions qui l'épinglent, sur les manifestes de kit
+ * `socle-acceptable.kit/1` et sur le catalogue des signaux d'`EVOLUTION.md` ; elle tourne dans
+ * `.github/workflows/verifier.yml`.
  */
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
@@ -16,8 +17,8 @@ import { after, before, test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 const RACINE = dirname(dirname(fileURLToPath(import.meta.url)));
-// Ce que lit le vérificateur : spécifications, transmissions, propositions de l'observatoire, README, glossaire.
-const A_COPIER = ['tools', 'specs', 'transmissions', 'observatoire', 'README.md', 'glossaire.md', '.geminiignore'];
+// Ce que lit le vérificateur : spécifications, transmissions, propositions de l'observatoire, README, EVOLUTION.md, glossaire.
+const A_COPIER = ['tools', 'specs', 'transmissions', 'observatoire', 'README.md', 'EVOLUTION.md', 'glossaire.md', '.geminiignore'];
 const SOCLE = 'specs/socle-acceptable/SKILL.md';
 const lf = (texte) => texte.replace(/\r\n/g, '\n');
 // Version courante d'une spécification, lue dans son manifeste : les tests suivent les versions sans être réécrits.
@@ -180,4 +181,34 @@ test('manifestes de kit : un système hors du dépôt, ou qui n’inclut pas le 
     alterer({ [SOCLE]: remplacer(['"systeme": { "nom": "agent2dev", "version": "1.4.0" },', '"systeme": { "nom": "java", "version": "1.1.1" },']) }),
     ["socle-acceptable : manifeste de kit java : java n'inclut pas socle-acceptable (shared) : aucun noyau à confronter"],
   );
+});
+
+test('catalogue des signaux : une ligne par clause de second ordre ; nature de la liste ; signal, statut, lieu et lecture pour un effet sur des personnes, aucun signal sinon', () => {
+  const resultat = alterer({
+    'EVOLUTION.md': remplacer(
+      ['| `java` | effet sur des personnes | constats et préférences contestés en revue | non mesuré | — | les constats acceptés |\n', ''],
+      ['| `angular` | précaution d\'observateur |', '| `angular` | effet esthétique |'],
+      ['| faux positifs, acceptations, suppressions et exclusions | mesuré |', '| faux positifs, acceptations, suppressions et exclusions | estimé |'],
+      ['`tension-dashboard-gitlab-agent:D5.INV-1`', '`tension-dashboard-gitlab-agent:D5.INV-9`'],
+      ['| disponible | `capture-sprint-jira:D11.INV-2` | les tickets classés |', '| disponible | `capture-sprint-jira:D11.INV-2` | — |'],
+      ['| recommandations retenues ou écartées | non mesuré | — |', '| recommandations retenues ou écartées | non mesuré | `specs/analyse-projet/SKILL.md` |'],
+      ['| `agent2dev` | structure du second ordre | — |', '| `agent2dev` | structure du second ordre | leçons ratifiées |'],
+      ['| décisions en attente et délai de décision aux points de validation d\'Agent2Dev | exporté | `observatoire:D10.INV-1` |', '| décisions en attente et délai de décision aux points de validation d\'Agent2Dev | exporté | `specs/agents-paralleles-gitlab/absent.md` |'],
+      ['| `skill4appli` | effet sur l\'observateur | — | — | — | — |\n', '| `skill4appli` | effet sur l\'observateur | — | — | — | — |\n| `socle-observation` | structure du second ordre | — | — | — | — |\n| `skill4appli` | effet sur l\'observateur | — | — | — | — |\n'],
+    ),
+    'specs/observatoire/SKILL.md': remplacer(['## 1. Lecture', 'Clause de second ordre : l\'observatoire fait partie de l\'écosystème qu\'il observe.\n\n## 1. Lecture']),
+  });
+  attendreErreurs(resultat, [
+    "EVOLUTION.md : catalogue des signaux : java : sa clause de second ordre n'a pas de ligne",
+    "EVOLUTION.md : catalogue des signaux : angular : nature « effet esthétique », hors de la liste : effet sur des personnes, structure du second ordre, effet sur l'observateur, précaution d'observateur",
+    'EVOLUTION.md : catalogue des signaux : sonarqube : statut « estimé », hors de la liste : exporté, mesuré, disponible, non mesuré',
+    "EVOLUTION.md : catalogue des signaux : tension-dashboard-gitlab-agent : lieu tension-dashboard-gitlab-agent:D5.INV-9, invariant qui n'est pas défini",
+    'EVOLUTION.md : catalogue des signaux : capture-sprint-jira : signal lu seul, sans ce avec quoi il se lit',
+    "EVOLUTION.md : catalogue des signaux : analyse-projet : un signal non mesuré n'a pas de lieu, « — »",
+    "EVOLUTION.md : catalogue des signaux : agent2dev : une clause de nature « structure du second ordre » n'a pas de signal, « — » dans chaque colonne",
+    'EVOLUTION.md : catalogue des signaux : agents-paralleles-gitlab : lieu « `specs/agents-paralleles-gitlab/absent.md` », un invariant préfixé par sa spécification ou un fichier du dépôt attendu',
+    "EVOLUTION.md : catalogue des signaux : socle-observation : aucune clause de second ordre dans son point d'entrée",
+    'EVOLUTION.md : catalogue des signaux : skill4appli : deux lignes',
+    "EVOLUTION.md : catalogue des signaux : observatoire : sa clause de second ordre n'a pas de ligne",
+  ]);
 });

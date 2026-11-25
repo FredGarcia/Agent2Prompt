@@ -1,10 +1,10 @@
 ---
 name: agent2dev
 description: Construire Agent2Dev, système multi-agents de développement qui applique le skill agent-tdd-jira comme méthode. D'une demande Jira exportée en MHTML, il tire les US et leurs critères d'acceptation, les scénarios Gherkin, les variantes, puis réalise chaque scénario en cycle TDD et trace la demande jusqu'aux commits, en binôme avec Agent2Test. Le moteur rédige, des agents déterministes écrivent et exécutent, le développeur valide à chaque point ; un journal chaîné et un apprentissage sous gouvernance en font un système de second ordre. Exécution locale, données dans un fichier SQLite unique, ouvert par un agent médiateur ; la remise et le journal de tests circulent à la main, ou par un échange par dossiers facultatif.
-version: 1.4.1
+version: 1.4.2
 ---
 
-# Agent2Dev, spécification 1.4.1
+# Agent2Dev, spécification 1.4.2
 
 Ce document est le point d'entrée du package. Il donne le principe, la carte du système, les points de validation, le registre des dimensions, les règles communes et les invariants. Les détails techniques sont dans `modules/`. Le fichier `manifest.json` déclare quels modules sont actifs.
 
@@ -186,7 +186,7 @@ Entre V4 et V5, l'acceptation en binôme n'est pas un point de validation : le d
 
 ## 6. Registre des dimensions
 
-| ID | Dimension | Introduite | Statut 1.4.1 | Dépend de | Module |
+| ID | Dimension | Introduite | Statut 1.4.2 | Dépend de | Module |
 |---|---|---|---|---|---|
 | D1 | Noyau 7E, bus et constitution | 1.0 | active | | `noyau` |
 | D2 | Données par agent, en SQLite | 1.0 | superseded | D1 | remplacée en 1.1.0 par D24 (`donnees`) |
@@ -236,7 +236,7 @@ Statuts : `active` (implémentée et testée), `reserved` (points d'extension po
 Un point d'extension n'est pas une fonctionnalité. En 1.x, il n'a qu'un test qui prouve qu'il est inerte.
 
 - **E1** : le port moteur accepte de nouveaux adaptateurs par version ; en 1.x : `simulation`, `externe` (Gemini Code Assist par MCP) et `compatible-openai`. Un adaptateur inconnu est refusé au démarrage.
-- **E2** : la méthode est désignée par le nom, la version et la transmission d'un skill dans la configuration humaine. En 1.4.1, seul agent-tdd-jira 1.3.9 est pris en charge ; un autre skill ou une autre version est refusé au démarrage avec le motif « méthode non prise en charge ».
+- **E2** : la méthode est désignée par le nom, la version et la transmission d'un skill dans la configuration humaine. En 1.4.2, seul agent-tdd-jira 1.3.9 est pris en charge ; un autre skill ou une autre version est refusé au démarrage avec le motif « méthode non prise en charge ».
 - **E3** : l'action `memoire.rechercher` existe et rend une liste vide ; chaque fiche a un emplacement « fragments », vide en 1.x. La mémoire sur le code et les demandes passées est réservée à D21.
 - **E4** : chaque point de validation V0 à V5 porte, dans la configuration humaine, un champ `regime`, qui vaut `presenter` ; toute autre valeur est refusée au démarrage. L'autonomie par point est réservée à D22, et suppose une version du skill qui la permette ; CP-4 n'a pas de régime, et reste toujours une décision humaine.
 - **E5** : le kit dev. Le champ `acceptable` de la constitution, refusé au démarrage en 1.2, épingle depuis 1.3.0 le noyau du socle de l'acceptable (D26). Inerte en 1.3, le kit dev est remis depuis 1.4.0 (D27), selon le contrat des kits du socle de l'acceptable 1.1.0 : le patch d'un scénario, confronté, avec son manifeste, que la fabrication de l'hôte applique sur l'environnement dev ; aucune règle n'a changé, et la garde refuse toujours ce qui ne se fait que dans un kit (scénario AC13, module `acceptable`).
@@ -373,7 +373,7 @@ Ces invariants ne sont plus en vigueur ; ils restent ici pour la migration d'une
 
 - **D13.INV-1** : le journal est en ajout seul et chaîné par empreintes SHA-256 ; `verifierChaine` nomme la première ligne rompue ou manquante.
 - **D13.INV-2** : chaque ligne porte son échelle et sa phase : une demande se relit comme un arbre 7E, de la demande au pas.
-- **D13.INV-3** : le livrable de demande est une projection du journal, en Markdown et en JSON, depuis la même source.
+- **D13.INV-3** : le livrable de demande est une projection du journal, en Markdown et en JSON, depuis la même source ; sa rubrique `points` porte chaque présentation d'un point de validation et sa décision, avec le numéro et la date de leurs lignes, la valeur et le rôle de la décision.
 - **D13.INV-4** : toute production du moteur porte l'adaptateur et le nom du moteur, la fiche et sa version composée, l'empreinte du prompt et la décision qui l'a validée.
 
 **D14 : observabilité**
@@ -540,3 +540,5 @@ Ce qui change par rapport à l'étape 1 :
 **1.4.0** (2026-11-25) : dimension D27 active, le kit dev, jalon J3d du passage du dépôt au troisième ordre (`EVOLUTION.md`, section 10). Le socle `socle-acceptable` 1.1.0, inclus et épinglé, décrit le contrat des kits sur la fabrication de l'hôte. Le patch d'un scénario devient son kit dev : le `depot` le confronte avant V4 au noyau et à la constitution, fichiers écrits et contenu, et un patch qui enfreint une règle n'est pas remis ; un patch conforme reçoit son manifeste `socle-acceptable.kit/1`, à son empreinte. La décision « accepter » de V4 le valide ; la fabrication de l'hôte l'applique sur l'environnement dev ; le développeur déclare son application et son retour arrière depuis le tableau de bord, et une déclaration pour un patch retouché est refusée `KIT_MODIFIE` ; aucun agent n'applique un kit. Rubrique `kits` du livrable, datée. Module `kit`, invariants D27.INV-1 à D27.INV-3, scénarios KI1 à KI5 ; AC13 récrit : la garde refuse toujours ce qui ne se fait que dans un kit ; point d'extension E5 récrit. Constitution 2.1.0, qui épingle le noyau à la version 1.1.0 du socle, à la même empreinte. Méthode : skill agent-tdd-jira 1.3.8, seule version prise en charge (point E2), dont seule la référence à Agent2Test change ; la transmission à placer dans `test/fixtures/methode/` est celle de la 1.3.8. Binôme : agent2test 1.6.0, qui produit de même le kit test. Exemples du journal à la version 1.4.0. Décisions ratifiées avant la rédaction : plan du jalon J3d, K1 à K4. Archive : `archives/SKILL-v1.3.1.md`.
 
 **1.4.1** (2026-11-25) : correctif, jalon J3e du passage du dépôt au troisième ordre (`EVOLUTION.md`, section 10), export des kits. Écart relevé au plan : la rubrique `kits` ne consignait pas qui déclare l'application, que l'enveloppe du socle d'observation exige comme sujet, et ne disait pas si un échec, déclaré avec son retour arrière, se consigne en un ou deux enregistrements. `application` porte désormais le rôle qui la déclare ; un échec ne remplit que `application`, de résultat `echec`, et `retourArriere` reste `null`. D27.INV-3 renforcé, scénario KI5 précisé ; la rubrique est la source de l'export des kits que porte l'observatoire 1.3.0, selon la correspondance du socle d'observation 1.3.0, section 6.6. Méthode : skill agent-tdd-jira 1.3.9, seule version prise en charge (point E2), dont seule la référence à Agent2Test change ; la transmission à placer dans `test/fixtures/methode/` est celle de la 1.3.9. Binôme : agent2test 1.6.1, même correctif. Exemples du journal à la version 1.4.1. Décisions ratifiées avant la rédaction : plan du jalon J3e, Y1 à Y3. Archive : `archives/SKILL-v1.4.0.md`.
+
+**1.4.2** (2026-11-25) : correctif, jalon J4 réduit du passage du dépôt au troisième ordre (`EVOLUTION.md`, section 10), les signaux du deuxième couplage. Écart relevé au plan : la rubrique « points, attentes et décisions » du livrable n'était décrite qu'en prose, sans le numéro des lignes ni l'heure de présentation d'un point, et le délai de décision ne pouvait sortir de l'instance. La rubrique `points` du livrable, en JSON : chaque présentation d'un point V0 à V5, avec le numéro et la date de sa ligne `point.ouvert`, et sa décision, avec ceux de sa ligne `point.decide`, sa valeur, dans la liste de son point, son rôle, son canal et son commentaire, ou `null` tant qu'elle attend (module `journal`, section 4.1). D13.INV-3 renforcé, scénario JO9 ; la rubrique est la source de l'export des décisions et des délais de décision que porte l'observatoire 1.4.0, selon la correspondance du socle d'observation 1.4.0, section 6.7 : ces deux signaux observent les clauses de second ordre d'agent-tdd-jira et d'agents-paralleles-gitlab (`EVOLUTION.md`, section 10.6). Exemples du journal à la version 1.4.2. Décisions ratifiées avant la rédaction : plan du jalon J4 réduit, Z1 à Z5. Archive : `archives/SKILL-v1.4.1.md`.

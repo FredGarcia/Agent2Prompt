@@ -15,7 +15,7 @@ status: active
 {
   "n": 2041,
   "horodatage": "2026-10-21T14:02:11.482Z",
-  "specVersion": "1.4.1",
+  "specVersion": "1.4.2",
   "instance": "principale",
   "demande": "ECR-77",
   "correlation": "5d1e…",
@@ -59,7 +59,7 @@ Une seule source, la projection JSON, de format `agent2dev.livrable/1` ; le Mark
 
 1. en-tête : clé, titre, empreinte du fichier MHTML, instance, versions épinglées (spécification, skill et empreinte de sa transmission, référentiel `R-<n>`, constitution), moteur, autorisations (écriture du code, moteur externe), mode, arbre de la demande (chemin, branche, commit de départ) ;
 2. profil : version ratifiée, écarts de versions et réponses ;
-3. points, attentes et décisions : cible, décision, auteur, canal, date, commentaire ;
+3. points, attentes et décisions : chaque présentation d'un point de validation V0 à V5, avec sa ligne `point.ouvert`, et sa décision, avec sa ligne `point.decide`, sa valeur, son rôle, son canal et son commentaire, ou `null` tant qu'elle attend (section 4.1) ; les attentes ;
 4. scénarios : pas par pas, avec le message du rouge, les essais consommés, les suites, le commit et, en copie de travail, le patch ;
 5. acceptation : remises, campagnes lues, lignes du script, corrections ;
 6. matrice, rapport et projet de commentaire Jira (module `tracabilite`) ;
@@ -73,17 +73,37 @@ Une seule source, la projection JSON, de format `agent2dev.livrable/1` ; le Mark
 {
   "format": "agent2dev.livrable/1",
   "demande": { "cle": "ECR-77", "titre": "Export des retours d'expérience en CSV", "source": "<sha256 du MHTML>" },
-  "versions": { "specification": "1.4.1", "skill": "agent-tdd-jira 1.3.9", "transmission": "<sha256>", "referentiel": "R-4", "constitution": "<sha256>" },
+  "versions": { "specification": "1.4.2", "skill": "agent-tdd-jira 1.3.9", "transmission": "<sha256>", "referentiel": "R-4", "constitution": "<sha256>" },
   "autorisations": { "ecritureCode": false, "moteurExterne": true },
   "arbre": { "mode": "normal", "branche": "feature/ECR-77-export-csv", "commitDepart": "<sha1>" },
   "scenarios": [
     { "id": "ECR-77-S02", "statut": "accepté", "rouge": "Expecting actual: [] to start with: [-17, -69, -65]", "essais": { "rouge": 1, "vert": 2 },
       "suites": { "back": "vert", "front": "non concerné" }, "patch": "002-S02.patch", "commit": "<sha1 dans l'arbre de la demande>" }
   ],
+  "points": [
+    { "n": 2040, "date": "2026-10-21T13:40:00Z", "point": "V2",
+      "decision": { "n": 2046, "date": "2026-10-21T14:02:30Z", "valeur": "corriger", "role": "developpeur", "canal": "tableau-de-bord", "commentaire": "le critère 3 vise l'export, pas l'import" } },
+    { "n": 2050, "date": "2026-10-21T14:10:00Z", "point": "V2", "decision": null }
+  ],
   "productions": [{ "id": "P-12", "fiche": "vert@1.0.0+agent-tdd-jira@1.3.9+L1", "moteur": "gemini", "adaptateur": "externe", "empreintePrompt": "<sha256>", "decision": "DEC-118" }],
   "empreinteFin": "<sha256>"
 }
 ```
+
+### 4.1 Rubrique `points`
+
+Chaque présentation d'un point de validation, V0 à V5, porte le numéro `n` et la date de sa ligne `point.ouvert`, et le point ; sa décision, le numéro et la date de sa ligne `point.decide`, à la seconde, en UTC, sa valeur, le rôle qui l'a prise, son canal et son commentaire, ou `null` tant qu'elle attend. Un point présenté de nouveau, après une correction ou des réponses, est une présentation nouvelle. Les valeurs sont celles du point (section 5 du point d'entrée), en minuscules et sans accent :
+
+| Point | Valeurs |
+|---|---|
+| V0 | `valider`, `corriger`, `rejeter` |
+| V1 | `confirmer`, `corriger` |
+| V2 | `valider`, `repondre`, `corriger`, `rejeter` |
+| V3 | `choisir`, `corriger` |
+| V4 | `accepter`, `ajuster` |
+| V5 | `accepter`, `corriger`, `recalculer` |
+
+Le rôle est `developpeur`, seul à décider aux points V0 à V5. La rubrique est la source de l'export des décisions et des délais de décision, que porte l'observatoire (socle d'observation, section 6.7) : le délai, de la présentation à la décision, s'y calcule à la source, et ni le canal, ni le commentaire, ni l'auteur ne sortent. Les décisions de CP-4, asynchrones et propres à la gouvernance, n'y figurent pas.
 
 - Le livrable va dans `<sortie>/<CLÉ>/livrable.json` et `livrable.md`.
 - `empreinteFin` est l'empreinte de la ligne `demande.close` ; un livrable rendu avant la clôture porte la mention « provisoire » et aucune empreinte de fin.
@@ -108,6 +128,7 @@ Une seule source, la projection JSON, de format `agent2dev.livrable/1` ; le Mark
 | JO6 | D13.INV-3 | avant `demande.close`, le livrable est « provisoire » ; après, `empreinteFin` égale l'empreinte de la ligne de clôture |
 | JO7 | D13.INV-4 | chaque production du moteur du livrable porte adaptateur, moteur, fiche, version composée, empreinte du prompt et décision |
 | JO8 | D13.INV-4 | une sortie refusée par le validateur garde sa ligne `moteur.production`, rattachée à son refus |
+| JO9 | D13.INV-3 | la rubrique `points` du livrable : chaque présentation avec le numéro et la date de sa ligne `point.ouvert`, chaque décision avec ceux de sa ligne `point.decide`, une valeur de la liste de son point et le rôle `developpeur` ; une présentation sans décision porte `null` |
 
 ## 7. Fichiers à produire
 

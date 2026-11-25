@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Observatoire de l'écosystème Agent2Prompt (observatoire 1.3.0) : le premier couplage du troisième ordre,
+// Observatoire de l'écosystème Agent2Prompt (observatoire 1.4.0) : le premier couplage du troisième ordre,
 // entre systèmes (EVOLUTION.md, section 10.3), et la boucle du troisième, avec les valeurs. Il se lance depuis le
 // clone du dépôt, sur le poste.
 //
@@ -7,8 +7,9 @@
 // système qui exporte, dans un magasin local, gardé dans le répertoire Git commun du clone,
 // <git-common-dir>/agent2prompt/observatoire/ : jamais versionné, publié ni exporté. Il les confronte entre
 // instances, entre systèmes par les invariants du dépôt que citent leurs écarts, confronte par règle les refus
-// du binôme, leurs dérogations et leurs faux refus, et compte ses kits, par système, environnement et instance ;
-// il observe l'état de l'écosystème, écrit des propositions
+// du binôme, leurs dérogations et leurs faux refus, compte ses kits, par système, environnement et instance, et
+// ses décisions aux points de validation, avec leurs délais, signaux du deuxième couplage ; il observe l'état de
+// l'écosystème, écrit des propositions
 // minimisées dans observatoire/propositions/, que le développeur apporte au dépôt par une pull request, et suit
 // l'effet de celles que la ratification a fait entrer dans une version. Il propose et n'applique jamais : il ne
 // modifie aucune spécification, ne commite ni ne publie. Il ne lit des instances que leurs enveloppes : jamais
@@ -51,7 +52,7 @@ const RACINE = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..', '..'
 
 // ---- Schéma fermé de l'enveloppe (socle, section 3), pour tout système qui exporte ----
 
-export const CHAMPS_ENVELOPPE = ['schema', 'numero', 'date', 'systeme', 'instance', 'ordre', 'niveau', 'type', 'motif', 'sujet', 'source', 'precedent', 'nature', 'profondeur', 'cible', 'invariant', 'ancre', 'preuve', 'decision'];
+export const CHAMPS_ENVELOPPE = ['schema', 'numero', 'date', 'systeme', 'instance', 'ordre', 'niveau', 'type', 'motif', 'sujet', 'source', 'precedent', 'nature', 'profondeur', 'cible', 'invariant', 'ancre', 'preuve', 'decision', 'mesure'];
 export const REQUIS_ENVELOPPE = CHAMPS_ENVELOPPE.slice(0, CHAMPS_ENVELOPPE.indexOf('precedent') + 1);
 const CHAMPS = CHAMPS_ENVELOPPE;
 const REQUIS = REQUIS_ENVELOPPE;
@@ -61,6 +62,7 @@ const OBJETS = {
   ancre: { cles: ['nature', 'ref'], requis: ['nature', 'ref'] },
   preuve: { cles: ['nature', 'ref'], requis: ['nature', 'ref'] },
   decision: { cles: ['valeur', 'vise'], requis: ['valeur', 'vise'] },
+  mesure: { cles: ['nom', 'valeur'], requis: ['nom', 'valeur'] },
 };
 const LISTES = {
   ordre: ['OC1', 'OC2', 'OC3'],
@@ -185,6 +187,10 @@ export function controlerEnveloppe(x) {
   if (x.decision !== undefined) {
     dansLaListe('decision.valeur', x.decision.valeur, LISTES.decision);
     if (!entier(x.decision.vise) || (entier(x.numero) && x.decision.vise >= x.numero)) err.push('decision.vise : le numéro d\'une enveloppe antérieure');
+  }
+  if (x.mesure !== undefined) {
+    if (!chaine(x.mesure.nom, MOTIF)) err.push(`mesure.nom « ${x.mesure.nom} » : le nom que définit une correspondance, en minuscules et tirets`);
+    if (!Number.isInteger(x.mesure.valeur) || x.mesure.valeur < 0) err.push(`mesure.valeur ${JSON.stringify(x.mesure.valeur)} : un entier positif ou nul`);
   }
   if (LISTES.ordre.includes(x.ordre) && LISTES.niveau.includes(x.niveau) && !NIVEAUX_DE[x.ordre].includes(x.niveau)) {
     err.push(`niveau ${x.niveau} avec l'ordre ${x.ordre} : N1 va avec OC1, N2 et N3 avec OC2, humain avec OC1 ou OC2, et aucun système n'émet OC3`);
@@ -430,7 +436,7 @@ function chargerMagasin(magasin, depot) {
   return { parInstance, toutes, ecartees, connus };
 }
 
-// ---- D2 : confrontation entre instances ; D6 : entre systèmes ; D8 : de l'acceptable ; D9 : des kits ----
+// ---- D2 : confrontation entre instances ; D6 : entre systèmes ; D8 : de l'acceptable ; D9 : des kits ; D10 : des signaux ----
 
 /**
  * Index des enveloppes d'une instance par système et par numéro : chaque système tient son journal, où les numéros
@@ -578,6 +584,53 @@ function parKit(parInstance) {
     .map((g) => ({ ...g, instances: g.instances.size }));
 }
 
+const POINT = /^point-v[0-5]$/;
+const mediane = (xs) => {
+  if (xs.length === 0) return null;
+  const tri = [...xs].sort((a, b) => a - b);
+  const m = Math.floor(tri.length / 2);
+  return tri.length % 2 === 1 ? tri[m] : Math.round((tri[m - 1] + tri[m]) / 2);
+};
+
+/**
+ * Confrontation des signaux (D10), deux signaux du deuxième couplage (EVOLUTION.md, section 10.6) : les décisions
+ * aux points de validation et leurs délais. Une présentation est une observation de nature `presente`, de motif
+ * `point-` suivi du point ; sa décision, une décision qui la vise, dans le journal de son système, avec la mesure
+ * `delai-decision` (socle, section 6.7). Pour chaque système et chaque point : présentations, décisions retenues,
+ * amendées et refusées, présentations en attente, délais médian et maximal, en secondes, et instances. Des comptes
+ * seulement : un signal ne cite aucune règle, ne fait ni retour, ni récurrence, ni candidat, et ne classe personne.
+ */
+function parSignal(parInstance, toutes) {
+  const groupes = new Map();
+  for (const [instance, xs] of parInstance) {
+    const index = indexer(toutes.get(instance));
+    const decidees = new Set();
+    for (const x of xs) {
+      if (x.type === 'decision' && POINT.test(x.motif) && viseeDe(x, index)?.nature === 'presente') decidees.add(`${x.systeme.nom}:${x.decision.vise}`);
+    }
+    for (const x of xs) {
+      if (!POINT.test(x.motif)) continue;
+      const presentation = x.type === 'observation' && x.nature === 'presente';
+      const decision = x.type === 'decision' && viseeDe(x, index)?.nature === 'presente';
+      if (!presentation && !decision) continue;
+      const cle = `${x.systeme.nom}|${x.motif}`;
+      const g = groupes.get(cle) ?? { systeme: x.systeme.nom, point: x.motif.slice(6).toUpperCase(), presentes: 0, retenues: 0, amendees: 0, refusees: 0, enAttente: 0, delais: [], instances: new Set() };
+      if (presentation) {
+        g.presentes++;
+        if (!decidees.has(`${x.systeme.nom}:${x.numero}`)) g.enAttente++;
+      } else {
+        g[{ retenue: 'retenues', amendee: 'amendees', refusee: 'refusees' }[x.decision.valeur]]++;
+        if (x.mesure?.nom === 'delai-decision') g.delais.push(x.mesure.valeur);
+      }
+      g.instances.add(instance);
+      groupes.set(cle, g);
+    }
+  }
+  return [...groupes.values()]
+    .sort((a, b) => parCodePoint(`${a.systeme}|${a.point}`, `${b.systeme}|${b.point}`))
+    .map(({ delais, instances, ...g }) => ({ ...g, delaiMedian: mediane(delais), delaiMax: delais.length > 0 ? Math.max(...delais) : null, instances: instances.size }));
+}
+
 /**
  * Retours, récurrences, invariants et règles trop larges candidats. Un retour : une proposition d'instance qui
  * vise une spécification, qu'une décision humaine de l'instance a retenue, dès une instance. Une récurrence : un
@@ -587,7 +640,7 @@ function parKit(parInstance) {
  */
 export function confronter({ magasin = magasinParDefaut(), depot = RACINE } = {}) {
   const r = relever({ magasin });
-  if (r.altere || !magasin) return { erreurs: r.erreurs, avertissements: [], candidats: [], acceptable: [], kits: [], ecartees: 0, instances: 0 };
+  if (r.altere || !magasin) return { erreurs: r.erreurs, avertissements: [], candidats: [], acceptable: [], kits: [], signaux: [], ecartees: 0, instances: 0 };
   const { parInstance, toutes, ecartees, connus } = chargerMagasin(magasin, depot);
   const groupes = new Map();
   const ajouter = (x, instance, retour, ...refs) => {
@@ -619,7 +672,7 @@ export function confronter({ magasin = magasinParDefaut(), depot = RACINE } = {}
   candidats.push(...parInvariant(parInstance, toutes, depot, connus).sort((a, b) => parCodePoint(a.invariant, b.invariant)));
   const { acceptable, candidats: regles } = parRegle(parInstance, toutes, depot, connus);
   candidats.push(...regles);
-  return { erreurs: r.erreurs, avertissements: r.avertissements, candidats, acceptable, kits: parKit(parInstance), ecartees: ecartees.length, instances: parInstance.size };
+  return { erreurs: r.erreurs, avertissements: r.avertissements, candidats, acceptable, kits: parKit(parInstance), signaux: parSignal(parInstance, toutes), ecartees: ecartees.length, instances: parInstance.size };
 }
 
 // ---- D3 : état de l'écosystème ----
@@ -862,6 +915,8 @@ const USAGE = [
 ].join('\n');
 
 const OPTIONS = { inscrire: ['--projet'], relever: [], etat: ['--json'], confronter: ['--json'], proposer: ['--date'], suivre: ['--json'], verifier: [] };
+/** Une durée en secondes, lisible : secondes, minutes, ou heures à une décimale. */
+const duree = (s) => (s < 60 ? `${s} s` : s < 3600 ? `${Math.round(s / 60)} min` : `${(s / 3600).toFixed(1).replace('.', ',')} h`);
 const EFFETS = { observe: 'effet observé', 'non-observe': 'effet non observé', indecidable: 'indécidable, moins de vingt enveloppes d\'un côté' };
 const ECARTS = { 'a-jour': 'à jour', 'en-retard': 'en retard', inconnue: 'version inconnue du dépôt' };
 
@@ -939,6 +994,11 @@ export function principal(argv, sortie = console.log, erreur = console.error, co
       for (const k of r.kits) {
         const attente = [k.enAttente > 0 ? `${k.enAttente} en attente d'application` : '', k.nonNettoyes > 0 ? `${k.nonNettoyes} sans nettoyage déclaré` : ''].filter(Boolean).join(', ');
         sortie(`  ${k.systeme}, kit ${k.environnement} : ${k.remis} remis, ${pluriel(k.valides, 'validé')}, ${pluriel(k.appliques, 'appliqué')}, ${pluriel(k.echecs, 'échec')}, ${pluriel(k.retoursArriere, 'défait')}${attente ? ` ; ${attente}` : ''} ; ${pluriel(k.instances, 'instance')}`);
+      }
+      if (r.signaux.length > 0) sortie('signaux des points de validation : des comptes, sans candidat');
+      for (const s of r.signaux) {
+        const delais = s.delaiMedian === null ? 'aucun délai' : `délai médian ${duree(s.delaiMedian)}, maximal ${duree(s.delaiMax)}`;
+        sortie(`  ${s.systeme}, point ${s.point} : ${pluriel(s.presentes, 'présentation')}, ${pluriel(s.retenues, 'retenue')}, ${pluriel(s.amendees, 'amendée')}, ${pluriel(s.refusees, 'refusée')}, ${s.enAttente} en attente ; ${delais} ; ${pluriel(s.instances, 'instance')}`);
       }
       if (r.instances < SEUIL_INSTANCES) sortie(`moins de ${SEUIL_INSTANCES} instances : aucune récurrence ni règle trop large possible ; seuls remontent les retours, et les invariants relevés par deux systèmes`);
     }

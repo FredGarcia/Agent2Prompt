@@ -1,14 +1,14 @@
 # Mode d'emploi : l'observatoire
 
-Ce mode d'emploi met en place l'observatoire de l'écosystème, [`observatoire`](../../specs/observatoire/SKILL.md) 1.3.0, sur le poste du développeur. L'observatoire relève les journaux d'enveloppes que les systèmes exportent dans ses projets, dont ceux qu'il écrit pour le binôme Agent2Dev et Agent2Test à partir de leurs refus et de leurs kits, les confronte d'une instance à l'autre, d'un système à l'autre par les invariants du dépôt que citent leurs écarts, et par règle de l'acceptable que citent les refus, compte les kits, observe l'état de l'écosystème, écrit des propositions minimisées que le développeur apporte au dépôt par pull request, et suit l'effet de celles que la ratification fait entrer dans une version. Il propose et n'applique jamais ; ce qu'il relève reste sur le poste.
+Ce mode d'emploi met en place l'observatoire de l'écosystème, [`observatoire`](../../specs/observatoire/SKILL.md) 1.4.0, sur le poste du développeur. L'observatoire relève les journaux d'enveloppes que les systèmes exportent dans ses projets, dont ceux qu'il écrit pour le binôme Agent2Dev et Agent2Test à partir de leurs refus, de leurs kits et de leurs décisions aux points de validation, les confronte d'une instance à l'autre, d'un système à l'autre par les invariants du dépôt que citent leurs écarts, et par règle de l'acceptable que citent les refus, compte les kits et les signaux, observe l'état de l'écosystème, écrit des propositions minimisées que le développeur apporte au dépôt par pull request, et suit l'effet de celles que la ratification fait entrer dans une version. Il propose et n'applique jamais ; ce qu'il relève reste sur le poste.
 
 ```mermaid
 flowchart LR
-  B["exporter les refus et les kits du binôme<br/>export-binome.mjs"] --> I
+  B["exporter les refus, les kits et les points du binôme<br/>export-binome.mjs"] --> I
   E["exporter<br/>dans chaque projet"] --> I["inscrire<br/>chaque projet"]
   I --> R["relever<br/>miroirs vérifiés"]
   R --> T["etat<br/>versions en usage"]
-  R --> C["confronter<br/>retours, récurrences, invariants, règles de l'acceptable, kits"]
+  R --> C["confronter<br/>retours, récurrences, invariants, règles de l'acceptable, kits, signaux"]
   C --> P["proposer<br/>observatoire/propositions/"]
   P --> PR["pull request<br/>ratification"]
   PR --> S["suivre<br/>effet après la version"]
@@ -25,17 +25,17 @@ flowchart LR
 node <dépôt>/tools/installer.mjs observatoire --utilisateur
 ```
 
-Le skill s'installe au niveau utilisateur seulement, dans `~/.gemini/skills/observatoire/` : il observe plusieurs projets depuis le clone, sans écrire dans aucun. Il sert à l'IA qui t'aide à lire ce que l'observatoire tire et à rédiger les propositions. Sa transmission porte sa consigne, ses modules et le socle d'observation ; ses outils restent dans le clone : [`transmissions/observatoire-1.3.0.md`](../../transmissions/observatoire-1.3.0.md). L'outil se lance aussi sans IA, depuis le clone.
+Le skill s'installe au niveau utilisateur seulement, dans `~/.gemini/skills/observatoire/` : il observe plusieurs projets depuis le clone, sans écrire dans aucun. Il sert à l'IA qui t'aide à lire ce que l'observatoire tire et à rédiger les propositions. Sa transmission porte sa consigne, ses modules et le socle d'observation ; ses outils restent dans le clone : [`transmissions/observatoire-1.4.0.md`](../../transmissions/observatoire-1.4.0.md). L'outil se lance aussi sans IA, depuis le clone.
 
-## 3. Exporter les refus et les kits du binôme, inscrire et relever
+## 3. Exporter les refus, les kits et les points du binôme, inscrire et relever
 
-Agent2Dev et Agent2Test n'ont pas d'outil dans le dépôt : l'observatoire exporte leurs refus et leurs kits pour eux, dans le projet de l'application, sous le sel de son instance.
+Agent2Dev et Agent2Test n'ont pas d'outil dans le dépôt : l'observatoire exporte leurs refus, leurs kits et les décisions d'Agent2Dev aux points de validation pour eux, dans le projet de l'application, sous le sel de son instance.
 
 ```bash
 node specs/observatoire/outils/export-binome.mjs exporter --projet <application> <sortie>/<CLÉ>/livrable.json <projet-agent2test>/rapports/<campagne>/journal-de-tests.json
 ```
 
-Depuis le clone. Chaque refus de la rubrique `acceptable` d'un livrable ou d'un journal de tests, et chaque réponse, dérogation ou faux refus, devient une enveloppe datée par la rubrique, dans le journal de son système ; de même chaque étape d'un kit de la rubrique `kits`, remise, validation, application ou échec, retour arrière. Rien d'autre ne sort : ni l'objet refusé, ni le motif d'une réponse, ni le commentaire d'un échec, ni la clé de la demande, ni le scénario, ni l'empreinte d'un patch, ni un nom. Versionne les journaux et leurs têtes avec le projet. Relancé, l'outil n'ajoute que ce qui est nouveau, comme la réponse donnée après l'export de son refus ; une rubrique qui change ce qu'elle a déjà rendu est refusée. `verifier --projet <application>` contrôle les deux journaux, `etat --projet <application>` les compte.
+Depuis le clone. Chaque refus de la rubrique `acceptable` d'un livrable ou d'un journal de tests, et chaque réponse, dérogation ou faux refus, devient une enveloppe datée par la rubrique, dans le journal de son système ; de même chaque étape d'un kit de la rubrique `kits`, remise, validation, application ou échec, retour arrière, et, pour Agent2Dev, chaque présentation d'un point de validation de la rubrique `points` et sa décision, avec le délai de décision, calculé à la source. Rien d'autre ne sort : ni l'objet refusé, ni le motif d'une réponse, ni le commentaire d'un échec ou d'une décision, ni son canal, ni la clé de la demande, ni le scénario, ni l'empreinte d'un patch, ni un nom. Versionne les journaux et leurs têtes avec le projet. Relancé, l'outil n'ajoute que ce qui est nouveau, comme la réponse donnée après l'export de son refus ; une rubrique qui change ce qu'elle a déjà rendu est refusée. `verifier --projet <application>` contrôle les deux journaux, `etat --projet <application>` les compte.
 
 ```bash
 node specs/observatoire/outils/observatoire.mjs inscrire --projet <dossier>
@@ -52,7 +52,7 @@ node specs/observatoire/outils/observatoire.mjs confronter
 node specs/observatoire/outils/observatoire.mjs proposer
 ```
 
-`etat` dit, pour chaque instance, la version de chaque système qui exporte, à jour, en retard ou inconnue du dépôt. `confronter` liste les candidats : un retour, une proposition qu'une instance a retenue pour une spécification, dès une instance ; une récurrence, un même motif à la même profondeur dans au moins deux instances ; un invariant, un même invariant du dépôt cité par des écarts distincts de deux systèmes, ou dans deux instances, proposé à la spécification qui le définit ; un faux refus, une règle de l'acceptable déclarée infondée par des faux refus dans au moins deux instances, proposée, trop large, à la spécification qui la définit. Il compte aussi, par règle, les refus, les dérogations et les faux refus du binôme : un refus seul ne fait que se compter ; et, par système et par environnement, ses kits : remis, validés, appliqués, en échec, défaits, en attente d'application, kits test sans nettoyage déclaré, sans candidat. Le désaccord entre nœuds que le générateur constate et que tu décides au registre des écarts de l'orchestrateur est un seul écart : il ne compte qu'une fois. `proposer` écrit une proposition par candidat nouveau dans `observatoire/propositions/`, à la racine du clone : relis-la, rédige sous « Ce qui change » la règle à changer et pourquoi, sans aucune donnée d'un projet, puis commite-la et ouvre la pull request. L'outil ne commite rien. `--json` donne `etat`, `confronter` et `suivre` en JSON.
+`etat` dit, pour chaque instance, la version de chaque système qui exporte, à jour, en retard ou inconnue du dépôt. `confronter` liste les candidats : un retour, une proposition qu'une instance a retenue pour une spécification, dès une instance ; une récurrence, un même motif à la même profondeur dans au moins deux instances ; un invariant, un même invariant du dépôt cité par des écarts distincts de deux systèmes, ou dans deux instances, proposé à la spécification qui le définit ; un faux refus, une règle de l'acceptable déclarée infondée par des faux refus dans au moins deux instances, proposée, trop large, à la spécification qui la définit. Il compte aussi, par règle, les refus, les dérogations et les faux refus du binôme : un refus seul ne fait que se compter ; et, par système et par environnement, ses kits : remis, validés, appliqués, en échec, défaits, en attente d'application, kits test sans nettoyage déclaré, sans candidat ; et, par système et par point de validation, les décisions d'Agent2Dev, retenues, amendées ou refusées, celles qui attendent, et les délais médian et maximal : deux signaux du deuxième couplage, au catalogue d'`EVOLUTION.md`, section 10.6, sans candidat non plus. Le désaccord entre nœuds que le générateur constate et que tu décides au registre des écarts de l'orchestrateur est un seul écart : il ne compte qu'une fois. `proposer` écrit une proposition par candidat nouveau dans `observatoire/propositions/`, à la racine du clone : relis-la, rédige sous « Ce qui change » la règle à changer et pourquoi, sans aucune donnée d'un projet, puis commite-la et ouvre la pull request. L'outil ne commite rien. `--json` donne `etat`, `confronter` et `suivre` en JSON.
 
 ## 5. Ratifier et suivre
 

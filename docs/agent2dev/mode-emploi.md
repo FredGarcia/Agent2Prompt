@@ -1,6 +1,6 @@
 # Mode d'emploi : construire et utiliser Agent2Dev
 
-[`agent2dev`](../../specs/agent2dev/SKILL.md) 1.4.1 est la **spécification d'un système à construire**, pas un skill qu'on installe. Une IA la reçoit dans le dépôt d'Agent2Dev et l'implémente par lots, sous votre validation.
+[`agent2dev`](../../specs/agent2dev/SKILL.md) 1.4.2 est la **spécification d'un système à construire**, pas un skill qu'on installe. Une IA la reçoit dans le dépôt d'Agent2Dev et l'implémente par lots, sous votre validation.
 
 Agent2Dev applique le skill [`agent-tdd-jira`](../agent-tdd-jira/mode-emploi.md) **comme méthode** : d'une demande Jira exportée en MHTML, il tire les US, les critères d'acceptation, les scénarios Gherkin et les variantes, puis réalise chaque scénario en cycle TDD, jusqu'à la traçabilité, en binôme avec [Agent2Test](../agent2test/mode-emploi.md). Le moteur rédige ; des agents déterministes écrivent et exécutent ; vous validez à chaque point.
 
@@ -18,7 +18,7 @@ flowchart LR
 - Une IA locale qui écrit et exécute du code : Gemini CLI ou équivalent.
 - Node 22.13 ou plus récent (26.13.0 recommandé), git 2.30 ou plus récent ; les données tiennent dans un fichier SQLite, par `node:sqlite`.
 - Le projet à faire évoluer (back Java, front Angular), avec ses outils de build et de test.
-- La transmission : [`transmissions/agent2dev-1.4.1.md`](../../transmissions/agent2dev-1.4.1.md), et celle de la méthode : [`transmissions/agent-tdd-jira-1.3.9.md`](../../transmissions/agent-tdd-jira-1.3.9.md).
+- La transmission : [`transmissions/agent2dev-1.4.2.md`](../../transmissions/agent2dev-1.4.2.md), et celle de la méthode : [`transmissions/agent-tdd-jira-1.3.9.md`](../../transmissions/agent-tdd-jira-1.3.9.md).
 
 L'installateur d'Agent2Prompt refuse cette spécification : elle se matérialise dans `spec/` de son propre projet.
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Export des registres de l'orchestrateur C7E vers le socle d'observation (orchestrateur-c7e, D12, depuis 3.7.0 ;
-// socle-observation 1.3.0). Il se lance depuis le clone du dépôt Agent2Prompt ; l'IA de l'orchestrateur ne
+// socle-observation 1.4.0). Il se lance depuis le clone du dépôt Agent2Prompt ; l'IA de l'orchestrateur ne
 // l'exécute pas d'elle-même : elle en donne la commande au développeur.
 //
 // L'export ne lit que ce qui est commité dans le projet, sans rien modifier : le registre des concepts,
@@ -47,7 +47,7 @@ const RACINE = join(SPEC, '..', '..');
 
 // ---- Schéma fermé de l'enveloppe (socle, section 3.1), pour les formats de l'orchestrateur ----
 
-export const CHAMPS_ENVELOPPE = ['schema', 'numero', 'date', 'systeme', 'instance', 'ordre', 'niveau', 'type', 'motif', 'sujet', 'source', 'precedent', 'nature', 'profondeur', 'cible', 'invariant', 'ancre', 'preuve', 'decision'];
+export const CHAMPS_ENVELOPPE = ['schema', 'numero', 'date', 'systeme', 'instance', 'ordre', 'niveau', 'type', 'motif', 'sujet', 'source', 'precedent', 'nature', 'profondeur', 'cible', 'invariant', 'ancre', 'preuve', 'decision', 'mesure'];
 export const REQUIS_ENVELOPPE = CHAMPS_ENVELOPPE.slice(0, CHAMPS_ENVELOPPE.indexOf('precedent') + 1);
 const OBJETS = {
   systeme: { cles: ['nom', 'version'], requis: ['nom', 'version'] },
@@ -183,6 +183,7 @@ export function controlerEnveloppe(x, { depart = conceptsDeDepart() } = {}) {
     if (!chaine(x.ancre.ref, EMPREINTE) && !(x.ancre.nature === 'concept' && depart.has(x.ancre.ref))) err.push('ancre.ref : une empreinte salée, ou l\'identifiant d\'un concept du registre de départ');
   }
   if (x.preuve !== undefined) err.push('preuve : aucune correspondance de l\'orchestrateur n\'en porte');
+  if (x.mesure !== undefined) err.push('mesure : aucune correspondance de l\'orchestrateur n\'en porte');
   if (x.decision !== undefined) {
     dansLaListe('decision.valeur', x.decision.valeur, LISTES.decision);
     if (!entier(x.decision.vise) || (entier(x.numero) && x.decision.vise >= x.numero)) err.push('decision.vise : le numéro d\'une enveloppe antérieure');
