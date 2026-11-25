@@ -125,48 +125,48 @@ Les options, la sortie et les codes de `indexer.mjs` sont au module `code`, § 2
 
 | Fichier | Module, section | Empreinte sha256 |
 |---|---|---|
-| `package.json` | `execution`, § 10 | `069d7ae99bd5fc710f0cf30a35dd40636b659ae4f4b87fd6c2d7f97e520c8b80` |
-| `package-lock.json` | `execution`, § 10 | `8941c23ae285e9ea96e1a9c8341bdb3383c322143597265b433e9ccede6d9ef9` |
+| `package.json` | `execution`, § 10 | `8628cadf474700025e5b5cc30ea24d79182ded2d521fe4e4ad493ae9fe773b1d` |
+| `package-lock.json` | `execution`, § 10 | `2e86d56036b3f8ec8cdaf2a288c5c7ddba1fae4fde96f2228287ac02a99cc950` |
 | `.gitignore` | `execution`, § 10 | `03bf7f97f17a0d1abb005b6480ec3b0f06a0b9c29c1d1f83131209b52b888a7e` |
-| `scripts/jouer.mjs` | `execution`, § 11 | `8cb128a998ce071359a93429a41a5632cfb53d482fc434762d8e47f8aa22ea7e` |
-| `scripts/verifier.mjs` | `execution`, § 12 | `b3b01d413b0566d81234a61e3cb4b2d090f2a4503905944d9c4032c2415b42d4` |
-| `scripts/traduire.mjs` | `execution`, § 13 | `6845c540de1d3ba4323cc4aad0b8bd052d32d38cbd39f464c92694c7e617f276` |
-| `scripts/texte.mjs` | `texte`, § 12 | `c04d80bfb61062a9b11e2a9d8b70392bd02cf447433f070994cde07533718c2c` |
-| `scripts/jira.mjs` | `jira`, § 9 | `c18b5d5d42d65acc8eecc6833c08f3d3d7e33ad31ad4c54d5d1c2cdecfff9f32` |
-| `scripts/importer.mjs` | `jira`, § 10 | `245de1f5190a1a1961f7a549e1ea2304ba2fecbd660fb0ec05560ddf4485aa3d` |
-| `scripts/cas.mjs` | `cas-de-test`, § 11 | `16869fb7ad7545a4ba4078a5f74ee43e61db273ea98ad7e7f6d37151a8255fee` |
-| `scripts/pages.mjs` | `cas-de-test`, § 12 | `fca03a9bf161348a905640c6939270aa7bfc3019543d5f625aefb8a34879bcab` |
-| `scripts/lecteurs.mjs` | `code`, § 11 | `115d9d38beef9b2af6d7e11ebe5ceebfcb0b603295d6e9ef4d0b981d0edfebc2` |
-| `scripts/code.mjs` | `code`, § 12 | `a1536a4051536fcf062ade7df4063bfb14449c810d2c80addd2e40e1fc563ec2` |
-| `scripts/indexer.mjs` | `code`, § 13 | `b25394c59672c90e419714d3d8d846a9cd2b440989d5dc7f2598dd6c1990c72d` |
-| `scripts/toml.mjs` | `scenario`, § 6 | `db1a7df515bba7d6a162ea6941c8d9a0ee1ce56c5a442d1c3c0b86e9bbb6f36f` |
-| `scripts/scenario.mjs` | `scenario`, § 7 | `b86131123e16efa2c207268303268a0c067a5b42be1f708998f8719d88173b9c` |
-| `scripts/cibles.mjs` | `cibles`, § 6 | `b201990f713e742093c1ee7fb0edea5b910b4bc95be8899e5040b545c7e74905` |
-| `scripts/moteur.mjs` | `actions`, § 9 | `a01fca8e995d747e2232afd505415913f3d73b1a03687e630665c14ad71f4f89` |
-| `scripts/session.mjs` | `session`, § 7 | `ea74c0e2ebb1dc6aeeadec8880f322a1167f8c93f7ad2cbc6fc1f970f144377e` |
-| `scripts/rapport.mjs` | `preuves`, § 7 | `5bfd39afac4399929ef340fce83d0d4b8a0f6db0b2a1e6955120ae2b65377e66` |
-| `scripts/designer.mjs` | `designer`, § 5 | `f57f5cdc32045cf98059ef211ec38641619b247df23a71d76c24ed33693fa566` |
-| `scripts/export.mjs` | `export`, § 10 | `a9d7b548993b487b8c8b48aba98b97878e6205ef0c045d8747c1eb7cf078ca23` |
-| `scripts/aides-export.mjs` | `export`, § 11 | `6f2aae933ec2721845e172201fa93076c3899a4caec8dc3a739b6dcfae20cf0e` |
-| `scripts/exporter.mjs` | `export`, § 12 | `4b5086a1959c41f97def4cd19370a3b42aeb43d5f16826c29de2fb8227b797c1` |
-| `scripts/resultats.mjs` | `export`, § 13 | `23c35b5c1c4895bf2254603e9f932649e1a2a1b71174a46d20709ddac35afb18` |
-| `scripts/conformite.mjs` | `conformite`, § 9 | `5d63ebbb05a293658c04c1221ba79ac4364cd92608ed7ca9db46347ffb83eece` |
-| `agent/pilote-scenario.md` | `agent`, § 6 | `651d5df9dad63820a782c38d54899c844425e472f9c228283b73fe473fccf49c` |
-| `commandes/scenario/importer.toml` | `agent`, § 7 | `b89fd02a47f807cc44328fe4dd5ae0a565226b240734a6520711a3697f7a16f1` |
-| `commandes/scenario/indexer.toml` | `agent`, § 7 | `6e16d2a6bbf07871853434a3d50225f2ee6ce030192ca1076e295ac22d311499` |
-| `commandes/scenario/traduire.toml` | `agent`, § 7 | `db6ed525939ddfad538726855836fa81eeac69b5889f8cfed186b567e0e445bd` |
-| `commandes/scenario/jouer.toml` | `agent`, § 7 | `8ae94f875b1adc424e82db39e82b076034e0c404e38fe0ce7ebd14cdf9c3438a` |
-| `commandes/scenario/designer.toml` | `agent`, § 7 | `7d9b640f449f95c338e9f6ae6dafca0324937a2b432dbdfb41990b45e1255fa8` |
-| `commandes/scenario/exporter.toml` | `agent`, § 7 | `edce9dedf43feea55cf780e511f18496a04a75f86bfd7698cda471603f354a28` |
-| `commandes/scenario/resultats.toml` | `agent`, § 7 | `ce0609701ad4d604cac73c2326b56be5ceb0e9fbae02b13d1642cbf43b9c36d0` |
-| `tests/application-demo.mjs` | `recette`, § 6 | `35d840571b734e289ee2ecd8ce2447ca7bdd7f31a2de262c740ce5bd42b2d976` |
-| `tests/projet-demo.mjs` | `recette`, § 6 | `e8ab1be11d29a5babe60b0c77d86d3801dd44a7025617e91dab8be39df230ce5` |
-| `tests/run-tests.mjs` | `recette`, § 6 | `328fd8420958c00e0f5170826f76c1f04af3ebc296e5430f1e1c82a70e5bbdba` |
+| `scripts/jouer.mjs` | `execution`, § 11 | `564d8d567a888d1bbb44ccd0a7b2db491b2e4cbc3b2fdc692c5157f55a5422de` |
+| `scripts/verifier.mjs` | `execution`, § 12 | `27be7388651e9ab9f947fd39a9bc83d43be03ed7b05363f240ef231f3b5f9197` |
+| `scripts/traduire.mjs` | `execution`, § 13 | `96667f628b3b766be6c34e0bef28248506316e9c6dfcbd51f5220f5f4fc0def4` |
+| `scripts/texte.mjs` | `texte`, § 12 | `62e0e834146a4898ec7d8f7a2322f09dba13fec6161fd9994df419ff69bc894e` |
+| `scripts/jira.mjs` | `jira`, § 9 | `ae073874e712becbf8f45a29c917f0720eb0bd3dd3ebef4d6bb4844792768728` |
+| `scripts/importer.mjs` | `jira`, § 10 | `be02328ed4a6efa0f08fe63ad61100ea5f6674241083353f6743836cb33a8d9c` |
+| `scripts/cas.mjs` | `cas-de-test`, § 11 | `95109c33d8569ba37b156d74302c9cb2faac178e018d2a56e46751c5848a2e96` |
+| `scripts/pages.mjs` | `cas-de-test`, § 12 | `f2559f7325b6b2db8c378cae47aedabc7d7373d80904e172894f26732f403850` |
+| `scripts/lecteurs.mjs` | `code`, § 11 | `a610434a11cc712e3e38c6e163225615b387ac795069355272fce41a28d2e54d` |
+| `scripts/code.mjs` | `code`, § 12 | `351bfb1aa8ec117804903483b36c0b4178af36a74399ca71d7e7d0affcc45a1b` |
+| `scripts/indexer.mjs` | `code`, § 13 | `7c02d64fc30a01062f953a4402616abdb07a87831ea4be23bcd80d8e11b2d0c8` |
+| `scripts/toml.mjs` | `scenario`, § 6 | `7100ceebc67565010cfc847331db3dc0a003825ed6c7f31d42af0a209d22fae1` |
+| `scripts/scenario.mjs` | `scenario`, § 7 | `be8b3c8282f61cf813c5d4badaf98ef0c5bb1f8534cad7dadc84234c5a6c1f2e` |
+| `scripts/cibles.mjs` | `cibles`, § 6 | `ed964f10f0e94c59efc1ee85988926e479de4a8c83d952f7fa55ec5f5920eaa3` |
+| `scripts/moteur.mjs` | `actions`, § 9 | `b1f246ae4ea72fadc23f8a5aef47a1be966d3fd9ad0e5d4e7e52875c9d3a9cf0` |
+| `scripts/session.mjs` | `session`, § 7 | `83d5b6496e9724878e593ce91b5d7cf2e4a5226fce56f39d31b8e97b3853555f` |
+| `scripts/rapport.mjs` | `preuves`, § 7 | `565c8cd0f01e7253e917f59594f6123aecf29f049db8222520649c077d4beed8` |
+| `scripts/designer.mjs` | `designer`, § 5 | `a330daf00a18f18862ae9cc0fc810e134f85256d862af36ba07731335c762882` |
+| `scripts/export.mjs` | `export`, § 10 | `796b7fee9527b1ac0fc18424538a40483d475834e35b7235203329ad2d91debb` |
+| `scripts/aides-export.mjs` | `export`, § 11 | `243b5bb1de49db0674cc0b613dfbaf5a91bdc3680418bc05e5a4b8118ce2971d` |
+| `scripts/exporter.mjs` | `export`, § 12 | `9cea55678772a581c73fcbb2c0e5cdde41198c0115d25a76f5174bf8bdf6adfb` |
+| `scripts/resultats.mjs` | `export`, § 13 | `faf2294ba0c9c57bc1b3900ef01eb80457297be27656177320fbef0825187ca6` |
+| `scripts/conformite.mjs` | `conformite`, § 9 | `650c58ced1c3b8223dd01c7dc6c95349b4a33b5990cb0d0bffa17d80bb56a4a1` |
+| `agent/pilote-scenario.md` | `agent`, § 6 | `99a47a70d72919283384168962d1c535affabfcacb40a949d318eaabde5ba297` |
+| `commandes/scenario/importer.toml` | `agent`, § 7 | `6add72268379d2bc00b9792ffbc8bd96437db8113db032c9dfb9eba1f2a4a27d` |
+| `commandes/scenario/indexer.toml` | `agent`, § 7 | `a46c2465fbb29f93d115a179ee493fb01d82e5cd5a91512b4e696e61c62f004d` |
+| `commandes/scenario/traduire.toml` | `agent`, § 7 | `96d36acff631b5840118e4b95241ed8ca1111fe8568bd3ac99408a22dc8e78f6` |
+| `commandes/scenario/jouer.toml` | `agent`, § 7 | `558fbc3eec98a52bc58b2b28ece0b64d0d5592a6a517bded2e6dcff919af591a` |
+| `commandes/scenario/designer.toml` | `agent`, § 7 | `ae4416e8132b301be7becc3c8628915eded791ac1ac3be0cc2f7d4c838db5c3b` |
+| `commandes/scenario/exporter.toml` | `agent`, § 7 | `0aa682d4489dbfed14142e993c9e5aa514ad48262bd31a7746c43b395ea2a61f` |
+| `commandes/scenario/resultats.toml` | `agent`, § 7 | `daa72a3fc0ba3fb587651311a979a53426d1424e6e428d5ff7ce6ef943cca812` |
+| `tests/application-demo.mjs` | `recette`, § 6 | `2564575fc2ebe2ec402417e6e6d9f0c46858a7173fffb6cbcb9712fbf0afeb1a` |
+| `tests/projet-demo.mjs` | `recette`, § 6 | `056640e6b81e4c9498b339f7585ac09690a3c47830e74fee38d593e6e2cc261a` |
+| `tests/run-tests.mjs` | `recette`, § 6 | `3f7387ae40d9bc7647834e352bbf945500cfcbb69e249ce5a003c782c93ed29f` |
 
 Depuis le dossier du skill, cette commande d'une ligne écrit les trente-sept fichiers, compare leurs empreintes à celles du tableau et sort avec le code 1 au moindre écart. Elle ne contient ni `$`, ni accent grave, ni `!`, ni `%`, ni guillemet intérieur : elle se colle telle quelle dans bash, zsh, CMD ou PowerShell, et dans un fichier `.cmd`. Elle lit aussi des modules aux fins de ligne CRLF.
 
 ```text
-node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'package.json': '069d7ae99bd5fc710f0cf30a35dd40636b659ae4f4b87fd6c2d7f97e520c8b80', 'package-lock.json': '8941c23ae285e9ea96e1a9c8341bdb3383c322143597265b433e9ccede6d9ef9', '.gitignore': '03bf7f97f17a0d1abb005b6480ec3b0f06a0b9c29c1d1f83131209b52b888a7e', 'scripts/jouer.mjs': '8cb128a998ce071359a93429a41a5632cfb53d482fc434762d8e47f8aa22ea7e', 'scripts/verifier.mjs': 'b3b01d413b0566d81234a61e3cb4b2d090f2a4503905944d9c4032c2415b42d4', 'scripts/traduire.mjs': '6845c540de1d3ba4323cc4aad0b8bd052d32d38cbd39f464c92694c7e617f276', 'scripts/texte.mjs': 'c04d80bfb61062a9b11e2a9d8b70392bd02cf447433f070994cde07533718c2c', 'scripts/jira.mjs': 'c18b5d5d42d65acc8eecc6833c08f3d3d7e33ad31ad4c54d5d1c2cdecfff9f32', 'scripts/importer.mjs': '245de1f5190a1a1961f7a549e1ea2304ba2fecbd660fb0ec05560ddf4485aa3d', 'scripts/cas.mjs': '16869fb7ad7545a4ba4078a5f74ee43e61db273ea98ad7e7f6d37151a8255fee', 'scripts/pages.mjs': 'fca03a9bf161348a905640c6939270aa7bfc3019543d5f625aefb8a34879bcab', 'scripts/lecteurs.mjs': '115d9d38beef9b2af6d7e11ebe5ceebfcb0b603295d6e9ef4d0b981d0edfebc2', 'scripts/code.mjs': 'a1536a4051536fcf062ade7df4063bfb14449c810d2c80addd2e40e1fc563ec2', 'scripts/indexer.mjs': 'b25394c59672c90e419714d3d8d846a9cd2b440989d5dc7f2598dd6c1990c72d', 'scripts/toml.mjs': 'db1a7df515bba7d6a162ea6941c8d9a0ee1ce56c5a442d1c3c0b86e9bbb6f36f', 'scripts/scenario.mjs': 'b86131123e16efa2c207268303268a0c067a5b42be1f708998f8719d88173b9c', 'scripts/cibles.mjs': 'b201990f713e742093c1ee7fb0edea5b910b4bc95be8899e5040b545c7e74905', 'scripts/moteur.mjs': 'a01fca8e995d747e2232afd505415913f3d73b1a03687e630665c14ad71f4f89', 'scripts/session.mjs': 'ea74c0e2ebb1dc6aeeadec8880f322a1167f8c93f7ad2cbc6fc1f970f144377e', 'scripts/rapport.mjs': '5bfd39afac4399929ef340fce83d0d4b8a0f6db0b2a1e6955120ae2b65377e66', 'scripts/designer.mjs': 'f57f5cdc32045cf98059ef211ec38641619b247df23a71d76c24ed33693fa566', 'scripts/export.mjs': 'a9d7b548993b487b8c8b48aba98b97878e6205ef0c045d8747c1eb7cf078ca23', 'scripts/aides-export.mjs': '6f2aae933ec2721845e172201fa93076c3899a4caec8dc3a739b6dcfae20cf0e', 'scripts/exporter.mjs': '4b5086a1959c41f97def4cd19370a3b42aeb43d5f16826c29de2fb8227b797c1', 'scripts/resultats.mjs': '23c35b5c1c4895bf2254603e9f932649e1a2a1b71174a46d20709ddac35afb18', 'scripts/conformite.mjs': '5d63ebbb05a293658c04c1221ba79ac4364cd92608ed7ca9db46347ffb83eece', 'agent/pilote-scenario.md': '651d5df9dad63820a782c38d54899c844425e472f9c228283b73fe473fccf49c', 'commandes/scenario/importer.toml': 'b89fd02a47f807cc44328fe4dd5ae0a565226b240734a6520711a3697f7a16f1', 'commandes/scenario/indexer.toml': '6e16d2a6bbf07871853434a3d50225f2ee6ce030192ca1076e295ac22d311499', 'commandes/scenario/traduire.toml': 'db6ed525939ddfad538726855836fa81eeac69b5889f8cfed186b567e0e445bd', 'commandes/scenario/jouer.toml': '8ae94f875b1adc424e82db39e82b076034e0c404e38fe0ce7ebd14cdf9c3438a', 'commandes/scenario/designer.toml': '7d9b640f449f95c338e9f6ae6dafca0324937a2b432dbdfb41990b45e1255fa8', 'commandes/scenario/exporter.toml': 'edce9dedf43feea55cf780e511f18496a04a75f86bfd7698cda471603f354a28', 'commandes/scenario/resultats.toml': 'ce0609701ad4d604cac73c2326b56be5ceb0e9fbae02b13d1642cbf43b9c36d0', 'tests/application-demo.mjs': '35d840571b734e289ee2ecd8ce2447ca7bdd7f31a2de262c740ce5bd42b2d976', 'tests/projet-demo.mjs': 'e8ab1be11d29a5babe60b0c77d86d3801dd44a7025617e91dab8be39df230ce5', 'tests/run-tests.mjs': '328fd8420958c00e0f5170826f76c1f04af3ebc296e5430f1e1c82a70e5bbdba' }; const vus = new Set(); let ecarts = 0; for (const module of ['modules/execution/SKILL.md', 'modules/texte/SKILL.md', 'modules/jira/SKILL.md', 'modules/cas-de-test/SKILL.md', 'modules/code/SKILL.md', 'modules/scenario/SKILL.md', 'modules/cibles/SKILL.md', 'modules/actions/SKILL.md', 'modules/session/SKILL.md', 'modules/preuves/SKILL.md', 'modules/designer/SKILL.md', 'modules/export/SKILL.md', 'modules/conformite/SKILL.md', 'modules/agent/SKILL.md', 'modules/recette/SKILL.md']) { const texte = fs.readFileSync(module, 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); vus.add(m[1]); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (conforme === false) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } } for (const f of Object.keys(attendu)) if (vus.has(f) === false) { ecarts++; console.log('ABSENT    ' + f); } if (ecarts > 0) process.exitCode = 1;"
+node -e "const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'); const attendu = { 'package.json': '8628cadf474700025e5b5cc30ea24d79182ded2d521fe4e4ad493ae9fe773b1d', 'package-lock.json': '2e86d56036b3f8ec8cdaf2a288c5c7ddba1fae4fde96f2228287ac02a99cc950', '.gitignore': '03bf7f97f17a0d1abb005b6480ec3b0f06a0b9c29c1d1f83131209b52b888a7e', 'scripts/jouer.mjs': '564d8d567a888d1bbb44ccd0a7b2db491b2e4cbc3b2fdc692c5157f55a5422de', 'scripts/verifier.mjs': '27be7388651e9ab9f947fd39a9bc83d43be03ed7b05363f240ef231f3b5f9197', 'scripts/traduire.mjs': '96667f628b3b766be6c34e0bef28248506316e9c6dfcbd51f5220f5f4fc0def4', 'scripts/texte.mjs': '62e0e834146a4898ec7d8f7a2322f09dba13fec6161fd9994df419ff69bc894e', 'scripts/jira.mjs': 'ae073874e712becbf8f45a29c917f0720eb0bd3dd3ebef4d6bb4844792768728', 'scripts/importer.mjs': 'be02328ed4a6efa0f08fe63ad61100ea5f6674241083353f6743836cb33a8d9c', 'scripts/cas.mjs': '95109c33d8569ba37b156d74302c9cb2faac178e018d2a56e46751c5848a2e96', 'scripts/pages.mjs': 'f2559f7325b6b2db8c378cae47aedabc7d7373d80904e172894f26732f403850', 'scripts/lecteurs.mjs': 'a610434a11cc712e3e38c6e163225615b387ac795069355272fce41a28d2e54d', 'scripts/code.mjs': '351bfb1aa8ec117804903483b36c0b4178af36a74399ca71d7e7d0affcc45a1b', 'scripts/indexer.mjs': '7c02d64fc30a01062f953a4402616abdb07a87831ea4be23bcd80d8e11b2d0c8', 'scripts/toml.mjs': '7100ceebc67565010cfc847331db3dc0a003825ed6c7f31d42af0a209d22fae1', 'scripts/scenario.mjs': 'be8b3c8282f61cf813c5d4badaf98ef0c5bb1f8534cad7dadc84234c5a6c1f2e', 'scripts/cibles.mjs': 'ed964f10f0e94c59efc1ee85988926e479de4a8c83d952f7fa55ec5f5920eaa3', 'scripts/moteur.mjs': 'b1f246ae4ea72fadc23f8a5aef47a1be966d3fd9ad0e5d4e7e52875c9d3a9cf0', 'scripts/session.mjs': '83d5b6496e9724878e593ce91b5d7cf2e4a5226fce56f39d31b8e97b3853555f', 'scripts/rapport.mjs': '565c8cd0f01e7253e917f59594f6123aecf29f049db8222520649c077d4beed8', 'scripts/designer.mjs': 'a330daf00a18f18862ae9cc0fc810e134f85256d862af36ba07731335c762882', 'scripts/export.mjs': '796b7fee9527b1ac0fc18424538a40483d475834e35b7235203329ad2d91debb', 'scripts/aides-export.mjs': '243b5bb1de49db0674cc0b613dfbaf5a91bdc3680418bc05e5a4b8118ce2971d', 'scripts/exporter.mjs': '9cea55678772a581c73fcbb2c0e5cdde41198c0115d25a76f5174bf8bdf6adfb', 'scripts/resultats.mjs': 'faf2294ba0c9c57bc1b3900ef01eb80457297be27656177320fbef0825187ca6', 'scripts/conformite.mjs': '650c58ced1c3b8223dd01c7dc6c95349b4a33b5990cb0d0bffa17d80bb56a4a1', 'agent/pilote-scenario.md': '99a47a70d72919283384168962d1c535affabfcacb40a949d318eaabde5ba297', 'commandes/scenario/importer.toml': '6add72268379d2bc00b9792ffbc8bd96437db8113db032c9dfb9eba1f2a4a27d', 'commandes/scenario/indexer.toml': 'a46c2465fbb29f93d115a179ee493fb01d82e5cd5a91512b4e696e61c62f004d', 'commandes/scenario/traduire.toml': '96d36acff631b5840118e4b95241ed8ca1111fe8568bd3ac99408a22dc8e78f6', 'commandes/scenario/jouer.toml': '558fbc3eec98a52bc58b2b28ece0b64d0d5592a6a517bded2e6dcff919af591a', 'commandes/scenario/designer.toml': 'ae4416e8132b301be7becc3c8628915eded791ac1ac3be0cc2f7d4c838db5c3b', 'commandes/scenario/exporter.toml': '0aa682d4489dbfed14142e993c9e5aa514ad48262bd31a7746c43b395ea2a61f', 'commandes/scenario/resultats.toml': 'daa72a3fc0ba3fb587651311a979a53426d1424e6e428d5ff7ce6ef943cca812', 'tests/application-demo.mjs': '2564575fc2ebe2ec402417e6e6d9f0c46858a7173fffb6cbcb9712fbf0afeb1a', 'tests/projet-demo.mjs': '056640e6b81e4c9498b339f7585ac09690a3c47830e74fee38d593e6e2cc261a', 'tests/run-tests.mjs': '3f7387ae40d9bc7647834e352bbf945500cfcbb69e249ce5a003c782c93ed29f' }; const vus = new Set(); let ecarts = 0; for (const module of ['modules/execution/SKILL.md', 'modules/texte/SKILL.md', 'modules/jira/SKILL.md', 'modules/cas-de-test/SKILL.md', 'modules/code/SKILL.md', 'modules/scenario/SKILL.md', 'modules/cibles/SKILL.md', 'modules/actions/SKILL.md', 'modules/session/SKILL.md', 'modules/preuves/SKILL.md', 'modules/designer/SKILL.md', 'modules/export/SKILL.md', 'modules/conformite/SKILL.md', 'modules/agent/SKILL.md', 'modules/recette/SKILL.md']) { const texte = fs.readFileSync(module, 'utf8').replace(/\r\n/g, '\n'); for (const m of texte.matchAll(/^<\x21-- fichier : (\S+) -->\n\x60{3}[a-z]*\n([\s\S]*?)\n\x60{3}\n/gm)) { const contenu = m[2] + '\n'; fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], contenu); vus.add(m[1]); const conforme = crypto.createHash('sha256').update(contenu).digest('hex') === attendu[m[1]]; if (conforme === false) ecarts++; console.log((conforme ? 'conforme  ' : 'ECART     ') + m[1]); } } for (const f of Object.keys(attendu)) if (vus.has(f) === false) { ecarts++; console.log('ABSENT    ' + f); } if (ecarts > 0) process.exitCode = 1;"
 ```
 
 Puis, depuis le même dossier : `npm ci`, et la recette, `npm test` (sous Linux sans écran, `xvfb-run -a npm test`).
@@ -185,7 +185,7 @@ Puis, depuis le même dossier : `npm ci`, et la recette, `npm test` (sous Linux 
 ```json
 {
   "name": "scenario-playwright",
-  "version": "1.6.4",
+  "version": "1.6.5",
   "private": true,
   "description": "Scénarios côté utilisateur, joués dans le Chrome du poste par Playwright (skill scenario-playwright)",
   "engines": {
@@ -215,13 +215,13 @@ Puis, depuis le même dossier : `npm ci`, et la recette, `npm test` (sous Linux 
 ```json
 {
   "name": "scenario-playwright",
-  "version": "1.6.4",
+  "version": "1.6.5",
   "lockfileVersion": 3,
   "requires": true,
   "packages": {
     "": {
       "name": "scenario-playwright",
-      "version": "1.6.4",
+      "version": "1.6.5",
       "dependencies": {
         "playwright-core": "1.65.1"
       },
@@ -296,7 +296,7 @@ L'exécution : lecture de la ligne de commande et des réglages, scénarios dés
 <!-- fichier : scripts/jouer.mjs -->
 ```javascript
 #!/usr/bin/env node
-// scenario-playwright 1.6.4 : joue un scénario TOML dans le navigateur du poste, comme un utilisateur, ou une
+// scenario-playwright 1.6.5 : joue un scénario TOML dans le navigateur du poste, comme un utilisateur, ou une
 // campagne de plusieurs scénarios, l'un après l'autre, dans la même fenêtre.
 //
 // Usage, depuis n'importe quel dossier :
@@ -543,7 +543,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
 <!-- fichier : scripts/verifier.mjs -->
 ```javascript
 #!/usr/bin/env node
-// scenario-playwright 1.6.4 : vérifie des textes de départ et des scénarios TOML, sans ouvrir de navigateur.
+// scenario-playwright 1.6.5 : vérifie des textes de départ et des scénarios TOML, sans ouvrir de navigateur.
 //
 // Usage : node <dossier du skill>/scripts/verifier.mjs <fichier.scenario | fichier.toml | test.spec.ts>... [--plan] [--param nom=valeur]...
 // Un texte : sa structure (D2). Un scénario : sa validité, le contrôle de sa traduction s'il cite un texte,
@@ -650,7 +650,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
 <!-- fichier : scripts/traduire.mjs -->
 ```javascript
 #!/usr/bin/env node
-// scenario-playwright 1.6.4 : squelette TOML de la traduction d'un texte de départ, produit sans IA.
+// scenario-playwright 1.6.5 : squelette TOML de la traduction d'un texte de départ, produit sans IA.
 //
 // Usage : node <dossier du skill>/scripts/traduire.mjs <fichier.scenario> [--remplacer]
 // Écrit <fichier>.toml à côté du texte : structure recopiée du texte, empreinte du texte, et un bloc

@@ -1,6 +1,6 @@
 # Mode d'emploi : construire et utiliser Agent2Test
 
-[`agent2test`](../../specs/agent2test/SKILL.md) 1.5.1 est la **spécification d'un système à construire**, pas un skill qu'on installe. Une IA la reçoit dans un projet séparé de l'application et l'implémente par lots, sous votre validation.
+[`agent2test`](../../specs/agent2test/SKILL.md) 1.6.0 est la **spécification d'un système à construire**, pas un skill qu'on installe. Une IA la reçoit dans un projet séparé de l'application et l'implémente par lots, sous votre validation.
 
 Agent2Test choisit, prépare et joue avec Playwright les tests essentiels d'une demande sur l'application Angular **que vous avez lancée**, et rend **un verdict prouvé par critère d'acceptation**. Son plan vient d'[`agent-tdd-jira`](../agent-tdd-jira/mode-emploi.md) : US, critères numérotés, scénarios Gherkin. Il travaille en binôme avec [Agent2Dev](../agent2dev/mode-emploi.md) ou avec l'agent TDD.
 
@@ -20,7 +20,7 @@ flowchart LR
 - Node 22.13 ou plus récent (26.13.0 recommandé), Playwright 1.63 ou plus récent ; les données tiennent dans un fichier SQLite, par `node:sqlite` : aucun serveur de base de données.
 - L'application Angular lancée par vous sur votre poste, et un navigateur du côté de la session SSO.
 - Docker Compose seulement pour un moteur local souverain (Ollama).
-- La transmission : [`transmissions/agent2test-1.5.1.md`](../../transmissions/agent2test-1.5.1.md).
+- La transmission : [`transmissions/agent2test-1.6.0.md`](../../transmissions/agent2test-1.6.0.md).
 
 L'installateur d'Agent2Prompt refuse cette spécification : elle se matérialise dans `spec/` de son propre projet.
 
@@ -37,7 +37,7 @@ L'installateur d'Agent2Prompt refuse cette spécification : elle se matérialise
 | 1 | noyau et bus |
 | 2 | données (agent médiateur du fichier SQLite), journal, référentiel |
 | 3 | plan, mémoire, cartographie de l'application |
-| 4 | exécution : navigateur, préparateur, verdict, orchestrateur |
+| 4 | exécution : navigateur, préparateur, kit test, verdict, orchestrateur |
 | 5 | sélection des tests essentiels |
 | 6 | observateur, apprenant, réflexif : premier et second ordre |
 | 7 | interfaces : serveur MCP, tableau de bord, échange par dossiers |
@@ -53,7 +53,7 @@ Entre deux points, les agents avancent seuls ; à chaque point, un humain décid
 |---|---|---|
 | **CP-0** Session | connexion silencieuse en échec, ou session expirée | l'opérateur, qui se connecte dans la fenêtre ouverte |
 | **CP-1** Sélection | tests essentiels retenus pour la demande | le testeur : valider, corriger avec commentaire, rejeter |
-| **CP-2** Mise en place | profil d'environnement, références de pictogrammes, parcours nouveaux ou modifiés | le testeur ou le développeur |
+| **CP-2** Mise en place | profil d'environnement, kit test, références de pictogrammes, parcours nouveaux ou modifiés | le testeur ou le développeur |
 | **CP-3** Verdicts | échecs, indéterminés, scénarios bloqués, avec le témoignage de chaque vérification | le testeur : confirmer, contester (le désaccord est consigné), demander une réparation |
 | **CP-4** Gouvernance | leçon, recalibrage, quarantaine proposés par le système | le référent qualité, depuis le tableau de bord seulement ; effet à la campagne suivante |
 | **CP-5** Préalable | scénario qui exige un batch Java | le développeur, qui lance le batch lui-même, ou déclare le scénario non joué |
@@ -69,11 +69,13 @@ Le niveau d'autonomie de chaque point se fixe dans `configuration/humaine.json`,
 
 **Le binôme** : la remise d'Agent2Dev ou de l'agent TDD arrive en fichier, ou par un échange par dossiers facultatif. Elle n'ouvre aucune campagne : vous redémarrez l'application sur le commit remis, puis ouvrez la campagne. Le journal de tests repart par le même chemin.
 
+**Le kit test** : un scénario qui exige des données en base n'est plus écarté d'office. Ses données, avec leur nettoyage, forment le kit test de la campagne, confronté au noyau du socle de l'acceptable et présenté en CP-2 avec son manifeste ; le valider l'accepte à son empreinte. La fabrication de kits de votre hôte l'applique sur l'environnement de test ; vous déclarez son application depuis le tableau de bord, puis son nettoyage après la campagne. Les parcours de ces scénarios se préparent ensuite. Agent2Test n'écrit jamais en base, n'applique aucun kit, et refuse la déclaration d'un patch retouché depuis CP-2.
+
 **Les refus vers l'observatoire** : la rubrique `acceptable` du journal de tests date chaque refus et chaque réponse. L'outil d'export du binôme, que porte l'observatoire d'Agent2Prompt, les traduit en enveloppes minimisées dans le projet de l'application testée, sous le sel de son instance, et non dans le projet Agent2Test ([mode d'emploi de l'observatoire](../observatoire/mode-emploi.md)).
 
 ## 4. Ce qui ne se négocie pas
 
-- L'application testée n'est jamais modifiée, ni démarrée, ni arrêtée, ni déployée par Agent2Test ; aucun batch lancé.
+- L'application testée n'est jamais modifiée, ni démarrée, ni arrêtée, ni déployée par Agent2Test ; aucun batch lancé, aucun kit appliqué.
 - Agent2Test ne rédige ni ne corrige aucune US, aucun critère, aucun scénario.
 - Aucun identifiant SSO détenu, saisi ou journalisé.
 - Le moteur ne produit que des données validées ; aucun code qu'il produit n'est exécuté ni injecté dans une page.
@@ -91,6 +93,8 @@ Une nouvelle version arrive par une nouvelle transmission : remplacez `spec/` à
 |---|---|---|
 | CP-0 à chaque scénario | session SSO expirée, ou navigateur du mauvais côté de WSL2 | lancer Agent2Test du côté du navigateur qui porte la session |
 | Campagne bloquée en CP-5 | scénario qui exige un batch | lancer le batch vous-même, ou déclarer le scénario non joué |
+| Scénario « prérequis de données : kit test non appliqué » | kit test non validé en CP-2, non appliqué, ou application non déclarée | valider le kit en CP-2, le faire appliquer par la fabrication, puis déclarer « kit appliqué » |
+| Déclaration refusée `KIT_MODIFIE` | patch du kit retouché depuis sa validation | faire confronter et valider le nouveau kit en CP-2 |
 | Verdict « indéterminé » | preuve insuffisante | examiner en CP-3 ; demander une réparation du parcours |
 | La remise n'ouvre rien | comportement voulu | redémarrer l'application sur le commit remis, puis ouvrir la campagne |
 | Parcours refusé : « référence de pictogramme » | pictogramme demandé sans référence ratifiée, ou référence modifiée depuis | désigner l'élément, faire capturer la référence et la ratifier en CP-2 |

@@ -20,7 +20,7 @@ L'IHM du développeur et du référent. Elle montre l'état des demandes et recu
 
 | Rôle | Décisions | Vues |
 |---|---|---|
-| développeur | V0 à V5, attentes, soumission d'une demande, journal de tests, synchronisation annoncée, reprise, réponses aux refus | demandes, points et attentes, refus, patchs, journal en arbre 7E, livrable |
+| développeur | V0 à V5, attentes, soumission d'une demande, journal de tests, synchronisation annoncée, reprise, réponses aux refus, déclarations des kits | demandes, points et attentes, refus, patchs, kits, journal en arbre 7E, livrable |
 | référent | CP-4, depuis le tableau de bord seulement : ratifier, amender dans les bornes, refuser ; réponses aux refus | gouvernance : leçons candidates, propositions, suspensions, grand livre, effets mesurés, échappements, dérives, alertes, faux refus par règle |
 
 - La configuration humaine associe chaque utilisateur à un ou plusieurs rôles ; en local, une même personne peut tenir les deux.
@@ -37,16 +37,17 @@ Chaque point présente ce qui est à décider, à gauche, et ses preuves, à dro
 | V1 | résumé de l'extraction | `demande.json`, empreinte de la source, limites déclarées |
 | V2 | `us.md`, tableau des exigences, questions | fichier Gherkin, sortie de `controler-criteres` et sa ligne « prêts pour la réalisation » |
 | V3 | variantes par scénario, recommandation | fiche d'impact, résultats de recherche cités |
-| V4 | présentation du scénario au format du skill | diff, sorties des commandes du rouge, du vert et des suites, avertissements de la garde statique |
+| V4 | présentation du scénario au format du skill | diff, sorties des commandes du rouge, du vert et des suites, avertissements de la garde statique, kit dev : manifeste et empreinte du patch |
 | V5 | matrice et rapport | projet de commentaire Jira, sorties des scripts, patchs manquants |
 | attente | ce qui est à trancher | preuves de l'agent qui l'a ouverte |
 | refus | l'objet refusé, la garde ; « déroger », proposé seulement si chaque entrée est dérogeable, et « faux refus », avec le motif obligatoire | chaque règle citée et son énoncé, l'entrée de la constitution, les entrées du noyau marquées comme telles (module `acceptable`) |
 
 - Sous l'objet : les boutons de décision et le champ de commentaire, obligatoire quand la décision l'exige (module `orchestrateur`, section 4).
 - **Patchs** : chaque patch remis, avec son scénario, son état (appliqué, en attente), son téléchargement, et la commande `git am -3` à copier (module `depot`, section 2).
+- **Kits** : chaque kit dev remis, avec son scénario, son manifeste, l'empreinte de son patch et son état ; « kit appliqué », « échec, retour arrière fait », avec le commentaire obligatoire, et « retour arrière fait », que seul le développeur déclare (module `kit`).
 - **Demande** : état, pas courant, arbre 7E dépliable jusqu'au pas, budgets consommés ; la remise à télécharger, au format `agent2test.remise/1` ; en mode `dossiers`, l'heure de sa publication dans la boîte de sortie et celle du relevé du journal (module `echange`).
 - **Gouvernance** : chaque proposition avec règle, échelle, phase, valeurs, preuves et effet attendu ; chaque leçon avec sa source ; ratifier, amender dans les bornes, refuser.
-- **Notice** : mode d'emploi et limites du système. Agent2Dev ne démarre ni ne déploie l'application, ne lance aucun batch, n'écrit ni dans Jira ni en base, ne pousse rien, n'écrit pas dans l'arbre du développeur sans autorisation, et ne ratifie pas ses propres leçons.
+- **Notice** : mode d'emploi et limites du système. Agent2Dev ne démarre ni ne déploie l'application, n'applique aucun kit, ne lance aucun batch, n'écrit ni dans Jira ni en base, ne pousse rien, n'écrit pas dans l'arbre du développeur sans autorisation, et ne ratifie pas ses propres leçons.
 
 ## 4. Accessibilité (D19.INV-3)
 

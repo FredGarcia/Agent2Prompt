@@ -70,7 +70,7 @@ Schéma fermé `schemas/parcours.json` et contrôles nommés :
 
 ## 3. Préparer (D7.INV-6)
 
-`preparer(selection)` traite chaque scénario retenu :
+Avant les parcours, les scénarios retenus qui portent un prérequis de données reçoivent le kit test de la campagne, présenté en CP-2 avec le profil ; leurs parcours attendent son application déclarée (module `kit`). Puis `preparer(selection)` traite chaque scénario retenu :
 
 1. Un parcours ratifié dont `empreinteScenario` égale celle du scénario courant est repris tel quel ; il ne repasse pas par CP-2.
 2. Sinon, le moteur rédige le parcours (fiche `preparateur`) à partir des étapes du scénario, de ses critères, de la carte des écrans concernés (instantanés ARIA), du profil et des leçons actives.

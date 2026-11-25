@@ -7,14 +7,14 @@ status: active
 
 # Module `acceptable` (D26)
 
-Ce module applique le socle de l'acceptable, `socle-acceptable/SKILL.md`, inclus dans la spécification à la version épinglée. Il n'ajoute aucun agent : il fixe ce que le noyau vérifie au démarrage, ce que chaque garde cite quand elle refuse, le contrôle des leçons qu'Agent2Test n'avait pas, et ce que l'humain peut répondre à un refus. Le kit test, par lequel Agent2Test écrira, attend le contrat des kits du socle (point d'extension E6).
+Ce module applique le socle de l'acceptable, `socle-acceptable/SKILL.md`, inclus dans la spécification à la version épinglée. Il n'ajoute aucun agent : il fixe ce que le noyau vérifie au démarrage, ce que chaque garde cite quand elle refuse, le contrôle des leçons qu'Agent2Test n'avait pas, et ce que l'humain peut répondre à un refus. Le kit test, par lequel les prérequis de données atteignent l'environnement de test, suit le contrat des kits du socle (module `kit`).
 
 ## 1. Épinglage (D26.INV-1)
 
 La constitution porte le champ `acceptable` (module `noyau`, section 5) :
 
 ```json
-{ "acceptable": { "socle": "socle-acceptable", "version": "1.0.1", "empreinte": "e815cadf230886d507d56dbbfb5d7cfd0cf3982036d54d0279b70cc8f49b4764" } }
+{ "acceptable": { "socle": "socle-acceptable", "version": "1.1.0", "empreinte": "e815cadf230886d507d56dbbfb5d7cfd0cf3982036d54d0279b70cc8f49b4764" } }
 ```
 
 Au démarrage, après la vérification de l'empreinte de la constitution (D1.INV-4), le noyau :
@@ -39,7 +39,7 @@ Chaque liste reprend les entrées du noyau, en tête, et ajoute celles d'Agent2T
 
 Lieux logiques d'Agent2Test : `constitution` est `constitution/` ; `sources-du-systeme`, `src/` ; `fiches`, `fiches/` ; `configuration-humaine`, `configuration/` et `<config>/humaine.json` ; `transmission-du-skill`, la transmission de cette spécification sous `spec/` ; `migrations`, `migrations/`.
 
-Tant que le socle ne décrit pas le contrat des kits, une entrée `horsKit` vaut partout : aucune action réservée aux kits ne s'exécute (point d'extension E6). Une entrée propre peut porter `derogeable: true` ; une entrée du noyau, jamais ; aucune ne le porte dans la constitution d'exemple.
+La garde refuse partout une entrée `horsKit` : ce qui ne se fait que dans un kit ne passe que par le kit test, que la fabrication de l'hôte applique sur l'environnement de test après sa validation (module `kit`). Une entrée propre peut porter `derogeable: true` ; une entrée du noyau, jamais ; aucune ne le porte dans la constitution d'exemple.
 
 ## 3. Refus et leçons interdites (D26.INV-2)
 
@@ -68,7 +68,7 @@ Le journal de tests `agent2test.journal-de-tests/1` porte une rubrique `acceptab
 
 ```json
 { "acceptable": {
-    "socle": "socle-acceptable", "version": "1.0.1",
+    "socle": "socle-acceptable", "version": "1.1.0",
     "refus": [
       { "n": 812, "date": "2026-10-21T10:02:14Z", "garde": "perimetre", "objet": "modifier-du-code", "regles": ["D1.INV-5"], "reponse": null }
     ]
@@ -90,7 +90,7 @@ Jeu d'essai : la constitution d'exemple, des copies altérées, et une constitut
 
 | Scénario | Vérifie | Cas |
 |---|---|---|
-| AC1 | D26.INV-1 | la constitution d'exemple démarre : socle 1.0.1, empreinte conforme, chaque entrée du noyau présente |
+| AC1 | D26.INV-1 | la constitution d'exemple démarre : socle 1.1.0, empreinte conforme, chaque entrée du noyau présente |
 | AC2 | D26.INV-1 | une empreinte fausse, une version autre que celle du socle inclus, une entrée du noyau retirée d'une liste, ou le champ `acceptable` absent empêchent le démarrage « acceptable non conforme » |
 | AC3 | D26.INV-2 | « corriger le code du composant » est refusée « hors périmètre », règle D1.INV-5 ; « redéployer l'application de recette », règle SA1.INV-1 ; chaque refus a sa ligne `acceptable.refus` |
 | AC4 | D26.INV-2 | une écriture dans `constitution/` est refusée `ECRITURE_INTERDITE`, règle SA3.INV-1 ; dans `migrations/`, règle D1.INV-6 |
@@ -99,7 +99,7 @@ Jeu d'essai : la constitution d'exemple, des copies altérées, et une constitut
 | AC7 | D26.INV-3 | avec la constitution d'essai, le testeur déroge au refus d'une écriture dans `essai/`, avec son motif : la ligne `acceptable.derogation` cite le refus, la règle, le rôle et le motif, et l'écriture se fait une fois |
 | AC8 | D26.INV-3 | un faux refus déclaré sur le refus de « redéployer l'application de recette », avec son motif : ligne `acceptable.faux-refus`, la campagne ne s'ouvre pas, et le faux refus paraît dans la vue de gouvernance, sous sa règle ; une réponse sans motif, une deuxième réponse, une réponse par l'échange ou par un rôle sans droit sont refusées |
 | AC9 | D26.INV-4 | le journal de tests d'une campagne qui a connu un refus porte la rubrique `acceptable`, le refus et sa réponse datés de leur ligne de journal, sans motif en clair, et `lire-acceptation.mjs` d'agent-tdd-jira le lit comme avant |
-| AC10 | point E6 | une demande « déployer sur l'environnement de test » est refusée, règle SA1.INV-1 : aucun kit n'existe, l'entrée `horsKit` vaut partout ; aucun kit n'est produit |
+| AC10 | point E6 | une demande « déployer sur l'environnement de test » est refusée par la garde de périmètre, règle SA1.INV-1 : ce qui ne se fait que dans un kit ne passe que par le kit test, que la fabrication de l'hôte applique après sa validation (module `kit`) |
 
 ## 8. Fichiers à produire
 

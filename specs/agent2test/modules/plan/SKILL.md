@@ -15,7 +15,7 @@ status: active
 
 ### 1.1 `agent-tdd-jira`
 
-Source : le dossier `docs/demandes/<CLÉ>/` du projet de l'application, produit par agent-tdd-jira 1.3.7 (`agent-tdd-jira:D10.INV-5`, `agent-tdd-jira:D7.INV-1`).
+Source : le dossier `docs/demandes/<CLÉ>/` du projet de l'application, produit par agent-tdd-jira 1.3.8 (`agent-tdd-jira:D10.INV-5`, `agent-tdd-jira:D7.INV-1`).
 
 `us.md` :
 
@@ -38,7 +38,8 @@ Source : le dossier `docs/demandes/<CLÉ>/` du projet de l'application, produit 
 | `@criticite-haute`, `@criticite-moyenne`, `@criticite-basse` | criticité ; moyenne par défaut |
 | `@role-<nom>` | rôle de l'application requis par le scénario, nommé comme elle le nomme |
 | `@batch-<nom>` | préalable : batch Java `<nom>`, lancé par le développeur en CP-5 |
-| `@redemarrage`, `@ecriture-base` | prérequis hors périmètre |
+| `@redemarrage` | prérequis hors périmètre |
+| `@ecriture-base` | prérequis de données, établi par un kit test (module `kit`) |
 | `@en-attente`, `@propose` | états d'agent-tdd-jira |
 
 Une étiquette portée par la ligne `Fonctionnalité:` vaut pour chacun de ses scénarios, comme `@role-LECTEUR` dans l'exemple ECR-77. Une étiquette absente de ce tableau, comme `@<CLÉ>` sur la fonctionnalité, est conservée sans effet.
@@ -64,7 +65,8 @@ Tout autre format est refusé avec le motif « format d'entrée non pris en char
 | scénario `@back` sans `@front` | non jouable : limité au back | ses critères restent « non vérifiés » par Agent2Test ; les tests d'agent-tdd-jira les couvrent |
 | scénario dont aucun critère n'est `validé` | non jouable : critère non validé | aucun parcours |
 | critère `retiré` | retiré | hors de la demande ; mentionné, sans verdict |
-| `@redemarrage`, `@ecriture-base`, `Prérequis : redémarrage` ou `écriture en base` | non automatisable, avec son motif | jamais joué |
+| `@redemarrage`, `Prérequis : redémarrage` | non automatisable, avec son motif | jamais joué |
+| `@ecriture-base`, `Prérequis : écriture en base` | prérequis de données | jouable seulement par le kit test de la campagne, validé en CP-2 et déclaré appliqué (D27.INV-2) ; sinon non automatisable, avec son motif |
 | `@batch-<nom>`, `Prérequis : batch <nom>` | préalable de batch | jouable ; CP-5 s'ouvre avant le scénario (D9.INV-7) |
 | `@role-<nom>`, dont le rôle manque aux rôles de la session déclarés par la configuration humaine (`session.roles`) | non jouable : rôle <nom> absent de la session | évalué à l'ouverture de la campagne ; ses critères restent « non vérifiés » |
 
@@ -150,6 +152,7 @@ await bus.demander('plan', 'ouvrir', {
 | PL12 | D1.INV-5 | une demande « déployer en recette » est refusée « hors périmètre » à l'ouverture |
 | PL13 | D3.INV-5 | avec `session.roles` limité à `LECTEUR`, un scénario `@role-ADMIN` est non jouable, motif « rôle ADMIN absent de la session » ; `@role-LECTEUR` porté par la fonctionnalité rend chacun de ses scénarios dépendant de ce rôle |
 | PL14 | D3.INV-4 | les empreintes des sources sont celles de `sha256sum` ; l'ouverture retient le commit et les fichiers suivis modifiés relevés par le `scanner` |
+| PL15 | D3.INV-3 | `@ecriture-base` donne un prérequis de données : le scénario entre au kit test ; sans kit validé et déclaré appliqué, il reste non automatisable, avec son motif |
 
 ## 9. Fichiers à produire
 

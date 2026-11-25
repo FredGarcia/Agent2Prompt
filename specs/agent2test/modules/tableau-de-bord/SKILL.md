@@ -19,8 +19,8 @@ L'IHM de l'opérateur. Elle montre l'état des campagnes et recueille les décis
 
 | Rôle | Décisions | Vues |
 |---|---|---|
-| testeur | CP-0, CP-1, CP-2, CP-3 ; réponses aux refus | campagnes ; points de contrôle ; refus ; journal en arbre 7E ; remises reçues |
-| développeur | CP-2, CP-5 | défauts applicatifs présumés : étapes de reproduction, captures, trace, erreurs de console et réponses en échec ; remises reçues |
+| testeur | CP-0, CP-1, CP-2, CP-3 ; réponses aux refus ; déclarations des kits | campagnes ; points de contrôle ; refus ; kits ; journal en arbre 7E ; remises reçues |
+| développeur | CP-2, CP-5 ; déclarations des kits | kits ; défauts applicatifs présumés : étapes de reproduction, captures, trace, erreurs de console et réponses en échec ; remises reçues |
 | référent qualité | CP-4, depuis le tableau de bord seulement ; réponses aux refus | gouvernance : propositions, leçons candidates, grand livre, effets mesurés, accord entre contrôles et humains, indicateurs du premier ordre |
 
 - La configuration humaine associe chaque utilisateur à un ou plusieurs rôles ; en local, une même personne peut les tenir tous.
@@ -29,13 +29,14 @@ L'IHM de l'opérateur. Elle montre l'état des campagnes et recueille les décis
 
 ## 3. Écrans
 
-- **Point de contrôle** : ce qui est à décider, à gauche ; les preuves, à droite (parcours, résultat probatoire et références de pictogrammes à ratifier en CP-2 ; captures, trace et témoignage « vu, non vu » de chaque étape en CP-3) ; boutons de décision et champ de commentaire, obligatoire pour une correction en CP-1.
+- **Point de contrôle** : ce qui est à décider, à gauche ; les preuves, à droite (kit test, son manifeste et l'empreinte de son patch, parcours, résultat probatoire et références de pictogrammes à ratifier en CP-2 ; captures, trace et témoignage « vu, non vu » de chaque étape en CP-3) ; boutons de décision et champ de commentaire, obligatoire pour une correction en CP-1.
 - **Campagne** : roue 7E de la campagne, dépliable jusqu'à l'étape ; matrice critères × verdicts ; liens vers les quatre formats du journal de tests.
 - **CP-5** : nom du batch à lancer, scénario concerné, boutons « batch lancé et terminé » et « scénario non joué » avec motif.
+- **Kits** : le kit test de chaque campagne, avec ses scénarios, son manifeste, l'empreinte de son patch et son état ; « kit appliqué », « échec, retour arrière fait », avec le commentaire obligatoire, et « retour arrière fait », que seuls le testeur et le développeur déclarent (module `kit`).
 - **Remises reçues** : le bouton « déposer une remise », pour le testeur et le développeur, accepte un fichier au format `agent2test.remise/1` ; en mode `dossiers`, les remises lues dans les boîtes d'Agent2Dev s'y ajoutent, annoncées dans la région `aria-live`. Chaque remise s'affiche avec sa demande, sa racine, son commit, ses sources et leurs empreintes, les jouables et les préalables qu'elle prévoit, et son état (reçue, ouverte, périmée). Le bouton « ouvrir la campagne », pour le testeur et le développeur, suit le rappel : « Redémarrez l'application sur le Tomcat local depuis le commit remis ; Agent2Test ne la démarre pas. » Une remise périmée nomme le commit, le fichier suivi ou la source qui diffère (module `echange`, section 4).
 - **Gouvernance** : chaque proposition avec règle, échelle, phase, valeurs, preuves et effet attendu ; ratifier, amender dans les bornes, refuser ; les faux refus, groupés par règle.
 - **Refus** : l'objet refusé et sa garde, chaque règle citée avec son énoncé, l'entrée de la constitution ; « déroger », proposé seulement si chaque entrée est dérogeable, et « faux refus », avec le motif obligatoire (module `acceptable`).
-- **Notice** : mode d'emploi, limites du système (ce qu'il ne fait pas : modifier l'application, la démarrer, lancer un batch, ratifier ses propres leçons).
+- **Notice** : mode d'emploi, limites du système (ce qu'il ne fait pas : modifier l'application, la démarrer, écrire en base, appliquer un kit, lancer un batch, ratifier ses propres leçons).
 
 ## 4. Accessibilité (D17.INV-3)
 

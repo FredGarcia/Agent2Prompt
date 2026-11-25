@@ -15,7 +15,7 @@ status: active
 {
   "n": 2041,
   "horodatage": "2026-10-21T14:02:11.482Z",
-  "specVersion": "1.3.1",
+  "specVersion": "1.4.0",
   "instance": "principale",
   "demande": "ECR-77",
   "correlation": "5d1e…",
@@ -66,20 +66,21 @@ Une seule source, la projection JSON, de format `agent2dev.livrable/1` ; le Mark
 7. productions du moteur, avec leur décision ;
 8. ligne de base, régressions, écritures étrangères intégrées, budgets consommés ;
 9. acceptable : refus de la demande, avec leur garde, leurs règles et leur réponse, datés, sans motif en clair (module `acceptable`, section 5) ;
-10. empreinte de fin de chaîne.
+10. kits : kits dev remis, avec leur scénario, leur empreinte, leur validation, leur application et leur retour arrière, datés (module `kit`, section 4) ;
+11. empreinte de fin de chaîne.
 
 ```json
 {
   "format": "agent2dev.livrable/1",
   "demande": { "cle": "ECR-77", "titre": "Export des retours d'expérience en CSV", "source": "<sha256 du MHTML>" },
-  "versions": { "specification": "1.3.1", "skill": "agent-tdd-jira 1.3.7", "transmission": "<sha256>", "referentiel": "R-4", "constitution": "<sha256>" },
+  "versions": { "specification": "1.4.0", "skill": "agent-tdd-jira 1.3.8", "transmission": "<sha256>", "referentiel": "R-4", "constitution": "<sha256>" },
   "autorisations": { "ecritureCode": false, "moteurExterne": true },
   "arbre": { "mode": "normal", "branche": "feature/ECR-77-export-csv", "commitDepart": "<sha1>" },
   "scenarios": [
     { "id": "ECR-77-S02", "statut": "accepté", "rouge": "Expecting actual: [] to start with: [-17, -69, -65]", "essais": { "rouge": 1, "vert": 2 },
       "suites": { "back": "vert", "front": "non concerné" }, "patch": "002-S02.patch", "commit": "<sha1 dans l'arbre de la demande>" }
   ],
-  "productions": [{ "id": "P-12", "fiche": "vert@1.0.0+agent-tdd-jira@1.3.7+L1", "moteur": "gemini", "adaptateur": "externe", "empreintePrompt": "<sha256>", "decision": "DEC-118" }],
+  "productions": [{ "id": "P-12", "fiche": "vert@1.0.0+agent-tdd-jira@1.3.8+L1", "moteur": "gemini", "adaptateur": "externe", "empreintePrompt": "<sha256>", "decision": "DEC-118" }],
   "empreinteFin": "<sha256>"
 }
 ```

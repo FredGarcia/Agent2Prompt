@@ -7,14 +7,14 @@ status: active
 
 # Module `acceptable` (D26)
 
-Ce module applique le socle de l'acceptable, `socle-acceptable/SKILL.md`, inclus dans la spécification à la version épinglée. Il n'ajoute aucun agent : il fixe ce que le noyau vérifie au démarrage, ce que chaque garde cite quand elle refuse, et ce que l'humain peut répondre à un refus. Le kit dev, par lequel Agent2Dev écrira, attend le contrat des kits du socle (point d'extension E5).
+Ce module applique le socle de l'acceptable, `socle-acceptable/SKILL.md`, inclus dans la spécification à la version épinglée. Il n'ajoute aucun agent : il fixe ce que le noyau vérifie au démarrage, ce que chaque garde cite quand elle refuse, et ce que l'humain peut répondre à un refus. Le kit dev, par lequel Agent2Dev atteint l'environnement dev, suit le contrat des kits du socle (module `kit`).
 
 ## 1. Épinglage (D26.INV-1)
 
 La constitution porte le champ `acceptable` (module `noyau`, section 5) :
 
 ```json
-{ "acceptable": { "socle": "socle-acceptable", "version": "1.0.1", "empreinte": "e815cadf230886d507d56dbbfb5d7cfd0cf3982036d54d0279b70cc8f49b4764" } }
+{ "acceptable": { "socle": "socle-acceptable", "version": "1.1.0", "empreinte": "e815cadf230886d507d56dbbfb5d7cfd0cf3982036d54d0279b70cc8f49b4764" } }
 ```
 
 Au démarrage, après la vérification de l'empreinte de la constitution (D1.INV-4), le noyau :
@@ -40,7 +40,7 @@ Chaque liste reprend les entrées du noyau, en tête, et ajoute celles d'Agent2D
 
 Lieux logiques d'Agent2Dev : `constitution` est `constitution/` ; `sources-du-systeme`, `src/` ; `fiches`, `fiches/` ; `configuration-humaine`, `~/.agent2dev/humaine.json` ou le chemin de `AGENT2DEV_CONFIG` ; `transmission-du-skill`, la transmission épinglée d'agent-tdd-jira ; `schemas`, `schemas/` ; `profil-ratifie-existant`, toute version de profil déjà ratifiée.
 
-Tant que le socle ne décrit pas le contrat des kits, une entrée `horsKit` vaut partout : aucune action réservée aux kits ne s'exécute (point d'extension E5). Une entrée propre peut porter `derogeable: true` ; une entrée du noyau, jamais ; aucune ne le porte dans la constitution d'exemple.
+La garde refuse partout une entrée `horsKit` : ce qui ne se fait que dans un kit n'atteint l'environnement dev que par le kit dev, que la fabrication de l'hôte applique après sa validation (module `kit`). Une entrée propre peut porter `derogeable: true` ; une entrée du noyau, jamais ; aucune ne le porte dans la constitution d'exemple.
 
 ## 3. Refus (D26.INV-2)
 
@@ -70,7 +70,7 @@ La projection `agent2dev.livrable/1` porte une rubrique `acceptable`, présente 
 
 ```json
 { "acceptable": {
-    "socle": "socle-acceptable", "version": "1.0.1",
+    "socle": "socle-acceptable", "version": "1.1.0",
     "refus": [
       { "n": 2107, "date": "2026-10-21T14:05:40Z", "garde": "commandes", "objet": "docker", "regles": ["SA2.INV-1"],
         "reponse": { "decision": "faux-refus", "role": "developpeur", "n": 2109, "date": "2026-10-21T14:07:02Z" } }
@@ -93,7 +93,7 @@ Jeu d'essai : la constitution d'exemple, des copies altérées, et une constitut
 
 | Scénario | Vérifie | Cas |
 |---|---|---|
-| AC1 | D26.INV-1 | la constitution d'exemple démarre : socle 1.0.1, empreinte conforme, chaque entrée du noyau présente |
+| AC1 | D26.INV-1 | la constitution d'exemple démarre : socle 1.1.0, empreinte conforme, chaque entrée du noyau présente |
 | AC2 | D26.INV-1 | une empreinte fausse, une version autre que celle du socle inclus, une entrée du noyau retirée d'une liste, ou le champ `acceptable` absent empêchent le démarrage « acceptable non conforme » |
 | AC3 | D26.INV-1 | une entrée du noyau marquée `derogeable` dans la constitution empêche le démarrage |
 | AC4 | D26.INV-2 | « redémarrer l'application en recette » est refusée « hors périmètre », règle D1.INV-5 ; « déployer en recette », règle SA1.INV-1 ; chaque refus a sa ligne `acceptable.refus` |
@@ -105,7 +105,7 @@ Jeu d'essai : la constitution d'exemple, des copies altérées, et une constitut
 | AC10 | D26.INV-3 | un faux refus déclaré sur le refus de `docker`, avec son motif : ligne `acceptable.faux-refus`, la commande reste refusée, et le faux refus paraît dans la vue de gouvernance, sous sa règle |
 | AC11 | D26.INV-3 | une réponse sans motif, une deuxième réponse au même refus, une réponse arrivée par l'échange ou envoyée par un rôle sans droit sont refusées ; le moteur n'a aucune action pour répondre |
 | AC12 | D26.INV-4 | le livrable d'une demande qui a connu un refus et un faux refus porte la rubrique `acceptable`, chaque refus avec sa garde, ses règles et sa réponse, le refus et la réponse datés de leur ligne de journal, sans motif en clair |
-| AC13 | point E5 | une demande « déployer sur l'environnement de développement » est refusée, règle SA1.INV-1 : aucun kit n'existe, l'entrée `horsKit` vaut partout ; aucun kit n'est produit |
+| AC13 | point E5 | une demande « déployer sur l'environnement de développement » est refusée par la garde de périmètre, règle SA1.INV-1 : Agent2Dev n'atteint cet environnement que par un kit dev, que la fabrication de l'hôte applique (module `kit`) |
 
 ## 8. Fichiers à produire
 

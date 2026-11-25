@@ -95,7 +95,7 @@ Le résultat est une liste d'écarts `{ chemin, regle, message }`. Une liste non
 
 ```json
 {
-  "version": "2.0.0",
+  "version": "2.1.0",
   "invariants": ["D1.INV-1", "D1.INV-2"],
   "pointsDeControle": ["CP-0", "CP-1", "CP-2", "CP-3", "CP-4", "CP-5"],
   "reglesModifiables": [
@@ -103,7 +103,7 @@ Le résultat est une liste d'écarts `{ chemin, regle, message }`. Une liste non
     { "regle": "budget.reessaiEtape", "bornes": { "min": 0, "max": 2 } }
   ],
   "metaCriteres": { "fenetre": 10, "expositionMin": 3, "marge": 15 },
-  "acceptable": { "socle": "socle-acceptable", "version": "1.0.1", "empreinte": "e815cadf230886d507d56dbbfb5d7cfd0cf3982036d54d0279b70cc8f49b4764" },
+  "acceptable": { "socle": "socle-acceptable", "version": "1.1.0", "empreinte": "e815cadf230886d507d56dbbfb5d7cfd0cf3982036d54d0279b70cc8f49b4764" },
   "intentionsRefusees": [
     { "intention": "deployer", "horsKit": true, "regle": "SA1.INV-1" },
     { "intention": "administrer", "horsKit": true, "regle": "SA1.INV-1" },
@@ -163,7 +163,7 @@ La liste complète des règles modifiables et de leurs bornes est au module `ref
 - La publication est une commande humaine, hors du bus : `npm run constitution:publier` inscrit l'empreinte au grand livre. Aucun agent ne l'appelle.
 - Le champ `acceptable` épingle le noyau du socle de l'acceptable inclus dans la spécification : son nom, sa version et l'empreinte de son bloc `noyau`. Après l'empreinte de la constitution, le noyau vérifie l'épinglage et la présence de chaque entrée du noyau (module `acceptable`, section 1) ; un écart empêche le démarrage.
 
-Garde d'écriture : le noyau expose `ecriture.autoriser(chemin, agent)`. Seuls sont permis le dossier des preuves (`navigateur`, `journal`), le fichier de session (`navigateur`) et les exports du journal de tests (`journal`). Toute autre écriture, et en particulier les lieux de `ecrituresInterdites`, `constitution/`, `src/`, `fiches/`, `configuration/` et `migrations/`, est refusée avec l'erreur `ECRITURE_INTERDITE`, qui cite la règle du lieu (module `acceptable`, section 3).
+Garde d'écriture : le noyau expose `ecriture.autoriser(chemin, agent)`. Seuls sont permis le dossier des preuves (`navigateur`, `journal`), le fichier de session (`navigateur`), les exports du journal de tests (`journal`) et le dossier des kits de la campagne, `kits/<campagne>/` (`preparateur`, module `kit`). Toute autre écriture, et en particulier les lieux de `ecrituresInterdites`, `constitution/`, `src/`, `fiches/`, `configuration/` et `migrations/`, est refusée avec l'erreur `ECRITURE_INTERDITE`, qui cite la règle du lieu (module `acceptable`, section 3).
 
 ## 6. Port moteur
 
