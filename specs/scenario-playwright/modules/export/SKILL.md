@@ -156,7 +156,7 @@ Les messages viennent du rapport, où les secrets sont déjà masqués (D19.INV-
 
 <!-- fichier : scripts/export.mjs -->
 ```javascript
-// scenario-playwright 1.6.3 : export d'un scénario ratifié en test @playwright/test du projet (D21).
+// scenario-playwright 1.6.4 : export d'un scénario ratifié en test @playwright/test du projet (D21).
 //
 // Le test s'écrit sans IA depuis le scénario TOML valide, dont la traduction est contrôlée : même scénario,
 // même test. Chaque étape garde son numéro et sa ligne, chaque cible devient le même localisateur de
@@ -171,7 +171,7 @@ import { strategie } from './cibles.mjs';
 import { positionsPreparation } from './moteur.mjs';
 import { DELAI_DEFAUT, DELAI_MAIN_DEFAUT, lireScenario, mutationsDe, resumeEntree, resumeEtape } from './scenario.mjs';
 
-export const VERSION = '1.6.3';
+export const VERSION = '1.6.4';
 export const NOM_AIDES = 'scenario-playwright.aides';
 export const NOM_CONNEXION = 'scenario-playwright.connexion';
 const RE_EMPREINTE = /^\/\/ Empreinte : ([0-9a-f]{64})$/;
@@ -492,7 +492,7 @@ Les aides, telles qu'elles s'écrivent dans le projet, sous leur en-tête : ouve
 
 <!-- fichier : scripts/aides-export.mjs -->
 ```javascript
-// scenario-playwright 1.6.3 : aides des tests exportés, copiées dans le dossier de tests du projet (D21).
+// scenario-playwright 1.6.4 : aides des tests exportés, copiées dans le dossier de tests du projet (D21).
 //
 // Un test exporté ne dépend que de @playwright/test et de ce fichier. Les aides reprennent la sémantique du
 // moteur du skill : attentes bornées sur un état, aucune étape rejouée, vérifications qui se poursuivent après
@@ -1048,7 +1048,7 @@ class Jeu {
 <!-- fichier : scripts/exporter.mjs -->
 ```javascript
 #!/usr/bin/env node
-// scenario-playwright 1.6.3 : exporte des scénarios ratifiés en tests @playwright/test du projet (D21).
+// scenario-playwright 1.6.4 : exporte des scénarios ratifiés en tests @playwright/test du projet (D21).
 //
 // Usage : node <dossier du skill>/scripts/exporter.mjs <scénario.toml>... --dossier <dossier de tests du projet>
 //           [--langage ts|js] [--comparer] [--remplacer]
@@ -1157,7 +1157,7 @@ Lecture des rapports et des campagnes, clé du test, verdicts recalculés, JSON 
 <!-- fichier : scripts/resultats.mjs -->
 ```javascript
 #!/usr/bin/env node
-// scenario-playwright 1.6.3 : résultats d'une exécution ou d'une campagne aux formats d'import de Xray et de
+// scenario-playwright 1.6.4 : résultats d'une exécution ou d'une campagne aux formats d'import de Xray et de
 // Zephyr Scale (D21), et rapport de conformité à coller dans Jira (D22).
 //
 // Usage : node <dossier du skill>/scripts/resultats.mjs <dossier de résultats | rapport.json | dossier de campagne>...

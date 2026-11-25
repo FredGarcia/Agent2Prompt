@@ -25,7 +25,7 @@ Lis `SKILL.md` et `manifest.json`, puis le socle et les modules dans l'ordre ind
 Obtiens du développeur, en une seule fois :
 
 - le chemin de son clone du dépôt Agent2Prompt, `<dépôt>` : l'outil de l'observatoire s'y lance, avec Node 20 ou plus récent. Vérifie que la version de l'observatoire dans le clone, dans `<dépôt>/specs/observatoire/manifest.json`, est {{VERSION}} ; sinon, signale-le : la consigne et l'outil vont ensemble ;
-- les projets à observer, dont les systèmes exportent déjà leurs observations.
+- les projets à observer, dont les systèmes exportent déjà leurs observations ; pour le binôme Agent2Dev et Agent2Test, les livrables et les journaux de tests dont il exportera les refus par l'outil d'export de l'observatoire.
 
 ## Étape 3 : déroulé
 
@@ -37,3 +37,4 @@ Suis la section 3 de `SKILL.md` : inscrire les projets, relever, lire l'état, c
 - Rien d'une instance n'entre dans le dépôt : ni texte de ticket, ni code, ni chemin, ni clé, ni nom ; seulement les valeurs minimisées de l'en-tête d'une proposition.
 - Le magasin de l'observatoire reste sur le poste : tu ne le copies, ne le versionnes ni ne l'exportes.
 - Tu ne lis des instances que leurs enveloppes : jamais leur sel, leur champ ni leur registre, pour l'observatoire.
+- L'export du binôme lit le sel de l'instance : tu ne le lances pas, tu en donnes la commande au développeur, qui la lance depuis son clone.

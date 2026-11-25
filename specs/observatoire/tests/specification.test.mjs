@@ -45,19 +45,19 @@ function registre() {
   return new Map(lignes.slice(2).map(cellules).map((c) => [c[0], { statut: c[i('Statut')], ordre: c[i('Ordre')], module: c[i('Module')].replace(/`/g, '') }]));
 }
 
-test('spécification : version du point d\'entrée, de son titre et du manifeste ; six dimensions actives, un module chacune, et leur ordre déclaré', () => {
+test('spécification : version du point d\'entrée, de son titre et du manifeste ; huit dimensions actives, un module chacune, et leur ordre déclaré', () => {
   assert.match(ENTREE, new RegExp(`^version: ${MANIFESTE.version.replace(/\./g, '\\.')}$`, 'm'));
   assert.match(ENTREE, new RegExp(`^# Observatoire de l'écosystème, version ${MANIFESTE.version.replace(/\./g, '\\.')}$`, 'm'));
   assert.match(ENTREE, new RegExp(`\\| ID \\| Dimension \\| Introduite \\| Statut ${MANIFESTE.version.replace(/\./g, '\\.')} \\| Ordre \\|`));
   const r = registre();
-  assert.deepStrictEqual([...r.keys()], ['D1', 'D2', 'D3', 'D4', 'D5', 'D6']);
-  assert.deepStrictEqual([...r.values()].map((d) => d.ordre), ['OC1', 'OC3', 'OC3', 'OC3', 'OC3', 'OC3'], 'D1 régule l\'entrée du magasin ; D2 à D6 font la boucle du troisième ordre');
+  assert.deepStrictEqual([...r.keys()], ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8']);
+  assert.deepStrictEqual([...r.values()].map((d) => d.ordre), ['OC1', 'OC3', 'OC3', 'OC3', 'OC3', 'OC3', 'OC1', 'OC3'], 'D1 régule l\'entrée du magasin, D7 la sortie d\'une instance pour le binôme ; D2 à D6 et D8 font la boucle du troisième ordre');
   for (const m of MANIFESTE.modules) {
     assert.equal(m.status, 'active', m.id);
     assert.deepStrictEqual(m.dimensions.map((d) => r.get(d).module), [m.id]);
   }
-  assert.equal(DEFINITIONS.length, 11);
-  assert.deepStrictEqual(MANIFESTE.previousVersions.map((p) => p.version), ['1.0.0'], 'la version précédente, archivée');
+  assert.equal(DEFINITIONS.length, 16);
+  assert.deepStrictEqual(MANIFESTE.previousVersions.map((p) => p.version), ['1.0.0', '1.1.0'], 'les versions précédentes, archivées');
 });
 
 test('spécification : chaque invariant a sa ligne de recette dans son module, et chaque test cité existe sous ce titre', () => {
@@ -82,6 +82,16 @@ test('spécification : l\'outil et ses commandes, tels que le point d\'entrée e
   const ligne = ENTREE.split('\n').find((l) => l.startsWith('| `observatoire.mjs` |'));
   assert.ok(ligne, 'la section 4 décrit l\'outil');
   assert.deepStrictEqual([...ligne.matchAll(/`([a-z]+)(?: [^`]*)?`/g)].map((m) => m[1]), usage, 'les mêmes commandes, dans le même ordre');
+  // L'outil d'export du binôme, et ses commandes, tels que la section 4 et son module les décrivent.
+  const exportBinome = lire(join(SPEC, 'outils', 'export-binome.mjs'));
+  const commandes = [...exportBinome.matchAll(/^\/\/ {3}node specs\/observatoire\/outils\/export-binome\.mjs ([a-z]+)/gm)].map((m) => m[1]);
+  assert.deepStrictEqual(commandes, ['exporter', 'verifier', 'etat']);
+  const ligneExport = ENTREE.split('\n').find((l) => l.startsWith('| `export-binome.mjs` |'));
+  assert.ok(ligneExport, 'la section 4 décrit l\'outil d\'export du binôme');
+  assert.deepStrictEqual([...ligneExport.matchAll(/`([a-z]+)(?: [^`]*)?`/g)].map((m) => m[1]).filter((c) => c !== 'export'), commandes);
+  const module = lire(join(SPEC, 'modules', 'export-binome', 'SKILL.md'));
+  for (const c of commandes) assert.match(module, new RegExp(`^node specs/observatoire/outils/export-binome\\.mjs ${c} `, 'm'), `le module donne la commande ${c}`);
+  assert.doesNotMatch(lire(join(SPEC, 'outils', 'observatoire.mjs')), /agent2prompt\/sel|lireSel|randomBytes/, 'observatoire.mjs ne lit ni ne tire le sel d\'une instance');
   assert.match(lire(join(SPEC, 'ENTETE-TRANSMISSION.md')), /\{\{VERSION\}\}/);
   for (const nom of readdirSync(join(SPEC, 'outils'))) assert.doesNotMatch(lire(join(SPEC, 'outils', nom)), /\b(?:git (?:commit|push)|'commit'|'push'|fetch\(|https?:\/\/)/, `outils/${nom} : ni commit, ni push, ni réseau`);
 });

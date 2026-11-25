@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Export des observations du générateur de skills de ticket vers le socle d'observation
-// (generateur-skill-ticket, D9, depuis 1.3.0 ; socle-observation 1.1.0). Il se lance depuis le clone du
+// (generateur-skill-ticket, D9, depuis 1.3.0 ; socle-observation 1.2.0). Il se lance depuis le clone du
 // dépôt Agent2Prompt : aucun skill de ticket ne le porte.
 //
 // L'export lit, sans les modifier, le champ d'observation de chaque ticket du projet,

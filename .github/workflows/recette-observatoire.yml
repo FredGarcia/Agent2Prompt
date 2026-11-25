@@ -2,12 +2,14 @@ name: Recette de l'observatoire
 
 # observatoire : l'observatoire de l'écosystème, sur le poste du développeur. Ce workflow joue sa recette
 # sous Linux et sous Windows : inscription et relevé des journaux d'enveloppes, confrontation des
-# instances et des systèmes, état de l'écosystème, propositions et suivi de leur effet, sur des instances
-# d'épreuve que produisent l'export du générateur de skills de ticket et celui de l'orchestrateur C7E, avec un
-# magasin et un dépôt temporaires ; puis la vérification des propositions du dépôt, au format
-# observatoire.proposition/1. Il suit aussi ses sources : le socle d'observation, l'export du générateur et ses
-# outils de champ et d'apprentissage, le champ de l'arbre d'exemple, l'orchestrateur, son export et ses
-# registres, le référentiel Java dont la recette cite un invariant, et l'outil de transmission. La structure de la spécification est vérifiée, avec toutes
+# instances, des systèmes et des refus par règle de l'acceptable, état de l'écosystème, propositions et suivi de
+# leur effet, sur des instances d'épreuve que produisent l'export du générateur de skills de ticket, celui de
+# l'orchestrateur C7E et l'export du binôme de l'observatoire, avec un magasin et un dépôt temporaires ; puis la
+# vérification des propositions du dépôt, au format observatoire.proposition/1. Il suit aussi ses sources : le
+# socle d'observation, l'export du générateur et ses outils de champ et d'apprentissage, le champ de l'arbre
+# d'exemple, l'orchestrateur, son export et ses registres, le référentiel Java dont la recette cite un invariant,
+# le binôme et le socle de l'acceptable, dont les règles définissent les invariants des refus, et l'outil de
+# transmission. La structure de la spécification est vérifiée, avec toutes
 # les autres, par tools/verifier.mjs.
 
 on:
@@ -21,6 +23,9 @@ on:
       - 'specs/generateur-skill-ticket/manifest.json'
       - 'specs/orchestrateur-c7e/**'
       - 'specs/java/**'
+      - 'specs/agent2dev/**'
+      - 'specs/agent2test/**'
+      - 'specs/socle-acceptable/**'
       - 'tools/bundle.mjs'
       - '.github/workflows/recette-observatoire.yml'
   push:
@@ -34,6 +39,9 @@ on:
       - 'specs/generateur-skill-ticket/manifest.json'
       - 'specs/orchestrateur-c7e/**'
       - 'specs/java/**'
+      - 'specs/agent2dev/**'
+      - 'specs/agent2test/**'
+      - 'specs/socle-acceptable/**'
       - 'tools/bundle.mjs'
       - '.github/workflows/recette-observatoire.yml'
 

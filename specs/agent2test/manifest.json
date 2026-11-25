@@ -1,6 +1,6 @@
 {
   "name": "agent2test",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "specSchema": 1,
   "language": "fr",
   "description": "Agent2Test : système multi-agents qui choisit, prépare, exécute et journalise les tests essentiels d'une application Angular pour une demande, en pilotant Playwright comme une bibliothèque depuis Node, dans un projet séparé de l'application ; plan importé d'agent-tdd-jira, verdict par critère d'acceptation, navigateur qui regarde comme une personne et rend compte de ce qu'il voit et ne voit pas, points de contrôle humains, cybernétique de premier et de second ordre, un fichier SQLite unique ouvert par un agent médiateur, remise d'Agent2Dev en fichier ou par un échange par dossiers facultatif, exécution locale.",
@@ -22,7 +22,7 @@
     { "path": "socle-acceptable/SKILL.md", "from": "specs/socle-acceptable/SKILL.md", "version": "1.0.1" }
   ],
   "references": [
-    { "name": "agent-tdd-jira", "version": "1.3.6" },
+    { "name": "agent-tdd-jira", "version": "1.3.7" },
     { "name": "socle-acceptable", "version": "1.0.1" }
   ],
   "modules": [
@@ -56,6 +56,7 @@
     { "version": "1.2.0", "file": "archives/SKILL-v1.2.0.md" },
     { "version": "1.3.0", "file": "archives/SKILL-v1.3.0.md" },
     { "version": "1.3.1", "file": "archives/SKILL-v1.3.1.md" },
-    { "version": "1.4.0", "file": "archives/SKILL-v1.4.0.md" }
+    { "version": "1.4.0", "file": "archives/SKILL-v1.4.0.md" },
+    { "version": "1.5.0", "file": "archives/SKILL-v1.5.0.md" }
   ]
 }

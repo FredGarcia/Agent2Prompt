@@ -1,6 +1,6 @@
 ---
 name: systemes
-description: Confrontation entre systèmes (un même invariant du dépôt, cité par des écarts ou des dérogations de deux systèmes ou de deux instances, proposé à la spécification qui le définit ; un même écart compté une fois, désigné par son instance et son ticket ; références qui nomment le système de chaque enveloppe). À lire pour comprendre ce que l'observatoire confronte d'un système à l'autre.
+description: Confrontation entre systèmes (un même invariant du dépôt, cité par des écarts ou des dérogations de deux systèmes ou de deux instances, proposé à la spécification qui le définit ; un même écart compté une fois, désigné par son instance et son ticket ; une réponse à un refus n'est pas un écart ; références qui nomment le système de chaque enveloppe). À lire pour comprendre ce que l'observatoire confronte d'un système à l'autre.
 dimensions: [D6]
 status: active
 ---
@@ -11,7 +11,7 @@ Deux systèmes ne parlent pas la même langue : le générateur de skills de tic
 
 ## 1. Écarts
 
-- Une enveloppe compte quand elle est un écart ou une dérogation, de type `ecart` ou `derogation`, et qu'elle porte un invariant que le dépôt définit : un invariant `**Dn.INV-k**`, `**SCn.INV-k**` ou `**SOn.INV-k**` du point d'entrée d'une de ses spécifications, préfixé par le nom de celle-ci, d'un système ou d'une version que le dépôt connaît (module `releve`). Un invariant que le dépôt ne définit pas, venu d'un système plus récent que le clone, ne fait pas de candidat (D6.INV-1).
+- Une enveloppe compte quand elle est un écart ou une dérogation, de type `ecart` ou `derogation`, et qu'elle porte un invariant que le dépôt définit : un invariant `**Dn.INV-k**`, `**SCn.INV-k**`, `**SOn.INV-k**` ou `**SAn.INV-k**` du point d'entrée d'une de ses spécifications, préfixé par le nom de celle-ci, d'un système ou d'une version que le dépôt connaît (module `releve`). Un invariant que le dépôt ne définit pas, venu d'un système plus récent que le clone, ne fait pas de candidat (D6.INV-1). Une réponse à un refus, dérogation ou faux refus du binôme, qui vise l'enveloppe de son refus, n'est pas un écart : les refus et leurs réponses se confrontent par la règle qu'ils citent (module `acceptable`).
 - Un écart se désigne par son instance et son ticket : l'ancre de l'enveloppe quand c'est un ticket, comme pour une ligne du registre des écarts de l'orchestrateur ; sinon son journal source, qui pour le champ d'observation du générateur est le ticket, par l'empreinte salée de sa clé. Les deux systèmes d'une instance partagent son sel : le même ticket a la même empreinte dans leurs deux journaux.
 - Le même écart peut donc venir de deux systèmes : le générateur le constate dans le champ, l'orchestrateur exporte la ligne où le développeur l'a décidé. Il ne compte qu'une fois. Une enveloppe sans ticket désigne son propre écart, par sa source.
 
@@ -37,5 +37,5 @@ L'effet d'une proposition par invariant ratifiée se mesure comme celui des autr
 
 | Invariant | Tests |
 |---|---|
-| D6.INV-1 | `tests/observatoire.test.mjs` : « D6 : un même invariant du dépôt, relevé par des écarts distincts de deux systèmes, ou dans deux instances, est un candidat ; un même écart ne compte qu'une fois » ; « D1 : les journaux de chaque système d'une instance se relèvent, chacun dans son miroir ; une instance aux journaux de sels différents n'est pas inscrite » |
+| D6.INV-1 | `tests/observatoire.test.mjs` : « D6 : un même invariant du dépôt, relevé par des écarts distincts de deux systèmes, ou dans deux instances, est un candidat ; un même écart ne compte qu'une fois » ; « D1 : les journaux de chaque système d'une instance se relèvent, chacun dans son miroir ; une instance aux journaux de sels différents n'est pas inscrite » ; « D8 : les refus se confrontent par règle : refus, dérogations et faux refus comptés par système et par instance ; aucun ne fait de retour, de récurrence ni de candidat par invariant » |
 | D6.INV-2 | `tests/observatoire.test.mjs` : « D6 : un candidat par invariant se propose à la spécification qui le définit, avec les systèmes qui l'ont relevé, et ses références nomment le système de chaque enveloppe » ; « D6 : un même invariant du dépôt, relevé par des écarts distincts de deux systèmes, ou dans deux instances, est un candidat ; un même écart ne compte qu'une fois » |

@@ -1,10 +1,10 @@
 ---
 name: orchestrateur-c7e
 description: Orchestrateur fractal C7E, qui pilote la résolution d'un ticket full-stack comme la transformation maîtrisée d'un système vivant (cycle de l'Axiome 7E, déclinaison récursive imbriquée sur quatre profondeurs, concepts paramétrables, qualification de chaque ticket à son ouverture par un modèle générique de la demande et des questions, méso-contrat principal et compléments confirmés avant tout le reste, options par couche rattachées au méso-contrat qui les permet et leurs paramètres au choix par ticket, variantes de représentation d'une ressource et leur mise à jour en temps réel, analyse des images PNG de l'objectif, fiche de transformation validée avant toute modification, tests déduits des risques, traçabilité Git compatible avec le kit des agents parallèles, boucle de second ordre bornée par un registre, registres exportés vers le socle d'observation par une commande que lance le développeur, valeur annoncée comme une hypothèse tant qu'elle n'est pas mesurée), avec le fichier des invariants du projet, meso-contrats. Adaptateur par défaut Java, Spring Boot, PostgreSQL, Liquibase et Angular. À activer au démarrage de l'IA locale, sur choix du développeur, pour les tickets qu'il lui confie.
-version: 3.8.1
+version: 3.8.2
 ---
 
-# Orchestrateur fractal C7E, version 3.8.1
+# Orchestrateur fractal C7E, version 3.8.2
 
 Ce document est le point d'entrée du skill et contient la méthode. Il s'active au démarrage de l'IA locale, sur choix du développeur (§ 11.4), avec le fichier des invariants du projet, copie remplie du modèle `meso-contrats.md`. Ces deux fichiers suffisent au démarrage ; le référentiel des méso-contrats se lit à l'ouverture de chaque ticket, pour le qualifier, puis à son analyse, et les autres fichiers quand un ticket touche leur domaine.
 
@@ -13,7 +13,7 @@ Fichiers du skill :
 - `SKILL.md` : la méthode, ce document ;
 - `meso-contrats.md` : modèle des invariants du projet (dimension D8), pré-rempli pour l'adaptateur par défaut, à copier dans le projet et à remplir par le développeur ;
 - `socle/SKILL.md` : socle commun back-front (contrat OpenAPI, erreurs RFC 9457, formats, pagination, sécurité, traçabilité, accessibilité, événements temps réel par WebSocket STOMP), inclus à une version épinglée, 1.1.0 ;
-- `socle-observation/SKILL.md` : socle d'observation, l'enveloppe commune dans laquelle s'exportent le registre des concepts et le registre des écarts (dimension D12), inclus à une version épinglée, 1.1.0 ;
+- `socle-observation/SKILL.md` : socle d'observation, l'enveloppe commune dans laquelle s'exportent le registre des concepts et le registre des écarts (dimension D12), inclus à une version épinglée, 1.2.0 ;
 - `references/java.md` et `references/angular.md` : points d'entrée des experts Java et Angular. Ce sont des **référentiels** : l'IA y lit les versions cibles et les invariants que tout code produit doit respecter, sans adopter leur mode de travail ;
 - `modules/qualification/SKILL.md` : dimension D11, la qualification de chaque ticket à son ouverture : modèle générique de la demande, questions complémentaires, méso-contrat confirmé avant tout le reste ;
 - `modules/referentiel/SKILL.md` : dimension D10, le référentiel des méso-contrats : modèle générique de la demande, catégories de tickets (dont M04, variante de représentation d'une ressource), options au choix par couche et leurs paramètres, analyse des images de l'objectif, modèle à installer dans le projet ;
@@ -525,7 +525,7 @@ Une contradiction entre deux niveaux se signale et s'inscrit au registre des éc
 
 ## 12. Registre des dimensions
 
-| ID | Dimension | Introduite | Statut 3.8.1 | Dépend de | Où |
+| ID | Dimension | Introduite | Statut 3.8.2 | Dépend de | Où |
 |---|---|---|---|---|---|
 | D1 | Ontologie : cycle 7E, profondeurs du CRI, concepts paramétrables | 3.1 | active | | `SKILL.md`, § 1 |
 | D2 | Configuration : matrice d'activation, modes de modulation, choix du démarrage | 3.1 | active | D1 | § 2, § 7.1, § 11.4 |
@@ -563,7 +563,7 @@ Point d'extension, actif dès 3.5.0 :
 
 Point d'extension, actif dès 3.6.0 :
 
-- **E6** : les événements du registre des concepts et les lignes décidées du registre des écarts s'exportent dans l'enveloppe `socle-observation.enveloppe/1` du socle `socle-observation` 1.1.0, selon ses correspondances, que le module `observation` précise pour ces deux registres, sans changer ni ces registres ni leurs droits (D6.INV-2). Un registre de plus à exporter attend sa correspondance dans une version du socle. Inerte en 3.6, l'export est actif depuis 3.7.0 (D12, scénario R23).
+- **E6** : les événements du registre des concepts et les lignes décidées du registre des écarts s'exportent dans l'enveloppe `socle-observation.enveloppe/1` du socle `socle-observation` 1.2.0, selon ses correspondances, que le module `observation` précise pour ces deux registres, sans changer ni ces registres ni leurs droits (D6.INV-2). Un registre de plus à exporter attend sa correspondance dans une version du socle. Inerte en 3.6, l'export est actif depuis 3.7.0 (D12, scénario R23).
 
 Point d'extension, actif dès 3.8.0 :
 
@@ -890,3 +890,5 @@ Décisions du développeur, le 24 novembre 2026, jalon J3a du passage du dépôt
 **3.8.0** (2026-11-24) : dimension D13 réservée, l'acceptable partagé, jalon J3a du passage du dépôt au troisième ordre (section 16) : les actions à effet extérieur d'un ticket se confronteront au noyau du socle `socle-acceptable` 1.0.0, référencé par le manifeste ; point d'extension E7 ; module `acceptable`. Scénario R24, qui vérifie l'inertie. Référence à agent-tdd-jira 1.3.5, dont seule la référence à Agent2Test change ; les conventions Git et la numérotation des critères reprises par l'orchestrateur sont identiques. Aucun invariant ajouté ni modifié ; trente-six invariants. Archive : `archives/SKILL-v3.7.0.md`.
 
 **3.8.1** (2026-11-24) : correctif, jalon J3b du passage du dépôt au troisième ordre (section 16). Référence au socle `socle-acceptable` 1.0.1, qui interdit toute dérogation à une règle du noyau ; E7 et le module `acceptable` le reprennent, et D13 reste réservée. Référence à agent-tdd-jira 1.3.6, dont seule la référence à Agent2Test change ; les conventions Git et la numérotation des critères reprises par l'orchestrateur sont identiques. Aucune dimension ni aucun invariant modifié. Archive : `archives/SKILL-v3.8.0.md`.
+
+**3.8.2** (2026-11-25) : correctif, jalon J3c du passage du dépôt au troisième ordre (section 16). Socle `socle-observation` 1.2.0, inclus et référencé : il ajoute la correspondance des rubriques `acceptable` du binôme, que l'observatoire exporte pour lui, sans changer celles du registre des concepts et du registre des écarts, ni ses invariants ; l'export de l'orchestrateur (D12) ne change pas. Référence à agent-tdd-jira 1.3.7, dont seule la référence à Agent2Test change. Aucune dimension ni aucun invariant modifié. Archive : `archives/SKILL-v3.8.1.md`.

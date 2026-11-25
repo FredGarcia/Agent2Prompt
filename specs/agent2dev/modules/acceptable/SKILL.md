@@ -72,12 +72,13 @@ La projection `agent2dev.livrable/1` porte une rubrique `acceptable`, présente 
 { "acceptable": {
     "socle": "socle-acceptable", "version": "1.0.1",
     "refus": [
-      { "n": 2107, "garde": "commandes", "objet": "docker", "regles": ["SA2.INV-1"], "reponse": { "decision": "faux-refus", "role": "developpeur", "n": 2109 } }
+      { "n": 2107, "date": "2026-10-21T14:05:40Z", "garde": "commandes", "objet": "docker", "regles": ["SA2.INV-1"],
+        "reponse": { "decision": "faux-refus", "role": "developpeur", "n": 2109, "date": "2026-10-21T14:07:02Z" } }
     ]
 } }
 ```
 
-Le Markdown en dérive, une ligne par refus ; les motifs des réponses restent dans le journal, après le masque du noyau, et ne sont pas recopiés dans le livrable. La rubrique est la source de l'export des refus vers le socle d'observation, à venir.
+Chaque refus et chaque réponse portent leur numéro de ligne de journal, `n`, et sa date, `date`, son horodatage à la seconde, en UTC (`AAAA-MM-JJTHH:MM:SSZ`). `garde` vaut `perimetre`, `ecriture`, `commandes` ou `lecons` ; `reponse` vaut `null` tant que personne n'a répondu, sinon elle porte sa décision, `deroger` ou `faux-refus`, et le rôle qui a répondu, `developpeur` ou `referent`. Le Markdown en dérive, une ligne par refus ; les motifs des réponses restent dans le journal, après le masque du noyau, et ne sont pas recopiés dans le livrable. La rubrique est la source de l'export des refus vers le socle d'observation, par l'outil d'export du binôme que porte l'observatoire du dépôt Agent2Prompt : il date chaque enveloppe par elle.
 
 ## 6. Pièges connus
 
@@ -103,7 +104,7 @@ Jeu d'essai : la constitution d'exemple, des copies altérées, et une constitut
 | AC9 | D26.INV-3 | avec la constitution d'essai, le développeur déroge au refus de `--essai-derogeable`, avec son motif : la ligne `acceptable.derogation` cite le refus, la règle, le rôle et le motif, et la commande est admise une fois |
 | AC10 | D26.INV-3 | un faux refus déclaré sur le refus de `docker`, avec son motif : ligne `acceptable.faux-refus`, la commande reste refusée, et le faux refus paraît dans la vue de gouvernance, sous sa règle |
 | AC11 | D26.INV-3 | une réponse sans motif, une deuxième réponse au même refus, une réponse arrivée par l'échange ou envoyée par un rôle sans droit sont refusées ; le moteur n'a aucune action pour répondre |
-| AC12 | D26.INV-4 | le livrable d'une demande qui a connu un refus et un faux refus porte la rubrique `acceptable`, chaque refus avec sa garde, ses règles et sa réponse, sans motif en clair |
+| AC12 | D26.INV-4 | le livrable d'une demande qui a connu un refus et un faux refus porte la rubrique `acceptable`, chaque refus avec sa garde, ses règles et sa réponse, le refus et la réponse datés de leur ligne de journal, sans motif en clair |
 | AC13 | point E5 | une demande « déployer sur l'environnement de développement » est refusée, règle SA1.INV-1 : aucun kit n'existe, l'entrée `horsKit` vaut partout ; aucun kit n'est produit |
 
 ## 8. Fichiers à produire

@@ -7,7 +7,7 @@ status: active
 
 # Module `confrontation` (D2)
 
-Aucun système ne se juge seul (`EVOLUTION.md`, section 10.3) : ce qu'une instance relève prend un autre poids quand une autre instance le relève aussi, et ce qu'une instance a décidé pour la spécification doit pouvoir remonter jusqu'au dépôt. La confrontation tire des enveloppes de toutes les instances deux sortes de candidats, pour un même système ; la confrontation entre systèmes, par les invariants du dépôt, en ajoute une troisième (module `systemes`).
+Aucun système ne se juge seul (`EVOLUTION.md`, section 10.3) : ce qu'une instance relève prend un autre poids quand une autre instance le relève aussi, et ce qu'une instance a décidé pour la spécification doit pouvoir remonter jusqu'au dépôt. La confrontation tire des enveloppes de toutes les instances deux sortes de candidats, pour un même système ; la confrontation entre systèmes, par les invariants du dépôt, en ajoute une troisième (module `systemes`), et celle de l'acceptable, par les règles que citent les refus, une quatrième (module `acceptable`).
 
 ## 1. Signaux
 
@@ -19,15 +19,15 @@ Une récurrence est un même motif, à la même profondeur, pour un même systè
 
 ## 3. Retour
 
-Un retour est une proposition d'une instance, de type `proposition` et de cible `specification`, qu'une décision humaine de la même instance a retenue ou amendée (D2.INV-2) : pour le générateur, une proposition du registre d'apprentissage qui vise ses consignes, décidée par son développeur. Il remonte dès une instance : c'est le canal qui manquait au retour de l'instance vers le dépôt. Une proposition refusée par l'instance, ou dont la cible est l'instance, ne remonte pas.
+Un retour est une proposition d'une instance, de type `proposition` et de cible `specification`, qu'une décision humaine de la même instance a retenue ou amendée (D2.INV-2) : pour le générateur, une proposition du registre d'apprentissage qui vise ses consignes, décidée par son développeur. Il remonte dès une instance : c'est le canal qui manquait au retour de l'instance vers le dépôt. Une proposition refusée par l'instance, ou dont la cible est l'instance, ne remonte pas. La décision vise une enveloppe du journal de son propre système : chaque système tient son journal, où les numéros recommencent à 1, et la décision d'un système ne retient jamais la proposition d'un autre.
 
 ## 4. Candidats
 
-Un candidat est identifié par son système, son motif et sa profondeur : un retour et une récurrence de même clé font un seul candidat, de sorte `retour`. Il porte les versions du système qu'il a vues, le nombre d'instances, le nombre d'enveloppes et leurs références tronquées, les huit premiers caractères de l'instance et le numéro de l'enveloppe : de quoi retrouver les enveloppes dans le magasin, et rien de plus. `confronter` les liste, avant les candidats par invariant du module `systemes` ; `proposer` les écrit. Les enveloppes de l'orchestrateur ne portent pas de profondeur : elles ne font ni retour ni récurrence, et ne se confrontent que par les invariants que citent ses écarts.
+Un candidat est identifié par son système, son motif et sa profondeur : un retour et une récurrence de même clé font un seul candidat, de sorte `retour`. Il porte les versions du système qu'il a vues, le nombre d'instances, le nombre d'enveloppes et leurs références tronquées, les huit premiers caractères de l'instance et le numéro de l'enveloppe : de quoi retrouver les enveloppes dans le magasin, et rien de plus. `confronter` les liste, avant les candidats par invariant du module `systemes` ; `proposer` les écrit. Les enveloppes de l'orchestrateur ne portent pas de profondeur : elles ne font ni retour ni récurrence, et ne se confrontent que par les invariants que citent ses écarts. Celles du binôme non plus : un refus, une dérogation ou un faux refus se confrontent par la règle qu'ils citent (module `acceptable`).
 
 ## 5. Recette
 
 | Invariant | Tests |
 |---|---|
 | D2.INV-1 | `tests/observatoire.test.mjs` : « D2 : une récurrence compte des instances distinctes : un même motif, à la même profondeur, pour un même système, dans au moins deux instances » ; « D1 : une enveloppe d'un système ou d'une version inconnus du dépôt est écartée de toute confrontation et signalée » ; « Ligne de commande : codes de sortie ; le magasin d'épreuve seul est écrit » |
-| D2.INV-2 | `tests/observatoire.test.mjs` : « D2 : un retour remonte dès une instance : une proposition qui vise la spécification, retenue par le développeur de l'instance » ; « D2 : une récurrence compte des instances distinctes : un même motif, à la même profondeur, pour un même système, dans au moins deux instances » |
+| D2.INV-2 | `tests/observatoire.test.mjs` : « D2 : un retour remonte dès une instance : une proposition qui vise la spécification, retenue par le développeur de l'instance » ; « D2 : une récurrence compte des instances distinctes : un même motif, à la même profondeur, pour un même système, dans au moins deux instances » ; « D2 : une décision vise une enveloppe du journal de son propre système : la décision d'un système ne retient pas la proposition d'un autre » |

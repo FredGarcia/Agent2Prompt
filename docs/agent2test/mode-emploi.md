@@ -1,6 +1,6 @@
 # Mode d'emploi : construire et utiliser Agent2Test
 
-[`agent2test`](../../specs/agent2test/SKILL.md) 1.5.0 est la **spécification d'un système à construire**, pas un skill qu'on installe. Une IA la reçoit dans un projet séparé de l'application et l'implémente par lots, sous votre validation.
+[`agent2test`](../../specs/agent2test/SKILL.md) 1.5.1 est la **spécification d'un système à construire**, pas un skill qu'on installe. Une IA la reçoit dans un projet séparé de l'application et l'implémente par lots, sous votre validation.
 
 Agent2Test choisit, prépare et joue avec Playwright les tests essentiels d'une demande sur l'application Angular **que vous avez lancée**, et rend **un verdict prouvé par critère d'acceptation**. Son plan vient d'[`agent-tdd-jira`](../agent-tdd-jira/mode-emploi.md) : US, critères numérotés, scénarios Gherkin. Il travaille en binôme avec [Agent2Dev](../agent2dev/mode-emploi.md) ou avec l'agent TDD.
 
@@ -20,7 +20,7 @@ flowchart LR
 - Node 22.13 ou plus récent (26.13.0 recommandé), Playwright 1.63 ou plus récent ; les données tiennent dans un fichier SQLite, par `node:sqlite` : aucun serveur de base de données.
 - L'application Angular lancée par vous sur votre poste, et un navigateur du côté de la session SSO.
 - Docker Compose seulement pour un moteur local souverain (Ollama).
-- La transmission : [`transmissions/agent2test-1.5.0.md`](../../transmissions/agent2test-1.5.0.md).
+- La transmission : [`transmissions/agent2test-1.5.1.md`](../../transmissions/agent2test-1.5.1.md).
 
 L'installateur d'Agent2Prompt refuse cette spécification : elle se matérialise dans `spec/` de son propre projet.
 
@@ -68,6 +68,8 @@ Le niveau d'autonomie de chaque point se fixe dans `configuration/humaine.json`,
 - Une absence n'est jamais constatée sur une zone que le navigateur n'a pas vue, et « chaque cellule » sur un tableau vide reste « non vérifié ».
 
 **Le binôme** : la remise d'Agent2Dev ou de l'agent TDD arrive en fichier, ou par un échange par dossiers facultatif. Elle n'ouvre aucune campagne : vous redémarrez l'application sur le commit remis, puis ouvrez la campagne. Le journal de tests repart par le même chemin.
+
+**Les refus vers l'observatoire** : la rubrique `acceptable` du journal de tests date chaque refus et chaque réponse. L'outil d'export du binôme, que porte l'observatoire d'Agent2Prompt, les traduit en enveloppes minimisées dans le projet de l'application testée, sous le sel de son instance, et non dans le projet Agent2Test ([mode d'emploi de l'observatoire](../observatoire/mode-emploi.md)).
 
 ## 4. Ce qui ne se négocie pas
 
