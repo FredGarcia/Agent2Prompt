@@ -11,7 +11,7 @@ Statut : `reserved`. En 1.4, l'acceptable des skills de ticket est celui de la m
 
 ## 1. Pourquoi cette dimension existe
 
-À la clôture d'un arbre, le skill racine écrit trois manifestes de kits, dev, test et démo (D4.INV-2) : ils recensent ce que l'arbre a produit, sans retour arrière ni confrontation à une règle commune. Le socle de l'acceptable (`socle-acceptable` 1.0.0) tire des systèmes du dépôt le noyau commun de ce qu'ils refusent, chaque règle un invariant que cite le refus, et fait des kits le chemin de l'écriture, avec retour arrière : le troisième couplage du troisième ordre, celui des valeurs (`EVOLUTION.md`, section 10). Cette dimension garde la place de son application dans le générateur et dans les skills de ticket.
+À la clôture d'un arbre, le skill racine écrit trois manifestes de kits, dev, test et démo (D4.INV-2) : ils recensent ce que l'arbre a produit, sans retour arrière ni confrontation à une règle commune. Le socle de l'acceptable (`socle-acceptable` 1.0.1) tire des systèmes du dépôt le noyau commun de ce qu'ils refusent, chaque règle un invariant que cite le refus, et fait des kits le chemin de l'écriture, avec retour arrière : le troisième couplage du troisième ordre, celui des valeurs (`EVOLUTION.md`, section 10). Cette dimension garde la place de son application dans le générateur et dans les skills de ticket.
 
 ## 2. Principe prévu
 

@@ -4,7 +4,8 @@
  * Le vérificateur se lance, comme en CI, sur une copie du dépôt, dans un dossier temporaire hors de Git :
  * il y lit le disque à la place de `git ls-files`. Chaque test altère des fichiers de la copie, lance le
  * vérificateur, attend les erreurs nommées, puis rend les fichiers. La recette porte sur le préfixe `SA` du
- * socle de l'acceptable et sur son bloc `noyau` ; elle tourne dans `.github/workflows/verifier.yml`.
+ * socle de l'acceptable, sur son bloc `noyau` et sur les constitutions qui l'épinglent ; elle tourne dans
+ * `.github/workflows/verifier.yml`.
  */
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
@@ -104,6 +105,24 @@ test('bloc noyau : schéma fermé, entrées aux seules clés de leur liste, sans
     'socle-acceptable : bloc noyau : clé secret, hors du schéma socle-acceptable.noyau/1',
     'socle-acceptable : bloc noyau : liste secrets absente ou vide',
     'socle-acceptable : bloc noyau : leconsInterdites[2] : motif invalide',
+  ]);
+});
+
+test('constitutions qui épinglent le noyau : version incluse, empreinte du bloc, chaque entrée reprise à l\'identique, aucune dérogeable', () => {
+  const EMPREINTE = '"empreinte": "e815cadf230886d507d56dbbfb5d7cfd0cf3982036d54d0279b70cc8f49b4764"';
+  const resultat = alterer({
+    'specs/agent2dev/modules/noyau/SKILL.md': remplacer(
+      [EMPREINTE, `"empreinte": "${'0'.repeat(64)}"`],
+      ['{ "programme": "docker", "horsKit": true, "regle": "SA2.INV-1" }', '{ "programme": "docker", "horsKit": true, "regle": "SA2.INV-1", "derogeable": true }'],
+    ),
+    'specs/agent2test/modules/noyau/SKILL.md': remplacer(['    { "intention": "administrer", "horsKit": true, "regle": "SA1.INV-1" },\n', '']),
+    'specs/agent2test/modules/acceptable/SKILL.md': remplacer([`"version": "1.0.1", ${EMPREINTE}`, `"version": "1.0.0", ${EMPREINTE}`]),
+  });
+  attendreErreurs(resultat, [
+    'agent2dev : constitution : acceptable.empreinte 000000000000…, le bloc noyau de socle-acceptable 1.0.1 a l\'empreinte e815cadf2308…',
+    'agent2dev : constitution : programmesInterdits, l\'entrée du noyau docker n\'est pas reprise à l\'identique',
+    'agent2test : constitution : intentionsRefusees, l\'entrée du noyau administrer n\'est pas reprise à l\'identique',
+    'agent2test : constitution : acceptable.version 1.0.0, la spécification inclut socle-acceptable 1.0.1',
   ]);
 });
 

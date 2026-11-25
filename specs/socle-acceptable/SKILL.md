@@ -1,10 +1,10 @@
 ---
 name: socle-acceptable
 description: Socle de l'acceptable partagé. Il fixe le noyau commun de ce que les systèmes du dépôt refusent, au sens du troisième couplage du troisième ordre, celui des valeurs (EVOLUTION.md, section 10) : intentions refusées, actions interdites, écritures interdites, secrets, leçons interdites, chaque règle un invariant que cite le refus ; écriture par les kits dev, test et démo, avec retour arrière ; refus, dérogations et faux refus ; épinglage par les constitutions, sans retrait ni affaiblissement. À lire avant d'écrire ou de réviser la constitution d'un système, ses gardes ou ses kits.
-version: 1.0.0
+version: 1.0.1
 ---
 
-# Socle de l'acceptable, version 1.0.0
+# Socle de l'acceptable, version 1.0.1
 
 Ce socle est le modèle de l'acceptable du troisième couplage du troisième ordre, celui des valeurs (`EVOLUTION.md`, section 10) : ce que tous les systèmes du dépôt refusent, explicite, versionné et épinglé, au lieu de listes éparses et figées dans chaque constitution. Il est référencé par les quatre systèmes qui prévoient de l'appliquer, `agent2dev`, `agent2test`, `orchestrateur-c7e` et `generateur-skill-ticket`, à des dimensions réservées ; il sera inclus à l'identique, à une version épinglée, dans chaque système dont la dimension deviendra active. Un système ne retire ni n'affaiblit jamais une règle du socle : sa constitution peut seulement en ajouter.
 
@@ -18,7 +18,7 @@ flowchart LR
   KIT -->|"chaque action, avant de s'exécuter"| CONF{"noyau épinglé<br/>et constitution"}
   CONF -->|"acceptable"| ACT["action exécutée<br/>sur l'environnement du kit"]
   CONF -->|"règle enfreinte"| REF["refus<br/>qui cite sa règle"]
-  REF -->|"un humain, d'un rôle, avec son motif"| DER["dérogation<br/>ou faux refus"]
+  REF -->|"un humain, d'un rôle, avec son motif"| DER["dérogation d'une règle propre<br/>ou faux refus"]
   ACT -->|"échec"| RET["retour arrière"]
   REF --> J[("journal du système")]
   DER --> J
@@ -48,8 +48,8 @@ Le noyau ne remplace aucune constitution : chacune l'inclut et y ajoute ses prop
 | Kit | le livrable par lequel un système écrit : Agent2Dev produit le kit dev, Agent2Test le kit test ; un kit démo complète la famille. Un kit porte ses actions et leur retour arrière ; il s'applique, par l'hôte d'IA, sur l'environnement de son nom, dev, test ou démo, jamais en production ; son application confronte chaque action au noyau épinglé et à la constitution du système avant de l'exécuter. En 1.0, ce contrat n'est pas décrit (point d'extension E1) : aucun kit n'exécute d'action |
 | Garde | le contrôle d'un système qui confronte une demande ou une action avant son exécution, sans kit : garde de périmètre, garde d'écriture, contrôle des leçons du binôme |
 | Refus | une demande ou une action arrêtée avant son exécution parce qu'elle enfreint une règle ; il cite sa règle |
-| Dérogation | la décision d'un humain, d'un rôle nommé, de laisser passer une action refusée, avec son motif, qui reste dans l'instance |
-| Faux refus | un refus qu'un humain juge infondé, la règle ne visant pas cette action ; il signale une règle trop large |
+| Dérogation | la décision d'un humain, d'un rôle nommé, de laisser passer une action refusée par une règle propre à la constitution, que celle-ci déclare dérogeable, avec son motif, qui reste dans l'instance ; aucune règle du noyau ne se déroge |
+| Faux refus | un refus qu'un humain juge infondé, la règle ne visant pas cette action ; l'action ne s'exécute pas pour autant, et le faux refus signale une règle trop large |
 | Retour arrière | l'action inverse, préparée avant l'action, qui la défait |
 
 ## 4. SA1 : intentions refusées
@@ -120,14 +120,14 @@ Le noyau ne remplace aucune constitution : chacune l'inclut et y ajoute ses prop
 
 - Toute action à effet extérieur se confronte, avant son exécution, à la version épinglée du noyau et de la constitution du système : par le kit qui l'exécute, ou, sans kit, par la garde du système. Un système qui ne refuse que par sa consigne, sans garde ni kit, applique le noyau par sa consigne et le déclare dans ses limites.
 - Un refus cite sa règle : un invariant du noyau, `socle-acceptable:SA1.INV-1`, ou de la constitution du système.
-- Seul un humain déroge : d'un rôle nommé, développeur ou référent, avec son motif, que garde l'instance ; aucun agent ne déroge, à une règle du noyau ni à une autre.
-- Un refus qu'un humain lève comme infondé est un faux refus, consigné avec sa règle : il signale une règle trop large, que la revue du noyau examine.
+- Aucune règle du noyau ne se déroge : seule une version de ce socle la change (SA7). Une règle propre à une constitution ne se déroge que si la constitution la déclare dérogeable, par `derogeable: true` sur son entrée. Seul un humain déroge : d'un rôle nommé, développeur ou référent, avec son motif, que garde l'instance ; aucun agent ne déroge.
+- Un refus qu'un humain déclare infondé est un faux refus, consigné avec sa règle et son motif ; l'action ne s'exécute pas pour autant. Il signale une règle trop large, que la revue examine : celle du noyau, pour une règle du noyau.
 - Refus, dérogations, faux refus et retours arrière se tiennent dans le journal du système. Leur export vers le milieu commun attend sa correspondance dans le socle d'observation (point d'extension E2).
 
 ### 9.2 Invariants
 
 - **SA6.INV-1** : toute action à effet extérieur est confrontée, avant son exécution, à la version épinglée du noyau et de la constitution du système, par le kit qui l'exécute ou, sans kit, par la garde du système ; un refus cite sa règle. Contrôle : scénarios du système, chaque refus avec sa règle.
-- **SA6.INV-2** : seul un humain déroge, d'un rôle nommé et avec son motif ; un refus levé comme infondé est un faux refus, consigné avec sa règle ; refus, dérogations, faux refus et retours arrière se journalisent. Contrôle : journal du système après une dérogation et un faux refus.
+- **SA6.INV-2** : seul un humain déroge, d'un rôle nommé et avec son motif, et seulement à une règle propre à la constitution qu'elle déclare dérogeable : aucune règle du noyau ne se déroge ; un refus déclaré infondé est un faux refus, consigné avec sa règle, sans que l'action s'exécute ; refus, dérogations, faux refus et retours arrière se journalisent. Contrôle : journal du système après une dérogation et un faux refus ; une dérogation demandée sur une règle du noyau, refusée.
 
 ## 10. SA7 : épinglage et révision
 
@@ -144,7 +144,7 @@ Le noyau ne remplace aucune constitution : chacune l'inclut et y ajoute ses prop
 
 ## 11. Le noyau, lisible par machine
 
-Le bloc `noyau` est la forme que reprennent les constitutions : chaque entrée cite la règle qu'elle applique, `regle`, un invariant de ce socle ; `horsKit` marque une entrée qui ne vaut que hors d'un kit. Une constitution y ajoute ses entrées, avec ses propres règles.
+Le bloc `noyau` est la forme que reprennent les constitutions : chaque entrée cite la règle qu'elle applique, `regle`, un invariant de ce socle ; `horsKit` marque une entrée qui ne vaut que hors d'un kit. Une constitution y ajoute ses entrées, avec ses propres règles, et marque `derogeable: true` celles qui se dérogent ; une entrée du noyau ne le porte jamais.
 
 ```json
 {
@@ -217,3 +217,5 @@ Réservés en 1.0 :
 ## 14. Journal de révision
 
 **1.0.0** (2026-11-24) : première version, jalon J3a du passage au troisième ordre (`EVOLUTION.md`, section 10), qui ouvre le couplage des valeurs. Dimensions SA1 à SA7 actives : le noyau commun de ce que tous les systèmes refusent, en cinq familles, intentions refusées, actions interdites, écritures interdites, secrets, leçons interdites, chaque règle un invariant que cite le refus ; écriture par les kits dev, test et démo, avec retour arrière ; application, refus, dérogations et faux refus ; épinglage par les constitutions, sans retrait ni affaiblissement ; révision par une version publiée par un humain. Bloc `noyau` au schéma `socle-acceptable.noyau/1`. Invariants SA1.INV-1 à SA7.INV-2, douze. Référencé par `agent2dev` 1.2.0, `agent2test` 1.4.0, `orchestrateur-c7e` 3.8.0 et `generateur-skill-ticket` 1.4.0, à des dimensions réservées : aucun système ne l'applique encore. Décisions ratifiées avant la rédaction : spécification non transmissible, préfixe `SA` (A1) ; noyau commun, constitutions autour (R6, A2) ; chaque règle un invariant (A3) ; quatre systèmes (A4) ; kits produits par le binôme (A5) ; règles écrites « hors d'un kit » dès cette version (A6).
+
+**1.0.1** (2026-11-24) : correctif, jalon J3b du passage au troisième ordre, décision B2 du développeur. SA6.INV-2 renforcé : aucune règle du noyau ne se déroge, seule une version de ce socle la change ; une règle propre à une constitution ne se déroge que si la constitution la déclare dérogeable, `derogeable: true` sur son entrée, qu'une entrée du noyau ne porte jamais ; un faux refus ne fait pas exécuter l'action. Vocabulaire précisé, dérogation et faux refus. Inclus et épinglé par `agent2dev` 1.3.0 et `agent2test` 1.5.0, dont l'acceptable partagé devient actif ; référencé par `orchestrateur-c7e` 3.8.1 et `generateur-skill-ticket` 1.4.1, où il reste réservé. Aucune entrée du noyau ni aucun autre invariant modifié. Archive : `archives/SKILL-v1.0.0.md`.

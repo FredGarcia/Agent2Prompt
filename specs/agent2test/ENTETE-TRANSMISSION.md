@@ -23,7 +23,8 @@ Les chemins internes à la spécification (`modules/...`, `SKILL.md`) sont relat
 
 1. Lis `spec/SKILL.md` en entier, puis `spec/manifest.json`.
 2. Lis les modules actifs dans l'ordre de `SKILL.md`, section 1.
-3. Ne lis `spec/modules/accessibilite/SKILL.md`, `spec/modules/profil-recette/SKILL.md` et `spec/modules/acceptable/SKILL.md` que pour comprendre les points d'extension E2 à E4 et E6. Ne les implémente pas : leur statut est `reserved`.
+3. Lis `spec/socle-acceptable/SKILL.md`, le socle de l'acceptable inclus : la constitution en reprend le noyau (module `acceptable`).
+4. Ne lis `spec/modules/accessibilite/SKILL.md` et `spec/modules/profil-recette/SKILL.md` que pour comprendre les points d'extension E2 à E4. Ne les implémente pas : leur statut est `reserved`.
 
 ## Étape 2 : plan, sans code
 
@@ -39,7 +40,7 @@ Attends la validation du développeur avant d'écrire la moindre ligne de code.
 
 Après validation, implémente dans cet ordre. Chaque lot passe ses tests, en simulation et sans réseau, avant le suivant, et se termine par un point de validation du développeur. Un lot qui a besoin d'un module d'un lot suivant s'appuie sur sa simulation, déclarée par le même contrat de bus.
 
-1. Noyau : `noyau` (D1).
+1. Noyau et acceptable partagé : `noyau`, `acceptable` (D1, D26) ; le contrôle des leçons s'achève avec l'`apprenant`, au lot 6, et les réponses aux refus avec les interfaces, au lot 7.
 2. Données, journal et référentiel : `donnees`, `journal`, `referentiel` (D23, D10, D15).
 3. Plan, mémoire et cartographie : `plan`, `memoire`, `scanner` (D3, D12, D5).
 4. Exécution : `navigateur`, `preparateur`, `verdict`, `orchestrateur` (D4, D7, D8, D9).
@@ -64,6 +65,7 @@ Vérifie les critères d'acceptation globaux de `SKILL.md`, section 9, puis rend
 - Les données d'Agent2Test tiennent dans un fichier SQLite unique, par `node:sqlite`, que seul l'agent médiateur `donnees` ouvre : aucun serveur de base de données. Les dimensions D2, D21 et D22 sont remplacées : n'implémente pas leurs invariants.
 - Tout s'exécute en local ; les interfaces n'écoutent que sur `127.0.0.1`.
 - L'échange par dossiers est facultatif : rien ne doit en dépendre. Il ne fait que lire une remise et déposer un journal de tests, sans aucune connexion ; il ne décide rien et n'ouvre aucune campagne.
+- Chaque refus cite sa règle. Aucune règle du noyau du socle de l'acceptable ne se déroge, et un faux refus n'exécute rien.
 - N'implémente aucun module au statut `reserved`.
 
 Commence par l'étape 0, puis l'étape 1, puis l'étape 2.

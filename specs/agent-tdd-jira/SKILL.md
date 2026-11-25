@@ -1,10 +1,10 @@
 ---
 name: agent-tdd-jira
 description: Agent de développement TDD qui part d'une demande Jira enregistrée en MHTML, l'analyse avec ses commentaires, établit les US et leurs critères d'acceptation numérotés, décline chaque critère en scénarios Gherkin, propose au développeur des variantes de réalisation back Java et front Angular pour chaque scénario, puis réalise les scénarios choisis un par un en cycle rouge, vert, remanié, avec traçabilité de la demande jusqu'aux commits ; en binôme avec Agent2Test, il reçoit un verdict d'acceptation par critère et corrige en TDD les défauts applicatifs confirmés ; en mode parallèle, il travaille dans un worktree géré par le kit agents-paralleles-gitlab.
-version: 1.3.5
+version: 1.3.6
 ---
 
-# Agent de développement TDD à partir d'une demande Jira, version 1.3.5
+# Agent de développement TDD à partir d'une demande Jira, version 1.3.6
 
 Ce document est le point d'entrée du skill. Il fixe le parcours de l'agent, ses points de validation, le registre des dimensions et les invariants. Les règles détaillées sont dans `modules/`.
 
@@ -87,7 +87,7 @@ Clause de second ordre : l'agent interprète une demande écrite par d'autres. S
 
 ## 5. Registre des dimensions
 
-| ID | Dimension | Introduite | Statut 1.3.5 | Dépend de | Module |
+| ID | Dimension | Introduite | Statut 1.3.6 | Dépend de | Module |
 |---|---|---|---|---|---|
 | D1 | Ingestion d'une demande Jira en MHTML | 1.0 | active | | `ingestion-jira` |
 | D2 | Analyse et scénarios Gherkin | 1.0 | active | D1, D10 | `analyse-demande` |
@@ -231,3 +231,5 @@ Point d'extension ajouté en 1.2.0 :
 **1.3.4** (2026-11-07) : correctif. Référence à agent2test 1.3.1, dont seule la version recommandée de Node change : Node 26.13.0, version du poste de la mission, à la place de Node 24 ; le journal de tests et son format `agent2test.journal-de-tests/1` sont identiques. Le module `binome-agent2test` cite la 1.3.1. Aucune dimension ni aucun invariant modifié ; `lire-acceptation.mjs` inchangé. Archive : `archives/SKILL-v1.3.3.md`.
 
 **1.3.5** (2026-11-24) : correctif, jalon J3a du passage du dépôt au troisième ordre (`EVOLUTION.md`, section 10). Référence à agent2test 1.4.0, qui réserve sa dimension D26, l'acceptable partagé : le noyau commun de ce que refusent les systèmes du dépôt, que sa constitution épinglera, et le kit test par lequel il écrira ; rien de son comportement ne change, et le journal de tests garde son format `agent2test.journal-de-tests/1`. Le module `binome-agent2test` cite la 1.4.0. Aucune dimension ni aucun invariant modifié ; `lire-acceptation.mjs` inchangé. Archive : `archives/SKILL-v1.3.4.md`.
+
+**1.3.6** (2026-11-24) : correctif, jalon J3b du passage du dépôt au troisième ordre (`EVOLUTION.md`, section 10). Référence à agent2test 1.5.0, dont l'acceptable partagé devient actif : sa constitution reprend le noyau commun de ce que refusent les systèmes du dépôt, chaque refus cite sa règle, et le journal de tests gagne une rubrique facultative `acceptable`, que `lire-acceptation.mjs` ne lit pas ; le format `agent2test.journal-de-tests/1` garde son nom. Le module `binome-agent2test` cite la 1.5.0. Aucune dimension ni aucun invariant modifié ; `lire-acceptation.mjs` inchangé. Archive : `archives/SKILL-v1.3.5.md`.

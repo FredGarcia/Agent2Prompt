@@ -95,25 +95,75 @@ Le résultat est une liste d'écarts `{ chemin, regle, message }`. Une liste non
 
 ```json
 {
-  "version": "1.0.0",
+  "version": "2.0.0",
   "invariants": ["D1.INV-1", "D1.INV-2"],
   "pointsDeControle": ["CP-0", "CP-1", "CP-2", "CP-3", "CP-4", "CP-5"],
   "reglesModifiables": [
     { "regle": "selection.poids", "bornes": { "min": 0, "max": 1 } },
     { "regle": "budget.reessaiEtape", "bornes": { "min": 0, "max": 2 } }
   ],
-  "metaCriteres": { "fenetre": 10, "expositionMin": 3, "marge": 15 }
+  "metaCriteres": { "fenetre": 10, "expositionMin": 3, "marge": 15 },
+  "acceptable": { "socle": "socle-acceptable", "version": "1.0.1", "empreinte": "e815cadf230886d507d56dbbfb5d7cfd0cf3982036d54d0279b70cc8f49b4764" },
+  "intentionsRefusees": [
+    { "intention": "deployer", "horsKit": true, "regle": "SA1.INV-1" },
+    { "intention": "administrer", "horsKit": true, "regle": "SA1.INV-1" },
+    { "intention": "ecrire-en-base", "horsKit": true, "regle": "SA1.INV-1" },
+    { "intention": "hors-test", "regle": "D1.INV-5" },
+    { "intention": "modifier-du-code", "regle": "D1.INV-5" }
+  ],
+  "programmesInterdits": [
+    { "programme": "docker", "horsKit": true, "regle": "SA2.INV-1" },
+    { "programme": "kubectl", "horsKit": true, "regle": "SA2.INV-1" },
+    { "programme": "oc", "horsKit": true, "regle": "SA2.INV-1" },
+    { "programme": "helm", "horsKit": true, "regle": "SA2.INV-1" },
+    { "programme": "ansible", "horsKit": true, "regle": "SA2.INV-1" },
+    { "programme": "ansible-playbook", "horsKit": true, "regle": "SA2.INV-1" },
+    { "programme": "catalina.sh", "horsKit": true, "regle": "SA2.INV-1" },
+    { "programme": "startup.sh", "horsKit": true, "regle": "SA2.INV-1" },
+    { "programme": "shutdown.sh", "horsKit": true, "regle": "SA2.INV-1" }
+  ],
+  "argumentsInterdits": [
+    { "argument": "spring-boot:run", "horsKit": true, "regle": "SA2.INV-1" },
+    { "argument": "spring-boot:start", "horsKit": true, "regle": "SA2.INV-1" },
+    { "argument": "cargo:run", "horsKit": true, "regle": "SA2.INV-1" },
+    { "argument": "cargo:deploy", "horsKit": true, "regle": "SA2.INV-1" },
+    { "argument": "tomcat7:run", "horsKit": true, "regle": "SA2.INV-1" },
+    { "argument": "jetty:run", "horsKit": true, "regle": "SA2.INV-1" },
+    { "argument": "deploy", "horsKit": true, "regle": "SA2.INV-1" },
+    { "argument": "exec:java", "horsKit": true, "regle": "SA2.INV-1" },
+    { "argument": "--force", "regle": "SA2.INV-2" },
+    { "argument": "--force-with-lease", "regle": "SA2.INV-2" },
+    { "argument": "--no-verify", "regle": "SA2.INV-2" }
+  ],
+  "ecrituresInterdites": [
+    { "lieu": "constitution", "regle": "SA3.INV-1" },
+    { "lieu": "sources-du-systeme", "regle": "SA3.INV-1" },
+    { "lieu": "fiches", "regle": "SA3.INV-1" },
+    { "lieu": "configuration-humaine", "regle": "SA3.INV-1" },
+    { "lieu": "transmission-du-skill", "regle": "SA3.INV-1" },
+    { "lieu": "migrations", "regle": "D1.INV-6" }
+  ],
+  "secrets": [
+    { "motif": "(^|/)(\\.env|id_rsa[^/]*|[^/]*\\.(pem|key|p12|jks))$", "regle": "SA4.INV-1" }
+  ],
+  "leconsInterdites": [
+    { "motif": "@Disabled|\\b[fx](it|describe)\\(|\\.only\\(", "regle": "SA5.INV-1" },
+    { "motif": "(sauter|passer|ignorer|valider d'office) (le |la |les )?(point|question|validation|contrôle)", "regle": "SA5.INV-1" },
+    { "motif": "--force|--no-verify", "regle": "SA2.INV-2" },
+    { "motif": "spring-boot:run|démarrer l'application|déployer l'application", "regle": "SA2.INV-1" },
+    { "motif": "tronquer|résumer (le |la )?(skill|méthode|section)", "regle": "SA5.INV-1" }
+  ]
 }
 ```
 
-La liste complète des règles modifiables et de leurs bornes est au module `referentiel`, section 4 ; la constitution la recopie.
+La liste complète des règles modifiables et de leurs bornes est au module `referentiel`, section 4 ; la constitution la recopie. Ses listes de refus, intentions, programmes et arguments, écritures, secrets et leçons interdites, reprennent à l'identique les entrées du noyau du socle de l'acceptable, chacune avec sa règle, et y ajoutent celles d'Agent2Test, avec les leurs (module `acceptable`) ; aucune n'est dérogeable dans cet exemple. Agent2Test ne lance aucun programme hors du navigateur : les listes de programmes et d'arguments valent pour tout programme qu'une version future lancerait.
 
 - L'empreinte est le SHA-256 de la constitution sérialisée en JSON canonique (clés triées, sans espace).
 - Au démarrage, le noyau compare cette empreinte à la dernière entrée `constitution.publiee` du grand livre. Un écart, ou l'absence d'entrée, empêche le démarrage avec le message « constitution non publiée ou modifiée : publier par `npm run constitution:publier` ».
 - La publication est une commande humaine, hors du bus : `npm run constitution:publier` inscrit l'empreinte au grand livre. Aucun agent ne l'appelle.
-- Le champ `acceptable` est réservé à la dimension D26 (point E6) : il épinglera le noyau du socle de l'acceptable, nom et version du socle et empreinte de son bloc `noyau`. En 1.x, une constitution qui le porte est refusée au démarrage, publiée ou non, avec le motif « dimension réservée : acceptable partagé (D26) ».
+- Le champ `acceptable` épingle le noyau du socle de l'acceptable inclus dans la spécification : son nom, sa version et l'empreinte de son bloc `noyau`. Après l'empreinte de la constitution, le noyau vérifie l'épinglage et la présence de chaque entrée du noyau (module `acceptable`, section 1) ; un écart empêche le démarrage.
 
-Garde d'écriture : le noyau expose `ecriture.autoriser(chemin, agent)`. Seuls sont permis le dossier des preuves (`navigateur`, `journal`), le fichier de session (`navigateur`) et les exports du journal de tests (`journal`). Toute autre écriture, et en particulier `constitution/`, `src/`, `migrations/`, `fiches/` et `configuration/`, est refusée avec l'erreur `ECRITURE_INTERDITE`.
+Garde d'écriture : le noyau expose `ecriture.autoriser(chemin, agent)`. Seuls sont permis le dossier des preuves (`navigateur`, `journal`), le fichier de session (`navigateur`) et les exports du journal de tests (`journal`). Toute autre écriture, et en particulier les lieux de `ecrituresInterdites`, `constitution/`, `src/`, `fiches/`, `configuration/` et `migrations/`, est refusée avec l'erreur `ECRITURE_INTERDITE`, qui cite la règle du lieu (module `acceptable`, section 3).
 
 ## 6. Port moteur
 
@@ -125,7 +175,7 @@ Le noyau définit l'interface et choisit l'adaptateur d'après la configuration 
 
 ## 7. Garde de périmètre (D1.INV-5)
 
-`perimetre.verifier(demande)` est appelé par `plan` à l'ouverture d'une campagne. Une demande est refusée avec le motif « hors périmètre » quand son objet n'est pas de tester, ou quand son texte demande de modifier du code, de déployer, d'administrer ou d'écrire en base. La liste des intentions refusées est dans la constitution.
+`perimetre.verifier(demande)` est appelé par `plan` à l'ouverture d'une campagne. Une demande est refusée avec le motif « hors périmètre » et la règle de l'intention quand son objet n'est pas de tester (`hors-test`), ou quand son texte demande de modifier du code, de déployer, d'administrer ou d'écrire en base. La liste des intentions refusées est dans la constitution : celles du noyau, puis celles d'Agent2Test (module `acceptable`).
 
 ## 8. Pièges connus
 
@@ -146,9 +196,9 @@ Le noyau définit l'interface et choisit l'adaptateur d'après la configuration 
 | NO6 | D1.INV-3 | une sortie du moteur avec un champ inconnu, ou un contrôle nommé en échec, n'est pas consommée et ses écarts sont listés |
 | NO7 | D1.INV-4 | une constitution modifiée d'un caractère empêche le démarrage avec le message prévu |
 | NO8 | D1.INV-4 | sans entrée `constitution.publiee` au grand livre, le démarrage est refusé |
-| NO9 | D1.INV-5 | une demande « corriger le code du composant » est refusée « hors périmètre » ; une demande de test est acceptée |
+| NO9 | D1.INV-5 | une demande « corriger le code du composant » est refusée « hors périmètre », avec la règle D1.INV-5 ; une demande de test est acceptée |
 | NO10 | D1.INV-6 | une tentative d'écriture d'un agent dans `constitution/` ou `configuration/` est refusée `ECRITURE_INTERDITE` |
-| NO11 | point E6 | une constitution qui porte le champ réservé `acceptable` est refusée au démarrage, publiée ou non, avec le motif « dimension réservée : acceptable partagé (D26) » ; la constitution et les fichiers restent inchangés |
+| NO11 | D26.INV-1 | une constitution sans le champ `acceptable` empêche le démarrage « acceptable non conforme », publiée ou non (module `acceptable`, AC2) |
 
 ## 10. Fichiers à produire
 

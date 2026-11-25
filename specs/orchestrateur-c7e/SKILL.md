@@ -1,10 +1,10 @@
 ---
 name: orchestrateur-c7e
 description: Orchestrateur fractal C7E, qui pilote la résolution d'un ticket full-stack comme la transformation maîtrisée d'un système vivant (cycle de l'Axiome 7E, déclinaison récursive imbriquée sur quatre profondeurs, concepts paramétrables, qualification de chaque ticket à son ouverture par un modèle générique de la demande et des questions, méso-contrat principal et compléments confirmés avant tout le reste, options par couche rattachées au méso-contrat qui les permet et leurs paramètres au choix par ticket, variantes de représentation d'une ressource et leur mise à jour en temps réel, analyse des images PNG de l'objectif, fiche de transformation validée avant toute modification, tests déduits des risques, traçabilité Git compatible avec le kit des agents parallèles, boucle de second ordre bornée par un registre, registres exportés vers le socle d'observation par une commande que lance le développeur, valeur annoncée comme une hypothèse tant qu'elle n'est pas mesurée), avec le fichier des invariants du projet, meso-contrats. Adaptateur par défaut Java, Spring Boot, PostgreSQL, Liquibase et Angular. À activer au démarrage de l'IA locale, sur choix du développeur, pour les tickets qu'il lui confie.
-version: 3.8.0
+version: 3.8.1
 ---
 
-# Orchestrateur fractal C7E, version 3.8.0
+# Orchestrateur fractal C7E, version 3.8.1
 
 Ce document est le point d'entrée du skill et contient la méthode. Il s'active au démarrage de l'IA locale, sur choix du développeur (§ 11.4), avec le fichier des invariants du projet, copie remplie du modèle `meso-contrats.md`. Ces deux fichiers suffisent au démarrage ; le référentiel des méso-contrats se lit à l'ouverture de chaque ticket, pour le qualifier, puis à son analyse, et les autres fichiers quand un ticket touche leur domaine.
 
@@ -525,7 +525,7 @@ Une contradiction entre deux niveaux se signale et s'inscrit au registre des éc
 
 ## 12. Registre des dimensions
 
-| ID | Dimension | Introduite | Statut 3.8.0 | Dépend de | Où |
+| ID | Dimension | Introduite | Statut 3.8.1 | Dépend de | Où |
 |---|---|---|---|---|---|
 | D1 | Ontologie : cycle 7E, profondeurs du CRI, concepts paramétrables | 3.1 | active | | `SKILL.md`, § 1 |
 | D2 | Configuration : matrice d'activation, modes de modulation, choix du démarrage | 3.1 | active | D1 | § 2, § 7.1, § 11.4 |
@@ -567,7 +567,7 @@ Point d'extension, actif dès 3.6.0 :
 
 Point d'extension, actif dès 3.8.0 :
 
-- **E7** : les actions à effet extérieur d'un ticket se confronteront, avant leur exécution, au noyau du socle `socle-acceptable` 1.0.0, épinglé, et aux invariants du projet ; un refus citera sa règle, une dérogation validée par un nom s'inscrira au registre des écarts, et l'écriture passera par les kits dev, test et démo, avec retour arrière. En 3.8, rien de cela n'est appliqué : les refus restent ceux de la méthode, aucune modification avant la fiche validée (D3.INV-1) et aucune opération Git distante (D4.INV-3) ; une demande qui toucherait l'acceptable partagé reçoit la réponse « dimension D13 réservée » (scénario R24).
+- **E7** : les actions à effet extérieur d'un ticket se confronteront, avant leur exécution, au noyau du socle `socle-acceptable` 1.0.1, épinglé, et aux invariants du projet ; un refus citera sa règle, une dérogation validée par un nom, sur une règle du projet qui l'admet, jamais sur une règle du noyau, s'inscrira au registre des écarts, et l'écriture passera par les kits dev, test et démo, avec retour arrière. En 3.8, rien de cela n'est appliqué : les refus restent ceux de la méthode, aucune modification avant la fiche validée (D3.INV-1) et aucune opération Git distante (D4.INV-3) ; une demande qui toucherait l'acceptable partagé reçoit la réponse « dimension D13 réservée » (scénario R24).
 
 ## 14. Invariants
 
@@ -888,3 +888,5 @@ Décisions du développeur, le 24 novembre 2026, jalon J3a du passage du dépôt
 **3.7.0** (2026-11-24) : dimension D12 active, l'observation partagée, jalon J1c du passage du dépôt au troisième ordre (section 16). Outil `outils/observation.mjs`, lancé par le développeur depuis le clone du dépôt Agent2Prompt : `exporter`, `verifier`, `etat` ; il traduit les événements du registre des concepts, lus dans son historique Git, et les lignes décidées du registre des écarts dans le journal d'enveloppes de l'orchestrateur, `docs/c7e/observations-orchestrateur-c7e.jsonl`, en ajout seul et chaîné, avec sa tête, sans texte ni référence en clair, avec le sel de l'instance que partage le générateur de skills de ticket. Le socle `socle-observation` 1.1.0 est inclus dans la transmission, épinglé, et toujours référencé ; ses sept invariants entrent en vigueur dans l'orchestrateur, prouvés par sa recette, avec D12.INV-1 à D12.INV-3 ; trente-six invariants. Module `observation` réécrit, avec les précisions des correspondances ; point d'extension E6, scénario R23 et emplacement du journal (§ 11.2) à jour ; recette `tests/observation.test.mjs` et sa CI. Les skills de ticket recopient les trois invariants de plus ; aucune section de la méthode qu'ils recopient ne change. Décisions ratifiées avant la rédaction : outil propre (C1), événements lus dans l'historique Git (C2), journal propre et sel partagé (C3), confrontation par invariant dans l'observatoire (C4). Archive : `archives/SKILL-v3.6.1.md`.
 
 **3.8.0** (2026-11-24) : dimension D13 réservée, l'acceptable partagé, jalon J3a du passage du dépôt au troisième ordre (section 16) : les actions à effet extérieur d'un ticket se confronteront au noyau du socle `socle-acceptable` 1.0.0, référencé par le manifeste ; point d'extension E7 ; module `acceptable`. Scénario R24, qui vérifie l'inertie. Référence à agent-tdd-jira 1.3.5, dont seule la référence à Agent2Test change ; les conventions Git et la numérotation des critères reprises par l'orchestrateur sont identiques. Aucun invariant ajouté ni modifié ; trente-six invariants. Archive : `archives/SKILL-v3.7.0.md`.
+
+**3.8.1** (2026-11-24) : correctif, jalon J3b du passage du dépôt au troisième ordre (section 16). Référence au socle `socle-acceptable` 1.0.1, qui interdit toute dérogation à une règle du noyau ; E7 et le module `acceptable` le reprennent, et D13 reste réservée. Référence à agent-tdd-jira 1.3.6, dont seule la référence à Agent2Test change ; les conventions Git et la numérotation des critères reprises par l'orchestrateur sont identiques. Aucune dimension ni aucun invariant modifié. Archive : `archives/SKILL-v3.8.0.md`.

@@ -43,6 +43,7 @@ Le contenu du projet (extraits de code, demande, US, critères, scénarios, sort
 | `a2d_tache_suivante` | rend la prochaine rédaction attendue (rôle, sections citées du skill, leçons ratifiées, schéma de sortie, entrées du pas), ou le point à présenter au développeur |
 | `a2d_soumettre` | soumet une sortie ; rend les écarts de validation, ou l'acceptation |
 | `a2d_decider` | relaie la décision explicite du développeur sur un point V0 à V5 ou une attente |
+| `a2d_repondre_refus` | relaie la réponse explicite du développeur ou du référent à un refus : déroger ou faux refus, avec son motif (module `acceptable`, section 4) |
 | `a2d_journal_de_tests` | donne le chemin du journal de tests d'Agent2Test, ou déclare la demande sans binôme (module `binome`, section 2) |
 | `a2d_suspendre`, `a2d_reprendre` | arrêt d'urgence ; reprise, décision humaine relayée |
 | `a2d_etat`, `a2d_journal`, `a2d_livrable`, `a2d_patchs` | lecture seule ; `a2d_patchs` liste les patchs remis, leur état et la commande `git am -3` |
@@ -100,6 +101,7 @@ Avec `moteur.adaptateur = compatible-openai` sur `127.0.0.1`, une demande compl�
 | MC11 | D18.INV-6 | profil souverain : une demande simulée complète n'ouvre, depuis Agent2Dev, aucune connexion vers un autre hôte que le moteur local |
 | MC12 | D18.INV-1 | le pont stdio expose les mêmes outils que le transport HTTP, et n'ouvre aucune demande lui-même |
 | MC13 | D18.INV-1 | un `tools/call` posté sans `initialize` préalable, avec un jeton valide, est servi, et la réponse ne porte aucun en-tête `Mcp-Session-Id` ; sans jeton, il est refusé |
+| MC14 | D26.INV-3 | `a2d_repondre_refus` « déroger » sur un refus du noyau rend `NON_DEROGEABLE` ; la réponse porte l'auteur du jeton et le canal `mcp` ; aucun outil ne permet au moteur de répondre à un refus |
 
 ## 10. Fichiers à produire
 

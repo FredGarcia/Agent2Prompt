@@ -39,7 +39,7 @@ V0 et V1 ne produisent pas de leçon : le profil et l'extraction ne passent pas 
 
 ## 2. Contrôle avant proposition (D15.INV-3)
 
-Le contrôle nommé `apprenant.lecon-compatible` confronte la consigne à la liste fermée `leconsInterdites` de la constitution. Chaque motif y est lié à la règle que la leçon contredirait :
+Le contrôle nommé `apprenant.lecon-compatible` confronte la consigne à la liste fermée `leconsInterdites` de la constitution. Chaque motif y est lié à la règle que la leçon contredirait. La liste reprend d'abord les cinq motifs du noyau du socle de l'acceptable (module `acceptable`), puis ajoute ceux d'Agent2Dev :
 
 ```json
 { "leconsInterdites": [
@@ -52,7 +52,7 @@ Le contrôle nommé `apprenant.lecon-compatible` confronte la consigne à la lis
 ] }
 ```
 
-Une leçon qui correspond à un motif n'est pas proposée : elle est consignée « refusée par contrôle », avec le motif et la règle. Le référent reste juge, en CP-4, de ce que la liste ne voit pas.
+Une leçon qui correspond à un motif n'est pas proposée : elle est consignée « refusée par contrôle », avec chaque motif qui correspond et sa règle, celles du noyau en tête, dans une ligne `acceptable.refus` (module `acceptable`, section 3). Le référent reste juge, en CP-4, de ce que la liste ne voit pas.
 
 ## 3. Ratification (D15.INV-2)
 
@@ -83,7 +83,7 @@ Une leçon qui correspond à un motif n'est pas proposée : elle est consignée 
 | AP3 | D15.INV-1 | un défaut confirmé par Agent2Test sur S04, déjà accepté à V4, crée une leçon candidate pour `rouge`, avec la campagne pour source |
 | AP4 | D15.INV-2 | une leçon candidate n'apparaît dans aucune fiche composée avant CP-4 ; ratifiée pendant une demande, elle agit à partir de la suivante |
 | AP5 | D15.INV-2 | une leçon ratifiée pour `gemini` n'entre pas dans la fiche composée pour un modèle local ; son extension est une ratification distincte |
-| AP6 | D15.INV-3 | la consigne « ajouter @Disabled au test instable » est refusée par `apprenant.lecon-compatible`, avec la règle D9.INV-4, et n'est pas proposée |
+| AP6 | D15.INV-3 | la consigne « ajouter @Disabled au test instable » est refusée par `apprenant.lecon-compatible`, avec les règles SA5.INV-1, du noyau, et D9.INV-4, et n'est pas proposée |
 
 ## 7. Fichiers à produire
 

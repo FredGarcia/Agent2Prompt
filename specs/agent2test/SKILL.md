@@ -1,20 +1,21 @@
 ---
 name: agent2test
 description: Construire Agent2Test, système multi-agents qui choisit, prépare, exécute et journalise les tests essentiels d'une application Angular pour une demande donnée. Playwright y est piloté comme une bibliothèque depuis Node, dans un projet séparé de l'application ; le plan vient d'agent-tdd-jira (US, critères d'acceptation numérotés, scénarios Gherkin), chaque critère reçoit un verdict prouvé, l'humain ratifie aux points de contrôle, et le système observe et fait évoluer ses propres règles sous gouvernance. Le navigateur joue une personne : il regarde la page par la vue, le lecteur d'écran et le clavier, et rend compte de ce qu'il voit et de ce qu'il ne voit pas. Exécution locale, données dans un fichier SQLite unique, ouvert par un agent médiateur ; la remise d'Agent2Dev arrive en fichier, ou par un échange par dossiers facultatif.
-version: 1.4.0
+version: 1.5.0
 ---
 
-# Agent2Test, spécification 1.4.0
+# Agent2Test, spécification 1.5.0
 
 Ce document est le point d'entrée du package. Il donne le principe, la carte du système, les points de contrôle, le registre des dimensions, les règles communes et les invariants. Les détails techniques sont dans `modules/`. Le fichier `manifest.json` déclare quels modules sont actifs.
 
-La spécification reprend le dossier de conception d'Agent2Test (cadrage, architecture globale et cahier des charges du 25 septembre 2026), adapté aux décisions du 21 octobre 2026 : exécution locale, plan produit par agent-tdd-jira, connexion SSO silencieuse, batchs lancés par le développeur. La section 11 en donne la filiation. Depuis la version 1.2.0, les données tiennent dans un fichier SQLite unique, dont l'agent médiateur `donnees` tient la seule connexion, et la remise d'Agent2Dev arrive en fichier, ou par un échange par dossiers facultatif (section 12). Depuis la version 1.3.0, le navigateur constate comme une personne : il ne lit de la page que ce qu'elle perçoit, ne conclut à une absence que dans une portée qu'il a vue, et rend un témoignage pour chaque vérification (dimension D25). Depuis la version 1.4.0, la dimension D26 réserve l'acceptable partagé : le noyau du socle de l'acceptable, que la constitution épinglera, et le kit test par lequel Agent2Test écrira.
+La spécification reprend le dossier de conception d'Agent2Test (cadrage, architecture globale et cahier des charges du 25 septembre 2026), adapté aux décisions du 21 octobre 2026 : exécution locale, plan produit par agent-tdd-jira, connexion SSO silencieuse, batchs lancés par le développeur. La section 11 en donne la filiation. Depuis la version 1.2.0, les données tiennent dans un fichier SQLite unique, dont l'agent médiateur `donnees` tient la seule connexion, et la remise d'Agent2Dev arrive en fichier, ou par un échange par dossiers facultatif (section 12). Depuis la version 1.3.0, le navigateur constate comme une personne : il ne lit de la page que ce qu'elle perçoit, ne conclut à une absence que dans une portée qu'il a vue, et rend un témoignage pour chaque vérification (dimension D25). Depuis la version 1.5.0, la dimension D26 applique l'acceptable partagé : la constitution épingle le noyau du socle de l'acceptable, inclus dans la spécification, chaque refus cite sa règle, une leçon interdite est refusée par contrôle, et l'humain répond à un refus par une dérogation, quand l'entrée l'admet, ou par un faux refus.
 
 ## 1. Ordre de lecture
 
 1. Ce document, sections 2 à 12.
 2. `manifest.json` : modules actifs et réservés.
-3. Les modules actifs, dans cet ordre :
+3. `socle-acceptable/SKILL.md` : le socle de l'acceptable, inclus à la version épinglée, dont la constitution reprend le noyau.
+4. Les modules actifs, dans cet ordre :
    1. `noyau` : cycle 7E, bus, contrats, validateur, constitution, port moteur.
    2. `donnees` : l'agent médiateur, le fichier SQLite unique, les contrats nommés et leur vérification, l'oracle en lecture seule.
    3. `journal` : journal chaîné, journal de tests.
@@ -29,11 +30,12 @@ La spécification reprend le dossier de conception d'Agent2Test (cadrage, archit
    12. `orchestrateur` : campagne, file, points de contrôle.
    13. `observateur` : métriques, alertes, traces.
    14. `apprenant`, `reflexif` : leçons candidates, mesures de second ordre, recalibrage.
-   15. `mcp` : moteurs et serveur MCP.
-   16. `echange` : remises d'Agent2Dev, en fichier ou par dossier d'échange.
-   17. `tableau-de-bord` : IHM par rôle.
-   18. `exploitation` : installation et lancement sur le poste.
-4. `modules/accessibilite/SKILL.md`, `modules/profil-recette/SKILL.md` et `modules/acceptable/SKILL.md` : seulement pour comprendre les points d'extension E2 à E4 et E6. Ne pas les implémenter en 1.x.
+   15. `acceptable` : noyau du socle de l'acceptable épinglé, refus, leçons interdites, réponses de l'humain.
+   16. `mcp` : moteurs et serveur MCP.
+   17. `echange` : remises d'Agent2Dev, en fichier ou par dossier d'échange.
+   18. `tableau-de-bord` : IHM par rôle.
+   19. `exploitation` : installation et lancement sur le poste.
+5. `modules/accessibilite/SKILL.md` et `modules/profil-recette/SKILL.md` : seulement pour comprendre les points d'extension E2 à E4. Ne pas les implémenter en 1.x.
 
 ## 2. Mode de travail pour l'IA qui produit le code
 
@@ -55,6 +57,7 @@ Pour une demande donnée, Agent2Test désigne les tests essentiels parmi les sc�
 - Seuls des agents déterministes agissent : `navigateur` sur l'IHM, `donnees`, l'agent médiateur, sur le fichier SQLite d'Agent2Test. Le moteur n'a accès ni au navigateur ni aux données.
 - Un parcours ratifié se rejoue sans moteur. Le moteur intervient à la conception et à la réparation, jamais pendant l'exécution : un verdict qui ne se reproduit pas ne prouve rien.
 - L'humain ratifie aux points de contrôle CP-0 à CP-5 (section 5). Entre deux points, les agents avancent seuls.
+- Ce qu'Agent2Test refuse vient de sa constitution, qui reprend le noyau du socle de l'acceptable : chaque refus cite sa règle, aucune règle du noyau ne se déroge, et l'humain peut déclarer un refus infondé sans que l'action s'exécute (D26).
 - L'échange par dossiers est facultatif : en mode `dossiers`, Agent2Test lit les remises dans la boîte de sortie d'Agent2Dev et dépose le journal de tests d'une campagne close dans la sienne, sans aucune connexion ; en mode `manuel`, le défaut, l'opérateur dépose la remise. Une remise reçue n'ouvre aucune campagne : un humain l'ouvre (module `echange`).
 
 Chaîne de traçabilité, depuis agent-tdd-jira :
@@ -170,7 +173,7 @@ Une remise reçue, déposée par l'opérateur ou lue dans une boîte d'Agent2Dev
 
 ## 6. Registre des dimensions
 
-| ID | Dimension | Introduite | Statut 1.4.0 | Dépend de | Module |
+| ID | Dimension | Introduite | Statut 1.5.0 | Dépend de | Module |
 |---|---|---|---|---|---|
 | D1 | Noyau 7E, bus et constitution | 1.0 | active | | `noyau` |
 | D2 | Données isolées par agent, sur PostgreSQL | 1.0 | superseded | D1 | remplacée en 1.1.0 par D21, elle-même remplacée en 1.2.0 par D23 (`donnees`) |
@@ -197,7 +200,7 @@ Une remise reçue, déposée par l'opérateur ou lue dans une boîte d'Agent2Dev
 | D23 | Données en un fichier unique, par l'agent médiateur | 1.2 | active | D1 | `donnees` |
 | D24 | Remises d'Agent2Dev, en fichier ou par dossier d'échange | 1.2 | active | D3, D9, D16, D17 | `echange` |
 | D25 | Constat perceptif et témoignage | 1.3 | active | D4, D7, D8, D10 | `navigateur` |
-| D26 | Acceptable partagé : noyau du socle de l'acceptable, refus, leçons interdites et kit test | 1.4 | reserved | D1, D10, D13, D15 | `acceptable` |
+| D26 | Acceptable partagé : noyau du socle de l'acceptable, refus, leçons interdites, dérogations et faux refus | 1.4 | active | D1, D10, D13, D15 | `acceptable` |
 
 Statuts : `active` (implémentée et testée), `reserved` (points d'extension posés, fonctionnalité absente), `superseded` (remplacée ; la version de remplacement est indiquée).
 
@@ -223,7 +226,7 @@ Un point d'extension n'est pas une fonctionnalité. En 1.x, il n'a qu'un test qu
 - **E3** : les profils d'environnement réservent `recette` et `conteneur` (D20). En 1.x, un profil de ce type est refusé au démarrage avec le motif « profil réservé ».
 - **E4** : la stratégie de session `etat`, une session importée pour un navigateur sans tête, est réservée à D20 ; en 1.x, elle est refusée au démarrage.
 - **E5** : le port moteur accepte de nouveaux adaptateurs par version ; en 1.x : `simulation`, `externe` (MCP) et `compatible-openai`. Un adaptateur inconnu est refusé au démarrage.
-- **E6** : la constitution réserve le champ `acceptable`, qui épinglera le noyau du socle de l'acceptable (`socle-acceptable` 1.0.0) : nom et version du socle, empreinte de son bloc `noyau`. En 1.x, une constitution qui le porte est refusée au démarrage avec le motif « dimension réservée : acceptable partagé (D26) » ; les refus restent ceux des gardes de périmètre et d'écriture (D1.INV-5, D1.INV-6), et Agent2Test ne produit aucun kit test. L'acceptable partagé est réservé à D26.
+- **E6** : le kit test. Le champ `acceptable` de la constitution, refusé au démarrage en 1.4, épingle depuis 1.5.0 le noyau du socle de l'acceptable (D26). Agent2Test ne produit aucun kit : tant que le socle ne décrit pas le contrat des kits, son point d'extension E1, une entrée `horsKit` de la constitution vaut partout, et ce qui ne se fait que dans un kit reste refusé. Le kit test s'ajoutera sans changer aucune règle (scénario AC10, module `acceptable`).
 
 ## 8. Règles globales
 
@@ -248,9 +251,10 @@ Un point d'extension n'est pas une fonctionnalité. En 1.x, il n'a qu'un test qu
 - Une altération du journal faite hors du système, par un outil SQLite qui en retire les déclencheurs, est détectée au démarrage suivant, et la première ligne rompue est nommée.
 - En mode `manuel` comme en mode `dossiers`, une remise reçue n'ouvre aucune campagne d'elle-même, et une remise périmée est refusée à l'ouverture ; en mode `dossiers`, Agent2Test n'ouvre aucune connexion vers Agent2Dev.
 - Aucun module `reserved` n'est chargé ; chaque point d'extension a son test d'inertie.
+- La constitution d'exemple démarre avec le socle de l'acceptable épinglé ; une entrée du noyau retirée l'en empêche ; chaque refus cite sa règle, une leçon interdite est refusée par contrôle, et une dérogation demandée sur une règle du noyau est refusée.
 - Le guide de démarrage suffit, seul, à installer et lancer le kit sur le poste du développeur.
 - Sur l'application de démonstration, la page de l'exemple TAB-1 et ses treize contre-épreuves reçoivent chacune les verdicts attendus et les fragments attendus de leur témoignage, et chaque constat se recalcule à l'identique depuis ses preuves (module `navigateur`, section 11).
-- Le journal de tests JSON de l'exemple ECR-77 respecte le contrat de lecture d'agent-tdd-jira 1.3.5 (module `journal`, section 3) : sources du plan et leurs empreintes, état git à l'ouverture, verdicts de la liste fermée, cible de chaque décision.
+- Le journal de tests JSON de l'exemple ECR-77 respecte le contrat de lecture d'agent-tdd-jira 1.3.6 (module `journal`, section 3) : sources du plan et leurs empreintes, état git à l'ouverture, verdicts de la liste fermée, cible de chaque décision.
 
 ## 10. Invariants
 
@@ -447,6 +451,13 @@ Ces invariants ne sont plus en vigueur : n8n n'est plus le relais du binôme. Il
 - **D25.INV-7** : chaque étape `verifier` à attendu perceptif rend un témoignage, réussie ou non : portée regardée, canaux, règle de comparaison, ce qui a été vu, ce qui ne l'a pas été, et les preuves ; un canal déclaré mais non perçu rend le constat « non constatable » ; ce qu'un canal non déclaré voit autrement est rapporté en remarque, sans décider ; une étape `verifier` échouée n'empêche pas les `verifier` suivantes d'être jouées.
 - **D25.INV-8** : un constat « vu » n'est retenu qu'après un second regard qui rend le même constat ; un regard pendant lequel la géométrie de la zone change ne vaut rien ; des regards discordants classent l'étape `INSTABILITE`, jamais « réussie ».
 
+**D26 : acceptable partagé**
+
+- **D26.INV-1** : la constitution épingle le noyau du socle de l'acceptable inclus, par son nom, sa version et l'empreinte de son bloc `noyau`, et en reprend chaque entrée à l'identique, aucune dérogeable ; un écart empêche le démarrage.
+- **D26.INV-2** : chaque refus d'une garde, de périmètre, d'écriture ou des leçons, cite les règles des entrées qui l'arrêtent, celles du noyau en tête ; il est journalisé et présenté au testeur ; une leçon candidate qui correspond à un motif de `leconsInterdites` n'est pas proposée ; tant que le contrat des kits n'est pas décrit, une entrée `horsKit` vaut partout.
+- **D26.INV-3** : seuls le testeur et le référent qualité répondent à un refus, depuis le tableau de bord ou par MCP, avec leur motif ; une dérogation n'est admise que si chaque entrée qui a refusé est propre à Agent2Test et déclarée dérogeable, jamais pour une entrée du noyau, et n'exécute l'action qu'une fois ; un faux refus n'exécute rien ; ni le moteur, ni un agent, ni l'échange ne répondent à un refus.
+- **D26.INV-4** : le journal de tests d'une campagne touchée par un refus porte la rubrique `acceptable` : chaque refus avec sa garde, ses règles et sa réponse, sans motif en clair ; le format garde son nom, et sa lecture par agent-tdd-jira ne change pas.
+
 ## 11. Filiation avec le dossier de conception
 
 Le dossier du dépôt Agent2Test (`00-cadrage.md`, `01-architecture.md`, `02-cahier-des-charges.md`) reste la source des choix. Ses invariants I1 à I15 deviennent des invariants de dimension ; ses décisions d'architecture, notées ici DA1 à DA20 pour ne pas les confondre avec les dimensions, sont reprises dans les modules.
@@ -503,3 +514,5 @@ Les valeurs par défaut H14 à H19 du cahier (budgets, conservation, langue, mé
 **1.3.1** (2026-11-07) : correctif. Node 26.13.0, version du poste de la mission depuis le 6 novembre 2026, devient la version recommandée, à la place de Node 24 : manifeste, règles globales (section 8), module `exploitation` (schéma de la topologie, message de démarrage). Le minimum reste Node 22.13, première version où `node:sqlite` se passe d'option (D18.INV-1 inchangé). Sous Node 26.13.0, `setAuthorizer` est présent : l'autorisateur du médiateur s'applique et le scénario BD12 s'exécute (module `donnees`). Entrée : agent-tdd-jira 1.3.4. Aucune dimension ni aucun invariant modifié. Archive : `archives/SKILL-v1.3.0.md`.
 
 **1.4.0** (2026-11-24) : dimension D26 réservée, l'acceptable partagé, jalon J3a du passage du dépôt au troisième ordre (`EVOLUTION.md`, section 10) : la constitution épinglera le noyau du socle `socle-acceptable` 1.0.0, référencé par le manifeste, et en reprendra toutes les entrées, dont une liste de leçons interdites ; les gardes citeront leur règle ; Agent2Test écrira par le kit test, avec retour arrière. Point d'extension E6 : le champ `acceptable` de la constitution, refusé au démarrage en 1.x ; module `acceptable` ; scénario NO11 du module `noyau`, qui vérifie l'inertie. Entrée : agent-tdd-jira 1.3.5, dont seule la référence à Agent2Test change. Exemples du journal à la version 1.4.0. Aucun invariant ajouté ni modifié. Archive : `archives/SKILL-v1.3.1.md`.
+
+**1.5.0** (2026-11-24) : dimension D26 active, l'acceptable partagé, jalon J3b du passage du dépôt au troisième ordre (`EVOLUTION.md`, section 10). Le socle `socle-acceptable` 1.0.1 est inclus et épinglé ; la constitution, version 2.0.0, porte le champ `acceptable` et reprend chaque entrée du noyau, avec sa règle, avant celles d'Agent2Test ; elle porte enfin ses intentions refusées, que la garde de périmètre y lisait déjà, `hors-test` et modifier du code, et une liste de leçons interdites, celle du noyau ; le démarrage vérifie l'empreinte du bloc et la présence de chaque entrée. Chaque garde cite ses règles, journalisées `acceptable.refus` ; contrôle nouveau `apprenant.lecon-compatible` ; le testeur ou le référent qualité répond à un refus depuis le tableau de bord ou par MCP, `a2t_repondre_refus` : dérogation, seulement sur une entrée propre déclarée dérogeable, aucune dans la constitution d'exemple, jamais sur une entrée du noyau (`NON_DEROGEABLE`), ou faux refus, qui n'exécute rien et paraît dans la vue de gouvernance. Rubrique facultative `acceptable` du journal de tests, dont le format garde son nom. Invariants D26.INV-1 à D26.INV-4 ; scénarios AC1 à AC10 ; point d'extension E6, le kit test, qui reste inerte. Entrée : agent-tdd-jira 1.3.6, dont seule la référence à Agent2Test change. Exemples du journal à la version 1.5.0. Décisions ratifiées avant la rédaction : plan du jalon J3b, B1 à B4. Archive : `archives/SKILL-v1.4.0.md`.
