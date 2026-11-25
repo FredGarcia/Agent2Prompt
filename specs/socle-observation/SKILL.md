@@ -1,12 +1,12 @@
 ---
 name: socle-observation
 description: Socle d'observation partagé. Il fixe l'enveloppe commune des observations, propositions, décisions et écarts qu'un système de second ordre du dépôt rend observables aux autres, au sens du troisième ordre (EVOLUTION.md, section 10) : schéma fermé, journal en ajout seul et chaîné, minimisation, correspondances avec les formats existants. À lire avant d'exporter les observations d'un système vers le milieu commun.
-version: 1.2.0
+version: 1.3.0
 ---
 
-# Socle d'observation, version 1.2.0
+# Socle d'observation, version 1.3.0
 
-Ce socle est le milieu commun du premier couplage du troisième ordre, entre systèmes (`EVOLUTION.md`, section 10.3) : chaque système de second ordre du dépôt y rend observables ses observations, ses propositions, ses décisions et ses écarts, dans une même enveloppe, sans changer ses propres formats. Un système dont la dimension d'export est active l'inclut à l'identique, à une version épinglée ; un système dont l'export est encore réservé le référence. En 1.2.0, `generateur-skill-ticket` et `orchestrateur-c7e` l'incluent et exportent leurs observations ; `observatoire` l'inclut, relève les journaux d'enveloppes de tous les systèmes, et exporte pour le binôme Agent2Dev et Agent2Test, dont le code se construit hors du dépôt, les refus de leurs livrables. Un système ne redéfinit jamais une règle du socle : il peut seulement la préciser pour ses propres formats.
+Ce socle est le milieu commun du premier couplage du troisième ordre, entre systèmes (`EVOLUTION.md`, section 10.3) : chaque système de second ordre du dépôt y rend observables ses observations, ses propositions, ses décisions et ses écarts, dans une même enveloppe, sans changer ses propres formats. Un système dont la dimension d'export est active l'inclut à l'identique, à une version épinglée ; un système dont l'export est encore réservé le référence. En 1.3.0, `generateur-skill-ticket` et `orchestrateur-c7e` l'incluent et exportent leurs observations ; `observatoire` l'inclut, relève les journaux d'enveloppes de tous les systèmes, et exporte pour le binôme Agent2Dev et Agent2Test, dont le code se construit hors du dépôt, les refus et les kits de leurs livrables. Un système ne redéfinit jamais une règle du socle : il peut seulement la préciser pour ses propres formats.
 
 Les identifiants du socle commencent par `SO` (`SO3.INV-1`), pour ne jamais se confondre avec ceux d'une spécification, qui commencent par `D`, ni avec ceux du socle back-front, qui commencent par `SC`, ni avec ceux du socle de l'acceptable, qui commencent par `SA`.
 
@@ -19,7 +19,7 @@ flowchart LR
   subgraph INSTANCE["Instance : un projet, sur le poste"]
     GEN["générateur de skills de ticket<br/>champ, relevé, registre d'apprentissage"]
     C7E["orchestrateur C7E<br/>registre des concepts, registre des écarts"]
-    BIN["binôme Agent2Dev et Agent2Test<br/>rubriques acceptable des livrables"]
+    BIN["binôme Agent2Dev et Agent2Test<br/>rubriques acceptable et kits des livrables"]
     SEL["sel de l'instance<br/>jamais exporté"]
     EXP["export selon SO4<br/>un outil par système ; celui de l'observatoire pour le binôme"]
     J[("journaux d'enveloppes, un par système<br/>socle-observation.enveloppe/1")]
@@ -37,7 +37,7 @@ Les formats sources restent ce qu'ils sont, là où ils sont : l'export les trad
 
 ## 2. Registre des dimensions du socle
 
-| ID | Dimension | Statut 1.2.0 |
+| ID | Dimension | Statut 1.3.0 |
 |---|---|---|
 | SO1 | Enveloppe : schéma fermé, ordres et niveaux | active |
 | SO2 | Chaînage : journal en ajout seul | active |
@@ -90,7 +90,7 @@ Une enveloppe par ligne, au format `socle-observation.enveloppe/1` :
 | `profondeur` | non | `macro`, `meso-contrats`, `meso-composants`, `micro` |
 | `cible` | non | `instance` (ce qui relève du projet) ou `specification` (ce qui relève d'une spécification du dépôt) |
 | `invariant` | non | identifiant d'un invariant d'une spécification du dépôt, préfixé par son nom (`orchestrateur-c7e:D6.INV-3`, `socle-acceptable:SA2.INV-1`) |
-| `ancre` | non | `{ nature, ref }` ; nature : `noeud`, `critere`, `ca`, `scenario`, `fichier`, `commit`, `contrat`, `option`, `ticket`, `concept` |
+| `ancre` | non | `{ nature, ref }` ; nature : `noeud`, `critere`, `ca`, `scenario`, `fichier`, `commit`, `contrat`, `option`, `ticket`, `concept`, `kit` |
 | `preuve` | non | `{ nature, ref }` ; nature : `test`, `commande`, `commit`, `fichier`, `enregistrements`, `rapport`, `champ`, `arbre` |
 | `decision` | non | `{ valeur, vise }` : `retenue`, `refusee` ou `amendee`, et le numéro de l'enveloppe visée : une proposition, ou le refus auquel répond une dérogation ou un faux refus (section 6.5) |
 
@@ -146,7 +146,7 @@ L'ordre `OC3` est réservé aux enregistrements de l'écosystème, que tiendra l
 
 Une correspondance dit comment un enregistrement d'un format source devient une enveloppe. Les empreintes salées de la section 5 s'appliquent partout où une référence de l'instance apparaît ; elles ne sont pas répétées dans les tableaux.
 
-La date d'une enveloppe est celle de l'enregistrement qu'elle traduit, pour un événement du registre des concepts celle du commit qui le porte, pour un refus ou une réponse du binôme celle que porte sa rubrique, ou celle de la ligne précédente du journal si elle est plus récente : un enregistrement exporté après d'autres, plus récents, par exemple venu d'une branche fusionnée plus tard, prend la date de la dernière enveloppe, et le journal reste dans l'ordre du temps. Un export fusionne par date les enregistrements nouveaux de ses journaux sources, sans jamais changer leur ordre dans un même journal ; à date égale, le journal que le système range le premier passe d'abord. Une preuve ne garde que sa nature et sa référence : tout autre champ, comme un extrait, reste dans l'instance.
+La date d'une enveloppe est celle de l'enregistrement qu'elle traduit, pour un événement du registre des concepts celle du commit qui le porte, pour un refus, une réponse ou une étape d'un kit du binôme celle que porte sa rubrique, ou celle de la ligne précédente du journal si elle est plus récente : un enregistrement exporté après d'autres, plus récents, par exemple venu d'une branche fusionnée plus tard, prend la date de la dernière enveloppe, et le journal reste dans l'ordre du temps. Un export fusionne par date les enregistrements nouveaux de ses journaux sources, sans jamais changer leur ordre dans un même journal ; à date égale, le journal que le système range le premier passe d'abord. Une preuve ne garde que sa nature et sa référence : tout autre champ, comme un extrait, reste dans l'instance.
 
 ### 6.1 Générateur : champ d'observation `skill-ticket.observation/1`
 
@@ -222,7 +222,27 @@ Le binôme n'a pas d'outil dans le dépôt, qui tient sa spécification et ses f
 - Les enveloppes s'écrivent dans le projet de l'application, un journal par système, `docs/c7e/observations-agent2dev.jsonl` et `docs/c7e/observations-agent2test.jsonl`, sous le sel de son instance : les refus d'Agent2Test, écrits dans son propre projet, relèvent de l'instance de l'application qu'il teste.
 - Une réponse s'exporte quand elle paraît dans la rubrique : un refus exporté sans réponse garde son enveloppe, et celle de sa réponse s'ajoute plus tard.
 
-### 6.6 Invariants
+### 6.6 Binôme : rubriques `kits` de `agent2dev.livrable/1` et `agent2test.journal-de-tests/1`
+
+L'outil d'export du binôme traduit de même la rubrique `kits` (socle de l'acceptable, section 11 ; `agent2dev` et `agent2test`, module `kit`). Chaque étape d'un kit est un enregistrement, à sa ligne de journal : la remise, la validation, l'application, ou son échec, et le retour arrière.
+
+| Enregistrement source | `type` | `ordre`, `niveau` | `nature` | `motif` | `sujet` | `decision` |
+|---|---|---|---|---|---|---|
+| remise | `observation` | `OC1`, `N1` | `remis` | `kit-` suivi de l'environnement | `agent:agent2dev`, ou `agent:agent2test` | — |
+| validation | `decision` | `OC1`, `humain` | `validation` | celui de la remise | le rôle qui valide | `retenue`, et le numéro de l'enveloppe de la remise |
+| application | `observation` | `OC1`, `humain` | `applique`, ou `echec` | celui de la remise | le rôle qui déclare | — |
+| retour arrière | `observation` | `OC1`, `humain` | `retour-arriere` | celui de la remise | le rôle qui déclare | — |
+
+- `motif` : `kit-dev` pour un kit dev, `kit-test` pour un kit test ; le même pour chaque étape d'un kit.
+- `ancre` est le kit : `{ "nature": "kit", "ref": … }`, l'empreinte salée de l'empreinte de son patch ; elle relie les étapes d'un même kit d'une enveloppe à l'autre.
+- `systeme`, `date` et `source` suivent la section 6.5 : chaque étape porte le numéro `n` et la date de sa ligne de journal ; les refus et les étapes d'une même source s'exportent ensemble, dans l'ordre de leur numéro.
+- `cible` vaut `instance`, et aucune enveloppe de kit ne porte d'`invariant` : une application n'éprouve aucune règle ; un kit refusé à sa confrontation n'est pas remis, et son refus passe par la rubrique `acceptable`.
+- Un échec, déclaré « échec, retour arrière fait », est un seul enregistrement, de nature `echec` : le retour arrière que la fabrication a fait y est compris, et ne fait pas d'autre enveloppe.
+- Le sujet est le rôle que porte la rubrique : `developpeur` pour Agent2Dev ; `testeur` ou `developpeur` pour Agent2Test.
+- Ni le scénario, ni la campagne, ni l'empreinte du patch, ni le commentaire d'un échec ne sortent en clair : l'ancre et `source.journal` les désignent par leur empreinte salée.
+- Une étape s'exporte quand elle paraît dans la rubrique : une remise exportée sans validation garde son enveloppe, et celles des étapes suivantes s'ajoutent plus tard ; une étape exportée ne change plus.
+
+### 6.7 Invariants
 
 - **SO4.INV-1** : une correspondance traduit un format source sans le modifier : il garde ses champs, sa version et son emplacement, et chaque enveloppe désigne sans ambiguïté l'enregistrement dont elle provient, par son format, son numéro et, pour un format qui tient plusieurs journaux dans une instance, son journal. Contrôle : test de l'export, qui compare les sources avant et après, sur une instance à deux journaux du même format.
 - **SO4.INV-2** : la même entrée source, avec le même sel d'instance, donne la même enveloppe, octet pour octet. Contrôle : test de l'export rejoué deux fois sur les exemples du système.
@@ -241,3 +261,5 @@ Le binôme n'a pas d'outil dans le dépôt, qui tient sa spécification et ses f
 **1.1.0** (2026-11-24) : jalon J1b, export du générateur activé. Lacune corrigée : un projet a un champ d'observation par ticket, numéroté à partir de 1 dans chacun ; le format et le numéro ne désignaient donc pas un enregistrement unique. Champ facultatif `source.journal`, empreinte salée de la clé du journal source, présent pour un format qui tient plusieurs journaux dans une instance ; SO4.INV-1 renforcé : l'enveloppe désigne sans ambiguïté l'enregistrement dont elle provient. Précisions : forme du sel dans les empreintes ; tête du journal, qui relève une dernière ligne réécrite ou supprimée, comme celle du champ du générateur ; date d'une enveloppe et fusion des journaux sources à l'export ; liste de numéros sans espace ; une preuve ne garde que sa nature et sa référence ; motif d'une ratification (`ratifie`, `non-ratifie`) ; ancre d'un retour sur une action ; journal d'une enveloppe du champ ; preuve d'une proposition et décision du registre d'apprentissage. Inclus par `generateur-skill-ticket` 1.3.0, dont la dimension D9 devient active ; référencé par `orchestrateur-c7e` 3.6.1, dont la dimension D12 reste réservée. Décision ratifiée avant la rédaction : `source.journal` facultatif, version mineure (Q1). Archive : `archives/SKILL-v1.0.0.md`.
 
 **1.2.0** (2026-11-25) : jalon J3c du passage au troisième ordre (`EVOLUTION.md`, section 10), export des refus du binôme. Correspondance nouvelle, section 6.5 : la rubrique `acceptable` des livrables d'Agent2Dev (`agent2dev.livrable/1`) et des journaux de tests d'Agent2Test (`agent2test.journal-de-tests/1`) ; un refus devient une enveloppe `refus`, une dérogation une enveloppe `derogation`, un faux refus une décision, qui visent l'enveloppe du refus, avec les valeurs `amendee` et `refusee` ; l'invariant cité sort préfixé, dont le préfixe `SA` du socle de l'acceptable ; aucune enveloppe ne porte l'objet refusé ni le motif d'une réponse. Le type `refus` est produit ; `decision.vise` désigne aussi le refus auquel une réponse répond ; valeur ajoutée au sujet, `testeur`. Dimension SO4 étendue au binôme ; invariants inchangés, leur section devenue 6.6. Précisions : la date d'un refus ou d'une réponse est celle de sa rubrique ; les systèmes qui incluent le socle, et depuis quelle version ses invariants y sont en vigueur. Inclus par `generateur-skill-ticket` 1.4.2, `orchestrateur-c7e` 3.8.2 et `observatoire` 1.2.0, dont l'outil d'export du binôme applique la correspondance. Décisions ratifiées avant la rédaction : plan du jalon J3c, X1 à X3 et X5. Archive : `archives/SKILL-v1.1.0.md`.
+
+**1.3.0** (2026-11-25) : jalon J3e du passage au troisième ordre (`EVOLUTION.md`, section 10), export des kits du binôme. Correspondance nouvelle, section 6.6 : la rubrique `kits` des livrables d'Agent2Dev et des journaux de tests d'Agent2Test ; la remise, la validation, l'application ou son échec, et le retour arrière d'un kit font chacun une enveloppe, motif `kit-dev` ou `kit-test`, reliées par l'ancre de nature `kit`, valeur ajoutée à sa liste fermée ; la validation vise l'enveloppe de la remise, valeur `retenue` ; un échec, une seule enveloppe ; aucun invariant, `cible` `instance`. Invariants inchangés, leur section devenue 6.7. Décisions ratifiées avant la rédaction : plan du jalon J3e, Y1 à Y3.

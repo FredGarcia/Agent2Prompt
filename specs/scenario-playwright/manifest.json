@@ -1,6 +1,6 @@
 {
   "name": "scenario-playwright",
-  "version": "1.6.5",
+  "version": "1.6.6",
   "specSchema": 1,
   "language": "fr",
   "description": "Scénarios côté utilisateur joués dans le Chrome du poste par Playwright : texte de départ inspiré de Gherkin, en français ou en anglais, écrit par le développeur ou importé sans IA d'une demande Jira (page enregistrée en MHTML ou adresse ouverte dans le navigateur du poste, connexion à la main ; Jira Cloud et Data Center ; description et champs de texte, commentaires sur demande), d'un fichier .feature ou d'une archive .zip d'un export, des tests de Xray et de Zephyr Scale lus par leur API REST, Cloud et Data Center, en lecture seule, jeton par variable d'environnement seulement, ou des pages de tests de Xray enregistrées par Chrome en HTML complet, lues sans rien exécuter, cadres compris, pas reconnus à leurs libellés en mode formulaire ou en tableau, diagnostic sans aucune valeur (test Cucumber ou BDD recopié, test manuel converti pas à pas en Quand puis Alors, clé du test pour identité ; provenance, étiquettes, comparaison et remplacement sur demande au réimport) ; traduction en scénario TOML exécutable par l'IA, sur un squelette produit sans IA, ratifiée par le développeur et contrôlée sans IA (empreinte, structure, lignes, marques, variables) ; jeu fermé de treize actions commun avec le navigateur d'Agent2Test, cibles par rôle et nom accessible, aucun code exécuté dans la page, attentes bornées, aucune étape rejouée ; origines gardées, mutations hors du poste sur autorisation explicite, connexion à la main dans un profil dédié ; rapport JSON et Markdown avec captures, instantanés ARIA et erreurs relevées ; index sans IA du code front et back du projet, sans rien exécuter (routes d'Angular, de Vue Router et de React Router, éléments d'interface et leurs noms accessibles possibles, identifiants de test, libellés traduits, endpoints de Spring et d'OpenAPI et appels du front, classes de leurs corps et leurs champs, contraintes de validation et leurs messages, chacun avec sa source ; lecture seule, empreinte et index périmé, bornes), lu par l'IA à la traduction, propositions en commentaire dans le squelette et notes du contrôle ; vérifications hors de l'écran : requêtes de la page (méthode, chemin, statut, champs JSON du corps et de la réponse), API en GET sur une origine déclarée avec la session du navigateur, sans redirection suivie, fichiers téléchargés (texte, lignes, colonne CSV), sans en-tête, cookie ni jeton relevé ; préparation et nettoyage des données depuis des lignes marquées du texte, hors du jeu d'actions : appels d'écriture vers une origine déclarée avec la session du navigateur et le jeton anti-CSRF recopié de son cookie, une fois, sans redirection suivie, valeurs gardées de la réponse et ${unique}, ou scénario ratifié joué dans le même onglet ; préparation à sa place, nettoyage même après un échec, garde des mutations ; export du scénario ratifié en test @playwright/test du projet, sans IA, dans le seul dossier de tests désigné, sans identifiant (un test par jeu, une étape par test.step avec son numéro et sa ligne, cibles en localisateurs de Playwright, étiquettes en tags, aides communes qui reprennent la sémantique du moteur, connexion laissée à l'équipe, garde des origines et des mutations là où le test joue, SCENARIO_ORIGINES, test périmé ou retouché, TypeScript ou JavaScript) ; campagne de plusieurs scénarios, contrôlés avant la première action, dans une seule fenêtre avec une seule connexion, un test en échec n'arrêtant pas les suivants ; copie d'écran à chaque vérification, à chaque échec et à la fin de chaque test ; verdict de chaque test, conforme, non conforme ou bloqué, avec sa cause ; rapport de conformité à coller dans Jira, en balisage wiki de Data Center et en page HTML pour Cloud, copies d'écran sous un nom stable sur demande ; résultats d'une exécution ou d'une campagne au format d'import de Xray Cloud ou Data Center (statut du verdict, statut et copies d'écran par pas d'un test manuel converti, exemples des jeux, exécution de test existante) ou de Zephyr Scale (format custom, JSON et archive .zip), sous la clé retenue à l'import, sans rien envoyer ; désignation d'une cible à la souris ; agent pilote-scenario et commandes /scenario:importer, /scenario:indexer, /scenario:traduire, /scenario:jouer, /scenario:designer, /scenario:exporter et /scenario:resultats.",
@@ -13,8 +13,8 @@
     "os": "Windows natif, Linux et WSL2 ; recette en CI sur ubuntu-latest et windows-latest"
   },
   "references": [
-    { "name": "agent2test", "version": "1.6.0" },
-    { "name": "agent-tdd-jira", "version": "1.3.8" },
+    { "name": "agent2test", "version": "1.6.1" },
+    { "name": "agent-tdd-jira", "version": "1.3.9" },
     { "name": "capture-sprint-jira", "version": "1.2.2" }
   ],
   "modules": [
@@ -59,6 +59,7 @@
     { "version": "1.6.1", "file": "archives/SKILL-v1.6.1.md" },
     { "version": "1.6.2", "file": "archives/SKILL-v1.6.2.md" },
     { "version": "1.6.3", "file": "archives/SKILL-v1.6.3.md" },
-    { "version": "1.6.4", "file": "archives/SKILL-v1.6.4.md" }
+    { "version": "1.6.4", "file": "archives/SKILL-v1.6.4.md" },
+    { "version": "1.6.5", "file": "archives/SKILL-v1.6.5.md" }
   ]
 }

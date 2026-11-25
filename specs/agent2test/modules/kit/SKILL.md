@@ -23,7 +23,7 @@ Un kit qui enfreint une règle n'est pas remis : refus `acceptable.refus`, avec 
 ```json
 {
   "format": "socle-acceptable.kit/1",
-  "systeme": { "nom": "agent2test", "version": "1.6.0" },
+  "systeme": { "nom": "agent2test", "version": "1.6.1" },
   "environnement": "test",
   "patch": { "chemin": "test.patch", "empreinte": "b97faf12ab63e0e511f9c867377374df22fb5f2e6cb21be01169ed17ef4cdcff" },
   "noyau": { "version": "1.1.0", "empreinte": "e815cadf230886d507d56dbbfb5d7cfd0cf3982036d54d0279b70cc8f49b4764" },
@@ -39,7 +39,7 @@ CP-2 présente le kit test avec le profil d'environnement : ses scénarios, ses 
 ## 3. Application, parcours et nettoyage (D27.INV-2)
 
 - La fabrication de l'hôte applique le kit validé sur l'environnement de test. Agent2Test ne l'applique pas.
-- Le testeur ou le développeur déclare ce qu'elle a fait, depuis le tableau de bord, vue des kits : « kit appliqué », ou « échec, retour arrière fait », avec son commentaire. Agent2Test recalcule l'empreinte du patch : si elle n'est plus celle du manifeste, la déclaration est refusée `KIT_MODIFIE`, journalisée, et rien n'est consigné comme appliqué.
+- Le testeur ou le développeur déclare ce qu'elle a fait, depuis le tableau de bord, vue des kits : « kit appliqué », ou « échec, retour arrière fait », avec son commentaire : un échec est une seule déclaration, le retour arrière que la fabrication a fait y étant compris. Agent2Test recalcule l'empreinte du patch : si elle n'est plus celle du manifeste, la déclaration est refusée `KIT_MODIFIE`, journalisée, et rien n'est consigné comme appliqué.
 - Les parcours des scénarios du kit ne se préparent, exécution probatoire comprise (module `preparateur`, section 3), et ces scénarios ne se jouent, qu'après l'application déclarée ; sans elle, ou après un échec, ils restent non automatisables, avec le motif « prérequis de données : kit test non appliqué ».
 - Après la campagne, la fabrication applique le nettoyage, et le testeur ou le développeur le déclare : « retour arrière fait ».
 - Les lignes `kit.applique`, `kit.echec` et `kit.retour-arriere` citent le kit, son empreinte, le rôle et l'heure de la déclaration. Aucun agent, ni le moteur, ni l'échange, ne déclare une application, et aucun outil MCP ne le permet.
@@ -52,12 +52,12 @@ Le journal de tests `agent2test.journal-de-tests/1` porte une rubrique facultati
 { "kits": [
     { "n": 830, "date": "2026-10-21T10:08:00Z", "environnement": "test", "empreinte": "b97faf12ab63e0e511f9c867377374df22fb5f2e6cb21be01169ed17ef4cdcff", "scenarios": ["ECR-77-S04"],
       "validation": { "n": 834, "date": "2026-10-21T10:12:00Z", "role": "testeur" },
-      "application": { "n": 840, "date": "2026-10-21T10:15:00Z", "resultat": "applique" },
+      "application": { "n": 840, "date": "2026-10-21T10:15:00Z", "role": "testeur", "resultat": "applique" },
       "retourArriere": { "n": 905, "date": "2026-10-21T11:02:00Z", "role": "testeur" } }
 ] }
 ```
 
-Chaque kit porte le numéro et la date de sa ligne `kit.remis` ; sa validation, sa déclaration d'application et son nettoyage, ceux de leur ligne, à la seconde, en UTC, ou `null` tant qu'ils n'ont pas eu lieu. `resultat` vaut `applique` ou `echec`. Le format garde son nom : la rubrique est facultative, et `lire-acceptation.mjs` d'agent-tdd-jira ne la lit pas. Elle est la source de l'export des applications et des retours arrière, quand le socle d'observation en donnera la correspondance.
+Chaque kit porte le numéro et la date de sa ligne `kit.remis` ; sa validation, sa déclaration d'application et son nettoyage, ceux de leur ligne, à la seconde, en UTC, avec le rôle de qui l'a fait, `testeur` ou `developpeur`, ou `null` tant qu'ils n'ont pas eu lieu. `resultat` vaut `applique` ou `echec` ; un échec, déclaré avec son retour arrière, ne remplit que `application`, et `retourArriere` reste `null`. Le format garde son nom : la rubrique est facultative, et `lire-acceptation.mjs` d'agent-tdd-jira ne la lit pas. Elle est la source de l'export des kits, que porte l'observatoire (socle d'observation, section 6.6) : chaque étape y fait une enveloppe.
 
 ## 5. Pièges connus
 
@@ -73,7 +73,7 @@ Chaque kit porte le numéro et la date de sa ligne `kit.remis` ; sa validation, 
 | KI2 | D27.INV-1 | un kit dont le patch écrit dans les sources de l'application, ou porte un fichier `.env`, n'est pas remis : refus `acceptable.refus`, règle D1.INV-5 ou SA4.INV-1 ; ses scénarios restent non automatisables |
 | KI3 | D27.INV-2 | le kit validé en CP-2, déclaré appliqué : ligne `kit.applique` ; le parcours de son scénario se prépare alors, et le scénario se joue ; après la campagne, « retour arrière fait » : ligne `kit.retour-arriere` |
 | KI4 | D27.INV-2 | un patch modifié après CP-2, puis déclaré appliqué : refus `KIT_MODIFIE` ; le scénario reste non automatisable ; aucun outil MCP, ni l'échange, ni le moteur, ne déclare une application |
-| KI5 | D27.INV-3 | le journal de tests d'une campagne dont le kit a été appliqué puis nettoyé porte la rubrique `kits`, chaque étape datée ; `lire-acceptation.mjs` le lit comme avant |
+| KI5 | D27.INV-3 | le journal de tests d'une campagne dont le kit a été appliqué puis nettoyé porte la rubrique `kits`, chaque étape datée, avec son rôle ; un kit en échec n'a que son application, de résultat `echec` ; `lire-acceptation.mjs` le lit comme avant |
 
 ## 7. Fichiers à produire
 

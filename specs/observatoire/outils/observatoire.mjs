@@ -1,13 +1,14 @@
 #!/usr/bin/env node
-// Observatoire de l'écosystème Agent2Prompt (observatoire 1.2.0) : le premier couplage du troisième ordre,
+// Observatoire de l'écosystème Agent2Prompt (observatoire 1.3.0) : le premier couplage du troisième ordre,
 // entre systèmes (EVOLUTION.md, section 10.3), et la boucle du troisième, avec les valeurs. Il se lance depuis le
 // clone du dépôt, sur le poste.
 //
 // Il relève, vérifiés selon le socle d'observation, les journaux d'enveloppes des projets inscrits, un par
 // système qui exporte, dans un magasin local, gardé dans le répertoire Git commun du clone,
 // <git-common-dir>/agent2prompt/observatoire/ : jamais versionné, publié ni exporté. Il les confronte entre
-// instances, entre systèmes par les invariants du dépôt que citent leurs écarts, et confronte par règle les refus
-// du binôme, leurs dérogations et leurs faux refus ; il observe l'état de l'écosystème, écrit des propositions
+// instances, entre systèmes par les invariants du dépôt que citent leurs écarts, confronte par règle les refus
+// du binôme, leurs dérogations et leurs faux refus, et compte ses kits, par système, environnement et instance ;
+// il observe l'état de l'écosystème, écrit des propositions
 // minimisées dans observatoire/propositions/, que le développeur apporte au dépôt par une pull request, et suit
 // l'effet de celles que la ratification a fait entrer dans une version. Il propose et n'applique jamais : il ne
 // modifie aucune spécification, ne commite ni ne publie. Il ne lit des instances que leurs enveloppes : jamais
@@ -67,7 +68,7 @@ const LISTES = {
   type: ['observation', 'proposition', 'decision', 'refus', 'derogation', 'ecart'],
   profondeur: ['macro', 'meso-contrats', 'meso-composants', 'micro'],
   cible: ['instance', 'specification'],
-  ancre: ['noeud', 'critere', 'ca', 'scenario', 'fichier', 'commit', 'contrat', 'option', 'ticket', 'concept'],
+  ancre: ['noeud', 'critere', 'ca', 'scenario', 'fichier', 'commit', 'contrat', 'option', 'ticket', 'concept', 'kit'],
   preuve: ['test', 'commande', 'commit', 'fichier', 'enregistrements', 'rapport', 'champ', 'arbre'],
   decision: ['retenue', 'refusee', 'amendee'],
 };
@@ -429,7 +430,7 @@ function chargerMagasin(magasin, depot) {
   return { parInstance, toutes, ecartees, connus };
 }
 
-// ---- D2 : confrontation entre instances ; D6 : entre systèmes ; D8 : de l'acceptable ----
+// ---- D2 : confrontation entre instances ; D6 : entre systèmes ; D8 : de l'acceptable ; D9 : des kits ----
 
 /**
  * Index des enveloppes d'une instance par système et par numéro : chaque système tient son journal, où les numéros
@@ -540,6 +541,44 @@ function parRegle(parInstance, toutes, depot, connus) {
 }
 
 /**
+ * Confrontation des kits (D9). Un kit se reconnaît à son ancre de nature `kit`, et son environnement à son motif,
+ * `kit-dev` ou `kit-test` (socle, section 6.6) ; ses étapes, d'un même système et d'une même instance, partagent
+ * son ancre. Pour chaque système et chaque environnement : les kits remis, validés, appliqués, en échec et défaits,
+ * ceux qui, validés, attendent leur application, et les kits test appliqués sans nettoyage déclaré, avec le nombre
+ * d'instances. Des comptes seulement : un kit ne cite aucune règle, et ne fait ni retour, ni récurrence, ni candidat.
+ */
+function parKit(parInstance) {
+  const kits = new Map();
+  for (const [instance, xs] of parInstance) {
+    for (const x of xs) {
+      if (x.ancre?.nature !== 'kit' || !/^kit-[a-z]+$/.test(x.motif)) continue;
+      const cle = `${instance}|${x.systeme.nom}|${x.ancre.ref}`;
+      const k = kits.get(cle) ?? { instance, systeme: x.systeme.nom, environnement: x.motif.slice(4), etapes: new Set() };
+      k.etapes.add(x.nature);
+      kits.set(cle, k);
+    }
+  }
+  const groupes = new Map();
+  for (const k of kits.values()) {
+    const cle = `${k.systeme}|${k.environnement}`;
+    const g = groupes.get(cle) ?? { systeme: k.systeme, environnement: k.environnement, remis: 0, valides: 0, appliques: 0, echecs: 0, retoursArriere: 0, enAttente: 0, nonNettoyes: 0, instances: new Set() };
+    const a = (n) => k.etapes.has(n);
+    g.remis += a('remis') ? 1 : 0;
+    g.valides += a('validation') ? 1 : 0;
+    g.appliques += a('applique') ? 1 : 0;
+    g.echecs += a('echec') ? 1 : 0;
+    g.retoursArriere += a('retour-arriere') ? 1 : 0;
+    g.enAttente += a('validation') && !a('applique') && !a('echec') ? 1 : 0;
+    g.nonNettoyes += k.environnement === 'test' && a('applique') && !a('retour-arriere') ? 1 : 0;
+    g.instances.add(k.instance);
+    groupes.set(cle, g);
+  }
+  return [...groupes.values()]
+    .sort((a, b) => parCodePoint(`${a.systeme}|${a.environnement}`, `${b.systeme}|${b.environnement}`))
+    .map((g) => ({ ...g, instances: g.instances.size }));
+}
+
+/**
  * Retours, récurrences, invariants et règles trop larges candidats. Un retour : une proposition d'instance qui
  * vise une spécification, qu'une décision humaine de l'instance a retenue, dès une instance. Une récurrence : un
  * même motif, à la même profondeur, pour un même système, dans au moins deux instances distinctes. Un invariant :
@@ -548,7 +587,7 @@ function parRegle(parInstance, toutes, depot, connus) {
  */
 export function confronter({ magasin = magasinParDefaut(), depot = RACINE } = {}) {
   const r = relever({ magasin });
-  if (r.altere || !magasin) return { erreurs: r.erreurs, avertissements: [], candidats: [], acceptable: [], ecartees: 0, instances: 0 };
+  if (r.altere || !magasin) return { erreurs: r.erreurs, avertissements: [], candidats: [], acceptable: [], kits: [], ecartees: 0, instances: 0 };
   const { parInstance, toutes, ecartees, connus } = chargerMagasin(magasin, depot);
   const groupes = new Map();
   const ajouter = (x, instance, retour, ...refs) => {
@@ -580,7 +619,7 @@ export function confronter({ magasin = magasinParDefaut(), depot = RACINE } = {}
   candidats.push(...parInvariant(parInstance, toutes, depot, connus).sort((a, b) => parCodePoint(a.invariant, b.invariant)));
   const { acceptable, candidats: regles } = parRegle(parInstance, toutes, depot, connus);
   candidats.push(...regles);
-  return { erreurs: r.erreurs, avertissements: r.avertissements, candidats, acceptable, ecartees: ecartees.length, instances: parInstance.size };
+  return { erreurs: r.erreurs, avertissements: r.avertissements, candidats, acceptable, kits: parKit(parInstance), ecartees: ecartees.length, instances: parInstance.size };
 }
 
 // ---- D3 : état de l'écosystème ----
@@ -896,6 +935,11 @@ export function principal(argv, sortie = console.log, erreur = console.error, co
       }
       if (r.acceptable.length > 0) sortie(`acceptable : ${pluriel(r.acceptable.length, 'règle')} citée${r.acceptable.length > 1 ? 's' : ''} par des refus`);
       for (const a of r.acceptable) sortie(`  ${a.invariant} : ${a.refus} refus, ${pluriel(a.derogations, 'dérogation')}, ${a.fauxRefus} faux refus ; ${a.systemes.join(', ')} ; ${pluriel(a.instances, 'instance')}`);
+      if (r.kits.length > 0) sortie('kits : des comptes, sans candidat');
+      for (const k of r.kits) {
+        const attente = [k.enAttente > 0 ? `${k.enAttente} en attente d'application` : '', k.nonNettoyes > 0 ? `${k.nonNettoyes} sans nettoyage déclaré` : ''].filter(Boolean).join(', ');
+        sortie(`  ${k.systeme}, kit ${k.environnement} : ${k.remis} remis, ${pluriel(k.valides, 'validé')}, ${pluriel(k.appliques, 'appliqué')}, ${pluriel(k.echecs, 'échec')}, ${pluriel(k.retoursArriere, 'défait')}${attente ? ` ; ${attente}` : ''} ; ${pluriel(k.instances, 'instance')}`);
+      }
       if (r.instances < SEUIL_INSTANCES) sortie(`moins de ${SEUIL_INSTANCES} instances : aucune récurrence ni règle trop large possible ; seuls remontent les retours, et les invariants relevés par deux systèmes`);
     }
     return rendre(r);

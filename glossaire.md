@@ -24,27 +24,27 @@ La colonne « Repris dans » cite les modules de la spécification qui reprennen
 
 | Spécification | Version | Dimensions actives | Dimensions réservées | Invariants |
 |---|---|---|---|---|
-| [`agent-tdd-jira`](#agent-tdd-jira-138) | 1.3.8 | 9 | 1 | 43 |
-| [`agent2dev`](#agent2dev-140) | 1.4.0 | 23 | 2 | 103 |
-| [`agent2test`](#agent2test-160) | 1.6.0 | 22 | 2 | 123 |
+| [`agent-tdd-jira`](#agent-tdd-jira-139) | 1.3.9 | 9 | 1 | 43 |
+| [`agent2dev`](#agent2dev-141) | 1.4.1 | 23 | 2 | 103 |
+| [`agent2test`](#agent2test-161) | 1.6.1 | 22 | 2 | 123 |
 | [`agents-paralleles-gitlab`](#agents-paralleles-gitlab-101) | 1.0.1 | 5 | 2 | 20 |
 | [`analyse-projet`](#analyse-projet-102) | 1.0.2 | 5 | 1 | 16 |
 | [`angular`](#angular-101) | 1.0.1 | 8 | 2 | 30 |
 | [`capture-sprint-jira`](#capture-sprint-jira-122) | 1.2.2 | 9 | 2 | 39 |
 | [`explication-hote-ia`](#explication-hote-ia-110) | 1.1.0 | 10 | 2 | 37 |
-| [`generateur-skill-ticket`](#generateur-skill-ticket-143) | 1.4.3 | 9 | 1 | 32 |
+| [`generateur-skill-ticket`](#generateur-skill-ticket-144) | 1.4.4 | 9 | 1 | 32 |
 | [`java`](#java-111) | 1.1.1 | 7 | 1 | 29 |
-| [`observatoire`](#observatoire-120) | 1.2.0 | 8 | 0 | 16 |
-| [`orchestrateur-c7e`](#orchestrateur-c7e-383) | 3.8.3 | 11 | 2 | 36 |
-| [`scenario-playwright`](#scenario-playwright-165) | 1.6.5 | 17 | 5 | 76 |
+| [`observatoire`](#observatoire-130) | 1.3.0 | 9 | 0 | 17 |
+| [`orchestrateur-c7e`](#orchestrateur-c7e-384) | 3.8.4 | 11 | 2 | 36 |
+| [`scenario-playwright`](#scenario-playwright-166) | 1.6.6 | 17 | 5 | 76 |
 | [`skill4appli`](#skill4appli-111) | 1.1.1 | 9 | 3 | 34 |
 | [`socle-acceptable`](#socle-acceptable-110) | 1.1.0 | 8 | 0 | 14 |
 | [`socle-back-front`](#socle-back-front-110) | 1.1.0 | 7 | 0 | 21 |
-| [`socle-observation`](#socle-observation-120) | 1.2.0 | 4 | 0 | 7 |
+| [`socle-observation`](#socle-observation-130) | 1.3.0 | 4 | 0 | 7 |
 | [`sonarqube`](#sonarqube-110) | 1.1.0 | 8 | 2 | 34 |
 | [`tension-dashboard-gitlab-agent`](#tension-dashboard-gitlab-agent-220) | 2.2.0 | 7 | 3 | 17 |
 
-## agent-tdd-jira 1.3.8
+## agent-tdd-jira 1.3.9
 
 Agent de développement TDD : demande Jira en MHTML, analyse avec commentaires, US et critères d'acceptation numérotés, scénarios Gherkin par critère, variantes back Java et front Angular, cycle rouge, vert, remanié scénario par scénario, traçabilité ; binôme avec Agent2Test, verdict d'acceptation par critère ; mode parallèle dans un worktree géré par agents-paralleles-gitlab. Point d'entrée : [`specs/agent-tdd-jira/SKILL.md`](specs/agent-tdd-jira/SKILL.md).
 
@@ -140,7 +140,7 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 | **D10.INV-6** | un critère d'acceptation n'entre en réalisation (choix des variantes V3, cycle TDD V4) que s'il est validé, décliné en scénarios validés, et qu'aucune question ouverte ne le concerne. | `us-criteres`, `variantes`, `agent2dev/cadrage` |
 | **D10.INV-7** | la matrice de traçabilité relie chaque US à ses critères d'acceptation, et chaque critère à ses scénarios, tests et commits, ou à un statut « non réalisé » avec sa raison ; le rapport final donne l'état de chaque critère. | `us-criteres`, `tracabilite`, `agent2dev`, `agent2dev/tracabilite` |
 
-## agent2dev 1.4.0
+## agent2dev 1.4.1
 
 Agent2Dev : système multi-agents de développement qui applique le skill agent-tdd-jira comme méthode, de la demande Jira en MHTML jusqu'au rapport, en cycle TDD scénario par scénario et en binôme avec Agent2Test ; le moteur rédige, des agents déterministes écrivent et exécutent, le développeur valide à chaque point ; journal chaîné, apprentissage sous gouvernance, un fichier SQLite unique ouvert par un agent médiateur, binôme à la main ou par un échange par dossiers facultatif, exécution locale. Point d'entrée : [`specs/agent2dev/SKILL.md`](specs/agent2dev/SKILL.md).
 
@@ -378,9 +378,9 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 |---|---|---|
 | **D27.INV-1** | le patch d'un scénario ne devient son kit dev qu'après sa confrontation par le `depot`, avant V4, à la version épinglée du noyau et de la constitution, fichiers écrits et contenu ; un patch qui enfreint une règle n'est pas remis, et le refus cite sa règle ; un patch conforme reçoit son manifeste `socle-acceptable.kit/1`, à son empreinte, avec la version et l'empreinte du noyau confronté (`socle-acceptable:SA8.INV-1`). | `kit`, `socle-acceptable` |
 | **D27.INV-2** | un kit dev ne s'applique, par la fabrication de l'hôte, sur l'environnement dev, qu'après la décision « accepter » de V4, qui le valide à son empreinte ; seul le développeur déclare son application et son retour arrière, depuis le tableau de bord ; une déclaration pour un patch dont l'empreinte n'est plus celle du manifeste est refusée `KIT_MODIFIE` ; aucun agent n'applique un kit ni ne déclare son application (`socle-acceptable:SA8.INV-2`). | `mcp`, `kit` |
-| **D27.INV-3** | le livrable d'une demande dont un kit a été remis porte la rubrique `kits` : chaque kit avec son scénario, son environnement, son empreinte, sa validation, son application et son retour arrière, chacun daté de sa ligne de journal. | `kit` |
+| **D27.INV-3** | le livrable d'une demande dont un kit a été remis porte la rubrique `kits` : chaque kit avec son scénario, son environnement, son empreinte, sa validation, son application et son retour arrière, chacun daté de sa ligne de journal, avec le rôle de qui l'a validé ou déclaré ; un échec, déclaré avec son retour arrière, ne remplit que l'application. | `kit` |
 
-## agent2test 1.6.0
+## agent2test 1.6.1
 
 Agent2Test : système multi-agents qui choisit, prépare, exécute et journalise les tests essentiels d'une application Angular pour une demande, en pilotant Playwright comme une bibliothèque depuis Node, dans un projet séparé de l'application ; plan importé d'agent-tdd-jira, verdict par critère d'acceptation, navigateur qui regarde comme une personne et rend compte de ce qu'il voit et ne voit pas, points de contrôle humains, cybernétique de premier et de second ordre, un fichier SQLite unique ouvert par un agent médiateur, remise d'Agent2Dev en fichier ou par un échange par dossiers facultatif, exécution locale. Point d'entrée : [`specs/agent2test/SKILL.md`](specs/agent2test/SKILL.md).
 
@@ -638,7 +638,7 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 |---|---|---|
 | **D27.INV-1** | les prérequis de données des scénarios retenus ne deviennent le kit test de la campagne qu'après sa confrontation, avant CP-2, à la version épinglée du noyau et de la constitution, fichiers écrits, contenu et intention ; un kit qui enfreint une règle n'est pas remis, et le refus cite sa règle ; un kit conforme reçoit son manifeste `socle-acceptable.kit/1`, à l'empreinte de son patch, avec la version et l'empreinte du noyau confronté (`socle-acceptable:SA8.INV-1`). | `kit`, `socle-acceptable` |
 | **D27.INV-2** | un kit test ne s'applique, par la fabrication de l'hôte, sur l'environnement de test, qu'après sa validation en CP-2, à son empreinte ; seuls le testeur et le développeur déclarent son application et son nettoyage, depuis le tableau de bord ; une déclaration pour un patch dont l'empreinte n'est plus celle du manifeste est refusée `KIT_MODIFIE` ; les parcours de ses scénarios ne se préparent, et ces scénarios ne se jouent, qu'après l'application déclarée ; aucun agent n'applique un kit ni ne déclare son application (`socle-acceptable:SA8.INV-2`). | `plan`, `mcp`, `kit` |
-| **D27.INV-3** | le journal de tests d'une campagne dont un kit a été remis porte la rubrique `kits` : le kit avec ses scénarios, son environnement, son empreinte, sa validation, son application et son nettoyage, chacun daté de sa ligne de journal ; le format garde son nom, et sa lecture par agent-tdd-jira ne change pas. | `kit` |
+| **D27.INV-3** | le journal de tests d'une campagne dont un kit a été remis porte la rubrique `kits` : le kit avec ses scénarios, son environnement, son empreinte, sa validation, son application et son nettoyage, chacun daté de sa ligne de journal, avec le rôle de qui l'a validé ou déclaré ; un échec, déclaré avec son retour arrière, ne remplit que l'application ; le format garde son nom, et sa lecture par agent-tdd-jira ne change pas. | `kit` |
 
 ## agents-paralleles-gitlab 1.0.1
 
@@ -1028,7 +1028,7 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 | **D12.INV-4** | hors du dossier du skill, rien ne s'écrit sans la demande du développeur : le sous-agent et les commandes s'installent par une commande qu'il lance ou qu'il approuve, une commande de retrait les supprime, et, avec `gemini skills uninstall`, rien ne reste. | `agent`, `diffusion` |
 | **D12.INV-5** | le dépôt où le skill est maintenu se nomme comme son origine et le lieu de sa vérification, jamais comme une étape ; le contrat de version, les règles et la recette du skill sont écrits dans le skill. | `recette`, `diffusion` |
 
-## generateur-skill-ticket 1.4.3
+## generateur-skill-ticket 1.4.4
 
 Générateur de skills de ticket C7E : décompose un ticket en arbre de sous-tickets, produit pour chaque nœud un skill assemblé depuis le référentiel des méso-contrats, l'installe et le lance dans Gemini CLI ; chaque skill s'observe dans un champ partagé, et chaque niveau voit le ticket augmenté ; chaque ticket entraîne le générateur, qui propose ses évolutions au développeur ; ses observations s'exportent, minimisées, vers le socle d'observation du dépôt. Point d'entrée : [`specs/generateur-skill-ticket/SKILL.md`](specs/generateur-skill-ticket/SKILL.md).
 
@@ -1185,7 +1185,7 @@ Expert Java 21, Spring Boot 3.5 et PostgreSQL : produire et relire du code confo
 
 Dimension réservée : aucun invariant en vigueur dans cette version.
 
-## observatoire 1.2.0
+## observatoire 1.3.0
 
 Observatoire de l'écosystème Agent2Prompt, sur le poste : relève les journaux d'enveloppes des projets selon le socle d'observation, dont ceux qu'il écrit pour le binôme Agent2Dev et Agent2Test à partir de leurs refus, les confronte entre instances, entre systèmes par les invariants du dépôt que citent leurs écarts, et par règle de l'acceptable que citent les refus, observe l'état de l'écosystème, écrit des propositions minimisées que le développeur apporte au dépôt par pull request, et suit l'effet des propositions ratifiées ; premier et troisième couplages du troisième ordre, il propose et n'applique jamais. Point d'entrée : [`specs/observatoire/SKILL.md`](specs/observatoire/SKILL.md).
 
@@ -1234,9 +1234,9 @@ Observatoire de l'écosystème Agent2Prompt, sur le poste : relève les journaux
 
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
-| **D7.INV-1** | l'export du binôme traduit la rubrique `acceptable` d'un livrable d'Agent2Dev ou d'un journal de tests d'Agent2Test selon la correspondance du socle d'observation, section 6.5 : une enveloppe par refus et par réponse, datée par la rubrique, au nom et à la version du système qui a produit l'enregistrement ; il ne modifie aucun fichier désigné, et la même rubrique, sous le même sel, donne les mêmes enveloppes, octet pour octet, quel que soit l'ordre des fichiers. | `export-binome` |
-| **D7.INV-2** | l'export écrit dans le projet de l'application un journal par système, `docs/c7e/observations-agent2dev.jsonl` et `docs/c7e/observations-agent2test.jsonl`, en ajout seul, chaîné, avec sa tête, sous le sel de l'instance, qu'il lit dans le répertoire Git commun du projet, ou tire s'il n'y existe aucun journal d'enveloppes ; un enregistrement déjà exporté ne l'est pas deux fois, et une réponse venue après son refus le vise ; un journal altéré, une source illisible, une rubrique qui change ou retire un enregistrement exporté, un sel absent alors qu'un journal existe, ou étranger à l'un d'eux, ou une enveloppe mal formée arrêtent l'export, sans rien écrire. | `export-binome` |
-| **D7.INV-3** | aucune enveloppe de l'export ne porte l'objet refusé, le motif d'une réponse ni le nom d'une personne : la règle sort préfixée par la spécification qui la définit, le rôle qui répond par son nom dans le socle, la demande et la campagne par leur empreinte salée ; l'export n'écrit rien dans le magasin de l'observatoire, et le sel ne s'affiche ni ne sort. | `export-binome` |
+| **D7.INV-1** | l'export du binôme traduit la rubrique `acceptable` d'un livrable d'Agent2Dev ou d'un journal de tests d'Agent2Test selon la correspondance du socle d'observation, section 6.5, et sa rubrique `kits` selon la section 6.6 : une enveloppe par refus, par réponse et par étape d'un kit, un échec en une seule, datée par la rubrique, au nom et à la version du système qui a produit l'enregistrement ; il ne modifie aucun fichier désigné, et la même rubrique, sous le même sel, donne les mêmes enveloppes, octet pour octet, quel que soit l'ordre des fichiers. | `export-binome` |
+| **D7.INV-2** | l'export écrit dans le projet de l'application un journal par système, `docs/c7e/observations-agent2dev.jsonl` et `docs/c7e/observations-agent2test.jsonl`, en ajout seul, chaîné, avec sa tête, sous le sel de l'instance, qu'il lit dans le répertoire Git commun du projet, ou tire s'il n'y existe aucun journal d'enveloppes ; un enregistrement déjà exporté ne l'est pas deux fois ; une réponse venue après son refus le vise, et la validation d'un kit, l'enveloppe de sa remise ; un journal altéré, une source illisible, une rubrique qui change ou retire un enregistrement exporté, un sel absent alors qu'un journal existe, ou étranger à l'un d'eux, ou une enveloppe mal formée arrêtent l'export, sans rien écrire. | `export-binome` |
+| **D7.INV-3** | aucune enveloppe de l'export ne porte l'objet refusé, le motif d'une réponse, le commentaire d'un échec ni le nom d'une personne : la règle sort préfixée par la spécification qui la définit, le rôle qui répond ou déclare par son nom dans le socle, la demande, la campagne et l'empreinte du patch d'un kit par leur empreinte salée ; l'export n'écrit rien dans le magasin de l'observatoire, et le sel ne s'affiche ni ne sort. | `export-binome` |
 
 ### D8 : Confrontation de l'acceptable (active)
 
@@ -1245,7 +1245,13 @@ Observatoire de l'écosystème Agent2Prompt, sur le poste : relève les journaux
 | **D8.INV-1** | les refus se confrontent par règle : pour chaque invariant qu'un refus cite, l'observatoire rend le nombre de refus, de dérogations et de faux refus, les systèmes qui les ont produits et le nombre d'instances où ils ont paru, une réponse comptant sous la règle du refus qu'elle vise, dans le journal de son système ; un refus, une dérogation ou un faux refus ne fait ni retour, ni récurrence, ni candidat par invariant. | `acceptable` |
 | **D8.INV-2** | une règle que le dépôt définit, déclarée infondée par des faux refus dans au moins deux instances distinctes, fait un candidat « règle trop large », de sorte `faux-refus`, proposé à la spécification qui la définit, à sa version courante, avec les systèmes qui ont relevé ces faux refus ; un refus sans faux refus, des faux refus d'une seule instance, ou une règle que le dépôt ne définit pas n'en font pas. | `acceptable` |
 
-## orchestrateur-c7e 3.8.3
+### D9 : Confrontation des kits (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D9.INV-1** | les kits se comptent par système et par environnement, leurs étapes se reconnaissant à l'ancre de leur kit : remis, validés, appliqués, en échec, défaits, validés en attente d'application, kits test appliqués sans nettoyage déclaré, et le nombre d'instances où ils ont paru, un échec comprenant son retour arrière ; une enveloppe de kit ne fait ni retour, ni récurrence, ni candidat par invariant ou par faux refus, et la confrontation des kits ne propose rien. | `kits` |
+
+## orchestrateur-c7e 3.8.4
 
 Orchestrateur fractal C7E : résolution d'un ticket full-stack comme transformation maîtrisée d'un système vivant, avec le cycle de l'Axiome 7E, quatre profondeurs de déclinaison, des concepts paramétrables, la qualification de chaque ticket à son ouverture par un modèle générique de la demande et des questions complémentaires, un méso-contrat principal et au besoin des compléments, confirmés avant tout le reste, des options par couche rattachées au méso-contrat qui les permet avec leurs paramètres au choix par ticket, des variantes de représentation d'une ressource et leur mise à jour en temps réel, l'analyse des images PNG de l'objectif, une fiche validée avant toute modification, des tests déduits des risques, des conventions Git compatibles avec le kit des agents parallèles, une boucle de second ordre bornée par un registre et un fichier d'invariants du projet, des registres exportés vers le socle d'observation par une commande que lance le développeur ; activé au démarrage de l'IA locale, sur choix du développeur. Point d'entrée : [`specs/orchestrateur-c7e/SKILL.md`](specs/orchestrateur-c7e/SKILL.md).
 
@@ -1348,7 +1354,7 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 
 Dimension réservée : aucun invariant en vigueur dans cette version.
 
-## scenario-playwright 1.6.5
+## scenario-playwright 1.6.6
 
 Scénarios côté utilisateur joués dans le Chrome du poste par Playwright : texte de départ inspiré de Gherkin, en français ou en anglais, écrit par le développeur ou importé sans IA d'une demande Jira (page enregistrée en MHTML ou adresse ouverte dans le navigateur du poste, connexion à la main ; Jira Cloud et Data Center ; description et champs de texte, commentaires sur demande), d'un fichier .feature ou d'une archive .zip d'un export, des tests de Xray et de Zephyr Scale lus par leur API REST, Cloud et Data Center, en lecture seule, jeton par variable d'environnement seulement, ou des pages de tests de Xray enregistrées par Chrome en HTML complet, lues sans rien exécuter, cadres compris, pas reconnus à leurs libellés en mode formulaire ou en tableau, diagnostic sans aucune valeur (test Cucumber ou BDD recopié, test manuel converti pas à pas en Quand puis Alors, clé du test pour identité ; provenance, étiquettes, comparaison et remplacement sur demande au réimport) ; traduction en scénario TOML exécutable par l'IA, sur un squelette produit sans IA, ratifiée par le développeur et contrôlée sans IA (empreinte, structure, lignes, marques, variables) ; jeu fermé de treize actions commun avec le navigateur d'Agent2Test, cibles par rôle et nom accessible, aucun code exécuté dans la page, attentes bornées, aucune étape rejouée ; origines gardées, mutations hors du poste sur autorisation explicite, connexion à la main dans un profil dédié ; rapport JSON et Markdown avec captures, instantanés ARIA et erreurs relevées ; index sans IA du code front et back du projet, sans rien exécuter (routes d'Angular, de Vue Router et de React Router, éléments d'interface et leurs noms accessibles possibles, identifiants de test, libellés traduits, endpoints de Spring et d'OpenAPI et appels du front, classes de leurs corps et leurs champs, contraintes de validation et leurs messages, chacun avec sa source ; lecture seule, empreinte et index périmé, bornes), lu par l'IA à la traduction, propositions en commentaire dans le squelette et notes du contrôle ; vérifications hors de l'écran : requêtes de la page (méthode, chemin, statut, champs JSON du corps et de la réponse), API en GET sur une origine déclarée avec la session du navigateur, sans redirection suivie, fichiers téléchargés (texte, lignes, colonne CSV), sans en-tête, cookie ni jeton relevé ; préparation et nettoyage des données depuis des lignes marquées du texte, hors du jeu d'actions : appels d'écriture vers une origine déclarée avec la session du navigateur et le jeton anti-CSRF recopié de son cookie, une fois, sans redirection suivie, valeurs gardées de la réponse et ${unique}, ou scénario ratifié joué dans le même onglet ; préparation à sa place, nettoyage même après un échec, garde des mutations ; export du scénario ratifié en test @playwright/test du projet, sans IA, dans le seul dossier de tests désigné, sans identifiant (un test par jeu, une étape par test.step avec son numéro et sa ligne, cibles en localisateurs de Playwright, étiquettes en tags, aides communes qui reprennent la sémantique du moteur, connexion laissée à l'équipe, garde des origines et des mutations là où le test joue, SCENARIO_ORIGINES, test périmé ou retouché, TypeScript ou JavaScript) ; campagne de plusieurs scénarios, contrôlés avant la première action, dans une seule fenêtre avec une seule connexion, un test en échec n'arrêtant pas les suivants ; copie d'écran à chaque vérification, à chaque échec et à la fin de chaque test ; verdict de chaque test, conforme, non conforme ou bloqué, avec sa cause ; rapport de conformité à coller dans Jira, en balisage wiki de Data Center et en page HTML pour Cloud, copies d'écran sous un nom stable sur demande ; résultats d'une exécution ou d'une campagne au format d'import de Xray Cloud ou Data Center (statut du verdict, statut et copies d'écran par pas d'un test manuel converti, exemples des jeux, exécution de test existante) ou de Zephyr Scale (format custom, JSON et archive .zip), sous la clé retenue à l'import, sans rien envoyer ; désignation d'une cible à la souris ; agent pilote-scenario et commandes /scenario:importer, /scenario:indexer, /scenario:traduire, /scenario:jouer, /scenario:designer, /scenario:exporter et /scenario:resultats. Point d'entrée : [`specs/scenario-playwright/SKILL.md`](specs/scenario-playwright/SKILL.md).
 
@@ -1746,7 +1752,7 @@ Socle commun back-front : contrat OpenAPI, erreurs RFC 9457, formats de données
 | **SC7.INV-5** | aucun jeton dans l'URL de connexion ; chaque abonnement vérifie le droit de lecture de la ressource ; origines explicites. Contrôle : test d'abonnement refusé (`ERROR` avec un Problem Details 403) et test de connexion depuis une origine non autorisée. | `orchestrateur-c7e`, `orchestrateur-c7e/referentiel` |
 | **SC7.INV-6** | toute mise à jour reçue en temps réel est annoncée par une région `aria-live="polite"`, sans déplacer le focus. Contrôle : test de composant et revue RGAA (critère 7.5). | `orchestrateur-c7e/referentiel` |
 
-## socle-observation 1.2.0
+## socle-observation 1.3.0
 
 Socle d'observation : l'enveloppe commune des observations, propositions, décisions et écarts qu'un système de second ordre du dépôt rend observables aux autres, au sens du troisième ordre (EVOLUTION.md, section 10) ; schéma fermé, journal en ajout seul et chaîné, minimisation, correspondances avec les formats existants. Point d'entrée : [`specs/socle-observation/SKILL.md`](specs/socle-observation/SKILL.md).
 

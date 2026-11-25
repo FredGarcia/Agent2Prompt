@@ -1,10 +1,10 @@
-// Recette de l'observatoire (observatoire 1.2.0, D1 à D6 et D8), sur des instances d'épreuve dont les journaux
+// Recette de l'observatoire (observatoire 1.3.0, D1 à D6, D8 et D9), sur des instances d'épreuve dont les journaux
 // sont produits par l'export du générateur de skills de ticket : A, le champ de l'arbre d'exemple ABCDE-3620
 // et un registre d'apprentissage dont une proposition, qui vise le générateur, est retenue ; B et C, des
 // champs écrits pour l'épreuve ; pour la confrontation entre systèmes, par l'export de l'orchestrateur C7E,
 // depuis un registre des écarts commité dans ces projets ; et, pour la confrontation de l'acceptable, par
 // l'export du binôme, depuis des livrables d'Agent2Dev et des journaux de tests d'Agent2Test écrits pour
-// l'épreuve. Le magasin et le dépôt d'épreuve sont temporaires : la recette n'écrit ni dans le répertoire Git
+// l'épreuve, avec leurs refus et, pour la confrontation des kits, leurs kits. Le magasin et le dépôt d'épreuve sont temporaires : la recette n'écrit ni dans le répertoire Git
 // commun du clone, ni dans ses propositions.
 
 import { test } from 'node:test';
@@ -165,8 +165,11 @@ function orchestrateur(p, nom, lignes, { concepts = `${DEPART}\n`, date = '2026-
 /** Un refus d'une rubrique acceptable, et sa réponse. */
 const refusDe = (n, date, garde, regles, reponse = null) => ({ n, date, garde, objet: 'objet-d-epreuve', regles, reponse });
 const reponseDe = (decision, role, n, date) => ({ decision, role, n, date });
-const livrableA2D = (cle, refus) => ({ format: 'agent2dev.livrable/1', demande: { cle, titre: 'Demande d\'épreuve, chez le client Dupont', source: 'e'.repeat(64) }, versions: { specification: VERSION_A2D }, acceptable: { socle: 'socle-acceptable', version: VERSION_SA, refus } });
-const journalA2T = (campagne, cle, refus) => ({ format: 'agent2test.journal-de-tests/1', campagne, demande: { cle, texte: 'Demande d\'épreuve' }, versions: { specification: VERSION_A2T }, acceptable: { socle: 'socle-acceptable', version: VERSION_SA, refus } });
+const livrableA2D = (cle, refus, kits) => ({ format: 'agent2dev.livrable/1', demande: { cle, titre: 'Demande d\'épreuve, chez le client Dupont', source: 'e'.repeat(64) }, versions: { specification: VERSION_A2D }, acceptable: { socle: 'socle-acceptable', version: VERSION_SA, refus }, ...(kits ? { kits } : {}) });
+const journalA2T = (campagne, cle, refus, kits) => ({ format: 'agent2test.journal-de-tests/1', campagne, demande: { cle, texte: 'Demande d\'épreuve' }, versions: { specification: VERSION_A2T }, acceptable: { socle: 'socle-acceptable', version: VERSION_SA, refus }, ...(kits ? { kits } : {}) });
+/** Un kit d'une rubrique kits : sa remise, puis ses étapes, chacune à sa ligne de journal, avec son rôle. */
+const kitDe = (n, date, environnement, empreinte, etapes = {}) => ({ n, date, environnement, empreinte, validation: null, application: null, retourArriere: null, ...etapes });
+const etapeDe = (n, date, role, resultat) => ({ n, date, role, ...(resultat ? { resultat } : {}) });
 
 /** Exporte, par l'outil d'export du binôme, des livrables et des journaux de tests dans le projet, sous le sel de l'instance `nom`. */
 function binome(p, nom, ...contenus) {
@@ -536,6 +539,38 @@ test('D8 : une règle déclarée infondée par des faux refus dans deux instance
 });
 
 // ---- D3 : état de l'écosystème ----
+
+test('D9 : les kits se comptent par système et par environnement, remis, validés, appliqués, en échec, défaits, en attente, sans nettoyage, avec leurs instances ; aucun ne fait de retour, de récurrence ni de candidat', () => {
+  const [a, b] = [projet('A'), projet('B')];
+  binome(a, 'A',
+    livrableA2D('ECR-1', [], [
+      kitDe(100, '2026-11-20T09:00:00Z', 'dev', '1'.repeat(64), { validation: etapeDe(101, '2026-11-20T09:01:00Z', 'developpeur'), application: etapeDe(102, '2026-11-20T09:05:00Z', 'developpeur', 'applique'), retourArriere: etapeDe(103, '2026-11-20T10:00:00Z', 'developpeur') }),
+      kitDe(110, '2026-11-20T11:00:00Z', 'dev', '2'.repeat(64), { validation: etapeDe(111, '2026-11-20T11:01:00Z', 'developpeur') }),
+    ]),
+    journalA2T('C-1', 'ECR-1', [], [kitDe(200, '2026-11-20T12:00:00Z', 'test', '3'.repeat(64), { validation: etapeDe(201, '2026-11-20T12:01:00Z', 'testeur'), application: etapeDe(202, '2026-11-20T12:05:00Z', 'developpeur', 'applique') })]));
+  binome(b, 'B', livrableA2D('FGH-2', [], [
+    kitDe(300, '2026-11-21T09:00:00Z', 'dev', '4'.repeat(64), { validation: etapeDe(301, '2026-11-21T09:01:00Z', 'developpeur'), application: etapeDe(302, '2026-11-21T09:05:00Z', 'developpeur', 'echec') }),
+    kitDe(310, '2026-11-21T10:00:00Z', 'dev', '5'.repeat(64)),
+    kitDe(320, '2026-11-21T11:00:00Z', 'dev', '6'.repeat(64), { validation: etapeDe(321, '2026-11-21T11:01:00Z', 'developpeur'), application: etapeDe(322, '2026-11-21T11:05:00Z', 'developpeur', 'applique') }),
+  ]));
+  const lieux = observatoire([a, b]);
+  const r = confronter(lieux);
+  assert.deepStrictEqual(r.erreurs, []);
+  assert.deepStrictEqual(r.kits, [
+    { systeme: 'agent2dev', environnement: 'dev', remis: 5, valides: 4, appliques: 2, echecs: 1, retoursArriere: 1, enAttente: 1, nonNettoyes: 0, instances: 2 },
+    { systeme: 'agent2test', environnement: 'test', remis: 1, valides: 1, appliques: 1, echecs: 0, retoursArriere: 0, enAttente: 0, nonNettoyes: 1, instances: 1 },
+  ], 'un échec comprend son retour arrière : il ne compte pas parmi les kits défaits ; un kit dev appliqué sans retour arrière n\'est pas un kit test à nettoyer');
+  assert.deepStrictEqual([r.candidats, r.acceptable], [[], []], 'aucun retour, aucune récurrence dans deux instances, aucun candidat par invariant ni par faux refus : des comptes seulement');
+  assert.deepStrictEqual(proposer({ ...lieux, date: '2026-11-25' }).ecrites, [], 'rien à proposer');
+  const sortie = lancer(lieux, 'confronter').sortie;
+  assert.match(sortie, /^kits : des comptes, sans candidat$/m);
+  assert.match(sortie, /^ {2}agent2dev, kit dev : 5 remis, 4 validés, 2 appliqués, 1 échec, 1 défait ; 1 en attente d'application ; 2 instances$/m);
+  assert.match(sortie, /^ {2}agent2test, kit test : 1 remis, 1 validé, 1 appliqué, 0 échec, 0 défait ; 1 sans nettoyage déclaré ; 1 instance$/m);
+  assert.deepStrictEqual(JSON.parse(lancer(lieux, 'confronter', '--json').sortie).kits, r.kits);
+  const instances = etat(lieux).instances;
+  const systemesDe = (nom) => instances.find((i) => i.instance === PREFIXE[nom]).systemes.map((s) => [s.nom, s.ecart]);
+  assert.deepStrictEqual([systemesDe('A'), systemesDe('B')], [[['agent2dev', 'a-jour'], ['agent2test', 'a-jour']], [['agent2dev', 'a-jour']]], 'les kits comptent dans l\'état de l\'écosystème comme toute enveloppe');
+});
 
 test('D3 : chaque instance est comparée aux versions publiées des systèmes qu\'elle exporte : à jour, en retard, ou inconnue', () => {
   const [a, b] = [INSTANCES.A('1.3.0'), INSTANCES.B('1.4.0')];

@@ -20,6 +20,8 @@ const RACINE = dirname(dirname(fileURLToPath(import.meta.url)));
 const A_COPIER = ['tools', 'specs', 'transmissions', 'observatoire', 'README.md', 'glossaire.md', '.geminiignore'];
 const SOCLE = 'specs/socle-acceptable/SKILL.md';
 const lf = (texte) => texte.replace(/\r\n/g, '\n');
+// Version courante d'une spécification, lue dans son manifeste : les tests suivent les versions sans être réécrits.
+const versionDe = (nom) => JSON.parse(readFileSync(join(RACINE, 'specs', nom, 'manifest.json'), 'utf8')).version;
 let copie;
 
 before(() => {
@@ -145,7 +147,7 @@ test('manifestes de kit : schéma fermé, système et environnement, patch, noya
       ['"retourArriere": { "prepare": true, "verifie": false }', '"retourArriere": { "prepare": false, "verifie": "non" }'],
     ),
     'specs/agent2test/modules/kit/SKILL.md': remplacer(
-      ['"systeme": { "nom": "agent2test", "version": "1.6.0" },', '"systeme": { "nom": "agent2test", "version": "1.5.1" },\n  "application": "manuelle",'],
+      [`"systeme": { "nom": "agent2test", "version": "${versionDe('agent2test')}" },`, '"systeme": { "nom": "agent2test", "version": "1.5.1" },\n  "application": "manuelle",'],
       [NOYAU, NOYAU.replace('1.1.0', '1.0.1')],
     ),
     [SOCLE]: remplacer(
@@ -161,7 +163,7 @@ test('manifestes de kit : schéma fermé, système et environnement, patch, noya
     'agent2dev : manifeste de kit agent2dev : retourArriere.prepare vaut true : un kit porte son retour arrière (socle-acceptable:SA2.INV-3)',
     'agent2dev : manifeste de kit agent2dev : retourArriere.verifie non, true ou false attendu',
     'agent2test : manifeste de kit agent2test : clé application, hors du schéma socle-acceptable.kit/1',
-    'agent2test : manifeste de kit agent2test : systeme.version 1.5.1, la spécification est en version 1.6.0',
+    `agent2test : manifeste de kit agent2test : systeme.version 1.5.1, la spécification est en version ${versionDe('agent2test')}`,
     'agent2test : manifeste de kit agent2test : noyau.version 1.0.1, agent2test inclut socle-acceptable 1.1.0',
     'socle-acceptable : manifeste de kit agent2dev : patch.chemin /tmp/002-S02.patch, un chemin relatif au manifeste attendu',
     'socle-acceptable : manifeste de kit agent2dev : noyau.empreinte 000000000000…, le bloc noyau de socle-acceptable 1.1.0 a l\'empreinte e815cadf2308…',

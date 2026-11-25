@@ -1,10 +1,10 @@
 ---
 name: agent2test
 description: Construire Agent2Test, système multi-agents qui choisit, prépare, exécute et journalise les tests essentiels d'une application Angular pour une demande donnée. Playwright y est piloté comme une bibliothèque depuis Node, dans un projet séparé de l'application ; le plan vient d'agent-tdd-jira (US, critères d'acceptation numérotés, scénarios Gherkin), chaque critère reçoit un verdict prouvé, l'humain ratifie aux points de contrôle, et le système observe et fait évoluer ses propres règles sous gouvernance. Le navigateur joue une personne : il regarde la page par la vue, le lecteur d'écran et le clavier, et rend compte de ce qu'il voit et de ce qu'il ne voit pas. Exécution locale, données dans un fichier SQLite unique, ouvert par un agent médiateur ; la remise d'Agent2Dev arrive en fichier, ou par un échange par dossiers facultatif.
-version: 1.6.0
+version: 1.6.1
 ---
 
-# Agent2Test, spécification 1.6.0
+# Agent2Test, spécification 1.6.1
 
 Ce document est le point d'entrée du package. Il donne le principe, la carte du système, les points de contrôle, le registre des dimensions, les règles communes et les invariants. Les détails techniques sont dans `modules/`. Le fichier `manifest.json` déclare quels modules sont actifs.
 
@@ -175,7 +175,7 @@ Une remise reçue, déposée par l'opérateur ou lue dans une boîte d'Agent2Dev
 
 ## 6. Registre des dimensions
 
-| ID | Dimension | Introduite | Statut 1.6.0 | Dépend de | Module |
+| ID | Dimension | Introduite | Statut 1.6.1 | Dépend de | Module |
 |---|---|---|---|---|---|
 | D1 | Noyau 7E, bus et constitution | 1.0 | active | | `noyau` |
 | D2 | Données isolées par agent, sur PostgreSQL | 1.0 | superseded | D1 | remplacée en 1.1.0 par D21, elle-même remplacée en 1.2.0 par D23 (`donnees`) |
@@ -258,7 +258,7 @@ Un point d'extension n'est pas une fonctionnalité. En 1.x, il n'a qu'un test qu
 - Un scénario `@ecriture-base` retenu entre au kit test de la campagne, avec son manifeste à son empreinte ; son parcours ne se prépare qu'après l'application déclarée du kit validé en CP-2 ; une déclaration pour un patch retouché est refusée `KIT_MODIFIE`.
 - Le guide de démarrage suffit, seul, à installer et lancer le kit sur le poste du développeur.
 - Sur l'application de démonstration, la page de l'exemple TAB-1 et ses treize contre-épreuves reçoivent chacune les verdicts attendus et les fragments attendus de leur témoignage, et chaque constat se recalcule à l'identique depuis ses preuves (module `navigateur`, section 11).
-- Le journal de tests JSON de l'exemple ECR-77 respecte le contrat de lecture d'agent-tdd-jira 1.3.8 (module `journal`, section 3) : sources du plan et leurs empreintes, état git à l'ouverture, verdicts de la liste fermée, cible de chaque décision.
+- Le journal de tests JSON de l'exemple ECR-77 respecte le contrat de lecture d'agent-tdd-jira 1.3.9 (module `journal`, section 3) : sources du plan et leurs empreintes, état git à l'ouverture, verdicts de la liste fermée, cible de chaque décision.
 
 ## 10. Invariants
 
@@ -466,7 +466,7 @@ Ces invariants ne sont plus en vigueur : n8n n'est plus le relais du binôme. Il
 
 - **D27.INV-1** : les prérequis de données des scénarios retenus ne deviennent le kit test de la campagne qu'après sa confrontation, avant CP-2, à la version épinglée du noyau et de la constitution, fichiers écrits, contenu et intention ; un kit qui enfreint une règle n'est pas remis, et le refus cite sa règle ; un kit conforme reçoit son manifeste `socle-acceptable.kit/1`, à l'empreinte de son patch, avec la version et l'empreinte du noyau confronté (`socle-acceptable:SA8.INV-1`).
 - **D27.INV-2** : un kit test ne s'applique, par la fabrication de l'hôte, sur l'environnement de test, qu'après sa validation en CP-2, à son empreinte ; seuls le testeur et le développeur déclarent son application et son nettoyage, depuis le tableau de bord ; une déclaration pour un patch dont l'empreinte n'est plus celle du manifeste est refusée `KIT_MODIFIE` ; les parcours de ses scénarios ne se préparent, et ces scénarios ne se jouent, qu'après l'application déclarée ; aucun agent n'applique un kit ni ne déclare son application (`socle-acceptable:SA8.INV-2`).
-- **D27.INV-3** : le journal de tests d'une campagne dont un kit a été remis porte la rubrique `kits` : le kit avec ses scénarios, son environnement, son empreinte, sa validation, son application et son nettoyage, chacun daté de sa ligne de journal ; le format garde son nom, et sa lecture par agent-tdd-jira ne change pas.
+- **D27.INV-3** : le journal de tests d'une campagne dont un kit a été remis porte la rubrique `kits` : le kit avec ses scénarios, son environnement, son empreinte, sa validation, son application et son nettoyage, chacun daté de sa ligne de journal, avec le rôle de qui l'a validé ou déclaré ; un échec, déclaré avec son retour arrière, ne remplit que l'application ; le format garde son nom, et sa lecture par agent-tdd-jira ne change pas.
 
 ## 11. Filiation avec le dossier de conception
 
@@ -530,3 +530,5 @@ Les valeurs par défaut H14 à H19 du cahier (budgets, conservation, langue, mé
 **1.5.1** (2026-11-25) : correctif, jalon J3c du passage du dépôt au troisième ordre (`EVOLUTION.md`, section 10). La rubrique `acceptable` du journal de tests date chaque refus et chaque réponse de l'horodatage de leur ligne de journal, à la seconde : l'export des refus vers le socle d'observation, que porte l'outil d'export du binôme de l'observatoire, date ses enveloppes par elle. Valeurs fermées de la rubrique précisées : garde, décision et rôle d'une réponse. D26.INV-4 renforcé : refus et réponses datés ; le format garde son nom, et `lire-acceptation.mjs` d'agent-tdd-jira ne lit pas la rubrique. Entrée : agent-tdd-jira 1.3.7, dont seule la référence à Agent2Test change. Exemples du journal à la version 1.5.1. Décision ratifiée avant la rédaction : X5, plan du jalon J3c. Archive : `archives/SKILL-v1.5.0.md`.
 
 **1.6.0** (2026-11-25) : dimension D27 active, le kit test, jalon J3d du passage du dépôt au troisième ordre (`EVOLUTION.md`, section 10). Le socle `socle-acceptable` 1.1.0, inclus et épinglé, décrit le contrat des kits sur la fabrication de l'hôte. Les prérequis de données des scénarios retenus forment le kit test de la campagne, avec leur nettoyage pour retour arrière : le `preparateur` le rédige avant les parcours, Agent2Test le confronte au noyau et à la constitution, fichiers écrits, contenu et intention, et un kit qui enfreint une règle n'est pas remis ; un kit conforme reçoit son manifeste `socle-acceptable.kit/1`, à son empreinte. CP-2 le valide avec le profil ; la fabrication de l'hôte l'applique sur l'environnement de test, où `ecrire-en-base` est permise, et reste refusée hors du kit ; le testeur ou le développeur déclare son application et son nettoyage depuis le tableau de bord, et une déclaration pour un patch retouché est refusée `KIT_MODIFIE` ; les parcours de ses scénarios ne se préparent, et ces scénarios ne se jouent, qu'après l'application déclarée ; aucun agent n'applique un kit. D3.INV-3 précisé, sans affaiblissement : Agent2Test n'écrit toujours pas en base, et un prérequis de données n'est plus « non automatisable » quand un kit test validé et déclaré appliqué l'établit (scénario PL15). Rubrique facultative `kits` du journal de tests, datée ; le format garde son nom. Module `kit`, invariants D27.INV-1 à D27.INV-3, scénarios KI1 à KI5 ; AC10 récrit : la garde refuse toujours ce qui ne se fait que dans un kit ; point d'extension E6 récrit ; garde d'écriture : le dossier des kits de la campagne permis au seul `preparateur`. Constitution 2.1.0, qui épingle le noyau à la version 1.1.0 du socle, à la même empreinte. Lecture par agent-tdd-jira 1.3.8, dont seule la référence à Agent2Test change. Décisions ratifiées avant la rédaction : plan du jalon J3d, K1 à K4. Archive : `archives/SKILL-v1.5.1.md`.
+
+**1.6.1** (2026-11-25) : correctif, jalon J3e du passage du dépôt au troisième ordre (`EVOLUTION.md`, section 10), export des kits. Écart relevé au plan : la rubrique `kits` du journal de tests ne consignait pas qui, du testeur ou du développeur, déclare l'application, que l'enveloppe du socle d'observation exige comme sujet, et ne disait pas si un échec, déclaré avec son retour arrière, se consigne en un ou deux enregistrements. `application` porte désormais le rôle qui la déclare ; un échec ne remplit que `application`, de résultat `echec`, et `retourArriere` reste `null`. D27.INV-3 renforcé, scénario KI5 précisé ; la rubrique, toujours facultative, est la source de l'export des kits que porte l'observatoire 1.3.0, selon la correspondance du socle d'observation 1.3.0, section 6.6 ; le format garde son nom. Lecture par agent-tdd-jira 1.3.9, dont seule la référence à Agent2Test change. Exemples du journal à la version 1.6.1. Décisions ratifiées avant la rédaction : plan du jalon J3e, Y1 à Y3. Archive : `archives/SKILL-v1.6.0.md`.

@@ -45,19 +45,19 @@ function registre() {
   return new Map(lignes.slice(2).map(cellules).map((c) => [c[0], { statut: c[i('Statut')], ordre: c[i('Ordre')], module: c[i('Module')].replace(/`/g, '') }]));
 }
 
-test('spécification : version du point d\'entrée, de son titre et du manifeste ; huit dimensions actives, un module chacune, et leur ordre déclaré', () => {
+test('spécification : version du point d\'entrée, de son titre et du manifeste ; neuf dimensions actives, un module chacune, et leur ordre déclaré', () => {
   assert.match(ENTREE, new RegExp(`^version: ${MANIFESTE.version.replace(/\./g, '\\.')}$`, 'm'));
   assert.match(ENTREE, new RegExp(`^# Observatoire de l'écosystème, version ${MANIFESTE.version.replace(/\./g, '\\.')}$`, 'm'));
   assert.match(ENTREE, new RegExp(`\\| ID \\| Dimension \\| Introduite \\| Statut ${MANIFESTE.version.replace(/\./g, '\\.')} \\| Ordre \\|`));
   const r = registre();
-  assert.deepStrictEqual([...r.keys()], ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8']);
-  assert.deepStrictEqual([...r.values()].map((d) => d.ordre), ['OC1', 'OC3', 'OC3', 'OC3', 'OC3', 'OC3', 'OC1', 'OC3'], 'D1 régule l\'entrée du magasin, D7 la sortie d\'une instance pour le binôme ; D2 à D6 et D8 font la boucle du troisième ordre');
+  assert.deepStrictEqual([...r.keys()], ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8', 'D9']);
+  assert.deepStrictEqual([...r.values()].map((d) => d.ordre), ['OC1', 'OC3', 'OC3', 'OC3', 'OC3', 'OC3', 'OC1', 'OC3', 'OC3'], 'D1 régule l\'entrée du magasin, D7 la sortie d\'une instance pour le binôme ; D2 à D6 et D8 font la boucle du troisième ordre, que D9 observe pour les kits');
   for (const m of MANIFESTE.modules) {
     assert.equal(m.status, 'active', m.id);
     assert.deepStrictEqual(m.dimensions.map((d) => r.get(d).module), [m.id]);
   }
-  assert.equal(DEFINITIONS.length, 16);
-  assert.deepStrictEqual(MANIFESTE.previousVersions.map((p) => p.version), ['1.0.0', '1.1.0'], 'les versions précédentes, archivées');
+  assert.equal(DEFINITIONS.length, 17);
+  assert.deepStrictEqual(MANIFESTE.previousVersions.map((p) => p.version), ['1.0.0', '1.1.0', '1.2.0'], 'les versions précédentes, archivées');
 });
 
 test('spécification : chaque invariant a sa ligne de recette dans son module, et chaque test cité existe sous ce titre', () => {

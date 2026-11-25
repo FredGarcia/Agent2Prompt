@@ -22,7 +22,7 @@ Un patch qui enfreint une règle n'est pas remis : refus `acceptable.refus`, ave
 ```json
 {
   "format": "socle-acceptable.kit/1",
-  "systeme": { "nom": "agent2dev", "version": "1.4.0" },
+  "systeme": { "nom": "agent2dev", "version": "1.4.1" },
   "environnement": "dev",
   "patch": { "chemin": "../patchs/002-S02.patch", "empreinte": "54b440c362566a4c8e8f22b9baf9f7d78a1c78b16820ec6d8fe0566a48aafc55" },
   "noyau": { "version": "1.1.0", "empreinte": "e815cadf230886d507d56dbbfb5d7cfd0cf3982036d54d0279b70cc8f49b4764" },
@@ -40,7 +40,7 @@ V4 présente le scénario avec son kit : le manifeste et l'empreinte du patch, s
 ## 3. Application et retour arrière (D27.INV-2)
 
 - La fabrication de l'hôte applique le kit validé sur l'environnement dev, et sait le défaire. Agent2Dev ne l'applique pas.
-- Le développeur déclare ce qu'elle a fait, depuis le tableau de bord, vue des kits : « kit appliqué », « échec, retour arrière fait », avec son commentaire, ou, plus tard, « retour arrière fait ». Agent2Dev recalcule l'empreinte du patch : si elle n'est plus celle du manifeste, la déclaration est refusée `KIT_MODIFIE`, journalisée, et rien n'est consigné comme appliqué.
+- Le développeur déclare ce qu'elle a fait, depuis le tableau de bord, vue des kits : « kit appliqué », « échec, retour arrière fait », avec son commentaire, ou, plus tard, « retour arrière fait ». Un échec est une seule déclaration : le retour arrière que la fabrication a fait y est compris. Agent2Dev recalcule l'empreinte du patch : si elle n'est plus celle du manifeste, la déclaration est refusée `KIT_MODIFIE`, journalisée, et rien n'est consigné comme appliqué.
 - Les lignes `kit.applique`, `kit.echec` et `kit.retour-arriere` citent le kit, son empreinte, le rôle et l'heure de la déclaration.
 - Aucun agent, ni le moteur, ni l'échange, ne déclare une application, et aucun outil MCP ne le permet.
 - Le patch reste applicable à la main, dans l'arbre du développeur, par `git am -3` (module `depot`, section 5) : ce n'est pas l'application d'un kit, qui seule atteint l'environnement dev.
@@ -53,12 +53,12 @@ La projection `agent2dev.livrable/1` porte une rubrique `kits`, présente dès q
 { "kits": [
     { "n": 2131, "date": "2026-10-21T14:31:10Z", "scenario": "ECR-77-S02", "environnement": "dev", "empreinte": "54b440c362566a4c8e8f22b9baf9f7d78a1c78b16820ec6d8fe0566a48aafc55",
       "validation": { "n": 2133, "date": "2026-10-21T14:33:00Z", "role": "developpeur" },
-      "application": { "n": 2140, "date": "2026-10-21T14:40:00Z", "resultat": "applique" },
+      "application": { "n": 2140, "date": "2026-10-21T14:40:00Z", "role": "developpeur", "resultat": "applique" },
       "retourArriere": null }
 ] }
 ```
 
-Chaque kit porte le numéro et la date de sa ligne `kit.remis` ; sa validation, sa déclaration d'application et son retour arrière, ceux de leur ligne, à la seconde, en UTC, ou `null` tant qu'ils n'ont pas eu lieu. `resultat` vaut `applique` ou `echec`. Le Markdown en dérive, une ligne par kit. La rubrique est la source de l'export des applications et des retours arrière, quand le socle d'observation en donnera la correspondance.
+Chaque kit porte le numéro et la date de sa ligne `kit.remis` ; sa validation, sa déclaration d'application et son retour arrière, ceux de leur ligne, à la seconde, en UTC, avec le rôle de qui l'a fait, ou `null` tant qu'ils n'ont pas eu lieu. `resultat` vaut `applique` ou `echec` ; un échec, déclaré avec son retour arrière, ne remplit que `application`, et `retourArriere` reste `null`. Le Markdown en dérive, une ligne par kit. La rubrique est la source de l'export des kits, que porte l'observatoire (socle d'observation, section 6.6) : chaque étape y fait une enveloppe.
 
 ## 5. Pièges connus
 
@@ -74,7 +74,7 @@ Chaque kit porte le numéro et la date de sa ligne `kit.remis` ; sa validation, 
 | KI2 | D27.INV-1 | un patch qui écrit `.env`, ou dans `schemas/`, n'est pas remis : refus `acceptable.refus`, garde d'écriture, règle SA4.INV-1 ou D1.INV-6 ; aucun manifeste n'est écrit |
 | KI3 | D27.INV-2 | la décision « accepter » de V4 cite le kit ; le développeur déclare « kit appliqué », ligne `kit.applique` avec l'empreinte, puis « retour arrière fait », ligne `kit.retour-arriere` |
 | KI4 | D27.INV-2 | le patch modifié après V4, puis déclaré appliqué : refus `KIT_MODIFIE`, journalisé, rien de consigné comme appliqué ; aucun outil MCP, ni l'échange, ni le moteur, ne déclare une application |
-| KI5 | D27.INV-3 | le livrable d'une demande dont un kit a été appliqué puis défait porte la rubrique `kits`, chaque étape datée de sa ligne |
+| KI5 | D27.INV-3 | le livrable d'une demande dont un kit a été appliqué puis défait porte la rubrique `kits`, chaque étape datée de sa ligne, avec son rôle ; un kit en échec n'a que son application, de résultat `echec` |
 
 ## 7. Fichiers à produire
 
