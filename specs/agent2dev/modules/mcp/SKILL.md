@@ -46,9 +46,10 @@ Le contenu du projet (extraits de code, demande, US, critères, scénarios, sort
 | `a2d_repondre_refus` | relaie la réponse explicite du développeur ou du référent à un refus : déroger ou faux refus, avec son motif (module `acceptable`, section 4) |
 | `a2d_journal_de_tests` | donne le chemin du journal de tests d'Agent2Test, ou déclare la demande sans binôme (module `binome`, section 2) |
 | `a2d_suspendre`, `a2d_reprendre` | arrêt d'urgence ; reprise, décision humaine relayée |
-| `a2d_etat`, `a2d_journal`, `a2d_livrable`, `a2d_patchs` | lecture seule ; `a2d_patchs` liste les patchs remis, leur état et la commande `git am -3` |
+| `a2d_etat`, `a2d_journal`, `a2d_livrable`, `a2d_patchs` | lecture seule ; `a2d_patchs` liste les patchs remis, leur kit, leur état et la commande `git am -3` |
 
 - Une décision CP-4 reçue par `a2d_decider` est refusée `CP4_HORS_TABLEAU_DE_BORD` (D18.INV-2). L'arrêt d'urgence reste permis : il va dans le sens sûr.
+- Aucun outil ne déclare l'application d'un kit dev ni son retour arrière : seul le développeur les déclare, depuis le tableau de bord (D27.INV-2).
 - `a2d_soumettre` passe la sortie au validateur du noyau ; en cas d'écart, la réponse liste les écarts, et la boucle reprend dans le budget `budget.tentativesSortie`. Au-delà, le pas s'arrête et l'attente « budget épuisé » s'ouvre (module `orchestrateur`, section 3).
 
 ## 4. Transports (D18.INV-1, D18.INV-2)

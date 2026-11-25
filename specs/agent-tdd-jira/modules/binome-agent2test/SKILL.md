@@ -7,7 +7,7 @@ status: active
 
 # Module `binome-agent2test` (D7)
 
-Agent2Test (spécification `agent2test` 1.5.1) est la tête de test du binôme. Dans un projet séparé de l'application, il choisit les scénarios essentiels de la demande, les joue avec Playwright sur l'application lancée, et rend un verdict prouvé par critère d'acceptation. La tête de développement est cet agent, ou Agent2Dev quand il applique ce skill. Le développeur fait le lien : il lance l'application, conduit Agent2Test et transmet son journal. Tout se fait en local et à la main : aucune des deux têtes n'appelle l'autre.
+Agent2Test (spécification `agent2test` 1.6.0) est la tête de test du binôme. Dans un projet séparé de l'application, il choisit les scénarios essentiels de la demande, les joue avec Playwright sur l'application lancée, et rend un verdict prouvé par critère d'acceptation. La tête de développement est cet agent, ou Agent2Dev quand il applique ce skill. Le développeur fait le lien : il lance l'application, conduit Agent2Test et transmet son journal. Tout se fait en local et à la main : aucune des deux têtes n'appelle l'autre.
 
 ## 1. Rôles
 
@@ -54,7 +54,8 @@ Elles s'ajoutent à celles du module `analyse-demande` (section 5). Une étiquet
 |---|---|---|
 | `@role-<nom>` | le scénario exige un rôle de l'application, nommé comme elle le nomme (`@role-LECTEUR`) ; sur la fonctionnalité quand le Contexte l'exige pour tous les scénarios | joué seulement si la session déclare ce rôle ; sinon non jouable, motif « rôle <nom> absent de la session » |
 | `@batch-<nom>` | le scénario exige qu'un batch Java ait tourné avant lui | le développeur lance le batch et le déclare terminé en CP-5, puis le scénario est joué |
-| `@redemarrage`, `@ecriture-base` | le scénario exige un redémarrage de l'application, ou une écriture directe en base | non automatisable, jamais joué : ses critères restent « non vérifiés » |
+| `@redemarrage` | le scénario exige un redémarrage de l'application | non automatisable, jamais joué : ses critères restent « non vérifiés » |
+| `@ecriture-base` | le scénario exige une écriture directe en base | prérequis de données : joué seulement après l'application, déclarée, du kit test de la campagne, validé en CP-2 ; sinon non automatisable, et ses critères restent « non vérifiés » |
 | `@criticite-haute`, `@criticite-moyenne`, `@criticite-basse` | criticité fixée par le développeur ; moyenne sans étiquette | pèse dans la non-régression des campagnes suivantes |
 | `@socle` | parcours essentiel de l'application, décidé par le développeur | rejoué à chaque campagne (palier P3) |
 

@@ -46,7 +46,7 @@ Les modifications non commitées de l'arbre de la demande ne sont pas dans la co
 
 En mode parallèle, la copie est clonée depuis le worktree de la demande. C'est un dépôt à part, dans les données d'Agent2Dev, et non un worktree du projet : `git worktree` reste interdit (`agent-tdd-jira:D9.INV-2`), et, dans le dépôt du projet, Agent2Dev n'écrit que dans le worktree de sa demande, sous `travail/` (`agent-tdd-jira:D9.INV-1`).
 
-**Patchs.** Chaque commit de la copie (section 7) devient un patch : `git format-patch -1 --stdout <commit>`, rangé dans `<dossier de travail>/patchs/<nnn>-<objet>.patch`, où `nnn` est son rang de remise (`001`, `002`…) et `objet` vaut `Snn`, `Snn-correction` ou `demande` pour un commit hors scénario. Le développeur les applique lui-même, dans l'ordre, dans l'arbre de la demande :
+**Patchs.** Chaque commit de la copie (section 7) devient un patch, et le patch d'un scénario, confronté au noyau, son kit dev (module `kit`) : `git format-patch -1 --stdout <commit>`, rangé dans `<dossier de travail>/patchs/<nnn>-<objet>.patch`, où `nnn` est son rang de remise (`001`, `002`…) et `objet` vaut `Snn`, `Snn-correction` ou `demande` pour un commit hors scénario. Le développeur les applique lui-même, dans l'ordre, dans l'arbre de la demande :
 
 ```bash
 git am -3 ~/.agent2dev/sortie/ECR-77/patchs/*.patch

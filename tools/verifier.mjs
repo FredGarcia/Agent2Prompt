@@ -33,7 +33,12 @@
  *   expressions régulières valides, et des règles qui sont des invariants du socle ;
  * - une constitution d'exemple qui épingle ce noyau (champ `acceptable`) le fait à la version que la
  *   spécification inclut, avec l'empreinte de son bloc `noyau` en JSON canonique, et reprend chacune de ses
- *   entrées à l'identique, aucune marquée `derogeable` (`socle-acceptable:SA7.INV-1`).
+ *   entrées à l'identique, aucune marquée `derogeable` (`socle-acceptable:SA7.INV-1`) ;
+ * - un manifeste de kit d'exemple suit le schéma fermé `socle-acceptable.kit/1` : système du dépôt, à sa
+ *   version courante s'il s'agit de la spécification elle-même, environnement dev, test ou demo, patch au
+ *   chemin relatif et à l'empreinte hexadécimale, noyau confronté à la version du socle qu'inclut le système
+ *   producteur, avec l'empreinte de son bloc `noyau`, confrontation en entiers, retour arrière préparé
+ *   (`socle-acceptable:SA8.INV-1`, `socle-acceptable:SA2.INV-3`).
  *
  * Pour le dépôt :
  *
@@ -117,6 +122,17 @@ const LISTES_DU_NOYAU = {
   leconsInterdites: 'motif',
 };
 const estObjet = (valeur) => valeur !== null && typeof valeur === 'object' && !Array.isArray(valeur);
+// Manifeste de kit du socle de l'acceptable (section 11.2) : clés de chaque niveau, toutes requises, aucune autre.
+const SCHEMA_KIT = 'socle-acceptable.kit/1';
+const CLES_DU_KIT = {
+  '': ['format', 'systeme', 'environnement', 'patch', 'noyau', 'confrontation', 'retourArriere'],
+  systeme: ['nom', 'version'],
+  patch: ['chemin', 'empreinte'],
+  noyau: ['version', 'empreinte'],
+  confrontation: ['fichiers', 'commandes'],
+  retourArriere: ['prepare', 'verifie'],
+};
+const ENVIRONNEMENTS_DE_KIT = ['dev', 'test', 'demo'];
 
 const blocsJson = (texte) => [...texte.matchAll(/^```json\n([\s\S]*?)\n```$/gm)].map((m) => m[1]);
 // JSON canonique : clés triées, sans espace ; c'est la forme que hache l'empreinte d'un bloc `noyau`.
@@ -182,6 +198,13 @@ function verifierNoyau(texte, definisLocaux, erreur) {
       }
     });
   }
+}
+
+/** Le bloc `noyau` du socle de l'acceptable, à la version qu'inclut une spécification, et son empreinte en JSON canonique. */
+function noyauInclus(partage, nom) {
+  const bloc = blocsJson(lire(sourcePartagee(partage, nom))).find((b) => b.includes(`"${SCHEMA_NOYAU}"`));
+  const noyau = JSON.parse(bloc);
+  return { noyau, empreinte: createHash('sha256').update(canonique(noyau)).digest('hex') };
 }
 
 function definitions(texte) {
@@ -277,14 +300,13 @@ function verifierEpinglages(manifeste, textes, erreur) {
     return;
   }
   let noyau;
+  let empreinte;
   try {
-    const bloc = blocsJson(lire(sourcePartagee(partage, manifeste.name))).find((b) => b.includes(`"${SCHEMA_NOYAU}"`));
-    noyau = JSON.parse(bloc);
+    ({ noyau, empreinte } = noyauInclus(partage, manifeste.name));
   } catch {
     erreur(`bloc noyau de ${SOCLE_ACCEPTABLE} ${partage.version} illisible`);
     return;
   }
-  const empreinte = createHash('sha256').update(canonique(noyau)).digest('hex');
   for (const constitution of epinglages) {
     const { version, empreinte: epinglee } = constitution.acceptable;
     if (version !== partage.version) erreur(`constitution : acceptable.version ${version}, la spécification inclut ${SOCLE_ACCEPTABLE} ${partage.version}`);
@@ -295,6 +317,102 @@ function verifierEpinglages(manifeste, textes, erreur) {
       const reprises = new Set((Array.isArray(listeDe(nom)) ? listeDe(nom) : []).map(canonique));
       for (const entree of noyau[nom] ?? []) {
         if (!reprises.has(canonique(entree))) erreur(`constitution : ${nom}, l'entrée du noyau ${entree[cle]} n'est pas reprise à l'identique`);
+      }
+    }
+  }
+}
+
+/**
+ * Manifestes de kit d'exemple (`socle-acceptable.kit/1`, section 11.2 du socle de l'acceptable) : schéma fermé ;
+ * système du dépôt, à sa version courante si c'est la spécification elle-même ; environnement dev, test ou demo ;
+ * patch au chemin relatif et à l'empreinte hexadécimale ; noyau confronté à la version du socle qu'inclut le
+ * système producteur, avec l'empreinte de son bloc `noyau` (`socle-acceptable:SA8.INV-1`) ; confrontation en
+ * entiers positifs ou nuls ; retour arrière préparé (`socle-acceptable:SA2.INV-3`).
+ */
+function verifierKits(manifeste, textes, erreur) {
+  for (const texte of textes) {
+    for (const bloc of blocsJson(texte).filter((b) => b.includes(`"${SCHEMA_KIT}"`))) {
+      let kit;
+      try {
+        kit = JSON.parse(bloc);
+      } catch (e) {
+        erreur(`manifeste de kit : JSON illisible (${e.message})`);
+        continue;
+      }
+      if (!estObjet(kit) || kit.format !== SCHEMA_KIT) {
+        erreur(`manifeste de kit : format ${kit?.format}, ${SCHEMA_KIT} attendu`);
+        continue;
+      }
+      const nom = typeof kit.systeme?.nom === 'string' ? kit.systeme.nom : '?';
+      const signaler = (message) => erreur(`manifeste de kit ${nom} : ${message}`);
+      // Schéma fermé, niveau par niveau ; un niveau absent ou qui n'est pas un objet n'est pas vérifié plus avant.
+      const lisibles = new Set();
+      for (const [niveau, cles] of Object.entries(CLES_DU_KIT)) {
+        const objet = niveau === '' ? kit : kit[niveau];
+        if (niveau !== '' && !Object.hasOwn(kit, niveau)) continue;
+        if (!estObjet(objet)) {
+          signaler(`${niveau}, un objet attendu`);
+          continue;
+        }
+        lisibles.add(niveau);
+        const prefixe = niveau === '' ? 'clé ' : `${niveau}.`;
+        for (const cle of Object.keys(objet)) if (!cles.includes(cle)) signaler(`${prefixe}${cle}, hors du schéma ${SCHEMA_KIT}`);
+        for (const cle of cles) if (!Object.hasOwn(objet, cle)) signaler(`${prefixe}${cle} absent`);
+      }
+      if (lisibles.has('systeme')) {
+        const { version } = kit.systeme;
+        if (!existsSync(join(dossierSpecs, nom, 'manifest.json'))) signaler(`systeme.nom ${nom}, qui n'est pas une spécification du dépôt`);
+        if (typeof version !== 'string' || !/^\d+\.\d+\.\d+$/.test(version)) signaler(`systeme.version ${version}, une version X.Y.Z attendue`);
+        else if (nom === manifeste.name && version !== manifeste.version) signaler(`systeme.version ${version}, la spécification est en version ${manifeste.version}`);
+      }
+      if (Object.hasOwn(kit, 'environnement') && !ENVIRONNEMENTS_DE_KIT.includes(kit.environnement)) {
+        signaler(`environnement ${kit.environnement}, ${ENVIRONNEMENTS_DE_KIT.join(', ')} attendu`);
+      }
+      if (lisibles.has('patch')) {
+        const { chemin, empreinte } = kit.patch;
+        if (typeof chemin !== 'string' || chemin === '') signaler('patch.chemin absent ou vide');
+        else if (/^([/\\]|[A-Za-z]:)/.test(chemin)) signaler(`patch.chemin ${chemin}, un chemin relatif au manifeste attendu`);
+        if (typeof empreinte !== 'string' || !/^[0-9a-f]{64}$/.test(empreinte)) signaler('patch.empreinte, 64 caractères hexadécimaux en minuscules attendus');
+      }
+      if (lisibles.has('confrontation')) {
+        for (const cle of CLES_DU_KIT.confrontation) {
+          const n = kit.confrontation[cle];
+          if (Object.hasOwn(kit.confrontation, cle) && !(Number.isInteger(n) && n >= 0)) signaler(`confrontation.${cle} ${n}, un entier positif ou nul attendu`);
+        }
+      }
+      if (lisibles.has('retourArriere')) {
+        const { prepare, verifie } = kit.retourArriere;
+        if (Object.hasOwn(kit.retourArriere, 'prepare') && prepare !== true) signaler('retourArriere.prepare vaut true : un kit porte son retour arrière (socle-acceptable:SA2.INV-3)');
+        if (Object.hasOwn(kit.retourArriere, 'verifie') && typeof verifie !== 'boolean') signaler(`retourArriere.verifie ${verifie}, true ou false attendu`);
+      }
+      // Le noyau confronté : la version du socle qu'inclut le système producteur, l'empreinte de son bloc `noyau`.
+      if (lisibles.has('noyau') && lisibles.has('systeme') && existsSync(join(dossierSpecs, nom, 'manifest.json'))) {
+        let partage;
+        try {
+          const producteur = JSON.parse(lire(join(dossierSpecs, nom, 'manifest.json')));
+          partage = (producteur.shared ?? []).find((p) => p.from === `specs/${SOCLE_ACCEPTABLE}/SKILL.md`);
+        } catch {
+          partage = undefined;
+        }
+        if (!partage) {
+          signaler(`${nom} n'inclut pas ${SOCLE_ACCEPTABLE} (shared) : aucun noyau à confronter`);
+          continue;
+        }
+        const { version, empreinte } = kit.noyau;
+        if (version !== partage.version) {
+          signaler(`noyau.version ${version}, ${nom} inclut ${SOCLE_ACCEPTABLE} ${partage.version}`);
+          continue;
+        }
+        let attendue;
+        try {
+          attendue = noyauInclus(partage, nom).empreinte;
+        } catch {
+          signaler(`bloc noyau de ${SOCLE_ACCEPTABLE} ${partage.version} illisible`);
+          continue;
+        }
+        if (empreinte !== attendue) {
+          signaler(`noyau.empreinte ${String(empreinte).slice(0, 12)}…, le bloc noyau de ${SOCLE_ACCEPTABLE} ${version} a l'empreinte ${attendue.slice(0, 12)}…`);
+        }
       }
     }
   }
@@ -422,6 +540,7 @@ function verifierSpec(dossier) {
   const definisLocaux = definitions(texteEntree);
   if (manifeste.name === SOCLE_ACCEPTABLE) verifierNoyau(texteEntree, definisLocaux, erreur);
   verifierEpinglages(manifeste, [texteEntree, ...textesModules], erreur);
+  verifierKits(manifeste, [texteEntree, ...textesModules], erreur);
   if (textesModules.length > 0) {
     const corpusModules = textesModules.join('\n');
     for (const id of definisLocaux) {

@@ -97,8 +97,8 @@ Le résultat est une liste d'écarts `{ chemin, regle, message }`. Une liste non
 
 ```json
 {
-  "version": "2.0.0",
-  "methode": { "skill": "agent-tdd-jira", "version": "1.3.7" },
+  "version": "2.1.0",
+  "methode": { "skill": "agent-tdd-jira", "version": "1.3.8" },
   "invariants": ["D1.INV-1", "D1.INV-2"],
   "points": ["V0", "V1", "V2", "V3", "V4", "V5", "CP-4"],
   "reglesModifiables": [
@@ -106,7 +106,7 @@ Le résultat est une liste d'écarts `{ chemin, regle, message }`. Une liste non
     { "regle": "budget.tentativesPas", "bornes": { "min": 1, "max": 5 } }
   ],
   "metaCriteres": { "fenetre": 10, "expositionMin": 3, "marge": 15 },
-  "acceptable": { "socle": "socle-acceptable", "version": "1.0.1", "empreinte": "e815cadf230886d507d56dbbfb5d7cfd0cf3982036d54d0279b70cc8f49b4764" },
+  "acceptable": { "socle": "socle-acceptable", "version": "1.1.0", "empreinte": "e815cadf230886d507d56dbbfb5d7cfd0cf3982036d54d0279b70cc8f49b4764" },
   "intentionsRefusees": [
     { "intention": "deployer", "horsKit": true, "regle": "SA1.INV-1" },
     { "intention": "administrer", "horsKit": true, "regle": "SA1.INV-1" },
@@ -182,7 +182,7 @@ Garde d'écriture des fichiers d'Agent2Dev : le noyau expose `ecriture.autoriser
 
 - pour le seul `donnees`, l'agent médiateur, le fichier de données de l'instance (module `donnees`) ;
 - pour le seul `journal`, le livrable, dans le dossier de sortie de la demande ;
-- pour le seul `depot`, le dossier de travail de la demande (scripts extraits, `demande.json` et ses compléments, `impact.txt`, journaux de tests relevés par l'échange, patchs, rapport, projet de commentaire), le dossier des copies de travail et la boîte de sortie de l'échange (module `echange`) ;
+- pour le seul `depot`, le dossier de travail de la demande (scripts extraits, `demande.json` et ses compléments, `impact.txt`, journaux de tests relevés par l'échange, patchs et manifestes de leurs kits, rapport, projet de commentaire), le dossier des copies de travail et la boîte de sortie de l'échange (module `echange`) ;
 - pour le seul `profil`, la création d'une version nouvelle de profil ratifié, à la décision V0 ; un profil ratifié n'est jamais réécrit.
 
 Les autres agents rédigent ou calculent ces contenus, et les remettent au `depot` par le bus.

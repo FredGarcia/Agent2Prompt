@@ -43,6 +43,7 @@ Sans cette autorisation, `a2t_tache_suivante` ne rend aucune tâche de rédactio
 | `a2t_etat`, `a2t_journal`, `a2t_rapport`, `a2t_carte` | lecture seule ; `a2t_etat` rend aussi les remises reçues et leur état |
 
 - Une décision CP-4 reçue par `a2t_decider` est refusée `CP4_HORS_TABLEAU_DE_BORD` (D16.INV-2). L'arrêt d'urgence reste permis aux rôles humains : il va dans le sens sûr.
+- Aucun outil ne déclare l'application d'un kit test ni son nettoyage : seuls le testeur et le développeur les déclarent, depuis le tableau de bord (D27.INV-2).
 - `a2t_soumettre` passe la sortie au validateur du noyau ; en cas d'écart, la réponse liste les écarts, et la boucle reprend dans le budget de 3 renvois.
 
 ## 4. Transports (D16.INV-1)

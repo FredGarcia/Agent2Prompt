@@ -43,7 +43,7 @@ Après validation, implémente dans cet ordre. Chaque lot passe ses tests, en si
 1. Noyau et acceptable partagé : `noyau`, `acceptable` (D1, D26) ; le contrôle des leçons s'achève avec l'`apprenant`, au lot 6, et les réponses aux refus avec les interfaces, au lot 7.
 2. Données, journal et référentiel : `donnees`, `journal`, `referentiel` (D23, D10, D15).
 3. Plan, mémoire et cartographie : `plan`, `memoire`, `scanner` (D3, D12, D5).
-4. Exécution : `navigateur`, `preparateur`, `verdict`, `orchestrateur` (D4, D7, D8, D9).
+4. Exécution et kit test : `navigateur`, `preparateur`, `kit`, `verdict`, `orchestrateur` (D4, D7, D27, D8, D9) ; les déclarations des kits s'achèvent avec les interfaces, au lot 7.
 5. Sélection : `stratege` (D6).
 6. Premier et second ordre : `observateur`, `apprenant`, `reflexif` (D11, D13, D14).
 7. Interfaces et échange : `mcp`, `tableau-de-bord`, `echange` (D16, D17, D24).
@@ -56,6 +56,7 @@ Vérifie les critères d'acceptation globaux de `SKILL.md`, section 9, puis rend
 ## Règles qui ne se négocient pas
 
 - L'application testée n'est jamais modifiée : ses sources sont lues, jamais écrites. Agent2Test ne la démarre, ne l'arrête ni ne la déploie, et ne lance aucun batch.
+- Agent2Test n'écrit jamais en base et n'applique aucun kit : la fabrication de l'hôte applique le kit test validé en CP-2, et seuls le testeur et le développeur déclarent son application ou son nettoyage.
 - Agent2Test ne rédige ni ne corrige aucune US, aucun critère, aucun scénario.
 - Aucun identifiant SSO n'est détenu, saisi ni journalisé.
 - Le moteur ne produit que des données validées ; aucun code produit par le moteur n'est exécuté ni injecté dans une page.

@@ -4,8 +4,8 @@
  * Le vérificateur se lance, comme en CI, sur une copie du dépôt, dans un dossier temporaire hors de Git :
  * il y lit le disque à la place de `git ls-files`. Chaque test altère des fichiers de la copie, lance le
  * vérificateur, attend les erreurs nommées, puis rend les fichiers. La recette porte sur le préfixe `SA` du
- * socle de l'acceptable, sur son bloc `noyau` et sur les constitutions qui l'épinglent ; elle tourne dans
- * `.github/workflows/verifier.yml`.
+ * socle de l'acceptable, sur son bloc `noyau`, sur les constitutions qui l'épinglent et sur les manifestes de
+ * kit `socle-acceptable.kit/1` ; elle tourne dans `.github/workflows/verifier.yml`.
  */
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
@@ -71,7 +71,7 @@ test('la copie du dépôt passe le vérificateur, et le socle de l’acceptable 
 test('SA : un invariant cité sans être défini est signalé, préfixé ou non, et le glossaire suit ses énoncés', () => {
   const resultat = alterer({
     [SOCLE]: remplacer(
-      ['## 14. Journal de révision\n', '## 14. Journal de révision\n\nVoir SA9.INV-1.\n'],
+      ['## 15. Journal de révision\n', '## 15. Journal de révision\n\nVoir SA9.INV-1.\n'],
       ['- **SA4.INV-1** : aucun secret,', '- **SA4.INV-1** : jamais aucun secret,'],
     ),
     'specs/agent2dev/SKILL.md': remplacer(['# Agent2Dev', '# Agent2Dev\n\nSelon socle-acceptable:SA1.INV-9.']),
@@ -116,13 +116,13 @@ test('constitutions qui épinglent le noyau : version incluse, empreinte du bloc
       ['{ "programme": "docker", "horsKit": true, "regle": "SA2.INV-1" }', '{ "programme": "docker", "horsKit": true, "regle": "SA2.INV-1", "derogeable": true }'],
     ),
     'specs/agent2test/modules/noyau/SKILL.md': remplacer(['    { "intention": "administrer", "horsKit": true, "regle": "SA1.INV-1" },\n', '']),
-    'specs/agent2test/modules/acceptable/SKILL.md': remplacer([`"version": "1.0.1", ${EMPREINTE}`, `"version": "1.0.0", ${EMPREINTE}`]),
+    'specs/agent2test/modules/acceptable/SKILL.md': remplacer([`"version": "1.1.0", ${EMPREINTE}`, `"version": "1.0.0", ${EMPREINTE}`]),
   });
   attendreErreurs(resultat, [
-    'agent2dev : constitution : acceptable.empreinte 000000000000…, le bloc noyau de socle-acceptable 1.0.1 a l\'empreinte e815cadf2308…',
+    'agent2dev : constitution : acceptable.empreinte 000000000000…, le bloc noyau de socle-acceptable 1.1.0 a l\'empreinte e815cadf2308…',
     'agent2dev : constitution : programmesInterdits, l\'entrée du noyau docker n\'est pas reprise à l\'identique',
     'agent2test : constitution : intentionsRefusees, l\'entrée du noyau administrer n\'est pas reprise à l\'identique',
-    'agent2test : constitution : acceptable.version 1.0.0, la spécification inclut socle-acceptable 1.0.1',
+    'agent2test : constitution : acceptable.version 1.0.0, la spécification inclut socle-acceptable 1.1.0',
   ]);
 });
 
@@ -133,4 +133,49 @@ test('bloc noyau : un seul, en JSON lisible', () => {
   attendreErreurs(alterer({ [SOCLE]: remplacer(['"schema": "socle-acceptable.noyau/1",', '"schema": "socle-acceptable.noyau/2",']) }), [
     'socle-acceptable : bloc noyau : 0 blocs JSON au schéma socle-acceptable.noyau/1, un seul attendu',
   ]);
+});
+
+test('manifestes de kit : schéma fermé, système et environnement, patch, noyau confronté à la version incluse, retour arrière préparé', () => {
+  const NOYAU = '"noyau": { "version": "1.1.0", "empreinte": "e815cadf230886d507d56dbbfb5d7cfd0cf3982036d54d0279b70cc8f49b4764" },';
+  const resultat = alterer({
+    'specs/agent2dev/modules/kit/SKILL.md': remplacer(
+      ['  "environnement": "dev",\n', '  "environnement": "production",\n'],
+      ['"chemin": "../patchs/002-S02.patch", "empreinte": "54b440c3', '"chemin": "../patchs/002-S02.patch", "empreinte": "54B440C3'],
+      ['"confrontation": { "fichiers": 3, "commandes": 0 }', '"confrontation": { "fichiers": 3, "commandes": -1 }'],
+      ['"retourArriere": { "prepare": true, "verifie": false }', '"retourArriere": { "prepare": false, "verifie": "non" }'],
+    ),
+    'specs/agent2test/modules/kit/SKILL.md': remplacer(
+      ['"systeme": { "nom": "agent2test", "version": "1.6.0" },', '"systeme": { "nom": "agent2test", "version": "1.5.1" },\n  "application": "manuelle",'],
+      [NOYAU, NOYAU.replace('1.1.0', '1.0.1')],
+    ),
+    [SOCLE]: remplacer(
+      ['"patch": { "chemin": "../patchs/002-S02.patch",', '"patch": { "chemin": "/tmp/002-S02.patch",'],
+      [NOYAU, `"noyau": { "version": "1.1.0", "empreinte": "${'0'.repeat(64)}" },`],
+      ['  "confrontation": { "fichiers": 3, "commandes": 0 },\n', ''],
+    ),
+  });
+  attendreErreurs(resultat, [
+    'agent2dev : manifeste de kit agent2dev : environnement production, dev, test, demo attendu',
+    'agent2dev : manifeste de kit agent2dev : patch.empreinte, 64 caractères hexadécimaux en minuscules attendus',
+    'agent2dev : manifeste de kit agent2dev : confrontation.commandes -1, un entier positif ou nul attendu',
+    'agent2dev : manifeste de kit agent2dev : retourArriere.prepare vaut true : un kit porte son retour arrière (socle-acceptable:SA2.INV-3)',
+    'agent2dev : manifeste de kit agent2dev : retourArriere.verifie non, true ou false attendu',
+    'agent2test : manifeste de kit agent2test : clé application, hors du schéma socle-acceptable.kit/1',
+    'agent2test : manifeste de kit agent2test : systeme.version 1.5.1, la spécification est en version 1.6.0',
+    'agent2test : manifeste de kit agent2test : noyau.version 1.0.1, agent2test inclut socle-acceptable 1.1.0',
+    'socle-acceptable : manifeste de kit agent2dev : patch.chemin /tmp/002-S02.patch, un chemin relatif au manifeste attendu',
+    'socle-acceptable : manifeste de kit agent2dev : noyau.empreinte 000000000000…, le bloc noyau de socle-acceptable 1.1.0 a l\'empreinte e815cadf2308…',
+    'socle-acceptable : manifeste de kit agent2dev : clé confrontation absent',
+  ]);
+});
+
+test('manifestes de kit : un système hors du dépôt, ou qui n’inclut pas le socle de l’acceptable', () => {
+  attendreErreurs(
+    alterer({ [SOCLE]: remplacer(['"systeme": { "nom": "agent2dev", "version": "1.4.0" },', '"systeme": { "nom": "agent2prod", "version": "1.4" },']) }),
+    ["socle-acceptable : manifeste de kit agent2prod : systeme.nom agent2prod, qui n'est pas une spécification du dépôt", 'socle-acceptable : manifeste de kit agent2prod : systeme.version 1.4, une version X.Y.Z attendue'],
+  );
+  attendreErreurs(
+    alterer({ [SOCLE]: remplacer(['"systeme": { "nom": "agent2dev", "version": "1.4.0" },', '"systeme": { "nom": "java", "version": "1.1.1" },']) }),
+    ["socle-acceptable : manifeste de kit java : java n'inclut pas socle-acceptable (shared) : aucun noyau à confronter"],
+  );
 });

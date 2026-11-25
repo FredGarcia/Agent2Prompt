@@ -1,14 +1,14 @@
 ---
 name: agent2dev
 description: Construire Agent2Dev, système multi-agents de développement qui applique le skill agent-tdd-jira comme méthode. D'une demande Jira exportée en MHTML, il tire les US et leurs critères d'acceptation, les scénarios Gherkin, les variantes, puis réalise chaque scénario en cycle TDD et trace la demande jusqu'aux commits, en binôme avec Agent2Test. Le moteur rédige, des agents déterministes écrivent et exécutent, le développeur valide à chaque point ; un journal chaîné et un apprentissage sous gouvernance en font un système de second ordre. Exécution locale, données dans un fichier SQLite unique, ouvert par un agent médiateur ; la remise et le journal de tests circulent à la main, ou par un échange par dossiers facultatif.
-version: 1.3.1
+version: 1.4.0
 ---
 
-# Agent2Dev, spécification 1.3.1
+# Agent2Dev, spécification 1.4.0
 
 Ce document est le point d'entrée du package. Il donne le principe, la carte du système, les points de validation, le registre des dimensions, les règles communes et les invariants. Les détails techniques sont dans `modules/`. Le fichier `manifest.json` déclare quels modules sont actifs.
 
-La spécification reprend la conception d'Agent2Dev de l'étape 1 (cadrage et architecture, version 0.3.0 ratifiée le 4 octobre 2026) et sa lignée `agents-modif`, adaptées aux décisions du 21 octobre 2026 : le skill agent-tdd-jira devient la méthode d'Agent2Dev, tout reste local et s'enchaîne à la main, le développeur lance lui-même l'application. La section 11 en donne la filiation. Depuis la version 1.1.0, les données tiennent dans un fichier SQLite unique, dont l'agent médiateur `donnees` tient la seule connexion, et la remise et le journal de tests circulent à la main, ou par un échange par dossiers facultatif, sans n8n (section 12). Depuis la version 1.3.0, la dimension D26 applique l'acceptable partagé : la constitution épingle le noyau du socle de l'acceptable, inclus dans la spécification, chaque refus cite sa règle, et l'humain y répond par une dérogation, quand l'entrée l'admet, ou par un faux refus.
+La spécification reprend la conception d'Agent2Dev de l'étape 1 (cadrage et architecture, version 0.3.0 ratifiée le 4 octobre 2026) et sa lignée `agents-modif`, adaptées aux décisions du 21 octobre 2026 : le skill agent-tdd-jira devient la méthode d'Agent2Dev, tout reste local et s'enchaîne à la main, le développeur lance lui-même l'application. La section 11 en donne la filiation. Depuis la version 1.1.0, les données tiennent dans un fichier SQLite unique, dont l'agent médiateur `donnees` tient la seule connexion, et la remise et le journal de tests circulent à la main, ou par un échange par dossiers facultatif, sans n8n (section 12). Depuis la version 1.3.0, la dimension D26 applique l'acceptable partagé : la constitution épingle le noyau du socle de l'acceptable, inclus dans la spécification, chaque refus cite sa règle, et l'humain y répond par une dérogation, quand l'entrée l'admet, ou par un faux refus. Depuis la version 1.4.0, la dimension D27 remet le kit dev : le patch d'un scénario, confronté au noyau avant V4, avec son manifeste, que la fabrication de l'hôte applique sur l'environnement dev après sa validation.
 
 ## 1. Ordre de lecture
 
@@ -34,9 +34,10 @@ La spécification reprend la conception d'Agent2Dev de l'étape 1 (cadrage et ar
    16. `observateur` : mesures et alertes.
    17. `apprenant`, `reflexif` : leçons candidates, mesures de second ordre.
    18. `acceptable` : noyau du socle de l'acceptable épinglé, refus, réponses de l'humain.
-   19. `mcp` : moteurs et serveur MCP.
-   20. `tableau-de-bord` : IHM par rôle.
-   21. `exploitation` : installation et lancement sur le poste.
+   19. `kit` : kit dev, manifeste, validation en V4, application déclarée.
+   20. `mcp` : moteurs et serveur MCP.
+   21. `tableau-de-bord` : IHM par rôle.
+   22. `exploitation` : installation et lancement sur le poste.
 5. `modules/memoire/SKILL.md` et `modules/autonomie/SKILL.md` : seulement pour comprendre les points d'extension E3 et E4. Ne pas les implémenter en 1.x.
 
 ## 2. Mode de travail pour l'IA qui produit le code
@@ -48,7 +49,7 @@ La spécification reprend la conception d'Agent2Dev de l'étape 1 (cadrage et ar
 5. Les identifiants de code sont sans accents. Les commentaires, les textes de l'IHM, les messages et les journaux sont en français.
 6. Chaque test cite l'invariant ou le scénario qu'il vérifie, par exemple `// D9.INV-2, RE3`. Un invariant sans test n'est pas implémenté.
 7. N'implémentez aucun module au statut `reserved` dans `manifest.json`, sauf les tests d'inertie de ses points d'extension.
-8. La méthode n'est pas recopiée dans le code : Agent2Dev la lit dans la transmission du skill agent-tdd-jira 1.3.7 (module `methode`). Ce que dit le skill, le code ne le redit pas.
+8. La méthode n'est pas recopiée dans le code : Agent2Dev la lit dans la transmission du skill agent-tdd-jira 1.3.8 (module `methode`). Ce que dit le skill, le code ne le redit pas.
 
 ## 3. Objectif et principe
 
@@ -56,10 +57,10 @@ Pour une demande Jira, Agent2Dev applique la méthode du skill agent-tdd-jira : 
 
 **Le skill fixe la méthode, le moteur rédige, les agents déterministes agissent, le développeur valide.**
 
-- Le skill agent-tdd-jira 1.3.7 est lu depuis sa transmission, vérifiée par sa table d'intégrité. Agent2Dev ne le réécrit jamais : les consignes de ses fiches en citent les sections telles quelles.
+- Le skill agent-tdd-jira 1.3.8 est lu depuis sa transmission, vérifiée par sa table d'intégrité. Agent2Dev ne le réécrit jamais : les consignes de ses fiches en citent les sections telles quelles.
 - Le moteur (Gemini Code Assist par défaut, tout LLM par le port moteur) ne produit que des données : le contenu de `us.md` et du fichier Gherkin, la fiche d'impact, les variantes, les modifications de tests et de code, le rapport et le projet de commentaire Jira. Chaque sortie est validée contre un schéma fermé et des contrôles nommés. Le moteur n'écrit aucun fichier et n'exécute rien.
 - Trois agents déterministes agissent, chacun seul dans son domaine : `depot` écrit et tient git dans l'arbre de travail de la demande, `executant` y exécute les commandes du profil ratifié et les scripts du skill, `methode` fournit le skill. Un quatrième, l'agent médiateur `donnees`, est le seul à ouvrir le fichier de données d'Agent2Dev : les autres agents n'y accèdent que par ses actions, sur le bus.
-- L'écriture du code se règle dans la configuration humaine. Sans autorisation, ce qui est le défaut, l'arbre de travail est une copie de travail du dépôt, dans les données d'Agent2Dev : il y écrit, y teste, et remet au développeur un patch par scénario accepté, que celui-ci applique lui-même. Avec l'autorisation, l'arbre de travail est l'arbre de la demande : la branche du développeur, ou le worktree du kit en mode parallèle.
+- L'écriture du code se règle dans la configuration humaine. Sans autorisation, ce qui est le défaut, l'arbre de travail est une copie de travail du dépôt, dans les données d'Agent2Dev : il y écrit, y teste, et remet au développeur un patch par scénario accepté, que celui-ci applique lui-même ; ce patch, confronté au noyau, est aussi le kit dev du scénario, que la fabrication de l'hôte applique sur l'environnement dev (D27). Avec l'autorisation, l'arbre de travail est l'arbre de la demande : la branche du développeur, ou le worktree du kit en mode parallèle.
 - Le développeur valide aux points V0 à V5 (section 5). Rien ne passe un point sans sa réponse explicite.
 - Ce qu'Agent2Dev refuse vient de sa constitution, qui reprend le noyau du socle de l'acceptable : chaque refus cite sa règle, aucune règle du noyau ne se déroge, et l'humain peut déclarer un refus infondé sans que l'action s'exécute (D26).
 - Agent2Test juge l'acceptation, dans son propre projet, sur une campagne que le développeur ouvre à la main. Agent2Dev ne se note pas lui-même : il lit le journal de tests avec le script du skill.
@@ -73,7 +74,7 @@ Chaîne de traçabilité, celle du skill :
 flowchart TB
   DEV(["Développeur · Référent"])
   GEM{{"Moteur : Gemini Code Assist,<br/>modèle local ou simulation"}}
-  SK[["skill agent-tdd-jira 1.3.7<br/>transmission vérifiée"]]
+  SK[["skill agent-tdd-jira 1.3.8<br/>transmission vérifiée"]]
   A2T[["Agent2Test<br/>remise lue, journal de tests"]]
   subgraph C6["C6 Interfaces · E7"]
     TDB["tableau-de-bord<br/>HTTP + SSE"]
@@ -177,7 +178,7 @@ Les points V1 à V5 sont ceux du skill, appliqués tels quels. Agent2Dev ajoute 
 | V1 Extraction | après l'extraction du MHTML | développeur | confirmer · corriger, avec les compléments | l'analyse |
 | V2 US, critères, scénarios | après l'analyse et le script de contrôle des critères | développeur | valider · répondre aux questions · corriger, commentaire obligatoire · rejeter la demande | l'impact |
 | V3 Variantes | après l'impact et les variantes | développeur | choisir une variante back et une variante front par scénario · corriger, commentaire obligatoire | la réalisation |
-| V4 Scénario | après le cycle d'un scénario, suites vertes | développeur | accepter : patch remis, ou commit dans l'arbre de la demande si l'écriture est autorisée et que le développeur le veut · ajuster, commentaire obligatoire | le scénario suivant |
+| V4 Scénario | après le cycle d'un scénario, suites vertes | développeur | accepter : kit dev remis, son patch et son manifeste, ou commit dans l'arbre de la demande si l'écriture est autorisée et que le développeur le veut · ajuster, commentaire obligatoire | le scénario suivant |
 | V5 Rapport | après la traçabilité | développeur | accepter · corriger, commentaire obligatoire · recalculer, après un patch appliqué | la clôture de la demande |
 | CP-4 Gouvernance | proposition de leçon ou de règle | référent, depuis le tableau de bord seulement | ratifier · amender · refuser | rien : asynchrone, effet à la demande suivante |
 
@@ -185,7 +186,7 @@ Entre V4 et V5, l'acceptation en binôme n'est pas un point de validation : le d
 
 ## 6. Registre des dimensions
 
-| ID | Dimension | Introduite | Statut 1.3.1 | Dépend de | Module |
+| ID | Dimension | Introduite | Statut 1.4.0 | Dépend de | Module |
 |---|---|---|---|---|---|
 | D1 | Noyau 7E, bus et constitution | 1.0 | active | | `noyau` |
 | D2 | Données par agent, en SQLite | 1.0 | superseded | D1 | remplacée en 1.1.0 par D24 (`donnees`) |
@@ -213,6 +214,7 @@ Entre V4 et V5, l'acceptation en binôme n'est pas un point de validation : le d
 | D24 | Données en un fichier unique, par l'agent médiateur | 1.1 | active | D1 | `donnees` |
 | D25 | Échange du binôme par dossiers, facultatif | 1.1 | active | D5, D10, D20 | `echange` |
 | D26 | Acceptable partagé : noyau du socle de l'acceptable, refus, dérogations et faux refus | 1.2 | active | D1, D15, D17 | `acceptable` |
+| D27 | Kit dev : patch confronté, manifeste, validation en V4, application déclarée | 1.4 | active | D5, D19, D26 | `kit` |
 
 Statuts : `active` (implémentée et testée), `reserved` (points d'extension posés, fonctionnalité absente), `superseded` (remplacée ; la version de remplacement est indiquée).
 
@@ -234,15 +236,15 @@ Statuts : `active` (implémentée et testée), `reserved` (points d'extension po
 Un point d'extension n'est pas une fonctionnalité. En 1.x, il n'a qu'un test qui prouve qu'il est inerte.
 
 - **E1** : le port moteur accepte de nouveaux adaptateurs par version ; en 1.x : `simulation`, `externe` (Gemini Code Assist par MCP) et `compatible-openai`. Un adaptateur inconnu est refusé au démarrage.
-- **E2** : la méthode est désignée par le nom, la version et la transmission d'un skill dans la configuration humaine. En 1.3.1, seul agent-tdd-jira 1.3.7 est pris en charge ; un autre skill ou une autre version est refusé au démarrage avec le motif « méthode non prise en charge ».
+- **E2** : la méthode est désignée par le nom, la version et la transmission d'un skill dans la configuration humaine. En 1.4.0, seul agent-tdd-jira 1.3.8 est pris en charge ; un autre skill ou une autre version est refusé au démarrage avec le motif « méthode non prise en charge ».
 - **E3** : l'action `memoire.rechercher` existe et rend une liste vide ; chaque fiche a un emplacement « fragments », vide en 1.x. La mémoire sur le code et les demandes passées est réservée à D21.
 - **E4** : chaque point de validation V0 à V5 porte, dans la configuration humaine, un champ `regime`, qui vaut `presenter` ; toute autre valeur est refusée au démarrage. L'autonomie par point est réservée à D22, et suppose une version du skill qui la permette ; CP-4 n'a pas de régime, et reste toujours une décision humaine.
-- **E5** : le kit dev. Le champ `acceptable` de la constitution, refusé au démarrage en 1.2, épingle depuis 1.3.0 le noyau du socle de l'acceptable (D26). Agent2Dev ne produit aucun kit : tant que le socle ne décrit pas le contrat des kits, son point d'extension E1, une entrée `horsKit` de la constitution vaut partout, et ce qui ne se fait que dans un kit reste refusé. Le kit dev s'ajoutera sans changer aucune règle (scénario AC13, module `acceptable`).
+- **E5** : le kit dev. Le champ `acceptable` de la constitution, refusé au démarrage en 1.2, épingle depuis 1.3.0 le noyau du socle de l'acceptable (D26). Inerte en 1.3, le kit dev est remis depuis 1.4.0 (D27), selon le contrat des kits du socle de l'acceptable 1.1.0 : le patch d'un scénario, confronté, avec son manifeste, que la fabrication de l'hôte applique sur l'environnement dev ; aucune règle n'a changé, et la garde refuse toujours ce qui ne se fait que dans un kit (scénario AC13, module `acceptable`).
 
 ## 8. Règles globales
 
 - **Périmètre** : Agent2Dev traite une demande Jira déjà rédigée, exportée en MHTML, pour un projet dont le profil est ratifié. Il ne rédige pas la demande, ne démarre, n'arrête ni ne déploie l'application, ne lance aucun batch, n'écrit ni en base ni dans Jira.
-- **Méthode** : le skill agent-tdd-jira 1.3.7 fait foi pour la méthode. Agent2Dev le lit depuis sa transmission, vérifiée, et n'en change rien.
+- **Méthode** : le skill agent-tdd-jira 1.3.8 fait foi pour la méthode. Agent2Dev le lit depuis sa transmission, vérifiée, et n'en change rien.
 - **Projet séparé** : Agent2Dev est un projet à part. L'arbre de la demande est la branche de travail du développeur, ou le worktree que le kit `agents-paralleles-gitlab` a créé en mode parallèle.
 - **Écriture du code** : sans l'autorisation de la configuration humaine, Agent2Dev n'écrit rien dans l'arbre de la demande, hors des fichiers de travail que le kit exclut du dépôt ; il écrit et teste dans une copie de travail, et remet un patch par scénario accepté. Avec l'autorisation, le seul `depot` écrit dans l'arbre de la demande.
 - **Git** : dans l'arbre de la demande, Agent2Dev commite après V4 si l'écriture est autorisée et que le développeur l'accepte, au format du skill ; il ne fusionne pas, ne rebase pas, ne change pas de branche. Dans la copie de travail, chaque scénario accepté est commité pour former son patch. Agent2Dev ne pousse jamais.
@@ -265,6 +267,7 @@ Un point d'extension n'est pas une fonctionnalité. En 1.x, il n'a qu'un test qu
 - Une écriture dans l'arbre de travail faite hors du `depot` est détectée, et la demande s'arrête.
 - Une commande absente du profil, une commande de démarrage de l'application et un batch sont refusés.
 - La constitution d'exemple démarre avec le socle de l'acceptable épinglé ; une entrée du noyau retirée l'en empêche ; chaque refus cite sa règle, et une dérogation demandée sur une règle du noyau est refusée.
+- Le patch d'un scénario accepté devient son kit dev, avec son manifeste à son empreinte ; un patch qui écrit un fichier interdit ou porte un secret n'est pas remis ; une déclaration d'application pour un patch retouché depuis V4 est refusée `KIT_MODIFIE`.
 - Une altération du journal est détectée, et la première ligne rompue est nommée.
 - Les données d'une demande simulée tiennent dans le seul fichier `agent2dev.sqlite`, et aucune source hors du médiateur n'importe `node:sqlite`.
 - Aucun module `reserved` n'est chargé ; chaque point d'extension a son test d'inertie.
@@ -450,6 +453,12 @@ Ces invariants ne sont plus en vigueur : n8n n'est plus le relais du binôme. Il
 - **D26.INV-3** : seuls le développeur et le référent répondent à un refus, depuis le tableau de bord ou par MCP, avec leur motif ; une dérogation n'est admise que si chaque entrée qui a refusé est propre à Agent2Dev et déclarée dérogeable, jamais pour une entrée du noyau, et n'exécute l'action qu'une fois ; un faux refus n'exécute rien ; ni le moteur, ni un agent, ni l'échange ne répondent à un refus.
 - **D26.INV-4** : le livrable d'une demande touchée par un refus porte la rubrique `acceptable` : chaque refus avec sa garde, ses règles et sa réponse, chaque refus et chaque réponse datés de leur ligne de journal, sans motif en clair.
 
+**D27 : kit dev**
+
+- **D27.INV-1** : le patch d'un scénario ne devient son kit dev qu'après sa confrontation par le `depot`, avant V4, à la version épinglée du noyau et de la constitution, fichiers écrits et contenu ; un patch qui enfreint une règle n'est pas remis, et le refus cite sa règle ; un patch conforme reçoit son manifeste `socle-acceptable.kit/1`, à son empreinte, avec la version et l'empreinte du noyau confronté (`socle-acceptable:SA8.INV-1`).
+- **D27.INV-2** : un kit dev ne s'applique, par la fabrication de l'hôte, sur l'environnement dev, qu'après la décision « accepter » de V4, qui le valide à son empreinte ; seul le développeur déclare son application et son retour arrière, depuis le tableau de bord ; une déclaration pour un patch dont l'empreinte n'est plus celle du manifeste est refusée `KIT_MODIFIE` ; aucun agent n'applique un kit ni ne déclare son application (`socle-acceptable:SA8.INV-2`).
+- **D27.INV-3** : le livrable d'une demande dont un kit a été remis porte la rubrique `kits` : chaque kit avec son scénario, son environnement, son empreinte, sa validation, son application et son retour arrière, chacun daté de sa ligne de journal.
+
 ## 11. Filiation
 
 ### 11.1 Avec la conception de l'étape 1
@@ -527,3 +536,5 @@ Ce qui change par rapport à l'étape 1 :
 **1.3.0** (2026-11-24) : dimension D26 active, l'acceptable partagé, jalon J3b du passage du dépôt au troisième ordre (`EVOLUTION.md`, section 10). Le socle `socle-acceptable` 1.0.1 est inclus et épinglé ; la constitution, version 2.0.0, porte le champ `acceptable` et reprend chaque entrée du noyau, avec sa règle, avant celles d'Agent2Dev ; le démarrage vérifie l'empreinte du bloc et la présence de chaque entrée. Chaque garde cite ses règles, journalisées `acceptable.refus` ; le développeur ou le référent répond à un refus depuis le tableau de bord ou par MCP, `a2d_repondre_refus` : dérogation, seulement sur une entrée propre déclarée dérogeable, aucune dans la constitution d'exemple, jamais sur une entrée du noyau (`NON_DEROGEABLE`), ou faux refus, qui n'exécute rien et paraît dans la vue de gouvernance. Rubrique `acceptable` du livrable. Invariants D26.INV-1 à D26.INV-4 ; scénarios AC1 à AC13 ; point d'extension E5, le kit dev, qui reste inerte. Méthode : skill agent-tdd-jira 1.3.6, seule version prise en charge (point E2), dont seule la référence à Agent2Test change. Binôme : agent2test 1.5.0, dont l'acceptable devient actif de même. Exemples du journal à la version 1.3.0. Décisions ratifiées avant la rédaction : plan du jalon J3b, B1 à B4. Archive : `archives/SKILL-v1.2.0.md`.
 
 **1.3.1** (2026-11-25) : correctif, jalon J3c du passage du dépôt au troisième ordre (`EVOLUTION.md`, section 10). La rubrique `acceptable` du livrable date chaque refus et chaque réponse de l'horodatage de leur ligne de journal, à la seconde : l'export des refus vers le socle d'observation, que porte l'outil d'export du binôme de l'observatoire, date ses enveloppes par elle. Valeurs fermées de la rubrique précisées : garde, décision et rôle d'une réponse. D26.INV-4 renforcé : refus et réponses datés. Méthode : skill agent-tdd-jira 1.3.7, seule version prise en charge (point E2), dont seule la référence à Agent2Test change ; la transmission à placer dans `test/fixtures/methode/` est celle de la 1.3.7. Binôme : agent2test 1.5.1, dont le journal de tests date de même ses refus. Exemples du journal à la version 1.3.1. Décision ratifiée avant la rédaction : X5, plan du jalon J3c. Archive : `archives/SKILL-v1.3.0.md`.
+
+**1.4.0** (2026-11-25) : dimension D27 active, le kit dev, jalon J3d du passage du dépôt au troisième ordre (`EVOLUTION.md`, section 10). Le socle `socle-acceptable` 1.1.0, inclus et épinglé, décrit le contrat des kits sur la fabrication de l'hôte. Le patch d'un scénario devient son kit dev : le `depot` le confronte avant V4 au noyau et à la constitution, fichiers écrits et contenu, et un patch qui enfreint une règle n'est pas remis ; un patch conforme reçoit son manifeste `socle-acceptable.kit/1`, à son empreinte. La décision « accepter » de V4 le valide ; la fabrication de l'hôte l'applique sur l'environnement dev ; le développeur déclare son application et son retour arrière depuis le tableau de bord, et une déclaration pour un patch retouché est refusée `KIT_MODIFIE` ; aucun agent n'applique un kit. Rubrique `kits` du livrable, datée. Module `kit`, invariants D27.INV-1 à D27.INV-3, scénarios KI1 à KI5 ; AC13 récrit : la garde refuse toujours ce qui ne se fait que dans un kit ; point d'extension E5 récrit. Constitution 2.1.0, qui épingle le noyau à la version 1.1.0 du socle, à la même empreinte. Méthode : skill agent-tdd-jira 1.3.8, seule version prise en charge (point E2), dont seule la référence à Agent2Test change ; la transmission à placer dans `test/fixtures/methode/` est celle de la 1.3.8. Binôme : agent2test 1.6.0, qui produit de même le kit test. Exemples du journal à la version 1.4.0. Décisions ratifiées avant la rédaction : plan du jalon J3d, K1 à K4. Archive : `archives/SKILL-v1.3.1.md`.

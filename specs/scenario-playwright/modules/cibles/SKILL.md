@@ -61,7 +61,7 @@ Le plan de ratification, la sortie de `jouer.mjs` et le rapport écrivent une ci
 
 <!-- fichier : scripts/cibles.mjs -->
 ```javascript
-// scenario-playwright 1.6.4 : cibles côté utilisateur.
+// scenario-playwright 1.6.5 : cibles côté utilisateur.
 //
 // Une cible désigne un élément comme le voit une personne : par son rôle et son nom accessible, son
 // libellé, son texte, son placeholder, son identifiant de test, son texte alternatif ou son titre. Le

@@ -48,13 +48,13 @@ Suis `SKILL.md` à partir de sa section 4. Rien n'est modifié avant la ratifica
       {
         "path": "modules/invariants/SKILL.md",
         "from": "specs/orchestrateur-c7e/SKILL.md",
-        "version": "3.8.2",
+        "version": "3.8.3",
         "invariants": 36
       },
       {
         "path": "modules/methode/SKILL.md",
         "from": "specs/orchestrateur-c7e/SKILL.md",
-        "version": "3.8.2",
+        "version": "3.8.3",
         "sections": [
           "2",
           "5.1",
@@ -85,9 +85,9 @@ Suis `SKILL.md` à partir de sa section 4. Rien n'est modifié avant la ratifica
     ],
     "genere_par": {
       "generateur": "generateur-skill-ticket",
-      "version": "1.4.2",
+      "version": "1.4.3",
       "fabrique": "java-angular-postgresql",
-      "orchestrateur": "3.8.2"
+      "orchestrateur": "3.8.3"
     }
   },
   "modules": [
@@ -159,7 +159,7 @@ version: 1.0.0
 
 # Skill de ticket ABCDE-3620-1.1
 
-> Produit par generateur-skill-ticket 1.4.2, fabrique `java-angular-postgresql`, référentiel des méso-contrats 3.3.0, orchestrateur-c7e 3.8.2. Ce skill remplace la fiche de transformation comme objet ratifié avant toute modification ; il reste identique à sa transmission. Si tu y relèves une ambiguïté ou une contradiction, signale-la au développeur ; ne corrige pas le skill toi-même.
+> Produit par generateur-skill-ticket 1.4.3, fabrique `java-angular-postgresql`, référentiel des méso-contrats 3.3.0, orchestrateur-c7e 3.8.3. Ce skill remplace la fiche de transformation comme objet ratifié avant toute modification ; il reste identique à sa transmission. Si tu y relèves une ambiguïté ou une contradiction, signale-la au développeur ; ne corrige pas le skill toi-même.
 
 ## 1. Place dans l'arbre
 
@@ -438,12 +438,12 @@ Dans `docs/demandes/ABCDE-3620/ABCDE-3620-1.1/remise.md` : test, scénario, crit
 <<<FICHIER modules/methode/SKILL.md>>>
 ---
 name: methode
-description: Sections de la méthode de l'orchestrateur C7E 3.8.2 dont le skill de ticket ABCDE-3620-1.1 a besoin, recopiées mot pour mot (§ 2, § 5.1, § 5.2, § 6, § 7.1, § 8, § 11.5).
+description: Sections de la méthode de l'orchestrateur C7E 3.8.3 dont le skill de ticket ABCDE-3620-1.1 a besoin, recopiées mot pour mot (§ 2, § 5.1, § 5.2, § 6, § 7.1, § 8, § 11.5).
 ---
 
 # Méthode C7E pour ABCDE-3620-1.1
 
-Sections recopiées mot pour mot de l'orchestrateur C7E 3.8.2 : § 2, § 5.1, § 5.2, § 6, § 7.1, § 8, § 11.5. La fiche dont elles parlent est ce skill, avec son analyse et sa remise (module `invariants`, correspondances). Un renvoi à un paragraphe absent de ce module est informatif.
+Sections recopiées mot pour mot de l'orchestrateur C7E 3.8.3 : § 2, § 5.1, § 5.2, § 6, § 7.1, § 8, § 11.5. La fiche dont elles parlent est ce skill, avec son analyse et sa remise (module `invariants`, correspondances). Un renvoi à un paragraphe absent de ce module est informatif.
 
 ## 2. Matrice d'activation (mixage paramétrique par défaut)
 
@@ -556,7 +556,7 @@ Une contradiction entre deux niveaux se signale et s'inscrit au registre des éc
 <<<FICHIER modules/invariants/SKILL.md>>>
 ---
 name: invariants
-description: Invariants dont hérite le skill de ticket ABCDE-3620-1.1, sans affaiblissement, avec ceux de l'orchestrateur C7E 3.8.2 recopiés mot pour mot et leurs correspondances dans un skill de ticket.
+description: Invariants dont hérite le skill de ticket ABCDE-3620-1.1, sans affaiblissement, avec ceux de l'orchestrateur C7E 3.8.3 recopiés mot pour mot et leurs correspondances dans un skill de ticket.
 ---
 
 # Invariants hérités par ABCDE-3620-1.1
@@ -566,7 +566,7 @@ Ce skill hérite, sans affaiblissement :
 - du socle back-front 1.1.0, inclus en entier dans `socle/SKILL.md` ;
 - des invariants du projet : sa copie du fichier d'invariants, comparée au démarrage à `projet/meso-contrats.md` ;
 - du référentiel `references/java.md` (java 1.1.1), pour ses sections « Versions cibles » et « Invariants », sans adopter son mode de travail ;
-- des invariants de l'orchestrateur C7E 3.8.2, ci-dessous, mot pour mot.
+- des invariants de l'orchestrateur C7E 3.8.3, ci-dessous, mot pour mot.
 
 Un invariant ne s'affaiblit jamais. Une contradiction entre deux niveaux suit la précédence du module `methode` (§ 11.5) ; un écart s'inscrit au registre des écarts, avec sa décision (D6.INV-3).
 
@@ -586,7 +586,7 @@ Les invariants de l'orchestrateur parlent de sa fiche de transformation. Dans un
 | la qualification et la confirmation de la composition (D10.INV-1, D11) | faites avant la génération de ce skill ; si l'analyse montre que la demande sort des empreintes, ce skill remonte au parent, sans changer de composition (D11.INV-4) |
 | un paragraphe de l'orchestrateur (§ n) | le texte recopié dans le module `methode` s'il y figure ; sinon un renvoi informatif |
 
-## Invariants de l'orchestrateur C7E 3.8.2
+## Invariants de l'orchestrateur C7E 3.8.3
 
 - **D1.INV-1** : chaque modification du ticket est rattachée à un slot (É1 à É7) et à une profondeur (d=0 à d=3), dans la fiche et dans le message de son commit.
 - **D1.INV-2** : les slots É1 à É7 portent les sept termes de l'Axiome 7E, dans leur ordre ; É0, l'Outillage, est une précondition hors axiome, qui ne livre rien.
@@ -1409,14 +1409,14 @@ Précision du développeur, s'il y en a une : {{args}}
 
 Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichiers ont été matérialisés.
 
-    ad180fff2af54e9d68235349072603282e42885d3606dd47deab102c57bac485  manifest.json
-    b14b3c695859d96b4f14d8154f3776c640ea1f42a801ebe21eb30b48d8155b79  SKILL.md
+    5b4e18f7c54f406992047eddae871bca7c36adb6d9c0d9f969ca6b2f1f0985f6  manifest.json
+    b7b642f095207334066d944503d1393fafac414ddf769d55e3a40c5d9a41dbf1  SKILL.md
     3dd01b85794d05f8856234f53a76e7b679e4717c900d7994d4ec5a966db7751f  ticket.toml
     427b91753721d9837d87a6ac8929c11124df6101bf959918468043b9dd6f88de  modules/meso-contrats/SKILL.md
     86a98a76275998dda7eb1918ba14623af7f6ee89f13b9a960b937180b3766307  modules/option-persistance-crud/SKILL.md
     ce14f42b61bb11269228e02aa7b2faffbbbf087a906cf10e1b875ca3f8415b89  modules/recette/SKILL.md
-    afb7c7902f6125938379f32e1782cfe2a896e2c813fab91542b801c23b931d15  modules/methode/SKILL.md
-    25e1598e773d18aa3ef358446ab8c5efd39c739820777c28e302cc28de0a9f9a  modules/invariants/SKILL.md
+    37066c7b463227c4cde47977683220465195474d7b237bdfba00e79b6e9ecabd  modules/methode/SKILL.md
+    d14ea2d8769569ff9a6c5da577ed1d57b2a041408b6639685b7a873f54e50fca  modules/invariants/SKILL.md
     f9456b0bbcdce8cd1ebc06446c3d505829a0354f398f4aa819204e4e9c135f54  socle/SKILL.md
     4bb52253c4504f4a804460442b1711a9caab8e364528171f2afb9ba7d5acfccf  references/java.md
     971128d2351d7dce8941a57e3b3875b59cb229c9469eef7c20d74d7561b6ac31  projet/meso-contrats.md
