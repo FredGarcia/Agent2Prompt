@@ -1,9 +1,9 @@
 {
   "name": "agent2dev",
-  "version": "1.4.3",
+  "version": "1.5.0",
   "specSchema": 1,
   "language": "fr",
-  "description": "Agent2Dev : système multi-agents de développement qui applique le skill agent-tdd-jira comme méthode, de la demande Jira en MHTML jusqu'au rapport, en cycle TDD scénario par scénario et en binôme avec Agent2Test ; le moteur rédige, des agents déterministes écrivent et exécutent, le développeur valide à chaque point ; journal chaîné, apprentissage sous gouvernance, un fichier SQLite unique ouvert par un agent médiateur, binôme à la main ou par un échange par dossiers facultatif, exécution locale.",
+  "description": "Agent2Dev : système multi-agents de développement qui applique le skill agent-tdd-jira comme méthode, de la demande Jira en MHTML jusqu'au rapport, en cycle TDD scénario par scénario et en binôme avec Agent2Test ; le moteur rédige, des agents déterministes écrivent et exécutent, le développeur valide à chaque point ; journal chaîné, apprentissage sous gouvernance, constitution qui ne se relâche qu'examinée et prouvée, un fichier SQLite unique ouvert par un agent médiateur, binôme à la main ou par un échange par dossiers facultatif, exécution locale.",
   "entry": "SKILL.md",
   "runtime": {
     "node": ">=22.13, 26.13.0 recommandé",
@@ -21,8 +21,8 @@
     { "path": "socle-acceptable/SKILL.md", "from": "specs/socle-acceptable/SKILL.md", "version": "1.2.0" }
   ],
   "references": [
-    { "name": "agent-tdd-jira", "version": "1.3.10" },
-    { "name": "agent2test", "version": "1.6.2" },
+    { "name": "agent-tdd-jira", "version": "1.3.11" },
+    { "name": "agent2test", "version": "1.7.0" },
     { "name": "socle-acceptable", "version": "1.2.0" }
   ],
   "modules": [
@@ -50,7 +50,8 @@
     { "id": "memoire", "path": "modules/memoire/SKILL.md", "dimensions": ["D21"], "status": "reserved" },
     { "id": "autonomie", "path": "modules/autonomie/SKILL.md", "dimensions": ["D22"], "status": "reserved" },
     { "id": "acceptable", "path": "modules/acceptable/SKILL.md", "dimensions": ["D26"], "status": "active" },
-    { "id": "kit", "path": "modules/kit/SKILL.md", "dimensions": ["D27"], "status": "active" }
+    { "id": "kit", "path": "modules/kit/SKILL.md", "dimensions": ["D27"], "status": "active" },
+    { "id": "revision", "path": "modules/revision/SKILL.md", "dimensions": ["D28"], "status": "active" }
   ],
   "extensionPoints": ["E1", "E2", "E3", "E4", "E5"],
   "previousVersions": [
@@ -64,6 +65,7 @@
     { "version": "1.3.1", "file": "archives/SKILL-v1.3.1.md" },
     { "version": "1.4.0", "file": "archives/SKILL-v1.4.0.md" },
     { "version": "1.4.1", "file": "archives/SKILL-v1.4.1.md" },
-    { "version": "1.4.2", "file": "archives/SKILL-v1.4.2.md" }
+    { "version": "1.4.2", "file": "archives/SKILL-v1.4.2.md" },
+    { "version": "1.4.3", "file": "archives/SKILL-v1.4.3.md" }
   ]
 }

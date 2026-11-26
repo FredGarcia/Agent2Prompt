@@ -15,7 +15,7 @@ status: active
 {
   "n": 2041,
   "horodatage": "2026-10-21T14:02:11.482Z",
-  "specVersion": "1.4.3",
+  "specVersion": "1.5.0",
   "instance": "principale",
   "demande": "ECR-77",
   "correlation": "5d1e…",
@@ -67,13 +67,14 @@ Une seule source, la projection JSON, de format `agent2dev.livrable/1` ; le Mark
 8. ligne de base, régressions, écritures étrangères intégrées, budgets consommés ;
 9. acceptable : refus de la demande, avec leur garde, leurs règles et leur réponse, datés, sans motif en clair (module `acceptable`, section 5) ;
 10. kits : kits dev remis, avec leur scénario, leur empreinte, leur validation, leur application et leur retour arrière, datés (module `kit`, section 4) ;
-11. empreinte de fin de chaîne.
+11. révisions : les examens et les publications de la constitution inscrits au grand livre, avec leur sens et leur avis, datés (module `revision`, section 4) ;
+12. empreinte de fin de chaîne.
 
 ```json
 {
   "format": "agent2dev.livrable/1",
   "demande": { "cle": "ECR-77", "titre": "Export des retours d'expérience en CSV", "source": "<sha256 du MHTML>" },
-  "versions": { "specification": "1.4.3", "skill": "agent-tdd-jira 1.3.10", "transmission": "<sha256>", "referentiel": "R-4", "constitution": "<sha256>" },
+  "versions": { "specification": "1.5.0", "skill": "agent-tdd-jira 1.3.11", "transmission": "<sha256>", "referentiel": "R-4", "constitution": "<sha256>" },
   "autorisations": { "ecritureCode": false, "moteurExterne": true },
   "arbre": { "mode": "normal", "branche": "feature/ECR-77-export-csv", "commitDepart": "<sha1>" },
   "scenarios": [
@@ -85,7 +86,7 @@ Une seule source, la projection JSON, de format `agent2dev.livrable/1` ; le Mark
       "decision": { "n": 2046, "date": "2026-10-21T14:02:30Z", "valeur": "corriger", "role": "developpeur", "canal": "tableau-de-bord", "commentaire": "le critère 3 vise l'export, pas l'import" } },
     { "n": 2050, "date": "2026-10-21T14:10:00Z", "point": "V2", "decision": null }
   ],
-  "productions": [{ "id": "P-12", "fiche": "vert@1.0.0+agent-tdd-jira@1.3.10+L1", "moteur": "gemini", "adaptateur": "externe", "empreintePrompt": "<sha256>", "decision": "DEC-118" }],
+  "productions": [{ "id": "P-12", "fiche": "vert@1.0.0+agent-tdd-jira@1.3.11+L1", "moteur": "gemini", "adaptateur": "externe", "empreintePrompt": "<sha256>", "decision": "DEC-118" }],
   "empreinteFin": "<sha256>"
 }
 ```

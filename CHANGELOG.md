@@ -96,6 +96,16 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-11-26 : socle-observation 1.5.0, observatoire 1.6.0, agent2dev 1.5.0, agent2test 1.7.0, agent-tdd-jira 1.3.11, scenario-playwright 1.6.8, orchestrateur-c7e 3.8.7, generateur-skill-ticket 1.4.7
+
+- **Dépôt, `EVOLUTION.md`** : jalon J5b du passage au troisième ordre, la révision dans l'instance. Section 10.7 : la constitution d'une instance du binôme, sa forme propre, suit la même révision que les formes propres du dépôt, que sa publication contrôle ; règle 7 de la section 10.5 et limites du troisième couplage à jour.
+- **agent2dev 1.5.0**, **agent2test 1.7.0** : dimension D28, module `revision`. `npm run constitution:publier` compare la constitution à la dernière publiée, que le grand livre porte désormais entière, et la classe : première, neutre, renforcement ou relâchement, selon la table de la section 10.7. Ce qui ne relâche rien se publie seul ; un relâchement exige l'examen de sa version, `constitution/examens/<version>.md`, au format `observatoire.examen/1`, d'objet `constitution`, par un observateur sur un autre modèle, une réponse s'il est défavorable, et ses preuves, deux faux refus vérifiés de chaque entrée relâchée ou un incident déclaré ; sinon la publication est refusée et n'écrit rien ; une entrée du noyau ne se relâche jamais. Grand livre : `constitution.examinee`, inscrite avec la publication qu'elle permet. Rubrique `revisions` du livrable et du journal de tests, dont le format garde son nom. Invariants D28.INV-1 à D28.INV-3, scénarios RV1 à RV8. Constitution d'exemple d'Agent2Dev 2.1.2, qui épingle agent-tdd-jira 1.3.11 ; celle d'Agent2Test inchangée. Migration au journal : republier d'abord la constitution en vigueur, telle quelle.
+- **socle-observation 1.5.0** : correspondance nouvelle, section 6.8, la rubrique `revisions` : l'examen, une observation `N3` du sujet nouveau `observateur-externe`, de nature son avis ; la publication, une observation du référent, de nature son sens, avec la mesure `relachements` ; motif `revision-constitution`, ancre nouvelle de nature `constitution`, source le grand livre, par sa référence salée. Invariants en section 6.9.
+- **observatoire 1.6.0** : D7 étendue, `export-binome.mjs` traduit la rubrique `revisions` ; une révision que portent plusieurs sources ne s'exporte qu'une fois, et deux sources qui la disent autrement, comme un relâchement sans son examen, arrêtent l'export. Dimension D12, module `revisions` : publications comptées par système et par sens, entrées relâchées, examens par avis, instances ; des comptes seulement, sans candidat. Le format `observatoire.examen/1` admet l'objet `constitution`, qui vit dans l'instance et que `verifier` refuse dans le dépôt. Point d'extension E5, critère P12 ; vingt et un invariants ; recette de trente-deux tests.
+- **agent-tdd-jira 1.3.11**, **scenario-playwright 1.6.8**, **orchestrateur-c7e 3.8.7**, **generateur-skill-ticket 1.4.7** : correctifs de références ; socle d'observation 1.5.0 inclus dans l'orchestrateur et le générateur ; numéros de version et empreintes de scenario-playwright, skills de ticket d'exemple et rapports de contexte régénérés.
+- Les huit versions se référencent et se publient dans un même commit (`EVOLUTION.md`, section 7). README, modes d'emploi, glossaire et transmissions à jour.
+- Décisions ratifiées avant la rédaction (plan du jalon J5b) : la publication compare à la dernière publiée et classe, un relâchement sans examen ni preuves est refusé, un renforcement passe seul (V1) ; l'examen, un fichier au format des examens du dépôt, d'objet `constitution` (V2) ; les preuves, deux faux refus vérifiés de la règle relâchée, ou un incident déclaré (V3) ; les révisions exportées par la rubrique `revisions`, comptées par l'observatoire (V4).
+
 ### 2026-11-26 : socle-acceptable 1.2.0, observatoire 1.5.0, agent2dev 1.4.3, agent2test 1.6.2, agent-tdd-jira 1.3.10, scenario-playwright 1.6.7, orchestrateur-c7e 3.8.6, generateur-skill-ticket 1.4.6
 
 - **Dépôt, `EVOLUTION.md`** : jalon J5a du passage au troisième ordre, la révision des formes propres. Section 10.7 : le noyau de l'acceptable et les constitutions d'exemple du binôme sont les formes propres du dépôt ; elles ne changent que par une version que le développeur publie, qui dit sa migration au journal ; un relâchement nomme en outre ses preuves et porte l'avis consigné d'un examinateur indépendant, un observateur sur un autre modèle que celui qui a préparé le changement ; un avis ne décide jamais ; le noyau ne fait que croître. Règle 7 de la section 10.5 ; les limites des couplages 1 et 3 disent l'examen, et que le développeur ratifie seul.
@@ -953,6 +963,12 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
   - la publication, dans ce dépôt public, d'un argumentaire destiné à un client, sans nom de client ni de mission.
 
 ## Outils
+
+### 2026-11-26 : révision dans l'instance
+
+- **`specs/observatoire/outils/export-binome.mjs`** : la rubrique `revisions` lue, contrôlée et traduite ; une révision du grand livre, que portent plusieurs sources, exportée une fois, sous la référence salée du grand livre ; la clé `grand-livre` réservée.
+- **`specs/observatoire/outils/observatoire.mjs`** : sujet `observateur-externe` et ancre `constitution` au schéma fermé ; `confronter` rend la rubrique `revisions` ; l'examen d'objet `constitution`, contrôlé sous le nom de sa version, refusé dans `observatoire/examens/`.
+- Les commentaires d'en-tête des outils d'export de l'orchestrateur et du générateur citent le socle d'observation 1.5.0.
 
 ### 2026-11-26 : révision des formes propres et examens indépendants
 

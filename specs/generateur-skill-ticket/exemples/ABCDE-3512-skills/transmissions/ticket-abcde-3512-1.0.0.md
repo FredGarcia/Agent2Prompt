@@ -48,13 +48,13 @@ Suis `SKILL.md` à partir de sa section 4. Rien n'est modifié avant la ratifica
       {
         "path": "modules/invariants/SKILL.md",
         "from": "specs/orchestrateur-c7e/SKILL.md",
-        "version": "3.8.6",
+        "version": "3.8.7",
         "invariants": 36
       },
       {
         "path": "modules/methode/SKILL.md",
         "from": "specs/orchestrateur-c7e/SKILL.md",
-        "version": "3.8.6",
+        "version": "3.8.7",
         "sections": [
           "2",
           "5.1",
@@ -92,66 +92,66 @@ Suis `SKILL.md` à partir de sa section 4. Rien n'est modifié avant la ratifica
       {
         "path": "references/agent-tdd-jira.md",
         "from": "specs/agent-tdd-jira/SKILL.md",
-        "version": "1.3.10",
-        "sha256": "3feed1b71e34f79b3c1042572675cc6e9c77504e56e28fddcf88071a4cd558b3"
+        "version": "1.3.11",
+        "sha256": "a4d7b3aaac1681018b9c1b4f8abe2192df73fab068bf9011ea2b11f2d18548ee"
       },
       {
         "path": "references/agent-tdd-jira/ingestion-jira.md",
         "from": "specs/agent-tdd-jira/modules/ingestion-jira/SKILL.md",
-        "version": "1.3.10",
+        "version": "1.3.11",
         "sha256": "0f764ee60e5818cb50f4b076ca2528d46f893b553957b023b1fac7f13386be6a"
       },
       {
         "path": "references/agent-tdd-jira/us-criteres.md",
         "from": "specs/agent-tdd-jira/modules/us-criteres/SKILL.md",
-        "version": "1.3.10",
+        "version": "1.3.11",
         "sha256": "ed5a9c72063718929b12f68130ce5e477a0624a1f14bcb96df065d633f496acd"
       },
       {
         "path": "references/agent-tdd-jira/analyse-demande.md",
         "from": "specs/agent-tdd-jira/modules/analyse-demande/SKILL.md",
-        "version": "1.3.10",
+        "version": "1.3.11",
         "sha256": "2b68bd4b7f3d2f27cdb218ac73c75e4628e5a7985c0dcfb0633e084cfc65b32a"
       },
       {
         "path": "references/agent-tdd-jira/cycle-tdd.md",
         "from": "specs/agent-tdd-jira/modules/cycle-tdd/SKILL.md",
-        "version": "1.3.10",
+        "version": "1.3.11",
         "sha256": "a5ba1475936065ca1fb846506af998343ce55690e4aa798d39c5321d44ef1fcb"
       },
       {
         "path": "references/agent-tdd-jira/tracabilite.md",
         "from": "specs/agent-tdd-jira/modules/tracabilite/SKILL.md",
-        "version": "1.3.10",
+        "version": "1.3.11",
         "sha256": "2657a6d1187c1b58011abac95b19365a6316629318770cff4006d2b1c9551492"
       },
       {
         "path": "references/agent-tdd-jira/binome-agent2test.md",
         "from": "specs/agent-tdd-jira/modules/binome-agent2test/SKILL.md",
-        "version": "1.3.10",
+        "version": "1.3.11",
         "sections": [
           "3",
           "4"
         ],
-        "sha256": "43154f387cdf166e7483102ddf450de8659a50add15c450f5e5cdeaf60233d66"
+        "sha256": "35a2b118cf0c1bc70ea5dfcbf8e2b53a000fbf6b7f3f3f298c7cc9baf6aacde7"
       },
       {
         "path": "references/agent2test/plan.md",
         "from": "specs/agent2test/modules/plan/SKILL.md",
-        "version": "1.6.2",
+        "version": "1.7.0",
         "sections": [
           "2"
         ],
-        "sha256": "884a39211422176a57195ebf76c9345e0a862583eb47154849446d2dac7ccb86"
+        "sha256": "b809b23529d7b423ccaf641553af33c0ce3d231d2d4fea0026a297b08609c0d0"
       },
       {
         "path": "references/agent2test/remise.md",
         "from": "specs/agent2test/modules/echange/SKILL.md",
-        "version": "1.6.2",
+        "version": "1.7.0",
         "sections": [
           "3"
         ],
-        "sha256": "6b720a2699fe59a6a0e4859a93a43c8c73ab07516af1a6133e2fb6e16105e1f0"
+        "sha256": "a88154ddc6345a4a49c41a40820562729e43bf4bcfa6a2b91a183e1d289ccd88"
       },
       {
         "path": "references/analyse-projet.md",
@@ -192,7 +192,7 @@ Suis `SKILL.md` à partir de sa section 4. Rien n'est modifié avant la ratifica
       {
         "path": "outils/extraire-jira.mjs",
         "from": "specs/agent-tdd-jira/modules/ingestion-jira/SKILL.md",
-        "version": "1.3.10",
+        "version": "1.3.11",
         "bloc": {
           "section": "3",
           "langage": "js"
@@ -202,7 +202,7 @@ Suis `SKILL.md` à partir de sa section 4. Rien n'est modifié avant la ratifica
       {
         "path": "outils/controler-criteres.mjs",
         "from": "specs/agent-tdd-jira/modules/us-criteres/SKILL.md",
-        "version": "1.3.10",
+        "version": "1.3.11",
         "bloc": {
           "section": "7",
           "langage": "js"
@@ -242,9 +242,9 @@ Suis `SKILL.md` à partir de sa section 4. Rien n'est modifié avant la ratifica
     ],
     "genere_par": {
       "generateur": "generateur-skill-ticket",
-      "version": "1.4.6",
+      "version": "1.4.7",
       "fabrique": "java-angular-postgresql",
-      "orchestrateur": "3.8.6"
+      "orchestrateur": "3.8.7"
     }
   },
   "modules": [
@@ -536,7 +536,7 @@ version: 1.0.0
 
 # Skill de ticket ABCDE-3512
 
-> Produit par generateur-skill-ticket 1.4.6, fabrique `java-angular-postgresql`, référentiel des méso-contrats 3.3.0, orchestrateur-c7e 3.8.6. Ce skill remplace la fiche de transformation comme objet ratifié avant toute modification ; il reste identique à sa transmission. Si tu y relèves une ambiguïté ou une contradiction, signale-la au développeur ; ne corrige pas le skill toi-même.
+> Produit par generateur-skill-ticket 1.4.7, fabrique `java-angular-postgresql`, référentiel des méso-contrats 3.3.0, orchestrateur-c7e 3.8.7. Ce skill remplace la fiche de transformation comme objet ratifié avant toute modification ; il reste identique à sa transmission. Si tu y relèves une ambiguïté ou une contradiction, signale-la au développeur ; ne corrige pas le skill toi-même.
 
 ## 1. Place dans l'arbre
 
@@ -665,23 +665,23 @@ Le module `invariants` liste ce dont ce skill hérite, sans affaiblissement : le
 | `references/java.md` | référentiel de la pile : versions cibles et invariants |
 | `references/angular.md` | référentiel de la pile : versions cibles et invariants |
 | `projet/meso-contrats.md` | invariants du projet, dans l'état où ce skill a été produit |
-| `references/agent-tdd-jira.md` | agent-tdd-jira 1.3.10 : méthode, points de validation et invariants, pour le rédacteur et les agents de couche |
-| `references/agent-tdd-jira/ingestion-jira.md` | agent-tdd-jira 1.3.10 : demande.json au schéma version 1, pour le rédacteur |
-| `references/agent-tdd-jira/us-criteres.md` | agent-tdd-jira 1.3.10 : US et critères d'acceptation numérotés, us.md, pour le rédacteur |
-| `references/agent-tdd-jira/analyse-demande.md` | agent-tdd-jira 1.3.10 : exigences, questions et scénarios Gherkin, pour le rédacteur |
-| `references/agent-tdd-jira/cycle-tdd.md` | agent-tdd-jira 1.3.10 : cycle rouge, vert, remanié, pour les agents de couche des feuilles |
-| `references/agent-tdd-jira/tracabilite.md` | agent-tdd-jira 1.3.10 : matrice de traçabilité, pour le kit test |
-| `references/agent-tdd-jira/binome-agent2test.md` | agent-tdd-jira 1.3.10, extrait (§ 3, § 4) : étiquettes du binôme et remise du plan, pour le rédacteur et la remise à Agent2Test |
-| `references/agent2test/plan.md` | agent2test 1.6.2, extrait (§ 2) : jouabilité des scénarios selon Agent2Test, pour la remise |
-| `references/agent2test/remise.md` | agent2test 1.6.2, extrait (§ 3) : format agent2test.remise/1, pour la remise |
+| `references/agent-tdd-jira.md` | agent-tdd-jira 1.3.11 : méthode, points de validation et invariants, pour le rédacteur et les agents de couche |
+| `references/agent-tdd-jira/ingestion-jira.md` | agent-tdd-jira 1.3.11 : demande.json au schéma version 1, pour le rédacteur |
+| `references/agent-tdd-jira/us-criteres.md` | agent-tdd-jira 1.3.11 : US et critères d'acceptation numérotés, us.md, pour le rédacteur |
+| `references/agent-tdd-jira/analyse-demande.md` | agent-tdd-jira 1.3.11 : exigences, questions et scénarios Gherkin, pour le rédacteur |
+| `references/agent-tdd-jira/cycle-tdd.md` | agent-tdd-jira 1.3.11 : cycle rouge, vert, remanié, pour les agents de couche des feuilles |
+| `references/agent-tdd-jira/tracabilite.md` | agent-tdd-jira 1.3.11 : matrice de traçabilité, pour le kit test |
+| `references/agent-tdd-jira/binome-agent2test.md` | agent-tdd-jira 1.3.11, extrait (§ 3, § 4) : étiquettes du binôme et remise du plan, pour le rédacteur et la remise à Agent2Test |
+| `references/agent2test/plan.md` | agent2test 1.7.0, extrait (§ 2) : jouabilité des scénarios selon Agent2Test, pour la remise |
+| `references/agent2test/remise.md` | agent2test 1.7.0, extrait (§ 3) : format agent2test.remise/1, pour la remise |
 | `references/analyse-projet.md` | analyse-projet 1.0.2 : règles globales et invariants, pour l'analyste |
 | `references/analyse-projet/cartographie.md` | analyse-projet 1.0.2 : cartographie du projet, pour l'analyste |
 | `references/java/revue.md` | java 1.1.1 : mode revue du référentiel Java, pour le relecteur |
 | `references/angular/revue.md` | angular 1.0.1 : mode revue du référentiel Angular, pour le relecteur |
 | `references/sonarqube.md` | sonarqube 1.1.0 : règles globales, jeton et invariants, pour l'agent qualité |
 | `references/sonarqube/examen-local.md` | sonarqube 1.1.0 : examen local de la qualité, pour l'agent qualité |
-| `outils/extraire-jira.mjs` | agent-tdd-jira 1.3.10, bloc de code du § 3 : script d'extraction d'une capture MHTML de Jira, pour le rédacteur |
-| `outils/controler-criteres.mjs` | agent-tdd-jira 1.3.10, bloc de code du § 7 : script de contrôle des US, des critères et des scénarios |
+| `outils/extraire-jira.mjs` | agent-tdd-jira 1.3.11, bloc de code du § 3 : script d'extraction d'une capture MHTML de Jira, pour le rédacteur |
+| `outils/controler-criteres.mjs` | agent-tdd-jira 1.3.11, bloc de code du § 7 : script de contrôle des US, des critères et des scénarios |
 | `outils/verifier-documents.mjs` | generateur-skill-ticket : script de contrôle des documents de la clé contre le rattachement de l'arbre |
 | `outils/verifier-kits.mjs` | generateur-skill-ticket : script de contrôle des kits dev, test et démo et de la remise à Agent2Test |
 | `outils/champ.mjs` | generateur-skill-ticket : script du champ d'observation : dépôt, vérification et état |
@@ -1174,12 +1174,12 @@ Dans `docs/demandes/ABCDE-3512/remise.md` : test, scénario, critère ou risque,
 <<<FICHIER modules/documents/SKILL.md>>>
 ---
 name: documents
-description: Documents de la clé Jira ABCDE-3512 selon agent-tdd-jira 1.3.10, demande.json, us.md et ABCDE-3512.feature, rédigés par le sous-agent rédacteur avant la ratification de l'arbre, avec le rattachement des critères des sous-tickets et les contrôles par script.
+description: Documents de la clé Jira ABCDE-3512 selon agent-tdd-jira 1.3.11, demande.json, us.md et ABCDE-3512.feature, rédigés par le sous-agent rédacteur avant la ratification de l'arbre, avec le rattachement des critères des sous-tickets et les contrôles par script.
 ---
 
 # Documents de la clé ABCDE-3512
 
-Avant la ratification de l'arbre, les documents de la clé Jira se rédigent dans `docs/demandes/ABCDE-3512/`, avec la méthode d'agent-tdd-jira 1.3.10, incluse dans ce skill (`references/agent-tdd-jira.md` et `references/agent-tdd-jira/`). Ils sont le plan commun de l'arbre : chaque sous-ticket prouve ses critères par leurs scénarios, et Agent2Test les reçoit tels quels à la remise. Ils se ratifient avec l'arbre, ce qui tient lieu de la validation V2 d'agent-tdd-jira.
+Avant la ratification de l'arbre, les documents de la clé Jira se rédigent dans `docs/demandes/ABCDE-3512/`, avec la méthode d'agent-tdd-jira 1.3.11, incluse dans ce skill (`references/agent-tdd-jira.md` et `references/agent-tdd-jira/`). Ils sont le plan commun de l'arbre : chaque sous-ticket prouve ses critères par leurs scénarios, et Agent2Test les reçoit tels quels à la remise. Ils se ratifient avec l'arbre, ce qui tient lieu de la validation V2 d'agent-tdd-jira.
 
 ## 1. Les trois documents
 
@@ -1728,12 +1728,12 @@ node .gemini/skills/ticket-abcde-3512/outils/vue.mjs verifier docs/demandes/ABCD
 <<<FICHIER modules/methode/SKILL.md>>>
 ---
 name: methode
-description: Sections de la méthode de l'orchestrateur C7E 3.8.6 dont le skill de ticket ABCDE-3512 a besoin, recopiées mot pour mot (§ 2, § 5.1, § 5.2, § 6, § 7.1, § 7.2, § 8, § 11.5).
+description: Sections de la méthode de l'orchestrateur C7E 3.8.7 dont le skill de ticket ABCDE-3512 a besoin, recopiées mot pour mot (§ 2, § 5.1, § 5.2, § 6, § 7.1, § 7.2, § 8, § 11.5).
 ---
 
 # Méthode C7E pour ABCDE-3512
 
-Sections recopiées mot pour mot de l'orchestrateur C7E 3.8.6 : § 2, § 5.1, § 5.2, § 6, § 7.1, § 7.2, § 8, § 11.5. La fiche dont elles parlent est ce skill, avec son analyse et sa remise (module `invariants`, correspondances). Un renvoi à un paragraphe absent de ce module est informatif.
+Sections recopiées mot pour mot de l'orchestrateur C7E 3.8.7 : § 2, § 5.1, § 5.2, § 6, § 7.1, § 7.2, § 8, § 11.5. La fiche dont elles parlent est ce skill, avec son analyse et sa remise (module `invariants`, correspondances). Un renvoi à un paragraphe absent de ce module est informatif.
 
 ## 2. Matrice d'activation (mixage paramétrique par défaut)
 
@@ -1922,7 +1922,7 @@ Une contradiction entre deux niveaux se signale et s'inscrit au registre des éc
 <<<FICHIER modules/invariants/SKILL.md>>>
 ---
 name: invariants
-description: Invariants dont hérite le skill de ticket ABCDE-3512, sans affaiblissement, avec ceux de l'orchestrateur C7E 3.8.6 recopiés mot pour mot et leurs correspondances dans un skill de ticket.
+description: Invariants dont hérite le skill de ticket ABCDE-3512, sans affaiblissement, avec ceux de l'orchestrateur C7E 3.8.7 recopiés mot pour mot et leurs correspondances dans un skill de ticket.
 ---
 
 # Invariants hérités par ABCDE-3512
@@ -1933,8 +1933,8 @@ Ce skill hérite, sans affaiblissement :
 - des invariants du projet : sa copie du fichier d'invariants, comparée au démarrage à `projet/meso-contrats.md` ;
 - du référentiel `references/java.md` (java 1.1.1), pour ses sections « Versions cibles » et « Invariants », sans adopter son mode de travail ;
 - du référentiel `references/angular.md` (angular 1.0.1), pour ses sections « Versions cibles » et « Invariants », sans adopter son mode de travail ;
-- des skills dont les sous-agents de rôle appliquent la méthode, recopiés dans `references/` et `outils/` à leur version épinglée (agent-tdd-jira 1.3.10, agent2test 1.6.2, java 1.1.1, angular 1.0.1, analyse-projet 1.0.2, sonarqube 1.1.0) : leurs invariants s'appliquent au travail fait avec eux, cités avec le nom de leur skill (`agent-tdd-jira:D10.INV-1`) ;
-- des invariants de l'orchestrateur C7E 3.8.6, ci-dessous, mot pour mot.
+- des skills dont les sous-agents de rôle appliquent la méthode, recopiés dans `references/` et `outils/` à leur version épinglée (agent-tdd-jira 1.3.11, agent2test 1.7.0, java 1.1.1, angular 1.0.1, analyse-projet 1.0.2, sonarqube 1.1.0) : leurs invariants s'appliquent au travail fait avec eux, cités avec le nom de leur skill (`agent-tdd-jira:D10.INV-1`) ;
+- des invariants de l'orchestrateur C7E 3.8.7, ci-dessous, mot pour mot.
 
 Un invariant ne s'affaiblit jamais. Une contradiction entre deux niveaux suit la précédence du module `methode` (§ 11.5) ; un écart s'inscrit au registre des écarts, avec sa décision (D6.INV-3).
 
@@ -1954,7 +1954,7 @@ Les invariants de l'orchestrateur parlent de sa fiche de transformation. Dans un
 | la qualification et la confirmation de la composition (D10.INV-1, D11) | faites avant la génération de ce skill ; si l'analyse montre que la demande sort des empreintes, ce skill remonte au parent, sans changer de composition (D11.INV-4) |
 | un paragraphe de l'orchestrateur (§ n) | le texte recopié dans le module `methode` s'il y figure ; sinon un renvoi informatif |
 
-## Invariants de l'orchestrateur C7E 3.8.6
+## Invariants de l'orchestrateur C7E 3.8.7
 
 - **D1.INV-1** : chaque modification du ticket est rattachée à un slot (É1 à É7) et à une profondeur (d=0 à d=3), dans la fiche et dans le message de son commit.
 - **D1.INV-2** : les slots É1 à É7 portent les sept termes de l'Axiome 7E, dans leur ordre ; É0, l'Outillage, est une précondition hors axiome, qui ne livre rien.
@@ -2929,10 +2929,10 @@ Fichier `docs/c7e/registre-ecarts.md` ⚠️ ADAPTER (emplacement), créé à l'
 ---
 name: agent-tdd-jira
 description: Agent de développement TDD qui part d'une demande Jira enregistrée en MHTML, l'analyse avec ses commentaires, établit les US et leurs critères d'acceptation numérotés, décline chaque critère en scénarios Gherkin, propose au développeur des variantes de réalisation back Java et front Angular pour chaque scénario, puis réalise les scénarios choisis un par un en cycle rouge, vert, remanié, avec traçabilité de la demande jusqu'aux commits ; en binôme avec Agent2Test, il reçoit un verdict d'acceptation par critère et corrige en TDD les défauts applicatifs confirmés ; en mode parallèle, il travaille dans un worktree géré par le kit agents-paralleles-gitlab.
-version: 1.3.10
+version: 1.3.11
 ---
 
-# Agent de développement TDD à partir d'une demande Jira, version 1.3.10
+# Agent de développement TDD à partir d'une demande Jira, version 1.3.11
 
 Ce document est le point d'entrée du skill. Il fixe le parcours de l'agent, ses points de validation, le registre des dimensions et les invariants. Les règles détaillées sont dans `modules/`.
 
@@ -3015,7 +3015,7 @@ Clause de second ordre : l'agent interprète une demande écrite par d'autres. S
 
 ## 5. Registre des dimensions
 
-| ID | Dimension | Introduite | Statut 1.3.10 | Dépend de | Module |
+| ID | Dimension | Introduite | Statut 1.3.11 | Dépend de | Module |
 |---|---|---|---|---|---|
 | D1 | Ingestion d'une demande Jira en MHTML | 1.0 | active | | `ingestion-jira` |
 | D2 | Analyse et scénarios Gherkin | 1.0 | active | D1, D10 | `analyse-demande` |
@@ -3169,6 +3169,8 @@ Point d'extension ajouté en 1.2.0 :
 **1.3.9** (2026-11-25) : correctif, jalon J3e du passage du dépôt au troisième ordre (`EVOLUTION.md`, section 10). Référence à agent2test 1.6.1, dont la rubrique facultative `kits` du journal de tests consigne le rôle de qui déclare l'application d'un kit test ; `lire-acceptation.mjs` ne la lit pas, et le format `agent2test.journal-de-tests/1` garde son nom. Le module `binome-agent2test` cite la 1.6.1. Aucune dimension ni aucun invariant modifié ; `lire-acceptation.mjs` inchangé. Archive : `archives/SKILL-v1.3.8.md`.
 
 **1.3.10** (2026-11-26) : correctif, jalon J5a du passage du dépôt au troisième ordre (`EVOLUTION.md`, section 10), la révision des formes propres. Référence à agent2test 1.6.2, qui inclut le socle de l'acceptable 1.2.0 et dont la constitution d'exemple passe en 2.1.1 ; le format `agent2test.journal-de-tests/1` ne change pas, et `lire-acceptation.mjs` le lit comme avant. Le module `binome-agent2test` cite la 1.6.2. Aucune dimension ni aucun invariant modifié ; `lire-acceptation.mjs` inchangé. Archive : `archives/SKILL-v1.3.9.md`.
+
+**1.3.11** (2026-11-26) : correctif, jalon J5b du passage du dépôt au troisième ordre (`EVOLUTION.md`, section 10.7), la révision dans l'instance. Référence à agent2test 1.7.0, dont la constitution se révise désormais dans l'instance, examinée et prouvée quand elle se relâche (D28), et dont le journal de tests porte une rubrique facultative `revisions` ; le format `agent2test.journal-de-tests/1` garde son nom, et `lire-acceptation.mjs` le lit comme avant. Le module `binome-agent2test` cite la 1.7.0. Aucune dimension ni aucun invariant modifié ; `lire-acceptation.mjs` inchangé. Archive : `archives/SKILL-v1.3.10.md`.
 <<<FIN references/agent-tdd-jira.md>>>
 
 <<<FICHIER references/agent-tdd-jira/ingestion-jira.md>>>
@@ -4318,9 +4320,9 @@ Tests : back et front verts. Commits : a1b2c3d, d4e5f6a, b7c8d9e, f0a1b2c.
 <<<FIN references/agent-tdd-jira/tracabilite.md>>>
 
 <<<FICHIER references/agent-tdd-jira/binome-agent2test.md>>>
-# Extrait de agent-tdd-jira 1.3.10, module `binome-agent2test` : § 3 et § 4
+# Extrait de agent-tdd-jira 1.3.11, module `binome-agent2test` : § 3 et § 4
 
-> Sections recopiées mot pour mot de `specs/agent-tdd-jira/modules/binome-agent2test/SKILL.md`, version 1.3.10, pour le skill racine d'un arbre de skills de ticket. Un renvoi à une section absente de cet extrait est informatif.
+> Sections recopiées mot pour mot de `specs/agent-tdd-jira/modules/binome-agent2test/SKILL.md`, version 1.3.11, pour le skill racine d'un arbre de skills de ticket. Un renvoi à une section absente de cet extrait est informatif.
 
 ## 3. Étiquettes du binôme (D7.INV-5)
 
@@ -4370,9 +4372,9 @@ me donner le chemin de son journal-de-tests.json.
 <<<FIN references/agent-tdd-jira/binome-agent2test.md>>>
 
 <<<FICHIER references/agent2test/plan.md>>>
-# Extrait de agent2test 1.6.2, module `plan` : § 2
+# Extrait de agent2test 1.7.0, module `plan` : § 2
 
-> Sections recopiées mot pour mot de `specs/agent2test/modules/plan/SKILL.md`, version 1.6.2, pour le skill racine d'un arbre de skills de ticket. Un renvoi à une section absente de cet extrait est informatif.
+> Sections recopiées mot pour mot de `specs/agent2test/modules/plan/SKILL.md`, version 1.7.0, pour le skill racine d'un arbre de skills de ticket. Un renvoi à une section absente de cet extrait est informatif.
 
 ## 2. Jouabilité et marques (D3.INV-1, D3.INV-3, D3.INV-5)
 
@@ -4394,9 +4396,9 @@ Est jouable un scénario qui n'a aucune des marques bloquantes ci-dessus et qui 
 <<<FIN references/agent2test/plan.md>>>
 
 <<<FICHIER references/agent2test/remise.md>>>
-# Extrait de agent2test 1.6.2, module `echange` : § 3
+# Extrait de agent2test 1.7.0, module `echange` : § 3
 
-> Sections recopiées mot pour mot de `specs/agent2test/modules/echange/SKILL.md`, version 1.6.2, pour le skill racine d'un arbre de skills de ticket. Un renvoi à une section absente de cet extrait est informatif.
+> Sections recopiées mot pour mot de `specs/agent2test/modules/echange/SKILL.md`, version 1.7.0, pour le skill racine d'un arbre de skills de ticket. Un renvoi à une section absente de cet extrait est informatif.
 
 ## 3. Remise `agent2test.remise/1` (D24.INV-3)
 
@@ -8823,7 +8825,7 @@ Tu réalises un à un les scénarios de `docs/demandes/ABCDE-3512/ABCDE-3512.fea
 <<<FICHIER agents/ticket-abcde-3512-redacteur.md>>>
 ---
 name: ticket-abcde-3512-redacteur
-description: Rédacteur des documents de la clé Jira ABCDE-3512, demande.json, us.md et fichier Gherkin, selon agent-tdd-jira 1.3.10, invoqué par le skill racine avant la ratification de l'arbre.
+description: Rédacteur des documents de la clé Jira ABCDE-3512, demande.json, us.md et fichier Gherkin, selon agent-tdd-jira 1.3.11, invoqué par le skill racine avant la ratification de l'arbre.
 kind: local
 tools:
   - read_file
@@ -8837,7 +8839,7 @@ tools:
 
 # Rédacteur des documents de ABCDE-3512
 
-Tu rédiges les documents de la clé Jira ABCDE-3512 dans `docs/demandes/ABCDE-3512/`, avec la méthode d'agent-tdd-jira 1.3.10. Ton contexte est le tien : le skill racine `ticket-abcde-3512` te confie ce travail et reçoit ton rapport. Commence par lire `.gemini/skills/ticket-abcde-3512/modules/documents/SKILL.md`, qui fixe les trois documents, les critères à reprendre et leur rattachement.
+Tu rédiges les documents de la clé Jira ABCDE-3512 dans `docs/demandes/ABCDE-3512/`, avec la méthode d'agent-tdd-jira 1.3.11. Ton contexte est le tien : le skill racine `ticket-abcde-3512` te confie ce travail et reçoit ton rapport. Commence par lire `.gemini/skills/ticket-abcde-3512/modules/documents/SKILL.md`, qui fixe les trois documents, les critères à reprendre et leur rattachement.
 
 ## Références
 
@@ -9069,8 +9071,8 @@ Lis d'abord la vue entière de l'arbre, `node .gemini/skills/ticket-abcde-3512/o
 
 Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichiers ont été matérialisés.
 
-    b91b01e3312651421d94430e53a2f2b4355543afa98e6f63e558abc34fcd52c0  manifest.json
-    7fd505296515993b047c953160660c1a7a1bed0437af3fb7c5342c09d5290ff6  SKILL.md
+    f07e2bff5c7d25f4acd40258c51256a92104bcbbb14c0072c21a64c72556f65b  manifest.json
+    1352797cad64daf6e873ab2b2aae09cc7c7cd33bd071665c64e9b56aae1095ae  SKILL.md
     7a6a452a94a9da17762e361f2cc5786f4cc8f5758f46aaf139cb1d4b75d779e6  ticket.toml
     ce951fe7a03b3fd6647efe36561f87ab4543d7e5099967afcf303072cb3d77cd  modules/meso-contrats/SKILL.md
     c61356a0950ba6abfaffc1a04cedb652fa78cf73df8891cd319d64012e154a69  modules/option-persistance-schema/SKILL.md
@@ -9081,27 +9083,27 @@ Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichier
     559e99c86f557181a983cf11907b4044f0e9099318e841c44008eebc8742c421  modules/option-frontend-elements_graphiques/SKILL.md
     eadb45d7e346538e497d5808f89211624f2191b917ae66d7b7b7273531135198  modules/option-frontend-fonctionnalites/SKILL.md
     01ceb03924eea81820f3a7f79e625c90bba86552cf9a1af08f861273947863fb  modules/recette/SKILL.md
-    9968fd270879d0db180a4717431b94c21b9be0dd34e7f8a34921b022dbba4389  modules/documents/SKILL.md
+    0b834db9a8841f182bafd4e7047b3cafc3e63323c46bc7f33769b5110a8aae03  modules/documents/SKILL.md
     6201aff204519f9f3d1fede185dae45c86e0219837d93a28575baa39252d1ee4  outils/rattachement.json
     66541bc090a35004b8885e74f02945b8eb655362d2435dbdcb754c41da6856ef  modules/kits/SKILL.md
     f7de880ba006f18417cd898e3494bb2800dd9a290463ea840d933b3a977c4f7e  modules/champ/SKILL.md
     719a3172164c5f91ee4d9d3b710b2e6efa204bb0f9534d9a7e95469b896fd70d  modules/champ-depot/SKILL.md
     631c8bce8352636564d26f1c8e0de5389460f2f4fb22dc933eb01ce11a771158  modules/vue/SKILL.md
-    ea021f334136c5daf54eff933d4d069c8deb7c74b062fefa1b3b27a9915b613a  modules/methode/SKILL.md
-    96e13a1baeab13f6564f4ced5727e202a57904e41259427960f1cbca5c64b6b7  modules/invariants/SKILL.md
+    170cc0207d32bb733f9a8ab2c67db9518294a399528a0394147e1ab96ad0c593  modules/methode/SKILL.md
+    7dc3e25673fc2d078a1505b81077ad9aced9ddf3f0ca8e6eb111f5ef87ad8490  modules/invariants/SKILL.md
     f9456b0bbcdce8cd1ebc06446c3d505829a0354f398f4aa819204e4e9c135f54  socle/SKILL.md
     4bb52253c4504f4a804460442b1711a9caab8e364528171f2afb9ba7d5acfccf  references/java.md
     28e0a697773aaf205f024e3fa0a0d99c43bbaf86fb7a56c954c9964e67d22d16  references/angular.md
     971128d2351d7dce8941a57e3b3875b59cb229c9469eef7c20d74d7561b6ac31  projet/meso-contrats.md
-    3feed1b71e34f79b3c1042572675cc6e9c77504e56e28fddcf88071a4cd558b3  references/agent-tdd-jira.md
+    a4d7b3aaac1681018b9c1b4f8abe2192df73fab068bf9011ea2b11f2d18548ee  references/agent-tdd-jira.md
     0f764ee60e5818cb50f4b076ca2528d46f893b553957b023b1fac7f13386be6a  references/agent-tdd-jira/ingestion-jira.md
     ed5a9c72063718929b12f68130ce5e477a0624a1f14bcb96df065d633f496acd  references/agent-tdd-jira/us-criteres.md
     2b68bd4b7f3d2f27cdb218ac73c75e4628e5a7985c0dcfb0633e084cfc65b32a  references/agent-tdd-jira/analyse-demande.md
     a5ba1475936065ca1fb846506af998343ce55690e4aa798d39c5321d44ef1fcb  references/agent-tdd-jira/cycle-tdd.md
     2657a6d1187c1b58011abac95b19365a6316629318770cff4006d2b1c9551492  references/agent-tdd-jira/tracabilite.md
-    43154f387cdf166e7483102ddf450de8659a50add15c450f5e5cdeaf60233d66  references/agent-tdd-jira/binome-agent2test.md
-    884a39211422176a57195ebf76c9345e0a862583eb47154849446d2dac7ccb86  references/agent2test/plan.md
-    6b720a2699fe59a6a0e4859a93a43c8c73ab07516af1a6133e2fb6e16105e1f0  references/agent2test/remise.md
+    35a2b118cf0c1bc70ea5dfcbf8e2b53a000fbf6b7f3f3f298c7cc9baf6aacde7  references/agent-tdd-jira/binome-agent2test.md
+    b809b23529d7b423ccaf641553af33c0ce3d231d2d4fea0026a297b08609c0d0  references/agent2test/plan.md
+    a88154ddc6345a4a49c41a40820562729e43bf4bcfa6a2b91a183e1d289ccd88  references/agent2test/remise.md
     abf876a7111f2b8c2bfe3153fb11379cb9132cc9d67f28f13df0032821c6142c  references/analyse-projet.md
     d69f912a83018be9da1b48a10f2d241c458d22728bf6af04933e4d29dfb71831  references/analyse-projet/cartographie.md
     5d93dc76abbd88d55061b30e098bf0b31f50bfe7cf79cb83a55770dde448d532  references/java/revue.md
@@ -9119,7 +9121,7 @@ Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichier
     9cdd757be73c152235f1b586ab17b2c96df1cee3dd798b94d3a3623271fad37b  agents/ticket-abcde-3512-persistance.md
     42296d91755a89d0b218b1aeaeaecaf99b8bf8d5bb53afc15a4375f87b7fdae7  agents/ticket-abcde-3512-back.md
     81a9f31038fd41d301861beeb445ebfdbda681d45b753383511583d8c8dcaf8b  agents/ticket-abcde-3512-front.md
-    e67c2b3004897bdbe461228dd67fd0b5ce679076727f13ea23a182869ddfbb13  agents/ticket-abcde-3512-redacteur.md
+    06995ef8466f1adef18607ad0452dc0a1a63c3945e6b21ae3d80f597455f2ac0  agents/ticket-abcde-3512-redacteur.md
     3adf6432ffe4e476e345b87310bd28a5a7ccb89b28d351f7cf671dc7adaa88f1  agents/ticket-abcde-3512-analyste.md
     f3a878f934a2175eccb531e85e06c54f15ec231a812c453a1093fc0948b44b90  agents/ticket-abcde-3512-relecteur.md
     e474fd7f8bd33cc567b1e7b17063259d084d72a829c7ff91811f751f49d78720  agents/ticket-abcde-3512-qualite.md

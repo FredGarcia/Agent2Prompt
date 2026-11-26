@@ -22,7 +22,7 @@ Un patch qui enfreint une règle n'est pas remis : refus `acceptable.refus`, ave
 ```json
 {
   "format": "socle-acceptable.kit/1",
-  "systeme": { "nom": "agent2dev", "version": "1.4.3" },
+  "systeme": { "nom": "agent2dev", "version": "1.5.0" },
   "environnement": "dev",
   "patch": { "chemin": "../patchs/002-S02.patch", "empreinte": "54b440c362566a4c8e8f22b9baf9f7d78a1c78b16820ec6d8fe0566a48aafc55" },
   "noyau": { "version": "1.2.0", "empreinte": "e815cadf230886d507d56dbbfb5d7cfd0cf3982036d54d0279b70cc8f49b4764" },

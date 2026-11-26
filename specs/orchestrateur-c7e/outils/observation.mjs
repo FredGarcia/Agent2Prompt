@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Export des registres de l'orchestrateur C7E vers le socle d'observation (orchestrateur-c7e, D12, depuis 3.7.0 ;
-// socle-observation 1.4.0). Il se lance depuis le clone du dépôt Agent2Prompt ; l'IA de l'orchestrateur ne
+// socle-observation 1.5.0). Il se lance depuis le clone du dépôt Agent2Prompt ; l'IA de l'orchestrateur ne
 // l'exécute pas d'elle-même : elle en donne la commande au développeur.
 //
 // L'export ne lit que ce qui est commité dans le projet, sans rien modifier : le registre des concepts,

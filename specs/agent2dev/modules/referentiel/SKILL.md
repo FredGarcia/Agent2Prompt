@@ -13,7 +13,7 @@ Le `referentiel` est la mémoire procédurale et réflexive d'Agent2Dev : ce qui
 
 - Huit fiches, une par usage du moteur : `fiches/analyse.json`, `impact.json`, `variantes.json`, `contrat.json`, `rouge.json`, `vert.json`, `remanie.json`, `rapport.json` (module `methode`, section 3). Elles vivent dans git et ne changent que par une version publiée, écrite par un humain ; leur publication s'inscrit au grand livre (`fiche.publiee`).
 - Les leçons ratifiées sont des surcouches, rangées dans les données du `referentiel`, rattachées à une fiche et à un moteur (D15.INV-2).
-- Version composée : `<fiche>@<version>+agent-tdd-jira@1.3.10+L<n>`, où `n` compte les leçons actives pour ce moteur, par exemple `rouge@1.0.0+agent-tdd-jira@1.3.10+L1`.
+- Version composée : `<fiche>@<version>+agent-tdd-jira@1.3.11+L<n>`, où `n` compte les leçons actives pour ce moteur, par exemple `rouge@1.0.0+agent-tdd-jira@1.3.11+L1`.
 - `fiche(code, moteur)` rend la fiche composée : la fiche de base, puis les leçons actives du moteur, dans l'ordre de ratification.
 - `reconstituer(production)` refait le prompt d'une production du moteur à partir du journal : version composée, sections du skill lues dans la transmission vérifiée, identifiants des leçons, entrées du pas. Son empreinte doit égaler celle que le journal a gardée (module `journal`, section 3).
 
@@ -56,8 +56,9 @@ Valeurs fixées par la configuration humaine, que le système lit sans les modif
 ## 5. Grand livre (D17.INV-2)
 
 - Collection en ajout seul du `referentiel`, chaînée comme le journal (module `journal`, section 1).
-- Types d'entrée : `constitution.publiee`, `fiche.publiee`, `lecon.ratifiee`, `lecon.refusee`, `lecon.suspendue`, `regle.ratifiee`, `regle.refusee`, `retour.arriere`, `epinglage`.
+- Types d'entrée : `constitution.examinee`, `constitution.publiee`, `fiche.publiee`, `lecon.ratifiee`, `lecon.refusee`, `lecon.suspendue`, `regle.ratifiee`, `regle.refusee`, `retour.arriere`, `epinglage`.
 - Chaque entrée porte sa cause, ses preuves (références au journal), l'auteur de la ratification et, plus tard, l'effet mesuré, ajouté par une entrée nouvelle, jamais par modification.
+- Depuis 1.5.0, `constitution.publiee` porte la constitution entière, son sens, ses relâchements et ses renforcements, et un relâchement est précédé de son `constitution.examinee`, inscrit avec lui (module `revision`, section 3).
 
 `revenir(element)` suspend une leçon ou rend à une règle sa dernière valeur ratifiée, à la demande du `reflexif` (D16.INV-1), et inscrit `lecon.suspendue` ou `retour.arriere`. C'est la seule évolution que le système fasse seul.
 
@@ -80,7 +81,7 @@ Valeurs fixées par la configuration humaine, que le système lit sans les modif
 | RF6 | D17.INV-4 | une décision CP-4 venue du canal MCP, ou d'un utilisateur sans le rôle référent, est refusée `DECISION_IRRECEVABLE` |
 | RF7 | D17.INV-5 | pour une production journalisée, `reconstituer` redonne un prompt de même empreinte |
 | RF8 | D17.INV-5 | une leçon ratifiée crée une version composée nouvelle, `+L<n+1>`, pour son seul moteur |
-| RF9 | D1.INV-4 | `npm run constitution:publier` inscrit `constitution.publiee` ; aucun agent ne l'appelle (analyse des sources) |
+| RF9 | D1.INV-4 | `npm run constitution:publier` inscrit `constitution.publiee`, précédée de `constitution.examinee` pour un relâchement (module `revision`) ; aucun agent ne l'appelle (analyse des sources) |
 
 ## 8. Fichiers à produire
 

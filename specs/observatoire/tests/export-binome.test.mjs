@@ -1,7 +1,8 @@
-// Recette de l'export du binôme (observatoire 1.4.0, D7 ; socle-observation 1.4.0, sections 6.5 à 6.7), sur des
+// Recette de l'export du binôme (observatoire 1.6.0, D7 ; socle-observation 1.5.0, sections 6.5 à 6.8), sur des
 // projets d'épreuve, dépôts Git temporaires, et des livrables d'Agent2Dev et des journaux de tests d'Agent2Test
 // écrits pour l'épreuve, avec refus, dérogations et faux refus, des kits, remis, validés, appliqués ou en échec,
-// défaits, et les points de validation d'Agent2Dev, présentés et décidés. Le sel est donné à l'outil, sauf pour l'épreuve du sel tiré ;
+// défaits, les points de validation d'Agent2Dev, présentés et décidés, et les révisions de la constitution,
+// examinées et publiées. Le sel est donné à l'outil, sauf pour l'épreuve du sel tiré ;
 // la recette n'écrit ni dans le clone, ni dans le magasin de l'observatoire.
 
 import { test } from 'node:test';
@@ -38,7 +39,7 @@ const REFUS_PERIMETRE = { n: 2110, date: '2026-10-21T14:10:00Z', garde: 'perimet
 const REFUS_ESSAI = { n: 2120, date: '2026-10-21T15:00:00Z', garde: 'commandes', objet: '--essai-derogeable', regles: ['D6.INV-2'], reponse: { decision: 'deroger', role: 'referent', n: 2121, date: '2026-10-21T15:01:00Z' } };
 
 /** Livrable d'Agent2Dev d'une demande, avec sa rubrique acceptable si des refus l'ont touchée. */
-function livrable(refus, { cle = 'ECR-77', version = '1.3.1', kits, points } = {}) {
+function livrable(refus, { cle = 'ECR-77', version = '1.3.1', kits, points, revisions } = {}) {
   return {
     format: 'agent2dev.livrable/1',
     demande: { cle, titre: 'Export des retours d\'expérience en CSV, chez le client Dupont', source: 'e'.repeat(64) },
@@ -50,11 +51,12 @@ function livrable(refus, { cle = 'ECR-77', version = '1.3.1', kits, points } = {
     ...(refus ? { acceptable: { socle: 'socle-acceptable', version: '1.0.1', refus } } : {}),
     ...(kits ? { kits } : {}),
     ...(points ? { points } : {}),
+    ...(revisions ? { revisions } : {}),
   };
 }
 
 /** Journal de tests d'Agent2Test d'une campagne, avec sa rubrique acceptable, et sa rubrique kits s'il en a. */
-function journalDeTests(refus, { campagne = 'C-20261021-001', cle = 'ECR-77', version = '1.5.1', kits, points } = {}) {
+function journalDeTests(refus, { campagne = 'C-20261021-001', cle = 'ECR-77', version = '1.5.1', kits, points, revisions } = {}) {
   return {
     format: 'agent2test.journal-de-tests/1',
     campagne,
@@ -67,6 +69,7 @@ function journalDeTests(refus, { campagne = 'C-20261021-001', cle = 'ECR-77', ve
     ...(refus ? { acceptable: { socle: 'socle-acceptable', version: '1.0.1', refus } } : {}),
     ...(kits ? { kits } : {}),
     ...(points ? { points } : {}),
+    ...(revisions ? { revisions } : {}),
   };
 }
 
@@ -87,6 +90,14 @@ const POINTS = [
   { n: 2040, date: '2026-10-21T13:40:00Z', point: 'V2', decision: { n: 2046, date: '2026-10-21T13:52:30Z', valeur: 'corriger', role: 'developpeur', canal: 'tableau-de-bord', commentaire: 'le critère 3 vise l\'export, chez Dupont' } },
   { n: 2050, date: '2026-10-21T13:55:00Z', point: 'V2', decision: { n: 2051, date: '2026-10-21T13:57:00Z', valeur: 'valider', role: 'developpeur', canal: 'mcp', commentaire: '' } },
   { n: 2060, date: '2026-10-21T14:00:00Z', point: 'V3', decision: null },
+];
+
+// Révisions de la constitution : les entrées du grand livre qui la révisent, chacune à son numéro (socle, 6.8).
+const CONSTITUTIONS = { premiere: '1'.repeat(64), relachee: '2'.repeat(64), renforcee: '3'.repeat(64) };
+const REVISIONS = [
+  { n: 12, date: '2026-10-20T09:00:00Z', type: 'constitution.publiee', version: '2.1.1', empreinte: CONSTITUTIONS.premiere, sens: 'premiere', relachements: 0, renforcements: 0 },
+  { n: 15, date: '2026-10-21T08:00:00Z', type: 'constitution.examinee', version: '2.2.0', empreinte: CONSTITUTIONS.relachee, avis: 'reserve' },
+  { n: 16, date: '2026-10-21T08:05:00Z', type: 'constitution.publiee', version: '2.2.0', empreinte: CONSTITUTIONS.relachee, sens: 'relachement', relachements: 2, renforcements: 1 },
 ];
 
 /** Écrit des sources d'épreuve dans un dossier hors du projet, comme la sortie d'Agent2Dev et le projet d'Agent2Test. */
@@ -391,4 +402,57 @@ test('D7 : la rubrique points d\'Agent2Dev devient des enveloppes : la présenta
   // Agent2Test n'a pas de rubrique points dans le socle : une telle rubrique n'exporte rien.
   const t2 = sansErreur(exporter({ projet: projet('points-a2t'), fichiers: sources(journalDeTests(null, { points: POINTS })), sel: SELS.A }));
   assert.deepStrictEqual(t2.journaux.map((j) => [j.journal, j.ajoutees]), [[J2T, 0]]);
+});
+
+test('D7 : la rubrique revisions du binôme devient des enveloppes : l\'examen, de l\'observateur extérieur, puis la publication, du référent, avec ses relâchements comptés, reliés par l\'ancre de la constitution ; une fois chacune, quelles que soient les sources ; rien en clair', () => {
+  const p = projet('revisions');
+  const [a, b] = sources(livrable(null, { revisions: REVISIONS }), livrable(null, { cle: 'ECR-92', revisions: REVISIONS.slice(0, 1) }));
+  const r = sansErreur(exporter({ projet: p, fichiers: [a, b], sel: SELS.A }));
+  assert.deepStrictEqual(r.journaux.map((j) => [j.journal, j.ajoutees]), [[J2D, 3]], 'la première publication, que portent les deux livrables, ne s\'exporte qu\'une fois');
+  const salee = (ref) => sha256(`${SELS.A}:${ref}`);
+  const d = enveloppes(p, J2D);
+  for (const x of d) assert.deepStrictEqual(controlerEnveloppe(x), [], JSON.stringify(x));
+  assert.deepStrictEqual(d.map((x) => [x.type, x.ordre, x.niveau, x.sujet, x.nature, x.motif, x.source.numero, x.source.journal, x.ancre, x.mesure ?? null]), [
+    ['observation', 'OC2', 'humain', 'referent', 'premiere', 'revision-constitution', 12, salee('grand-livre'), { nature: 'constitution', ref: salee(CONSTITUTIONS.premiere) }, { nom: 'relachements', valeur: 0 }],
+    ['observation', 'OC2', 'N3', 'observateur-externe', 'reserve', 'revision-constitution', 15, salee('grand-livre'), { nature: 'constitution', ref: salee(CONSTITUTIONS.relachee) }, null],
+    ['observation', 'OC2', 'humain', 'referent', 'relachement', 'revision-constitution', 16, salee('grand-livre'), { nature: 'constitution', ref: salee(CONSTITUTIONS.relachee) }, { nom: 'relachements', valeur: 2 }],
+  ]);
+  for (const x of d) assert.deepStrictEqual([x.cible, x.invariant, x.decision, x.systeme], ['instance', undefined, undefined, { nom: 'agent2dev', version: '1.3.1' }]);
+  for (const v of ['2.2.0', '2.1.1', CONSTITUTIONS.relachee, 'grand-livre']) assert.ok(!texte(p, J2D).includes(v), `« ${v} » en clair`);
+
+  // Une révision venue plus tard s'ajoute ; les révisions déjà exportées ne se répètent pas.
+  const renforcement = { n: 20, date: '2026-10-22T08:00:00Z', type: 'constitution.publiee', version: '2.3.0', empreinte: CONSTITUTIONS.renforcee, sens: 'renforcement', relachements: 0, renforcements: 1 };
+  const deux = sansErreur(exporter({ projet: p, fichiers: sources(livrable(null, { cle: 'ECR-95', revisions: [...REVISIONS, renforcement] })), sel: SELS.A }));
+  assert.deepStrictEqual(deux.journaux.map((j) => j.ajoutees), [1]);
+  assert.deepStrictEqual([enveloppes(p, J2D)[3]].map((x) => [x.nature, x.mesure]), [['renforcement', { nom: 'relachements', valeur: 0 }]]);
+  const intact = texte(p, J2D);
+  const refuse = (revisions, motif) => {
+    const r2 = exporter({ projet: p, fichiers: sources(livrable(null, { cle: 'ECR-96', revisions })), sel: SELS.A });
+    assert.ok(r2.erreurs.length > 0 && r2.erreurs.some((e) => motif.test(e)), `${motif} : ${r2.erreurs.join(' ; ')}`);
+    assert.equal(texte(p, J2D), intact, 'rien n\'est écrit');
+  };
+  refuse([REVISIONS[0], { ...REVISIONS[2], n: 17 }], /révision 2 : relâchement sans l'examen de la même constitution juste avant lui/);
+  refuse([REVISIONS[0], { ...REVISIONS[1], n: 21 }], /révision 2 : un examen précède la publication, en relâchement, de la même constitution/);
+  refuse([REVISIONS[0], REVISIONS[1], { ...REVISIONS[2], empreinte: CONSTITUTIONS.renforcee }], /un examen précède la publication, en relâchement, de la même constitution/);
+  refuse([{ ...REVISIONS[0], relachements: 1 }], /un relâchement compte au moins un relâchement, et seul un relâchement en compte/);
+  refuse([{ ...REVISIONS[0], sens: 'affaiblissement' }], /sens « affaiblissement », hors de la liste : premiere, neutre, renforcement, relachement/);
+  refuse([REVISIONS[0], { ...REVISIONS[1], avis: 'neutre' }, REVISIONS[2]], /avis « neutre », hors de la liste : favorable, reserve, defavorable/);
+  refuse([REVISIONS[1], REVISIONS[2], REVISIONS[0]], /révision 3 : postérieure à la précédente, par son numéro au grand livre et par sa date/);
+  refuse([REVISIONS[0], { ...REVISIONS[1], n: 11 }, { ...REVISIONS[2], n: 13 }], /révision 2 : postérieure à la précédente, par son numéro au grand livre et par sa date/);
+  refuse([REVISIONS[0], { ...REVISIONS[1], date: '2026-10-19T08:00:00Z' }, { ...REVISIONS[2], date: '2026-10-19T08:05:00Z' }], /révision 2 : postérieure à la précédente, par son numéro au grand livre et par sa date/);
+  refuse([{ ...REVISIONS[0], renforcements: -1 }], /relachements et renforcements, des entiers positifs ou nuls/);
+  refuse([{ ...REVISIONS[0], type: 'lecon.ratifiee' }], /type « lecon\.ratifiee », constitution\.examinee ou constitution\.publiee/);
+  refuse([{ ...REVISIONS[0], empreinte: 'abc' }], /empreinte, celle de la constitution/);
+  refuse({ n: 12 }, /rubrique revisions mal formée : la liste des entrées du grand livre/);
+  const r4 = exporter({ projet: p, fichiers: sources(journalDeTests(null, { campagne: 'grand-livre' })), sel: SELS.A });
+  assert.ok(r4.erreurs.some((e) => /campagne « grand-livre », réservé aux révisions, que le grand livre numérote/.test(e)), r4.erreurs.join(' ; '));
+  refuse([{ ...REVISIONS[0], sens: 'neutre' }], /l'enregistrement 12 a changé depuis son export/);
+  // Deux sources qui disent autrement la même entrée du grand livre : rien n'est écrit.
+  const q = projet('revisions-divergentes');
+  const r3 = exporter({ projet: q, fichiers: sources(livrable(null, { revisions: REVISIONS.slice(0, 1) }), livrable(null, { cle: 'ECR-92', revisions: [{ ...REVISIONS[0], sens: 'neutre' }] })), sel: SELS.A });
+  assert.ok(r3.erreurs.some((e) => /la révision 12 du grand livre ne se dit pas comme dans/.test(e)), r3.erreurs.join(' ; '));
+  assert.equal(texte(q, J2D), null);
+  // Agent2Test : la même rubrique, dans son journal de tests, vers son propre journal d'enveloppes.
+  const t2 = sansErreur(exporter({ projet: projet('revisions-a2t'), fichiers: sources(journalDeTests(null, { revisions: REVISIONS })), sel: SELS.A }));
+  assert.deepStrictEqual(t2.journaux.map((j) => [j.journal, j.ajoutees]), [[J2T, 3]]);
 });

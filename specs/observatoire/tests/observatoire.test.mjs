@@ -1,4 +1,4 @@
-// Recette de l'observatoire (observatoire 1.5.0, D1 à D6, D8 à D11), sur des instances d'épreuve dont les journaux
+// Recette de l'observatoire (observatoire 1.6.0, D1 à D6, D8 à D12), sur des instances d'épreuve dont les journaux
 // sont produits par l'export du générateur de skills de ticket : A, le champ de l'arbre d'exemple ABCDE-3620
 // et un registre d'apprentissage dont une proposition, qui vise le générateur, est retenue ; B et C, des
 // champs écrits pour l'épreuve ; pour la confrontation entre systèmes, par l'export de l'orchestrateur C7E,
@@ -167,11 +167,14 @@ function orchestrateur(p, nom, lignes, { concepts = `${DEPART}\n`, date = '2026-
 /** Un refus d'une rubrique acceptable, et sa réponse. */
 const refusDe = (n, date, garde, regles, reponse = null) => ({ n, date, garde, objet: 'objet-d-epreuve', regles, reponse });
 const reponseDe = (decision, role, n, date) => ({ decision, role, n, date });
-const livrableA2D = (cle, refus, kits, points) => ({ format: 'agent2dev.livrable/1', demande: { cle, titre: 'Demande d\'épreuve, chez le client Dupont', source: 'e'.repeat(64) }, versions: { specification: VERSION_A2D }, acceptable: { socle: 'socle-acceptable', version: VERSION_SA, refus }, ...(kits ? { kits } : {}), ...(points ? { points } : {}) });
+const livrableA2D = (cle, refus, kits, points, revisions) => ({ format: 'agent2dev.livrable/1', demande: { cle, titre: 'Demande d\'épreuve, chez le client Dupont', source: 'e'.repeat(64) }, versions: { specification: VERSION_A2D }, acceptable: { socle: 'socle-acceptable', version: VERSION_SA, refus }, ...(kits ? { kits } : {}), ...(points ? { points } : {}), ...(revisions ? { revisions } : {}) });
 /** Une présentation d'un point de validation, et sa décision, ou null tant qu'elle attend. */
 const pointDe = (n, date, point, decision = null) => ({ n, date, point, decision });
 const decisionDe = (n, date, valeur) => ({ n, date, valeur, role: 'developpeur', canal: 'tableau-de-bord', commentaire: 'chez le client Dupont' });
-const journalA2T = (campagne, cle, refus, kits) => ({ format: 'agent2test.journal-de-tests/1', campagne, demande: { cle, texte: 'Demande d\'épreuve' }, versions: { specification: VERSION_A2T }, acceptable: { socle: 'socle-acceptable', version: VERSION_SA, refus }, ...(kits ? { kits } : {}) });
+const journalA2T = (campagne, cle, refus, kits, revisions) => ({ format: 'agent2test.journal-de-tests/1', campagne, demande: { cle, texte: 'Demande d\'épreuve' }, versions: { specification: VERSION_A2T }, acceptable: { socle: 'socle-acceptable', version: VERSION_SA, refus }, ...(kits ? { kits } : {}), ...(revisions ? { revisions } : {}) });
+/** Une entrée de la rubrique revisions : une publication, avec son sens et ses relâchements, ou un examen, avec son avis. */
+const publicationDe = (n, date, empreinte, sens, relachements = 0) => ({ n, date, type: 'constitution.publiee', version: `2.${n}.0`, empreinte, sens, relachements, renforcements: sens === 'renforcement' ? 1 : 0 });
+const examenDe2 = (n, date, empreinte, avis) => ({ n, date, type: 'constitution.examinee', version: `2.${n + 1}.0`, empreinte, avis });
 /** Un kit d'une rubrique kits : sa remise, puis ses étapes, chacune à sa ligne de journal, avec son rôle. */
 const kitDe = (n, date, environnement, empreinte, etapes = {}) => ({ n, date, environnement, empreinte, validation: null, application: null, retourArriere: null, ...etapes });
 const etapeDe = (n, date, role, resultat) => ({ n, date, role, ...(resultat ? { resultat } : {}) });
@@ -689,6 +692,32 @@ test('D4 : l\'observatoire n\'écrit dans le dépôt que des propositions, sans 
   assert.deepStrictEqual(lirePropositions(lieux.depot).erreurs, []);
 });
 
+test('D12 : les révisions des constitutions se comptent par système : publications par sens, entrées relâchées, examens par avis, et instances ; aucun candidat', () => {
+  const [a, b2] = [projet('A'), projet('B')];
+  const [c1, c2, c3] = ['1', '2', '3'].map((c) => c.repeat(64));
+  binome(a, 'A', livrableA2D('ABC-1', [], null, null, [publicationDe(3, '2026-11-20T09:00:00Z', c1, 'premiere'), examenDe2(5, '2026-11-21T09:00:00Z', c2, 'reserve'), publicationDe(6, '2026-11-21T09:05:00Z', c2, 'relachement', 2)]));
+  binome(b2, 'B', livrableA2D('FGH-1', [], null, null, [publicationDe(4, '2026-11-20T10:00:00Z', c1, 'premiere'), publicationDe(7, '2026-11-22T10:00:00Z', c3, 'renforcement')]), journalA2T('C-1', 'FGH-1', [], null, [publicationDe(2, '2026-11-20T11:00:00Z', c1, 'premiere'), examenDe2(8, '2026-11-23T11:00:00Z', c3, 'defavorable'), publicationDe(9, '2026-11-23T11:30:00Z', c3, 'relachement', 1)]));
+  const lieux = observatoire([a, b2]);
+  const r = confronter(lieux);
+  assert.deepStrictEqual(r.erreurs, []);
+  assert.deepStrictEqual(r.revisions, [
+    { systeme: 'agent2dev', publications: 4, premieres: 2, neutres: 0, renforcements: 1, relachements: 1, entreesRelachees: 2, examens: 1, favorables: 0, reserves: 1, defavorables: 0, instances: 2 },
+    { systeme: 'agent2test', publications: 2, premieres: 1, neutres: 0, renforcements: 0, relachements: 1, entreesRelachees: 1, examens: 1, favorables: 0, reserves: 0, defavorables: 1, instances: 1 },
+  ]);
+  assert.deepStrictEqual([r.candidats, r.acceptable, r.kits, r.signaux], [[], [], [], []], 'des comptes seulement : aucun candidat, ni règle, ni kit, ni signal');
+  assert.deepStrictEqual(proposer({ ...lieux, date: '2026-11-26' }).ecrites, [], 'rien à proposer : un relâchement examiné est une décision du développeur, non un retour');
+  assert.deepStrictEqual(JSON.parse(lancer(lieux, 'confronter', '--json').sortie).revisions, r.revisions);
+  const sortie = lancer(lieux, 'confronter').sortie;
+  assert.match(sortie, /^révisions des constitutions : des comptes, sans candidat$/m);
+  assert.match(sortie, /^ {2}agent2dev : 4 publications, 2 premières, 0 neutre, 1 renforcement, 1 relâchement de 2 entrées ; 1 examen : 0 favorable, 1 réservé, 0 défavorable ; 2 instances$/m);
+  assert.match(sortie, /^ {2}agent2test : 2 publications, 1 première, 0 neutre, 0 renforcement, 1 relâchement de 1 entrée ; 1 examen : 0 favorable, 0 réservé, 1 défavorable ; 1 instance$/m);
+  // Le socle admet l'observateur extérieur et l'ancre de la constitution ; une révision n'a pas d'invariant.
+  const x = sansCR(readFileSync(join(a, 'docs', 'c7e', 'observations-agent2dev.jsonl'), 'utf8')).trim().split('\n').map((l) => JSON.parse(l))[1];
+  assert.deepStrictEqual([x.sujet, x.ancre.nature, x.invariant, controlerEnveloppe(x)], ['observateur-externe', 'constitution', undefined, []]);
+  assert.match(controlerEnveloppe({ ...x, sujet: 'examinateur' }).join(' ; '), /sujet « examinateur »/);
+  assert.match(controlerEnveloppe({ ...x, ancre: { nature: 'grand-livre', ref: x.ancre.ref } }).join(' ; '), /ancre\.nature/);
+});
+
 // ---- D11 : examens indépendants ----
 
 /** Une proposition au format observatoire.proposition/1, au statut donné, avec son corps. */
@@ -706,7 +735,7 @@ test('D11 : un examen suit le format observatoire.examen/1 : en-tête fermé, ob
     [bon.replace('avis: reserve', 'avis: neutre'), /avis « neutre » : favorable, reserve ou defavorable/],
     [bon.replace('examinateur: observateur-externe', 'examinateur: developpeur'), /examinateur « developpeur » : le rôle observateur-externe/],
     [bon.replace('modele: gemini-3-flash-preview', 'modele: Gemini 3, chez le client Dupont'), /modele « Gemini 3, chez le client Dupont »/],
-    [bon.replace('objet: specification', 'objet: version'), /objet « version » : proposition ou specification/],
+    [bon.replace('objet: specification', 'objet: version'), /objet « version » : proposition, specification ou constitution/],
     [bon.replace('version: 1.5.0', 'version: 1.5'), /version « 1\.5 » : la version qui porte le relâchement/],
     [bon.replace('date: 2026-11-26', 'date: 26/11/2026'), /date « 26\/11\/2026 »/],
     [bon.replace(/## Avis\n\n- .*\n$/, 'Favorable, sans plus.\n'), /corps : ## Avis, puis les points de l'examinateur/],
@@ -719,6 +748,9 @@ test('D11 : un examen suit le format observatoire.examen/1 : en-tête fermé, ob
     assert.ok(erreurs.some((e) => motif.test(e)), `${motif} : ${erreurs.join(' ; ')}`);
   }
   assert.match(controlerExamen(bon, 'agent2dev-1.4.0.md').erreurs.join(' ; '), /nom du fichier : agent2dev-1\.5\.0\.md, celui de la spécification et de sa version/);
+  const deConstitution = examenDe('format: observatoire.examen/1\ndate: 2026-11-26\nobjet: constitution\nsysteme: agent2dev\nversion: 2.2.0\nexaminateur: observateur-externe\nmodele: gemini-3-flash-preview\navis: reserve');
+  assert.deepStrictEqual(controlerExamen(deConstitution, '2.2.0.md').erreurs, [], 'l\'examen d\'une constitution, dans son instance, porte le nom de sa version');
+  assert.match(controlerExamen(deConstitution, 'agent2dev-2.2.0.md').erreurs.join(' ; '), /nom du fichier : 2\.2\.0\.md, la version de la constitution/);
   const deProposition = examenDe(EXAMEN_DE_PROPOSITION);
   assert.deepStrictEqual(controlerExamen(deProposition, '2026-11-26-x.md').erreurs, []);
   assert.match(controlerExamen(deProposition.replace('objet: proposition', 'objet: proposition\nsysteme: agent2dev'), '2026-11-26-x.md').erreurs.join(' ; '), /systeme, version : seulement pour l'examen d'une spécification/);
@@ -741,6 +773,10 @@ test('D11 : une proposition ne se ratifie qu\'avec son examen, du même nom, qui
   assert.deepStrictEqual(controlerRatifications(d).erreurs, [`${PROPOSITIONS}/${nom} : ratifiée contre un avis défavorable, sans « ## Réponse à l'examen » dans son corps`], 'un avis ne décide pas, mais il demande sa réponse');
   ecrire(`${PROPOSITIONS}/${nom}`, propositionDe('statut: ratifiee\nversion: 1.4.0\npr: 80', '## Ce qui change\n\nLa règle se précise.\n\n## Réponse à l\'examen\n\nLa règle se précise sans s\'affaiblir.\n'));
   assert.deepStrictEqual(controlerRatifications(d).erreurs, []);
+  // L'examen d'une constitution vit dans son instance, jamais dans le dépôt.
+  ecrire(`${EXAMENS}/2.2.0.md`, examenDe('format: observatoire.examen/1\ndate: 2026-11-26\nobjet: constitution\nsysteme: agent2dev\nversion: 2.2.0\nexaminateur: observateur-externe\nmodele: gemini-3-flash-preview\navis: reserve'));
+  assert.deepStrictEqual(lireExamens(d).erreurs, [`${EXAMENS}/2.2.0.md : l'examen d'une constitution vit dans son instance, constitution/examens/, non dans le dépôt`]);
+  rmSync(join(d, EXAMENS, '2.2.0.md'));
   // Un examen sans sa proposition, ou qui vise une spécification sous le nom d'une proposition.
   ecrire(`${EXAMENS}/2026-11-26-autre.md`, examenDe(EXAMEN_DE_PROPOSITION));
   ecrire(`${EXAMENS}/${nom}`, examenDe('format: observatoire.examen/1\ndate: 2026-11-26\nobjet: specification\nsysteme: generateur-skill-ticket\nversion: 1.4.0\nexaminateur: observateur-externe\nmodele: gemini-3-flash-preview\navis: favorable'));

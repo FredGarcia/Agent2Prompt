@@ -143,7 +143,7 @@ Dans Gemini CLI, depuis un clone du dépôt Agent2Prompt, `node installer.mjs` i
 ```markdown
 ---
 name: pilote-scenario
-description: Pilote de scénarios côté utilisateur (skill scenario-playwright 1.6.7). À solliciter pour importer en textes de départ les scénarios Gherkin d'une demande Jira, d'un fichier .feature ou d'une archive d'export, les tests de Xray et de Zephyr Scale, ou des pages de tests de Xray enregistrées en HTML complet, pour indexer sans IA le code front et back du projet, pour traduire un texte de scénario (.scenario, inspiré de Gherkin) en scénario TOML exécutable, avec des vérifications de ce qui se passe hors de l'écran (requêtes, API en lecture, fichiers téléchargés) et la préparation et le nettoyage des données, par l'API ou par un autre scénario, pour jouer un scénario, ou une campagne de plusieurs, dans le Chrome du poste comme un utilisateur et en rendre le bilan et le verdict de chaque test, pour désigner une cible à la souris, pour exporter un scénario ratifié en test @playwright/test du projet, pour mettre les résultats au format d'import de Xray ou de Zephyr Scale, ou pour écrire un rapport de conformité, avec ses copies d'écran, à coller dans Jira. Ne saisit aucun identifiant ni ne demande de jeton ; fait ratifier chaque traduction ; demande avant toute exécution qui modifie des données hors du poste ; n'envoie rien à Xray ni à Zephyr Scale.
+description: Pilote de scénarios côté utilisateur (skill scenario-playwright 1.6.8). À solliciter pour importer en textes de départ les scénarios Gherkin d'une demande Jira, d'un fichier .feature ou d'une archive d'export, les tests de Xray et de Zephyr Scale, ou des pages de tests de Xray enregistrées en HTML complet, pour indexer sans IA le code front et back du projet, pour traduire un texte de scénario (.scenario, inspiré de Gherkin) en scénario TOML exécutable, avec des vérifications de ce qui se passe hors de l'écran (requêtes, API en lecture, fichiers téléchargés) et la préparation et le nettoyage des données, par l'API ou par un autre scénario, pour jouer un scénario, ou une campagne de plusieurs, dans le Chrome du poste comme un utilisateur et en rendre le bilan et le verdict de chaque test, pour désigner une cible à la souris, pour exporter un scénario ratifié en test @playwright/test du projet, pour mettre les résultats au format d'import de Xray ou de Zephyr Scale, ou pour écrire un rapport de conformité, avec ses copies d'écran, à coller dans Jira. Ne saisit aucun identifiant ni ne demande de jeton ; fait ratifier chaque traduction ; demande avant toute exécution qui modifie des données hors du poste ; n'envoie rien à Xray ni à Zephyr Scale.
 kind: local
 tools:
   - run_shell_command
@@ -280,7 +280,7 @@ Tu importes de Jira, de Xray, de Zephyr Scale, de fichiers .feature ou de pages 
 
 <!-- fichier : commandes/scenario/importer.toml -->
 ```toml
-description = "Importe en textes de départ (.scenario), sans IA, les scénarios d'une demande Jira, d'un fichier .feature ou d'une archive d'export, les tests de Xray et de Zephyr Scale, ou des pages de tests de Xray enregistrées en HTML complet (skill scenario-playwright 1.6.7)"
+description = "Importe en textes de départ (.scenario), sans IA, les scénarios d'une demande Jira, d'un fichier .feature ou d'une archive d'export, les tests de Xray et de Zephyr Scale, ou des pages de tests de Xray enregistrées en HTML complet (skill scenario-playwright 1.6.8)"
 prompt = """
 Active le skill scenario-playwright, puis importe les scénarios de la source suivante : {{args}}
 Une adresse de demande ouvre Jira dans la fenêtre, sur le profil dédié : relaie le message « À VOUS », sans jamais demander ni saisir d'identifiant. Une page enregistrée en MHTML, un fichier .feature, une archive .zip, une page de test de Xray enregistrée en HTML complet ou un dossier de ces pages se lisent sans navigateur ; une page dont rien n'est reconnu se décrit par --diagnostic, sans aucune de ses valeurs. xray:, xray-dc:, zephyr: et zephyr-dc:, suivis des clés des tests, lisent Xray ou Zephyr Scale par leur API, en lecture seule : le jeton passe par la variable d'environnement que le développeur définit lui-même (XRAY_CLIENT_ID et XRAY_CLIENT_SECRET, ZEPHYR_TOKEN, JIRA_TOKEN) ; ne le demande jamais, ne l'affiche jamais, ne le passe jamais en argument. --adresse de l'application est requise ; les commentaires d'une demande ne se lisent qu'avec --commentaires, à la demande du développeur.
@@ -290,7 +290,7 @@ Pour un réimport, --comparer d'abord ; --remplacer seulement avec l'accord du d
 
 <!-- fichier : commandes/scenario/indexer.toml -->
 ```toml
-description = "Indexe sans IA le code front et back du projet, pour traduire les scénarios (skill scenario-playwright 1.6.7)"
+description = "Indexe sans IA le code front et back du projet, pour traduire les scénarios (skill scenario-playwright 1.6.8)"
 prompt = """
 Active le skill scenario-playwright, puis indexe le code du projet suivant : {{args}}
 Suis le module code : indexer.mjs sur le dossier du projet, avec le dossier des scénarios et la langue de l'interface ; le projet n'est que lu, et seul le dossier index/ des scénarios est écrit.
@@ -300,7 +300,7 @@ Rends le bilan : routes, éléments d'interface, textes, endpoints et appels, co
 
 <!-- fichier : commandes/scenario/traduire.toml -->
 ```toml
-description = "Traduit un texte de scénario (.scenario) en scénario TOML exécutable, puis le présente à la ratification (skill scenario-playwright 1.6.7)"
+description = "Traduit un texte de scénario (.scenario) en scénario TOML exécutable, puis le présente à la ratification (skill scenario-playwright 1.6.8)"
 prompt = """
 Active le skill scenario-playwright, puis traduis le texte de scénario suivant : {{args}}
 Suis la traduction décrite au module scenario : texte vérifié, squelette écrit par traduire.mjs, étapes complétées, verifier.mjs --plan conforme. Si le dossier a un index du code à jour, lis index/code.md et contrôle chaque proposition du squelette avant de la reprendre ; examine avec le développeur chaque cible ou chemin que verifier.mjs note absent de l'index.
@@ -311,7 +311,7 @@ Présente le plan ligne du texte par ligne du texte, avec les étapes qui modifi
 
 <!-- fichier : commandes/scenario/jouer.toml -->
 ```toml
-description = "Joue un scénario TOML, ou une campagne de plusieurs, dans le Chrome du poste, comme un utilisateur, et rend le bilan et le verdict de chaque test (skill scenario-playwright 1.6.7)"
+description = "Joue un scénario TOML, ou une campagne de plusieurs, dans le Chrome du poste, comme un utilisateur, et rend le bilan et le verdict de chaque test (skill scenario-playwright 1.6.8)"
 prompt = """
 Active le skill scenario-playwright, puis joue le scénario, ou les scénarios de la campagne : {{args}}
 verifier.mjs d'abord, sur chaque scénario. Demande l'accord explicite du développeur avant --autoriser-mutations, pour les étapes comme pour la préparation et le nettoyage des données hors du poste. Fenêtre visible ; relaie chaque message « À VOUS » sans jamais demander ni saisir d'identifiant. Plusieurs scénarios, ou un dossier, se jouent en campagne : une seule fenêtre, une seule connexion, un test en échec n'arrêtant pas les suivants.
@@ -321,7 +321,7 @@ Rends le bilan du rapport.json, ou de campagne.md et de chaque test : statut et 
 
 <!-- fichier : commandes/scenario/designer.toml -->
 ```toml
-description = "Ouvre une page et rend la cible de chaque élément que le développeur désigne à la souris (skill scenario-playwright 1.6.7)"
+description = "Ouvre une page et rend la cible de chaque élément que le développeur désigne à la souris (skill scenario-playwright 1.6.8)"
 prompt = """
 Active le skill scenario-playwright, puis lance designer.mjs sur l'adresse suivante : {{args}}
 Le développeur clique lui-même les éléments dans la fenêtre ; rends chaque cible au format du scénario. Une cible non convertible s'écrit à la main, avec lui.
@@ -330,7 +330,7 @@ Le développeur clique lui-même les éléments dans la fenêtre ; rends chaque 
 
 <!-- fichier : commandes/scenario/exporter.toml -->
 ```toml
-description = "Exporte des scénarios ratifiés en tests @playwright/test du projet, sans IA (skill scenario-playwright 1.6.7)"
+description = "Exporte des scénarios ratifiés en tests @playwright/test du projet, sans IA (skill scenario-playwright 1.6.8)"
 prompt = """
 Active le skill scenario-playwright, puis exporte en tests du projet : {{args}}
 verifier.mjs d'abord : seul un scénario ratifié s'exporte. Demande au développeur le dossier de tests du projet s'il ne l'a pas donné ; exporter.mjs n'y écrit que ses propres fichiers. Si un test exporté existe déjà, --comparer d'abord ; --remplacer seulement avec l'accord du développeur.
@@ -340,7 +340,7 @@ Rends le bilan : fichiers écrits, à jour, périmés, retouchés et gardés à 
 
 <!-- fichier : commandes/scenario/resultats.toml -->
 ```toml
-description = "Écrit les résultats d'une exécution ou d'une campagne au format d'import de Xray ou de Zephyr Scale, ou un rapport de conformité à coller dans Jira, sans rien envoyer (skill scenario-playwright 1.6.7)"
+description = "Écrit les résultats d'une exécution ou d'une campagne au format d'import de Xray ou de Zephyr Scale, ou un rapport de conformité à coller dans Jira, sans rien envoyer (skill scenario-playwright 1.6.8)"
 prompt = """
 Active le skill scenario-playwright, puis écris les résultats suivants : {{args}}
 resultats.mjs sur le dossier de résultats de jouer.mjs, ou le dossier de la campagne, avec --format xray (Xray Cloud), xray-dc (Xray Data Center), zephyr, ou jira pour le rapport de conformité à coller dans Jira (conformite-jira.txt pour Data Center, conformite.html pour Cloud). La clé du test est celle retenue à l'import ; pour un scénario écrit à la main, demande-la au développeur (--cle). --preuves seulement à sa demande : les copies d'écran montrent les écrans et leurs données. --execution seulement si le développeur donne l'exécution de test où verser les résultats.

@@ -1,6 +1,6 @@
 # Mode d'emploi : construire et utiliser Agent2Dev
 
-[`agent2dev`](../../specs/agent2dev/SKILL.md) 1.4.3 est la **spécification d'un système à construire**, pas un skill qu'on installe. Une IA la reçoit dans le dépôt d'Agent2Dev et l'implémente par lots, sous votre validation.
+[`agent2dev`](../../specs/agent2dev/SKILL.md) 1.5.0 est la **spécification d'un système à construire**, pas un skill qu'on installe. Une IA la reçoit dans le dépôt d'Agent2Dev et l'implémente par lots, sous votre validation.
 
 Agent2Dev applique le skill [`agent-tdd-jira`](../agent-tdd-jira/mode-emploi.md) **comme méthode** : d'une demande Jira exportée en MHTML, il tire les US, les critères d'acceptation, les scénarios Gherkin et les variantes, puis réalise chaque scénario en cycle TDD, jusqu'à la traçabilité, en binôme avec [Agent2Test](../agent2test/mode-emploi.md). Le moteur rédige ; des agents déterministes écrivent et exécutent ; vous validez à chaque point.
 
@@ -18,14 +18,14 @@ flowchart LR
 - Une IA locale qui écrit et exécute du code : Gemini CLI ou équivalent.
 - Node 22.13 ou plus récent (26.13.0 recommandé), git 2.30 ou plus récent ; les données tiennent dans un fichier SQLite, par `node:sqlite`.
 - Le projet à faire évoluer (back Java, front Angular), avec ses outils de build et de test.
-- La transmission : [`transmissions/agent2dev-1.4.3.md`](../../transmissions/agent2dev-1.4.3.md), et celle de la méthode : [`transmissions/agent-tdd-jira-1.3.10.md`](../../transmissions/agent-tdd-jira-1.3.10.md).
+- La transmission : [`transmissions/agent2dev-1.5.0.md`](../../transmissions/agent2dev-1.5.0.md), et celle de la méthode : [`transmissions/agent-tdd-jira-1.3.11.md`](../../transmissions/agent-tdd-jira-1.3.11.md).
 
 L'installateur d'Agent2Prompt refuse cette spécification : elle se matérialise dans `spec/` de son propre projet.
 
 ## 2. Construire
 
 1. Ouvrir l'IA à la racine du dépôt d'Agent2Dev et coller la transmission.
-2. **Étape 0** : l'IA crée `agent2dev/spec/` et vérifie chaque fichier. Elle vous demande ensuite **la transmission d'agent-tdd-jira 1.3.10**, qu'elle place telle quelle dans `test/fixtures/methode/` : c'est la méthode qu'Agent2Dev charge, vérifiée par ses empreintes, et jamais recopiée dans son code.
+2. **Étape 0** : l'IA crée `agent2dev/spec/` et vérifie chaque fichier. Elle vous demande ensuite **la transmission d'agent-tdd-jira 1.3.11**, qu'elle place telle quelle dans `test/fixtures/methode/` : c'est la méthode qu'Agent2Dev charge, vérifiée par ses empreintes, et jamais recopiée dans son code.
 3. **Étape 1** : lecture, sans code.
 4. **Étape 2** : plan soumis à votre validation. Rien ne s'écrit avant.
 5. **Étape 3** : implémentation en neuf lots, chacun testé en simulation et sans réseau, chacun clos par votre validation :
@@ -33,7 +33,7 @@ L'installateur d'Agent2Prompt refuse cette spécification : elle se matérialise
 | Lot | Contenu |
 |---|---|
 | 1 | noyau et bus |
-| 2 | données (agent médiateur du fichier SQLite), journal, référentiel, méthode |
+| 2 | données (agent médiateur du fichier SQLite), journal, référentiel, révision de la constitution, méthode |
 | 3 | substrat : profil du projet, dépôt, exécutant, kit dev |
 | 4 | cadrage et orchestration |
 | 5 | conception et réalisation |
@@ -67,26 +67,31 @@ L'installateur d'Agent2Prompt refuse cette spécification : elle se matérialise
 
 ## 4. Ce qui ne se négocie pas
 
-- La méthode est agent-tdd-jira 1.3.10, lue depuis sa transmission vérifiée : rien n'en est réécrit.
+- La méthode est agent-tdd-jira 1.3.11, lue depuis sa transmission vérifiée : rien n'en est réécrit.
 - Seul l'agent `depot` écrit dans un arbre du projet ; il ne pousse jamais, et dans votre arbre ne fusionne pas, ne rebase pas, ne change pas de branche.
 - Seules s'exécutent les commandes du profil ratifié et les scripts du skill, sans shell ; l'application n'est ni démarrée, ni arrêtée, ni déployée ; aucun batch.
 - Aucun code de production avant un test étiqueté qui échoue pour la bonne raison.
 - Aucun point de validation sauté ou décidé par le système ; journal et grand livre en ajout seul.
 - La constitution reprend le noyau du socle de l'acceptable, à la version épinglée : chaque refus cite sa règle, et aucune règle du noyau ne se déroge.
+- La constitution ne change que par sa publication, `npm run constitution:publier`, que vous lancez : un renforcement se publie seul ; un relâchement exige l'examen de sa version par un observateur sur un autre modèle et ses preuves ; aucune entrée du noyau ne se relâche.
 - Tout tourne en local ; les interfaces n'écoutent que sur `127.0.0.1`.
 
 ## 5. Faire évoluer
 
 Une nouvelle version arrive par une nouvelle transmission : remplacez `spec/` à l'identique, et la transmission de la méthode si son épinglage change. Demandez ensuite à l'IA un plan pour l'écart, d'après le journal de révision de `spec/SKILL.md`. Les écarts relevés sur la spécification se ratifient dans Agent2Prompt (`EVOLUTION.md`, § 5).
 
+Pour changer la constitution de votre instance, montez sa version, puis publiez-la : `npm run constitution:publier` la compare à la dernière publiée et la classe. Ce qui la renforce, ou ne change rien de ce qu'elle refuse, se publie seul. Pour la relâcher, retirer une entrée propre, élargir des bornes, faites d'abord examiner la version par un observateur sur un autre modèle que celui qui l'a préparée : il écrit son avis dans `constitution/examens/<version>.md`, au format `observatoire.examen/1`, et rien d'autre. Publiez ensuite avec vos preuves, `--preuves` et les numéros de deux faux refus de chaque entrée relâchée, ou `--incident` et sa description, et `--reponse` si l'avis est défavorable. À la montée en 1.5.0, republiez d'abord la constitution en vigueur, telle quelle : le grand livre la garde entière, référence des publications suivantes (module [`revision`](../../specs/agent2dev/modules/revision/SKILL.md)).
+
 ## 6. Dépannage
 
 | Symptôme | Cause probable | Remède |
 |---|---|---|
 | Aucune commande ne s'exécute | profil V0 non ratifié, ou fichier de construction modifié | ratifier le profil en V0 |
-| Méthode refusée au chargement | transmission d'agent-tdd-jira absente ou altérée | replacer la transmission 1.3.10 telle quelle dans `test/fixtures/methode/` |
+| Méthode refusée au chargement | transmission d'agent-tdd-jira absente ou altérée | replacer la transmission 1.3.11 telle quelle dans `test/fixtures/methode/` |
 | Rien n'apparaît dans votre arbre | écriture non autorisée, comportement par défaut | appliquer le patch remis en V4, ou autoriser l'écriture |
 | V5 attend | journal de tests d'Agent2Test non fourni | donner son chemin, ou déclarer la demande sans binôme |
+| Publication refusée, « republier d'abord la constitution en vigueur » | première publication en 1.5.0, avec une constitution déjà changée | republier la constitution en vigueur telle quelle, puis la nouvelle version |
+| Publication d'un relâchement refusée | examen absent, d'une autre version ou mal formé, réponse manquante à un avis défavorable, ou preuves insuffisantes | faire écrire l'examen de la version candidate ; citer deux faux refus de chaque entrée relâchée, ou déclarer un incident |
 | Démarrage refusé « acceptable non conforme » | constitution qui ne reprend pas le noyau épinglé, ou empreinte du socle fausse | republier la constitution de la version, sans retirer d'entrée du noyau |
 
 La mémoire longue et l'autonomie accrue sont des dimensions réservées, non appliquées en 1.1.

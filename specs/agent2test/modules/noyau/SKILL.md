@@ -160,7 +160,7 @@ La liste complète des règles modifiables et de leurs bornes est au module `ref
 
 - L'empreinte est le SHA-256 de la constitution sérialisée en JSON canonique (clés triées, sans espace).
 - Au démarrage, le noyau compare cette empreinte à la dernière entrée `constitution.publiee` du grand livre. Un écart, ou l'absence d'entrée, empêche le démarrage avec le message « constitution non publiée ou modifiée : publier par `npm run constitution:publier` ».
-- La publication est une commande humaine, hors du bus : `npm run constitution:publier` inscrit l'empreinte au grand livre. Aucun agent ne l'appelle.
+- La publication est une commande humaine, hors du bus : `npm run constitution:publier` compare la constitution à la dernière publiée, la classe, et l'inscrit au grand livre, avec son examen et ses preuves pour un relâchement (module `revision`). Aucun agent ne l'appelle.
 - Le champ `acceptable` épingle le noyau du socle de l'acceptable inclus dans la spécification : son nom, sa version et l'empreinte de son bloc `noyau`. Après l'empreinte de la constitution, le noyau vérifie l'épinglage et la présence de chaque entrée du noyau (module `acceptable`, section 1) ; un écart empêche le démarrage.
 
 Garde d'écriture : le noyau expose `ecriture.autoriser(chemin, agent)`. Seuls sont permis le dossier des preuves (`navigateur`, `journal`), le fichier de session (`navigateur`), les exports du journal de tests (`journal`) et le dossier des kits de la campagne, `kits/<campagne>/` (`preparateur`, module `kit`). Toute autre écriture, et en particulier les lieux de `ecrituresInterdites`, `constitution/`, `src/`, `fiches/`, `configuration/` et `migrations/`, est refusée avec l'erreur `ECRITURE_INTERDITE`, qui cite la règle du lieu (module `acceptable`, section 3).

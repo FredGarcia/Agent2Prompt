@@ -288,9 +288,10 @@ test('formes propres : une constitution d\'exemple relâchée cite son examen, s
   ];
   const raison = `agent2dev : formes propres : constitution d'exemple relâchée depuis ${PD} (${relachements.join(' ; ')})`;
   // Sans migration au journal, ni examen, ni preuves : tout ce qui manque est relevé. Agent2Test : sa constitution
-  // d'exemple change sans se relâcher, et seule sa migration est due.
+  // d'exemple, changée ici sans se relâcher, sa version seule, ne doit que sa migration.
   const sansMigration = (version) => (texte) => texte.replace(new RegExp(`^(\\*\\*${motif(version)}\\*\\* .*)Migration : `, 'm'), '$1Ensuite : ');
-  const r1 = alterer({ 'specs/agent2dev/modules/noyau/SKILL.md': relacher, 'specs/agent2dev/SKILL.md': sansMigration(VD), 'specs/agent2test/SKILL.md': sansMigration(VT) });
+  const versionSeule = (texte) => texte.replace(/^( {2}"version": ")(\d+\.\d+\.)(\d+)(",)$/m, (_, a, b, c, d) => `${a}${b}${Number(c) + 1}${d}`);
+  const r1 = alterer({ 'specs/agent2dev/modules/noyau/SKILL.md': relacher, 'specs/agent2dev/SKILL.md': sansMigration(VD), 'specs/agent2test/modules/noyau/SKILL.md': versionSeule, 'specs/agent2test/SKILL.md': sansMigration(VT) });
   attendreErreurs(r1, [
     `${raison} : examen absent, ${EXAMEN} attendu (EVOLUTION.md, section 10.7)`,
     `${raison} : le journal de ${VD} ne cite pas son examen, ${EXAMEN}`,
@@ -298,7 +299,7 @@ test('formes propres : une constitution d\'exemple relâchée cite son examen, s
     `${raison} : le journal de ${VD} ne dit pas sa migration (« Migration : »)`,
     `agent2test : formes propres : constitution d'exemple changée depuis ${PT} : le journal de ${VT} ne dit pas sa migration (« Migration : »)`,
   ]);
-  assert.doesNotMatch(r1.stderr, /agent2test : formes propres : constitution d'exemple relâchée/, 'une constitution ré-épinglée ne se relâche pas');
+  assert.doesNotMatch(r1.stderr, /agent2test : formes propres : constitution d'exemple relâchée/, 'une constitution dont seule la version change ne se relâche pas');
   // Examinée, avec un avis défavorable, citée au journal avec ses preuves : seule manque la réponse à l'avis.
   const examen = `---\nformat: observatoire.examen/1\ndate: 2026-11-26\nobjet: specification\nsysteme: agent2dev\nversion: ${VD}\nexaminateur: observateur-externe\nmodele: gemini-3-flash-preview\navis: defavorable\n---\n\n## Avis\n\n- Une marge plus étroite fait adopter des leçons sur moins de preuves.\n`;
   const cite = auJournal(VD, `Preuves : incident du 2026-11-20. Examen : \`${EXAMEN}\`. `);
