@@ -11,7 +11,7 @@ Statut : `reserved`. En 3.8, l'acceptable de l'orchestrateur est celui de sa mé
 
 ## 1. Pourquoi cette dimension existe
 
-Ce que l'orchestrateur refuse est écrit dans sa méthode et dans le fichier d'invariants de chaque projet, sans lien avec ce que refusent les autres systèmes du dépôt. Le socle de l'acceptable (`socle-acceptable` 1.1.0) en tire le noyau commun, chaque règle un invariant que cite le refus : le troisième couplage du troisième ordre, celui des valeurs (`EVOLUTION.md`, section 10). Cette dimension garde la place de son application dans l'orchestrateur.
+Ce que l'orchestrateur refuse est écrit dans sa méthode et dans le fichier d'invariants de chaque projet, sans lien avec ce que refusent les autres systèmes du dépôt. Le socle de l'acceptable (`socle-acceptable` 1.2.0) en tire le noyau commun, chaque règle un invariant que cite le refus : le troisième couplage du troisième ordre, celui des valeurs (`EVOLUTION.md`, section 10). Cette dimension garde la place de son application dans l'orchestrateur.
 
 ## 2. Principe prévu
 

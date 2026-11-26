@@ -1,10 +1,10 @@
 ---
 name: generateur-skill-ticket
 description: Générateur de skills de ticket C7E, qui fait résoudre un ticket par un arbre de skills produits pour lui. Il décompose le ticket en sous-tickets, assemble pour chaque nœud un skill depuis le référentiel des méso-contrats de l'orchestrateur C7E, l'installe et le lance dans Gemini CLI, nœud par nœud ; chaque skill s'observe dans un champ partagé et voit le ticket augmenté ; chaque ticket entraîne le générateur, qui s'observe lui-même et propose ses évolutions au développeur ; ses observations s'exportent, minimisées, vers le socle d'observation du dépôt. À utiliser depuis un clone du dépôt Agent2Prompt.
-version: 1.4.5
+version: 1.4.6
 ---
 
-# Générateur de skills de ticket C7E, version 1.4.5
+# Générateur de skills de ticket C7E, version 1.4.6
 
 Ce document est le point d'entrée du générateur. Un ticket n'y est plus résolu directement par l'orchestrateur C7E : il l'est par un **arbre de skills de ticket**, un par nœud, produits pour lui sur le même modèle fractal et récursif. Le générateur fait qualifier et décomposer le ticket, vérifie l'arbre, assemble chaque skill depuis les blocs ratifiés du référentiel des méso-contrats, l'installe dans Gemini CLI et le lance ; ensuite, chaque nœud se résout dans sa propre session, par son skill et ses agents. Chaque skill s'observe par rapport aux retours du développeur, ses choix et ses corrections, dans un champ d'observation partagé, et chaque niveau voit le ticket augmenté des observations des autres. L'arbre suit la composition récursive imbriquée (CRI) de la méthode C7E : le ticket et son US au niveau macro, la composition au niveau des méso-contrats, les tâches au niveau des méso-composants, les commits de la branche au niveau micro ; le besoin y descend, les preuves y remontent. Chaque ticket est aussi une recette et un cycle d'apprentissage : le générateur s'observe lui-même, classe ce qu'il apprend par profondeur, et propose ses évolutions au développeur, qui seul les promeut. Ce que les skills et le générateur observent s'exporte enfin, sans texte ni référence en clair, dans l'enveloppe commune du socle d'observation, où d'autres systèmes du dépôt peuvent s'y confronter. Les règles détaillées sont dans `modules/`.
 
@@ -90,7 +90,7 @@ Clause de second ordre : un niveau agit sur la manière d'observer du niveau inf
 
 ## 6. Registre des dimensions
 
-| ID | Dimension | Introduite | Statut 1.4.5 | Dépend de | Module |
+| ID | Dimension | Introduite | Statut 1.4.6 | Dépend de | Module |
 |---|---|---|---|---|---|
 | D1 | Arbre de tickets | 1.0 | active | orchestrateur-c7e | `arbre` |
 | D2 | Assemblage et transmission des skills de ticket | 1.0 | active | D1 | `assemblage` |
@@ -119,7 +119,7 @@ Point d'extension, actif dès 1.2.0 :
 
 Point d'extension, actif dès 1.4.0 :
 
-- **E5** : acceptable partagé. Les kits dev, test et démo du skill racine (D4, `skill-ticket.kit/1`) et les actions des skills de ticket se confronteront, avant leur exécution, au noyau du socle `socle-acceptable` 1.1.0, épinglé ; un refus citera sa règle, et l'écriture passera par les kits, avec retour arrière, selon le contrat des kits du socle (SA8) ; le kit démo, que le skill racine produira, rejoindra ce contrat avec l'activation de D10, et scenario-playwright le jouera. En 1.4, rien n'est appliqué : aucun outil du générateur ne lit le socle, et aucun skill de ticket ne porte le module `acceptable` ni le socle ; une demande qui toucherait l'acceptable partagé reçoit la réponse « dimension D10 réservée ».
+- **E5** : acceptable partagé. Les kits dev, test et démo du skill racine (D4, `skill-ticket.kit/1`) et les actions des skills de ticket se confronteront, avant leur exécution, au noyau du socle `socle-acceptable` 1.2.0, épinglé ; un refus citera sa règle, et l'écriture passera par les kits, avec retour arrière, selon le contrat des kits du socle (SA8) ; le kit démo, que le skill racine produira, rejoindra ce contrat avec l'activation de D10, et scenario-playwright le jouera. En 1.4, rien n'est appliqué : aucun outil du générateur ne lit le socle, et aucun skill de ticket ne porte le module `acceptable` ni le socle ; une demande qui toucherait l'acceptable partagé reçoit la réponse « dimension D10 réservée ».
 
 ## 8. Règles globales
 
@@ -211,6 +211,8 @@ Chaque module donne, pour chacun de ses invariants, les tests qui le prouvent.
 - **D9.INV-3** : l'export est incrémental et idempotent : un enregistrement déjà exporté, reconnu par son format, son journal et son numéro, ne l'est pas une seconde fois, et un export sans enregistrement nouveau laisse le journal et sa tête identiques, octet pour octet ; un enregistrement arrivé après d'autres, plus récents, prend la date de la dernière enveloppe, sans que son journal source change d'ordre.
 
 ## 11. Journal de révision
+
+**1.4.6** (2026-11-26) : correctif, jalon J5a du passage du dépôt au troisième ordre (`EVOLUTION.md`, section 10), la révision des formes propres. Socle `socle-acceptable` 1.2.0, référencé : son noyau, qui ne change pas, se révise désormais selon `EVOLUTION.md`, section 10.7, une révision n'y faisant qu'ajouter ; D10 reste réservée, et E5 cite la 1.2.0. Références à orchestrateur-c7e 3.8.6, agent-tdd-jira 1.3.10 et agent2test 1.6.2. Aucune section recopiée dans les skills de ticket ne change, seules les versions qu'ils citent ; skills de ticket d'exemple et rapports de contexte régénérés. Aucune dimension ni aucun invariant modifié ; les outils ne changent pas. Archive : `archives/SKILL-v1.4.5.md`.
 
 **1.4.5** (2026-11-25) : correctif, jalon J4 réduit du passage du dépôt au troisième ordre (`EVOLUTION.md`, section 10). Socle `socle-observation` 1.4.0, inclus et référencé à la version qu'épingle l'orchestrateur : il ajoute le champ facultatif `mesure` et la correspondance de la rubrique `points` des livrables d'Agent2Dev, que l'observatoire exporte pour le binôme, sans changer celles du champ et du registre d'apprentissage, ni ses invariants ; l'export du générateur (D9) ne change pas, ni son outil, qui n'émet aucune mesure, et dont seul l'en-tête cite la 1.4.0. Référence à orchestrateur-c7e 3.8.5. Aucune section recopiée dans les skills de ticket ne change, seules les versions qu'ils citent ; skills de ticket d'exemple et rapports de contexte régénérés. Aucune dimension ni aucun invariant modifié. Archive : `archives/SKILL-v1.4.4.md`.
 

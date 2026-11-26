@@ -53,6 +53,13 @@
  * - chaque proposition de l'observatoire, dans `observatoire/propositions/`, suit le format
  *   `observatoire.proposition/1` (spécification `observatoire`, module `propositions`) : rien que des valeurs
  *   minimisées ; le magasin local de l'observatoire, lui, reste sur le poste et n'est pas vérifié ici ;
+ * - chaque examen, dans `observatoire/examens/`, suit le format `observatoire.examen/1` (module `examens`), et
+ *   chaque proposition ratifiée a le sien, du même nom, qui lui répond s'il est défavorable ;
+ * - les formes propres du dépôt ne changent que par la révision d'`EVOLUTION.md`, section 10.7 : le noyau du
+ *   socle de l'acceptable ne perd, ne change ni ne rend permise dans un kit aucune entrée de sa version archivée
+ *   précédente, et son changement dit sa migration au journal ; la constitution d'exemple d'une spécification,
+ *   comparée à celle de la transmission de sa version précédente, cite au journal, si elle se relâche, son examen,
+ *   ses preuves et sa migration, et, si elle change autrement, sa migration ;
  * - les noms d'un autre hôte d'IA et de son éditeur ne figurent dans aucun fichier suivi, hors de
  *   l'historique figé que `.geminiignore` cache à Gemini CLI : archives des versions publiées et
  *   anciennes transmissions ; et `.geminiignore` ne cache rien d'autre, aucune version courante.
@@ -70,7 +77,7 @@ import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { assembler, relire, sourcePartagee } from './bundle.mjs';
 import { CHEMIN_GLOSSAIRE, genererGlossaire } from './glossaire.mjs';
-import { PROPOSITIONS, lirePropositions } from '../specs/observatoire/outils/observatoire.mjs';
+import { EXAMENS, PROPOSITIONS, controlerRatifications, lireExamens, lirePropositions } from '../specs/observatoire/outils/observatoire.mjs';
 
 const racine = dirname(dirname(fileURLToPath(import.meta.url)));
 const dossierSpecs = join(racine, 'specs');
@@ -573,7 +580,6 @@ function verifierSpec(dossier) {
   };
 }
 
-/** Le README affiche chaque spécification à sa version courante, et ses liens aboutissent. */
 // Catalogue des signaux du deuxième couplage (EVOLUTION.md, section 10.6 ; règle 6 de la section 10.5).
 const NATURES_DE_CLAUSE = ['effet sur des personnes', 'structure du second ordre', "effet sur l'observateur", "précaution d'observateur"];
 const STATUTS_DE_SIGNAL = ['exporté', 'mesuré', 'disponible', 'non mesuré'];
@@ -658,6 +664,7 @@ function verifierCatalogue() {
   return vues.size;
 }
 
+/** Le README affiche chaque spécification à sa version courante, et ses liens aboutissent. */
 function verifierReadme(specs) {
   const chemin = join(racine, 'README.md');
   if (!existsSync(chemin)) {
@@ -681,6 +688,158 @@ function verifierReadme(specs) {
     if (!existsSync(join(racine, cible))) erreurs.push(`README.md : lien vers ${cible}, fichier absent`);
   }
   return erreurs.length === avant;
+}
+
+// ---------------------------------------------------------------------------
+// Formes propres du dépôt (EVOLUTION.md, section 10.7)
+// ---------------------------------------------------------------------------
+
+/** Paragraphe du journal de révision d'un point d'entrée pour une version, ou une chaîne vide. */
+const entreeDuJournal = (texte, version) => new RegExp(`^\\*\\*${echapper(version)}\\*\\* \\([^)]*\\) : (.*)$`, 'm').exec(texte)?.[1] ?? '';
+
+/**
+ * Le noyau courant, comparé à celui de la version précédente : une entrée qui se retire, change de règle ou devient
+ * permise dans un kit l'affaiblirait ; une entrée ajoutée, ou qui perd `horsKit`, le renforce.
+ */
+function ecartsDuNoyau(avant, apres) {
+  const affaiblissements = [];
+  for (const [liste, cle] of Object.entries(LISTES_DU_NOYAU)) {
+    const courantes = new Map((Array.isArray(apres[liste]) ? apres[liste] : []).map((e) => [e[cle], e]));
+    for (const e of Array.isArray(avant[liste]) ? avant[liste] : []) {
+      const c = courantes.get(e[cle]);
+      if (!c) affaiblissements.push(`${liste} : l'entrée ${e[cle]} se retire`);
+      else if (c.regle !== e.regle) affaiblissements.push(`${liste} : l'entrée ${e[cle]} change de règle, ${e.regle} devient ${c.regle}`);
+      else if (!e.horsKit && c.horsKit) affaiblissements.push(`${liste} : l'entrée ${e[cle]} devient permise dans un kit`);
+    }
+  }
+  return { affaiblissements, change: canonique(avant) !== canonique(apres) };
+}
+
+// Une liste d'une constitution, en tête ou sous `commandes` ; une entrée s'y reconnaît à sa valeur et à sa règle.
+const listeDeConstitution = (c, nom) => (Array.isArray(c[nom]) ? c[nom] : Array.isArray(c.commandes?.[nom]) ? c.commandes[nom] : []);
+const idEntree = (e, cle) => `${e[cle]} (${e.regle})`;
+
+/** La constitution d'exemple : le premier bloc JSON qui épingle le noyau, porte sa version et des listes du noyau. */
+function constitutionDExemple(textes) {
+  for (const texte of textes) {
+    for (const bloc of blocsJson(texte)) {
+      let objet;
+      try {
+        objet = JSON.parse(bloc);
+      } catch {
+        continue;
+      }
+      if (!estObjet(objet) || objet.acceptable?.socle !== SOCLE_ACCEPTABLE || typeof objet.version !== 'string') continue;
+      if (Object.keys(LISTES_DU_NOYAU).some((nom) => listeDeConstitution(objet, nom).length > 0)) return objet;
+    }
+  }
+  return null;
+}
+
+/**
+ * Ce qui relâche une constitution d'exemple par rapport à la précédente : une entrée d'une liste retirée ou
+ * modifiée, rendue permise dans un kit ou dérogeable ; un point ou un invariant retiré ; une commande ou une règle
+ * modifiable ajoutée ; des bornes élargies ; un méta-critère changé. Le reste la renforce, ou ne la change pas.
+ */
+function relachementsDeConstitution(avant, apres) {
+  const r = [];
+  for (const [liste, cle] of Object.entries(LISTES_DU_NOYAU)) {
+    const courantes = new Map(listeDeConstitution(apres, liste).map((e) => [idEntree(e, cle), e]));
+    for (const e of listeDeConstitution(avant, liste)) {
+      const c = courantes.get(idEntree(e, cle));
+      if (!c) r.push(`${liste}, entrée ${idEntree(e, cle)} retirée ou modifiée`);
+      else if (!e.horsKit && c.horsKit) r.push(`${liste}, entrée ${idEntree(e, cle)} permise dans un kit`);
+      else if (!e.derogeable && c.derogeable) r.push(`${liste}, entrée ${idEntree(e, cle)} rendue dérogeable`);
+    }
+  }
+  for (const nom of ['points', 'pointsDeControle', 'invariants']) {
+    const courants = new Set(Array.isArray(apres[nom]) ? apres[nom] : []);
+    for (const v of Array.isArray(avant[nom]) ? avant[nom] : []) if (!courants.has(v)) r.push(`${nom}, ${v} retiré`);
+  }
+  const noms = new Set(avant.commandes?.noms ?? []);
+  for (const n of apres.commandes?.noms ?? []) if (!noms.has(n)) r.push(`commandes.noms, ${n} ajoutée`);
+  const bornes = new Map((avant.reglesModifiables ?? []).map((m) => [m.regle, m.bornes ?? {}]));
+  for (const m of apres.reglesModifiables ?? []) {
+    const b = bornes.get(m.regle);
+    if (!b) r.push(`reglesModifiables, ${m.regle} ajoutée`);
+    else if ((m.bornes?.min ?? -Infinity) < (b.min ?? -Infinity) || (m.bornes?.max ?? Infinity) > (b.max ?? Infinity)) r.push(`reglesModifiables, bornes de ${m.regle} élargies`);
+  }
+  const [ma, mb] = [avant.metaCriteres ?? {}, apres.metaCriteres ?? {}];
+  for (const k of [...new Set([...Object.keys(ma), ...Object.keys(mb)])]) if (canonique(ma[k]) !== canonique(mb[k])) r.push(`metaCriteres.${k} changé`);
+  return r;
+}
+
+/**
+ * Formes propres (EVOLUTION.md, section 10.7). Le noyau du socle de l'acceptable, comparé à sa version archivée
+ * précédente : aucun affaiblissement, et un changement dit sa migration. La constitution d'exemple d'une
+ * spécification, comparée à celle de la transmission de sa version précédente : un relâchement cite au journal son
+ * examen, `observatoire/examens/<nom>-<version>.md`, ses preuves et sa migration, et répond à un avis défavorable ;
+ * un autre changement dit sa migration. Renvoie un bilan.
+ */
+function verifierFormesPropres(examens) {
+  const bilan = { noyau: null, constitutions: 0, relachements: 0 };
+  const parNom = new Map(examens.map((e) => [e.nom, e]));
+  for (const nom of readdirSync(dossierSpecs).sort()) {
+    const dossier = join(dossierSpecs, nom);
+    if (!existsSync(join(dossier, 'manifest.json'))) continue;
+    let manifeste;
+    try {
+      manifeste = JSON.parse(lire(join(dossier, 'manifest.json')));
+    } catch {
+      continue;
+    }
+    const precedente = (manifeste.previousVersions ?? []).at(-1);
+    const cheminEntree = join(dossier, manifeste.entry ?? 'SKILL.md');
+    if (!precedente || !existsSync(cheminEntree)) continue;
+    const entree = lire(cheminEntree);
+    const journal = entreeDuJournal(entree, manifeste.version);
+    const erreur = (message) => erreurs.push(`${nom} : formes propres : ${message}`);
+    const exiger = (motif, quoi, raison) => {
+      if (!journal.includes(motif)) erreur(`${raison} : le journal de ${manifeste.version} ne dit pas ${quoi} (« ${motif} »)`);
+    };
+    if (nom === SOCLE_ACCEPTABLE) {
+      const archive = join(dossier, precedente.file);
+      const blocAvant = existsSync(archive) ? blocsJson(lire(archive)).find((b) => b.includes(`"${SCHEMA_NOYAU}"`)) : undefined;
+      const blocApres = blocsJson(entree).find((b) => b.includes(`"${SCHEMA_NOYAU}"`));
+      let avant;
+      let apres;
+      try {
+        avant = JSON.parse(blocAvant);
+        apres = JSON.parse(blocApres);
+      } catch {
+        continue; // un bloc absent ou illisible est déjà relevé par verifierNoyau
+      }
+      if (!estObjet(avant) || !estObjet(apres)) continue;
+      const { affaiblissements, change } = ecartsDuNoyau(avant, apres);
+      for (const a of affaiblissements) erreur(`noyau, ${a} depuis ${precedente.version} ; une règle de sûreté ne s'affaiblit jamais (EVOLUTION.md, section 10.7)`);
+      if (change) exiger('Migration :', 'sa migration', `le noyau change depuis ${precedente.version}`);
+      bilan.noyau = `${manifeste.version}, ${change ? 'renforcé' : 'inchangé'} depuis ${precedente.version}`;
+      continue;
+    }
+    const textes = [entree, ...(manifeste.modules ?? []).map((m) => join(dossier, m.path)).filter((c) => existsSync(c)).map(lire)];
+    const apres = constitutionDExemple(textes);
+    const cheminAvant = join(racine, 'transmissions', `${manifeste.name}-${precedente.version}.md`);
+    if (!apres || !existsSync(cheminAvant)) continue;
+    const avant = constitutionDExemple(relire(lire(cheminAvant)).fichiers.map((f) => f.contenu));
+    if (!avant) continue;
+    bilan.constitutions++;
+    if (canonique(avant) === canonique(apres)) continue;
+    const relachements = relachementsDeConstitution(avant, apres);
+    if (relachements.length === 0) {
+      exiger('Migration :', 'sa migration', `constitution d'exemple changée depuis ${precedente.version}`);
+      continue;
+    }
+    bilan.relachements += relachements.length;
+    const fichier = `${EXAMENS}/${manifeste.name}-${manifeste.version}.md`;
+    const raison = `constitution d'exemple relâchée depuis ${precedente.version} (${relachements.join(' ; ')})`;
+    const examen = parNom.get(`${manifeste.name}-${manifeste.version}.md`);
+    if (!examen) erreur(`${raison} : examen absent, ${fichier} attendu (EVOLUTION.md, section 10.7)`);
+    if (!journal.includes(fichier)) erreur(`${raison} : le journal de ${manifeste.version} ne cite pas son examen, ${fichier}`);
+    exiger('Preuves :', 'ses preuves', raison);
+    exiger('Migration :', 'sa migration', raison);
+    if (examen?.entete.avis === 'defavorable') exiger("Réponse à l'examen", "sa réponse à l'avis défavorable", raison);
+  }
+  return bilan;
 }
 
 // ---------------------------------------------------------------------------
@@ -756,6 +915,15 @@ const avantPropositions = erreurs.length;
 const propositions = lirePropositions(racine);
 erreurs.push(...propositions.erreurs);
 const propositionsConformes = erreurs.length === avantPropositions;
+// Examens indépendants : chacun au format observatoire.examen/1 ; une proposition ratifiée a le sien.
+const avantExamens = erreurs.length;
+const examens = lireExamens(racine);
+erreurs.push(...examens.erreurs, ...controlerRatifications(racine).erreurs);
+const examensConformes = erreurs.length === avantExamens;
+// Formes propres : révision selon EVOLUTION.md, section 10.7.
+const avantFormes = erreurs.length;
+const formes = verifierFormesPropres(examens.examens);
+const formesConformes = erreurs.length === avantFormes;
 const avantHistorique = erreurs.length;
 const versionsCourantes = new Map(
   readdirSync(dossierSpecs)
@@ -775,6 +943,11 @@ if (readmeAJour) console.log('ok  README.md à jour');
 if (glossaireAJour) console.log('ok  glossaire.md à jour');
 if (catalogueAJour) console.log(`ok  EVOLUTION.md : catalogue des signaux, ${clausesCataloguees} clauses de second ordre classées`);
 if (propositionsConformes) console.log(`ok  ${PROPOSITIONS}/ : ${propositions.propositions.length} proposition${propositions.propositions.length > 1 ? 's' : ''} au format observatoire.proposition/1`);
+if (examensConformes) console.log(`ok  ${EXAMENS}/ : ${examens.examens.length} examen${examens.examens.length > 1 ? 's' : ''} au format observatoire.examen/1 ; chaque proposition ratifiée a le sien`);
+if (formesConformes) {
+  const relachements = formes.relachements === 0 ? 'aucun relâchement' : `${formes.relachements} relâchement${formes.relachements > 1 ? 's' : ''}, chacun examiné`;
+  console.log(`ok  formes propres : noyau de socle-acceptable ${formes.noyau ?? 'sans version précédente'} ; ${formes.constitutions} constitution${formes.constitutions > 1 ? 's' : ''} d'exemple comparée${formes.constitutions > 1 ? 's' : ''} à leur version précédente, ${relachements}`);
+}
 if (erreurs.length === avantHistorique) console.log(`ok  historique caché à Gemini CLI (${motifsCaches} motifs de .geminiignore), aucun nom d'un autre hôte d'IA ailleurs`);
 const uniques = [...new Set(erreurs)];
 for (const message of uniques) console.error(`ERREUR  ${message}`);

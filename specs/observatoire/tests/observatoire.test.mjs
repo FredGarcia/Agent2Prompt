@@ -1,12 +1,13 @@
-// Recette de l'observatoire (observatoire 1.4.0, D1 à D6, D8 à D10), sur des instances d'épreuve dont les journaux
+// Recette de l'observatoire (observatoire 1.5.0, D1 à D6, D8 à D11), sur des instances d'épreuve dont les journaux
 // sont produits par l'export du générateur de skills de ticket : A, le champ de l'arbre d'exemple ABCDE-3620
 // et un registre d'apprentissage dont une proposition, qui vise le générateur, est retenue ; B et C, des
 // champs écrits pour l'épreuve ; pour la confrontation entre systèmes, par l'export de l'orchestrateur C7E,
 // depuis un registre des écarts commité dans ces projets ; et, pour la confrontation de l'acceptable, par
 // l'export du binôme, depuis des livrables d'Agent2Dev et des journaux de tests d'Agent2Test écrits pour
 // l'épreuve, avec leurs refus et, pour la confrontation des kits et des signaux, leurs kits et leurs points de
-// validation. Le magasin et le dépôt d'épreuve sont temporaires : la recette n'écrit ni dans le répertoire Git
-// commun du clone, ni dans ses propositions.
+// validation ; et, pour l'examen indépendant, des propositions et des examens écrits pour l'épreuve. Le magasin
+// et le dépôt d'épreuve sont temporaires : la recette n'écrit ni dans le répertoire Git commun du clone, ni dans
+// ses propositions, ni dans ses examens.
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -21,8 +22,8 @@ import { exporter } from '../../generateur-skill-ticket/outils/observation.mjs';
 import { exporter as exporterOrchestrateur } from '../../orchestrateur-c7e/outils/observation.mjs';
 import { exporter as exporterBinome } from '../outils/export-binome.mjs';
 import {
-  MAGASIN, PROPOSITIONS, SEUIL_ENVELOPPES, canonique, confronter, controlerEnveloppe, controlerProposition, etat, inscrire, lirePropositions, magasinParDefaut,
-  principal, proposer, relever, repertoireGitCommun, sha256, suivre, verifier,
+  EXAMENS, MAGASIN, PROPOSITIONS, SEUIL_ENVELOPPES, canonique, confronter, controlerEnveloppe, controlerExamen, controlerProposition, controlerRatifications, etat,
+  inscrire, lireExamens, lirePropositions, magasinParDefaut, principal, proposer, relever, repertoireGitCommun, sha256, suivre, verifier,
 } from '../outils/observatoire.mjs';
 
 const ICI = dirname(fileURLToPath(import.meta.url));
@@ -688,6 +689,86 @@ test('D4 : l\'observatoire n\'écrit dans le dépôt que des propositions, sans 
   assert.deepStrictEqual(lirePropositions(lieux.depot).erreurs, []);
 });
 
+// ---- D11 : examens indépendants ----
+
+/** Une proposition au format observatoire.proposition/1, au statut donné, avec son corps. */
+const propositionDe = (statut, corps = '## Ce qui change\n\nLa règle de requête native se précise.\n') =>
+  `---\nformat: observatoire.proposition/1\ndate: 2026-11-26\nsysteme: generateur-skill-ticket\nversions: [1.3.0]\nsorte: recurrence\nmotif: requete-native\nprofondeur: meso-composants\ninstances: 2\nenveloppes: 3\nreferences: [0123abcd:12, 4567cdef:4, 4567cdef:9]\n${statut}\n---\n\n${corps}`;
+/** Un examen au format observatoire.examen/1 : son en-tête, puis son corps. */
+const examenDe = (entete, corps = '## Avis\n\n- Les preuves viennent de deux instances, sur le même motif.\n') => `---\n${entete}\n---\n\n${corps}`;
+const EXAMEN_DE_PROPOSITION = 'format: observatoire.examen/1\ndate: 2026-11-26\nobjet: proposition\nexaminateur: observateur-externe\nmodele: gemini-3-flash-preview\navis: favorable';
+
+test('D11 : un examen suit le format observatoire.examen/1 : en-tête fermé, objet et cible, examinateur, modèle et avis, corps sous ## Avis', () => {
+  const bon = examenDe('format: observatoire.examen/1\ndate: 2026-11-26\nobjet: specification\nsysteme: agent2dev\nversion: 1.5.0\nexaminateur: observateur-externe\nmodele: gemini-3-flash-preview\navis: reserve');
+  assert.deepStrictEqual(controlerExamen(bon, 'agent2dev-1.5.0.md'), { entete: { format: 'observatoire.examen/1', date: '2026-11-26', objet: 'specification', systeme: 'agent2dev', version: '1.5.0', examinateur: 'observateur-externe', modele: 'gemini-3-flash-preview', avis: 'reserve' }, erreurs: [] });
+  const cas = [
+    [bon.replace('avis: reserve', 'avis: reserve\nauteur: Fred Dupont'), /clé inconnue auteur/],
+    [bon.replace('avis: reserve', 'avis: neutre'), /avis « neutre » : favorable, reserve ou defavorable/],
+    [bon.replace('examinateur: observateur-externe', 'examinateur: developpeur'), /examinateur « developpeur » : le rôle observateur-externe/],
+    [bon.replace('modele: gemini-3-flash-preview', 'modele: Gemini 3, chez le client Dupont'), /modele « Gemini 3, chez le client Dupont »/],
+    [bon.replace('objet: specification', 'objet: version'), /objet « version » : proposition ou specification/],
+    [bon.replace('version: 1.5.0', 'version: 1.5'), /version « 1\.5 » : la version qui porte le relâchement/],
+    [bon.replace('date: 2026-11-26', 'date: 26/11/2026'), /date « 26\/11\/2026 »/],
+    [bon.replace(/## Avis\n\n- .*\n$/, 'Favorable, sans plus.\n'), /corps : ## Avis, puis les points de l'examinateur/],
+    [bon.replace('format: observatoire.examen/1', 'format: observatoire.proposition/1'), /format « observatoire\.proposition\/1 », attendu observatoire\.examen\/1/],
+    [bon.replace('avis: reserve\n', ''), /clé requise absente avis/],
+    [bon.replace(/^---\n/, ''), /en-tête absent/],
+  ];
+  for (const [texte, motif] of cas) {
+    const { erreurs } = controlerExamen(texte, 'agent2dev-1.5.0.md');
+    assert.ok(erreurs.some((e) => motif.test(e)), `${motif} : ${erreurs.join(' ; ')}`);
+  }
+  assert.match(controlerExamen(bon, 'agent2dev-1.4.0.md').erreurs.join(' ; '), /nom du fichier : agent2dev-1\.5\.0\.md, celui de la spécification et de sa version/);
+  const deProposition = examenDe(EXAMEN_DE_PROPOSITION);
+  assert.deepStrictEqual(controlerExamen(deProposition, '2026-11-26-x.md').erreurs, []);
+  assert.match(controlerExamen(deProposition.replace('objet: proposition', 'objet: proposition\nsysteme: agent2dev'), '2026-11-26-x.md').erreurs.join(' ; '), /systeme, version : seulement pour l'examen d'une spécification/);
+});
+
+test('D11 : une proposition ne se ratifie qu\'avec son examen, du même nom, qui la vise ; contre un avis défavorable, elle lui répond ; un refus n\'en demande pas', () => {
+  const d = temporaire('depot');
+  const nom = '2026-11-26-generateur-skill-ticket-requete-native-meso-composants.md';
+  mkdirSync(join(d, PROPOSITIONS), { recursive: true });
+  mkdirSync(join(d, EXAMENS), { recursive: true });
+  const ecrire = (rel, texte) => writeFileSync(join(d, rel), texte);
+  ecrire(`${PROPOSITIONS}/${nom}`, propositionDe('statut: ouverte'));
+  ecrire(`${PROPOSITIONS}/2026-11-26-agent2dev-faux-refus-agent2dev-d1-inv-5.md`, propositionDe('statut: refusee\npr: 81').replace('systeme: generateur-skill-ticket', 'systeme: agent2dev').replace('sorte: recurrence\nmotif: requete-native\nprofondeur: meso-composants', 'sorte: faux-refus\nmotif: faux-refus-agent2dev-d1-inv-5\ninvariant: agent2dev:D1.INV-5\nsystemes: [agent2dev]').replace('references: [0123abcd:12, 4567cdef:4, 4567cdef:9]', 'references: [0123abcd:agent2dev:12, 4567cdef:agent2dev:4]'));
+  assert.deepStrictEqual([lirePropositions(d).erreurs, controlerRatifications(d).erreurs], [[], []], 'une ouverte attend, une refusée se décide seule');
+  ecrire(`${PROPOSITIONS}/${nom}`, propositionDe('statut: ratifiee\nversion: 1.4.0\npr: 80'));
+  assert.deepStrictEqual(controlerRatifications(d).erreurs, [`${PROPOSITIONS}/${nom} : ratifiée sans examen, ${EXAMENS}/${nom} attendu (D11.INV-1)`]);
+  ecrire(`${EXAMENS}/${nom}`, examenDe(EXAMEN_DE_PROPOSITION));
+  assert.deepStrictEqual([lireExamens(d).examens.map((e) => [e.fichier, e.entete.avis]), lireExamens(d).erreurs, controlerRatifications(d).erreurs], [[[`${EXAMENS}/${nom}`, 'favorable']], [], []]);
+  ecrire(`${EXAMENS}/${nom}`, examenDe(EXAMEN_DE_PROPOSITION.replace('avis: favorable', 'avis: defavorable')));
+  assert.deepStrictEqual(controlerRatifications(d).erreurs, [`${PROPOSITIONS}/${nom} : ratifiée contre un avis défavorable, sans « ## Réponse à l'examen » dans son corps`], 'un avis ne décide pas, mais il demande sa réponse');
+  ecrire(`${PROPOSITIONS}/${nom}`, propositionDe('statut: ratifiee\nversion: 1.4.0\npr: 80', '## Ce qui change\n\nLa règle se précise.\n\n## Réponse à l\'examen\n\nLa règle se précise sans s\'affaiblir.\n'));
+  assert.deepStrictEqual(controlerRatifications(d).erreurs, []);
+  // Un examen sans sa proposition, ou qui vise une spécification sous le nom d'une proposition.
+  ecrire(`${EXAMENS}/2026-11-26-autre.md`, examenDe(EXAMEN_DE_PROPOSITION));
+  ecrire(`${EXAMENS}/${nom}`, examenDe('format: observatoire.examen/1\ndate: 2026-11-26\nobjet: specification\nsysteme: generateur-skill-ticket\nversion: 1.4.0\nexaminateur: observateur-externe\nmodele: gemini-3-flash-preview\navis: favorable'));
+  assert.deepStrictEqual(lireExamens(d).erreurs, [
+    `${EXAMENS}/2026-11-26-autre.md : aucune proposition ${PROPOSITIONS}/2026-11-26-autre.md à examiner`,
+    `${EXAMENS}/${nom} : nom du fichier : generateur-skill-ticket-1.4.0.md, celui de la spécification et de sa version`,
+  ]);
+  assert.deepStrictEqual(controlerRatifications(d).erreurs, [], 'un examen hors format est relevé une fois, par lireExamens');
+  // La commande verifier les relève, et n'écrit rien.
+  const contexte = { magasin: join(temporaire('magasin'), MAGASIN), depot: d };
+  const avant = inventaire(d);
+  const r = lancer(contexte, 'verifier');
+  assert.equal(r.code, 1);
+  assert.match(r.erreur, /^ALTÉRÉ {2}observatoire\/examens\/2026-11-26-autre\.md : aucune proposition/m);
+  assert.deepStrictEqual(inventaire(d), avant, 'verifier ne fait que lire');
+  rmSync(join(d, EXAMENS, '2026-11-26-autre.md'));
+  ecrire(`${EXAMENS}/${nom}`, examenDe(EXAMEN_DE_PROPOSITION.replace('avis: favorable', 'avis: defavorable')));
+  ecrire(`${PROPOSITIONS}/${nom}`, propositionDe('statut: ratifiee\nversion: 1.4.0\npr: 80'));
+  assert.deepStrictEqual(lancer(contexte, 'verifier'), { code: 1, sortie: '', erreur: `ALTÉRÉ  ${PROPOSITIONS}/${nom} : ratifiée contre un avis défavorable, sans « ## Réponse à l'examen » dans son corps` });
+  ecrire(`${EXAMENS}/${nom}`, examenDe(EXAMEN_DE_PROPOSITION));
+  assert.deepStrictEqual(lancer(contexte, 'verifier'), { code: 0, sortie: 'magasin, propositions et examens intacts', erreur: '' });
+  // Une proposition dont l'examen, valide, vise une spécification : il ne compte pas pour la ratifier.
+  const piege = 'generateur-skill-ticket-1.4.0.md';
+  ecrire(`${PROPOSITIONS}/${piege}`, propositionDe('statut: ratifiee\nversion: 1.4.0\npr: 82'));
+  ecrire(`${EXAMENS}/${piege}`, examenDe('format: observatoire.examen/1\ndate: 2026-11-26\nobjet: specification\nsysteme: generateur-skill-ticket\nversion: 1.4.0\nexaminateur: observateur-externe\nmodele: gemini-3-flash-preview\navis: favorable'));
+  assert.deepStrictEqual(controlerRatifications(d).erreurs, [`${PROPOSITIONS}/${piege} : son examen, ${EXAMENS}/${piege}, ne vise pas une proposition`]);
+});
+
 // ---- D5 : suivi ----
 
 test('D5 : l\'effet d\'une proposition ratifiée se mesure avant et après sa version : observé, non observé, ou indécidable sous vingt enveloppes', () => {
@@ -744,7 +825,7 @@ test('Ligne de commande : codes de sortie ; le magasin d\'épreuve seul est écr
   assert.deepStrictEqual(c.candidats.map(cle), ['retour generateur-skill-ticket commit-hors-plan-back micro', 'recurrence generateur-skill-ticket requete-native meso-composants']);
   assert.match(lancer(contexte, 'proposer', '--date', '2026-11-24').sortie, /^écrite : observatoire\/propositions\/2026-11-24-generateur-skill-ticket-commit-hors-plan-back-micro\.md ; à relire, compléter et apporter par une pull request$/m);
   assert.match(lancer(contexte, 'suivre').sortie, /^ouverte {2}observatoire\/propositions\/2026-11-24-/m);
-  assert.deepStrictEqual(lancer(contexte, 'verifier'), { code: 0, sortie: 'magasin et propositions intacts', erreur: '' });
+  assert.deepStrictEqual(lancer(contexte, 'verifier'), { code: 0, sortie: 'magasin, propositions et examens intacts', erreur: '' });
   const miroir = join(contexte.magasin, 'instances', sha256(SELS.A), 'observations.tete');
   writeFileSync(miroir, '{}\n');
   assert.equal(lancer(contexte, 'verifier').code, 1);

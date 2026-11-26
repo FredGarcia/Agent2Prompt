@@ -14,7 +14,7 @@ Ce module applique le socle de l'acceptable, `socle-acceptable/SKILL.md`, inclus
 La constitution porte le champ `acceptable` (module `noyau`, section 5) :
 
 ```json
-{ "acceptable": { "socle": "socle-acceptable", "version": "1.1.0", "empreinte": "e815cadf230886d507d56dbbfb5d7cfd0cf3982036d54d0279b70cc8f49b4764" } }
+{ "acceptable": { "socle": "socle-acceptable", "version": "1.2.0", "empreinte": "e815cadf230886d507d56dbbfb5d7cfd0cf3982036d54d0279b70cc8f49b4764" } }
 ```
 
 Au démarrage, après la vérification de l'empreinte de la constitution (D1.INV-4), le noyau :
@@ -68,7 +68,7 @@ Le journal de tests `agent2test.journal-de-tests/1` porte une rubrique `acceptab
 
 ```json
 { "acceptable": {
-    "socle": "socle-acceptable", "version": "1.1.0",
+    "socle": "socle-acceptable", "version": "1.2.0",
     "refus": [
       { "n": 812, "date": "2026-10-21T10:02:14Z", "garde": "perimetre", "objet": "modifier-du-code", "regles": ["D1.INV-5"], "reponse": null }
     ]
@@ -90,7 +90,7 @@ Jeu d'essai : la constitution d'exemple, des copies altérées, et une constitut
 
 | Scénario | Vérifie | Cas |
 |---|---|---|
-| AC1 | D26.INV-1 | la constitution d'exemple démarre : socle 1.1.0, empreinte conforme, chaque entrée du noyau présente |
+| AC1 | D26.INV-1 | la constitution d'exemple démarre : socle 1.2.0, empreinte conforme, chaque entrée du noyau présente |
 | AC2 | D26.INV-1 | une empreinte fausse, une version autre que celle du socle inclus, une entrée du noyau retirée d'une liste, ou le champ `acceptable` absent empêchent le démarrage « acceptable non conforme » |
 | AC3 | D26.INV-2 | « corriger le code du composant » est refusée « hors périmètre », règle D1.INV-5 ; « redéployer l'application de recette », règle SA1.INV-1 ; chaque refus a sa ligne `acceptable.refus` |
 | AC4 | D26.INV-2 | une écriture dans `constitution/` est refusée `ECRITURE_INTERDITE`, règle SA3.INV-1 ; dans `migrations/`, règle D1.INV-6 |

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Observatoire de l'écosystème Agent2Prompt (observatoire 1.4.0) : le premier couplage du troisième ordre,
+// Observatoire de l'écosystème Agent2Prompt (observatoire 1.5.0) : le premier couplage du troisième ordre,
 // entre systèmes (EVOLUTION.md, section 10.3), et la boucle du troisième, avec les valeurs. Il se lance depuis le
 // clone du dépôt, sur le poste.
 //
@@ -11,8 +11,10 @@
 // ses décisions aux points de validation, avec leurs délais, signaux du deuxième couplage ; il observe l'état de
 // l'écosystème, écrit des propositions
 // minimisées dans observatoire/propositions/, que le développeur apporte au dépôt par une pull request, et suit
-// l'effet de celles que la ratification a fait entrer dans une version. Il propose et n'applique jamais : il ne
-// modifie aucune spécification, ne commite ni ne publie. Il ne lit des instances que leurs enveloppes : jamais
+// l'effet de celles que la ratification a fait entrer dans une version. Il contrôle les examens indépendants,
+// dans observatoire/examens/, qu'écrivent des observateurs sur un autre modèle : une proposition ne se ratifie
+// qu'avec le sien. Il propose et n'applique jamais : il ne modifie aucune spécification, n'écrit aucun examen,
+// ne commite ni ne publie. Il ne lit des instances que leurs enveloppes : jamais
 // leur sel ; l'export du binôme, qui agit à la source, est un outil à part, export-binome.mjs.
 //
 // Usage, depuis le clone :
@@ -40,6 +42,8 @@ export const FORMAT_PROPOSITION = 'observatoire.proposition/1';
 // et Agent2Dev et Agent2Test, dont l'outil d'export du binôme écrit les journaux.
 export const JOURNAUX = ['docs/c7e/observations.jsonl', 'docs/c7e/observations-orchestrateur-c7e.jsonl', 'docs/c7e/observations-agent2dev.jsonl', 'docs/c7e/observations-agent2test.jsonl'];
 export const PROPOSITIONS = 'observatoire/propositions';
+export const EXAMENS = 'observatoire/examens';
+export const FORMAT_EXAMEN = 'observatoire.examen/1';
 export const MAGASIN = 'agent2prompt/observatoire'; // sous le répertoire Git commun du clone
 export const SEUIL_INSTANCES = 2; // une récurrence : au moins deux instances distinctes
 export const SEUIL_ENVELOPPES = 20; // un effet : au moins vingt enveloppes du système de part et d'autre de la version
@@ -896,9 +900,98 @@ export function suivre({ magasin = magasinParDefaut(), depot = RACINE } = {}) {
   return { erreurs: [...r.erreurs, ...erreurs.map((x) => `proposition mal formée, ${x}`)], avertissements: r.avertissements, suivis };
 }
 
-/** Écarts du magasin et des propositions du dépôt. */
+// ---- D11 : examens indépendants ----
+
+const CLES_EXAMEN = ['format', 'date', 'objet', 'systeme', 'version', 'examinateur', 'modele', 'avis'];
+const AVIS = ['favorable', 'reserve', 'defavorable'];
+const MODELE = /^[a-z0-9][a-z0-9.-]*$/;
+const REPONSE = '## Réponse à l\'examen';
+
+/**
+ * En-tête d'un examen et ses écarts au format `observatoire.examen/1` (D11.INV-2) : date, objet, pour une
+ * spécification son nom et sa version, l'examinateur, un rôle, son modèle déclaré, son avis ; un corps qui
+ * commence par `## Avis`. `nom` : le nom du fichier, qui dit ce que l'examen vise.
+ */
+export function controlerExamen(texte, nom) {
+  const lignes = texte.replace(/^\uFEFF/, '').replace(/\r\n/g, '\n').split('\n');
+  if (lignes[0] !== '---') return { entete: null, erreurs: ['en-tête absent : l\'examen commence par ---'] };
+  const fin = lignes.indexOf('---', 1);
+  if (fin === -1) return { entete: null, erreurs: ['en-tête non fermé par ---'] };
+  const entete = {};
+  const erreurs = [];
+  for (const ligne of lignes.slice(1, fin)) {
+    const m = /^([a-z]+): (.+)$/.exec(ligne);
+    if (!m) {
+      erreurs.push(`ligne d'en-tête mal formée : « ${ligne} »`);
+      continue;
+    }
+    const [, cle, valeur] = m;
+    if (!CLES_EXAMEN.includes(cle)) erreurs.push(`clé inconnue ${cle}`);
+    if (cle in entete) erreurs.push(`clé répétée ${cle}`);
+    entete[cle] = valeur;
+  }
+  for (const k of ['format', 'date', 'objet', 'examinateur', 'modele', 'avis']) if (!(k in entete)) erreurs.push(`clé requise absente ${k}`);
+  if (erreurs.length > 0) return { entete, erreurs };
+  if (entete.format !== FORMAT_EXAMEN) erreurs.push(`format « ${entete.format} », attendu ${FORMAT_EXAMEN}`);
+  if (!JOUR.test(entete.date)) erreurs.push(`date « ${entete.date} » : AAAA-MM-JJ`);
+  if (entete.objet === 'specification') {
+    if (!chaine(entete.systeme, NOM)) erreurs.push(`systeme « ${entete.systeme} » : le nom d'une spécification`);
+    if (!chaine(entete.version, VERSION)) erreurs.push(`version « ${entete.version} » : la version qui porte le relâchement`);
+    if (erreurs.length === 0 && nom !== `${entete.systeme}-${entete.version}.md`) erreurs.push(`nom du fichier : ${entete.systeme}-${entete.version}.md, celui de la spécification et de sa version`);
+  } else if (entete.objet === 'proposition') {
+    if (entete.systeme !== undefined || entete.version !== undefined) erreurs.push('systeme, version : seulement pour l\'examen d\'une spécification ; celui d\'une proposition porte son nom');
+  } else erreurs.push(`objet « ${entete.objet} » : proposition ou specification`);
+  if (entete.examinateur !== 'observateur-externe') erreurs.push(`examinateur « ${entete.examinateur} » : le rôle observateur-externe`);
+  if (!MODELE.test(entete.modele)) erreurs.push(`modele « ${entete.modele} » : le modèle de l'examinateur, en minuscules, chiffres, points et tirets`);
+  if (!AVIS.includes(entete.avis)) erreurs.push(`avis « ${entete.avis} » : favorable, reserve ou defavorable`);
+  const corps = lignes.slice(fin + 1).filter((l) => l.trim() !== '');
+  if (corps[0] !== '## Avis' || corps.length < 2) erreurs.push('corps : ## Avis, puis les points de l\'examinateur');
+  return { entete, erreurs };
+}
+
+/** Examens du dépôt, avec leur en-tête ; l'examen d'une proposition en porte le nom, et la proposition existe. */
+export function lireExamens(depot = RACINE) {
+  const dossier = join(depot, EXAMENS);
+  const examens = [];
+  const erreurs = [];
+  if (!existsSync(dossier)) return { examens, erreurs };
+  for (const nom of readdirSync(dossier).filter((n) => n.endsWith('.md') && n !== 'README.md').sort(parCodePoint)) {
+    const { entete, erreurs: ecarts } = controlerExamen(lire(join(dossier, nom)), nom);
+    if (ecarts.length === 0 && entete.objet === 'proposition' && !existsSync(join(depot, PROPOSITIONS, nom))) ecarts.push(`aucune proposition ${PROPOSITIONS}/${nom} à examiner`);
+    if (ecarts.length > 0) erreurs.push(...ecarts.map((e) => `${EXAMENS}/${nom} : ${e}`));
+    else examens.push({ fichier: `${EXAMENS}/${nom}`, nom, entete });
+  }
+  return { examens, erreurs };
+}
+
+/**
+ * Ratifications des propositions (D11.INV-1) : une proposition ratifiée a son examen, du même nom, qui vise une
+ * proposition ; contre un avis défavorable, son corps y répond sous « ## Réponse à l'examen ». Une proposition
+ * ouverte ou refusée n'en demande pas.
+ */
+export function controlerRatifications(depot = RACINE) {
+  const { examens } = lireExamens(depot);
+  const parNom = new Map(examens.map((e) => [e.nom, e]));
+  const erreurs = [];
+  for (const { fichier, entete } of lirePropositions(depot).propositions) {
+    if (entete.statut !== 'ratifiee') continue;
+    const nom = basename(fichier);
+    const examen = parNom.get(nom);
+    if (!examen) {
+      if (!existsSync(join(depot, EXAMENS, nom))) erreurs.push(`${fichier} : ratifiée sans examen, ${EXAMENS}/${nom} attendu (D11.INV-1)`);
+      continue;
+    }
+    if (examen.entete.objet !== 'proposition') erreurs.push(`${fichier} : son examen, ${examen.fichier}, ne vise pas une proposition`);
+    else if (examen.entete.avis === 'defavorable' && !lire(join(depot, fichier)).split('\n').includes(REPONSE)) {
+      erreurs.push(`${fichier} : ratifiée contre un avis défavorable, sans « ${REPONSE} » dans son corps`);
+    }
+  }
+  return { erreurs };
+}
+
+/** Écarts du magasin, des propositions, des examens et des ratifications du dépôt. */
 export function verifier({ magasin = magasinParDefaut(), depot = RACINE } = {}) {
-  return [...verifierMagasin(magasin), ...lirePropositions(depot).erreurs];
+  return [...verifierMagasin(magasin), ...lirePropositions(depot).erreurs, ...lireExamens(depot).erreurs, ...controlerRatifications(depot).erreurs];
 }
 
 // ---- Ligne de commande ----
@@ -1028,7 +1121,7 @@ export function principal(argv, sortie = console.log, erreur = console.error, co
     for (const e of erreurs) erreur(`ALTÉRÉ  ${e}`);
     return 1;
   }
-  sortie('magasin et propositions intacts');
+  sortie('magasin, propositions et examens intacts');
   return 0;
 }
 

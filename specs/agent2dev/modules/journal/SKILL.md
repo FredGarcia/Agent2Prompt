@@ -15,7 +15,7 @@ status: active
 {
   "n": 2041,
   "horodatage": "2026-10-21T14:02:11.482Z",
-  "specVersion": "1.4.2",
+  "specVersion": "1.4.3",
   "instance": "principale",
   "demande": "ECR-77",
   "correlation": "5d1e…",
@@ -73,7 +73,7 @@ Une seule source, la projection JSON, de format `agent2dev.livrable/1` ; le Mark
 {
   "format": "agent2dev.livrable/1",
   "demande": { "cle": "ECR-77", "titre": "Export des retours d'expérience en CSV", "source": "<sha256 du MHTML>" },
-  "versions": { "specification": "1.4.2", "skill": "agent-tdd-jira 1.3.9", "transmission": "<sha256>", "referentiel": "R-4", "constitution": "<sha256>" },
+  "versions": { "specification": "1.4.3", "skill": "agent-tdd-jira 1.3.10", "transmission": "<sha256>", "referentiel": "R-4", "constitution": "<sha256>" },
   "autorisations": { "ecritureCode": false, "moteurExterne": true },
   "arbre": { "mode": "normal", "branche": "feature/ECR-77-export-csv", "commitDepart": "<sha1>" },
   "scenarios": [
@@ -85,7 +85,7 @@ Une seule source, la projection JSON, de format `agent2dev.livrable/1` ; le Mark
       "decision": { "n": 2046, "date": "2026-10-21T14:02:30Z", "valeur": "corriger", "role": "developpeur", "canal": "tableau-de-bord", "commentaire": "le critère 3 vise l'export, pas l'import" } },
     { "n": 2050, "date": "2026-10-21T14:10:00Z", "point": "V2", "decision": null }
   ],
-  "productions": [{ "id": "P-12", "fiche": "vert@1.0.0+agent-tdd-jira@1.3.9+L1", "moteur": "gemini", "adaptateur": "externe", "empreintePrompt": "<sha256>", "decision": "DEC-118" }],
+  "productions": [{ "id": "P-12", "fiche": "vert@1.0.0+agent-tdd-jira@1.3.10+L1", "moteur": "gemini", "adaptateur": "externe", "empreintePrompt": "<sha256>", "decision": "DEC-118" }],
   "empreinteFin": "<sha256>"
 }
 ```

@@ -59,7 +59,7 @@ Une forme que le scénario n'exprime pas, filtre, dernier élément, expression 
 <!-- fichier : scripts/designer.mjs -->
 ```javascript
 #!/usr/bin/env node
-// scenario-playwright 1.6.6 : désigner une cible à la souris, pour l'écrire dans un scénario.
+// scenario-playwright 1.6.7 : désigner une cible à la souris, pour l'écrire dans un scénario.
 //
 // Usage : node <dossier du skill>/scripts/designer.mjs <adresse> [--profil nom] [--max n]
 // Ouvre la page dans la fenêtre du navigateur du poste, sur le profil dédié : chaque clic du

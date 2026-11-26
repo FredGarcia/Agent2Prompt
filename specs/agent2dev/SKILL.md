@@ -1,10 +1,10 @@
 ---
 name: agent2dev
 description: Construire Agent2Dev, système multi-agents de développement qui applique le skill agent-tdd-jira comme méthode. D'une demande Jira exportée en MHTML, il tire les US et leurs critères d'acceptation, les scénarios Gherkin, les variantes, puis réalise chaque scénario en cycle TDD et trace la demande jusqu'aux commits, en binôme avec Agent2Test. Le moteur rédige, des agents déterministes écrivent et exécutent, le développeur valide à chaque point ; un journal chaîné et un apprentissage sous gouvernance en font un système de second ordre. Exécution locale, données dans un fichier SQLite unique, ouvert par un agent médiateur ; la remise et le journal de tests circulent à la main, ou par un échange par dossiers facultatif.
-version: 1.4.2
+version: 1.4.3
 ---
 
-# Agent2Dev, spécification 1.4.2
+# Agent2Dev, spécification 1.4.3
 
 Ce document est le point d'entrée du package. Il donne le principe, la carte du système, les points de validation, le registre des dimensions, les règles communes et les invariants. Les détails techniques sont dans `modules/`. Le fichier `manifest.json` déclare quels modules sont actifs.
 
@@ -49,7 +49,7 @@ La spécification reprend la conception d'Agent2Dev de l'étape 1 (cadrage et ar
 5. Les identifiants de code sont sans accents. Les commentaires, les textes de l'IHM, les messages et les journaux sont en français.
 6. Chaque test cite l'invariant ou le scénario qu'il vérifie, par exemple `// D9.INV-2, RE3`. Un invariant sans test n'est pas implémenté.
 7. N'implémentez aucun module au statut `reserved` dans `manifest.json`, sauf les tests d'inertie de ses points d'extension.
-8. La méthode n'est pas recopiée dans le code : Agent2Dev la lit dans la transmission du skill agent-tdd-jira 1.3.9 (module `methode`). Ce que dit le skill, le code ne le redit pas.
+8. La méthode n'est pas recopiée dans le code : Agent2Dev la lit dans la transmission du skill agent-tdd-jira 1.3.10 (module `methode`). Ce que dit le skill, le code ne le redit pas.
 
 ## 3. Objectif et principe
 
@@ -57,7 +57,7 @@ Pour une demande Jira, Agent2Dev applique la méthode du skill agent-tdd-jira : 
 
 **Le skill fixe la méthode, le moteur rédige, les agents déterministes agissent, le développeur valide.**
 
-- Le skill agent-tdd-jira 1.3.9 est lu depuis sa transmission, vérifiée par sa table d'intégrité. Agent2Dev ne le réécrit jamais : les consignes de ses fiches en citent les sections telles quelles.
+- Le skill agent-tdd-jira 1.3.10 est lu depuis sa transmission, vérifiée par sa table d'intégrité. Agent2Dev ne le réécrit jamais : les consignes de ses fiches en citent les sections telles quelles.
 - Le moteur (Gemini Code Assist par défaut, tout LLM par le port moteur) ne produit que des données : le contenu de `us.md` et du fichier Gherkin, la fiche d'impact, les variantes, les modifications de tests et de code, le rapport et le projet de commentaire Jira. Chaque sortie est validée contre un schéma fermé et des contrôles nommés. Le moteur n'écrit aucun fichier et n'exécute rien.
 - Trois agents déterministes agissent, chacun seul dans son domaine : `depot` écrit et tient git dans l'arbre de travail de la demande, `executant` y exécute les commandes du profil ratifié et les scripts du skill, `methode` fournit le skill. Un quatrième, l'agent médiateur `donnees`, est le seul à ouvrir le fichier de données d'Agent2Dev : les autres agents n'y accèdent que par ses actions, sur le bus.
 - L'écriture du code se règle dans la configuration humaine. Sans autorisation, ce qui est le défaut, l'arbre de travail est une copie de travail du dépôt, dans les données d'Agent2Dev : il y écrit, y teste, et remet au développeur un patch par scénario accepté, que celui-ci applique lui-même ; ce patch, confronté au noyau, est aussi le kit dev du scénario, que la fabrication de l'hôte applique sur l'environnement dev (D27). Avec l'autorisation, l'arbre de travail est l'arbre de la demande : la branche du développeur, ou le worktree du kit en mode parallèle.
@@ -74,7 +74,7 @@ Chaîne de traçabilité, celle du skill :
 flowchart TB
   DEV(["Développeur · Référent"])
   GEM{{"Moteur : Gemini Code Assist,<br/>modèle local ou simulation"}}
-  SK[["skill agent-tdd-jira 1.3.9<br/>transmission vérifiée"]]
+  SK[["skill agent-tdd-jira 1.3.10<br/>transmission vérifiée"]]
   A2T[["Agent2Test<br/>remise lue, journal de tests"]]
   subgraph C6["C6 Interfaces · E7"]
     TDB["tableau-de-bord<br/>HTTP + SSE"]
@@ -186,7 +186,7 @@ Entre V4 et V5, l'acceptation en binôme n'est pas un point de validation : le d
 
 ## 6. Registre des dimensions
 
-| ID | Dimension | Introduite | Statut 1.4.2 | Dépend de | Module |
+| ID | Dimension | Introduite | Statut 1.4.3 | Dépend de | Module |
 |---|---|---|---|---|---|
 | D1 | Noyau 7E, bus et constitution | 1.0 | active | | `noyau` |
 | D2 | Données par agent, en SQLite | 1.0 | superseded | D1 | remplacée en 1.1.0 par D24 (`donnees`) |
@@ -236,7 +236,7 @@ Statuts : `active` (implémentée et testée), `reserved` (points d'extension po
 Un point d'extension n'est pas une fonctionnalité. En 1.x, il n'a qu'un test qui prouve qu'il est inerte.
 
 - **E1** : le port moteur accepte de nouveaux adaptateurs par version ; en 1.x : `simulation`, `externe` (Gemini Code Assist par MCP) et `compatible-openai`. Un adaptateur inconnu est refusé au démarrage.
-- **E2** : la méthode est désignée par le nom, la version et la transmission d'un skill dans la configuration humaine. En 1.4.2, seul agent-tdd-jira 1.3.9 est pris en charge ; un autre skill ou une autre version est refusé au démarrage avec le motif « méthode non prise en charge ».
+- **E2** : la méthode est désignée par le nom, la version et la transmission d'un skill dans la configuration humaine. En 1.4.3, seul agent-tdd-jira 1.3.10 est pris en charge ; un autre skill ou une autre version est refusé au démarrage avec le motif « méthode non prise en charge ».
 - **E3** : l'action `memoire.rechercher` existe et rend une liste vide ; chaque fiche a un emplacement « fragments », vide en 1.x. La mémoire sur le code et les demandes passées est réservée à D21.
 - **E4** : chaque point de validation V0 à V5 porte, dans la configuration humaine, un champ `regime`, qui vaut `presenter` ; toute autre valeur est refusée au démarrage. L'autonomie par point est réservée à D22, et suppose une version du skill qui la permette ; CP-4 n'a pas de régime, et reste toujours une décision humaine.
 - **E5** : le kit dev. Le champ `acceptable` de la constitution, refusé au démarrage en 1.2, épingle depuis 1.3.0 le noyau du socle de l'acceptable (D26). Inerte en 1.3, le kit dev est remis depuis 1.4.0 (D27), selon le contrat des kits du socle de l'acceptable 1.1.0 : le patch d'un scénario, confronté, avec son manifeste, que la fabrication de l'hôte applique sur l'environnement dev ; aucune règle n'a changé, et la garde refuse toujours ce qui ne se fait que dans un kit (scénario AC13, module `acceptable`).
@@ -244,7 +244,7 @@ Un point d'extension n'est pas une fonctionnalité. En 1.x, il n'a qu'un test qu
 ## 8. Règles globales
 
 - **Périmètre** : Agent2Dev traite une demande Jira déjà rédigée, exportée en MHTML, pour un projet dont le profil est ratifié. Il ne rédige pas la demande, ne démarre, n'arrête ni ne déploie l'application, ne lance aucun batch, n'écrit ni en base ni dans Jira.
-- **Méthode** : le skill agent-tdd-jira 1.3.9 fait foi pour la méthode. Agent2Dev le lit depuis sa transmission, vérifiée, et n'en change rien.
+- **Méthode** : le skill agent-tdd-jira 1.3.10 fait foi pour la méthode. Agent2Dev le lit depuis sa transmission, vérifiée, et n'en change rien.
 - **Projet séparé** : Agent2Dev est un projet à part. L'arbre de la demande est la branche de travail du développeur, ou le worktree que le kit `agents-paralleles-gitlab` a créé en mode parallèle.
 - **Écriture du code** : sans l'autorisation de la configuration humaine, Agent2Dev n'écrit rien dans l'arbre de la demande, hors des fichiers de travail que le kit exclut du dépôt ; il écrit et teste dans une copie de travail, et remet un patch par scénario accepté. Avec l'autorisation, le seul `depot` écrit dans l'arbre de la demande.
 - **Git** : dans l'arbre de la demande, Agent2Dev commite après V4 si l'écriture est autorisée et que le développeur l'accepte, au format du skill ; il ne fusionne pas, ne rebase pas, ne change pas de branche. Dans la copie de travail, chaque scénario accepté est commité pour former son patch. Agent2Dev ne pousse jamais.
@@ -542,3 +542,5 @@ Ce qui change par rapport à l'étape 1 :
 **1.4.1** (2026-11-25) : correctif, jalon J3e du passage du dépôt au troisième ordre (`EVOLUTION.md`, section 10), export des kits. Écart relevé au plan : la rubrique `kits` ne consignait pas qui déclare l'application, que l'enveloppe du socle d'observation exige comme sujet, et ne disait pas si un échec, déclaré avec son retour arrière, se consigne en un ou deux enregistrements. `application` porte désormais le rôle qui la déclare ; un échec ne remplit que `application`, de résultat `echec`, et `retourArriere` reste `null`. D27.INV-3 renforcé, scénario KI5 précisé ; la rubrique est la source de l'export des kits que porte l'observatoire 1.3.0, selon la correspondance du socle d'observation 1.3.0, section 6.6. Méthode : skill agent-tdd-jira 1.3.9, seule version prise en charge (point E2), dont seule la référence à Agent2Test change ; la transmission à placer dans `test/fixtures/methode/` est celle de la 1.3.9. Binôme : agent2test 1.6.1, même correctif. Exemples du journal à la version 1.4.1. Décisions ratifiées avant la rédaction : plan du jalon J3e, Y1 à Y3. Archive : `archives/SKILL-v1.4.0.md`.
 
 **1.4.2** (2026-11-25) : correctif, jalon J4 réduit du passage du dépôt au troisième ordre (`EVOLUTION.md`, section 10), les signaux du deuxième couplage. Écart relevé au plan : la rubrique « points, attentes et décisions » du livrable n'était décrite qu'en prose, sans le numéro des lignes ni l'heure de présentation d'un point, et le délai de décision ne pouvait sortir de l'instance. La rubrique `points` du livrable, en JSON : chaque présentation d'un point V0 à V5, avec le numéro et la date de sa ligne `point.ouvert`, et sa décision, avec ceux de sa ligne `point.decide`, sa valeur, dans la liste de son point, son rôle, son canal et son commentaire, ou `null` tant qu'elle attend (module `journal`, section 4.1). D13.INV-3 renforcé, scénario JO9 ; la rubrique est la source de l'export des décisions et des délais de décision que porte l'observatoire 1.4.0, selon la correspondance du socle d'observation 1.4.0, section 6.7 : ces deux signaux observent les clauses de second ordre d'agent-tdd-jira et d'agents-paralleles-gitlab (`EVOLUTION.md`, section 10.6). Exemples du journal à la version 1.4.2. Décisions ratifiées avant la rédaction : plan du jalon J4 réduit, Z1 à Z5. Archive : `archives/SKILL-v1.4.1.md`.
+
+**1.4.3** (2026-11-26) : correctif, jalon J5a du passage du dépôt au troisième ordre (`EVOLUTION.md`, section 10), la révision des formes propres. Le socle de l'acceptable 1.2.0 est inclus et épinglé à sa place : son noyau ne change pas, ni son empreinte ; il se révise désormais selon `EVOLUTION.md`, section 10.7, une révision n'y faisant qu'ajouter. La constitution d'exemple passe en 2.1.1 : elle épingle le socle 1.2.0, à la même empreinte, et la méthode agent-tdd-jira 1.3.10, dont seule la référence à Agent2Test change ; aucune entrée ne se retire ni ne se relâche. Migration : une instance monte la version de sa constitution, y épingle le socle de l'acceptable 1.2.0 avec la même empreinte, et la republie par `npm run constitution:publier`, sans quoi le démarrage la refuse ; ses listes ne changent pas. La constitution d'exemple est désormais une forme propre du dépôt : un relâchement de ses listes, de ses points, de ses règles modifiables ou de ses méta-critères demandera l'examen indépendant de la section 10.7, avec ses preuves et sa migration. Binôme : agent2test 1.6.2, même correctif. Exemples du journal à la version 1.4.3. Décisions ratifiées avant la rédaction : plan du jalon J5, W1 à W4. Archive : `archives/SKILL-v1.4.2.md`.
