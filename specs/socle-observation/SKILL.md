@@ -1,12 +1,12 @@
 ---
 name: socle-observation
 description: Socle d'observation partagé. Il fixe l'enveloppe commune des observations, propositions, décisions et écarts qu'un système de second ordre du dépôt rend observables aux autres, au sens du troisième ordre (EVOLUTION.md, section 10) : schéma fermé, journal en ajout seul et chaîné, minimisation, correspondances avec les formats existants. À lire avant d'exporter les observations d'un système vers le milieu commun.
-version: 1.4.0
+version: 1.5.0
 ---
 
-# Socle d'observation, version 1.4.0
+# Socle d'observation, version 1.5.0
 
-Ce socle est le milieu commun du premier couplage du troisième ordre, entre systèmes (`EVOLUTION.md`, section 10.3) : chaque système de second ordre du dépôt y rend observables ses observations, ses propositions, ses décisions et ses écarts, dans une même enveloppe, sans changer ses propres formats. Un système dont la dimension d'export est active l'inclut à l'identique, à une version épinglée ; un système dont l'export est encore réservé le référence. En 1.4.0, `generateur-skill-ticket` et `orchestrateur-c7e` l'incluent et exportent leurs observations ; `observatoire` l'inclut, relève les journaux d'enveloppes de tous les systèmes, et exporte pour le binôme Agent2Dev et Agent2Test, dont le code se construit hors du dépôt, les refus, les kits et les décisions aux points de validation de leurs livrables. Un système ne redéfinit jamais une règle du socle : il peut seulement la préciser pour ses propres formats.
+Ce socle est le milieu commun du premier couplage du troisième ordre, entre systèmes (`EVOLUTION.md`, section 10.3) : chaque système de second ordre du dépôt y rend observables ses observations, ses propositions, ses décisions et ses écarts, dans une même enveloppe, sans changer ses propres formats. Un système dont la dimension d'export est active l'inclut à l'identique, à une version épinglée ; un système dont l'export est encore réservé le référence. En 1.5.0, `generateur-skill-ticket` et `orchestrateur-c7e` l'incluent et exportent leurs observations ; `observatoire` l'inclut, relève les journaux d'enveloppes de tous les systèmes, et exporte pour le binôme Agent2Dev et Agent2Test, dont le code se construit hors du dépôt, les refus, les kits, les décisions aux points de validation et les révisions de la constitution de leurs livrables. Un système ne redéfinit jamais une règle du socle : il peut seulement la préciser pour ses propres formats.
 
 Les identifiants du socle commencent par `SO` (`SO3.INV-1`), pour ne jamais se confondre avec ceux d'une spécification, qui commencent par `D`, ni avec ceux du socle back-front, qui commencent par `SC`, ni avec ceux du socle de l'acceptable, qui commencent par `SA`.
 
@@ -37,7 +37,7 @@ Les formats sources restent ce qu'ils sont, là où ils sont : l'export les trad
 
 ## 2. Registre des dimensions du socle
 
-| ID | Dimension | Statut 1.4.0 |
+| ID | Dimension | Statut 1.5.0 |
 |---|---|---|
 | SO1 | Enveloppe : schéma fermé, ordres et niveaux | active |
 | SO2 | Chaînage : journal en ajout seul | active |
@@ -83,14 +83,14 @@ Une enveloppe par ligne, au format `socle-observation.enveloppe/1` :
 | `niveau` | oui | `N1`, `N2`, `N3`, `humain` |
 | `type` | oui | `observation`, `proposition`, `decision`, `refus`, `derogation`, `ecart` |
 | `motif` | oui | minuscules et tirets (`possibilite-inconnue`), le même pour un même écart d'une instance à l'autre |
-| `sujet` | oui | un rôle : `developpeur`, `referent`, `testeur`, `agent:<spécification>`, `observateur-N2`, `observateur-N3` |
+| `sujet` | oui | un rôle : `developpeur`, `referent`, `testeur`, `agent:<spécification>`, `observateur-N2`, `observateur-N3`, `observateur-externe` |
 | `source` | oui | `{ format, journal, numero }` : le format source ; le journal source, empreinte salée de sa clé, présent pour un format qui tient plusieurs journaux dans une instance, comme le champ d'observation du générateur, un par ticket, absent pour un format à journal unique ; le numéro de l'enregistrement traduit dans ce journal |
 | `precedent` | oui | empreinte de la ligne précédente, `null` pour la première (section 4) |
 | `nature` | non | valeur de la liste fermée du format source : verdict d'une observation, nature d'un retour ou d'un relevé, statut d'un concept |
 | `profondeur` | non | `macro`, `meso-contrats`, `meso-composants`, `micro` |
 | `cible` | non | `instance` (ce qui relève du projet) ou `specification` (ce qui relève d'une spécification du dépôt) |
 | `invariant` | non | identifiant d'un invariant d'une spécification du dépôt, préfixé par son nom (`orchestrateur-c7e:D6.INV-3`, `socle-acceptable:SA2.INV-1`) |
-| `ancre` | non | `{ nature, ref }` ; nature : `noeud`, `critere`, `ca`, `scenario`, `fichier`, `commit`, `contrat`, `option`, `ticket`, `concept`, `kit` |
+| `ancre` | non | `{ nature, ref }` ; nature : `noeud`, `critere`, `ca`, `scenario`, `fichier`, `commit`, `contrat`, `option`, `ticket`, `concept`, `kit`, `constitution` |
 | `preuve` | non | `{ nature, ref }` ; nature : `test`, `commande`, `commit`, `fichier`, `enregistrements`, `rapport`, `champ`, `arbre` |
 | `decision` | non | `{ valeur, vise }` : `retenue`, `refusee` ou `amendee`, et le numéro de l'enveloppe visée : une proposition, ou le refus auquel répond une dérogation ou un faux refus (section 6.5) |
 | `mesure` | non | `{ nom, valeur }` : une mesure que définit une correspondance, son nom en minuscules et tirets, sa valeur un entier positif ou nul, calculé à la source (section 6.7) |
@@ -104,8 +104,8 @@ Chaque enveloppe porte l'ordre cybernétique de la boucle qui l'a produite et le
 | Niveau | Ordre | Exemples |
 |---|---|---|
 | `N1` | `OC1` | verdict conforme ou écart sur le travail ; désaccord entre deux nœuds |
-| `N2`, `N3` | `OC2` | proposition d'adaptation de la méthode ; examen d'une proposition ; mise en veille d'un motif |
-| `humain` | celui de la boucle où la personne intervient | correction ou ratification d'un travail (`OC1`) ; décision sur une proposition de méthode (`OC2`) |
+| `N2`, `N3` | `OC2` | proposition d'adaptation de la méthode ; examen d'une proposition ; mise en veille d'un motif ; examen d'une révision de la constitution, par un observateur extérieur (`N3`) |
+| `humain` | celui de la boucle où la personne intervient | correction ou ratification d'un travail (`OC1`) ; décision sur une proposition de méthode, publication d'une constitution (`OC2`) |
 
 L'ordre `OC3` est réservé aux enregistrements de l'écosystème, que tiendra l'observatoire du dépôt : aucun système ne l'émet.
 
@@ -148,7 +148,7 @@ L'ordre `OC3` est réservé aux enregistrements de l'écosystème, que tiendra l
 
 Une correspondance dit comment un enregistrement d'un format source devient une enveloppe. Les empreintes salées de la section 5 s'appliquent partout où une référence de l'instance apparaît ; elles ne sont pas répétées dans les tableaux.
 
-La date d'une enveloppe est celle de l'enregistrement qu'elle traduit, pour un événement du registre des concepts celle du commit qui le porte, pour un refus, une réponse, une étape d'un kit ou un point de validation du binôme celle que porte sa rubrique, ou celle de la ligne précédente du journal si elle est plus récente : un enregistrement exporté après d'autres, plus récents, par exemple venu d'une branche fusionnée plus tard, prend la date de la dernière enveloppe, et le journal reste dans l'ordre du temps. Un export fusionne par date les enregistrements nouveaux de ses journaux sources, sans jamais changer leur ordre dans un même journal ; à date égale, le journal que le système range le premier passe d'abord. Une preuve ne garde que sa nature et sa référence : tout autre champ, comme un extrait, reste dans l'instance.
+La date d'une enveloppe est celle de l'enregistrement qu'elle traduit, pour un événement du registre des concepts celle du commit qui le porte, pour un refus, une réponse, une étape d'un kit, un point de validation ou une révision de la constitution du binôme celle que porte sa rubrique, ou celle de la ligne précédente du journal si elle est plus récente : un enregistrement exporté après d'autres, plus récents, par exemple venu d'une branche fusionnée plus tard, prend la date de la dernière enveloppe, et le journal reste dans l'ordre du temps. Un export fusionne par date les enregistrements nouveaux de ses journaux sources, sans jamais changer leur ordre dans un même journal ; à date égale, le journal que le système range le premier passe d'abord. Une preuve ne garde que sa nature et sa référence : tout autre champ, comme un extrait, reste dans l'instance.
 
 ### 6.1 Générateur : champ d'observation `skill-ticket.observation/1`
 
@@ -259,7 +259,25 @@ L'outil d'export du binôme traduit aussi la rubrique `points` d'un livrable d'A
 - Le sujet est le rôle que porte la rubrique, `developpeur` ; ni le canal, ni le commentaire, ni le nom de qui décide ne sortent.
 - Une présentation s'exporte quand elle paraît dans la rubrique : exportée sans décision, elle garde son enveloppe, et celle de sa décision s'ajoute plus tard ; une étape exportée ne change plus.
 
-### 6.8 Invariants
+### 6.8 Binôme : rubriques `revisions` de `agent2dev.livrable/1` et `agent2test.journal-de-tests/1`
+
+L'outil d'export du binôme traduit enfin la rubrique `revisions` (`agent2dev` et `agent2test`, module `revision`) : les entrées du grand livre qui révisent la constitution de l'instance, sa forme propre (`EVOLUTION.md`, section 10.7). L'examen d'une version qui relâche la constitution, par un observateur sur un autre modèle, est un enregistrement ; chaque publication en est un autre.
+
+| Enregistrement source | `type` | `ordre`, `niveau` | `nature` | `motif` | `sujet` | `mesure` |
+|---|---|---|---|---|---|---|
+| `constitution.examinee` | `observation` | `OC2`, `N3` | l'avis : `favorable`, `reserve`, `defavorable` | `revision-constitution` | `observateur-externe` | — |
+| `constitution.publiee` | `observation` | `OC2`, `humain` | le sens : `premiere`, `neutre`, `renforcement`, `relachement` | `revision-constitution` | `referent` | `relachements`, leur nombre |
+
+- `systeme` et `date` suivent la section 6.5 : la date est celle de l'entrée du grand livre, bornée par la ligne précédente du journal d'enveloppes.
+- `source.journal` est l'empreinte salée de `grand-livre`, le même pour toutes les révisions d'un système dans une instance ; `source.numero` est le numéro `n` de l'entrée au grand livre. Une révision que portent plusieurs livrables ne s'exporte qu'une fois.
+- `ancre` est la constitution : `{ "nature": "constitution", "ref": … }`, l'empreinte salée de son empreinte ; elle relie l'examen d'une version à sa publication.
+- `mesure` vaut `{ "nom": "relachements", "valeur": … }` : le nombre de relâchements que la publication compte, zéro pour un autre sens.
+- `cible` vaut `instance`, et aucune enveloppe de révision ne porte d'`invariant` ni de `decision` : une publication est une décision humaine sans enveloppe à viser, que l'observation enregistre.
+- Une publication de sens `relachement` suit, dans la rubrique, l'examen de la même empreinte : l'export refuse une rubrique qui dit autre chose.
+- Ni le contenu de la constitution, ni sa version, ni les entrées relâchées, ni les preuves, ni le modèle de l'examinateur, ni la réponse à son avis ne sortent : ils restent au grand livre de l'instance.
+- Une révision s'exporte quand elle paraît dans la rubrique ; une révision exportée ne change plus.
+
+### 6.9 Invariants
 
 - **SO4.INV-1** : une correspondance traduit un format source sans le modifier : il garde ses champs, sa version et son emplacement, et chaque enveloppe désigne sans ambiguïté l'enregistrement dont elle provient, par son format, son numéro et, pour un format qui tient plusieurs journaux dans une instance, son journal. Contrôle : test de l'export, qui compare les sources avant et après, sur une instance à deux journaux du même format.
 - **SO4.INV-2** : la même entrée source, avec le même sel d'instance, donne la même enveloppe, octet pour octet. Contrôle : test de l'export rejoué deux fois sur les exemples du système.
@@ -282,3 +300,5 @@ L'outil d'export du binôme traduit aussi la rubrique `points` d'un livrable d'A
 **1.3.0** (2026-11-25) : jalon J3e du passage au troisième ordre (`EVOLUTION.md`, section 10), export des kits du binôme. Correspondance nouvelle, section 6.6 : la rubrique `kits` des livrables d'Agent2Dev et des journaux de tests d'Agent2Test ; la remise, la validation, l'application ou son échec, et le retour arrière d'un kit font chacun une enveloppe, motif `kit-dev` ou `kit-test`, reliées par l'ancre de nature `kit`, valeur ajoutée à sa liste fermée ; la validation vise l'enveloppe de la remise, valeur `retenue` ; un échec, une seule enveloppe ; aucun invariant, `cible` `instance`. Invariants inchangés, leur section devenue 6.7. Décisions ratifiées avant la rédaction : plan du jalon J3e, Y1 à Y3.
 
 **1.4.0** (2026-11-25) : jalon J4 réduit du passage au troisième ordre (`EVOLUTION.md`, section 10), les signaux du deuxième couplage. Champ facultatif `mesure`, `{ nom, valeur }` : une mesure que définit une correspondance, son nom en minuscules et tirets, sa valeur un entier positif ou nul, calculé à la source ; la date d'une enveloppe pouvant être avancée pour garder le journal dans l'ordre du temps, une durée ne se déduit pas des dates. Règle de minimisation des mesures ajoutée, et SO3.INV-1 précisé : une mesure entière est un nombre, comme un numéro ; elle ne porte ni texte, ni référence, ni nom, et son sujet reste un rôle ; rien de la minimisation ne se relâche. Correspondance nouvelle, section 6.7 : la rubrique `points` des livrables d'Agent2Dev ; la présentation d'un point de validation, une observation de nature `presente`, et sa décision, qui la vise, avec la valeur `retenue`, `amendee` ou `refusee` et le délai de décision en secondes, motif `point-` suivi du point ; aucun invariant, `cible` `instance`. Invariants en section 6.8. Décisions ratifiées avant la rédaction : plan du jalon J4 réduit, Z1 à Z5. Archive : `archives/SKILL-v1.3.0.md`.
+
+**1.5.0** (2026-11-26) : jalon J5b du passage au troisième ordre (`EVOLUTION.md`, section 10), la révision dans l'instance. Correspondance nouvelle, section 6.8 : la rubrique `revisions` des livrables d'Agent2Dev et des journaux de tests d'Agent2Test ; l'examen d'une version qui relâche la constitution, une observation `OC2`, `N3`, du sujet nouveau `observateur-externe`, de nature son avis ; chaque publication, une observation `OC2`, `humain`, du référent, de nature son sens, avec la mesure `relachements` ; motif `revision-constitution`, ancre nouvelle de nature `constitution`, `source.journal` l'empreinte salée de `grand-livre` ; ni contenu, ni entrées relâchées, ni preuves, ni modèle, ni réponse ne sortent. Exemples de la section 3.2 complétés. Invariants en section 6.9 ; aucun ne change. Décisions ratifiées avant la rédaction : plan du jalon J5b, V1 à V4. Archive : `archives/SKILL-v1.4.0.md`.

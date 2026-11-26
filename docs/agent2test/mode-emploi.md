@@ -1,6 +1,6 @@
 # Mode d'emploi : construire et utiliser Agent2Test
 
-[`agent2test`](../../specs/agent2test/SKILL.md) 1.6.2 est la **spécification d'un système à construire**, pas un skill qu'on installe. Une IA la reçoit dans un projet séparé de l'application et l'implémente par lots, sous votre validation.
+[`agent2test`](../../specs/agent2test/SKILL.md) 1.7.0 est la **spécification d'un système à construire**, pas un skill qu'on installe. Une IA la reçoit dans un projet séparé de l'application et l'implémente par lots, sous votre validation.
 
 Agent2Test choisit, prépare et joue avec Playwright les tests essentiels d'une demande sur l'application Angular **que vous avez lancée**, et rend **un verdict prouvé par critère d'acceptation**. Son plan vient d'[`agent-tdd-jira`](../agent-tdd-jira/mode-emploi.md) : US, critères numérotés, scénarios Gherkin. Il travaille en binôme avec [Agent2Dev](../agent2dev/mode-emploi.md) ou avec l'agent TDD.
 
@@ -20,7 +20,7 @@ flowchart LR
 - Node 22.13 ou plus récent (26.13.0 recommandé), Playwright 1.63 ou plus récent ; les données tiennent dans un fichier SQLite, par `node:sqlite` : aucun serveur de base de données.
 - L'application Angular lancée par vous sur votre poste, et un navigateur du côté de la session SSO.
 - Docker Compose seulement pour un moteur local souverain (Ollama).
-- La transmission : [`transmissions/agent2test-1.6.2.md`](../../transmissions/agent2test-1.6.2.md).
+- La transmission : [`transmissions/agent2test-1.7.0.md`](../../transmissions/agent2test-1.7.0.md).
 
 L'installateur d'Agent2Prompt refuse cette spécification : elle se matérialise dans `spec/` de son propre projet.
 
@@ -35,7 +35,7 @@ L'installateur d'Agent2Prompt refuse cette spécification : elle se matérialise
 | Lot | Contenu |
 |---|---|
 | 1 | noyau et bus |
-| 2 | données (agent médiateur du fichier SQLite), journal, référentiel |
+| 2 | données (agent médiateur du fichier SQLite), journal, référentiel, révision de la constitution |
 | 3 | plan, mémoire, cartographie de l'application |
 | 4 | exécution : navigateur, préparateur, kit test, verdict, orchestrateur |
 | 5 | sélection des tests essentiels |
@@ -82,10 +82,13 @@ Le niveau d'autonomie de chaque point se fixe dans `configuration/humaine.json`,
 - Aucun verdict sans preuve, aucun verdict réécrit ; journal et grand livre en ajout seul.
 - Tout tourne en local ; les interfaces n'écoutent que sur `127.0.0.1`.
 - La constitution reprend le noyau du socle de l'acceptable, à la version épinglée : chaque refus cite sa règle, et aucune règle du noyau ne se déroge.
+- La constitution ne change que par sa publication, `npm run constitution:publier`, que lance le référent qualité : un renforcement se publie seul ; un relâchement exige l'examen de sa version par un observateur sur un autre modèle et ses preuves ; aucune entrée du noyau ne se relâche.
 
 ## 5. Faire évoluer
 
 Une nouvelle version arrive par une nouvelle transmission : remplacez `spec/` à l'identique, puis demandez à l'IA un plan pour l'écart, d'après le journal de révision de `spec/SKILL.md`. Les écarts qu'elle relève sur la spécification deviennent la matière de la version suivante, à ratifier dans Agent2Prompt (`EVOLUTION.md`, § 5).
+
+Pour changer la constitution de votre instance, montez sa version, puis publiez-la : `npm run constitution:publier` la compare à la dernière publiée et la classe. Ce qui la renforce, ou ne change rien de ce qu'elle refuse, se publie seul. Pour la relâcher, retirer une entrée propre, élargir des bornes, retirer un point de contrôle, faites d'abord examiner la version par un observateur sur un autre modèle que celui qui l'a préparée : il écrit son avis dans `constitution/examens/<version>.md`, au format `observatoire.examen/1`, et rien d'autre. Publiez ensuite avec vos preuves, `--preuves` et les numéros de deux faux refus de chaque entrée relâchée, ou `--incident` et sa description, et `--reponse` si l'avis est défavorable. À la montée en 1.7.0, republiez d'abord la constitution en vigueur, telle quelle : le grand livre la garde entière, référence des publications suivantes (module [`revision`](../../specs/agent2test/modules/revision/SKILL.md)).
 
 ## 6. Dépannage
 
@@ -100,6 +103,8 @@ Une nouvelle version arrive par une nouvelle transmission : remplacez `spec/` à
 | Parcours refusé : « référence de pictogramme » | pictogramme demandé sans référence ratifiée, ou référence modifiée depuis | désigner l'élément, faire capturer la référence et la ratifier en CP-2 |
 | Constat « non constatable » | zone non vue (page d'erreur, chargement non terminé), ou tableau sans ligne | lire ce que le témoignage dit avoir vu à la place ; faire attendre la fin du chargement au parcours, ou fournir des données |
 | Étape `INSTABILITE`, regards discordants | la page bouge pendant qu'il la regarde | faire attendre au parcours l'état final de l'écran |
+| Publication refusée, « republier d'abord la constitution en vigueur » | première publication en 1.7.0, avec une constitution déjà changée | republier la constitution en vigueur telle quelle, puis la nouvelle version |
+| Publication d'un relâchement refusée | examen absent, d'une autre version ou mal formé, réponse manquante à un avis défavorable, ou preuves insuffisantes | faire écrire l'examen de la version candidate ; citer deux faux refus de chaque entrée relâchée, ou déclarer un incident |
 | Démarrage refusé « acceptable non conforme » | constitution qui ne reprend pas le noyau épinglé, ou empreinte du socle fausse | republier la constitution de la version, sans retirer d'entrée du noyau |
 
 L'accessibilité automatisée et le profil de recette partagé sont des dimensions réservées, non appliquées en 1.3 : le navigateur rend compte de ce que perçoit une personne, il ne rend pas de verdict de conformité RGAA ou WCAG.

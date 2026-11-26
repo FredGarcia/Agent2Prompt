@@ -68,7 +68,7 @@ Depuis le projet, sur sa branche d'intégration, avec Node 20 ou plus récent :
 
 | Point | Règle active en 3.7 |
 |---|---|
-| E6 | le registre des concepts et le registre des écarts s'exportent selon les correspondances du socle `socle-observation` 1.4.0, précisées par la section 3 ; un registre de plus à exporter attend sa correspondance dans une version du socle ; la transmission ne porte pas l'outil |
+| E6 | le registre des concepts et le registre des écarts s'exportent selon les correspondances du socle `socle-observation` 1.5.0, précisées par la section 3 ; un registre de plus à exporter attend sa correspondance dans une version du socle ; la transmission ne porte pas l'outil |
 
 ## 8. Recette
 

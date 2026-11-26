@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-// Export des refus, des kits et des points de validation du binôme Agent2Dev et Agent2Test vers le socle
-// d'observation (observatoire, D7, depuis 1.2.0, les kits depuis 1.3.0, les points depuis 1.4.0 ; socle-observation
-// 1.4.0, sections 6.5 à 6.7). Il se lance depuis le clone du dépôt Agent2Prompt ; l'IA de l'observatoire ne
+// Export des refus, des kits, des points de validation et des révisions de la constitution du binôme Agent2Dev et
+// Agent2Test vers le socle d'observation (observatoire, D7, depuis 1.2.0, les kits depuis 1.3.0, les points depuis
+// 1.4.0, les révisions depuis 1.6.0 ; socle-observation 1.5.0, sections 6.5 à 6.8). Il se lance depuis le clone du dépôt Agent2Prompt ; l'IA de l'observatoire ne
 // l'exécute pas d'elle-même : elle en donne la commande au développeur.
 //
 // Le binôme n'a pas d'outil dans le dépôt, qui tient sa spécification et ses formats, pas son code : cet outil agit
@@ -9,17 +9,20 @@
 // (agent2dev.livrable/1) et les journaux de tests d'Agent2Test (agent2test.journal-de-tests/1) qu'on lui désigne :
 // chaque refus de leur rubrique acceptable, chaque réponse à un refus, dérogation ou faux refus, et chaque étape
 // d'un kit de leur rubrique kits, remise, validation, application ou échec, retour arrière, et, pour Agent2Dev,
-// chaque présentation d'un point de validation et sa décision, avec le délai de décision calculé à la source,
+// chaque présentation d'un point de validation et sa décision, avec le délai de décision calculé à la source, et
+// chaque entrée du grand livre qui révise la constitution, examen ou publication, de leur rubrique revisions,
 // devient une enveloppe socle-observation.enveloppe/1, datée par la rubrique, au nom et à la version du système
 // qui l'a produite, ajoutée au journal de ce système dans le projet, docs/c7e/observations-agent2dev.jsonl ou
 // docs/c7e/observations-agent2test.jsonl : en ajout seul, chaque ligne chaînée à l'empreinte de la précédente, la
 // tête portant le numéro et l'empreinte de la dernière (SO2). Aucun texte ne sort, ni l'objet refusé, ni le motif
-// d'une réponse, ni le nom de qui l'a donnée, ni le commentaire d'un échec ou d'une décision, et toute référence du projet, demande,
-// campagne, empreinte d'un patch, sort par son empreinte salée (SO3) : le
+// d'une réponse, ni le nom de qui l'a donnée, ni le commentaire d'un échec ou d'une décision, ni la version d'une
+// constitution, et toute référence du projet, demande, campagne, empreinte d'un patch ou d'une constitution, grand
+// livre, sort par son empreinte salée (SO3) : le
 // sel de l'instance, partagé avec les autres systèmes qui exportent dans le projet, est gardé dans son répertoire
 // Git commun, <git-common-dir>/agent2prompt/sel ; il n'est jamais versionné, affiché ni exporté. Un enregistrement
-// déjà exporté ne l'est pas deux fois ; une rubrique réécrite depuis son export, comme une enveloppe mal formée,
-// arrête l'export, sans rien écrire. L'outil n'écrit rien dans le magasin de l'observatoire, et ne versionne rien.
+// déjà exporté ne l'est pas deux fois, ni une révision que portent plusieurs sources ; une rubrique réécrite
+// depuis son export, deux sources qui disent autrement une même révision, comme une enveloppe mal formée,
+// arrêtent l'export, sans rien écrire. L'outil n'écrit rien dans le magasin de l'observatoire, et ne versionne rien.
 //
 // Usage, depuis le clone :
 //   node specs/observatoire/outils/export-binome.mjs exporter --projet <dossier> <fichier>...
@@ -66,6 +69,11 @@ const REPONSES = {
 };
 // Résultats d'une application déclarée ; un échec comprend le retour arrière que la fabrication a fait (socle, 6.6).
 const RESULTATS = ['applique', 'echec'];
+// Révisions de la constitution (socle, 6.8) : le sens d'une publication, l'avis d'un examen ; toutes se rapportent
+// au grand livre du système dans l'instance, dont l'empreinte salée tient lieu de journal source.
+const SENS = ['premiere', 'neutre', 'renforcement', 'relachement'];
+const AVIS = ['favorable', 'reserve', 'defavorable'];
+export const GRAND_LIVRE = 'grand-livre';
 // Valeur de la décision sur une présentation, selon la valeur prise au point (socle, 6.7).
 const DECISION_DE_POINT = {
   valider: 'retenue', confirmer: 'retenue', choisir: 'retenue', accepter: 'retenue',
@@ -128,6 +136,7 @@ export function lireSource(chemin) {
   const demande = x.demande?.cle;
   const version = x.versions?.specification;
   if (typeof cle !== 'string' || cle === '') erreurs.push(`${chemin} : ${f.nomCle} absent`);
+  else if (cle === GRAND_LIVRE) erreurs.push(`${chemin} : ${f.nomCle} « ${GRAND_LIVRE} », réservé aux révisions, que le grand livre numérote`);
   if (typeof demande !== 'string' || demande === '') erreurs.push(`${chemin} : demande.cle absent`);
   if (typeof version !== 'string' || !VERSION.test(version)) erreurs.push(`${chemin} : versions.specification, la version x.y.z du système, absente`);
   const enregistrements = [];
@@ -178,9 +187,58 @@ export function lireSource(chemin) {
     if (!Array.isArray(k)) erreurs.push(`${chemin} : rubrique kits mal formée : la liste des kits`);
     else k.forEach((kit, i) => lireKit(kit, `${chemin}, kit ${i + 1}`, f, numero, erreurs, enregistrements));
   }
+  // Les révisions se numérotent au grand livre, non au journal : elles restent à part, dans l'ordre de la rubrique.
+  const revisions = [];
+  const rv = x.revisions;
+  if (rv !== undefined) {
+    if (!Array.isArray(rv)) erreurs.push(`${chemin} : rubrique revisions mal formée : la liste des entrées du grand livre`);
+    else lireRevisions(rv, chemin, erreurs, revisions);
+  }
   if (erreurs.length > 0) return { erreurs };
   enregistrements.sort((p, q) => p.n - q.n);
-  return { erreurs: [], source: { chemin, format: x.format, cle, demande, version, enregistrements } };
+  return { erreurs: [], source: { chemin, format: x.format, cle, demande, version, enregistrements, revisions } };
+}
+
+/**
+ * La rubrique revisions : les entrées du grand livre qui révisent la constitution, dans leur ordre, chacune à son
+ * numéro au grand livre et à sa date, avec la version et l'empreinte de la constitution ; une publication porte son
+ * sens et ses relâchements et renforcements comptés, un examen son avis. Un examen précède la publication, en
+ * relâchement, de la même constitution, et un relâchement suit son examen. Ajoute ses enregistrements, ou ses écarts
+ * aux erreurs.
+ */
+function lireRevisions(rv, chemin, erreurs, revisions) {
+  const avant = erreurs.length;
+  rv.forEach((r, i) => {
+    const ici = `${chemin}, révision ${i + 1}`;
+    if (!estObjet(r)) {
+      erreurs.push(`${ici} : objet attendu`);
+      return;
+    }
+    if (!entier(r.n)) erreurs.push(`${ici} : n, le numéro de son entrée au grand livre`);
+    if (typeof r.date !== 'string' || !DATE.test(r.date)) erreurs.push(`${ici} : date, AAAA-MM-JJTHH:MM:SSZ, en UTC`);
+    if (typeof r.version !== 'string' || !VERSION.test(r.version)) erreurs.push(`${ici} : version, celle de la constitution, x.y.z`);
+    if (typeof r.empreinte !== 'string' || !EMPREINTE.test(r.empreinte)) erreurs.push(`${ici} : empreinte, celle de la constitution, 64 caractères hexadécimaux`);
+    if (r.type === 'constitution.publiee') {
+      if (!SENS.includes(r.sens)) erreurs.push(`${ici} : sens « ${r.sens} », hors de la liste : ${SENS.join(', ')}`);
+      else if (!Number.isInteger(r.relachements) || r.relachements < 0 || !Number.isInteger(r.renforcements) || r.renforcements < 0) erreurs.push(`${ici} : relachements et renforcements, des entiers positifs ou nuls`);
+      else if ((r.sens === 'relachement') !== (r.relachements > 0)) erreurs.push(`${ici} : un relâchement compte au moins un relâchement, et seul un relâchement en compte`);
+    } else if (r.type === 'constitution.examinee') {
+      if (!AVIS.includes(r.avis)) erreurs.push(`${ici} : avis « ${r.avis} », hors de la liste : ${AVIS.join(', ')}`);
+    } else erreurs.push(`${ici} : type « ${r.type} », constitution.examinee ou constitution.publiee`);
+  });
+  if (erreurs.length > avant) return;
+  rv.forEach((r, j) => {
+    const ici = `${chemin}, révision ${j + 1}`;
+    const [precedente, suivante] = [rv[j - 1], rv[j + 1]];
+    if (precedente && (r.n <= precedente.n || r.date < precedente.date)) erreurs.push(`${ici} : postérieure à la précédente, par son numéro au grand livre et par sa date`);
+    if (r.type === 'constitution.examinee' && !(suivante?.type === 'constitution.publiee' && suivante.sens === 'relachement' && suivante.empreinte === r.empreinte)) erreurs.push(`${ici} : un examen précède la publication, en relâchement, de la même constitution`);
+    if (r.type === 'constitution.publiee' && r.sens === 'relachement' && !(precedente?.type === 'constitution.examinee' && precedente.empreinte === r.empreinte)) erreurs.push(`${ici} : relâchement sans l'examen de la même constitution juste avant lui`);
+  });
+  if (erreurs.length > avant) return;
+  for (const r of rv) {
+    const commun = { sorte: 'revision', n: r.n, date: r.date, empreinte: r.empreinte };
+    revisions.push(r.type === 'constitution.examinee' ? { ...commun, etape: 'examen', avis: r.avis } : { ...commun, etape: 'publication', sens: r.sens, relachements: r.relachements });
+  }
 }
 
 /**
@@ -263,9 +321,23 @@ function lirePoint(pt, ici, f, numero, erreurs, enregistrements) {
   }
 }
 
-/** Enveloppe partielle d'un enregistrement, selon la correspondance du socle (sections 6.5 à 6.7), sans numéro ni chaînage. */
+/** Enveloppe partielle d'un enregistrement, selon la correspondance du socle (sections 6.5 à 6.8), sans numéro ni chaînage. */
 export function traduire(e, source, sel) {
   const f = FORMATS[source.format];
+  if (e.sorte === 'revision') {
+    // Une révision vient du grand livre : son journal source ; l'ancre, la constitution, relie l'examen à sa publication.
+    const revision = {
+      date: e.date,
+      source: { format: source.format, journal: empreinteSalee(sel, GRAND_LIVRE), numero: e.n },
+      cible: 'instance',
+      ancre: { nature: 'constitution', ref: empreinteSalee(sel, e.empreinte) },
+      ordre: 'OC2',
+      type: 'observation',
+      motif: 'revision-constitution',
+    };
+    if (e.etape === 'examen') return { ...revision, niveau: 'N3', sujet: 'observateur-externe', nature: e.avis };
+    return { ...revision, niveau: 'humain', sujet: 'referent', nature: e.sens, mesure: { nom: 'relachements', valeur: e.relachements } };
+  }
   if (e.sorte === 'point') {
     // Un point de validation n'éprouve aucune règle : ni invariant ni cible de spécification ; l'ancre est la demande.
     const point = {
@@ -411,6 +483,24 @@ export function exporter({ projet = '.', fichiers = [], sel } = {}) {
         partielle: traduire(e, s, sel),
       }));
     });
+    // Les révisions, une file par source ; une entrée du grand livre que portent plusieurs sources ne compte qu'une
+    // fois, et toutes doivent la dire de même.
+    const grandLivre = empreinteSalee(sel, GRAND_LIVRE);
+    const premieres = new Map();
+    const divergentes = [];
+    for (const s of siennes) {
+      files.push(s.revisions.flatMap((e) => {
+        const r = { s, e, cle: cleSource({ format, journal: grandLivre, numero: e.n }), cleVisee: null, partielle: traduire(e, s, sel) };
+        const premiere = premieres.get(r.cle);
+        if (!premiere) {
+          premieres.set(r.cle, r);
+          return [r];
+        }
+        if (empreinteDeTraduction(premiere.partielle) !== empreinteDeTraduction(r.partielle)) divergentes.push(`${s.chemin} : la révision ${e.n} du grand livre ne se dit pas comme dans ${premiere.s.chemin}`);
+        return [];
+      }));
+    }
+    if (divergentes.length > 0) return refus(divergentes.map((e) => `source refusée, ${e} : rien n'est exporté`));
 
     // Un enregistrement déjà exporté doit se traduire comme à son export, et rester dans sa rubrique.
     const reecrits = [];

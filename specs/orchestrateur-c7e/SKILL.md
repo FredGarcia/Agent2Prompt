@@ -1,10 +1,10 @@
 ---
 name: orchestrateur-c7e
 description: Orchestrateur fractal C7E, qui pilote la résolution d'un ticket full-stack comme la transformation maîtrisée d'un système vivant (cycle de l'Axiome 7E, déclinaison récursive imbriquée sur quatre profondeurs, concepts paramétrables, qualification de chaque ticket à son ouverture par un modèle générique de la demande et des questions, méso-contrat principal et compléments confirmés avant tout le reste, options par couche rattachées au méso-contrat qui les permet et leurs paramètres au choix par ticket, variantes de représentation d'une ressource et leur mise à jour en temps réel, analyse des images PNG de l'objectif, fiche de transformation validée avant toute modification, tests déduits des risques, traçabilité Git compatible avec le kit des agents parallèles, boucle de second ordre bornée par un registre, registres exportés vers le socle d'observation par une commande que lance le développeur, valeur annoncée comme une hypothèse tant qu'elle n'est pas mesurée), avec le fichier des invariants du projet, meso-contrats. Adaptateur par défaut Java, Spring Boot, PostgreSQL, Liquibase et Angular. À activer au démarrage de l'IA locale, sur choix du développeur, pour les tickets qu'il lui confie.
-version: 3.8.6
+version: 3.8.7
 ---
 
-# Orchestrateur fractal C7E, version 3.8.6
+# Orchestrateur fractal C7E, version 3.8.7
 
 Ce document est le point d'entrée du skill et contient la méthode. Il s'active au démarrage de l'IA locale, sur choix du développeur (§ 11.4), avec le fichier des invariants du projet, copie remplie du modèle `meso-contrats.md`. Ces deux fichiers suffisent au démarrage ; le référentiel des méso-contrats se lit à l'ouverture de chaque ticket, pour le qualifier, puis à son analyse, et les autres fichiers quand un ticket touche leur domaine.
 
@@ -525,7 +525,7 @@ Une contradiction entre deux niveaux se signale et s'inscrit au registre des éc
 
 ## 12. Registre des dimensions
 
-| ID | Dimension | Introduite | Statut 3.8.6 | Dépend de | Où |
+| ID | Dimension | Introduite | Statut 3.8.7 | Dépend de | Où |
 |---|---|---|---|---|---|
 | D1 | Ontologie : cycle 7E, profondeurs du CRI, concepts paramétrables | 3.1 | active | | `SKILL.md`, § 1 |
 | D2 | Configuration : matrice d'activation, modes de modulation, choix du démarrage | 3.1 | active | D1 | § 2, § 7.1, § 11.4 |
@@ -563,7 +563,7 @@ Point d'extension, actif dès 3.5.0 :
 
 Point d'extension, actif dès 3.6.0 :
 
-- **E6** : les événements du registre des concepts et les lignes décidées du registre des écarts s'exportent dans l'enveloppe `socle-observation.enveloppe/1` du socle `socle-observation` 1.4.0, selon ses correspondances, que le module `observation` précise pour ces deux registres, sans changer ni ces registres ni leurs droits (D6.INV-2). Un registre de plus à exporter attend sa correspondance dans une version du socle. Inerte en 3.6, l'export est actif depuis 3.7.0 (D12, scénario R23).
+- **E6** : les événements du registre des concepts et les lignes décidées du registre des écarts s'exportent dans l'enveloppe `socle-observation.enveloppe/1` du socle `socle-observation` 1.5.0, selon ses correspondances, que le module `observation` précise pour ces deux registres, sans changer ni ces registres ni leurs droits (D6.INV-2). Un registre de plus à exporter attend sa correspondance dans une version du socle. Inerte en 3.6, l'export est actif depuis 3.7.0 (D12, scénario R23).
 
 Point d'extension, actif dès 3.8.0 :
 
@@ -900,3 +900,5 @@ Décisions du développeur, le 24 novembre 2026, jalon J3a du passage du dépôt
 **3.8.5** (2026-11-25) : correctif, jalon J4 réduit du passage du dépôt au troisième ordre (section 16). Socle `socle-observation` 1.4.0, inclus et référencé : il ajoute le champ facultatif `mesure` à l'enveloppe et la correspondance de la rubrique `points` des livrables d'Agent2Dev, que l'observatoire exporte pour le binôme, sans changer celles du registre des concepts et du registre des écarts, ni ses invariants. L'outil d'export connaît le champ `mesure`, au schéma fermé, et le refuse dans ses propres enveloppes, aucune de ses correspondances n'en portant ; son export (D12) ne change pas. Aucune dimension ni aucun invariant modifié. Archive : `archives/SKILL-v3.8.4.md`.
 
 **3.8.6** (2026-11-26) : correctif, jalon J5a du passage du dépôt au troisième ordre (`EVOLUTION.md`, section 10), la révision des formes propres. Socle `socle-acceptable` 1.2.0, référencé : son noyau, qui ne change pas, se révise désormais selon `EVOLUTION.md`, section 10.7, une révision n'y faisant qu'ajouter ; D13 reste réservée, et E7 cite la 1.2.0. Méthode agent-tdd-jira 1.3.10, dont seule la référence à Agent2Test change. Aucune dimension ni aucun invariant modifié ; l'outil d'export ne change pas. Archive : `archives/SKILL-v3.8.5.md`.
+
+**3.8.7** (2026-11-26) : correctif, jalon J5b du passage du dépôt au troisième ordre (`EVOLUTION.md`, section 10.7), la révision dans l'instance. Socle `socle-observation` 1.5.0, inclus et épinglé : il ajoute la correspondance des révisions de la constitution du binôme (section 6.8), le sujet `observateur-externe` et l'ancre `constitution`, sans rien changer aux correspondances des deux registres de l'orchestrateur ; E6 et le module `observation` citent la 1.5.0. Méthode agent-tdd-jira 1.3.11, dont seule la référence à Agent2Test change. Aucune dimension ni aucun invariant modifié ; l'outil d'export ne change que son commentaire d'en-tête. Archive : `archives/SKILL-v3.8.6.md`.

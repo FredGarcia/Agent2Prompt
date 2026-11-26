@@ -23,7 +23,7 @@ Un kit qui enfreint une règle n'est pas remis : refus `acceptable.refus`, avec 
 ```json
 {
   "format": "socle-acceptable.kit/1",
-  "systeme": { "nom": "agent2test", "version": "1.6.2" },
+  "systeme": { "nom": "agent2test", "version": "1.7.0" },
   "environnement": "test",
   "patch": { "chemin": "test.patch", "empreinte": "b97faf12ab63e0e511f9c867377374df22fb5f2e6cb21be01169ed17ef4cdcff" },
   "noyau": { "version": "1.2.0", "empreinte": "e815cadf230886d507d56dbbfb5d7cfd0cf3982036d54d0279b70cc8f49b4764" },

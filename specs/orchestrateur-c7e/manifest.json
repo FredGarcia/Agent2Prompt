@@ -1,6 +1,6 @@
 {
   "name": "orchestrateur-c7e",
-  "version": "3.8.6",
+  "version": "3.8.7",
   "specSchema": 1,
   "language": "fr",
   "description": "Orchestrateur fractal C7E : résolution d'un ticket full-stack comme transformation maîtrisée d'un système vivant, avec le cycle de l'Axiome 7E, quatre profondeurs de déclinaison, des concepts paramétrables, la qualification de chaque ticket à son ouverture par un modèle générique de la demande et des questions complémentaires, un méso-contrat principal et au besoin des compléments, confirmés avant tout le reste, des options par couche rattachées au méso-contrat qui les permet avec leurs paramètres au choix par ticket, des variantes de représentation d'une ressource et leur mise à jour en temps réel, l'analyse des images PNG de l'objectif, une fiche validée avant toute modification, des tests déduits des risques, des conventions Git compatibles avec le kit des agents parallèles, une boucle de second ordre bornée par un registre et un fichier d'invariants du projet, des registres exportés vers le socle d'observation par une commande que lance le développeur ; activé au démarrage de l'IA locale, sur choix du développeur.",
@@ -17,14 +17,14 @@
     { "path": "socle/SKILL.md", "from": "specs/socle-back-front/SKILL.md", "version": "1.1.0" },
     { "path": "references/java.md", "from": "specs/java/SKILL.md", "version": "1.1.1" },
     { "path": "references/angular.md", "from": "specs/angular/SKILL.md", "version": "1.0.1" },
-    { "path": "socle-observation/SKILL.md", "from": "specs/socle-observation/SKILL.md", "version": "1.4.0" }
+    { "path": "socle-observation/SKILL.md", "from": "specs/socle-observation/SKILL.md", "version": "1.5.0" }
   ],
   "references": [
     { "name": "java", "version": "1.1.1" },
     { "name": "angular", "version": "1.0.1" },
     { "name": "agents-paralleles-gitlab", "version": "1.0.1" },
-    { "name": "agent-tdd-jira", "version": "1.3.10" },
-    { "name": "socle-observation", "version": "1.4.0" },
+    { "name": "agent-tdd-jira", "version": "1.3.11" },
+    { "name": "socle-observation", "version": "1.5.0" },
     { "name": "socle-acceptable", "version": "1.2.0" }
   ],
   "modules": [
@@ -57,6 +57,7 @@
     { "version": "3.8.2", "file": "archives/SKILL-v3.8.2.md" },
     { "version": "3.8.3", "file": "archives/SKILL-v3.8.3.md" },
     { "version": "3.8.4", "file": "archives/SKILL-v3.8.4.md" },
-    { "version": "3.8.5", "file": "archives/SKILL-v3.8.5.md" }
+    { "version": "3.8.5", "file": "archives/SKILL-v3.8.5.md" },
+    { "version": "3.8.6", "file": "archives/SKILL-v3.8.6.md" }
   ]
 }

@@ -60,8 +60,9 @@ Valeurs fixées par la configuration humaine, que le système lit sans les modif
 ## 5. Grand livre (D15.INV-2)
 
 - Table `referentiel__grand_livre`, en ajout seul, protégée par les déclencheurs du module `donnees` (section 5) et chaînée comme le journal (module `journal`, section 1). Sa chaîne est vérifiée en entier à chaque démarrage ; une chaîne rompue empêche le démarrage, et un grand livre rompu ne se répare que par la restauration d'une sauvegarde (module `donnees`, section 7).
-- Types d'entrée : `constitution.publiee`, `fiche.publiee`, `lecon.ratifiee`, `lecon.refusee`, `regle.ratifiee`, `regle.refusee`, `regle.suspendue`, `retour.arriere`, `epinglage`.
+- Types d'entrée : `constitution.examinee`, `constitution.publiee`, `fiche.publiee`, `lecon.ratifiee`, `lecon.refusee`, `regle.ratifiee`, `regle.refusee`, `regle.suspendue`, `retour.arriere`, `epinglage`.
 - Chaque entrée porte sa cause, ses preuves (références au journal), l'auteur de la ratification et, plus tard, l'effet mesuré, ajouté par une nouvelle entrée, jamais par modification.
+- Depuis 1.7.0, `constitution.publiee` porte la constitution entière, son sens, ses relâchements et ses renforcements, et un relâchement est précédé de son `constitution.examinee`, inscrit avec lui (module `revision`, section 3).
 
 `revenir(version)` restaure la dernière version ratifiée d'une règle ou d'une leçon, à la demande du `reflexif` (D14.INV-2), et inscrit `retour.arriere`. C'est la seule évolution que le système fasse seul, parce qu'elle va dans le sens sûr.
 

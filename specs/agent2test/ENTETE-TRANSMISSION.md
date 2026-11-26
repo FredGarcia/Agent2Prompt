@@ -41,7 +41,7 @@ Attends la validation du développeur avant d'écrire la moindre ligne de code.
 Après validation, implémente dans cet ordre. Chaque lot passe ses tests, en simulation et sans réseau, avant le suivant, et se termine par un point de validation du développeur. Un lot qui a besoin d'un module d'un lot suivant s'appuie sur sa simulation, déclarée par le même contrat de bus.
 
 1. Noyau et acceptable partagé : `noyau`, `acceptable` (D1, D26) ; le contrôle des leçons s'achève avec l'`apprenant`, au lot 6, et les réponses aux refus avec les interfaces, au lot 7.
-2. Données, journal et référentiel : `donnees`, `journal`, `referentiel` (D23, D10, D15).
+2. Données, journal, référentiel et révision : `donnees`, `journal`, `referentiel`, `revision` (D23, D10, D15, D28) ; les faux refus que citent les preuves d'un relâchement viennent de journaux d'essai, jusqu'aux réponses du lot 7.
 3. Plan, mémoire et cartographie : `plan`, `memoire`, `scanner` (D3, D12, D5).
 4. Exécution et kit test : `navigateur`, `preparateur`, `kit`, `verdict`, `orchestrateur` (D4, D7, D27, D8, D9) ; les déclarations des kits s'achèvent avec les interfaces, au lot 7.
 5. Sélection : `stratege` (D6).
@@ -63,6 +63,7 @@ Vérifie les critères d'acceptation globaux de `SKILL.md`, section 9, puis rend
 - Aucun point de contrôle n'est sauté, supprimé ou validé par le système.
 - Aucun verdict sans preuve ; aucun verdict réécrit.
 - Le journal et le grand livre sont en ajout seul.
+- La constitution ne change que par sa publication, commande humaine : un relâchement ne se publie qu'avec l'examen d'un observateur sur un autre modèle et ses preuves, et aucune entrée du noyau ne se relâche.
 - Les données d'Agent2Test tiennent dans un fichier SQLite unique, par `node:sqlite`, que seul l'agent médiateur `donnees` ouvre : aucun serveur de base de données. Les dimensions D2, D21 et D22 sont remplacées : n'implémente pas leurs invariants.
 - Tout s'exécute en local ; les interfaces n'écoutent que sur `127.0.0.1`.
 - L'échange par dossiers est facultatif : rien ne doit en dépendre. Il ne fait que lire une remise et déposer un journal de tests, sans aucune connexion ; il ne décide rien et n'ouvre aucune campagne.

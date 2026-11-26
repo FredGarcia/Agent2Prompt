@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Observatoire de l'écosystème Agent2Prompt (observatoire 1.5.0) : le premier couplage du troisième ordre,
+// Observatoire de l'écosystème Agent2Prompt (observatoire 1.6.0) : le premier couplage du troisième ordre,
 // entre systèmes (EVOLUTION.md, section 10.3), et la boucle du troisième, avec les valeurs. Il se lance depuis le
 // clone du dépôt, sur le poste.
 //
@@ -8,8 +8,8 @@
 // <git-common-dir>/agent2prompt/observatoire/ : jamais versionné, publié ni exporté. Il les confronte entre
 // instances, entre systèmes par les invariants du dépôt que citent leurs écarts, confronte par règle les refus
 // du binôme, leurs dérogations et leurs faux refus, compte ses kits, par système, environnement et instance, et
-// ses décisions aux points de validation, avec leurs délais, signaux du deuxième couplage ; il observe l'état de
-// l'écosystème, écrit des propositions
+// ses décisions aux points de validation, avec leurs délais, signaux du deuxième couplage, et les révisions de sa
+// constitution, par sens et par avis de leur examen ; il observe l'état de l'écosystème, écrit des propositions
 // minimisées dans observatoire/propositions/, que le développeur apporte au dépôt par une pull request, et suit
 // l'effet de celles que la ratification a fait entrer dans une version. Il contrôle les examens indépendants,
 // dans observatoire/examens/, qu'écrivent des observateurs sur un autre modèle : une proposition ne se ratifie
@@ -74,11 +74,11 @@ const LISTES = {
   type: ['observation', 'proposition', 'decision', 'refus', 'derogation', 'ecart'],
   profondeur: ['macro', 'meso-contrats', 'meso-composants', 'micro'],
   cible: ['instance', 'specification'],
-  ancre: ['noeud', 'critere', 'ca', 'scenario', 'fichier', 'commit', 'contrat', 'option', 'ticket', 'concept', 'kit'],
+  ancre: ['noeud', 'critere', 'ca', 'scenario', 'fichier', 'commit', 'contrat', 'option', 'ticket', 'concept', 'kit', 'constitution'],
   preuve: ['test', 'commande', 'commit', 'fichier', 'enregistrements', 'rapport', 'champ', 'arbre'],
   decision: ['retenue', 'refusee', 'amendee'],
 };
-const SUJETS = ['developpeur', 'referent', 'testeur', 'observateur-N2', 'observateur-N3'];
+const SUJETS = ['developpeur', 'referent', 'testeur', 'observateur-N2', 'observateur-N3', 'observateur-externe'];
 const PREUVES_NUMEROS = ['enregistrements', 'champ'];
 // Niveaux admis avec chaque ordre (socle, section 3.2) : aucun système n'émet OC3, réservé à l'écosystème.
 const NIVEAUX_DE = { OC1: ['N1', 'humain'], OC2: ['N2', 'N3', 'humain'], OC3: [] };
@@ -635,6 +635,39 @@ function parSignal(parInstance, toutes) {
     .map(({ delais, instances, ...g }) => ({ ...g, delaiMedian: mediane(delais), delaiMax: delais.length > 0 ? Math.max(...delais) : null, instances: instances.size }));
 }
 
+const REVISION = 'revision-constitution';
+const PAR_SENS = { premiere: 'premieres', neutre: 'neutres', renforcement: 'renforcements', relachement: 'relachements' };
+const PAR_AVIS = { favorable: 'favorables', reserve: 'reserves', defavorable: 'defavorables' };
+
+/**
+ * Confrontation des révisions (D12) : les révisions de la constitution du binôme, sa forme propre dans l'instance
+ * (EVOLUTION.md, section 10.7 ; socle, section 6.8). Une publication est une observation du référent, de motif
+ * `revision-constitution`, de nature son sens, avec la mesure `relachements` ; un examen, une observation de
+ * l'observateur extérieur, de nature son avis. Pour chaque système : publications par sens, entrées relâchées,
+ * examens par avis, et instances. Des comptes seulement, sans candidat ni proposition.
+ */
+function parRevision(parInstance) {
+  const groupes = new Map();
+  for (const [instance, xs] of parInstance) {
+    for (const x of xs) {
+      if (x.motif !== REVISION || x.type !== 'observation') continue;
+      const examen = x.sujet === 'observateur-externe';
+      const compte = examen ? PAR_AVIS[x.nature] : PAR_SENS[x.nature];
+      if (!compte) continue;
+      const g = groupes.get(x.systeme.nom) ?? { systeme: x.systeme.nom, publications: 0, premieres: 0, neutres: 0, renforcements: 0, relachements: 0, entreesRelachees: 0, examens: 0, favorables: 0, reserves: 0, defavorables: 0, instances: new Set() };
+      g[compte]++;
+      if (examen) g.examens++;
+      else {
+        g.publications++;
+        if (x.mesure?.nom === 'relachements') g.entreesRelachees += x.mesure.valeur;
+      }
+      g.instances.add(instance);
+      groupes.set(x.systeme.nom, g);
+    }
+  }
+  return [...groupes.values()].sort((a, b) => parCodePoint(a.systeme, b.systeme)).map((g) => ({ ...g, instances: g.instances.size }));
+}
+
 /**
  * Retours, récurrences, invariants et règles trop larges candidats. Un retour : une proposition d'instance qui
  * vise une spécification, qu'une décision humaine de l'instance a retenue, dès une instance. Une récurrence : un
@@ -676,7 +709,7 @@ export function confronter({ magasin = magasinParDefaut(), depot = RACINE } = {}
   candidats.push(...parInvariant(parInstance, toutes, depot, connus).sort((a, b) => parCodePoint(a.invariant, b.invariant)));
   const { acceptable, candidats: regles } = parRegle(parInstance, toutes, depot, connus);
   candidats.push(...regles);
-  return { erreurs: r.erreurs, avertissements: r.avertissements, candidats, acceptable, kits: parKit(parInstance), signaux: parSignal(parInstance, toutes), ecartees: ecartees.length, instances: parInstance.size };
+  return { erreurs: r.erreurs, avertissements: r.avertissements, candidats, acceptable, kits: parKit(parInstance), signaux: parSignal(parInstance, toutes), revisions: parRevision(parInstance), ecartees: ecartees.length, instances: parInstance.size };
 }
 
 // ---- D3 : état de l'écosystème ----
@@ -934,13 +967,15 @@ export function controlerExamen(texte, nom) {
   if (erreurs.length > 0) return { entete, erreurs };
   if (entete.format !== FORMAT_EXAMEN) erreurs.push(`format « ${entete.format} », attendu ${FORMAT_EXAMEN}`);
   if (!JOUR.test(entete.date)) erreurs.push(`date « ${entete.date} » : AAAA-MM-JJ`);
-  if (entete.objet === 'specification') {
+  if (entete.objet === 'specification' || entete.objet === 'constitution') {
+    // Une spécification du dépôt et sa version ; ou, dans une instance, un système du binôme et la version de sa constitution.
     if (!chaine(entete.systeme, NOM)) erreurs.push(`systeme « ${entete.systeme} » : le nom d'une spécification`);
     if (!chaine(entete.version, VERSION)) erreurs.push(`version « ${entete.version} » : la version qui porte le relâchement`);
-    if (erreurs.length === 0 && nom !== `${entete.systeme}-${entete.version}.md`) erreurs.push(`nom du fichier : ${entete.systeme}-${entete.version}.md, celui de la spécification et de sa version`);
+    const attendu = entete.objet === 'constitution' ? `${entete.version}.md` : `${entete.systeme}-${entete.version}.md`;
+    if (erreurs.length === 0 && nom !== attendu) erreurs.push(`nom du fichier : ${attendu}, ${entete.objet === 'constitution' ? 'la version de la constitution' : 'celui de la spécification et de sa version'}`);
   } else if (entete.objet === 'proposition') {
     if (entete.systeme !== undefined || entete.version !== undefined) erreurs.push('systeme, version : seulement pour l\'examen d\'une spécification ; celui d\'une proposition porte son nom');
-  } else erreurs.push(`objet « ${entete.objet} » : proposition ou specification`);
+  } else erreurs.push(`objet « ${entete.objet} » : proposition, specification ou constitution`);
   if (entete.examinateur !== 'observateur-externe') erreurs.push(`examinateur « ${entete.examinateur} » : le rôle observateur-externe`);
   if (!MODELE.test(entete.modele)) erreurs.push(`modele « ${entete.modele} » : le modèle de l'examinateur, en minuscules, chiffres, points et tirets`);
   if (!AVIS.includes(entete.avis)) erreurs.push(`avis « ${entete.avis} » : favorable, reserve ou defavorable`);
@@ -957,6 +992,7 @@ export function lireExamens(depot = RACINE) {
   if (!existsSync(dossier)) return { examens, erreurs };
   for (const nom of readdirSync(dossier).filter((n) => n.endsWith('.md') && n !== 'README.md').sort(parCodePoint)) {
     const { entete, erreurs: ecarts } = controlerExamen(lire(join(dossier, nom)), nom);
+    if (ecarts.length === 0 && entete.objet === 'constitution') ecarts.push('l\'examen d\'une constitution vit dans son instance, constitution/examens/, non dans le dépôt');
     if (ecarts.length === 0 && entete.objet === 'proposition' && !existsSync(join(depot, PROPOSITIONS, nom))) ecarts.push(`aucune proposition ${PROPOSITIONS}/${nom} à examiner`);
     if (ecarts.length > 0) erreurs.push(...ecarts.map((e) => `${EXAMENS}/${nom} : ${e}`));
     else examens.push({ fichier: `${EXAMENS}/${nom}`, nom, entete });
@@ -1092,6 +1128,10 @@ export function principal(argv, sortie = console.log, erreur = console.error, co
       for (const s of r.signaux) {
         const delais = s.delaiMedian === null ? 'aucun délai' : `délai médian ${duree(s.delaiMedian)}, maximal ${duree(s.delaiMax)}`;
         sortie(`  ${s.systeme}, point ${s.point} : ${pluriel(s.presentes, 'présentation')}, ${pluriel(s.retenues, 'retenue')}, ${pluriel(s.amendees, 'amendée')}, ${pluriel(s.refusees, 'refusée')}, ${s.enAttente} en attente ; ${delais} ; ${pluriel(s.instances, 'instance')}`);
+      }
+      if (r.revisions.length > 0) sortie('révisions des constitutions : des comptes, sans candidat');
+      for (const v of r.revisions) {
+        sortie(`  ${v.systeme} : ${pluriel(v.publications, 'publication')}, ${pluriel(v.premieres, 'première')}, ${pluriel(v.neutres, 'neutre')}, ${pluriel(v.renforcements, 'renforcement')}, ${pluriel(v.relachements, 'relâchement')} de ${pluriel(v.entreesRelachees, 'entrée')} ; ${pluriel(v.examens, 'examen')} : ${pluriel(v.favorables, 'favorable')}, ${pluriel(v.reserves, 'réservé')}, ${pluriel(v.defavorables, 'défavorable')} ; ${pluriel(v.instances, 'instance')}`);
       }
       if (r.instances < SEUIL_INSTANCES) sortie(`moins de ${SEUIL_INSTANCES} instances : aucune récurrence ni règle trop large possible ; seuls remontent les retours, et les invariants relevés par deux systèmes`);
     }
