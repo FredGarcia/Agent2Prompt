@@ -5,12 +5,13 @@
  * il y lit le disque à la place de `git ls-files`. Chaque test altère des fichiers de la copie, lance le
  * vérificateur, attend les erreurs nommées, puis rend les fichiers. La recette porte sur le préfixe `SA` du
  * socle de l'acceptable, sur son bloc `noyau`, sur les constitutions qui l'épinglent, sur les manifestes de kit
- * `socle-acceptable.kit/1` et sur le catalogue des signaux d'`EVOLUTION.md` ; elle tourne dans
+ * `socle-acceptable.kit/1`, sur le catalogue des signaux d'`EVOLUTION.md`, sur les formes propres, que révise sa
+ * section 10.7, et sur les examens et les ratifications de l'observatoire ; elle tourne dans
  * `.github/workflows/verifier.yml`.
  */
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { after, before, test } from 'node:test';
@@ -22,7 +23,14 @@ const A_COPIER = ['tools', 'specs', 'transmissions', 'observatoire', 'README.md'
 const SOCLE = 'specs/socle-acceptable/SKILL.md';
 const lf = (texte) => texte.replace(/\r\n/g, '\n');
 // Version courante d'une spécification, lue dans son manifeste : les tests suivent les versions sans être réécrits.
-const versionDe = (nom) => JSON.parse(readFileSync(join(RACINE, 'specs', nom, 'manifest.json'), 'utf8')).version;
+const manifesteDe = (nom) => JSON.parse(readFileSync(join(RACINE, 'specs', nom, 'manifest.json'), 'utf8'));
+const versionDe = (nom) => manifesteDe(nom).version;
+// Version précédente, la dernière archivée : celle à laquelle se comparent les formes propres.
+const precedenteDe = (nom) => manifesteDe(nom).previousVersions.at(-1).version;
+const VA = versionDe('socle-acceptable');
+const motif = (texte) => texte.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+/** Ajoute, en tête de l'entrée du journal de la version courante d'un point d'entrée, le texte donné. */
+const auJournal = (version, ajout) => (texte) => texte.replace(new RegExp(`^(\\*\\*${motif(version)}\\*\\* \\([^)]*\\) : )`, 'm'), `$1${ajout}`);
 let copie;
 
 before(() => {
@@ -40,6 +48,19 @@ function remplacer(...paires) {
       assert.equal(t.split(avant).length - 1, 1, `« ${avant} » doit figurer une fois`);
       return t.replace(avant, apres);
     }, texte);
+}
+
+/** Écrit dans la copie des fichiers nouveaux (chemin relatif → texte), lance `faire`, puis les retire. */
+function avecFichiers(fichiers, faire) {
+  try {
+    for (const [rel, texte] of Object.entries(fichiers)) {
+      mkdirSync(dirname(join(copie, rel)), { recursive: true });
+      writeFileSync(join(copie, rel), texte);
+    }
+    return faire();
+  } finally {
+    for (const rel of Object.keys(fichiers)) rmSync(join(copie, rel), { force: true });
+  }
 }
 
 /** Altère des fichiers de la copie (chemin relatif → transformation du texte en LF), lance le vérificateur, rend les fichiers. */
@@ -119,13 +140,13 @@ test('constitutions qui épinglent le noyau : version incluse, empreinte du bloc
       ['{ "programme": "docker", "horsKit": true, "regle": "SA2.INV-1" }', '{ "programme": "docker", "horsKit": true, "regle": "SA2.INV-1", "derogeable": true }'],
     ),
     'specs/agent2test/modules/noyau/SKILL.md': remplacer(['    { "intention": "administrer", "horsKit": true, "regle": "SA1.INV-1" },\n', '']),
-    'specs/agent2test/modules/acceptable/SKILL.md': remplacer([`"version": "1.1.0", ${EMPREINTE}`, `"version": "1.0.0", ${EMPREINTE}`]),
+    'specs/agent2test/modules/acceptable/SKILL.md': remplacer([`"version": "${VA}", ${EMPREINTE}`, `"version": "1.0.0", ${EMPREINTE}`]),
   });
   attendreErreurs(resultat, [
-    'agent2dev : constitution : acceptable.empreinte 000000000000…, le bloc noyau de socle-acceptable 1.1.0 a l\'empreinte e815cadf2308…',
+    `agent2dev : constitution : acceptable.empreinte 000000000000…, le bloc noyau de socle-acceptable ${VA} a l'empreinte e815cadf2308…`,
     'agent2dev : constitution : programmesInterdits, l\'entrée du noyau docker n\'est pas reprise à l\'identique',
     'agent2test : constitution : intentionsRefusees, l\'entrée du noyau administrer n\'est pas reprise à l\'identique',
-    'agent2test : constitution : acceptable.version 1.0.0, la spécification inclut socle-acceptable 1.1.0',
+    `agent2test : constitution : acceptable.version 1.0.0, la spécification inclut socle-acceptable ${VA}`,
   ]);
 });
 
@@ -139,7 +160,7 @@ test('bloc noyau : un seul, en JSON lisible', () => {
 });
 
 test('manifestes de kit : schéma fermé, système et environnement, patch, noyau confronté à la version incluse, retour arrière préparé', () => {
-  const NOYAU = '"noyau": { "version": "1.1.0", "empreinte": "e815cadf230886d507d56dbbfb5d7cfd0cf3982036d54d0279b70cc8f49b4764" },';
+  const NOYAU = `"noyau": { "version": "${VA}", "empreinte": "e815cadf230886d507d56dbbfb5d7cfd0cf3982036d54d0279b70cc8f49b4764" },`;
   const resultat = alterer({
     'specs/agent2dev/modules/kit/SKILL.md': remplacer(
       ['  "environnement": "dev",\n', '  "environnement": "production",\n'],
@@ -149,11 +170,11 @@ test('manifestes de kit : schéma fermé, système et environnement, patch, noya
     ),
     'specs/agent2test/modules/kit/SKILL.md': remplacer(
       [`"systeme": { "nom": "agent2test", "version": "${versionDe('agent2test')}" },`, '"systeme": { "nom": "agent2test", "version": "1.5.1" },\n  "application": "manuelle",'],
-      [NOYAU, NOYAU.replace('1.1.0', '1.0.1')],
+      [NOYAU, NOYAU.replace(VA, '1.0.1')],
     ),
     [SOCLE]: remplacer(
       ['"patch": { "chemin": "../patchs/002-S02.patch",', '"patch": { "chemin": "/tmp/002-S02.patch",'],
-      [NOYAU, `"noyau": { "version": "1.1.0", "empreinte": "${'0'.repeat(64)}" },`],
+      [NOYAU, `"noyau": { "version": "${VA}", "empreinte": "${'0'.repeat(64)}" },`],
       ['  "confrontation": { "fichiers": 3, "commandes": 0 },\n', ''],
     ),
   });
@@ -165,9 +186,9 @@ test('manifestes de kit : schéma fermé, système et environnement, patch, noya
     'agent2dev : manifeste de kit agent2dev : retourArriere.verifie non, true ou false attendu',
     'agent2test : manifeste de kit agent2test : clé application, hors du schéma socle-acceptable.kit/1',
     `agent2test : manifeste de kit agent2test : systeme.version 1.5.1, la spécification est en version ${versionDe('agent2test')}`,
-    'agent2test : manifeste de kit agent2test : noyau.version 1.0.1, agent2test inclut socle-acceptable 1.1.0',
+    `agent2test : manifeste de kit agent2test : noyau.version 1.0.1, agent2test inclut socle-acceptable ${VA}`,
     'socle-acceptable : manifeste de kit agent2dev : patch.chemin /tmp/002-S02.patch, un chemin relatif au manifeste attendu',
-    'socle-acceptable : manifeste de kit agent2dev : noyau.empreinte 000000000000…, le bloc noyau de socle-acceptable 1.1.0 a l\'empreinte e815cadf2308…',
+    `socle-acceptable : manifeste de kit agent2dev : noyau.empreinte 000000000000…, le bloc noyau de socle-acceptable ${VA} a l'empreinte e815cadf2308…`,
     'socle-acceptable : manifeste de kit agent2dev : clé confrontation absent',
   ]);
 });
@@ -211,4 +232,98 @@ test('catalogue des signaux : une ligne par clause de second ordre ; nature de l
     'EVOLUTION.md : catalogue des signaux : skill4appli : deux lignes',
     "EVOLUTION.md : catalogue des signaux : observatoire : sa clause de second ordre n'a pas de ligne",
   ]);
+});
+
+test('formes propres : le noyau ne perd, ne change ni ne rend permise dans un kit aucune entrée de sa version archivée ; un changement dit sa migration', () => {
+  const PA = precedenteDe('socle-acceptable');
+  const OC = '    { "programme": "oc", "horsKit": true, "regle": "SA2.INV-1" },\n';
+  const resultat = alterer({
+    [SOCLE]: remplacer(
+      [OC, ''],
+      ['{ "argument": "--force", "regle": "SA2.INV-2" }', '{ "argument": "--force", "horsKit": true, "regle": "SA2.INV-2" }'],
+      ['{ "lieu": "fiches", "regle": "SA3.INV-1" }', '{ "lieu": "fiches", "regle": "SA2.INV-1" }'],
+    ),
+  });
+  const sureté = "une règle de sûreté ne s'affaiblit jamais (EVOLUTION.md, section 10.7)";
+  attendreErreurs(resultat, [
+    `socle-acceptable : formes propres : noyau, programmesInterdits : l'entrée oc se retire depuis ${PA} ; ${sureté}`,
+    `socle-acceptable : formes propres : noyau, argumentsInterdits : l'entrée --force devient permise dans un kit depuis ${PA} ; ${sureté}`,
+    `socle-acceptable : formes propres : noyau, ecrituresInterdites : l'entrée fiches change de règle, SA3.INV-1 devient SA2.INV-1 depuis ${PA} ; ${sureté}`,
+    `socle-acceptable : formes propres : le noyau change depuis ${PA} : le journal de ${VA} ne dit pas sa migration (« Migration : »)`,
+  ]);
+  // Une entrée ajoutée renforce le noyau : seule sa migration est due, et, dite au journal, rien ne manque aux formes propres.
+  const PODMAN = `${OC}    { "programme": "podman", "horsKit": true, "regle": "SA2.INV-1" },\n`;
+  const ajout = alterer({ [SOCLE]: remplacer([OC, PODMAN]) });
+  attendreErreurs(ajout, [`socle-acceptable : formes propres : le noyau change depuis ${PA} : le journal de ${VA} ne dit pas sa migration (« Migration : »)`]);
+  assert.doesNotMatch(ajout.stderr, /noyau, \w+ : l'entrée/, 'un ajout n\'affaiblit rien');
+  const migre = alterer({ [SOCLE]: (texte) => auJournal(VA, 'Migration : les constitutions reprennent podman. ')(remplacer([OC, PODMAN])(texte)) });
+  assert.doesNotMatch(migre.stderr, /formes propres/, migre.stderr);
+});
+
+test('formes propres : une constitution d\'exemple relâchée cite son examen, ses preuves et sa migration ; un autre changement, sa migration', () => {
+  const [VD, PD, VT, PT] = [versionDe('agent2dev'), precedenteDe('agent2dev'), versionDe('agent2test'), precedenteDe('agent2test')];
+  const EXAMEN = `observatoire/examens/agent2dev-${VD}.md`;
+  // Chaque sorte de relâchement, dans l'ordre où le vérificateur les nomme.
+  const relacher = remplacer(
+    ['{ "intention": "demarrer", "regle": "D1.INV-5" }', '{ "intention": "demarrer", "horsKit": true, "regle": "D1.INV-5" }'],
+    ['{ "intention": "arreter", "regle": "D1.INV-5" }', '{ "intention": "arreter", "regle": "D1.INV-5", "derogeable": true }'],
+    ['    { "intention": "batch", "regle": "D1.INV-5" },\n', ''],
+    ['"points": ["V0", "V1", "V2", "V3", "V4", "V5", "CP-4"]', '"points": ["V0", "V1", "V2", "V4", "V5", "CP-4"]'],
+    ['"invariants": ["D1.INV-1", "D1.INV-2"]', '"invariants": ["D1.INV-1"]'],
+    ['"noms": ["compiler-back",', '"noms": ["deployer", "compiler-back",'],
+    ['{ "regle": "budget.tentativesSortie", "bornes": { "min": 1, "max": 3 } }', '{ "regle": "budget.tentativesSortie", "bornes": { "min": 1, "max": 5 } }'],
+    ['{ "regle": "budget.tentativesPas", "bornes": { "min": 1, "max": 5 } }', '{ "regle": "budget.tentativesPas", "bornes": { "min": 1, "max": 5 } },\n    { "regle": "contexte.plafond", "bornes": { "min": 8000, "max": 60000 } }'],
+    ['"metaCriteres": { "fenetre": 10, "expositionMin": 3, "marge": 15 }', '"metaCriteres": { "fenetre": 10, "expositionMin": 3, "marge": 10 }'],
+  );
+  const relachements = [
+    'intentionsRefusees, entrée demarrer (D1.INV-5) permise dans un kit',
+    'intentionsRefusees, entrée arreter (D1.INV-5) rendue dérogeable',
+    'intentionsRefusees, entrée batch (D1.INV-5) retirée ou modifiée',
+    'points, V3 retiré',
+    'invariants, D1.INV-2 retiré',
+    'commandes.noms, deployer ajoutée',
+    'reglesModifiables, bornes de budget.tentativesSortie élargies',
+    'reglesModifiables, contexte.plafond ajoutée',
+    'metaCriteres.marge changé',
+  ];
+  const raison = `agent2dev : formes propres : constitution d'exemple relâchée depuis ${PD} (${relachements.join(' ; ')})`;
+  // Sans migration au journal, ni examen, ni preuves : tout ce qui manque est relevé. Agent2Test : sa constitution
+  // d'exemple change sans se relâcher, et seule sa migration est due.
+  const sansMigration = (version) => (texte) => texte.replace(new RegExp(`^(\\*\\*${motif(version)}\\*\\* .*)Migration : `, 'm'), '$1Ensuite : ');
+  const r1 = alterer({ 'specs/agent2dev/modules/noyau/SKILL.md': relacher, 'specs/agent2dev/SKILL.md': sansMigration(VD), 'specs/agent2test/SKILL.md': sansMigration(VT) });
+  attendreErreurs(r1, [
+    `${raison} : examen absent, ${EXAMEN} attendu (EVOLUTION.md, section 10.7)`,
+    `${raison} : le journal de ${VD} ne cite pas son examen, ${EXAMEN}`,
+    `${raison} : le journal de ${VD} ne dit pas ses preuves (« Preuves : »)`,
+    `${raison} : le journal de ${VD} ne dit pas sa migration (« Migration : »)`,
+    `agent2test : formes propres : constitution d'exemple changée depuis ${PT} : le journal de ${VT} ne dit pas sa migration (« Migration : »)`,
+  ]);
+  assert.doesNotMatch(r1.stderr, /agent2test : formes propres : constitution d'exemple relâchée/, 'une constitution ré-épinglée ne se relâche pas');
+  // Examinée, avec un avis défavorable, citée au journal avec ses preuves : seule manque la réponse à l'avis.
+  const examen = `---\nformat: observatoire.examen/1\ndate: 2026-11-26\nobjet: specification\nsysteme: agent2dev\nversion: ${VD}\nexaminateur: observateur-externe\nmodele: gemini-3-flash-preview\navis: defavorable\n---\n\n## Avis\n\n- Une marge plus étroite fait adopter des leçons sur moins de preuves.\n`;
+  const cite = auJournal(VD, `Preuves : incident du 2026-11-20. Examen : \`${EXAMEN}\`. `);
+  avecFichiers({ [EXAMEN]: examen }, () => {
+    const r2 = alterer({ 'specs/agent2dev/modules/noyau/SKILL.md': relacher, 'specs/agent2dev/SKILL.md': cite });
+    attendreErreurs(r2, [`${raison} : le journal de ${VD} ne dit pas sa réponse à l'avis défavorable (« Réponse à l'examen »)`]);
+    assert.doesNotMatch(r2.stderr, /examen absent|ne cite pas son examen|ses preuves/, r2.stderr);
+    const r3 = alterer({ 'specs/agent2dev/modules/noyau/SKILL.md': relacher, 'specs/agent2dev/SKILL.md': auJournal(VD, `Preuves : incident du 2026-11-20. Examen : \`${EXAMEN}\`. Réponse à l'examen : la marge reste bornée par la constitution. `) });
+    assert.doesNotMatch(r3.stderr, /formes propres/, r3.stderr);
+  });
+});
+
+test('examens : une proposition ratifiée sans examen, ou un examen hors format, sont relevés', () => {
+  const nom = '2026-11-26-generateur-skill-ticket-requete-native-meso-composants.md';
+  const proposition = `---\nformat: observatoire.proposition/1\ndate: 2026-11-26\nsysteme: generateur-skill-ticket\nversions: [${versionDe('generateur-skill-ticket')}]\nsorte: recurrence\nmotif: requete-native\nprofondeur: meso-composants\ninstances: 2\nenveloppes: 3\nreferences: [0123abcd:12, 4567cdef:4, 4567cdef:9]\nstatut: ratifiee\nversion: 9.9.9\npr: 999\n---\n\n## Ce qui change\n\nLa règle de requête native se précise.\n`;
+  avecFichiers({ [`observatoire/propositions/${nom}`]: proposition }, () => {
+    attendreErreurs(verifier(), [`observatoire/propositions/${nom} : ratifiée sans examen, observatoire/examens/${nom} attendu (D11.INV-1)`]);
+    const examen = '---\nformat: observatoire.examen/1\ndate: 2026-11-26\nobjet: proposition\nexaminateur: observateur-externe\nmodele: gemini-3-flash-preview\navis: neutre\n---\n\n## Avis\n\n- Rien à redire.\n';
+    avecFichiers({ [`observatoire/examens/${nom}`]: examen }, () => {
+      attendreErreurs(verifier(), [`observatoire/examens/${nom} : avis « neutre » : favorable, reserve ou defavorable`]);
+    });
+    avecFichiers({ [`observatoire/examens/${nom}`]: examen.replace('avis: neutre', 'avis: favorable') }, () => {
+      const r = verifier();
+      assert.equal(r.status, 0, r.stderr);
+      assert.match(r.stdout, /^ok {2}observatoire\/examens\/ : 1 examen au format observatoire\.examen\/1 ; chaque proposition ratifiée a le sien$/m);
+    });
+  });
 });

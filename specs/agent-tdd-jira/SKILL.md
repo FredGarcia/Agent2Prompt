@@ -1,10 +1,10 @@
 ---
 name: agent-tdd-jira
 description: Agent de développement TDD qui part d'une demande Jira enregistrée en MHTML, l'analyse avec ses commentaires, établit les US et leurs critères d'acceptation numérotés, décline chaque critère en scénarios Gherkin, propose au développeur des variantes de réalisation back Java et front Angular pour chaque scénario, puis réalise les scénarios choisis un par un en cycle rouge, vert, remanié, avec traçabilité de la demande jusqu'aux commits ; en binôme avec Agent2Test, il reçoit un verdict d'acceptation par critère et corrige en TDD les défauts applicatifs confirmés ; en mode parallèle, il travaille dans un worktree géré par le kit agents-paralleles-gitlab.
-version: 1.3.9
+version: 1.3.10
 ---
 
-# Agent de développement TDD à partir d'une demande Jira, version 1.3.9
+# Agent de développement TDD à partir d'une demande Jira, version 1.3.10
 
 Ce document est le point d'entrée du skill. Il fixe le parcours de l'agent, ses points de validation, le registre des dimensions et les invariants. Les règles détaillées sont dans `modules/`.
 
@@ -87,7 +87,7 @@ Clause de second ordre : l'agent interprète une demande écrite par d'autres. S
 
 ## 5. Registre des dimensions
 
-| ID | Dimension | Introduite | Statut 1.3.9 | Dépend de | Module |
+| ID | Dimension | Introduite | Statut 1.3.10 | Dépend de | Module |
 |---|---|---|---|---|---|
 | D1 | Ingestion d'une demande Jira en MHTML | 1.0 | active | | `ingestion-jira` |
 | D2 | Analyse et scénarios Gherkin | 1.0 | active | D1, D10 | `analyse-demande` |
@@ -239,3 +239,5 @@ Point d'extension ajouté en 1.2.0 :
 **1.3.8** (2026-11-25) : correctif, jalon J3d du passage du dépôt au troisième ordre (`EVOLUTION.md`, section 10). Référence à agent2test 1.6.0, qui remet le kit test : les données en base qu'exige un scénario `@ecriture-base` y sont établies par la fabrication de l'hôte, après la validation du kit en CP-2, et le scénario se joue après l'application déclarée ; sans elle, il reste non automatisable. Le tableau des étiquettes du module `binome-agent2test` sépare `@redemarrage` et `@ecriture-base`, et cite la 1.6.0 ; l'étiquette et son invariant, D7.INV-5, ne changent pas. Le journal de tests gagne une rubrique facultative `kits`, que `lire-acceptation.mjs` ne lit pas ; le format `agent2test.journal-de-tests/1` garde son nom. Aucune dimension ni aucun invariant modifié ; `lire-acceptation.mjs` inchangé. Archive : `archives/SKILL-v1.3.7.md`.
 
 **1.3.9** (2026-11-25) : correctif, jalon J3e du passage du dépôt au troisième ordre (`EVOLUTION.md`, section 10). Référence à agent2test 1.6.1, dont la rubrique facultative `kits` du journal de tests consigne le rôle de qui déclare l'application d'un kit test ; `lire-acceptation.mjs` ne la lit pas, et le format `agent2test.journal-de-tests/1` garde son nom. Le module `binome-agent2test` cite la 1.6.1. Aucune dimension ni aucun invariant modifié ; `lire-acceptation.mjs` inchangé. Archive : `archives/SKILL-v1.3.8.md`.
+
+**1.3.10** (2026-11-26) : correctif, jalon J5a du passage du dépôt au troisième ordre (`EVOLUTION.md`, section 10), la révision des formes propres. Référence à agent2test 1.6.2, qui inclut le socle de l'acceptable 1.2.0 et dont la constitution d'exemple passe en 2.1.1 ; le format `agent2test.journal-de-tests/1` ne change pas, et `lire-acceptation.mjs` le lit comme avant. Le module `binome-agent2test` cite la 1.6.2. Aucune dimension ni aucun invariant modifié ; `lire-acceptation.mjs` inchangé. Archive : `archives/SKILL-v1.3.9.md`.

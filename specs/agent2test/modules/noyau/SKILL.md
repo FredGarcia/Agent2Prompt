@@ -95,7 +95,7 @@ Le résultat est une liste d'écarts `{ chemin, regle, message }`. Une liste non
 
 ```json
 {
-  "version": "2.1.0",
+  "version": "2.1.1",
   "invariants": ["D1.INV-1", "D1.INV-2"],
   "pointsDeControle": ["CP-0", "CP-1", "CP-2", "CP-3", "CP-4", "CP-5"],
   "reglesModifiables": [
@@ -103,7 +103,7 @@ Le résultat est une liste d'écarts `{ chemin, regle, message }`. Une liste non
     { "regle": "budget.reessaiEtape", "bornes": { "min": 0, "max": 2 } }
   ],
   "metaCriteres": { "fenetre": 10, "expositionMin": 3, "marge": 15 },
-  "acceptable": { "socle": "socle-acceptable", "version": "1.1.0", "empreinte": "e815cadf230886d507d56dbbfb5d7cfd0cf3982036d54d0279b70cc8f49b4764" },
+  "acceptable": { "socle": "socle-acceptable", "version": "1.2.0", "empreinte": "e815cadf230886d507d56dbbfb5d7cfd0cf3982036d54d0279b70cc8f49b4764" },
   "intentionsRefusees": [
     { "intention": "deployer", "horsKit": true, "regle": "SA1.INV-1" },
     { "intention": "administrer", "horsKit": true, "regle": "SA1.INV-1" },

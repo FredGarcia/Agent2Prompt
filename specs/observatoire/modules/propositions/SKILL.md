@@ -39,6 +39,7 @@ Toute autre clé, toute valeur hors de ces formes, refusent la proposition. L'in
 ## 3. Statut et répétition
 
 - La pull request de ratification inscrit le statut dans l'en-tête : `statut: ratifiee`, avec `version` et `pr`, ou `statut: refusee`, avec `pr`. C'est ce statut que suit le module `suivi`.
+- Une ratification apporte l'examen de la proposition, du même nom dans `observatoire/examens/`, l'avis d'un examinateur indépendant sur un autre modèle ; un refus n'en demande pas (module `examens`, D11.INV-1). Le format des propositions ne change pas pour autant : l'examen est un fichier à part, que l'observatoire n'écrit pas.
 - Une proposition ouverte ou ratifiée ne se répète pas ; une proposition refusée ne revient qu'avec une instance nouvelle, absente de ses références (D4.INV-2). Une proposition se reconnaît à son système, son motif et sa profondeur ; une proposition par invariant ou par faux refus, à sa sorte, son système et son motif, et ne se confond avec aucune autre sorte. Le corps d'une proposition par faux refus rappelle qu'une règle de sûreté ne s'affaiblit jamais (module `acceptable`).
 
 ## 4. Recette

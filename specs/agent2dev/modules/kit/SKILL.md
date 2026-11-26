@@ -22,10 +22,10 @@ Un patch qui enfreint une règle n'est pas remis : refus `acceptable.refus`, ave
 ```json
 {
   "format": "socle-acceptable.kit/1",
-  "systeme": { "nom": "agent2dev", "version": "1.4.2" },
+  "systeme": { "nom": "agent2dev", "version": "1.4.3" },
   "environnement": "dev",
   "patch": { "chemin": "../patchs/002-S02.patch", "empreinte": "54b440c362566a4c8e8f22b9baf9f7d78a1c78b16820ec6d8fe0566a48aafc55" },
-  "noyau": { "version": "1.1.0", "empreinte": "e815cadf230886d507d56dbbfb5d7cfd0cf3982036d54d0279b70cc8f49b4764" },
+  "noyau": { "version": "1.2.0", "empreinte": "e815cadf230886d507d56dbbfb5d7cfd0cf3982036d54d0279b70cc8f49b4764" },
   "confrontation": { "fichiers": 3, "commandes": 0 },
   "retourArriere": { "prepare": true, "verifie": false }
 }
@@ -70,7 +70,7 @@ Chaque kit porte le numéro et la date de sa ligne `kit.remis` ; sa validation, 
 
 | Scénario | Vérifie | Cas |
 |---|---|---|
-| KI1 | D27.INV-1 | le scénario ECR-77-S02 achevé : son patch confronté, le manifeste `kits/dev-002-S02.json` au format `socle-acceptable.kit/1`, à l'empreinte du patch, avec le noyau 1.1.0 et son empreinte ; ligne `kit.remis` |
+| KI1 | D27.INV-1 | le scénario ECR-77-S02 achevé : son patch confronté, le manifeste `kits/dev-002-S02.json` au format `socle-acceptable.kit/1`, à l'empreinte du patch, avec le noyau 1.2.0 et son empreinte ; ligne `kit.remis` |
 | KI2 | D27.INV-1 | un patch qui écrit `.env`, ou dans `schemas/`, n'est pas remis : refus `acceptable.refus`, garde d'écriture, règle SA4.INV-1 ou D1.INV-6 ; aucun manifeste n'est écrit |
 | KI3 | D27.INV-2 | la décision « accepter » de V4 cite le kit ; le développeur déclare « kit appliqué », ligne `kit.applique` avec l'empreinte, puis « retour arrière fait », ligne `kit.retour-arriere` |
 | KI4 | D27.INV-2 | le patch modifié après V4, puis déclaré appliqué : refus `KIT_MODIFIE`, journalisé, rien de consigné comme appliqué ; aucun outil MCP, ni l'échange, ni le moteur, ne déclare une application |

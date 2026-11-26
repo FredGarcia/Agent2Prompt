@@ -97,8 +97,8 @@ Le résultat est une liste d'écarts `{ chemin, regle, message }`. Une liste non
 
 ```json
 {
-  "version": "2.1.0",
-  "methode": { "skill": "agent-tdd-jira", "version": "1.3.9" },
+  "version": "2.1.1",
+  "methode": { "skill": "agent-tdd-jira", "version": "1.3.10" },
   "invariants": ["D1.INV-1", "D1.INV-2"],
   "points": ["V0", "V1", "V2", "V3", "V4", "V5", "CP-4"],
   "reglesModifiables": [
@@ -106,7 +106,7 @@ Le résultat est une liste d'écarts `{ chemin, regle, message }`. Une liste non
     { "regle": "budget.tentativesPas", "bornes": { "min": 1, "max": 5 } }
   ],
   "metaCriteres": { "fenetre": 10, "expositionMin": 3, "marge": 15 },
-  "acceptable": { "socle": "socle-acceptable", "version": "1.1.0", "empreinte": "e815cadf230886d507d56dbbfb5d7cfd0cf3982036d54d0279b70cc8f49b4764" },
+  "acceptable": { "socle": "socle-acceptable", "version": "1.2.0", "empreinte": "e815cadf230886d507d56dbbfb5d7cfd0cf3982036d54d0279b70cc8f49b4764" },
   "intentionsRefusees": [
     { "intention": "deployer", "horsKit": true, "regle": "SA1.INV-1" },
     { "intention": "administrer", "horsKit": true, "regle": "SA1.INV-1" },

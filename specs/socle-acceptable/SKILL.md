@@ -1,10 +1,10 @@
 ---
 name: socle-acceptable
-description: Socle de l'acceptable partagé. Il fixe le noyau commun de ce que les systèmes du dépôt refusent, au sens du troisième couplage du troisième ordre, celui des valeurs (EVOLUTION.md, section 10) : intentions refusées, actions interdites, écritures interdites, secrets, leçons interdites, chaque règle un invariant que cite le refus ; écriture par les kits dev, test et démo, avec retour arrière, selon un contrat décrit sur la fabrication de l'hôte ; refus, dérogations et faux refus ; épinglage par les constitutions, sans retrait ni affaiblissement. À lire avant d'écrire ou de réviser la constitution d'un système, ses gardes ou ses kits.
-version: 1.1.0
+description: Socle de l'acceptable partagé. Il fixe le noyau commun de ce que les systèmes du dépôt refusent, au sens du troisième couplage du troisième ordre, celui des valeurs (EVOLUTION.md, section 10) : intentions refusées, actions interdites, écritures interdites, secrets, leçons interdites, chaque règle un invariant que cite le refus ; écriture par les kits dev, test et démo, avec retour arrière, selon un contrat décrit sur la fabrication de l'hôte ; refus, dérogations et faux refus ; épinglage par les constitutions, sans retrait ni affaiblissement ; révision du noyau par une version publiée par un humain, qui ne fait qu'y ajouter, comparée à la version précédente. À lire avant d'écrire ou de réviser la constitution d'un système, ses gardes ou ses kits.
+version: 1.2.0
 ---
 
-# Socle de l'acceptable, version 1.1.0
+# Socle de l'acceptable, version 1.2.0
 
 Ce socle est le modèle de l'acceptable du troisième couplage du troisième ordre, celui des valeurs (`EVOLUTION.md`, section 10) : ce que tous les systèmes du dépôt refusent, explicite, versionné et épinglé, au lieu de listes éparses et figées dans chaque constitution. Il est inclus à l'identique, à une version épinglée, par `agent2dev` et `agent2test`, qui l'appliquent et produisent le kit dev et le kit test ; `orchestrateur-c7e` et `generateur-skill-ticket` le référencent, à des dimensions réservées, et l'incluront quand elles deviendront actives. Un système ne retire ni n'affaiblit jamais une règle du socle : sa constitution peut seulement en ajouter.
 
@@ -25,14 +25,14 @@ flowchart LR
   DER --> J
   FAB --> J
   RET --> J
-  J -.->|"revue, par une version publiée"| NOY["noyau commun<br/>socle-acceptable"]
+  J -.->|"révision, par une version publiée qui ne fait qu'ajouter"| NOY["noyau commun<br/>socle-acceptable"]
 ```
 
 Le noyau ne remplace aucune constitution : chacune l'inclut et y ajoute ses propres règles. Il ne s'applique pas par lui-même : il dit à la garde d'un système, et au système qui produit un kit, ce qui se refuse et pourquoi.
 
 ## 2. Registre des dimensions du socle
 
-| ID | Dimension | Statut 1.1.0 |
+| ID | Dimension | Statut 1.2.0 |
 |---|---|---|
 | SA1 | Intentions refusées : ce qu'une demande ne peut pas viser | active |
 | SA2 | Actions interdites, et le retour arrière des actions d'un kit | active |
@@ -126,7 +126,7 @@ Le noyau ne remplace aucune constitution : chacune l'inclut et y ajoute ses prop
 - Un refus cite sa règle : un invariant du noyau, `socle-acceptable:SA1.INV-1`, ou de la constitution du système.
 - Aucune règle du noyau ne se déroge : seule une version de ce socle la change (SA7). Une règle propre à une constitution ne se déroge que si la constitution la déclare dérogeable, par `derogeable: true` sur son entrée. Seul un humain déroge : d'un rôle nommé, développeur ou référent, avec son motif, que garde l'instance ; aucun agent ne déroge.
 - Un refus qu'un humain déclare infondé est un faux refus, consigné avec sa règle et son motif ; l'action ne s'exécute pas pour autant. Il signale une règle trop large, que la revue examine : celle du noyau, pour une règle du noyau.
-- Refus, dérogations, faux refus, applications de kits et retours arrière se tiennent dans le journal du système. Les refus, dérogations et faux refus du binôme s'exportent vers le milieu commun selon la correspondance du socle d'observation 1.2.0 ; les applications et les retours arrière attendent la leur (point d'extension E2).
+- Refus, dérogations, faux refus, applications de kits et retours arrière se tiennent dans le journal du système. Les refus, dérogations et faux refus du binôme s'exportent vers le milieu commun selon la correspondance du socle d'observation 1.2.0, et chaque étape de ses kits, remise, validation, application ou échec, retour arrière, selon celle du socle d'observation 1.3.0 (point d'extension E2).
 
 ### 9.2 Invariants
 
@@ -139,12 +139,13 @@ Le noyau ne remplace aucune constitution : chacune l'inclut et y ajoute ses prop
 
 - Une constitution épingle le noyau par le nom et la version du socle, et par l'empreinte SHA-256 du bloc `noyau` (section 12), sérialisé en JSON canonique, clés triées, sans espace ; elle en reprend toutes les entrées, et peut en ajouter.
 - Elle n'en retire ni n'en affaiblit aucune : chacune de ses listes contient celle du noyau, et une entrée du noyau marquée `horsKit` ne devient pas permise hors d'un kit.
-- Le noyau ne change que par une version de ce socle, publiée par un humain, par pull request ; aucun agent ne le modifie. Une règle de sûreté ne s'affaiblit jamais : une version qui retirerait ou affaiblirait une entrée du noyau est refusée. La procédure de révision par au moins deux sujets distincts, nourrie des refus, des dérogations et des faux refus de plusieurs instances, attend le jalon J5 du passage au troisième ordre.
+- Le noyau ne change que par une version de ce socle, publiée par un humain, par pull request, selon la révision des formes propres d'`EVOLUTION.md`, section 10.7 ; aucun agent ne le modifie. Une révision du noyau ne fait qu'y ajouter : une entrée ajoutée, ou une entrée marquée `horsKit` qui ne l'est plus, le renforcent ; c'est le sens sûr, que le développeur publie seul, avec la migration des constitutions au journal de la version.
+- Une règle de sûreté ne s'affaiblit jamais : une entrée qui se retirerait, changerait de règle ou deviendrait permise dans un kit est refusée. Le vérificateur du dépôt compare le bloc `noyau` à celui de la version archivée précédente. Un faux refus récurrent ne relâche donc jamais le noyau : la ratification précise la règle propre d'une constitution, après l'examen indépendant de la section 10.7, ou refuse la proposition.
 
 ### 10.2 Invariants
 
 - **SA7.INV-1** : une constitution inclut tout le noyau, à une version épinglée par son empreinte, et n'en retire ni n'en affaiblit aucune règle ; elle peut en ajouter. Contrôle : au démarrage du système, l'empreinte du bloc épinglé, et chaque entrée du noyau présente dans la constitution.
-- **SA7.INV-2** : le noyau ne change que par une version de ce socle publiée par un humain ; aucun agent ne le modifie, et aucune règle de sûreté ne s'affaiblit. Contrôle : vérificateur du dépôt, bloc `noyau` au schéma fermé ; revue de la pull request.
+- **SA7.INV-2** : le noyau ne change que par une version de ce socle publiée par un humain, qui ne fait qu'y ajouter ; aucun agent ne le modifie, et aucune règle de sûreté ne s'affaiblit : aucune entrée ne se retire, ne change de règle ni ne devient permise dans un kit. Contrôle : vérificateur du dépôt, bloc `noyau` au schéma fermé, comparé à celui de la version archivée précédente, et migration au journal de la version qui le change ; revue de la pull request.
 
 ## 11. SA8 : kits
 
@@ -165,7 +166,7 @@ Le noyau ne remplace aucune constitution : chacune l'inclut et y ajoute ses prop
   "systeme": { "nom": "agent2dev", "version": "1.4.0" },
   "environnement": "dev",
   "patch": { "chemin": "../patchs/002-S02.patch", "empreinte": "54b440c362566a4c8e8f22b9baf9f7d78a1c78b16820ec6d8fe0566a48aafc55" },
-  "noyau": { "version": "1.1.0", "empreinte": "e815cadf230886d507d56dbbfb5d7cfd0cf3982036d54d0279b70cc8f49b4764" },
+  "noyau": { "version": "1.2.0", "empreinte": "e815cadf230886d507d56dbbfb5d7cfd0cf3982036d54d0279b70cc8f49b4764" },
   "confrontation": { "fichiers": 3, "commandes": 0 },
   "retourArriere": { "prepare": true, "verifie": false }
 }
@@ -244,20 +245,20 @@ Le bloc `noyau` est la forme que reprennent les constitutions : chaque entrée c
 }
 ```
 
-Le vérificateur du dépôt contrôle ce bloc : un JSON au schéma fermé `socle-acceptable.noyau/1`, six listes non vides, des entrées aux seules clés de leur liste, sans doublon, des motifs qui sont des expressions régulières valides, et des règles qui sont des invariants de ce socle.
+Le vérificateur du dépôt contrôle ce bloc : un JSON au schéma fermé `socle-acceptable.noyau/1`, six listes non vides, des entrées aux seules clés de leur liste, sans doublon, des motifs qui sont des expressions régulières valides, et des règles qui sont des invariants de ce socle ; il le compare au bloc de la version archivée précédente, dont il garde chaque entrée, avec sa règle, sans `horsKit` ajouté (SA7).
 
 ## 13. Points d'extension
 
-En 1.1 :
+En 1.2 :
 
 - **E1** : kits d'écriture. Réservé en 1.0, le contrat des kits est décrit depuis 1.1.0 (SA8), sur la fabrication de l'hôte, sans la changer : Agent2Dev produit le kit dev, Agent2Test le kit test. Le skill racine du générateur de skills de ticket écrit déjà, à la clôture d'un arbre, trois manifestes de kits, dev, test et démo (`generateur-skill-ticket:D4.INV-2`), qui recensent ce que l'arbre a produit, sans retour arrière ni confrontation au noyau ; il produira le kit démo, que scenario-playwright jouera, quand son acceptable sera actif, et ses manifestes rejoindront alors le contrat.
-- **E2** : export des refus et des kits. Depuis le socle d'observation 1.2.0, les refus, dérogations et faux refus du binôme s'exportent dans son enveloppe, avec la règle citée, et l'observatoire 1.2.0 les confronte par règle. Les applications de kits et les retours arrière s'exporteront selon une correspondance qu'une version du socle d'observation donnera.
+- **E2** : export des refus et des kits. Depuis le socle d'observation 1.2.0, les refus, dérogations et faux refus du binôme s'exportent dans son enveloppe, avec la règle citée, et l'observatoire 1.2.0 les confronte par règle. Depuis le socle d'observation 1.3.0, chaque étape de ses kits, remise, validation, application ou échec, retour arrière, s'exporte aussi, et l'observatoire 1.3.0 les compte par système, environnement et instance.
 
 ## 14. Règles d'évolution du socle
 
 - Le socle suit le contrat de version d'`EVOLUTION.md` à la racine du dépôt.
 - Tant que sa dimension de l'acceptable est réservée, un système référence le socle dans son `manifest.json` (champ `references`) ; quand elle devient active, il l'épingle (champ `shared`), et l'outil d'assemblage l'inclut dans sa transmission.
-- Une entrée ajoutée au noyau, ou une règle de plus, fait une version mineure ; chaque système l'adopte en montant sa constitution. Une entrée retirée, ou une règle affaiblie, est interdite : elle ne se propose pas.
+- Une entrée ajoutée au noyau, ou une règle de plus, fait une version mineure ; chaque système l'adopte en montant sa constitution, et le journal de la version dit cette migration, par une phrase qui commence par « Migration : ». Une entrée retirée, ou une règle affaiblie, est interdite : elle ne se propose pas, et le vérificateur la refuse (`EVOLUTION.md`, section 10.7).
 - Le contrat des kits (SA8) ne change aucune règle du noyau : il rend possible, dans un kit, ce que les règles réservent aux kits. Un système de plus qui produit un kit l'adopte en montant sa version, sans changer le contrat.
 
 ## 15. Journal de révision
@@ -267,3 +268,5 @@ En 1.1 :
 **1.0.1** (2026-11-24) : correctif, jalon J3b du passage au troisième ordre, décision B2 du développeur. SA6.INV-2 renforcé : aucune règle du noyau ne se déroge, seule une version de ce socle la change ; une règle propre à une constitution ne se déroge que si la constitution la déclare dérogeable, `derogeable: true` sur son entrée, qu'une entrée du noyau ne porte jamais ; un faux refus ne fait pas exécuter l'action. Vocabulaire précisé, dérogation et faux refus. Inclus et épinglé par `agent2dev` 1.3.0 et `agent2test` 1.5.0, dont l'acceptable partagé devient actif ; référencé par `orchestrateur-c7e` 3.8.1 et `generateur-skill-ticket` 1.4.1, où il reste réservé. Aucune entrée du noyau ni aucun autre invariant modifié. Archive : `archives/SKILL-v1.0.0.md`.
 
 **1.1.0** (2026-11-25) : dimension SA8 active, le contrat des kits, jalon J3d du passage au troisième ordre (`EVOLUTION.md`, section 10). Un kit est un patch, avec son application et son retour arrière, que la fabrication de l'hôte exécute sur l'environnement de son nom, dev, test ou démo, jamais en production ; la fabrication existe hors du dépôt, et ce socle ne la change pas. Le système qui produit un kit le confronte, avant de le remettre, au noyau épinglé et à sa constitution : fichiers écrits, contenu, commandes et intention ; un kit refusé n'est pas remis. Manifeste fermé `socle-acceptable.kit/1`, qui désigne le kit par l'empreinte de son patch ; validation par un humain à cette empreinte avant l'application ; application et retour arrière déclarés par un humain et consignés par le système qui l'a produit. Agent2Dev produit le kit dev, Agent2Test le kit test ; le skill racine du générateur produira le kit démo, quand son acceptable sera actif. SA6.INV-1 précisé, sans affaiblissement : dans un kit, la confrontation se fait par le système qui le produit, avant sa remise, et le kit ne s'applique que tel qu'il a été confronté et validé ; la confrontation précède toujours l'exécution. Contrôle de SA2.INV-3 rattaché au contrat ; vocabulaire, fabrication des kits ; SA1 et SA6, intentions `horsKit` accomplies par un kit et export des refus ; points E1 et E2 récrits. Invariants SA8.INV-1 et SA8.INV-2, quatorze. Le bloc `noyau` ne change pas, ni son empreinte. Inclus et épinglé par `agent2dev` 1.4.0 et `agent2test` 1.6.0 ; référencé par `orchestrateur-c7e` 3.8.3 et `generateur-skill-ticket` 1.4.3, où il reste réservé. Décisions ratifiées avant la rédaction : plan du jalon J3d, K1 à K4. Archive : `archives/SKILL-v1.0.1.md`.
+
+**1.2.0** (2026-11-26) : jalon J5a du passage au troisième ordre (`EVOLUTION.md`, section 10), la révision des formes propres. SA7 : le noyau se révise selon la section 10.7 d'`EVOLUTION.md` ; une révision ne fait qu'y ajouter, une entrée ajoutée, ou une entrée qui perd `horsKit`, le renforcent, et le développeur la publie seul, en disant au journal la migration des constitutions ; une entrée qui se retirerait, changerait de règle ou deviendrait permise dans un kit est refusée. SA7.INV-2 renforcé : son contrôle compare le bloc `noyau` à celui de la version archivée précédente. Un faux refus récurrent ne relâche jamais le noyau : la ratification précise la règle propre d'une constitution, après l'examen indépendant, ou refuse la proposition. SA6 et E2 à jour : les étapes des kits s'exportent depuis le socle d'observation 1.3.0. Le bloc `noyau` ne change pas, ni son empreinte. Inclus et épinglé par `agent2dev` 1.4.3 et `agent2test` 1.6.2 ; référencé par `orchestrateur-c7e` 3.8.6 et `generateur-skill-ticket` 1.4.6, où il reste réservé. Décisions ratifiées avant la rédaction : plan du jalon J5, W1 à W4. Archive : `archives/SKILL-v1.1.0.md`.

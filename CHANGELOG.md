@@ -96,6 +96,16 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-11-26 : socle-acceptable 1.2.0, observatoire 1.5.0, agent2dev 1.4.3, agent2test 1.6.2, agent-tdd-jira 1.3.10, scenario-playwright 1.6.7, orchestrateur-c7e 3.8.6, generateur-skill-ticket 1.4.6
+
+- **Dépôt, `EVOLUTION.md`** : jalon J5a du passage au troisième ordre, la révision des formes propres. Section 10.7 : le noyau de l'acceptable et les constitutions d'exemple du binôme sont les formes propres du dépôt ; elles ne changent que par une version que le développeur publie, qui dit sa migration au journal ; un relâchement nomme en outre ses preuves et porte l'avis consigné d'un examinateur indépendant, un observateur sur un autre modèle que celui qui a préparé le changement ; un avis ne décide jamais ; le noyau ne fait que croître. Règle 7 de la section 10.5 ; les limites des couplages 1 et 3 disent l'examen, et que le développeur ratifie seul.
+- **socle-acceptable 1.2.0** : SA7, la révision du noyau selon la section 10.7, qui ne fait qu'y ajouter ; SA7.INV-2 renforcé, son contrôle comparant le bloc `noyau` à celui de la version archivée précédente ; SA6 et E2 à jour, les étapes des kits s'exportant depuis le socle d'observation 1.3.0. Le bloc `noyau` ne change pas, ni son empreinte.
+- **observatoire 1.5.0** : dimension D11, l'examen indépendant, module `examens` : un avis `favorable`, `reserve` ou `defavorable`, au format fermé `observatoire.examen/1`, dans `observatoire/examens/`, sous le nom de la proposition qu'il examine, ou de la spécification et de la version qui relâche ; une proposition ne se ratifie qu'avec le sien, un refus n'en demande pas, et une ratification contre un avis défavorable lui répond ; `verifier` contrôle examens et ratifications. D4 étendue, E2 récrit, critère P11 ; vingt invariants ; recette de trente tests. L'observatoire n'écrit aucun examen, et le format des propositions ne change pas.
+- **agent2dev 1.4.3**, **agent2test 1.6.2** : correctifs. Socle de l'acceptable 1.2.0 inclus et épinglé ; constitutions d'exemple 2.1.1, ré-épinglées à la même empreinte ; migration au journal : republier la constitution.
+- **agent-tdd-jira 1.3.10**, **scenario-playwright 1.6.7**, **orchestrateur-c7e 3.8.6**, **generateur-skill-ticket 1.4.6** : correctifs de références ; numéros de version et empreintes de scenario-playwright, skills de ticket d'exemple et rapports de contexte régénérés.
+- `observatoire/examens/`, avec son README ; les huit versions se référencent et se publient dans un même commit (`EVOLUTION.md`, section 7). README, modes d'emploi, glossaire et transmissions à jour.
+- Décisions ratifiées avant la rédaction (plan du jalon J5) : trois jalons, J5a, J5b et J5c (W1) ; la pluralité d'une révision : le développeur ratifie seul, après l'avis consigné d'un examinateur indépendant, sur un autre modèle (W2, révisé) ; ratifier ou relâcher exigent cet examen, refuser ou renforcer non, le noyau ne s'affaiblissant jamais (W3) ; socle de l'acceptable 1.2.0 dans J5a (W4).
+
 ### 2026-11-25 : socle-observation 1.4.0, observatoire 1.4.0, agent2dev 1.4.2, orchestrateur-c7e 3.8.5, generateur-skill-ticket 1.4.5
 
 - **Dépôt, `EVOLUTION.md`** : jalon J4 réduit du passage au troisième ordre, le deuxième couplage s'ouvre. Section 10.6, le catalogue des signaux : les quatorze clauses de second ordre du dépôt, classées par leur nature, et, pour les sept qui décrivent un effet sur des personnes, leur signal, son statut, exporté, mesuré, disponible ou non mesuré, son lieu et ce avec quoi il se lit. Règle 6 de la section 10.5 : toute clause a sa ligne au catalogue ; un signal ne se lit jamais seul et ne classe jamais des personnes.
@@ -941,6 +951,13 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
   - la publication, dans ce dépôt public, d'un argumentaire destiné à un client, sans nom de client ni de mission.
 
 ## Outils
+
+### 2026-11-26 : révision des formes propres et examens indépendants
+
+- **`tools/verifier.mjs`** : les formes propres, selon `EVOLUTION.md`, section 10.7. Le noyau du socle de l'acceptable, comparé à celui de sa version archivée précédente : aucune entrée qui se retire, change de règle ou devient permise dans un kit, et sa migration au journal s'il change. La constitution d'exemple d'Agent2Dev et d'Agent2Test, comparée à celle de la transmission de leur version précédente : un relâchement, entrée retirée, modifiée, rendue dérogeable ou permise dans un kit, point ou invariant retiré, commande ou règle modifiable ajoutée, bornes élargies, méta-critère changé, exige au journal son examen, ses preuves, sa migration, et sa réponse à un avis défavorable ; tout autre changement, sa migration. Les examens et les ratifications, par l'outil de l'observatoire.
+- **`tools/verifier.test.mjs`** : trois tests de plus, le noyau, les constitutions et les examens ; les versions du socle de l'acceptable lues dans son manifeste.
+- **`specs/observatoire/outils/observatoire.mjs`** : `controlerExamen`, `lireExamens` et `controlerRatifications` ; la commande `verifier` contrôle aussi les examens et les ratifications.
+- Le commentaire de `verifierReadme`, déplacé en J4 au-dessus du catalogue des signaux, rendu à sa fonction.
 
 ### 2026-11-25 : catalogue des signaux et signaux du binôme
 

@@ -23,10 +23,10 @@ Un kit qui enfreint une règle n'est pas remis : refus `acceptable.refus`, avec 
 ```json
 {
   "format": "socle-acceptable.kit/1",
-  "systeme": { "nom": "agent2test", "version": "1.6.1" },
+  "systeme": { "nom": "agent2test", "version": "1.6.2" },
   "environnement": "test",
   "patch": { "chemin": "test.patch", "empreinte": "b97faf12ab63e0e511f9c867377374df22fb5f2e6cb21be01169ed17ef4cdcff" },
-  "noyau": { "version": "1.1.0", "empreinte": "e815cadf230886d507d56dbbfb5d7cfd0cf3982036d54d0279b70cc8f49b4764" },
+  "noyau": { "version": "1.2.0", "empreinte": "e815cadf230886d507d56dbbfb5d7cfd0cf3982036d54d0279b70cc8f49b4764" },
   "confrontation": { "fichiers": 2, "commandes": 0 },
   "retourArriere": { "prepare": true, "verifie": false }
 }
@@ -69,7 +69,7 @@ Chaque kit porte le numéro et la date de sa ligne `kit.remis` ; sa validation, 
 
 | Scénario | Vérifie | Cas |
 |---|---|---|
-| KI1 | D27.INV-1 | un scénario `@ecriture-base` retenu en CP-1 : le kit test rédigé, confronté, son manifeste `kits/<campagne>/test.json` au format `socle-acceptable.kit/1`, à l'empreinte du patch, avec le noyau 1.1.0 ; ligne `kit.remis` |
+| KI1 | D27.INV-1 | un scénario `@ecriture-base` retenu en CP-1 : le kit test rédigé, confronté, son manifeste `kits/<campagne>/test.json` au format `socle-acceptable.kit/1`, à l'empreinte du patch, avec le noyau 1.2.0 ; ligne `kit.remis` |
 | KI2 | D27.INV-1 | un kit dont le patch écrit dans les sources de l'application, ou porte un fichier `.env`, n'est pas remis : refus `acceptable.refus`, règle D1.INV-5 ou SA4.INV-1 ; ses scénarios restent non automatisables |
 | KI3 | D27.INV-2 | le kit validé en CP-2, déclaré appliqué : ligne `kit.applique` ; le parcours de son scénario se prépare alors, et le scénario se joue ; après la campagne, « retour arrière fait » : ligne `kit.retour-arriere` |
 | KI4 | D27.INV-2 | un patch modifié après CP-2, puis déclaré appliqué : refus `KIT_MODIFIE` ; le scénario reste non automatisable ; aucun outil MCP, ni l'échange, ni le moteur, ne déclare une application |
