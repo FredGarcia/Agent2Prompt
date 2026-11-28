@@ -96,6 +96,14 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-11-28 : observatoire 1.7.0
+
+- **Dépôt, `EVOLUTION.md`** : jalon J6 du passage au troisième ordre, la clôture autotélique. Section 10.8, la viabilité des couplages : pour chaque couplage et pour le dépôt lui-même, sa boucle, ses preuves, des invariants testés, son statut et ce qui lui manque ; les couplages 1 et 3 prouvés, le couplage 2 et le dépôt partiels ; règle 8 de la section 10.5. Section 10.9, les articulations : le passage clos ; l'orchestrateur 4.0.0 en option ultérieure, la voie (b) en vigueur ; le binôme couplé par ses remises et ses dossiers d'échange, n8n en transport facultatif ; le méta-projet 12 facteurs × 7E hors du dépôt, relié par le socle d'observation s'il exporte un jour. Section 6 : la lecture 7E gagne sa colonne « Au troisième ordre ». Section 5 : la boucle d'évolution, observée. Section 10.7 : `EVOLUTION.md` reste hors des formes propres.
+- **observatoire 1.7.0** : dimension D13, module `depot`. Commande `depot [--depuis AAAA-MM-JJ] [--json]` : la gouvernance du dépôt lue dans l'historique Git de la branche courante, en premier parent, et dans le CHANGELOG, hors ligne, sans jeton ; par pull request fusionnée par merge commit, le délai de son plus ancien commit à sa fusion, ses reprises, les points hors plan ratifiés, sa consignation et son délai ; médiane, maximum et consignations en attente ; un clone superficiel signalé. Rien n'est écrit ni proposé ; un nombre que le CHANGELOG ne dit pas reste inconnu ; les refus de la CI se déclarent non mesurés. Critère P13 ; vingt-quatre invariants ; recette de trente-six tests.
+- **`tools/verifier.mjs`** : contrôle du tableau de viabilité, une ligne par couplage de la section 10.3 puis le dépôt, un statut de la liste, des preuves définies dont la recette cite des tests qui existent sous leurs titres, ce qui manque à une ligne partielle ; et de la colonne « Au troisième ordre » de la section 6.
+- README, mode d'emploi de l'observatoire, glossaire et transmission à jour.
+- Décisions ratifiées avant la rédaction (plan du jalon J6) : l'historique Git et le CHANGELOG, hors ligne, sans jeton, les refus de la CI déclarés non mesurés (Z1) ; des comptes recalculés à chaque appel, lus avant chaque plan de jalon, sans journal ni proposition (Z2) ; le tableau de viabilité, vérifié, en section 10.8, et la colonne 7E (Z3) ; OC3 clos par J6, l'orchestrateur 4.0.0 plus tard, le binôme par ses dossiers d'échange, le méta-projet hors du dépôt (Z4).
+
 ### 2026-11-28 : generateur-skill-ticket 1.5.0
 
 - **Dépôt, `EVOLUTION.md`** : jalon J5c du passage au troisième ordre, l'observateur extérieur dans le générateur ; limites du troisième couplage à jour.

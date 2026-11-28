@@ -5,8 +5,9 @@
  * il y lit le disque à la place de `git ls-files`. Chaque test altère des fichiers de la copie, lance le
  * vérificateur, attend les erreurs nommées, puis rend les fichiers. La recette porte sur le préfixe `SA` du
  * socle de l'acceptable, sur son bloc `noyau`, sur les constitutions qui l'épinglent, sur les manifestes de kit
- * `socle-acceptable.kit/1`, sur le catalogue des signaux d'`EVOLUTION.md`, sur les formes propres, que révise sa
- * section 10.7, et sur les examens et les ratifications de l'observatoire ; elle tourne dans
+ * `socle-acceptable.kit/1`, sur le catalogue des signaux d'`EVOLUTION.md`, sur son tableau de viabilité des couplages
+ * et sa lecture 7E au troisième ordre, sur les formes propres, que révise sa section 10.7, et sur les examens et les
+ * ratifications de l'observatoire ; elle tourne dans
  * `.github/workflows/verifier.yml`.
  */
 import assert from 'node:assert/strict';
@@ -231,6 +232,42 @@ test('catalogue des signaux : une ligne par clause de second ordre ; nature de l
     "EVOLUTION.md : catalogue des signaux : socle-observation : aucune clause de second ordre dans son point d'entrée",
     'EVOLUTION.md : catalogue des signaux : skill4appli : deux lignes',
     "EVOLUTION.md : catalogue des signaux : observatoire : sa clause de second ordre n'a pas de ligne",
+  ]);
+});
+
+test('viabilité des couplages : statut de la liste, preuves préfixées et définies, ce qui manque pour une ligne partielle ; chaque phase de la lecture 7E lue au troisième ordre', () => {
+  const resultat = alterer({
+    'EVOLUTION.md': remplacer(
+      ['| `observatoire:D7.INV-1`, `observatoire:D10.INV-1` | partiel |', '| `observatoire:D7.INV-1`, `observatoire:D10.INV-1` | estimé |'],
+      ['`observatoire:D5.INV-1` | prouvé |', '`observatoire:D5.INV-9` | prouvé |'],
+      ['| `observatoire:D7.INV-1`, `observatoire:D8.INV-1`,', '| `D7.INV-1`, `observatoire:D8.INV-1`,'],
+      ['| partiel | la lecture des comptes avant chaque plan, une pratique sans preuve ; les refus de la CI, non mesurés ; `EVOLUTION.md` hors des formes propres de la section 10.7 ; un seul sujet ratifie |', '| partiel | — |'],
+      ['| Expression | la transmission texte, seule forme qui sort du dépôt | les propositions de l\'observatoire, et les examens indépendants qui précèdent leur ratification |', '| Expression | la transmission texte, seule forme qui sort du dépôt | — |'],
+    ),
+  });
+  attendreErreurs(resultat, [
+    'EVOLUTION.md : viabilité des couplages : 2. Entre description et pratique : statut « estimé », hors de la liste : prouvé, partiel, non couvert',
+    "EVOLUTION.md : viabilité des couplages : 1. Entre systèmes : preuve observatoire:D5.INV-9, invariant qui n'est pas défini",
+    'EVOLUTION.md : viabilité des couplages : 3. Avec les valeurs : preuve « `D7.INV-1` », un invariant préfixé par sa spécification attendu',
+    'EVOLUTION.md : viabilité des couplages : Le dépôt lui-même : partiel, sans dire ce qui manque',
+    "EVOLUTION.md : viabilité des couplages : lecture 7E de la section 6 : Expression n'est pas lue au troisième ordre",
+  ]);
+});
+
+test('viabilité des couplages : une ligne par couplage de la section 10.3, dans l\'ordre, puis le dépôt ; aucune preuve pour une ligne non couverte ; chaque preuve a ses tests, sous les titres que cite sa recette', () => {
+  const resultat = alterer({
+    'EVOLUTION.md': remplacer(
+      ['| 2. Entre description et pratique |', '| 2. Entre description et pratique ; |'],
+      ['`observatoire:D12.INV-1` | prouvé |', '`observatoire:D12.INV-1` | non couvert |'],
+      ['| Phase | Au niveau du dépôt | Au troisième ordre |', '| Phase | Au niveau du dépôt | Au troisième niveau |'],
+    ),
+    'specs/observatoire/modules/depot/SKILL.md': remplacer(['« D13 : un nombre de points hors plan que sa ligne ne dit pas reste inconnu, hors des comptes ; les refus de la CI sont non mesurés »', '« D13 : un test qui n\'existe pas »']),
+  });
+  attendreErreurs(resultat, [
+    'EVOLUTION.md : viabilité des couplages : lignes « 1. Entre systèmes », « 2. Entre description et pratique ; », « 3. Avec les valeurs », « Le dépôt lui-même » : une par couplage de la section 10.3, dans l\'ordre, puis le dépôt, attendues : « 1. Entre systèmes », « 2. Entre description et pratique », « 3. Avec les valeurs », « Le dépôt lui-même »',
+    'EVOLUTION.md : viabilité des couplages : 3. Avec les valeurs : non couvert, sans preuve, « — »',
+    'EVOLUTION.md : viabilité des couplages : Le dépôt lui-même : preuve observatoire:D13.INV-3, aucun test « D13 : un test qui n\'existe pas » dans tests/observatoire.test.mjs',
+    'EVOLUTION.md : viabilité des couplages : lecture 7E de la section 6 : en-tête « | Phase | Au niveau du dépôt | Au troisième ordre | » attendu',
   ]);
 });
 

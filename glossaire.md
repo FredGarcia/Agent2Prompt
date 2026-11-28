@@ -34,7 +34,7 @@ La colonne « Repris dans » cite les modules de la spécification qui reprennen
 | [`explication-hote-ia`](#explication-hote-ia-110) | 1.1.0 | 10 | 2 | 37 |
 | [`generateur-skill-ticket`](#generateur-skill-ticket-150) | 1.5.0 | 10 | 1 | 35 |
 | [`java`](#java-111) | 1.1.1 | 7 | 1 | 29 |
-| [`observatoire`](#observatoire-160) | 1.6.0 | 12 | 0 | 21 |
+| [`observatoire`](#observatoire-170) | 1.7.0 | 13 | 0 | 24 |
 | [`orchestrateur-c7e`](#orchestrateur-c7e-387) | 3.8.7 | 11 | 2 | 36 |
 | [`scenario-playwright`](#scenario-playwright-168) | 1.6.8 | 17 | 5 | 76 |
 | [`skill4appli`](#skill4appli-111) | 1.1.1 | 9 | 3 | 34 |
@@ -1209,9 +1209,9 @@ Expert Java 21, Spring Boot 3.5 et PostgreSQL : produire et relire du code confo
 
 Dimension réservée : aucun invariant en vigueur dans cette version.
 
-## observatoire 1.6.0
+## observatoire 1.7.0
 
-Observatoire de l'écosystème Agent2Prompt, sur le poste : relève les journaux d'enveloppes des projets selon le socle d'observation, dont ceux qu'il écrit pour le binôme Agent2Dev et Agent2Test à partir de leurs refus, de leurs kits, de leurs décisions aux points de validation et des révisions de leurs constitutions, les confronte entre instances, entre systèmes par les invariants du dépôt que citent leurs écarts, et par règle de l'acceptable que citent les refus, compte les kits, les signaux et les révisions, observe l'état de l'écosystème, écrit des propositions minimisées que le développeur apporte au dépôt par pull request, contrôle les examens indépendants qui précèdent leur ratification, et suit l'effet des propositions ratifiées ; premier et troisième couplages du troisième ordre, deuxième ouvert, il propose et n'applique jamais. Point d'entrée : [`specs/observatoire/SKILL.md`](specs/observatoire/SKILL.md).
+Observatoire de l'écosystème Agent2Prompt, sur le poste : relève les journaux d'enveloppes des projets selon le socle d'observation, dont ceux qu'il écrit pour le binôme Agent2Dev et Agent2Test à partir de leurs refus, de leurs kits, de leurs décisions aux points de validation et des révisions de leurs constitutions, les confronte entre instances, entre systèmes par les invariants du dépôt que citent leurs écarts, et par règle de l'acceptable que citent les refus, compte les kits, les signaux et les révisions, observe l'état de l'écosystème, écrit des propositions minimisées que le développeur apporte au dépôt par pull request, contrôle les examens indépendants qui précèdent leur ratification, et suit l'effet des propositions ratifiées ; compte aussi la gouvernance du dépôt lui-même, dans son historique Git et son CHANGELOG ; premier et troisième couplages du troisième ordre, deuxième ouvert, le dépôt observé, il propose et n'applique jamais. Point d'entrée : [`specs/observatoire/SKILL.md`](specs/observatoire/SKILL.md).
 
 ### D1 : Inscription et relevé (active)
 
@@ -1293,6 +1293,14 @@ Observatoire de l'écosystème Agent2Prompt, sur le poste : relève les journaux
 | Invariant | Énoncé | Repris dans |
 |---|---|---|
 | **D12.INV-1** | les révisions des constitutions se comptent par système : publications, par sens, première, neutre, renforcement, relâchement, entrées relâchées, lues dans la mesure de chaque publication, examens, par avis, favorable, réservé, défavorable, et le nombre d'instances ; une enveloppe de révision ne fait ni retour, ni récurrence, ni candidat, et la confrontation des révisions ne propose rien. | `revisions` |
+
+### D13 : Le dépôt observé (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D13.INV-1** | le dépôt s'observe hors ligne, sans jeton : la commande `depot` ne lit que l'historique Git de la branche courante du clone, en premier parent, et son `CHANGELOG.md` ; elle n'écrit rien, ni journal, ni enveloppe, ni proposition, ne touche pas au magasin, et ses comptes se recalculent à chaque appel. | `depot` |
+| **D13.INV-2** | seule une fusion par merge commit, de sujet « Merge pull request #N from … », est une pull request ; son délai court de la date du plus ancien de ses commits à celle de sa fusion, et ses reprises sont ses commits au-delà du premier ; une pull request de branche `docs/ratification-<n>` est la consignation de la n° n, qui compte pour elle et jamais comme une de plus, et son délai court de la fusion de la n° n à la sienne ; une pull request fusionnée après la dernière consignée, sans consignation, est en attente. | `depot` |
+| **D13.INV-3** | un compte ne se devine pas : les points hors plan d'une pull request se lisent dans sa ligne « Décisions ratifiées » du CHANGELOG, la plus récente, quand elle dit leur nombre, sinon ils restent inconnus, hors des comptes ; les refus de la CI, que l'historique ne garde pas, se déclarent non mesurés ; le dépôt observé ne fait aucun candidat. | `depot` |
 
 ## orchestrateur-c7e 3.8.7
 
