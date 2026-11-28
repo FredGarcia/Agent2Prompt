@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Observatoire de l'écosystème Agent2Prompt (observatoire 1.6.0) : le premier couplage du troisième ordre,
+// Observatoire de l'écosystème Agent2Prompt (observatoire 1.7.0) : le premier couplage du troisième ordre,
 // entre systèmes (EVOLUTION.md, section 10.3), et la boucle du troisième, avec les valeurs. Il se lance depuis le
 // clone du dépôt, sur le poste.
 //
@@ -13,9 +13,11 @@
 // minimisées dans observatoire/propositions/, que le développeur apporte au dépôt par une pull request, et suit
 // l'effet de celles que la ratification a fait entrer dans une version. Il contrôle les examens indépendants,
 // dans observatoire/examens/, qu'écrivent des observateurs sur un autre modèle : une proposition ne se ratifie
-// qu'avec le sien. Il propose et n'applique jamais : il ne modifie aucune spécification, n'écrit aucun examen,
-// ne commite ni ne publie. Il ne lit des instances que leurs enveloppes : jamais
-// leur sel ; l'export du binôme, qui agit à la source, est un outil à part, export-binome.mjs.
+// qu'avec le sien. Il lit enfin la gouvernance du dépôt lui-même, dans son historique Git et son CHANGELOG :
+// délais de ratification et de consignation, reprises des pull requests, points hors plan ratifiés (D13). Il
+// propose et n'applique jamais : il ne modifie aucune spécification, n'écrit aucun examen, ne commite ni ne
+// publie. Il ne lit des instances que leurs enveloppes : jamais leur sel ; l'export du binôme, qui agit à la
+// source, est un outil à part, export-binome.mjs.
 //
 // Usage, depuis le clone :
 //   node specs/observatoire/outils/observatoire.mjs inscrire --projet <dossier>
@@ -24,10 +26,11 @@
 //   node specs/observatoire/outils/observatoire.mjs confronter [--json]
 //   node specs/observatoire/outils/observatoire.mjs proposer [--date AAAA-MM-JJ]
 //   node specs/observatoire/outils/observatoire.mjs suivre [--json]
+//   node specs/observatoire/outils/observatoire.mjs depot [--depuis AAAA-MM-JJ] [--json]
 //   node specs/observatoire/outils/observatoire.mjs verifier
-// etat, confronter, proposer et suivre relèvent d'abord les projets inscrits. Codes de sortie : 0 ; 1 pour un
-// refus, un journal altéré ou un magasin altéré ; 2 pour un usage incorrect. Node 20 ou plus récent, modules
-// natifs uniquement.
+// etat, confronter, proposer et suivre relèvent d'abord les projets inscrits ; depot ne lit que l'historique Git
+// et le CHANGELOG du clone. Codes de sortie : 0 ; 1 pour un refus, un journal altéré ou un magasin altéré ; 2
+// pour un usage incorrect. Node 20 ou plus récent, modules natifs uniquement.
 
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
@@ -116,6 +119,8 @@ const lireJson = (chemin) => {
 };
 const parCodePoint = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
 const pluriel = (n, mot) => `${n} ${mot}${n > 1 ? 's' : ''}`;
+/** Un compte et son nom accordé, quand le pluriel n'est pas un « s » au bout. */
+const accord = (n, un, plusieurs) => `${n} ${n > 1 ? plusieurs : un}`;
 const teteDe = (journal) => journal.replace(/\.jsonl$/, '.tete');
 const court = (instance) => instance.slice(0, 8);
 export const sha256 = (texte) => createHash('sha256').update(texte, 'utf8').digest('hex');
@@ -1032,6 +1037,111 @@ export function verifier({ magasin = magasinParDefaut(), depot = RACINE } = {}) 
 
 // ---- Ligne de commande ----
 
+// ---- D13 : le dépôt observé ----
+
+const FUSION_PR = /^Merge pull request #(\d+) from [^/\s]+\/(\S+)$/;
+const CONSIGNATION = /^docs\/ratification-(\d+)$/;
+const RATIFIEES = /^- Décisions ratifiées \(pull request n° (\d+)\) : (.*)$/;
+const NOMBRES = {
+  un: 1, une: 1, deux: 2, trois: 3, quatre: 4, cinq: 5, six: 6, sept: 7, huit: 8, neuf: 9, dix: 10, onze: 11, douze: 12, treize: 13,
+  quatorze: 14, quinze: 15, seize: 16, 'dix-sept': 17, 'dix-huit': 18, 'dix-neuf': 19, vingt: 20,
+};
+const enUtc = (date) => new Date(date).toISOString().replace(/\.\d{3}Z$/, 'Z');
+const secondes = (avant, apres) => Math.round((Date.parse(apres) - Date.parse(avant)) / 1000);
+/**
+ * Points hors plan qu'une ligne « Décisions ratifiées » du CHANGELOG dit ratifiés : « les huit points au-delà du
+ * plan », « les quatre précisions … », « le point … », « aucun point … ». `null` quand elle ne dit pas son nombre :
+ * il ne se devine pas (D13.INV-2).
+ */
+export function pointsHorsPlan(texte) {
+  if (/^aucun(?:e)? (?:point|précision)\b/.test(texte)) return 0;
+  if (/^(?:le|son|la|sa) (?:point|précision)\b/.test(texte)) return 1;
+  const m = /^(?:les|ses) ([a-z-]+|\d+) (?:points|précisions)\b/.exec(texte);
+  if (!m) return null;
+  return /^\d+$/.test(m[1]) ? Number(m[1]) : NOMBRES[m[1]] ?? null;
+}
+
+/**
+ * Le dépôt observé (D13) : sa gouvernance lue dans son historique Git et son CHANGELOG, hors ligne, sans jeton.
+ * Pour chaque pull request fusionnée par merge commit sur la branche courante, en premier parent : le délai du
+ * plus ancien de ses commits à sa fusion, ses reprises, commits au-delà du premier, les points hors plan que sa
+ * ligne « Décisions ratifiées » du CHANGELOG dit ratifiés, et le délai de sa consignation, pull request de branche
+ * `docs/ratification-<n>`, qui compte pour la n° n et non comme une de plus (D13.INV-2). Une autre fusion, un
+ * commit direct ou une fusion sans commit propre ne se comptent pas. Des comptes, médiane et maximum, recalculés à
+ * chaque appel ; rien n'est écrit ni proposé (D13.INV-1). Les refus de la CI ne laissent pas de trace dans
+ * l'historique : ils se déclarent non mesurés (D13.INV-3).
+ */
+export function observerDepot({ depot = RACINE, depuis } = {}) {
+  if (depuis !== undefined && !/^\d{4}-\d{2}-\d{2}$/.test(depuis)) return { erreurs: [`date « ${depuis} » : AAAA-MM-JJ attendu`] };
+  const git = (...args) => execFileSync('git', args, { cwd: depot, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+  const avertissements = [];
+  let fusions;
+  try {
+    if (git('rev-parse', '--is-shallow-repository').trim() === 'true') avertissements.push('clone superficiel : l\'historique est tronqué, ses comptes aussi');
+    fusions = git('log', '--first-parent', '--merges', '--format=%H%x09%P%x09%cI%x09%s', 'HEAD').split('\n').filter(Boolean).flatMap((ligne) => {
+      const [, parents, date, sujet] = ligne.split('\t');
+      const m = FUSION_PR.exec(sujet ?? '');
+      const [p1, p2] = (parents ?? '').split(' ');
+      if (!m || !p2) return [];
+      const dates = git('log', '--format=%cI', `${p1}..${p2}`).split('\n').filter(Boolean).map((d) => Date.parse(d));
+      if (dates.length === 0) return [];
+      return [{ pr: Number(m[1]), branche: m[2], fusion: enUtc(date), premier: enUtc(Math.min(...dates)), commits: dates.length }];
+    });
+  } catch {
+    return { erreurs: [`historique Git illisible dans ${depot} : un clone du dépôt est attendu`] };
+  }
+  // Les lignes « Décisions ratifiées » : la première d'une pull request compte, le CHANGELOG allant du plus récent au plus ancien.
+  const changelog = join(depot, 'CHANGELOG.md');
+  const lignes = new Map();
+  if (existsSync(changelog)) for (const l of lire(changelog).split('\n')) {
+    const m = RATIFIEES.exec(l);
+    if (m && !lignes.has(Number(m[1]))) lignes.set(Number(m[1]), m[2]);
+  }
+  const consignations = new Map();
+  for (const f of fusions) {
+    const c = CONSIGNATION.exec(f.branche);
+    if (c && !consignations.has(Number(c[1]))) consignations.set(Number(c[1]), f);
+  }
+  const toutes = fusions
+    .filter((f) => !CONSIGNATION.test(f.branche))
+    .sort((a, b) => (a.fusion < b.fusion ? -1 : a.fusion > b.fusion ? 1 : a.pr - b.pr))
+    .map((f) => {
+      const c = consignations.get(f.pr);
+      return {
+        pr: f.pr, branche: f.branche, fusion: f.fusion, commits: f.commits, reprises: f.commits - 1, delai: secondes(f.premier, f.fusion),
+        consignation: c ? { pr: c.pr, fusion: c.fusion, delai: secondes(f.fusion, c.fusion) } : null,
+        horsPlan: lignes.has(f.pr) ? pointsHorsPlan(lignes.get(f.pr)) : null,
+        ratifiee: lignes.has(f.pr),
+      };
+    });
+  // En attente : fusionnée après la dernière pull request consignée, sans consignation ; rien, si le dépôt ne consigne pas.
+  const derniere = toutes.filter((x) => x.consignation).at(-1);
+  const dedans = (x) => depuis === undefined || x.fusion.slice(0, 10) >= depuis;
+  const pullRequests = toutes.filter(dedans);
+  const delais = pullRequests.map((x) => x.delai);
+  const consignees = pullRequests.filter((x) => x.consignation);
+  const lisibles = pullRequests.filter((x) => x.horsPlan !== null);
+  return {
+    erreurs: [],
+    avertissements,
+    depuis: depuis ?? null,
+    pullRequests,
+    resume: {
+      pullRequests: pullRequests.length,
+      delai: { mediane: mediane(delais), maximum: delais.length > 0 ? Math.max(...delais) : null },
+      reprises: { pullRequests: pullRequests.filter((x) => x.reprises > 0).length, commits: pullRequests.reduce((s, x) => s + x.reprises, 0) },
+      horsPlan: { points: lisibles.reduce((s, x) => s + x.horsPlan, 0), mediane: mediane(lisibles.map((x) => x.horsPlan)), lisibles: lisibles.length, lignes: pullRequests.filter((x) => x.ratifiee).length },
+      consignation: {
+        nombre: consignees.length,
+        mediane: mediane(consignees.map((x) => x.consignation.delai)),
+        maximum: consignees.length > 0 ? Math.max(...consignees.map((x) => x.consignation.delai)) : null,
+        enAttente: derniere ? toutes.filter((x) => !x.consignation && x.fusion > derniere.fusion && dedans(x)).map((x) => x.pr) : [],
+      },
+      refusCi: 'non mesurés',
+    },
+  };
+}
+
 const USAGE = [
   'Usage, depuis le clone :',
   '  node specs/observatoire/outils/observatoire.mjs inscrire --projet <dossier>',
@@ -1040,10 +1150,11 @@ const USAGE = [
   '  node specs/observatoire/outils/observatoire.mjs confronter [--json]',
   '  node specs/observatoire/outils/observatoire.mjs proposer [--date AAAA-MM-JJ]',
   '  node specs/observatoire/outils/observatoire.mjs suivre [--json]',
+  '  node specs/observatoire/outils/observatoire.mjs depot [--depuis AAAA-MM-JJ] [--json]',
   '  node specs/observatoire/outils/observatoire.mjs verifier',
 ].join('\n');
 
-const OPTIONS = { inscrire: ['--projet'], relever: [], etat: ['--json'], confronter: ['--json'], proposer: ['--date'], suivre: ['--json'], verifier: [] };
+const OPTIONS = { inscrire: ['--projet'], relever: [], etat: ['--json'], confronter: ['--json'], proposer: ['--date'], suivre: ['--json'], depot: ['--depuis', '--json'], verifier: [] };
 /** Une durée en secondes, lisible : secondes, minutes, ou heures à une décimale. */
 const duree = (s) => (s < 60 ? `${s} s` : s < 3600 ? `${Math.round(s / 60)} min` : `${(s / 3600).toFixed(1).replace('.', ',')} h`);
 const EFFETS = { observe: 'effet observé', 'non-observe': 'effet non observé', indecidable: 'indécidable, moins de vingt enveloppes d\'un côté' };
@@ -1142,6 +1253,22 @@ export function principal(argv, sortie = console.log, erreur = console.error, co
     for (const f of r.ecrites) sortie(`écrite : ${f} ; à relire, compléter et apporter par une pull request`);
     for (const i of r.ignorees) sortie(`ignorée : ${i.candidat}, ${i.raison}`);
     if (r.ecrites.length === 0 && r.ignorees.length === 0 && r.erreurs.length === 0) sortie('aucun candidat : rien à proposer');
+    return rendre(r);
+  }
+  if (commande === 'depot') {
+    const r = observerDepot({ depot: lieux.depot, depuis: options.depuis });
+    if (r.erreurs.length > 0) return rendre(r);
+    if (options.json) sortie(JSON.stringify(r, null, 2));
+    else {
+      const x = r.resume;
+      const h = (s) => (s === null ? '—' : duree(s));
+      sortie(`dépôt : ${accord(x.pullRequests, 'pull request fusionnée', 'pull requests fusionnées')}${r.depuis ? ` depuis le ${r.depuis}` : ''}, hors consignations`);
+      sortie(`  délai du premier commit à la fusion : médiane ${h(x.delai.mediane)}, maximum ${h(x.delai.maximum)}`);
+      sortie(`  reprises : ${accord(x.reprises.pullRequests, 'pull request reprise', 'pull requests reprises')}, ${accord(x.reprises.commits, 'commit de plus', 'commits de plus')}`);
+      sortie(`  points hors plan ratifiés : ${x.horsPlan.points}${x.horsPlan.mediane === null ? '' : `, médiane ${x.horsPlan.mediane}`}, lus sur ${x.horsPlan.lisibles} des ${accord(x.horsPlan.lignes, 'ligne « Décisions ratifiées »', 'lignes « Décisions ratifiées »')}`);
+      sortie(`  consignations : ${x.consignation.nombre}, délai médian ${h(x.consignation.mediane)}, maximum ${h(x.consignation.maximum)} ; en attente : ${x.consignation.enAttente.length > 0 ? x.consignation.enAttente.map((n) => `#${n}`).join(', ') : 'aucune'}`);
+      sortie('  refus de la CI : non mesurés, l\'historique Git ne les garde pas');
+    }
     return rendre(r);
   }
   if (commande === 'suivre') {

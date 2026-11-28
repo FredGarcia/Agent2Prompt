@@ -50,6 +50,12 @@
  *   d'entrée, et aucune autre : sa nature dans la liste ; pour un effet sur des personnes, un signal, un statut
  *   de la liste, un lieu, invariant défini ou fichier du dépôt, sauf pour un signal non mesuré, et ce avec quoi il
  *   se lit ; pour une autre nature, aucun signal (règle 6 de la section 10.5) ;
+ * - le tableau de viabilité d'`EVOLUTION.md`, section 10.8, a une ligne par couplage de la section 10.3, dans
+ *   l'ordre, puis le dépôt lui-même : une boucle décrite, un statut de la liste ; pour une ligne prouvée ou
+ *   partielle, des preuves, chacune un invariant défini, préfixé par sa spécification, dont la ligne de recette
+ *   cite des tests qui existent sous ces titres ; pour une ligne non couverte, aucune ; pour une ligne partielle
+ *   ou non couverte, ce qui manque (règle 8) ; la lecture 7E de la section 6 a sa colonne « Au troisième ordre »,
+ *   une ligne par phase ;
  * - chaque proposition de l'observatoire, dans `observatoire/propositions/`, suit le format
  *   `observatoire.proposition/1` (spécification `observatoire`, module `propositions`) : rien que des valeurs
  *   minimisées ; le magasin local de l'observatoire, lui, reste sur le poste et n'est pas vérifié ici ;
@@ -583,6 +589,9 @@ function verifierSpec(dossier) {
 // Catalogue des signaux du deuxième couplage (EVOLUTION.md, section 10.6 ; règle 6 de la section 10.5).
 const NATURES_DE_CLAUSE = ['effet sur des personnes', 'structure du second ordre', "effet sur l'observateur", "précaution d'observateur"];
 const STATUTS_DE_SIGNAL = ['exporté', 'mesuré', 'disponible', 'non mesuré'];
+// Statuts du tableau de viabilité d'EVOLUTION.md, section 10.8, et phases de l'Axiome 7E, dans l'ordre de la section 6.
+const STATUTS_DE_VIABILITE = ['prouvé', 'partiel', 'non couvert'];
+const PHASES_7E = ['Éléments', 'Espace', 'Engendrent', 'État', 'Expression', 'Évolutif', 'Environnement'];
 const CLAUSE = /^Clause de second ordre : /m;
 
 /**
@@ -662,6 +671,122 @@ function verifierCatalogue() {
   }
   for (const nom of clauses) if (!vues.has(nom)) erreur(`${nom} : sa clause de second ordre n'a pas de ligne`);
   return vues.size;
+}
+
+/** Les tests que cite la ligne de recette d'un invariant, dans les modules ou le point d'entrée de sa spécification : [{ fichier, titre }], ou null. */
+function recetteDe(nom, id) {
+  const dossier = join(dossierSpecs, nom);
+  const fichiers = [join(dossier, 'SKILL.md'), ...(existsSync(join(dossier, 'modules')) ? fichiersMarkdown(join(dossier, 'modules')) : [])];
+  for (const chemin of fichiers.filter((f) => existsSync(f))) {
+    const ligne = lire(chemin).split('\n').find((l) => l.startsWith(`| ${id} |`) && l.includes('`tests/'));
+    if (!ligne) continue;
+    const titres = [];
+    let fichier = null;
+    for (const m of ligne.matchAll(/`(tests\/[a-z0-9-]+\.test\.mjs)`|« ([^»]+?) »/g)) {
+      if (m[1]) fichier = m[1];
+      else if (fichier) titres.push({ fichier, titre: m[2] });
+    }
+    return titres;
+  }
+  return null;
+}
+
+/**
+ * Le tableau de viabilité d'EVOLUTION.md, section 10.8 (règle 8), et la colonne « Au troisième ordre » de la lecture
+ * 7E de la section 6. Rend le bilan, ou null si le tableau manque.
+ */
+function verifierViabilite() {
+  const erreur = (message) => erreurs.push(`EVOLUTION.md : viabilité des couplages : ${message}`);
+  const chemin = join(racine, 'EVOLUTION.md');
+  if (!existsSync(chemin)) return null;
+  const texte = lire(chemin);
+  const section = (titre) => new RegExp(`^${titre} [^\\n]*\\n([\\s\\S]*?)(?=\\n### |\\n## |(?![\\s\\S]))`, 'm').exec(texte)?.[1] ?? null;
+  const cellules = (ligne) => ligne.slice(1, -1).split('|').map((c) => c.trim());
+  const tableau = (corps, entete) => {
+    const lignes = corps.split('\n');
+    const debut = lignes.findIndex((l) => l === entete);
+    if (debut === -1) return null;
+    const rangs = [];
+    for (let i = debut + 2; i < lignes.length && lignes[i].startsWith('|'); i++) rangs.push(cellules(lignes[i]));
+    return rangs;
+  };
+  // Section 6 : chaque phase, dans l'ordre, lue aussi au troisième ordre.
+  const lecture = section('## 6\\.');
+  const phases = lecture === null ? null : tableau(lecture, '| Phase | Au niveau du dépôt | Au troisième ordre |');
+  if (phases === null) erreur('lecture 7E de la section 6 : en-tête « | Phase | Au niveau du dépôt | Au troisième ordre | » attendu');
+  else {
+    if (phases.map((c) => c[0]).join(', ') !== PHASES_7E.join(', ')) erreur(`lecture 7E de la section 6 : phases ${phases.map((c) => c[0]).join(', ')}, attendu ${PHASES_7E.join(', ')}`);
+    for (const c of phases) if (c.length !== 3 || c[2] === '' || c[2] === '—') erreur(`lecture 7E de la section 6 : ${c[0]} n'est pas lue au troisième ordre`);
+  }
+  // Section 10.8 : une ligne par couplage de la section 10.3, dans l'ordre, puis le dépôt lui-même.
+  const couplages = [...(section('### 10\\.3') ?? '').matchAll(/^(\d)\. \*\*([^*]+?)\.\*\*/gm)].map((m) => `${m[1]}. ${m[2]}`);
+  const attendues = [...couplages, 'Le dépôt lui-même'];
+  const viabilite = section('### 10\\.8');
+  if (viabilite === null) {
+    erreur('section 10.8 absente');
+    return null;
+  }
+  const lignes = tableau(viabilite, '| Couplage | Boucle | Preuves | Statut | Ce qui manque |');
+  if (lignes === null) {
+    erreur('tableau absent : en-tête « | Couplage | Boucle | Preuves | Statut | Ce qui manque | »');
+    return null;
+  }
+  const noms = lignes.map((c) => c[0]);
+  if (noms.join(' ; ') !== attendues.join(' ; ')) erreur(`lignes ${noms.map((n) => `« ${n} »`).join(', ')} : une par couplage de la section 10.3, dans l'ordre, puis le dépôt, attendues : ${attendues.map((n) => `« ${n} »`).join(', ')}`);
+  const bilan = { lignes: lignes.length, prouvé: 0, partiel: 0, 'non couvert': 0, preuves: 0 };
+  for (const c of lignes) {
+    const nom = c[0];
+    if (c.length !== 5) {
+      erreur(`${nom} : cinq colonnes attendues, couplage, boucle, preuves, statut et ce qui manque`);
+      continue;
+    }
+    const [, boucle, preuves, statut, manque] = c;
+    if (boucle === '' || boucle === '—') erreur(`${nom} : boucle non décrite`);
+    if (!STATUTS_DE_VIABILITE.includes(statut)) {
+      erreur(`${nom} : statut « ${statut} », hors de la liste : ${STATUTS_DE_VIABILITE.join(', ')}`);
+      continue;
+    }
+    bilan[statut]++;
+    if (statut !== 'prouvé' && (manque === '' || manque === '—')) erreur(`${nom} : ${statut}, sans dire ce qui manque`);
+    if (statut === 'non couvert') {
+      if (preuves !== '—') erreur(`${nom} : non couvert, sans preuve, « — »`);
+      continue;
+    }
+    if (preuves === '' || preuves === '—') {
+      erreur(`${nom} : ${statut}, sans preuve`);
+      continue;
+    }
+    for (const preuve of preuves.split(/,\s*/)) {
+      const m = /^`([a-z][a-z0-9-]*):((?:D|SC|SO|SA)\d+\.INV-\d+)`$/.exec(preuve);
+      if (!m) {
+        erreur(`${nom} : preuve « ${preuve} », un invariant préfixé par sa spécification attendu`);
+        continue;
+      }
+      const reference = `${m[1]}:${m[2]}`;
+      if (!definitionsDe(m[1])?.has(m[2])) {
+        erreur(`${nom} : preuve ${reference}, invariant qui n'est pas défini`);
+        continue;
+      }
+      const tests = recetteDe(m[1], m[2]);
+      if (!tests || tests.length === 0) {
+        erreur(`${nom} : preuve ${reference}, sans ligne de recette qui cite ses tests`);
+        continue;
+      }
+      let prouvee = true;
+      for (const { fichier, titre } of tests) {
+        const source = join(dossierSpecs, m[1], fichier);
+        if (!existsSync(source)) {
+          erreur(`${nom} : preuve ${reference}, ${fichier} absent`);
+          prouvee = false;
+        } else if (!lire(source).replace(/\\'/g, '\'').includes(titre)) {
+          erreur(`${nom} : preuve ${reference}, aucun test « ${titre} » dans ${fichier}`);
+          prouvee = false;
+        }
+      }
+      if (prouvee) bilan.preuves++;
+    }
+  }
+  return bilan;
 }
 
 /** Le README affiche chaque spécification à sa version courante, et ses liens aboutissent. */
@@ -905,6 +1030,9 @@ const readmeAJour = verifierReadme(specs);
 const avantCatalogue = erreurs.length;
 const clausesCataloguees = verifierCatalogue();
 const catalogueAJour = erreurs.length === avantCatalogue;
+const avantViabilite = erreurs.length;
+const viabilite = verifierViabilite();
+const viabiliteAJour = viabilite !== null && erreurs.length === avantViabilite;
 // Glossaire : il doit être exactement celui que génère tools/glossaire.mjs.
 let glossaireAJour = false;
 if (!existsSync(CHEMIN_GLOSSAIRE)) erreurs.push('glossaire.md : absent, lancer node tools/glossaire.mjs');
@@ -942,6 +1070,10 @@ for (const { bilan } of specs) console.log(`ok  ${bilan}`);
 if (readmeAJour) console.log('ok  README.md à jour');
 if (glossaireAJour) console.log('ok  glossaire.md à jour');
 if (catalogueAJour) console.log(`ok  EVOLUTION.md : catalogue des signaux, ${clausesCataloguees} clauses de second ordre classées`);
+if (viabiliteAJour) {
+  const accord = (n, mot) => `${n} ${mot}${n > 1 ? 's' : ''}`;
+  console.log(`ok  EVOLUTION.md : viabilité des couplages, ${accord(viabilite.lignes, 'ligne')}, ${accord(viabilite['prouvé'], 'prouvée')}, ${accord(viabilite.partiel, 'partielle')}, ${viabilite['non couvert']} non couverte${viabilite['non couvert'] > 1 ? 's' : ''} ; ${accord(viabilite.preuves, 'preuve')} testée${viabilite.preuves > 1 ? 's' : ''} ; lecture 7E au troisième ordre`);
+}
 if (propositionsConformes) console.log(`ok  ${PROPOSITIONS}/ : ${propositions.propositions.length} proposition${propositions.propositions.length > 1 ? 's' : ''} au format observatoire.proposition/1`);
 if (examensConformes) console.log(`ok  ${EXAMENS}/ : ${examens.examens.length} examen${examens.examens.length > 1 ? 's' : ''} au format observatoire.examen/1 ; chaque proposition ratifiée a le sien`);
 if (formesConformes) {

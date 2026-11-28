@@ -1,11 +1,12 @@
-// Recette de l'observatoire (observatoire 1.6.0, D1 à D6, D8 à D12), sur des instances d'épreuve dont les journaux
+// Recette de l'observatoire (observatoire 1.7.0, D1 à D6, D8 à D13), sur des instances d'épreuve dont les journaux
 // sont produits par l'export du générateur de skills de ticket : A, le champ de l'arbre d'exemple ABCDE-3620
 // et un registre d'apprentissage dont une proposition, qui vise le générateur, est retenue ; B et C, des
 // champs écrits pour l'épreuve ; pour la confrontation entre systèmes, par l'export de l'orchestrateur C7E,
 // depuis un registre des écarts commité dans ces projets ; et, pour la confrontation de l'acceptable, par
 // l'export du binôme, depuis des livrables d'Agent2Dev et des journaux de tests d'Agent2Test écrits pour
 // l'épreuve, avec leurs refus et, pour la confrontation des kits et des signaux, leurs kits et leurs points de
-// validation ; et, pour l'examen indépendant, des propositions et des examens écrits pour l'épreuve. Le magasin
+// validation ; et, pour l'examen indépendant, des propositions et des examens écrits pour l'épreuve ; pour le
+// dépôt observé, un historique d'épreuve de pull requests et de consignations, avec son CHANGELOG. Le magasin
 // et le dépôt d'épreuve sont temporaires : la recette n'écrit ni dans le répertoire Git commun du clone, ni dans
 // ses propositions, ni dans ses examens.
 
@@ -15,7 +16,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { appendFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, relative, sep } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { clore, decider, noter, proposer as proposerAuRegistre } from '../../generateur-skill-ticket/outils/apprentissage.mjs';
 import { FORMAT, canonique as canoniqueChamp } from '../../generateur-skill-ticket/outils/champ.mjs';
 import { exporter } from '../../generateur-skill-ticket/outils/observation.mjs';
@@ -23,7 +24,7 @@ import { exporter as exporterOrchestrateur } from '../../orchestrateur-c7e/outil
 import { exporter as exporterBinome } from '../outils/export-binome.mjs';
 import {
   EXAMENS, MAGASIN, PROPOSITIONS, SEUIL_ENVELOPPES, canonique, confronter, controlerEnveloppe, controlerExamen, controlerProposition, controlerRatifications, etat,
-  inscrire, lireExamens, lirePropositions, magasinParDefaut, principal, proposer, relever, repertoireGitCommun, sha256, suivre, verifier,
+  inscrire, lireExamens, lirePropositions, magasinParDefaut, observerDepot, pointsHorsPlan, principal, proposer, relever, repertoireGitCommun, sha256, suivre, verifier,
 } from '../outils/observatoire.mjs';
 
 const ICI = dirname(fileURLToPath(import.meta.url));
@@ -839,6 +840,137 @@ test('D5 : l\'effet d\'une proposition ratifiée se mesure avant et après sa ve
   exporterInstance(b2, 'B', '1.4.0');
   const s2 = suivi(lieux2, fichier2);
   assert.deepStrictEqual([s2.effet, s2.apres], ['non-observe', { motif: 5, enveloppes: 20 }], 'cinq sur vingt après, quatre sur vingt-six avant : la part du motif monte');
+});
+
+// ---- D13 : le dépôt observé ----
+
+const ARBITRE = ['user.name', 'Epreuve', 'user.email', 'epreuve@exemple.invalid', 'commit.gpgsign', 'false', 'core.autocrlf', 'false'];
+const datee = (iso) => ({ ...process.env, GIT_AUTHOR_DATE: `${iso} +0000`, GIT_COMMITTER_DATE: `${iso} +0000` });
+/** Un commit daté sur la branche courante, qui ajoute une ligne au CHANGELOG. */
+const commiter = (d, iso, message, ligne = `<!-- ${message} -->`) => {
+  appendFileSync(join(d, 'CHANGELOG.md'), `${ligne}\n`);
+  git(d, 'add', 'CHANGELOG.md');
+  execFileSync('git', ['commit', '-q', '-m', message], { cwd: d, env: datee(iso), stdio: 'ignore' });
+};
+/** Une pull request : sa branche, partie de la branche principale, ses commits, puis sa fusion par merge commit. */
+const pullRequest = (d, n, branche, commits, fusion, sujet = `Merge pull request #${n} from Epreuve/${branche}`) => {
+  git(d, 'checkout', '-q', '-b', branche, 'principale');
+  for (const [iso, message, ligne] of commits) commiter(d, iso, message, ligne);
+  git(d, 'checkout', '-q', 'principale');
+  execFileSync('git', ['merge', '-q', '--no-ff', '-m', sujet, '-m', 'Titre de la pull request', branche], { cwd: d, env: datee(fusion), stdio: 'ignore' });
+};
+/** La ligne du CHANGELOG qui consigne les décisions ratifiées d'une pull request. */
+const ratifiees = (n, texte) => `- Décisions ratifiées (pull request n° ${n}) : ${texte} ; le reste tel que proposé.`;
+
+/**
+ * Historique d'épreuve : #1, reprise une fois, consignée par #2, trois points hors plan ; une fusion d'une autre
+ * branche et un commit direct, qui ne comptent pas ; #3, consignée par #4, sur une ligne qui ne dit pas son nombre ;
+ * #5, sans consignation.
+ */
+function historique() {
+  const d = temporaire('historique');
+  git(d, 'init', '-q', '-b', 'principale');
+  for (let k = 0; k < ARBITRE.length; k += 2) git(d, 'config', ARBITRE[k], ARBITRE[k + 1]);
+  commiter(d, '2026-11-01T08:00:00', 'Départ', '# Journal des modifications\n');
+  pullRequest(d, 1, 'spec/a', [['2026-11-02T09:00:00', 'spec(a): version 1.0.0'], ['2026-11-02T10:00:00', 'spec(a): reprise']], '2026-11-02T11:00:00');
+  pullRequest(d, 2, 'docs/ratification-1', [['2026-11-02T12:00:00', 'docs(changelog): décisions de la pull request n° 1 ratifiées', ratifiees(1, 'les trois points au-delà du plan, un, deux et trois')]], '2026-11-02T13:30:00');
+  pullRequest(d, 0, 'essai', [['2026-11-03T08:00:00', 'essai']], '2026-11-03T08:30:00', 'Merge branch \'essai\'');
+  commiter(d, '2026-11-03T09:00:00', 'correction directe');
+  pullRequest(d, 3, 'spec/b', [['2026-11-04T09:00:00', 'spec(b): version 1.0.0']], '2026-11-04T09:30:00');
+  pullRequest(d, 4, 'docs/ratification-3', [['2026-11-04T10:00:00', 'docs(changelog): décisions de la pull request n° 3 ratifiées', ratifiees(3, 'la rédaction de la section 10')]], '2026-11-04T12:30:00');
+  pullRequest(d, 5, 'spec/c', [['2026-11-05T09:00:00', 'spec(c): version 1.0.0']], '2026-11-05T10:00:00');
+  return d;
+}
+
+test('D13 : le dépôt s\'observe dans son historique Git et son CHANGELOG, hors ligne : délais, reprises, consignations et points hors plan par pull request, sans rien écrire', () => {
+  const d = historique();
+  const r = observerDepot({ depot: d });
+  assert.deepStrictEqual([r.erreurs, r.avertissements, r.depuis], [[], [], null]);
+  assert.deepStrictEqual(r.pullRequests, [
+    { pr: 1, branche: 'spec/a', fusion: '2026-11-02T11:00:00Z', commits: 2, reprises: 1, delai: 7200, consignation: { pr: 2, fusion: '2026-11-02T13:30:00Z', delai: 9000 }, horsPlan: 3, ratifiee: true },
+    { pr: 3, branche: 'spec/b', fusion: '2026-11-04T09:30:00Z', commits: 1, reprises: 0, delai: 1800, consignation: { pr: 4, fusion: '2026-11-04T12:30:00Z', delai: 10800 }, horsPlan: null, ratifiee: true },
+    { pr: 5, branche: 'spec/c', fusion: '2026-11-05T10:00:00Z', commits: 1, reprises: 0, delai: 3600, consignation: null, horsPlan: null, ratifiee: false },
+  ], 'les consignations, la fusion d\'une autre branche et le commit direct ne sont pas des pull requests de plus ; le délai part du plus ancien commit');
+  assert.deepStrictEqual(r.resume, {
+    pullRequests: 3,
+    delai: { mediane: 3600, maximum: 7200 },
+    reprises: { pullRequests: 1, commits: 1 },
+    horsPlan: { points: 3, mediane: 3, lisibles: 1, lignes: 2 },
+    consignation: { nombre: 2, mediane: 9900, maximum: 10800, enAttente: [5] },
+    refusCi: 'non mesurés',
+  });
+  assert.equal(git(d, 'status', '--porcelain'), '', 'rien d\'écrit dans l\'arbre de travail');
+  assert.ok(!existsSync(join(d, '.git', 'agent2prompt')), 'ni magasin, ni journal');
+  assert.match(observerDepot({ depot: temporaire('hors-git') }).erreurs[0], /historique Git illisible dans .* : un clone du dépôt est attendu/);
+});
+
+test('D13 : depuis une date, seules comptent les pull requests fusionnées ce jour-là ou après ; une consignation compte pour celle qu\'elle consigne, et la dernière sans consignation est en attente', () => {
+  const d = historique();
+  const r = observerDepot({ depot: d, depuis: '2026-11-04' });
+  assert.deepStrictEqual([r.depuis, r.pullRequests.map((x) => x.pr)], ['2026-11-04', [3, 5]]);
+  assert.deepStrictEqual(r.resume.consignation, { nombre: 1, mediane: 10800, maximum: 10800, enAttente: [5] });
+  assert.deepStrictEqual(r.resume.horsPlan, { points: 0, mediane: null, lisibles: 0, lignes: 1 }, 'seules comptent les lignes des pull requests retenues');
+  const vide = observerDepot({ depot: d, depuis: '2026-11-06' }).resume;
+  assert.deepStrictEqual([vide.pullRequests, vide.delai, vide.horsPlan.mediane, vide.consignation], [0, { mediane: null, maximum: null }, null, { nombre: 0, mediane: null, maximum: null, enAttente: [] }]);
+  // Consignée à son tour, #5 n'est plus en attente, et sa consignation ne compte pas comme une pull request de plus.
+  pullRequest(d, 6, 'docs/ratification-5', [['2026-11-05T10:30:00', 'docs(changelog): décisions de la pull request n° 5 ratifiées', ratifiees(5, 'aucun point au-delà du plan')]], '2026-11-05T11:00:00');
+  const apres = observerDepot({ depot: d });
+  assert.deepStrictEqual([apres.resume.pullRequests, apres.resume.consignation.enAttente, apres.pullRequests.at(-1).consignation, apres.pullRequests.at(-1).horsPlan], [3, [], { pr: 6, fusion: '2026-11-05T11:00:00Z', delai: 3600 }, 0]);
+  // Une pull request fusionnée après la dernière consignée attend ; un dépôt qui ne consigne pas n'a rien en attente.
+  pullRequest(d, 7, 'spec/d', [['2026-11-06T09:00:00', 'spec(d): version 1.0.0']], '2026-11-06T09:10:00');
+  assert.deepStrictEqual(observerDepot({ depot: d }).resume.consignation.enAttente, [7]);
+  const sans = temporaire('sans-consignation');
+  git(sans, 'init', '-q', '-b', 'principale');
+  for (let k = 0; k < ARBITRE.length; k += 2) git(sans, 'config', ARBITRE[k], ARBITRE[k + 1]);
+  commiter(sans, '2026-11-01T08:00:00', 'Départ');
+  pullRequest(sans, 1, 'spec/a', [['2026-11-02T09:00:00', 'spec(a): version 1.0.0']], '2026-11-02T09:05:00');
+  assert.deepStrictEqual(observerDepot({ depot: sans }).resume.consignation, { nombre: 0, mediane: null, maximum: null, enAttente: [] });
+});
+
+test('D13 : un nombre de points hors plan que sa ligne ne dit pas reste inconnu, hors des comptes ; les refus de la CI sont non mesurés', () => {
+  const lus = [
+    ['les huit points au-delà du plan, un, deux', 8], ['les quatre précisions apparues à la réalisation', 4], ['les dix-sept points au-delà du plan', 17], ['les 12 points au-delà du plan', 12],
+    ['le point au-delà du plan, un seul', 1], ['aucun point au-delà du plan', 0], ['la rédaction de la section 10', null], ['les nombreux points au-delà du plan', null], ['les vingt et un points', null], ['noms sans préfixe', null],
+  ];
+  for (const [texte, attendu] of lus) assert.equal(pointsHorsPlan(texte), attendu, texte);
+  const d = historique();
+  const r = observerDepot({ depot: d });
+  assert.deepStrictEqual([r.pullRequests[1].horsPlan, r.resume.horsPlan, r.resume.refusCi], [null, { points: 3, mediane: 3, lisibles: 1, lignes: 2 }, 'non mesurés']);
+  // Une ligne plus récente, en tête du CHANGELOG, dit le nombre : c'est elle qui compte.
+  writeFileSync(join(d, 'CHANGELOG.md'), `${ratifiees(3, 'les deux points au-delà du plan')}\n${readFileSync(join(d, 'CHANGELOG.md'), 'utf8')}`);
+  assert.deepStrictEqual(observerDepot({ depot: d }).resume.horsPlan, { points: 5, mediane: 3, lisibles: 2, lignes: 2 });
+  // Sans CHANGELOG, aucune ligne : rien n'est ratifié, rien ne se devine.
+  rmSync(join(d, 'CHANGELOG.md'));
+  assert.deepStrictEqual(observerDepot({ depot: d }).resume.horsPlan, { points: 0, mediane: null, lisibles: 0, lignes: 0 });
+});
+
+test('D13 : la commande depot rend ses comptes en six lignes, ou en JSON, sur l\'historique seul ; une date mal formée est refusée, un clone superficiel signalé', () => {
+  const d = historique();
+  const contexte = { magasin: join(temporaire('magasin'), MAGASIN), depot: d };
+  assert.deepStrictEqual(lancer(contexte, 'depot'), {
+    code: 0,
+    sortie: [
+      'dépôt : 3 pull requests fusionnées, hors consignations',
+      '  délai du premier commit à la fusion : médiane 1,0 h, maximum 2,0 h',
+      '  reprises : 1 pull request reprise, 1 commit de plus',
+      '  points hors plan ratifiés : 3, médiane 3, lus sur 1 des 2 lignes « Décisions ratifiées »',
+      '  consignations : 2, délai médian 2,8 h, maximum 3,0 h ; en attente : #5',
+      '  refus de la CI : non mesurés, l\'historique Git ne les garde pas',
+    ].join('\n'),
+    erreur: '',
+  });
+  assert.match(lancer(contexte, 'depot', '--depuis', '2026-11-06').sortie, /^dépôt : 0 pull request fusionnée depuis le 2026-11-06, hors consignations\n {2}délai du premier commit à la fusion : médiane —, maximum —\n/);
+  assert.deepStrictEqual(JSON.parse(lancer(contexte, 'depot', '--json').sortie).resume.consignation.enAttente, [5]);
+  assert.equal(lancer(contexte, 'depot', '--depuis').code, 2);
+  assert.equal(lancer(contexte, 'depot', '--projet', d).code, 2);
+  assert.deepStrictEqual(lancer(contexte, 'depot', '--depuis', '2026-11-4'), { code: 1, sortie: '', erreur: 'REFUS  date « 2026-11-4 » : AAAA-MM-JJ attendu' });
+  assert.equal(lancer({ ...contexte, depot: temporaire('hors-git') }, 'depot').code, 1);
+  assert.ok(!existsSync(contexte.magasin), 'le magasin n\'est pas créé');
+  const superficiel = join(temporaire('superficiel'), 'clone');
+  execFileSync('git', ['clone', '-q', '--depth', '1', pathToFileURL(d).href, superficiel], { stdio: 'ignore' });
+  const s = lancer({ ...contexte, depot: superficiel }, 'depot');
+  assert.equal(s.code, 0);
+  assert.equal(s.erreur, 'ATTENTION  clone superficiel : l\'historique est tronqué, ses comptes aussi');
 });
 
 // ---- Ligne de commande ----

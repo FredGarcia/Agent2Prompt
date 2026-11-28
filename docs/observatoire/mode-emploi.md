@@ -1,6 +1,6 @@
 # Mode d'emploi : l'observatoire
 
-Ce mode d'emploi met en place l'observatoire de l'écosystème, [`observatoire`](../../specs/observatoire/SKILL.md) 1.6.0, sur le poste du développeur. L'observatoire relève les journaux d'enveloppes que les systèmes exportent dans ses projets, dont ceux qu'il écrit pour le binôme Agent2Dev et Agent2Test à partir de leurs refus, de leurs kits, de leurs décisions aux points de validation et des révisions de leurs constitutions, les confronte d'une instance à l'autre, d'un système à l'autre par les invariants du dépôt que citent leurs écarts, et par règle de l'acceptable que citent les refus, compte les kits, les signaux et les révisions, observe l'état de l'écosystème, écrit des propositions minimisées que le développeur apporte au dépôt par pull request, contrôle l'examen indépendant qui précède chaque ratification, et suit l'effet de celles que la ratification fait entrer dans une version. Il propose et n'applique jamais ; ce qu'il relève reste sur le poste.
+Ce mode d'emploi met en place l'observatoire de l'écosystème, [`observatoire`](../../specs/observatoire/SKILL.md) 1.7.0, sur le poste du développeur. L'observatoire relève les journaux d'enveloppes que les systèmes exportent dans ses projets, dont ceux qu'il écrit pour le binôme Agent2Dev et Agent2Test à partir de leurs refus, de leurs kits, de leurs décisions aux points de validation et des révisions de leurs constitutions, les confronte d'une instance à l'autre, d'un système à l'autre par les invariants du dépôt que citent leurs écarts, et par règle de l'acceptable que citent les refus, compte les kits, les signaux et les révisions, observe l'état de l'écosystème, écrit des propositions minimisées que le développeur apporte au dépôt par pull request, contrôle l'examen indépendant qui précède chaque ratification, et suit l'effet de celles que la ratification fait entrer dans une version. Il compte aussi la gouvernance du dépôt lui-même, dans son historique Git et son CHANGELOG, avant chaque plan de jalon. Il propose et n'applique jamais ; ce qu'il relève reste sur le poste.
 
 ```mermaid
 flowchart LR
@@ -13,6 +13,7 @@ flowchart LR
   P --> X["examen indépendant<br/>observatoire/examens/"]
   X --> PR["pull request<br/>ratification"]
   PR --> S["suivre<br/>effet après la version"]
+  PR --> G["depot<br/>gouvernance du dépôt, avant chaque plan"]
 ```
 
 ## 1. Prérequis
@@ -26,7 +27,7 @@ flowchart LR
 node <dépôt>/tools/installer.mjs observatoire --utilisateur
 ```
 
-Le skill s'installe au niveau utilisateur seulement, dans `~/.gemini/skills/observatoire/` : il observe plusieurs projets depuis le clone, sans écrire dans aucun. Il sert à l'IA qui t'aide à lire ce que l'observatoire tire et à rédiger les propositions. Sa transmission porte sa consigne, ses modules et le socle d'observation ; ses outils restent dans le clone : [`transmissions/observatoire-1.5.0.md`](../../transmissions/observatoire-1.5.0.md). L'outil se lance aussi sans IA, depuis le clone.
+Le skill s'installe au niveau utilisateur seulement, dans `~/.gemini/skills/observatoire/` : il observe plusieurs projets depuis le clone, sans écrire dans aucun. Il sert à l'IA qui t'aide à lire ce que l'observatoire tire et à rédiger les propositions. Sa transmission porte sa consigne, ses modules et le socle d'observation ; ses outils restent dans le clone : [`transmissions/observatoire-1.7.0.md`](../../transmissions/observatoire-1.7.0.md). L'outil se lance aussi sans IA, depuis le clone.
 
 ## 3. Exporter les refus, les kits, les points et les révisions du binôme, inscrire et relever
 
@@ -67,16 +68,25 @@ node specs/observatoire/outils/observatoire.mjs suivre
 
 Pour chaque proposition ratifiée, `suivre` compare la part de son motif dans les enveloppes du système avant et après la version qui la porte : effet observé, non observé, ou indécidable tant qu'il n'y a pas vingt enveloppes de chaque côté. Pour une proposition par invariant, le motif est celui des écarts qui citent l'invariant, dans les enveloppes de la spécification qui le définit, quand elle exporte ; pour une proposition par faux refus, celui des faux refus qui citent la règle. Le socle de l'acceptable n'exporte pas : l'effet d'une proposition sur une règle du noyau reste indécidable.
 
-## 6. Recette et essais sur le poste
+## 6. Compter la gouvernance du dépôt
+
+```bash
+node specs/observatoire/outils/observatoire.mjs depot
+node specs/observatoire/outils/observatoire.mjs depot --depuis 2026-11-24 --json
+```
+
+Depuis le clone, avant chaque plan de jalon. `depot` lit l'historique Git de la branche courante, en premier parent, et le `CHANGELOG.md` du clone, hors ligne, sans jeton, et n'écrit rien. Pour chaque pull request fusionnée par merge commit, il compte le délai de son plus ancien commit à sa fusion, ses reprises, les commits au-delà du premier, les points hors plan que sa ligne « Décisions ratifiées » dit ratifiés, et sa consignation, la pull request de branche `docs/ratification-<n>`, avec son délai, de la fusion consignée à la sienne. Il rend la médiane et le maximum de ces délais, les pull requests reprises, les points hors plan, et les consignations en attente : une pull request fusionnée après la dernière consignée, sans consignation, attend la sienne. Une ligne « Décisions ratifiées » qui ne dit pas son nombre de points reste hors des comptes ; les refus de la CI ne se mesurent pas, l'historique ne les gardant pas. `--depuis` ne garde que les pull requests fusionnées ce jour-là ou après, `--json` rend chaque pull request et le résumé (module [`depot`](../../specs/observatoire/modules/depot/SKILL.md)).
+
+## 7. Recette et essais sur le poste
 
 ```bash
 node --test "specs/observatoire/tests/*.test.mjs"
 node specs/observatoire/outils/observatoire.mjs verifier
 ```
 
-La recette, depuis la racine du clone, produit ses instances d'épreuve par l'export du générateur, par celui de l'orchestrateur et par celui du binôme, depuis des livrables d'épreuve, dans des dossiers temporaires, avec un magasin et un dépôt temporaires : elle n'écrit ni dans le magasin du clone, ni dans ses propositions. `verifier` contrôle le magasin, les propositions et les examens du dépôt, et qu'une proposition ratifiée a son examen.
+La recette, depuis la racine du clone, produit ses instances d'épreuve par l'export du générateur, par celui de l'orchestrateur et par celui du binôme, depuis des livrables d'épreuve, et un historique d'épreuve de pull requests et de consignations, dans des dossiers temporaires, avec un magasin et un dépôt temporaires : elle n'écrit ni dans le magasin du clone, ni dans ses propositions. `verifier` contrôle le magasin, les propositions et les examens du dépôt, et qu'une proposition ratifiée a son examen.
 
-## 7. Dépannage
+## 8. Dépannage
 
 | Symptôme | Cause | Remède |
 |---|---|---|
@@ -88,6 +98,8 @@ La recette, depuis la racine du clone, produit ses instances d'épreuve par l'ex
 | `etat` compte des enveloppes écartées | une instance exporte une version qu'aucune version publiée du dépôt ne connaît | mettre le clone à jour, ou le système de l'instance à une version publiée |
 | `confronter` ne trouve aucune récurrence | une seule instance inscrite | inscrire une deuxième instance ; les retours, et les invariants relevés par deux systèmes, remontent sans elle |
 | `inscrire` dit que les journaux viennent d'instances différentes | un système du projet a exporté sous un autre sel | reprendre le journal de ce système depuis l'historique Git du projet, et exporter avec le sel du répertoire Git commun du projet |
+| `depot` dit un clone superficiel | le clone a été fait avec `--depth` | compléter l'historique, `git fetch --unshallow`, puis relancer |
+| `depot` ne compte pas une pull request | elle a été fusionnée par squash ou par rebase, sans merge commit | rien à faire : seules les fusions par merge commit se lisent |
 | `verifier` dit une proposition ratifiée sans examen | la pull request de ratification n'apporte pas l'avis de l'examinateur | faire écrire l'examen, du même nom, dans `observatoire/examens/`, et l'ajouter à la pull request |
 | `export-binome.mjs` dit qu'une révision du grand livre ne se dit pas comme dans une autre source | deux livrables ou journaux de tests portent la même entrée du grand livre, différemment | reprendre les sources telles que le binôme les a projetées : une entrée du grand livre ne change pas |
 | `export-binome.mjs` dit un relâchement sans l'examen de la même constitution | la rubrique `revisions` est incomplète ou réordonnée | reprendre le livrable tel que le binôme l'a projeté : son grand livre inscrit l'examen avec la publication qu'il permet |

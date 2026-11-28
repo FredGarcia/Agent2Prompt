@@ -45,19 +45,19 @@ function registre() {
   return new Map(lignes.slice(2).map(cellules).map((c) => [c[0], { statut: c[i('Statut')], ordre: c[i('Ordre')], module: c[i('Module')].replace(/`/g, '') }]));
 }
 
-test('spécification : version du point d\'entrée, de son titre et du manifeste ; douze dimensions actives, un module chacune, et leur ordre déclaré', () => {
+test('spécification : version du point d\'entrée, de son titre et du manifeste ; treize dimensions actives, un module chacune, et leur ordre déclaré', () => {
   assert.match(ENTREE, new RegExp(`^version: ${MANIFESTE.version.replace(/\./g, '\\.')}$`, 'm'));
   assert.match(ENTREE, new RegExp(`^# Observatoire de l'écosystème, version ${MANIFESTE.version.replace(/\./g, '\\.')}$`, 'm'));
   assert.match(ENTREE, new RegExp(`\\| ID \\| Dimension \\| Introduite \\| Statut ${MANIFESTE.version.replace(/\./g, '\\.')} \\| Ordre \\|`));
   const r = registre();
-  assert.deepStrictEqual([...r.keys()], ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8', 'D9', 'D10', 'D11', 'D12']);
-  assert.deepStrictEqual([...r.values()].map((d) => d.ordre), ['OC1', 'OC3', 'OC3', 'OC3', 'OC3', 'OC3', 'OC1', 'OC3', 'OC3', 'OC3', 'OC3', 'OC3'], 'D1 régule l\'entrée du magasin, D7 la sortie d\'une instance pour le binôme ; D2 à D6 et D8 font la boucle du troisième ordre, que D9 observe pour les kits et D10 pour les signaux, et où D11 met un examen indépendant avant la ratification, que D12 prolonge dans les instances en comptant les révisions de leurs constitutions');
+  assert.deepStrictEqual([...r.keys()], ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8', 'D9', 'D10', 'D11', 'D12', 'D13']);
+  assert.deepStrictEqual([...r.values()].map((d) => d.ordre), ['OC1', 'OC3', 'OC3', 'OC3', 'OC3', 'OC3', 'OC1', 'OC3', 'OC3', 'OC3', 'OC3', 'OC3', 'OC3'], 'D1 régule l\'entrée du magasin, D7 la sortie d\'une instance pour le binôme ; D2 à D6 et D8 font la boucle du troisième ordre, que D9 observe pour les kits et D10 pour les signaux, et où D11 met un examen indépendant avant la ratification, que D12 prolonge dans les instances en comptant les révisions de leurs constitutions ; D13 la tourne vers le dépôt lui-même');
   for (const m of MANIFESTE.modules) {
     assert.equal(m.status, 'active', m.id);
     assert.deepStrictEqual(m.dimensions.map((d) => r.get(d).module), [m.id]);
   }
-  assert.equal(DEFINITIONS.length, 21);
-  assert.deepStrictEqual(MANIFESTE.previousVersions.map((p) => p.version), ['1.0.0', '1.1.0', '1.2.0', '1.3.0', '1.4.0', '1.5.0'], 'les versions précédentes, archivées');
+  assert.equal(DEFINITIONS.length, 24);
+  assert.deepStrictEqual(MANIFESTE.previousVersions.map((p) => p.version), ['1.0.0', '1.1.0', '1.2.0', '1.3.0', '1.4.0', '1.5.0', '1.6.0'], 'les versions précédentes, archivées');
 });
 
 test('spécification : chaque invariant a sa ligne de recette dans son module, et chaque test cité existe sous ce titre', () => {
@@ -78,7 +78,7 @@ test('spécification : chaque invariant a sa ligne de recette dans son module, e
 test('spécification : l\'outil et ses commandes, tels que le point d\'entrée et la transmission les décrivent', () => {
   const outil = lire(join(SPEC, 'outils', 'observatoire.mjs'));
   const usage = [...outil.matchAll(/^\/\/ {3}node specs\/observatoire\/outils\/observatoire\.mjs ([a-z]+)/gm)].map((m) => m[1]);
-  assert.deepStrictEqual(usage, ['inscrire', 'relever', 'etat', 'confronter', 'proposer', 'suivre', 'verifier']);
+  assert.deepStrictEqual(usage, ['inscrire', 'relever', 'etat', 'confronter', 'proposer', 'suivre', 'depot', 'verifier']);
   const ligne = ENTREE.split('\n').find((l) => l.startsWith('| `observatoire.mjs` |'));
   assert.ok(ligne, 'la section 4 décrit l\'outil');
   assert.deepStrictEqual([...ligne.matchAll(/`([a-z]+)(?: [^`]*)?`/g)].map((m) => m[1]), usage, 'les mêmes commandes, dans le même ordre');
