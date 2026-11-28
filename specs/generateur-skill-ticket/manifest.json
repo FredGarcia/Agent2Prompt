@@ -1,9 +1,9 @@
 {
   "name": "generateur-skill-ticket",
-  "version": "1.4.7",
+  "version": "1.5.0",
   "specSchema": 1,
   "language": "fr",
-  "description": "Générateur de skills de ticket C7E : décompose un ticket en arbre de sous-tickets, produit pour chaque nœud un skill assemblé depuis le référentiel des méso-contrats, l'installe et le lance dans Gemini CLI ; chaque skill s'observe dans un champ partagé, et chaque niveau voit le ticket augmenté ; chaque ticket entraîne le générateur, qui propose ses évolutions au développeur ; ses observations s'exportent, minimisées, vers le socle d'observation du dépôt.",
+  "description": "Générateur de skills de ticket C7E : décompose un ticket en arbre de sous-tickets, produit pour chaque nœud un skill assemblé depuis le référentiel des méso-contrats, l'installe et le lance dans Gemini CLI ; chaque skill s'observe dans un champ partagé, et chaque niveau voit le ticket augmenté ; l'observateur d'ordre 3 peut juger sur un autre modèle que la session ; chaque ticket entraîne le générateur, qui propose ses évolutions au développeur ; ses observations s'exportent, minimisées, vers le socle d'observation du dépôt.",
   "entry": "SKILL.md",
   "shared": [
     { "path": "socle-observation/SKILL.md", "from": "specs/socle-observation/SKILL.md", "version": "1.5.0" }
@@ -30,9 +30,10 @@
     { "id": "mesure", "path": "modules/mesure/SKILL.md", "dimensions": ["D7"], "status": "active" },
     { "id": "apprentissage", "path": "modules/apprentissage/SKILL.md", "dimensions": ["D8"], "status": "active" },
     { "id": "observation", "path": "modules/observation/SKILL.md", "dimensions": ["D9"], "status": "active" },
-    { "id": "acceptable", "path": "modules/acceptable/SKILL.md", "dimensions": ["D10"], "status": "reserved" }
+    { "id": "acceptable", "path": "modules/acceptable/SKILL.md", "dimensions": ["D10"], "status": "reserved" },
+    { "id": "exterieur", "path": "modules/exterieur/SKILL.md", "dimensions": ["D11"], "status": "active" }
   ],
-  "extensionPoints": ["E1", "E2", "E3", "E4", "E5"],
+  "extensionPoints": ["E1", "E2", "E3", "E4", "E5", "E6"],
   "previousVersions": [
     { "version": "1.0.0", "file": "archives/SKILL-v1.0.0.md" },
     { "version": "1.0.1", "file": "archives/SKILL-v1.0.1.md" },
@@ -47,6 +48,7 @@
     { "version": "1.4.3", "file": "archives/SKILL-v1.4.3.md" },
     { "version": "1.4.4", "file": "archives/SKILL-v1.4.4.md" },
     { "version": "1.4.5", "file": "archives/SKILL-v1.4.5.md" },
-    { "version": "1.4.6", "file": "archives/SKILL-v1.4.6.md" }
+    { "version": "1.4.6", "file": "archives/SKILL-v1.4.6.md" },
+    { "version": "1.4.7", "file": "archives/SKILL-v1.4.7.md" }
   ]
 }

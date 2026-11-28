@@ -12,8 +12,9 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { lireTexte } from '../outils/referentiel.mjs';
-import { CritereChamp, deposer, enregistrementDe, estRatifie, etatChamp, etatsCriteres, formaterEtat, lireChamp, verifierChamp } from '../outils/champ.mjs';
+import { CritereChamp, chargerModeles, contexteDe, controler, deposer, enregistrementDe, estRatifie, etatChamp, etatsCriteres, formaterEtat, lireChamp, verifierChamp } from '../outils/champ.mjs';
 import { CHAMPS, CONTEXTE, RATTACHEMENT, projetDe, rejouer } from './champ-scenarios.mjs';
+import { decrireEnregistrement } from '../outils/vue.mjs';
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const OUTIL = join(ICI, '..', 'outils', 'champ.mjs');
@@ -274,4 +275,114 @@ test('ligne de commande : deposer, etat, verifier, codes de sortie', () => {
   assert.equal(lancer('etat').status, 2);
   assert.equal(lancer('verifier', dossier, '--json').status, 2);
   assert.throws(() => enregistrementDe('action', { ancre: ['sans-deux-points'] }), /ancre attendu sous la forme <type>:<référence>/);
+});
+
+// ---- D11 : observateur extérieur ----
+
+const MODELES = { session: 'gemini-3-pro-preview', observateur: 'gemini-3-flash-preview', effectif: 'gemini-3-flash-preview' };
+const exterieur = (modeles = MODELES) => contexteDe(RATTACHEMENT, modeles);
+/** Rejoue les k premiers dépôts du scénario d'essai avec un contexte donné, sans s'arrêter à un refus. */
+function rejouerAvec(ctx, k, projet = projetVide()) {
+  const dossier = join(projet, 'docs', 'demandes', CLE);
+  const resultats = ESSAI.depots.slice(0, k).map(({ date, ...partiel }) => deposer(dossier, partiel, { contexte: ctx, date }));
+  return { projet, dossier, resultats };
+}
+
+test('D11 : dans un arbre à deux modèles, champ.mjs inscrit à chaque observation d\'ordre 3 le modèle effectif de son observateur, et refuse celle qui retomberait sur la session ou dont le modèle est introuvable', () => {
+  const { dossier, resultats } = rejouerAvec(exterieur(), 8);
+  assert.deepStrictEqual(resultats.map((x) => x.erreurs), Array(8).fill([]));
+  const { enregistrements } = lireChamp(dossier);
+  assert.deepStrictEqual([enregistrements[7].ordre, enregistrements[7].modele], [3, 'gemini-3-flash-preview']);
+  assert.ok(enregistrements.slice(0, 7).every((e) => e.modele === undefined), 'seul l\'ordre 3 porte un modèle');
+  assert.deepStrictEqual(verifierChamp(dossier, exterieur()), []);
+  assert.deepStrictEqual(verifierChamp(dossier, CONTEXTE), [], 'le champ reste au schéma skill-ticket.observation/1, lu sans les modèles');
+  for (const [modeles, motif] of [
+    [{ ...MODELES, effectif: MODELES.session }, /n° 8 : l'observateur d'ordre 3 tourne sur le modèle de la session, gemini-3-pro-preview : son jugement ne serait pas extérieur/],
+    [{ ...MODELES, effectif: null }, /modèle de l'observateur d'ordre 3 introuvable : ni l'en-tête de ticket-abcde-3620-observateur-3/],
+  ]) {
+    const refus = rejouerAvec(exterieur(modeles), 8);
+    attendreEcart(refus.resultats[7].erreurs, motif);
+    assert.equal(nombreDeLignes(refus.dossier), 7, 'rien n\'est écrit');
+  }
+  // Sans modèle d'observateur, l'ordre 3 ne porte rien, comme avant.
+  assert.equal(lireChamp(rejouerAvec(CONTEXTE, 8).dossier).enregistrements[7].modele, undefined);
+  // Le modèle ne vient jamais du déposant, et n'appartient qu'à l'ordre 3.
+  assert.throws(() => enregistrementDe('observation', { ordre: ['3'], modele: ['gemini-3-flash-preview'] }), /option inconnue : --modele/);
+  attendreEcart(controler({ ...enregistrements[6], modele: 'gemini-3-flash-preview' }, enregistrements.slice(0, 6), exterieur()), /champ modele sans objet pour observation d'ordre 2/);
+  attendreEcart(controler({ ...enregistrements[7], modele: 'gemini 3' }, enregistrements.slice(0, 7), exterieur()), /modèle « gemini 3 », un nom de modèle/);
+  // Un champ dont l'ordre 3 est sur le modèle que l'arbre donne à la session ne se vérifie pas.
+  attendreEcart(verifierChamp(dossier, exterieur({ ...MODELES, session: 'gemini-3-flash-preview' })), /n° 8 : l'observateur d'ordre 3 tourne sur le modèle de la session/);
+  // L'état dit sur quel modèle juge l'ordre 3 ; un arbre sans modèle n'en dit rien.
+  const etat = etatChamp(enregistrements, exterieur());
+  assert.deepStrictEqual(etat.observateur, { session: 'gemini-3-pro-preview', modele: 'gemini-3-flash-preview' });
+  assert.match(formaterEtat(etat), /^Observateur d'ordre 3 : sur gemini-3-flash-preview, autre que celui de la session, gemini-3-pro-preview$/m);
+  assert.match(formaterEtat(etatChamp(enregistrements, exterieur({ ...MODELES, effectif: MODELES.session }))), /^Observateur d'ordre 3 : sur le modèle de la session, gemini-3-pro-preview : dépôt d'ordre 3 refusé$/m);
+  assert.match(formaterEtat(etatChamp(enregistrements, exterieur({ ...MODELES, effectif: null }))), /^Observateur d'ordre 3 : modèle introuvable, dépôt d'ordre 3 refusé$/m);
+  assert.equal(etatChamp(enregistrements, CONTEXTE).observateur, undefined);
+  // La vue dit sur quel modèle l'ordre 3 a jugé.
+  assert.match(decrireEnregistrement(enregistrements[7]), /^examen de la proposition n° 7 : fondée ; .* ; jugé sur gemini-3-flash-preview, hors du modèle de la session$/);
+  assert.doesNotMatch(decrireEnregistrement({ ...enregistrements[7], modele: undefined }), /jugé sur/);
+});
+
+/** Skill racine installé dans un projet temporaire : rattachement, manifeste, agent de l'observateur d'ordre 3. */
+function installe() {
+  const projet = temporaire('installe-');
+  const gemini = join(projet, '.gemini');
+  const skill = join(gemini, 'skills', 'ticket-abcde-3620');
+  mkdirSync(join(skill, 'outils'), { recursive: true });
+  mkdirSync(join(gemini, 'agents'), { recursive: true });
+  const rattachement = join(skill, 'outils', 'rattachement.json');
+  writeFileSync(rattachement, JSON.stringify(RATTACHEMENT));
+  return {
+    projet, rattachement, utilisateur: join(projet, 'utilisateur.json'), reglages: join(gemini, 'settings.json'),
+    manifeste: (modeles) => writeFileSync(join(skill, 'manifest.json'), JSON.stringify({ name: 'ticket-abcde-3620', ticket: { reference: CLE, ...(modeles ? { modeles } : {}) } })),
+    agent: (model) => writeFileSync(join(gemini, 'agents', 'ticket-abcde-3620-observateur-3.md'), `---\nname: ticket-abcde-3620-observateur-3\nkind: local\n${model ? `model: ${model}\n` : ''}---\n\n# Observateur d'ordre 3\n`),
+    surcharge: (chemin, model) => writeFileSync(chemin, JSON.stringify({ agents: { overrides: { 'ticket-abcde-3620-observateur-3': { modelConfig: { model } } } } })),
+  };
+}
+
+test('D11 : le modèle effectif de l\'observateur d\'ordre 3 se lit comme Gemini CLI le servirait : l\'en-tête de son agent installé, sauf surcharge de l\'utilisateur, puis du projet ; inherit le ramène à la session', () => {
+  const i = installe();
+  const lire = () => chargerModeles(i.rattachement, { utilisateur: i.utilisateur });
+  i.manifeste(null);
+  assert.equal(lire(), null, 'sans modèle nommé, l\'ordre 3 est intérieur');
+  i.manifeste({ session: 'gemini-3-pro-preview' });
+  assert.equal(lire(), null, 'la session seule ne fait pas d\'observateur extérieur');
+  i.manifeste({ session: 'gemini-3-pro-preview', observateur: 'gemini-3-flash-preview' });
+  assert.deepStrictEqual(lire(), { session: 'gemini-3-pro-preview', observateur: 'gemini-3-flash-preview', effectif: null }, 'agent non installé');
+  i.agent('gemini-3-flash-preview');
+  assert.equal(lire().effectif, 'gemini-3-flash-preview');
+  i.surcharge(i.utilisateur, 'gemini-3-pro-preview');
+  assert.equal(lire().effectif, 'gemini-3-pro-preview', 'la surcharge de l\'utilisateur l\'emporte sur l\'en-tête');
+  i.surcharge(i.reglages, 'gemini-2.5-flash');
+  assert.equal(lire().effectif, 'gemini-2.5-flash', 'celle du projet, sur celle de l\'utilisateur');
+  rmSync(i.reglages);
+  rmSync(i.utilisateur);
+  i.agent('inherit');
+  assert.equal(lire().effectif, 'gemini-3-pro-preview', 'inherit : le modèle de la session');
+  writeFileSync(i.reglages, '{');
+  assert.throws(lire, /réglages de Gemini CLI illisibles/);
+});
+
+test('D11 : en ligne de commande, depuis le skill racine installé, le dépôt d\'ordre 3 porte le modèle de l\'observateur, et l\'état le dit ; ramené par les réglages au modèle de la session, il est refusé', () => {
+  const ordre3 = (dossier, i, maison) => spawnSync(process.execPath, [OUTIL, 'deposer', dossier, 'observation', '--noeud', 'ABCDE-3620-1.1', '--auteur', O3, '--ordre', '3', '--verdict', 'fondee', '--observe', '7', '--preuve', 'enregistrements:7', '--date', '2026-11-03T11:05:00Z', '--rattachement', i.rattachement], { encoding: 'utf8', env: { ...process.env, HOME: maison, USERPROFILE: maison } });
+  const maison = temporaire('maison-');
+  const i = installe();
+  i.manifeste({ session: 'gemini-3-pro-preview', observateur: 'gemini-3-flash-preview' });
+  i.agent('gemini-3-flash-preview');
+  const { dossier } = rejouerAvec(CONTEXTE, 7, i.projet);
+  const ok = ordre3(dossier, i, maison);
+  assert.equal(ok.status, 0, ok.stderr);
+  assert.match(ok.stdout, /^n° 8 déposé : observation d'ordre 3, fondee$/m);
+  assert.equal(lireChamp(dossier).enregistrements[7].modele, 'gemini-3-flash-preview');
+  const etat = spawnSync(process.execPath, [OUTIL, 'etat', dossier, '--rattachement', i.rattachement], { encoding: 'utf8', env: { ...process.env, HOME: maison, USERPROFILE: maison } });
+  assert.match(etat.stdout, /^Observateur d'ordre 3 : sur gemini-3-flash-preview, autre que celui de la session, gemini-3-pro-preview$/m);
+  const j = installe();
+  j.manifeste({ session: 'gemini-3-pro-preview', observateur: 'gemini-3-flash-preview' });
+  j.agent('gemini-3-flash-preview');
+  j.surcharge(j.reglages, 'gemini-3-pro-preview');
+  const refus = ordre3(rejouerAvec(CONTEXTE, 7, j.projet).dossier, j, maison);
+  assert.equal(refus.status, 1);
+  assert.match(refus.stderr, /REFUS {2}n° 8 : l'observateur d'ordre 3 tourne sur le modèle de la session, gemini-3-pro-preview/);
+  assert.equal(spawnSync(process.execPath, [OUTIL, 'deposer', dossier, 'observation', '--modele', 'x', '--rattachement', i.rattachement], { encoding: 'utf8' }).status, 2, 'le déposant ne donne jamais le modèle');
 });

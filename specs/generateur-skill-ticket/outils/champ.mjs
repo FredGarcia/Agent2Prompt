@@ -22,11 +22,15 @@
 // menace, de proche en proche, les critères qu'il soutient (visiteur des critères de l'arbre, construits
 // depuis le rattachement) ; deux nœuds aux verdicts contraires sur une
 // même ancre font un désaccord, inscrit d'office comme écart au registre des écarts (D6.INV-3 de
-// l'orchestrateur). Codes de sortie : 0, 1 au moindre refus ou écart, 2 pour un usage incorrect.
+// l'orchestrateur). Quand l'arbre nomme deux modèles, celui de la session et celui de l'observateur d'ordre
+// 3, le script inscrit à chaque observation d'ordre 3 le modèle effectif de son observateur, l'en-tête de son
+// agent installé ou sa surcharge dans les réglages de Gemini CLI, et refuse celle qui retomberait sur le modèle
+// de la session (D11). Codes de sortie : 0, 1 au moindre refus ou écart, 2 pour un usage incorrect.
 // Node 20 ou plus récent, modules natifs uniquement.
 
 import { createHash } from 'node:crypto';
 import { appendFileSync, closeSync, existsSync, mkdirSync, openSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { homedir } from 'node:os';
 import { basename, dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -40,7 +44,7 @@ const COMMUNS = ['n', 'date', 'type', 'noeud', 'auteur', 'precedent'];
 const CHAMPS = {
   action: { requis: ['nature', 'ancre', 'resume'], facultatifs: ['options'] },
   retour: { requis: ['nature', 'par', 'contenu'], facultatifs: ['vise', 'motif', 'objet', 'decision'] },
-  observation: { requis: ['ordre', 'verdict', 'preuve'], facultatifs: ['ancre', 'observe', 'ecart', 'proposition', 'motif', 'commentaire', 'cout'] },
+  observation: { requis: ['ordre', 'verdict', 'preuve'], facultatifs: ['ancre', 'observe', 'ecart', 'proposition', 'motif', 'commentaire', 'cout', 'modele'] },
   ecart: { requis: ['ancre', 'invariant', 'constat'], facultatifs: ['observe'] },
 };
 const ANCRES = ['noeud', 'critere', 'ca', 'scenario', 'fichier', 'commit', 'contrat', 'option'];
@@ -48,6 +52,7 @@ const PREUVES = ['test', 'commande', 'commit', 'fichier', 'enregistrements', 'ra
 const VERDICTS = { 1: ['conforme', 'ecart'], 2: ['proposition', 'conforme'], 3: ['fondee', 'infondee', 'veille', 'bilan'] };
 const MOTIF = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const DATE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/;
+export const MODELE = /^[A-Za-z0-9][A-Za-z0-9._/-]{0,99}$/;
 const INVARIANT_DESACCORD = 'désaccord entre nœuds (D6.INV-3)';
 
 export const sha256 = (texte) => createHash('sha256').update(texte, 'utf8').digest('hex');
@@ -75,8 +80,10 @@ export function canonique(e) {
 
 // ---- Contexte de l'arbre : ses nœuds, ses critères, ses critères d'acceptation ----
 
+const RATTACHEMENT_PAR_DEFAUT = join(dirname(fileURLToPath(import.meta.url)), 'rattachement.json');
+
 /** Rattachement de l'arbre, produit par la fabrique dans le skill racine. */
-export function chargerRattachement(chemin = join(dirname(fileURLToPath(import.meta.url)), 'rattachement.json')) {
+export function chargerRattachement(chemin = RATTACHEMENT_PAR_DEFAUT) {
   if (!existsSync(chemin)) throw new Error(`rattachement introuvable : ${chemin}`);
   return JSON.parse(lire(chemin));
 }
@@ -96,8 +103,52 @@ export class CritereChamp {
   }
 }
 
-/** Contexte des contrôles : nœuds, critères (référence → critère et ses soutiens), critères d'acceptation, observateurs. */
-export function contexteDe(r) {
+/** Modèle nommé par l'en-tête d'un agent de Gemini CLI, s'il en nomme un. */
+function modeleDEnTete(chemin) {
+  if (!existsSync(chemin)) return undefined;
+  const m = /^---\n([\s\S]*?)\n---/.exec(lire(chemin));
+  const v = m && /^model:[ \t]*(.+?)[ \t]*$/m.exec(m[1]);
+  return v ? v[1].replace(/^(['"])(.*)\1$/, '$2') : undefined;
+}
+
+/** Surcharge du modèle d'un agent dans un fichier de réglages de Gemini CLI, `agents.overrides`. */
+function modeleDeReglages(chemin, agent) {
+  if (!existsSync(chemin)) return undefined;
+  let reglages;
+  try {
+    reglages = JSON.parse(lire(chemin));
+  } catch {
+    throw new Error(`réglages de Gemini CLI illisibles : ${chemin}`);
+  }
+  const v = reglages?.agents?.overrides?.[agent]?.modelConfig?.model;
+  return typeof v === 'string' && v.trim() !== '' ? v.trim() : undefined;
+}
+
+/**
+ * Modèles de l'arbre (D11) : ceux que nomme le manifeste du skill racine, la session et l'observateur
+ * d'ordre 3, et le modèle effectif de l'observateur, lu dans Gemini CLI comme il le servirait : l'en-tête
+ * de son agent installé, sauf surcharge dans les réglages de l'utilisateur, puis dans ceux du projet ;
+ * `inherit` le ramène au modèle de la session. `null` si l'arbre ne nomme pas de modèle d'observateur :
+ * son ordre 3 tourne sur le modèle de la session. Le skill racine est installé dans `.gemini/skills/` :
+ * ses agents dans `.gemini/agents/`, les réglages du projet dans `.gemini/settings.json`.
+ */
+export function chargerModeles(rattachement = RATTACHEMENT_PAR_DEFAUT, { utilisateur = join(homedir(), '.gemini', 'settings.json') } = {}) {
+  const skill = dirname(dirname(resolve(rattachement)));
+  const manifeste = join(skill, 'manifest.json');
+  if (!existsSync(manifeste)) return null;
+  const m = JSON.parse(lire(manifeste));
+  const modeles = m?.ticket?.modeles;
+  if (!modeles?.observateur) return null;
+  const gemini = dirname(dirname(skill));
+  const agent = `${m.name}-observateur-3`;
+  let effectif = modeleDEnTete(join(gemini, 'agents', `${agent}.md`));
+  for (const reglages of [utilisateur, join(gemini, 'settings.json')]) effectif = modeleDeReglages(reglages, agent) ?? effectif;
+  if (effectif === 'inherit') effectif = modeles.session;
+  return { session: modeles.session, observateur: modeles.observateur, effectif: effectif ?? null };
+}
+
+/** Contexte des contrôles : nœuds, critères (référence → critère et ses soutiens), critères d'acceptation, observateurs, modèles. */
+export function contexteDe(r, modeles = null) {
   const noeuds = new Map([[r.cle, { reference: r.cle, nature: 'racine', criteres: [] }]]);
   for (const n of r.noeuds) noeuds.set(n.reference, n);
   const criteres = new Map(r.criteres.map((c) => [c.critere, new CritereChamp({ ref: c.critere, noeud: r.cle, ca: [c.ca] })]));
@@ -116,6 +167,7 @@ export function contexteDe(r) {
     cas: new Map(r.criteres.map((c) => [c.ca, c.critere])),
     sousTickets: r.noeuds.some((n) => n.reference !== r.cle),
     observateurs: { 2: `${racine}-observateur-2`, 3: `${racine}-observateur-3` },
+    modeles,
   };
 }
 
@@ -227,6 +279,10 @@ export function controler(e, avant, ctx) {
     if (e.cout !== undefined && (!estObjet(e.cout) || Object.keys(e.cout).length === 0 || Object.entries(e.cout).some(([k, v]) => !['tokens', 'secondes'].includes(k) || typeof v !== 'number' || v < 0))) {
       err.push(`${nom} : coût attendu, { tokens, secondes }, nombres positifs`);
     }
+    if (e.modele !== undefined && e.ordre === 3) {
+      if (typeof e.modele !== 'string' || !MODELE.test(e.modele)) err.push(`${nom} : modèle « ${e.modele} », un nom de modèle`);
+      else if (ctx.modeles?.session && e.modele === ctx.modeles.session) err.push(`${nom} : l'observateur d'ordre 3 tourne sur le modèle de la session, ${e.modele} : son jugement ne serait pas extérieur`);
+    } else absents('modele');
     if (e.ordre === 1) {
       err.push(...controlerAncre(e.ancre, ctx, nom));
       absents('observe', 'proposition', 'motif');
@@ -461,6 +517,7 @@ export function etatChamp(enregistrements, ctx) {
     desaccords: desaccords(enregistrements, ctx).map((d) => ({ ancre: d.ancre, conformes: d.conformes.map((o) => ({ noeud: o.noeud, n: o.n })), ecarts: d.ecarts.map((o) => ({ noeud: o.noeud, n: o.n, ecart: o.ecart })), inscrit: inscrit(enregistrements, d)?.n ?? null })),
     attentes: attentes(enregistrements, ctx),
     veilles: enregistrements.filter((x) => x.type === 'observation' && x.ordre === 3 && x.verdict === 'veille').map((x) => ({ motif: x.motif, n: x.n })),
+    ...(ctx.modeles ? { observateur: { session: ctx.modeles.session, modele: ctx.modeles.effectif } } : {}),
   };
 }
 
@@ -495,6 +552,10 @@ export function formaterEtat(etat, verification = []) {
     if (a.nature === 'veille') lignes.push(`  veille, motif ${a.motif}, propositions refusées n° ${liste(a.propositions)} : invoquer ${a.observateur}`);
   }
   lignes.push(`Veilles : ${etat.veilles.length === 0 ? 'aucune' : etat.veilles.map((v) => `motif ${v.motif} (n° ${v.n})`).join(', ')}`);
+  if (etat.observateur) {
+    const o = etat.observateur;
+    lignes.push(`Observateur d'ordre 3 : ${!o.modele ? 'modèle introuvable, dépôt d\'ordre 3 refusé' : o.modele === o.session ? `sur le modèle de la session, ${o.session} : dépôt d'ordre 3 refusé` : `sur ${o.modele}, autre que celui de la session, ${o.session}`}`);
+  }
   return lignes.join('\n');
 }
 
@@ -535,7 +596,12 @@ function inscrireAuRegistre(registre, dossier, e) {
  * d'office au registre. Renvoie { erreurs, deposes, attentes } ; rien n'est écrit au moindre écart.
  */
 export function deposer(dossier, partiel, { contexte, rattachement, registre = registreParDefaut(dossier), date } = {}) {
-  const ctx = contexte ?? contexteDe(chargerRattachement(rattachement));
+  const ctx = contexte ?? contexteDe(chargerRattachement(rattachement), chargerModeles(rattachement));
+  // D11 : le modèle d'une observation d'ordre 3 s'inscrit d'après Gemini CLI, jamais d'après le déposant.
+  if (partiel?.type === 'observation' && partiel.ordre === 3 && ctx.modeles) {
+    if (!ctx.modeles.effectif) return { erreurs: [`modèle de l'observateur d'ordre 3 introuvable : ni l'en-tête de ${ctx.observateurs[3]}, installé dans .gemini/agents/, ni une surcharge des réglages de Gemini CLI ne le nomment`], deposes: [], attentes: [] };
+    partiel = { ...partiel, modele: ctx.modeles.effectif };
+  }
   if (basename(resolve(dossier)) !== ctx.cle) return { erreurs: [`le dossier doit être celui de la clé ${ctx.cle} : ${dossier}`], deposes: [], attentes: [] };
   mkdirSync(dossier, { recursive: true });
   const liberer = verrouiller(dossier);
@@ -665,7 +731,8 @@ export function principal(argv, sortie = console.log, erreur = console.error) {
   }
   let ctx;
   try {
-    ctx = contexteDe(chargerRattachement(cheminRattachement ? resolve(cheminRattachement) : undefined));
+    const chemin = cheminRattachement ? resolve(cheminRattachement) : undefined;
+    ctx = contexteDe(chargerRattachement(chemin), chargerModeles(chemin));
   } catch (e) {
     erreur(e.message);
     return 2;

@@ -32,7 +32,7 @@ La colonne « Repris dans » cite les modules de la spécification qui reprennen
 | [`angular`](#angular-101) | 1.0.1 | 8 | 2 | 30 |
 | [`capture-sprint-jira`](#capture-sprint-jira-122) | 1.2.2 | 9 | 2 | 39 |
 | [`explication-hote-ia`](#explication-hote-ia-110) | 1.1.0 | 10 | 2 | 37 |
-| [`generateur-skill-ticket`](#generateur-skill-ticket-147) | 1.4.7 | 9 | 1 | 32 |
+| [`generateur-skill-ticket`](#generateur-skill-ticket-150) | 1.5.0 | 10 | 1 | 35 |
 | [`java`](#java-111) | 1.1.1 | 7 | 1 | 29 |
 | [`observatoire`](#observatoire-160) | 1.6.0 | 12 | 0 | 21 |
 | [`orchestrateur-c7e`](#orchestrateur-c7e-387) | 3.8.7 | 11 | 2 | 36 |
@@ -1044,9 +1044,9 @@ Dimension réservée : aucun invariant en vigueur dans cette version.
 | **D12.INV-4** | hors du dossier du skill, rien ne s'écrit sans la demande du développeur : le sous-agent et les commandes s'installent par une commande qu'il lance ou qu'il approuve, une commande de retrait les supprime, et, avec `gemini skills uninstall`, rien ne reste. | `agent`, `diffusion` |
 | **D12.INV-5** | le dépôt où le skill est maintenu se nomme comme son origine et le lieu de sa vérification, jamais comme une étape ; le contrat de version, les règles et la recette du skill sont écrits dans le skill. | `recette`, `diffusion` |
 
-## generateur-skill-ticket 1.4.7
+## generateur-skill-ticket 1.5.0
 
-Générateur de skills de ticket C7E : décompose un ticket en arbre de sous-tickets, produit pour chaque nœud un skill assemblé depuis le référentiel des méso-contrats, l'installe et le lance dans Gemini CLI ; chaque skill s'observe dans un champ partagé, et chaque niveau voit le ticket augmenté ; chaque ticket entraîne le générateur, qui propose ses évolutions au développeur ; ses observations s'exportent, minimisées, vers le socle d'observation du dépôt. Point d'entrée : [`specs/generateur-skill-ticket/SKILL.md`](specs/generateur-skill-ticket/SKILL.md).
+Générateur de skills de ticket C7E : décompose un ticket en arbre de sous-tickets, produit pour chaque nœud un skill assemblé depuis le référentiel des méso-contrats, l'installe et le lance dans Gemini CLI ; chaque skill s'observe dans un champ partagé, et chaque niveau voit le ticket augmenté ; l'observateur d'ordre 3 peut juger sur un autre modèle que la session ; chaque ticket entraîne le générateur, qui propose ses évolutions au développeur ; ses observations s'exportent, minimisées, vers le socle d'observation du dépôt. Point d'entrée : [`specs/generateur-skill-ticket/SKILL.md`](specs/generateur-skill-ticket/SKILL.md).
 
 ### D1 : Arbre de tickets (active)
 
@@ -1090,7 +1090,7 @@ Générateur de skills de ticket C7E : décompose un ticket en arbre de sous-tic
 |---|---|---|
 | **D5.INV-1** | un champ par arbre, en ajout seul, au schéma fermé `skill-ticket.observation/1` ; chaque enregistrement porte son numéro, sa date en UTC, jamais antérieure à la précédente, et l'empreinte du précédent ; `champ.mjs` est seul à l'écrire, et un champ altéré refuse tout dépôt. | `champ` |
 | **D5.INV-2** | toute observation porte sa preuve ; une correction vise une action antérieure et porte un motif ; seul l'observateur de l'arbre observe à l'ordre 2, et il propose une adaptation de la méthode, jamais une action sur le code. | `champ` |
-| **D5.INV-3** | deux corrections au même motif dans l'arbre font attendre une proposition d'ordre 2, qui attend l'examen de l'ordre 3, puis la décision du développeur ; deux propositions refusées sur un motif le mettent en veille ; l'ordre d'observation ne dépasse pas 3, le développeur au-dessus. | `champ` |
+| **D5.INV-3** | deux corrections au même motif dans l'arbre font attendre une proposition d'ordre 2, qui attend l'examen de l'ordre 3, puis la décision du développeur ; deux propositions refusées sur un motif le mettent en veille ; l'ordre d'observation ne dépasse pas 3, le développeur au-dessus. | `champ`, `exterieur` |
 | **D5.INV-4** | un écart sur un critère menace, de proche en proche, les critères qu'il soutient, jusqu'au critère d'acceptation de la clé ; des verdicts contraires de deux nœuds sur une même ancre forment un désaccord, que le script inscrit au champ et au registre des écarts du projet, décision au développeur. | `champ` |
 
 ### D6 : Vue augmentée (active)
@@ -1128,6 +1128,14 @@ Générateur de skills de ticket C7E : décompose un ticket en arbre de sous-tic
 ### D10 : Acceptable partagé : kits et actions confrontés au noyau du socle de l'acceptable (reserved)
 
 Dimension réservée : aucun invariant en vigueur dans cette version.
+
+### D11 : Observateur extérieur : l'ordre 3 sur un autre modèle que la session, nommé, inscrit au champ (active)
+
+| Invariant | Énoncé | Repris dans |
+|---|---|---|
+| **D11.INV-1** | les modèles de la session et de l'observateur d'ordre 3 sont facultatifs à la génération ; celui de l'observateur demande celui de la session et en diffère, chacun un nom de modèle, sinon la génération est refusée et n'écrit rien ; nommés, l'en-tête de l'observateur d'ordre 3 de la racine porte le sien, les manifestes de l'arbre les deux, et tout autre agent garde le modèle de la session ; sans eux, l'arbre se génère comme avant. | `exterieur` |
+| **D11.INV-2** | dans un arbre qui nomme deux modèles, `champ.mjs` inscrit à chaque observation d'ordre 3 le modèle effectif de son observateur, l'en-tête de son agent installé ou sa surcharge dans les réglages de Gemini CLI, que le déposant ne donne jamais, et refuse l'observation si ce modèle est introuvable ou retombe sur celui de la session ; un modèle ne se porte qu'à l'ordre 3 ; le champ garde son format, et l'export ne change pas. | `exterieur` |
+| **D11.INV-3** | `lancer` ouvre la session d'un nœud sur le modèle de la session que nomme le manifeste de son skill, un nom de modèle, sinon il refuse ; sans modèle nommé, sur les réglages du développeur. | `installation`, `exterieur` |
 
 ## java 1.1.1
 

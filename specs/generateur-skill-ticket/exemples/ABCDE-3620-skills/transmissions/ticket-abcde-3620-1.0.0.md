@@ -208,12 +208,12 @@ Suis `SKILL.md` à partir de sa section 4. Rien n'est modifié avant la ratifica
       {
         "path": "outils/champ.mjs",
         "from": "specs/generateur-skill-ticket/outils/champ.mjs",
-        "sha256": "6a8432370146559f705ce84e6954e8c1f452891a1f33a6191ae27977aba231df"
+        "sha256": "040f7758e48a220dd68ca20dcd6f043c8a7053fc27b82c0ee2b905b8732b4738"
       },
       {
         "path": "outils/vue.mjs",
         "from": "specs/generateur-skill-ticket/outils/vue.mjs",
-        "sha256": "1d77807ab1947fe4ae2315337725c3c728cc9dfbbb3a1fff28c453edb655c9d5"
+        "sha256": "808b6cbaa7b1c297acddae122256969dcb44ed8a0af51f97a8de2be6be4351b1"
       },
       {
         "path": "outils/invariants.mjs",
@@ -228,7 +228,7 @@ Suis `SKILL.md` à partir de sa section 4. Rien n'est modifié avant la ratifica
     ],
     "genere_par": {
       "generateur": "generateur-skill-ticket",
-      "version": "1.4.7",
+      "version": "1.5.0",
       "fabrique": "java-angular-postgresql",
       "orchestrateur": "3.8.7"
     }
@@ -467,7 +467,7 @@ version: 1.0.0
 
 # Skill de ticket ABCDE-3620
 
-> Produit par generateur-skill-ticket 1.4.7, fabrique `java-angular-postgresql`, référentiel des méso-contrats 3.3.0, orchestrateur-c7e 3.8.7. Ce skill remplace la fiche de transformation comme objet ratifié avant toute modification ; il reste identique à sa transmission. Si tu y relèves une ambiguïté ou une contradiction, signale-la au développeur ; ne corrige pas le skill toi-même.
+> Produit par generateur-skill-ticket 1.5.0, fabrique `java-angular-postgresql`, référentiel des méso-contrats 3.3.0, orchestrateur-c7e 3.8.7. Ce skill remplace la fiche de transformation comme objet ratifié avant toute modification ; il reste identique à sa transmission. Si tu y relèves une ambiguïté ou une contradiction, signale-la au développeur ; ne corrige pas le skill toi-même.
 
 ## 1. Place dans l'arbre
 
@@ -5646,11 +5646,15 @@ if (estPrincipal) process.exitCode = principal(process.argv.slice(2));
 // menace, de proche en proche, les critères qu'il soutient (visiteur des critères de l'arbre, construits
 // depuis le rattachement) ; deux nœuds aux verdicts contraires sur une
 // même ancre font un désaccord, inscrit d'office comme écart au registre des écarts (D6.INV-3 de
-// l'orchestrateur). Codes de sortie : 0, 1 au moindre refus ou écart, 2 pour un usage incorrect.
+// l'orchestrateur). Quand l'arbre nomme deux modèles, celui de la session et celui de l'observateur d'ordre
+// 3, le script inscrit à chaque observation d'ordre 3 le modèle effectif de son observateur, l'en-tête de son
+// agent installé ou sa surcharge dans les réglages de Gemini CLI, et refuse celle qui retomberait sur le modèle
+// de la session (D11). Codes de sortie : 0, 1 au moindre refus ou écart, 2 pour un usage incorrect.
 // Node 20 ou plus récent, modules natifs uniquement.
 
 import { createHash } from 'node:crypto';
 import { appendFileSync, closeSync, existsSync, mkdirSync, openSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { homedir } from 'node:os';
 import { basename, dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -5664,7 +5668,7 @@ const COMMUNS = ['n', 'date', 'type', 'noeud', 'auteur', 'precedent'];
 const CHAMPS = {
   action: { requis: ['nature', 'ancre', 'resume'], facultatifs: ['options'] },
   retour: { requis: ['nature', 'par', 'contenu'], facultatifs: ['vise', 'motif', 'objet', 'decision'] },
-  observation: { requis: ['ordre', 'verdict', 'preuve'], facultatifs: ['ancre', 'observe', 'ecart', 'proposition', 'motif', 'commentaire', 'cout'] },
+  observation: { requis: ['ordre', 'verdict', 'preuve'], facultatifs: ['ancre', 'observe', 'ecart', 'proposition', 'motif', 'commentaire', 'cout', 'modele'] },
   ecart: { requis: ['ancre', 'invariant', 'constat'], facultatifs: ['observe'] },
 };
 const ANCRES = ['noeud', 'critere', 'ca', 'scenario', 'fichier', 'commit', 'contrat', 'option'];
@@ -5672,6 +5676,7 @@ const PREUVES = ['test', 'commande', 'commit', 'fichier', 'enregistrements', 'ra
 const VERDICTS = { 1: ['conforme', 'ecart'], 2: ['proposition', 'conforme'], 3: ['fondee', 'infondee', 'veille', 'bilan'] };
 const MOTIF = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const DATE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/;
+export const MODELE = /^[A-Za-z0-9][A-Za-z0-9._/-]{0,99}$/;
 const INVARIANT_DESACCORD = 'désaccord entre nœuds (D6.INV-3)';
 
 export const sha256 = (texte) => createHash('sha256').update(texte, 'utf8').digest('hex');
@@ -5699,8 +5704,10 @@ export function canonique(e) {
 
 // ---- Contexte de l'arbre : ses nœuds, ses critères, ses critères d'acceptation ----
 
+const RATTACHEMENT_PAR_DEFAUT = join(dirname(fileURLToPath(import.meta.url)), 'rattachement.json');
+
 /** Rattachement de l'arbre, produit par la fabrique dans le skill racine. */
-export function chargerRattachement(chemin = join(dirname(fileURLToPath(import.meta.url)), 'rattachement.json')) {
+export function chargerRattachement(chemin = RATTACHEMENT_PAR_DEFAUT) {
   if (!existsSync(chemin)) throw new Error(`rattachement introuvable : ${chemin}`);
   return JSON.parse(lire(chemin));
 }
@@ -5720,8 +5727,52 @@ export class CritereChamp {
   }
 }
 
-/** Contexte des contrôles : nœuds, critères (référence → critère et ses soutiens), critères d'acceptation, observateurs. */
-export function contexteDe(r) {
+/** Modèle nommé par l'en-tête d'un agent de Gemini CLI, s'il en nomme un. */
+function modeleDEnTete(chemin) {
+  if (!existsSync(chemin)) return undefined;
+  const m = /^---\n([\s\S]*?)\n---/.exec(lire(chemin));
+  const v = m && /^model:[ \t]*(.+?)[ \t]*$/m.exec(m[1]);
+  return v ? v[1].replace(/^(['"])(.*)\1$/, '$2') : undefined;
+}
+
+/** Surcharge du modèle d'un agent dans un fichier de réglages de Gemini CLI, `agents.overrides`. */
+function modeleDeReglages(chemin, agent) {
+  if (!existsSync(chemin)) return undefined;
+  let reglages;
+  try {
+    reglages = JSON.parse(lire(chemin));
+  } catch {
+    throw new Error(`réglages de Gemini CLI illisibles : ${chemin}`);
+  }
+  const v = reglages?.agents?.overrides?.[agent]?.modelConfig?.model;
+  return typeof v === 'string' && v.trim() !== '' ? v.trim() : undefined;
+}
+
+/**
+ * Modèles de l'arbre (D11) : ceux que nomme le manifeste du skill racine, la session et l'observateur
+ * d'ordre 3, et le modèle effectif de l'observateur, lu dans Gemini CLI comme il le servirait : l'en-tête
+ * de son agent installé, sauf surcharge dans les réglages de l'utilisateur, puis dans ceux du projet ;
+ * `inherit` le ramène au modèle de la session. `null` si l'arbre ne nomme pas de modèle d'observateur :
+ * son ordre 3 tourne sur le modèle de la session. Le skill racine est installé dans `.gemini/skills/` :
+ * ses agents dans `.gemini/agents/`, les réglages du projet dans `.gemini/settings.json`.
+ */
+export function chargerModeles(rattachement = RATTACHEMENT_PAR_DEFAUT, { utilisateur = join(homedir(), '.gemini', 'settings.json') } = {}) {
+  const skill = dirname(dirname(resolve(rattachement)));
+  const manifeste = join(skill, 'manifest.json');
+  if (!existsSync(manifeste)) return null;
+  const m = JSON.parse(lire(manifeste));
+  const modeles = m?.ticket?.modeles;
+  if (!modeles?.observateur) return null;
+  const gemini = dirname(dirname(skill));
+  const agent = `${m.name}-observateur-3`;
+  let effectif = modeleDEnTete(join(gemini, 'agents', `${agent}.md`));
+  for (const reglages of [utilisateur, join(gemini, 'settings.json')]) effectif = modeleDeReglages(reglages, agent) ?? effectif;
+  if (effectif === 'inherit') effectif = modeles.session;
+  return { session: modeles.session, observateur: modeles.observateur, effectif: effectif ?? null };
+}
+
+/** Contexte des contrôles : nœuds, critères (référence → critère et ses soutiens), critères d'acceptation, observateurs, modèles. */
+export function contexteDe(r, modeles = null) {
   const noeuds = new Map([[r.cle, { reference: r.cle, nature: 'racine', criteres: [] }]]);
   for (const n of r.noeuds) noeuds.set(n.reference, n);
   const criteres = new Map(r.criteres.map((c) => [c.critere, new CritereChamp({ ref: c.critere, noeud: r.cle, ca: [c.ca] })]));
@@ -5740,6 +5791,7 @@ export function contexteDe(r) {
     cas: new Map(r.criteres.map((c) => [c.ca, c.critere])),
     sousTickets: r.noeuds.some((n) => n.reference !== r.cle),
     observateurs: { 2: `${racine}-observateur-2`, 3: `${racine}-observateur-3` },
+    modeles,
   };
 }
 
@@ -5851,6 +5903,10 @@ export function controler(e, avant, ctx) {
     if (e.cout !== undefined && (!estObjet(e.cout) || Object.keys(e.cout).length === 0 || Object.entries(e.cout).some(([k, v]) => !['tokens', 'secondes'].includes(k) || typeof v !== 'number' || v < 0))) {
       err.push(`${nom} : coût attendu, { tokens, secondes }, nombres positifs`);
     }
+    if (e.modele !== undefined && e.ordre === 3) {
+      if (typeof e.modele !== 'string' || !MODELE.test(e.modele)) err.push(`${nom} : modèle « ${e.modele} », un nom de modèle`);
+      else if (ctx.modeles?.session && e.modele === ctx.modeles.session) err.push(`${nom} : l'observateur d'ordre 3 tourne sur le modèle de la session, ${e.modele} : son jugement ne serait pas extérieur`);
+    } else absents('modele');
     if (e.ordre === 1) {
       err.push(...controlerAncre(e.ancre, ctx, nom));
       absents('observe', 'proposition', 'motif');
@@ -6085,6 +6141,7 @@ export function etatChamp(enregistrements, ctx) {
     desaccords: desaccords(enregistrements, ctx).map((d) => ({ ancre: d.ancre, conformes: d.conformes.map((o) => ({ noeud: o.noeud, n: o.n })), ecarts: d.ecarts.map((o) => ({ noeud: o.noeud, n: o.n, ecart: o.ecart })), inscrit: inscrit(enregistrements, d)?.n ?? null })),
     attentes: attentes(enregistrements, ctx),
     veilles: enregistrements.filter((x) => x.type === 'observation' && x.ordre === 3 && x.verdict === 'veille').map((x) => ({ motif: x.motif, n: x.n })),
+    ...(ctx.modeles ? { observateur: { session: ctx.modeles.session, modele: ctx.modeles.effectif } } : {}),
   };
 }
 
@@ -6119,6 +6176,10 @@ export function formaterEtat(etat, verification = []) {
     if (a.nature === 'veille') lignes.push(`  veille, motif ${a.motif}, propositions refusées n° ${liste(a.propositions)} : invoquer ${a.observateur}`);
   }
   lignes.push(`Veilles : ${etat.veilles.length === 0 ? 'aucune' : etat.veilles.map((v) => `motif ${v.motif} (n° ${v.n})`).join(', ')}`);
+  if (etat.observateur) {
+    const o = etat.observateur;
+    lignes.push(`Observateur d'ordre 3 : ${!o.modele ? 'modèle introuvable, dépôt d\'ordre 3 refusé' : o.modele === o.session ? `sur le modèle de la session, ${o.session} : dépôt d'ordre 3 refusé` : `sur ${o.modele}, autre que celui de la session, ${o.session}`}`);
+  }
   return lignes.join('\n');
 }
 
@@ -6159,7 +6220,12 @@ function inscrireAuRegistre(registre, dossier, e) {
  * d'office au registre. Renvoie { erreurs, deposes, attentes } ; rien n'est écrit au moindre écart.
  */
 export function deposer(dossier, partiel, { contexte, rattachement, registre = registreParDefaut(dossier), date } = {}) {
-  const ctx = contexte ?? contexteDe(chargerRattachement(rattachement));
+  const ctx = contexte ?? contexteDe(chargerRattachement(rattachement), chargerModeles(rattachement));
+  // D11 : le modèle d'une observation d'ordre 3 s'inscrit d'après Gemini CLI, jamais d'après le déposant.
+  if (partiel?.type === 'observation' && partiel.ordre === 3 && ctx.modeles) {
+    if (!ctx.modeles.effectif) return { erreurs: [`modèle de l'observateur d'ordre 3 introuvable : ni l'en-tête de ${ctx.observateurs[3]}, installé dans .gemini/agents/, ni une surcharge des réglages de Gemini CLI ne le nomment`], deposes: [], attentes: [] };
+    partiel = { ...partiel, modele: ctx.modeles.effectif };
+  }
   if (basename(resolve(dossier)) !== ctx.cle) return { erreurs: [`le dossier doit être celui de la clé ${ctx.cle} : ${dossier}`], deposes: [], attentes: [] };
   mkdirSync(dossier, { recursive: true });
   const liberer = verrouiller(dossier);
@@ -6289,7 +6355,8 @@ export function principal(argv, sortie = console.log, erreur = console.error) {
   }
   let ctx;
   try {
-    ctx = contexteDe(chargerRattachement(cheminRattachement ? resolve(cheminRattachement) : undefined));
+    const chemin = cheminRattachement ? resolve(cheminRattachement) : undefined;
+    ctx = contexteDe(chargerRattachement(chemin), chargerModeles(chemin));
   } catch (e) {
     erreur(e.message);
     return 2;
@@ -6775,9 +6842,10 @@ export function decrireEnregistrement(e) {
   if (e.ordre === 1) return `${e.verdict === 'ecart' ? `écart : ${e.ecart}` : 'conforme'} ; ${decrirePreuve(e.preuve)}${cout}`;
   if (e.ordre === 2) return `${e.verdict === 'proposition' ? `proposition sur le motif ${e.motif} : « ${e.proposition} »` : `conforme sur le motif ${e.motif}`}, observe n° ${liste(e.observe)} ; ${decrirePreuve(e.preuve)}${cout}`;
   const commentaire = e.commentaire ? ` : « ${e.commentaire} »` : '';
-  if (e.verdict === 'veille') return `motif ${e.motif} mis en veille, propositions n° ${liste(e.observe)} refusées ; ${decrirePreuve(e.preuve)}${cout}`;
-  if (e.verdict === 'bilan') return `bilan de clôture des observations n° ${liste(e.observe)}${commentaire} ; ${decrirePreuve(e.preuve)}${cout}`;
-  return `examen de la proposition n° ${liste(e.observe)} : ${e.verdict === 'fondee' ? 'fondée' : 'infondée'}${commentaire} ; ${decrirePreuve(e.preuve)}${cout}`;
+  const sur = e.modele ? ` ; jugé sur ${e.modele}, hors du modèle de la session` : '';
+  if (e.verdict === 'veille') return `motif ${e.motif} mis en veille, propositions n° ${liste(e.observe)} refusées ; ${decrirePreuve(e.preuve)}${cout}${sur}`;
+  if (e.verdict === 'bilan') return `bilan de clôture des observations n° ${liste(e.observe)}${commentaire} ; ${decrirePreuve(e.preuve)}${cout}${sur}`;
+  return `examen de la proposition n° ${liste(e.observe)} : ${e.verdict === 'fondee' ? 'fondée' : 'infondée'}${commentaire} ; ${decrirePreuve(e.preuve)}${cout}${sur}`;
 }
 
 const enTeteEnregistrement = (e) => `n° ${e.n} · ${date(e.date)} · ${e.noeud} · ${e.auteur}`;
@@ -8061,8 +8129,8 @@ Lis d'abord la vue entière de l'arbre, `node .gemini/skills/ticket-abcde-3620/o
 
 Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichiers ont été matérialisés.
 
-    2aee2caad28fbdea4149cb83be41fe64bb76a1c3f538ff40e091f7bd8b712678  manifest.json
-    4edca7afa32b66d39ae97b1ea56990cb504835630fa6918d01837369e0c116df  SKILL.md
+    bffab5deb7b0be4667e7136abd792db7e9d4f5dde387088e7c380b43896e7190  manifest.json
+    ab138b1aab996cdefba8b4d51966fbac62c4773e5f9835d317e9520fee88adff  SKILL.md
     99f8d264ef101abf040d4648830305caa54de9a772ecd8f48eb4f2265ce1d75e  ticket.toml
     132002bb56c3b49254191bd44b9edfff7fd5dad422095a09bc1392ec046201cf  modules/meso-contrats/SKILL.md
     def6289cfdd5ad0505e021abead226caa9c78467aad516cec7807c653711d861  modules/recette/SKILL.md
@@ -8096,8 +8164,8 @@ Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichier
     c2410a4a5d48acd077ae1df9e6e090d278b62927e623b7a9abfabe5dbbd16bc8  outils/controler-criteres.mjs
     c360f5b58f1594813cd9ff8f723342e74633dfdf4e982244946d05fe8a337135  outils/verifier-documents.mjs
     f69b3d1f3d323f206f3afe96621bf6ead188469248b73e7311f2bd2bd123da2d  outils/verifier-kits.mjs
-    6a8432370146559f705ce84e6954e8c1f452891a1f33a6191ae27977aba231df  outils/champ.mjs
-    1d77807ab1947fe4ae2315337725c3c728cc9dfbbb3a1fff28c453edb655c9d5  outils/vue.mjs
+    040f7758e48a220dd68ca20dcd6f043c8a7053fc27b82c0ee2b905b8732b4738  outils/champ.mjs
+    808b6cbaa7b1c297acddae122256969dcb44ed8a0af51f97a8de2be6be4351b1  outils/vue.mjs
     724a65763146e9ec2fc606dd796d4a802c765951f3e60e59069d38e7b8816437  outils/invariants.mjs
     738866e64ed488a7f6bf0d6a3a5a26a28e4eb65354c71596c13eb464f36cb0f5  outils/apprentissage.mjs
     8df1d4370b1bfffd736b0dc54fb60e1706e96620ee80e72c989f5844b54bf316  agents/ticket-abcde-3620-redacteur.md

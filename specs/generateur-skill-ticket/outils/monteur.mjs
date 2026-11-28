@@ -14,7 +14,7 @@ import { assembler, relire } from '../../../tools/bundle.mjs';
 import { lireToml } from './toml.mjs';
 import { chargerReferentiel } from './referentiel.mjs';
 import { chargerArbre, verifierArbre } from './arbre.mjs';
-import { FABRIQUES, VERSION_SKILL, couchesDuTicket, nomSkill, sha256 } from './fabrique.mjs';
+import { FABRIQUES, VERSION_SKILL, controlerModeles, couchesDuTicket, nomSkill, sha256 } from './fabrique.mjs';
 import { BOITE, blocDeCode, chargerProjet, chargerSources, extraireSection, idInvariant, lignesInvariants, resoudre } from './sources.mjs';
 
 export const DOSSIER_TRANSMISSIONS = 'transmissions';
@@ -230,16 +230,18 @@ function ecrireFichiers(dossier, fichiers) {
  * transmission par `tools/bundle.mjs`, vérifie l'aller-retour et l'héritage de la transmission, et
  * l'écrit dans `<sortie>/transmissions/<nom>-<version>.md`. Rien n'est écrit au moindre écart.
  */
-export function generer({ arbre: dossierArbre, sortie, referentiel, invariantsProjet, profondeurMax, fabrique = 'java-angular-postgresql' }) {
+export function generer({ arbre: dossierArbre, sortie, referentiel, invariantsProjet, profondeurMax, fabrique = 'java-angular-postgresql', modeles }) {
   const Fabrique = typeof fabrique === 'function' ? fabrique : FABRIQUES[fabrique];
   if (!Fabrique) return { erreurs: [`fabrique inconnue : ${fabrique} (connues : ${Object.keys(FABRIQUES).join(', ')})`], skills: [] };
+  const erreursModeles = controlerModeles(modeles);
+  if (erreursModeles.length > 0) return { erreurs: erreursModeles, skills: [] };
   const R = chargerReferentiel(referentiel);
   const arbre = chargerArbre(dossierArbre);
   const erreursArbre = verifierArbre(arbre, R, { profondeurMax: profondeurMax ?? R.profondeurMax });
   if (erreursArbre.length > 0) return { erreurs: erreursArbre, skills: [] };
 
   const sources = chargerSources({ invariantsProjet });
-  const skills = new Monteur(new Fabrique({ R, arbre, sources })).construireArbre(arbre);
+  const skills = new Monteur(new Fabrique({ R, arbre, sources, modeles })).construireArbre(arbre);
   const erreurs = [];
   const noms = new Map();
   for (const s of skills) {

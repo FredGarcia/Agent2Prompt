@@ -40,13 +40,13 @@ function recette(texte, motif = /^\| (D\d+\.INV-\d+) \| (.+) \|$/gm) {
   return lignes;
 }
 
-test('spécification : version du point d\'entrée, de son titre et du manifeste ; neuf dimensions actives et une réservée, un module chacune', () => {
+test('spécification : version du point d\'entrée, de son titre et du manifeste ; dix dimensions actives et une réservée, un module chacune', () => {
   assert.equal(MANIFESTE.name, 'generateur-skill-ticket');
   assert.match(ENTREE, new RegExp(`^version: ${MANIFESTE.version.replace(/\./g, '\\.')}$`, 'm'));
   assert.match(ENTREE, new RegExp(`^# Générateur de skills de ticket C7E, version ${MANIFESTE.version.replace(/\./g, '\\.')}$`, 'm'));
-  assert.deepStrictEqual(MANIFESTE.modules.map((m) => m.dimensions.join()), ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8', 'D9', 'D10']);
+  assert.deepStrictEqual(MANIFESTE.modules.map((m) => m.dimensions.join()), ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8', 'D9', 'D10', 'D11']);
   assert.deepStrictEqual(MANIFESTE.modules.filter((m) => m.status !== 'active').map((m) => `${m.id}:${m.status}`), ['acceptable:reserved']);
-  assert.equal(DEFINITIONS.length, 32);
+  assert.equal(DEFINITIONS.length, 35);
 });
 
 test('1.3.0 : l\'export ne passe pas par les skills de ticket : ni l\'outil, ni le module, ni le socle n\'y entrent', () => {

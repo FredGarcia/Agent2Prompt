@@ -16,7 +16,7 @@ status: active
 | `installer <dossier ou transmissions>` | vérifie chaque transmission (intégrité et héritage) et que l'ensemble forme un arbre complet ; installe les skills par `tools/installer.mjs` ; copie les agents dans `.gemini/agents/` et les commandes dans `.gemini/commands/ticket/` ; écrit le relevé et une copie des transmissions dans `.gemini/skill-ticket/<clé>/` ; masque le tout à Git. Rien n'est écrit au moindre écart ; un fichier modifié depuis l'installation, ou que l'installateur n'a pas écrit, n'est remplacé qu'avec `--forcer` (D3.INV-1) |
 | `liste` | les arbres installés, et l'état de chaque nœud d'après le champ d'observation et les dossiers du ticket ; puis l'état du champ, et celui de la vue augmentée, avec la commande qui la régénère |
 | `verifier [<clé>]` | fichiers installés intacts ; si Gemini CLI est là, ses skills découverts et activés, ses agents chargés sans erreur, un dossier non fiable signalé |
-| `lancer <référence>` | ouvre Gemini CLI dans le workspace, en mode interactif, sur la phrase qui active le skill du nœud : `gemini -i "Active le skill …"` (D3.INV-4) |
+| `lancer <référence>` | ouvre Gemini CLI dans le workspace, en mode interactif, sur la phrase qui active le skill du nœud : `gemini -i "Active le skill …"`, précédé de `-m <modèle>` si le manifeste du skill nomme le modèle de la session (D3.INV-4, D11.INV-3) |
 | `retirer <clé>` | archive les transmissions dans `docs/demandes/<clé>/skills/`, où elles se versionnent avec le ticket, puis retire skills, agents, commandes et relevé (D3.INV-2) |
 
 Options : `--visible` pour ne rien masquer à Git ; `--forcer` ; `--essai` pour voir ce qui serait fait ; `--sans-archive` au retrait ; `--gemini <exécutable>`, ou la variable `SKILL_TICKET_GEMINI`, sinon `gemini`.

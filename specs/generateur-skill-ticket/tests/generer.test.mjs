@@ -892,3 +892,43 @@ test("l'installateur du dépôt accepte chaque transmission produite", () => {
   }
   rmSync(workspace, { recursive: true, force: true });
 });
+
+// ---- D11 : observateur extérieur ----
+
+test('D11 : deux modèles nommés : l\'observateur d\'ordre 3 de la racine porte le sien dans son en-tête, les manifestes de l\'arbre les deux, tout autre agent garde la session ; un modèle d\'observateur sans session, égal à elle ou mal formé est refusé, sans rien écrire', () => {
+  const modeles = { session: 'gemini-3-pro-preview', observateur: 'gemini-3-flash-preview' };
+  const r = generer({ arbre: EXEMPLE, sortie: temporaire('modeles-'), modeles });
+  assert.deepStrictEqual(r.erreurs, []);
+  const racine = fichiersDe(readFileSync(r.skills[0].transmission, 'utf8'));
+  const o3 = racine.get('agents/ticket-abcde-3620-observateur-3.md');
+  assert.match(o3, /^---\n[\s\S]*\nmodel: gemini-3-flash-preview\n---\n/);
+  assert.match(o3, /Tu tournes sur gemini-3-flash-preview, un autre modèle que celui de la session, gemini-3-pro-preview/);
+  for (const [rel, contenu] of racine) if (rel.startsWith('agents/') && !rel.endsWith('-observateur-3.md')) assert.doesNotMatch(contenu, /^model:/m, rel);
+  for (const s of r.skills) {
+    const f = fichiersDe(readFileSync(s.transmission, 'utf8'));
+    assert.deepStrictEqual(JSON.parse(f.get('manifest.json')).ticket.modeles, modeles, s.nom);
+    assert.deepStrictEqual(verifierTransmission(readFileSync(s.transmission, 'utf8')).erreurs, [], s.nom);
+  }
+  // La session seule : les sessions sur son modèle, l'ordre 3 aussi, intérieur.
+  const seule = generer({ arbre: EXEMPLE, sortie: temporaire('session-'), modeles: { session: 'gemini-3-pro-preview' } });
+  assert.deepStrictEqual(seule.erreurs, []);
+  const racine2 = fichiersDe(readFileSync(seule.skills[0].transmission, 'utf8'));
+  assert.doesNotMatch(racine2.get('agents/ticket-abcde-3620-observateur-3.md'), /^model:|Tu tournes sur/m);
+  assert.deepStrictEqual(JSON.parse(racine2.get('manifest.json')).ticket.modeles, { session: 'gemini-3-pro-preview' });
+  for (const [m, motif] of [
+    [{ observateur: 'gemini-3-flash-preview' }, /--modele-observateur demande --modele-session/],
+    [{ session: 'gemini-3-pro-preview', observateur: 'gemini-3-pro-preview' }, /--modele-observateur gemini-3-pro-preview : celui de la session/],
+    [{ session: 'gemini 3', observateur: 'gemini-3-flash-preview' }, /--modele-session « gemini 3 » : un nom de modèle/],
+    [{ session: 'gemini-3-pro-preview', observateur: '-x' }, /--modele-observateur « -x » : un nom de modèle/],
+  ]) {
+    const sortie = join(temporaire('refus-'), 'sortie');
+    attendreEcart(generer({ arbre: EXEMPLE, sortie, modeles: m }).erreurs, motif);
+    assert.equal(existsSync(sortie), false, 'rien n\'est écrit');
+  }
+  const cli = lancer('generer', EXEMPLE, '--sortie', temporaire('cli-'), '--modele-session', 'gemini-3-pro-preview', '--modele-observateur', 'gemini-3-flash-preview');
+  assert.equal(cli.status, 0, cli.stderr);
+  assert.match(cli.stdout, /^modèles : sessions sur gemini-3-pro-preview, observateur d'ordre 3 sur gemini-3-flash-preview$/m);
+  const ko = lancer('generer', EXEMPLE, '--sortie', temporaire('cli-'), '--modele-observateur', 'gemini-3-flash-preview');
+  assert.equal(ko.status, 1);
+  assert.match(ko.stderr, /--modele-observateur demande --modele-session/);
+});
