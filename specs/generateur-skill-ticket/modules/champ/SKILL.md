@@ -13,9 +13,9 @@ Chaque niveau de l'arbre dépose ce qu'il fait et ce qu'il observe dans un champ
 
 | Commande | Effet |
 |---|---|
-| `deposer <dossier> <type> --noeud … --auteur … [options]` | contrôle le champ existant, puis l'enregistrement contre le schéma fermé et les règles du champ ; l'ajoute avec son numéro, sa date en UTC et l'empreinte de la ligne précédente ; met à jour `champ.tete` ; inscrit d'office l'écart d'un désaccord, au champ et au registre des écarts ; annonce les observations que le dépôt fait attendre. Un dépôt refusé n'écrit rien |
+| `deposer <dossier> <type> --noeud … --auteur … [options]` | contrôle le champ existant, puis l'enregistrement contre le schéma fermé et les règles du champ ; l'ajoute avec son numéro, sa date en UTC et l'empreinte de la ligne précédente ; met à jour `champ.tete` ; inscrit d'office l'écart d'un désaccord, au champ et au registre des écarts ; dans un arbre qui nomme deux modèles, inscrit à une observation d'ordre 3 le modèle de son observateur (module `exterieur`) ; annonce les observations que le dépôt fait attendre. Un dépôt refusé n'écrit rien |
 | `verifier <dossier>` | schéma, numéros, dates non décroissantes, forme canonique de chaque ligne, chaîne d'empreintes et tête, désaccords inscrits, écarts présents au registre des écarts |
-| `etat <dossier> [--json]` | ratifications, état de chaque critère de l'arbre, désaccords, observations attendues, motifs en veille |
+| `etat <dossier> [--json]` | ratifications, état de chaque critère de l'arbre, désaccords, observations attendues, motifs en veille ; dans un arbre qui nomme deux modèles, celui sur lequel juge l'ordre 3 |
 
 Depuis la racine du projet : `node .gemini/skills/ticket-<clé>/outils/champ.mjs <commande> docs/demandes/<clé> …`. Le skill racine porte deux modules du champ : `champ`, entier, que lisent la racine et les observateurs, et `champ-depot`, court, que lisent les autres nœuds et les agents de couche, avec leurs dépôts et la suite qu'ils donnent aux attentes du champ. Le script lit les critères de l'arbre dans le rattachement du skill racine installé, sans le modèle de l'arbre ; un verrou de fichier sérialise les dépôts de deux sessions.
 
@@ -25,7 +25,7 @@ Depuis la racine du projet : `node .gemini/skills/ticket-<clé>/outils/champ.mjs
 |---|---|---|
 | `action` | proposition au développeur, avec ses options, ou réalisation qu'il peut corriger, sur une ancre : `noeud`, `critere`, `ca`, `scenario`, `fichier`, `commit`, `contrat`, `option` | l'agent ou le skill qui agit |
 | `retour` | choix parmi les options d'une proposition, ou décision sur une proposition d'ordre 2 ; correction, qui vise une action et porte un motif ; ratification | le skill du nœud, au nom du développeur |
-| `observation` | ordre 1 : conforme ou écart sur une ancre ; ordre 2 : proposition d'adaptation de la méthode, ou conforme ; ordre 3 : proposition fondée ou infondée, veille d'un motif, bilan de clôture ; toujours avec sa preuve, `test`, `commande`, `commit`, `fichier`, `enregistrements` ou `rapport`, et son coût s'il est connu | agents et skills à l'ordre 1, observateurs de l'arbre aux ordres 2 et 3 |
+| `observation` | ordre 1 : conforme ou écart sur une ancre ; ordre 2 : proposition d'adaptation de la méthode, ou conforme ; ordre 3 : proposition fondée ou infondée, veille d'un motif, bilan de clôture ; toujours avec sa preuve, `test`, `commande`, `commit`, `fichier`, `enregistrements` ou `rapport`, et son coût s'il est connu ; à l'ordre 3, dans un arbre qui nomme deux modèles, le modèle de l'observateur, que le script inscrit seul | agents et skills à l'ordre 1, observateurs de l'arbre aux ordres 2 et 3 |
 | `ecart` | écart à un invariant, ou désaccord entre nœuds, avec sa ligne au registre des écarts | le skill qui le constate ; le script pour un désaccord |
 
 Toute observation porte sa preuve ; une correction vise une action antérieure et porte un motif, en minuscules et tirets, choisi par le skill qui la dépose ; seul l'observateur de l'arbre observe à l'ordre 2, et seulement sur des corrections répétées (D5.INV-2). La référence d'une auto-observation est un retour du développeur ou une preuve, jamais l'auto-évaluation seule.
@@ -35,7 +35,7 @@ Toute observation porte sa preuve ; une correction vise une action antérieure e
 | Déclencheur, décidé par le script | Attente | Suite, formulée par un sous-agent ou le développeur |
 |---|---|---|
 | deux corrections au même motif, dans l'arbre, sans observation d'ordre 2 qui les couvre | ordre 2 | `ticket-<clé>-observateur-2` propose une adaptation de la méthode, ou conclut conforme ; jamais une action sur le code |
-| une proposition d'ordre 2 non examinée | ordre 3 | `ticket-<clé>-observateur-3` la juge fondée ou infondée, d'après ses preuves et son effet sur la décision |
+| une proposition d'ordre 2 non examinée | ordre 3 | `ticket-<clé>-observateur-3`, sur son propre modèle si l'arbre en nomme un, la juge fondée ou infondée, d'après ses preuves et son effet sur la décision |
 | une proposition examinée, non décidée | développeur | il la retient, et elle s'inscrit au registre des concepts comme entrée `proposed`, par le skill du nœud, commitée à part ; ou il la refuse |
 | deux propositions refusées sur un motif, sans proposition retenue depuis | veille | l'observateur d'ordre 3 met le motif en veille : l'ordre 2 ne s'y éveille plus |
 

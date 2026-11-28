@@ -39,7 +39,7 @@ Le skill du nœud `ABCDE-3620-1.2` s'appelle `ticket-abcde-3620-1-2`, la référ
 | `projet/meso-contrats.md` | invariants du projet dans l'état où le skill a été produit ; au démarrage, comparés par empreinte à la copie du projet, qui fait foi et seule se lit | tous |
 | `agents/<skill>-<couche>.md` | un agent par couche touchée, au format des sous-agents de Gemini CLI 0.67.0 ; il porte sa part de la consigne, objectif, critères et composition, sans relire celle du nœud | feuilles |
 | `commandes/ticket/<nœud>.toml` | la commande Gemini CLI qui lance le skill dans une session | tous |
-| boîte à outils de l'arbre | documents de la clé, kits, champ, vue, scripts de contrôle, références et sous-agents de rôle, observateurs (modules `documents-kits`, `champ`, `vue`) | racine |
+| boîte à outils de l'arbre | documents de la clé, kits, champ, vue, scripts de contrôle, références et sous-agents de rôle, observateurs, l'en-tête de celui d'ordre 3 nommant son modèle si la génération en nomme deux (modules `documents-kits`, `champ`, `vue`, `exterieur`) | racine |
 
 Chaque skill cite, au début de sa consigne comme dans son manifeste, le générateur et sa version, sa fabrique, le référentiel et l'orchestrateur dont il est issu (D2.INV-4).
 

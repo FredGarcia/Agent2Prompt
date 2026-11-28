@@ -16,6 +16,7 @@ import { fileURLToPath } from 'node:url';
 import { relire } from '../../../tools/bundle.mjs';
 import { lireTexte } from '../outils/referentiel.mjs';
 import { phraseActivation, sha256 } from '../outils/fabrique.mjs';
+import { generer } from '../outils/monteur.mjs';
 
 const ICI = dirname(fileURLToPath(import.meta.url));
 const OUTIL = join(ICI, '..', 'outils', 'installer-arbre.mjs');
@@ -304,4 +305,43 @@ test('Gemini CLI réel : skills découverts et activés, agents chargés, dossie
   const r = lancer(['verifier', 'ABCDE-3620', '--workspace', ws], { env });
   assert.equal(r.status, 0, `${r.stdout}\n${r.stderr}`);
   assert.match(r.stdout, /Gemini CLI \d+\.\d+\.\d+ : skills découverts et activés, agents chargés sans erreur/);
+});
+
+// ---- D11 : observateur extérieur ----
+
+test('D11 : lancer ouvre la session d\'un nœud sur le modèle que nomme son manifeste ; un modèle mal formé est refusé', () => {
+  const sortie = temporaire('modeles-');
+  const g = generer({ arbre: join(ICI, '..', 'exemples', 'ABCDE-3620'), sortie, modeles: { session: 'gemini-3-pro-preview', observateur: 'gemini-3-flash-preview' } });
+  assert.deepStrictEqual(g.erreurs, []);
+  const ws = temporaire('ws-');
+  const inst = lancer(['installer', join(sortie, 'transmissions'), '--workspace', ws]);
+  assert.equal(inst.status, 0, inst.stderr);
+  const essai = lancer(['lancer', 'ABCDE-3620-1.2', '--workspace', ws, '--essai']);
+  assert.equal(essai.status, 0, essai.stderr);
+  assert.equal(essai.stdout.trim(), `essai : gemini -m gemini-3-pro-preview -i "${phraseActivation('ticket-abcde-3620-1-2')}"`);
+  assert.match(readFileSync(join(ws, '.gemini', 'agents', 'ticket-abcde-3620-observateur-3.md'), 'utf8'), /^model: gemini-3-flash-preview$/m, 'l\'agent installé nomme le modèle de l\'observateur');
+  // Un faux Gemini CLI note ses arguments : la session s'ouvre sur le modèle nommé.
+  const faux = temporaire('faux-gemini-');
+  const note = join(faux, 'sortie.json');
+  writeFileSync(join(faux, 'noter.js'), 'require("fs").writeFileSync(process.env.SORTIE_GEMINI, JSON.stringify({ argv: process.argv.slice(2) }));\n');
+  let executable;
+  if (process.platform === 'win32') {
+    executable = join(faux, 'gemini.cmd');
+    writeFileSync(executable, `@echo off\r\n"${process.execPath}" "%~dp0noter.js" %*\r\n`);
+  } else {
+    executable = join(faux, 'gemini');
+    writeFileSync(executable, `#!/bin/sh\nexec "${process.execPath}" "${join(faux, 'noter.js')}" "$@"\n`);
+    chmodSync(executable, 0o755);
+  }
+  const reel = lancer(['lancer', 'ABCDE-3620-1.2', '--workspace', ws, '--gemini', executable], { env: { SORTIE_GEMINI: note } });
+  assert.equal(reel.status, 0, reel.stderr);
+  assert.match(reel.stdout, /, sur gemini-3-pro-preview :$/m);
+  assert.deepStrictEqual(JSON.parse(readFileSync(note, 'utf8')).argv, ['-m', 'gemini-3-pro-preview', '-i', phraseActivation('ticket-abcde-3620-1-2')]);
+  const manifeste = join(ws, '.gemini', 'skills', 'ticket-abcde-3620', 'manifest.json');
+  const m = JSON.parse(readFileSync(manifeste, 'utf8'));
+  m.ticket.modeles.session = 'gemini 3';
+  writeFileSync(manifeste, JSON.stringify(m));
+  const ko = lancer(['lancer', 'ABCDE-3620', '--workspace', ws, '--essai']);
+  assert.equal(ko.status, 1);
+  assert.match(ko.stderr, /ticket-abcde-3620 : modèle de la session « gemini 3 » mal formé dans son manifeste, à réinstaller/);
 });

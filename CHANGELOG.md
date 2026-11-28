@@ -96,6 +96,13 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
 
 ## Socle et experts back-front
 
+### 2026-11-28 : generateur-skill-ticket 1.5.0
+
+- **Dépôt, `EVOLUTION.md`** : jalon J5c du passage au troisième ordre, l'observateur extérieur dans le générateur ; limites du troisième couplage à jour.
+- **generateur-skill-ticket 1.5.0** : dimension D11, module `exterieur`. Deux options facultatives de génération, `--modele-session` et `--modele-observateur` : nommés et différents, l'en-tête de l'observateur d'ordre 3 de la racine porte son modèle et les manifestes de l'arbre les deux ; un modèle d'observateur sans session, égal à elle ou mal formé est refusé. `lancer` ouvre la session sur son modèle, `gemini -m`. `champ.mjs` inscrit à chaque observation d'ordre 3 le modèle effectif de son observateur, l'en-tête de son agent installé ou sa surcharge dans les réglages de Gemini CLI, et refuse celle qui retomberait sur la session ; `etat` et la vue le disent. Le champ garde son format ; l'export et le socle d'observation ne changent pas. Invariants D11.INV-1 à D11.INV-3, critère P13, point d'extension réservé E6, l'observateur distant par A2A. Arbres d'exemple régénérés, sans modèle.
+- README, mode d'emploi du générateur et transmission à jour.
+- Décisions ratifiées avant la rédaction (plan du jalon J5c) : l'observateur d'ordre 3, sous-agent local sur un autre modèle, nommé dans son en-tête, l'A2A réservé (X1, sans préférence, selon la recommandation) ; deux modèles nommés à la génération, `lancer` sur celui de la session, `champ.mjs` qui inscrit le modèle et refuse celui de la session (X2, sans préférence, selon la recommandation) ; rien à l'export (X3) ; des modèles facultatifs, l'ordre 3 héritant sinon de la session (X4).
+
 ### 2026-11-26 : socle-observation 1.5.0, observatoire 1.6.0, agent2dev 1.5.0, agent2test 1.7.0, agent-tdd-jira 1.3.11, scenario-playwright 1.6.8, orchestrateur-c7e 3.8.7, generateur-skill-ticket 1.4.7
 
 - **Dépôt, `EVOLUTION.md`** : jalon J5b du passage au troisième ordre, la révision dans l'instance. Section 10.7 : la constitution d'une instance du binôme, sa forme propre, suit la même révision que les formes propres du dépôt, que sa publication contrôle ; règle 7 de la section 10.5 et limites du troisième couplage à jour.
@@ -963,6 +970,13 @@ Les détails de chaque version figurent dans le journal de révision du `SKILL.m
   - la publication, dans ce dépôt public, d'un argumentaire destiné à un client, sans nom de client ni de mission.
 
 ## Outils
+
+### 2026-11-28 : observateur extérieur
+
+- **`specs/generateur-skill-ticket/outils/generer.mjs`**, **`monteur.mjs`**, **`fabrique.mjs`** : options `--modele-session` et `--modele-observateur`, contrôlées ; l'en-tête de l'observateur d'ordre 3 et les manifestes de l'arbre les portent.
+- **`specs/generateur-skill-ticket/outils/champ.mjs`** : modèle effectif de l'observateur d'ordre 3, lu dans l'en-tête de son agent installé et les réglages de Gemini CLI, inscrit à chaque observation d'ordre 3 et contrôlé ; `etat` le dit.
+- **`specs/generateur-skill-ticket/outils/installer-arbre.mjs`** : `lancer` ouvre la session sur le modèle que nomme le manifeste du skill.
+- **`specs/generateur-skill-ticket/outils/vue.mjs`** : un examen d'ordre 3 dit sur quel modèle il a été jugé.
 
 ### 2026-11-26 : révision dans l'instance
 

@@ -14,7 +14,8 @@
 // l'installation et une copie des transmissions dans .gemini/skill-ticket/<clé>/ ; masque le tout à Git,
 // comme tools/installer.mjs masque les skills. Rien n'est écrit au moindre écart.
 // `lancer` ouvre Gemini CLI dans le workspace, en mode interactif, sur la phrase qui active le skill du
-// nœud : une session par nœud, avec son propre contexte.
+// nœud : une session par nœud, avec son propre contexte, sur le modèle de la session que nomme le manifeste
+// du skill, s'il en nomme un (D11).
 // `liste` montre les arbres installés et l'état de chaque nœud, d'après le champ d'observation de l'arbre
 // (lot 5 ; retours.md pour les arbres des lots 3 et 4) et les dossiers sous docs/demandes/, puis le
 // résumé du champ : critères en écart ou menacés, désaccords, observations attendues ; et, depuis le
@@ -34,7 +35,7 @@ import { basename, dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { relire } from '../../../tools/bundle.mjs';
 import { RACINE_DEPOT, lireTexte } from './referentiel.mjs';
-import { phraseActivation } from './fabrique.mjs';
+import { MODELE, phraseActivation } from './fabrique.mjs';
 import { contexteDe, etatChamp, lireChamp, ratifications, verifierChamp } from './champ.mjs';
 import { FICHIERS_VUE, etatVue } from './vue.mjs';
 import { transmissionsDe, verifierTransmission } from './monteur.mjs';
@@ -521,12 +522,17 @@ export function lancer(reference, o, sortie = console.log) {
   if (!existsSync(join(o.workspace, '.gemini', 'skills', trouve.nom, 'integrite.sha256'))) throw new Erreur(`${trouve.nom} : absent de .gemini/skills/, à réinstaller`);
   const phrase = phraseActivation(trouve.nom);
   const executable = o.gemini || process.env.SKILL_TICKET_GEMINI || 'gemini';
+  // D11 : la session s'ouvre sur le modèle que nomme le manifeste du skill, s'il en nomme un.
+  const manifeste = lireOuNull(join(o.workspace, '.gemini', 'skills', trouve.nom, 'manifest.json'));
+  const session = manifeste ? JSON.parse(manifeste)?.ticket?.modeles?.session : undefined;
+  if (session !== undefined && (typeof session !== 'string' || !MODELE.test(session))) throw new Erreur(`${trouve.nom} : modèle de la session « ${session} » mal formé dans son manifeste, à réinstaller`);
+  const args = [...(session ? ['-m', session] : []), '-i', phrase];
   if (o.essai) {
-    sortie(`essai : ${executable} -i "${phrase}"`);
+    sortie(`essai : ${executable} ${session ? `-m ${session} ` : ''}-i "${phrase}"`);
     return 0;
   }
-  sortie(`Gemini CLI, session du skill ${trouve.nom} (${trouve.reference}) :`);
-  const r = executerGemini(executable, ['-i', phrase], o.workspace, 'inherit');
+  sortie(`Gemini CLI, session du skill ${trouve.nom} (${trouve.reference})${session ? `, sur ${session}` : ''} :`);
+  const r = executerGemini(executable, args, o.workspace, 'inherit');
   if (r.error) throw new Erreur(`Gemini CLI introuvable (${executable}) : --gemini <exécutable>, ou la variable SKILL_TICKET_GEMINI`);
   return r.status ?? 1;
 }

@@ -521,3 +521,28 @@ test('SO4 : le registre d\'apprentissage se traduit selon le socle : relevés, p
   assert.deepStrictEqual(xs[3].preuve, { nature: 'enregistrements', ref: '1,2' }, 'une proposition cite les relevés qui la fondent');
   assert.deepStrictEqual(xs[4].decision, { valeur: 'retenue', vise: 4 }, 'une décision vise l\'enveloppe de sa proposition');
 });
+
+// ---- D11 : observateur extérieur ----
+
+test('D11 : le modèle d\'une observation d\'ordre 3 ne s\'exporte pas : deux champs qui ne diffèrent que par lui donnent le même journal, l\'ordre 3 au nom de l\'observateur N3', () => {
+  const o2 = 'ticket-abcde-3900-observateur-2';
+  const o3 = 'ticket-abcde-3900-observateur-3';
+  const champ = (modele) => [
+    { date: '2026-11-07T09:30:00Z', type: 'action', nature: 'realisation', ancre: { type: 'fichier', ref: 'back/src/main/java/fr/client/Pagination.java' }, resume: 'pagination par offset' },
+    { date: '2026-11-07T09:35:00Z', type: 'retour', nature: 'correction', par: PAR, contenu: 'Pagination par curseur', vise: 1, motif: 'pagination-curseur' },
+    { date: '2026-11-07T10:00:00Z', type: 'action', nature: 'realisation', ancre: { type: 'scenario', ref: 'ABCDE-3900-S02' }, resume: 'scénario S02, offset' },
+    { date: '2026-11-07T10:05:00Z', type: 'retour', nature: 'correction', par: PAR, contenu: 'Toujours le curseur', vise: 3, motif: 'pagination-curseur' },
+    { date: '2026-11-07T10:30:00Z', type: 'observation', auteur: o2, ordre: 2, verdict: 'proposition', preuve: { nature: 'enregistrements', ref: '1, 2, 3, 4' }, observe: [1, 2, 3, 4], proposition: 'Relever la pagination au référentiel', motif: 'pagination-curseur' },
+    { date: '2026-11-07T10:35:00Z', type: 'observation', auteur: o3, ordre: 3, verdict: 'fondee', preuve: { nature: 'enregistrements', ref: '5' }, observe: [5], ...(modele ? { modele } : {}) },
+  ];
+  const journaux = [undefined, 'gemini-3-flash-preview'].map((modele) => {
+    const p = projet({ champ: false });
+    ajouterAuChamp(p, 'ABCDE-3900', ...champ(modele));
+    assert.deepStrictEqual(exporter({ projet: p, sel: SEL_EPREUVE }).erreurs, []);
+    return sansCR(readFileSync(join(p, JOURNAL), 'utf8'));
+  });
+  assert.equal(journaux[1], journaux[0]);
+  assert.ok(!journaux[1].includes('gemini'), 'aucun modèle en clair');
+  const n3 = journaux[1].trim().split('\n').map((l) => JSON.parse(l)).find((x) => x.niveau === 'N3');
+  assert.deepStrictEqual([n3.sujet, n3.ordre, n3.nature, n3.modele], ['observateur-N3', 'OC2', 'fondee', undefined]);
+});

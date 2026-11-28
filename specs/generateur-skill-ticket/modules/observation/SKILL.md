@@ -16,6 +16,7 @@ Le champ et l'apprentissage font du générateur un système de second ordre, bo
 - Il n'écrit dans le projet que le journal d'enveloppes, `docs/c7e/observations.jsonl`, en ajout seul et chaîné, et sa tête, `docs/c7e/observations.tete`, qui porte le numéro et l'empreinte de sa dernière ligne. Le développeur les versionne avec le projet, comme le registre d'apprentissage ; l'outil ne commite rien.
 - Chaque enveloppe porte le générateur et sa version, `systeme`, et l'empreinte du sel de l'instance, `instance`. Aucun texte ne sort, ni résumé, ni contenu de retour, ni constat, ni extrait de preuve (`socle-observation:SO3.INV-1`) ; toute référence du projet, clé, nœud, critère, scénario, chemin ou commit, sort par son empreinte salée ; les numéros d'enregistrements sortent tels quels ; le sujet est un rôle, jamais un nom (`socle-observation:SO3.INV-2`).
 - Un écart aux consignes du générateur, relevé avec la cible `generateur`, sort avec la cible `specification` : c'est ce qui doit remonter jusqu'au dépôt.
+- Le modèle d'une observation d'ordre 3, que porte le champ d'un arbre à deux modèles (module `exterieur`), ne s'exporte pas : la correspondance du socle, section 6.1, n'en dit rien, et l'ordre 3 sort au nom de l'observateur N3.
 
 ## 2. Le sel de l'instance
 

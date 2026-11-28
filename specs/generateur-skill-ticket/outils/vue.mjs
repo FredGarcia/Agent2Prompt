@@ -421,9 +421,10 @@ export function decrireEnregistrement(e) {
   if (e.ordre === 1) return `${e.verdict === 'ecart' ? `écart : ${e.ecart}` : 'conforme'} ; ${decrirePreuve(e.preuve)}${cout}`;
   if (e.ordre === 2) return `${e.verdict === 'proposition' ? `proposition sur le motif ${e.motif} : « ${e.proposition} »` : `conforme sur le motif ${e.motif}`}, observe n° ${liste(e.observe)} ; ${decrirePreuve(e.preuve)}${cout}`;
   const commentaire = e.commentaire ? ` : « ${e.commentaire} »` : '';
-  if (e.verdict === 'veille') return `motif ${e.motif} mis en veille, propositions n° ${liste(e.observe)} refusées ; ${decrirePreuve(e.preuve)}${cout}`;
-  if (e.verdict === 'bilan') return `bilan de clôture des observations n° ${liste(e.observe)}${commentaire} ; ${decrirePreuve(e.preuve)}${cout}`;
-  return `examen de la proposition n° ${liste(e.observe)} : ${e.verdict === 'fondee' ? 'fondée' : 'infondée'}${commentaire} ; ${decrirePreuve(e.preuve)}${cout}`;
+  const sur = e.modele ? ` ; jugé sur ${e.modele}, hors du modèle de la session` : '';
+  if (e.verdict === 'veille') return `motif ${e.motif} mis en veille, propositions n° ${liste(e.observe)} refusées ; ${decrirePreuve(e.preuve)}${cout}${sur}`;
+  if (e.verdict === 'bilan') return `bilan de clôture des observations n° ${liste(e.observe)}${commentaire} ; ${decrirePreuve(e.preuve)}${cout}${sur}`;
+  return `examen de la proposition n° ${liste(e.observe)} : ${e.verdict === 'fondee' ? 'fondée' : 'infondée'}${commentaire} ; ${decrirePreuve(e.preuve)}${cout}${sur}`;
 }
 
 const enTeteEnregistrement = (e) => `n° ${e.n} · ${date(e.date)} · ${e.noeud} · ${e.auteur}`;

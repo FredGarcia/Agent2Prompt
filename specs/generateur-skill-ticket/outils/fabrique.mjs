@@ -28,6 +28,26 @@ import { extraireSection } from './sources.mjs';
 
 export const VERSION_SKILL = '1.0.0';
 
+/** Nom d'un modèle de Gemini CLI, tel que l'en-tête d'un agent et l'option -m le prennent. */
+export const MODELE = /^[A-Za-z0-9][A-Za-z0-9._/-]{0,99}$/;
+
+/**
+ * Modèles de l'arbre (D11), facultatifs : sans eux, chaque session et chaque agent tournent sur le modèle
+ * des réglages du développeur. Le modèle de l'observateur d'ordre 3 demande celui de la session, et en
+ * diffère : sinon l'ordre 3 jugerait l'ordre 2 avec le modèle qui l'a produit.
+ */
+export function controlerModeles(modeles) {
+  if (!modeles) return [];
+  const erreurs = [];
+  for (const [cle, option] of [['session', '--modele-session'], ['observateur', '--modele-observateur']]) {
+    const v = modeles[cle];
+    if (v !== undefined && (typeof v !== 'string' || !MODELE.test(v))) erreurs.push(`${option} « ${v} » : un nom de modèle, lettres, chiffres, points, tirets, soulignés et barres obliques`);
+  }
+  if (modeles.observateur !== undefined && modeles.session === undefined) erreurs.push('--modele-observateur demande --modele-session : le modèle de la session, dont celui de l\'observateur d\'ordre 3 doit différer');
+  else if (modeles.observateur !== undefined && modeles.observateur === modeles.session) erreurs.push(`--modele-observateur ${modeles.observateur} : celui de la session ; l'observateur d'ordre 3 jugerait l'ordre 2 avec le modèle qui l'a produit`);
+  return erreurs;
+}
+
 /** Format du rattachement des critères de l'arbre aux critères de la clé Jira, lu par les scripts de contrôle. */
 export const FORMAT_RATTACHEMENT = 'skill-ticket.rattachement/1';
 export const FICHIER_RATTACHEMENT = 'outils/rattachement.json';
@@ -1345,8 +1365,9 @@ export class FabriqueSkillTicket {
       '- Chaque observation cite les enregistrements qui la fondent ; ce qui n\'est ni dans le champ ni prouvé reste une question.',
       '- Ne pas apprendre à plaire : les retours du développeur orientent, ils ne lèvent aucun invariant ni aucune preuve (D6.INV-3).',
     ];
+    const modeles = this.ctx.modeles;
     const agent = (ordre, description, lignes) => fichier(`agents/${this.nomRole(n, `observateur-${ordre}`)}.md`, [
-      frontmatter({ name: this.nomRole(n, `observateur-${ordre}`), description, kind: 'local', tools: outils }),
+      frontmatter({ name: this.nomRole(n, `observateur-${ordre}`), description, kind: 'local', tools: outils, ...(ordre === 3 && modeles?.observateur ? { model: modeles.observateur } : {}) }),
       ...lignes,
     ]);
     return [
@@ -1380,7 +1401,7 @@ export class FabriqueSkillTicket {
       agent(3, `Observateur d'ordre 3 de l'arbre ${cle}, qui examine les propositions de l'ordre 2, met un motif en veille après deux propositions refusées et fait le bilan de clôture, sans rien proposer lui-même.`, [
         `# Observateur d'ordre 3 de l'arbre ${cle}`,
         '',
-        `Tu observes l'observateur d'ordre 2 de l'arbre ${cle}. Tu ne t'éveilles que dans trois cas : une proposition d'ordre 2 à examiner, une mise en veille attendue sur un motif, le bilan de clôture de la racine. Ton contexte est le tien ; tu rends ton rapport au skill qui t'invoque.`,
+        `Tu observes l'observateur d'ordre 2 de l'arbre ${cle}. Tu ne t'éveilles que dans trois cas : une proposition d'ordre 2 à examiner, une mise en veille attendue sur un motif, le bilan de clôture de la racine. Ton contexte est le tien ; tu rends ton rapport au skill qui t'invoque.${modeles?.observateur ? ` Tu tournes sur ${modeles.observateur}, un autre modèle que celui de la session, ${modeles.session} : tu juges l'ordre 2 hors du modèle qui l'a produit, et \`champ.mjs\` inscrit ce modèle à chacune de tes observations (D11).` : ''}`,
         '',
         '## Références',
         '',
@@ -1767,6 +1788,7 @@ export class FabriqueSkillTicket {
         dossier: this.dossier(n),
         herites,
         genere_par: { generateur: this.S.generateur.nom, version: this.S.generateur.version, fabrique: this.nom, orchestrateur: this.S.orchestrateur.version },
+        ...(this.ctx.modeles ? { modeles: Object.fromEntries(['session', 'observateur'].filter((k) => this.ctx.modeles[k] !== undefined).map((k) => [k, this.ctx.modeles[k]])) } : {}),
       },
       modules: corps.map((f) => ({ id: id(f.rel), path: f.rel, status: 'active' })),
     };

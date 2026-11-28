@@ -5,12 +5,15 @@
 // Usage, depuis la racine du dépôt :
 //   node specs/generateur-skill-ticket/outils/generer.mjs generer <dossier-arbre> --sortie <dossier>
 //        [--referentiel <chemin>] [--invariants-projet <chemin>] [--profondeur-max <n>] [--fabrique <nom>]
+//        [--modele-session <modèle> [--modele-observateur <modèle>]]
 //   node specs/generateur-skill-ticket/outils/generer.mjs verifier <transmission.md | dossier>... [--invariants-projet <chemin>]
 //
 // `generer` vérifie l'arbre (lot 1), construit les skills, contrôle leur héritage, puis écrit chaque
 // skill dans <sortie>/<nom>/ et sa transmission dans <sortie>/transmissions/. Rien n'est écrit au
 // moindre écart. `verifier` relit des transmissions et contrôle leur intégrité et leur héritage contre
-// les sources du dépôt. Code de sortie 1 au moindre écart, 2 pour un usage incorrect.
+// les sources du dépôt. `--modele-session` et `--modele-observateur`, facultatifs, nomment le modèle des
+// sessions de l'arbre et celui de son observateur d'ordre 3, qui en diffère (D11). Code de sortie 1 au
+// moindre écart, 2 pour un usage incorrect.
 
 import { readFileSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
@@ -19,7 +22,7 @@ import { FABRIQUES } from './fabrique.mjs';
 import { chargerProjet, generer, transmissionsDe, verifierTransmission } from './monteur.mjs';
 
 const USAGE = [
-  'Usage : generer.mjs generer <dossier-arbre> --sortie <dossier> [--referentiel <chemin>] [--invariants-projet <chemin>] [--profondeur-max <n>] [--fabrique <nom>]',
+  'Usage : generer.mjs generer <dossier-arbre> --sortie <dossier> [--referentiel <chemin>] [--invariants-projet <chemin>] [--profondeur-max <n>] [--fabrique <nom>]\n         [--modele-session <modèle> [--modele-observateur <modèle>]]',
   '        generer.mjs verifier <transmission.md | dossier>... [--invariants-projet <chemin>]',
 ].join('\n');
 
@@ -40,7 +43,7 @@ function lireOptions(reste, permises) {
 export function principal(argv, sortie = console.log, erreur = console.error) {
   const [commande, ...reste] = argv;
   if (commande === 'generer') {
-    const o = lireOptions(reste, ['--sortie', '--referentiel', '--invariants-projet', '--profondeur-max', '--fabrique']);
+    const o = lireOptions(reste, ['--sortie', '--referentiel', '--invariants-projet', '--profondeur-max', '--fabrique', '--modele-session', '--modele-observateur']);
     const profondeurMax = o['profondeur-max'] === undefined ? undefined : Number(o['profondeur-max']);
     if (o.erreur || o.positions.length !== 1 || !o.sortie || (profondeurMax !== undefined && !(profondeurMax >= 0)) || (o.fabrique && !FABRIQUES[o.fabrique])) {
       erreur(o.erreur ?? (o.fabrique && !FABRIQUES[o.fabrique] ? `fabrique inconnue : ${o.fabrique} (connues : ${Object.keys(FABRIQUES).join(', ')})` : USAGE));
@@ -48,6 +51,7 @@ export function principal(argv, sortie = console.log, erreur = console.error) {
     }
     const { erreurs, skills, sources } = generer({
       arbre: o.positions[0], sortie: o.sortie, referentiel: o.referentiel, invariantsProjet: o['invariants-projet'], profondeurMax, fabrique: o.fabrique,
+      modeles: o['modele-session'] === undefined && o['modele-observateur'] === undefined ? undefined : { session: o['modele-session'], observateur: o['modele-observateur'] },
     });
     if (erreurs.length > 0) {
       for (const e of erreurs) erreur(`ÉCHEC  ${e}`);
@@ -59,6 +63,7 @@ export function principal(argv, sortie = console.log, erreur = console.error) {
     }
     const o2 = sources.orchestrateur;
     sortie(`${pluriel(skills.length, 'skill')} de ticket dans ${relative(process.cwd(), resolve(o.sortie)) || '.'} : orchestrateur-c7e ${o2.version} (${o2.invariants.length} invariants), socle ${sources.socle.version}, java ${sources.experts.java.version}, angular ${sources.experts.angular.version}, invariants du projet ${sources.projet.from}`);
+    if (o['modele-session']) sortie(`modèles : sessions sur ${o['modele-session']}, observateur d'ordre 3 sur ${o['modele-observateur'] ?? 'le modèle de la session'}`);
     return 0;
   }
   if (commande === 'verifier') {

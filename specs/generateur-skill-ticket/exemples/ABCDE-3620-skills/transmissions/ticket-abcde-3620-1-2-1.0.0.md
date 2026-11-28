@@ -87,7 +87,7 @@ Suis `SKILL.md` à partir de sa section 4. Rien n'est modifié avant la ratifica
     ],
     "genere_par": {
       "generateur": "generateur-skill-ticket",
-      "version": "1.4.7",
+      "version": "1.5.0",
       "fabrique": "java-angular-postgresql",
       "orchestrateur": "3.8.7"
     }
@@ -171,7 +171,7 @@ version: 1.0.0
 
 # Skill de ticket ABCDE-3620-1.2
 
-> Produit par generateur-skill-ticket 1.4.7, fabrique `java-angular-postgresql`, référentiel des méso-contrats 3.3.0, orchestrateur-c7e 3.8.7. Ce skill remplace la fiche de transformation comme objet ratifié avant toute modification ; il reste identique à sa transmission. Si tu y relèves une ambiguïté ou une contradiction, signale-la au développeur ; ne corrige pas le skill toi-même.
+> Produit par generateur-skill-ticket 1.5.0, fabrique `java-angular-postgresql`, référentiel des méso-contrats 3.3.0, orchestrateur-c7e 3.8.7. Ce skill remplace la fiche de transformation comme objet ratifié avant toute modification ; il reste identique à sa transmission. Si tu y relèves une ambiguïté ou une contradiction, signale-la au développeur ; ne corrige pas le skill toi-même.
 
 ## 1. Place dans l'arbre
 
@@ -1613,8 +1613,8 @@ Précision du développeur, s'il y en a une : {{args}}
 
 Format compatible `sha256sum -c`, à exécuter depuis le dossier où les fichiers ont été matérialisés.
 
-    cd7b2a5b7cf1fa710733bf1c6fc45ab9ff92db9fa2c4843f1273a4f0d3f14e1f  manifest.json
-    b33f32fff3424c6eaa895c7cb5ac6581aced998e6657331fc6b0fa1566fd0e6f  SKILL.md
+    8e1f7bc0d4de83d2fd69a9716b542a2413e1bd2bb3c04b285e75d70b35cfac4c  manifest.json
+    5debb290eed8ace4acd59602655cc60c699a887d35c1c38844549dd4f3935a46  SKILL.md
     e24620fbd65e7bc734919478c2c0b2102dfb7b72dc3627cb6526feb01db37928  ticket.toml
     23e7fe61f9baacfa3d7d42fe655ddd8f1f631b600b3a8a05a7316ed22055052b  modules/meso-contrats/SKILL.md
     b90ce5e911d8aeb8a06e3e135a7c2569691f790d4000ca08d3b3eb0e1849aa85  modules/option-backend-endpoints/SKILL.md
